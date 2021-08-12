@@ -1,6 +1,8 @@
 # n9e-fe
 This is the web project for N9E
 
+## Online
+http://116.85.46.86/resource  (demo/demo.2021)
 ## Installation
 
 ```
