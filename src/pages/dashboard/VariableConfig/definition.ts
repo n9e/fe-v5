@@ -1,6 +1,6 @@
-import { Tag } from '@/store/chart';
+import { TagForVariable } from '@/store/chart';
 import { useTranslation } from 'react-i18next';
-export type TagDataItem = Tag & {
+export type TagDataItem = TagForVariable & {
   tagName: string;
   prefix: boolean;
 };
@@ -14,6 +14,7 @@ export interface TagFilterData {
 }
 export type TagFilterResponse = {
   tags: Array<TagDataItem>;
+  metric?: string;
   classpath_tagName?: string;
   classpath_id?: number | '*';
   classpath_prefix?: number;

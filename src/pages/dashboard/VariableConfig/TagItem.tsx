@@ -6,6 +6,7 @@ import { DeleteOutlined } from '@ant-design/icons';
 import { resourceGroupItem } from '@/store/businessInterface';
 import { TagDataItem } from './definition';
 import { useTranslation } from 'react-i18next';
+import MetricTable, { Metric } from '@/pages/metric/matric';
 import { debounce } from 'lodash';
 import {
   DEFAULT_CLASSPATH_DATA,
@@ -27,9 +28,9 @@ const TagItem: React.FC<ITagItemProps> = ({ tagData, index, isEditing }) => {
   const NAME_INVALID = t('变量名包含非法字符');
   const DEFAULT_VALUE = '*';
   const CLASS_PATH = 'classpath';
-  const CLASS_PATH_VALUE = t('classpath(资源分组)');
+  const CLASS_PATH_VALUE = 'classpath';
   const CLASS_PATH_PREFIX = 'classpath(prefix)';
-  const CLASS_PATH_PREFIX_VALUE = t('classpath(前缀匹配资源分组)');
+  const CLASS_PATH_PREFIX_VALUE = 'classpath_prefix';
   const [data, dispatch] = useContext(TagFilterStore);
   const [tagKeyOptions, setTagKeyOptions] = useState<string[]>([
     CLASS_PATH_VALUE,
@@ -72,6 +73,7 @@ const TagItem: React.FC<ITagItemProps> = ({ tagData, index, isEditing }) => {
     JSON.stringify(data.duplicateList),
     JSON.stringify(data.nonNameList),
     JSON.stringify(data.invalidList),
+    t,
   ]);
   useEffect(() => {
     // 仅是classpath内容回显, 避免id直接展示
@@ -125,6 +127,11 @@ const TagItem: React.FC<ITagItemProps> = ({ tagData, index, isEditing }) => {
     getTagKey({
       limit: PAGE_SIZE_OPTION_LARGE,
       tag_key: key,
+      params: [
+        {
+          metric: tagData.metric,
+        },
+      ],
     })
       .then((res) => {
         if (res.dat.keys) {
@@ -179,6 +186,11 @@ const TagItem: React.FC<ITagItemProps> = ({ tagData, index, isEditing }) => {
             limit: PAGE_SIZE_OPTION_LARGE,
             tag_key: tagData.key,
             tag_value: value,
+            params: [
+              {
+                metric: tagData.metric,
+              },
+            ],
             tags:
               determinedTagValues.length > 0 ? determinedTagValues : undefined,
           })
@@ -228,11 +240,11 @@ const TagItem: React.FC<ITagItemProps> = ({ tagData, index, isEditing }) => {
     });
   };
 
-  const handleClickPrefix = (e) => {
+  const handleMetricChange = (metric) => {
     dispatch({
       type: UPDATE_ITEM,
       index,
-      data: { ...tagData, prefix: e.target.checked },
+      data: { ...tagData, value: '', key: '', metric },
     });
   };
 
@@ -242,11 +254,19 @@ const TagItem: React.FC<ITagItemProps> = ({ tagData, index, isEditing }) => {
         <Col span={3}>
           <Input value={tagData.tagName} onChange={handleChangeName}></Input>
         </Col>
-        <Col span={3}>
+        <Col span={6}>
+          <MetricTable
+            onChange={handleMetricChange}
+            multiple={false}
+            value={tagData.metric}
+          />
+        </Col>
+        <Col span={4}>
           <Select
             style={{
               width: '100%',
             }}
+            disabled={!tagData.metric}
             onSearch={handleSearchTagkey}
             onChange={handleChangeTagkey}
             defaultActiveFirstOption={false}
@@ -265,11 +285,12 @@ const TagItem: React.FC<ITagItemProps> = ({ tagData, index, isEditing }) => {
             ))}
           </Select>
         </Col>
-        <Col span={3}>
+        <Col span={4}>
           <Select
             style={{
               width: '100%',
             }}
+            disabled={!tagData.metric}
             onSearch={handleSearchTagValue}
             onChange={handleChangeTagValue}
             defaultActiveFirstOption={false}
@@ -294,7 +315,7 @@ const TagItem: React.FC<ITagItemProps> = ({ tagData, index, isEditing }) => {
                 ))}
           </Select>
         </Col>
-        <Col span={3}>
+        <Col span={1}>
           <DeleteOutlined onClick={handleDeleteItem} className={'icon'} />
           {/* {tagData.key === CLASS_PATH_VALUE ? (
             <Checkbox
@@ -305,7 +326,7 @@ const TagItem: React.FC<ITagItemProps> = ({ tagData, index, isEditing }) => {
           ) : null} */}
         </Col>
         {errorTip && (
-          <Col span={4}>
+          <Col span={5}>
             <div className='error-tips'>{errorTip}</div>
           </Col>
         )}

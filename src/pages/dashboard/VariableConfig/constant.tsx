@@ -3,8 +3,8 @@ import { favoriteFrom } from '@/store/common';
 import React, { createContext } from 'react';
 import { TagDataItem } from './definition';
 
-export const CLASS_PATH_VALUE = 'classpath(资源分组)';
-export const CLASS_PATH_PREFIX_VALUE = 'classpath(前缀匹配资源分组)';
+export const CLASS_PATH_VALUE = 'classpath';
+export const CLASS_PATH_PREFIX_VALUE = 'classpath_prefix';
 export const DEFAULT_VALUE = '*';
 export const DEFAULT_NAME = 'var';
 

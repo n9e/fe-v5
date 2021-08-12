@@ -77,6 +77,7 @@ const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = (
     return classpath
       ? {
           tags: tagArray,
+          metric: classpath.metric,
           classpath_tagName: classpath?.tagName || '',
           classpath_id: classpath?.value ? classpath?.value : 0,
           classpath_prefix:
@@ -96,8 +97,13 @@ const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = (
 
     try {
       const jsonData = JSON.parse(originData);
-      const { tags, classpath_id, classpath_prefix, classpath_tagName } =
-        jsonData;
+      const {
+        tags,
+        classpath_id,
+        classpath_prefix,
+        classpath_tagName,
+        metric,
+      } = jsonData;
 
       if (
         typeof classpath_id !== 'undefined' &&
@@ -109,6 +115,7 @@ const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = (
             tagName: classpath_tagName,
             key: CLASS_PATH_VALUE,
             value: classpath_id,
+            metric,
             prefix: classpath_prefix === 1,
           }),
           hasClassPath: true,
@@ -159,8 +166,9 @@ const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = (
         {editing ? (
           <Row gutter={[6, 6]} className='tag-header'>
             <Col span={3}>{t('变量名')}</Col>
-            <Col span={3}>{t('标签或资源分组')}</Col>
-            <Col span={3}>{t('默认值')}</Col>
+            <Col span={6}>Filter metric</Col>
+            <Col span={4}>{t('标签或资源分组')}</Col>
+            <Col span={4}>{t('默认值')}</Col>
           </Row>
         ) : null}
         <div
