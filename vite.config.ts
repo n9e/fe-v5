@@ -19,7 +19,7 @@ export default defineConfig({
       // '/foo': 'http://localhost:4567/foo',
       // 选项写法
       '/api': {
-        target: 'http://10.86.76.13:8085',
+        target: 'http://116.85.69.138:8000',
         changeOrigin: true,
       },
       // 正则表达式写法
