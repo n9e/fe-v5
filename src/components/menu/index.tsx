@@ -67,7 +67,7 @@ const SideMenu: FC = () => {
           onClick={() => history.push('/overview')}
           key='overview'
         >
-          <img src={'/logo.png'} alt='' className='logo' />
+          <img src={'/image/logo.png'} alt='' className='logo' />
           <strong
             style={{
               lineHeight: '32px',

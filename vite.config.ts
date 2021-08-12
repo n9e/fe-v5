@@ -30,6 +30,9 @@ export default defineConfig({
       // }
     },
   },
+  build: {
+    outDir: 'pub',
+  },
   css: {
     preprocessorOptions: {
       less: {

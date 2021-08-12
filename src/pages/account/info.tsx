@@ -26,7 +26,7 @@ export default function Info() {
     (state) => state.account,
   );
   const [selectAvatar, setSelectAvatar] = useState<string>(
-    profile.portrait || '/avatar1.png',
+    profile.portrait || '/image/avatar1.png',
   );
   const [customAvatar, setCustomAvatar] = useState('');
   const dispatch = useDispatch();
@@ -125,7 +125,7 @@ export default function Info() {
   const avatarList = new Array(8).fill(0).map((_, i) => i + 1);
 
   const handleImgClick = (i) => {
-    setSelectAvatar(`/avatar${i}.png`);
+    setSelectAvatar(`/image/avatar${i}.png`);
   };
 
   return (
@@ -260,7 +260,7 @@ export default function Info() {
           </Col>
           <Col span={4}>
             <div className='avatar'>
-              <img src={profile.portrait || '/avatar1.png'} />
+              <img src={profile.portrait || '/image/avatar1.png'} />
               <Button
                 type='primary'
                 className='update-avatar'
@@ -285,13 +285,13 @@ export default function Info() {
               <div
                 key={i}
                 className={
-                  `/avatar${i}.png` === selectAvatar
+                  `/image/avatar${i}.png` === selectAvatar
                     ? 'avatar active'
                     : 'avatar'
                 }
                 onClick={() => handleImgClick(i)}
               >
-                <img src={`/avatar${i}.png`} />
+                <img src={`/image/avatar${i}.png`} />
               </div>
             );
           })}
