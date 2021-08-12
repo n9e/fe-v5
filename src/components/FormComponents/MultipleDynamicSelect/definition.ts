@@ -21,9 +21,11 @@ export interface IBaseSearchTag {
 }
 export interface ISearchTagKeyParams extends IBaseSearchTag {
   tag_key?: string;
+  params?: { metric: string }[];
 }
 export interface ISearchTagValueParams extends IBaseSearchTag {
   tag_value?: string;
   tag_key?: string;
   tags?: TagType[];
+  params?: { metric: string }[];
 }

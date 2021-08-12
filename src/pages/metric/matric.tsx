@@ -14,6 +14,8 @@ interface Column {
   dataIndex: string;
 }
 interface Props {
+  value?: string;
+  multiple?: boolean;
   onChange: Function;
   idents?: Array<string>;
 }
@@ -22,9 +24,12 @@ export interface Metric {
   description: string;
 }
 
-const MetricTable = ({ onChange, idents }: Props, ref: any) => {
+const MetricTable = (
+  { onChange, idents, multiple = true, value }: Props,
+  ref: any,
+) => {
   const { t } = useTranslation();
-  const [selMetrics, setSelMetrics] = useState<Metric[]>([]);
+  const [selMetrics, setSelMetrics] = useState<Metric[] | string>([]);
   const [metrics, setMetrics] = useState<Metric[]>([]);
   const [historyMetrics, setHistoryMetrics] = useState<Metric[]>([]);
   // useEffect(() => {
@@ -33,6 +38,10 @@ const MetricTable = ({ onChange, idents }: Props, ref: any) => {
   useEffect(() => {
     getMetrics();
   }, [JSON.stringify(idents)]);
+
+  useEffect(() => {
+    value && setSelMetrics(value);
+  }, [value]);
 
   const getMetrics = (query = '') => {
     if (query.length > 0 && query.length < 4) return; //因为后端性能问题，必须传入4字符才发起检索
@@ -51,11 +60,14 @@ const MetricTable = ({ onChange, idents }: Props, ref: any) => {
 
   const handleSelectChange = (select) => {
     setSelMetrics(select); // 因为要把description展示在chart上所以反选出该对象；antd的 Select中的value不能为对象？
-
-    let matricObjList = select.map((item) => {
-      return historyMetrics.find((i) => i.name === item); // search之后metrics中不包含select的所有项，所以反查会丢项，需要记录所有查询过的metrics来反查
-    });
-    onChange(matricObjList);
+    if (multiple) {
+      let matricObjList = select.map((item) => {
+        return historyMetrics.find((i) => i.name === item); // search之后metrics中不包含select的所有项，所以反查会丢项，需要记录所有查询过的metrics来反查
+      });
+      onChange(matricObjList);
+    } else {
+      onChange(select);
+    }
   };
 
   const handleSearch = debounce((value) => {
@@ -71,7 +83,7 @@ const MetricTable = ({ onChange, idents }: Props, ref: any) => {
   return (
     <>
       <Select
-        mode='multiple'
+        mode={multiple ? 'multiple' : undefined}
         style={{
           width: '100%',
         }}
@@ -85,7 +97,8 @@ const MetricTable = ({ onChange, idents }: Props, ref: any) => {
             getMetrics();
           }
         }}
-        filterOption={false}
+        // filterOption={false}
+        showSearch
         dropdownClassName='overflow-586'
       >
         {metrics.map((item, i) => {

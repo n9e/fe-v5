@@ -69,6 +69,10 @@ export interface Tag {
   value: string;
 }
 
+export interface TagForVariable extends Tag {
+  metric: string;
+}
+
 export interface Param {
   start: number;
   end: number;
