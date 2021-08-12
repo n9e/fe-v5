@@ -5,7 +5,7 @@ import DateRangePicker from '@/components/DateRangePicker';
 import {
   ReloadOutlined,
   RollbackOutlined,
-  FormOutlined,
+  EditOutlined,
   FileAddOutlined,
 } from '@ant-design/icons';
 import { Button, Input, Form, Modal, Divider, message } from 'antd';
@@ -212,7 +212,7 @@ export default function DashboardDetail() {
             ) : (
               <div className='title'>{dashboard.name}</div>
             )}
-            <FormOutlined className='edit' onClick={handleEdit} />
+            <EditOutlined className='edit' onClick={handleEdit} />
           </div>
           <div className='dashboard-detail-header-right'>
             <RefreshIcon
