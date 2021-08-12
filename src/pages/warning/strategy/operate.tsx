@@ -189,13 +189,14 @@ const StrategyOperate: React.FC = () => {
           if (curStrategyObj?.expression?.trigger_conditions?.length > 0) {
             initTriggerConditions =
               curStrategyObj?.expression?.trigger_conditions;
-          }
-          const curMetricList =
-            curStrategyObj?.expression?.trigger_conditions.map(
-              (item) => item.metric,
-            );
 
-          fetchTagKey(curMetricList);
+            const curMetricList =
+              curStrategyObj?.expression?.trigger_conditions.map(
+                (item) => item.metric,
+              );
+
+            fetchTagKey(curMetricList);
+          }
 
           if (curStrategyObj?.expression?.res_filters?.length > 0) {
             initResourceFilterConditions =
