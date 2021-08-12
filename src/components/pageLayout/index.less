@@ -1,0 +1,30 @@
+@import '@/global.variable.less';
+
+.page-wrapper {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .page-top-header {
+    width: 100%;
+    .page-header-title {
+      font-size: @baseFontSizeLarge;
+      color: black;
+      font-weight: bold;
+      font-size: 17px;
+      .anticon {
+        margin-right: 10px;
+      }
+    }
+    .page-header-right-area {
+    }
+    .page-header-content {
+      flex: 1;
+      width: 100%;
+      padding: 20px 20px;
+      border-bottom: 1px solid @baseBorderColor;
+      display: flex;
+      justify-content: space-between;
+    }
+  }
+}

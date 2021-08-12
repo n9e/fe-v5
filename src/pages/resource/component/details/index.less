@@ -1,0 +1,43 @@
+@import '@/global.variable.less';
+
+.detail-content {
+  .ant-select {
+    width: 300px;
+  }
+  .ant-tabs-tab {
+    padding: 12px 20px;
+  }
+  input {
+    width: 300px;
+  }
+  .ant-card-head {
+    background-color: #e0dee294;
+  }
+  .hoverInput:hover > .anticon-edit {
+    visibility: inherit;
+  }
+  .anticon-edit {
+    visibility: hidden;
+  }
+
+  .detail-tooltipIcon {
+    position: absolute;
+    font-size: 19px;
+    top: 6px;
+    left: -32px;
+  }
+  .clear-button {
+    color: @fontColorDanger;
+    border-color: @fontColorDanger;
+  }
+  .row-style {
+    line-height: 32px;
+    margin-bottom: 4px;
+  }
+  .row-style:hover {
+    .detail-mute-time {
+      color: #333;
+      visibility: inherit;
+    }
+  }
+}

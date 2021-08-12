@@ -1,0 +1,31 @@
+.indicator-index {
+  padding: 0 20px;
+  .indicator-operations {
+    margin: 20px 0 0 0;
+    display: flex;
+    justify-content: space-between;
+  }
+  .indicator-main {
+    .ant-table-cell {
+      .operations {
+        cursor: pointer;
+        color: @fontColorBlue;
+        .edit-save {
+          margin-right: 10px;
+        }
+        .ant-popover-inner-content {
+          padding: 6px 8px;
+        }
+      }
+      .delete {
+        color: @fontColorDanger;
+        margin-left: 10px;
+      }
+    }
+
+    .ant-pagination {
+      text-align: right;
+      margin-top: 10px;
+    }
+  }
+}
