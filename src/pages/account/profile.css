@@ -1,0 +1,49 @@
+.profile {
+  padding: 20px;
+  .ant-tabs-content {
+    padding: 20px 40px;
+  }
+  .avatar{
+    display: flex;
+    flex-direction: column;
+    align-content: flex-start;
+    justify-content: space-evenly;
+    align-items: center;
+    img{
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+    }
+  }
+  .ant-form-item-control{
+    width: 600px;
+  }
+  .update-avatar{
+    margin-top: 20px;
+  }
+}
+.avatar-modal{
+  .avatar-content{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .avatar{
+    display: flex;
+    flex-direction: column;
+    width: 100px;
+    &.active{
+      img{
+        border: 2px solid blue;
+      }
+    }
+    img{
+      padding: 3px;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      margin-bottom: 10px;
+    }
+  }
+}

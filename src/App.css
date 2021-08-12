@@ -1,0 +1,46 @@
+#root,
+.App {
+  height: 100%;
+}
+
+html.ant-scrolling-effect, .App {
+  font-family: verdana, Microsoft YaHei, Consolas, Deja Vu Sans Mono,
+    Bitstream Vera Sans Mono;
+  display: flex;
+  color: #333;
+  .ant-menu-inline-collapsed {
+    width: 50px;
+  }
+  .content {
+    flex: 1;
+    height: 100%;
+    overflow: auto;
+  }
+  .ant-table .ant-table-tbody td {
+    line-height: 24px;
+    padding-top:2px;
+    padding-bottom: 2px;
+  }
+
+  .table-handle {
+    display: flex;
+    justify-content: space-between;
+    &-buttons {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .table-more-options {
+      .ant-btn {
+        margin-left: 8px;
+      }
+    }
+  }
+  .searchInput {
+    width: 300px;
+  }
+  .ant-pagination-total-text {
+    line-height: 32px;
+    margin-right: 16px;
+  }
+}

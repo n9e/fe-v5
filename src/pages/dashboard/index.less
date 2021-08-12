@@ -1,0 +1,76 @@
+.dashboard {
+  padding: 20px;
+}
+
+.dashboard-detail-header {
+  display: flex;
+  height: 51px;
+  justify-content: space-between;
+  padding: 12px 20px;
+  border-bottom: 1px solid @baseBorderColor;
+  &-left {
+    display: flex;
+    align-items: center;
+    .back {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      margin-right: 15px;
+      &:hover {
+        color: @colorBlue;
+      }
+    }
+    .title {
+      font-size: @baseFontSizeLarge;
+      color: black;
+      font-weight: bold;
+    }
+    .edit {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      margin-left: 15px;
+      color: @colorGray3;
+    }
+  }
+  &-right {
+    display: flex;
+    & > button {
+      margin-right: 10px;
+    }
+  }
+}
+
+.dashboard-detail-content {
+  background: #f6f5f6;
+  height: 100%;
+  .variable-area {
+    padding: 10px 20px;
+    background: @colorWhite;
+    display: flex;
+  }
+  .charts {
+    padding: 15px 20px;
+    .ant-collapse {
+      margin-bottom: 15px;
+    }
+    .ant-collapse-header {
+      font-size: @baseFontSizeTiny;
+      height: 40px;
+    }
+    .ant-collapse-extra {
+      margin-top: -3px;
+      button {
+        font-size: @baseFontSizeTiny;
+      }
+    }
+    .ant-collapse-content-box {
+      display: flex;
+      padding: 2px;
+      .empty-group-holder {
+        flex: 1;
+        text-align: center;
+      }
+    }
+  }
+}

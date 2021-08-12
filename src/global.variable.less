@@ -1,0 +1,119 @@
+@colorWhite: #fff;
+@colorBlack: #000;
+@colorGray1: #333;
+@colorGray2: #f0f0f0;
+@colorGray3: #999;
+@colorGray4: #666;
+@colorGray5: #f6f5f6;
+@colorGray6: #f3f6f9;
+@colorGray7: #e6e5e7;
+@colorRed1: #ff5656;
+@colorRed2: #f53146;
+@colorRed3: #fdebed;
+@colorBlue: #1473ff;
+@colorLightBlue: #d4ecf9;
+@colorDarkBlue: #005fb6;
+@colorOrange: #fed738;
+@colorWarning: #e6a23c;
+@colorDanger: #ff5656;
+@colorDangerBackground: @colorRed3;
+
+@baseFontSizeTiny: 12px;
+@baseFontSizeSmall: 14px;
+@baseFontSizeMiddle: 18px;
+@baseFontSizeLarge: 24px;
+
+@fontColorLevel1: @colorBlack;
+@fontColorLevel2: @colorGray1;
+@fontColorLevel3: rgba(0, 0, 0, 0.85);
+@fontColorLevel4: rgba(0, 0, 0, 0.65);
+@fontColorBlue: @colorBlue;
+@fontColorWarning: @colorWarning;
+@fontColorDanger: @colorDanger;
+
+@basePadding: 12px 24px 0 24px;
+
+@baseBorderColor: #d2d6dc;
+
+@baseTransition: transform 0.15s cubic-bezier(0.55, 0, 0.1, 1);
+@panelBackground: #f6f5f6;
+
+.table-active-text {
+  color: @colorBlue;
+  cursor: pointer;
+}
+.table-operator-area {
+  display: flex;
+  flex-direction: row;
+  div {
+    cursor: pointer;
+    margin-right: 8px;
+  }
+  &-normal {
+    color: @colorBlue;
+  }
+  &-warning {
+    color: @colorRed2;
+  }
+}
+// input
+input::placeholder {
+  // font-size: 12px;
+  line-height: 18px;
+}
+// table
+.ant-table {
+  margin-top: 10px;
+  border: 1px solid #dbdee3;
+  border-radius: 2px;
+  .ant-table-thead th {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    color: #666;
+    // font-size: 12px;
+  }
+  .ant-table-tbody {
+    td {
+      height: 40px;
+      line-height: 40px;
+      border-top: 1px solid #dbdee3;
+      border-bottom: none;
+      padding-top: 0;
+      padding-bottom: 0;
+      color: #666;
+      // font-size: 12px;
+    }
+    .ant-table-expanded-row {
+      .ant-table-wrapper {
+        overflow: hidden;
+      }
+      .ant-table {
+        margin: 0 0 10px;
+      }
+    }
+  }
+}
+
+// select
+.ant-select-selection-placeholder {
+  font-size: 12px;
+}
+.ant-select {
+  .overflow-586 {
+    min-width: 586px !important;
+  }
+  .overflow-230 {
+    min-width: 230px !important;
+  }
+}
+
+// input
+.ant-input {
+  height: 32px;
+}
+.ant-input-affix-wrapper {
+  height: 32px;
+  .ant-input {
+    height: auto;
+  }
+}

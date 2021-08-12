@@ -1,0 +1,28 @@
+ .home {
+  width: 200px;
+  &.collapse {
+    width: 50px;
+    padding-left: 0px;
+    .name {
+      display: none;
+    }
+  }
+  transition: width 0.3s cubic-bezier(0.2, 0, 0, 1) 0s;
+  display: flex;
+  height: 60px;
+  background: #001529;
+  padding-top: 14px;
+  padding-left: 24px;
+  strong {
+    color: #fff;
+    margin-left: 10px;
+  }
+  .name {
+    flex: 1;
+  }
+  .collapseBtn {
+    width: 50px;
+    background: #001529;
+    border-color: #001529;
+  }
+}
