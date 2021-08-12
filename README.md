@@ -15,6 +15,7 @@ npm install
 npm run dev
 ```
 The api service of the development is from a testing mechine, you can use your n9e api instead of it.
+
 You can login with `root/root.2020`.
 ## Build
 
@@ -22,5 +23,10 @@ You can login with `root/root.2020`.
 npm run build
 ```
 
+## Notice
+
+- `vite.config.js` and `tsconfig.json` should both configure to make sure alias works
+- Add `"css.validate": false` in vscode setting.json to ignore the css warning 
+
 ## Usage
-The pub folder after built can work in the [n9e](https://github.com/didi/nightingale) 
+The built pub folder can work in the [n9e](https://github.com/didi/nightingale) 
