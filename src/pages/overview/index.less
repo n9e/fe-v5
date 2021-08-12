@@ -1,0 +1,155 @@
+@import '@/global.variable.less';
+
+.overview_con {
+  p {
+    margin: 0;
+  }
+  .float_r {
+    float: right;
+    margin-right: 4px;
+  }
+  .clearfix::after {
+    content: '';
+    display: block;
+    visibility: hidden;
+    clear: both;
+  }
+  .red {
+    color: red;
+  }
+  .ant-input-number {
+    width: 100%;
+  }
+  background: #eee;
+  width: 100%;
+  padding: 10px;
+  .part {
+    background: #fff;
+    padding: 20px;
+    margin-bottom: 10px;
+    .title {
+      padding-bottom: 10px;
+      font-size: 16px;
+      font-weight: 400;
+      color: #101724;
+      line-height: 24px;
+    }
+  }
+}
+// statistics 样式
+.statistics_con {
+  padding: 0 18px;
+  .statistics_icon {
+    font-size: 48px;
+  }
+  .name {
+    font-size: 14px;
+    color: #5d6d91;
+    line-height: 22px;
+  }
+  .num {
+    font-size: 28px;
+    color: #101724;
+    letter-spacing: 0;
+    line-height: 28px;
+  }
+  .unit {
+    font-size: 12px;
+    color: #a8adbd;
+    line-height: 20px;
+  }
+}
+
+.indicator_part {
+  .ant-table-wrapper {
+    cursor: pointer;
+    overflow: hidden;
+    &:hover {
+      overflow: auto;
+    }
+    height: 200px;
+    border: 1px solid #dbdee3;
+  }
+  .ant-table {
+    margin-top: 0;
+    border-top: 0;
+    border-left: 0;
+    border-right: 0;
+    &.ant-table-empty {
+      border: 0;
+    }
+    .ant-table-thead > tr > th {
+      background: #fff;
+    }
+  }
+  .ant-select-single:not(.ant-select-customize-input) .ant-select-selector {
+    background: #f8fafd;
+  }
+  .ant-select-selector {
+    background: #f8fafd;
+  }
+  .table_select {
+    width: 100%;
+  }
+}
+
+.event_part {
+  .event_t {
+    overflow: hidden;
+    padding-bottom: 10px;
+    .enterEventBtn {
+      float: right;
+    }
+  }
+  .list {
+    width: 200px;
+    height: 76px;
+    padding: 10px 20px;
+    box-sizing: border-box;
+    border: 1px solid #dcdfe6;
+    border-radius: 4px;
+    border-left: 3px solid #ef645c;
+    position: relative;
+    .list_icon {
+      position: absolute;
+      right: 16px;
+      bottom: 0px;
+      font-size: 40px;
+      opacity: 0.18;
+    }
+    &.week_part {
+      border-left: 3px solid #f48f38;
+    }
+    &.month_part {
+      border-left: 3px solid #f4cd38;
+    }
+    .title {
+      font-size: 14px;
+      color: #5d6d91;
+      line-height: 22px;
+    }
+    .name {
+      font-size: 14px;
+      color: #5d6d91;
+      line-height: 22px;
+      padding-bottom: 5px;
+    }
+    .num {
+      font-size: 28px;
+      color: #101724;
+      line-height: 28px;
+    }
+  }
+  .refresh_con {
+    padding-top: 30px;
+    font-size: 12px;
+    color: #303a51;
+    line-height: 20px;
+    .refresh_icon {
+      margin-top: 10px;
+    }
+  }
+  .ant-table-content {
+    overflow-x: auto;
+  }
+}
