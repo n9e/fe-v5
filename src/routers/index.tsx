@@ -42,15 +42,15 @@ export default function Content() {
     dispatch({ type: 'account/getProfile' });
   }
 
-  // this is a workaround for D3Chart, it's destroy function has some problem
-  useEffect(() => {
-    const chartTooltip = document.querySelectorAll('.ts-graph-tooltip');
-    if (chartTooltip.length > 0) {
-      chartTooltip.forEach((item) => {
-        item.remove();
-      });
-    }
-  }, [location]);
+  // // this is a workaround for D3Chart, it's destroy function has some problem
+  // useEffect(() => {
+  //   const chartTooltip = document.querySelectorAll('.ts-graph-tooltip');
+  //   if (chartTooltip.length > 0) {
+  //     chartTooltip.forEach((item) => {
+  //       item.remove();
+  //     });
+  //   }
+  // }, [location]);
 
   return (
     <div className='content'>

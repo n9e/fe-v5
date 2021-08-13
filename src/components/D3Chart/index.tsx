@@ -237,11 +237,13 @@ function Chart(props: Props) {
     initChart(privateTags);
   }, [options, multi, sort, tooltipFormat]);
 
-  // useEffect(() => {
-  //   return () => {
-  //     instance && instance.destroy();
-  //   };
-  // });
+  // each chart is mounted once, when props and state change, the instance will update.
+  // so below hook only run once.
+  useEffect(() => {
+    return () => {
+      instance && instance.destroy();
+    };
+  }, [instance]);
 
   const handleRefresh = (e) => {
     if (refreshing) return;
