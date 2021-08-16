@@ -723,8 +723,9 @@ const StrategyOperate: React.FC = () => {
                             fields.map((field, index) => (
                               <Row gutter={[10, 10]} key={field.key}>
                                 <TagFilterConditionComponent
-                                  field={field} // initObj={initTagFilterConditions[field.key]}
+                                  field={field}
                                   tagKeys={tagKeys}
+                                  form={form}
                                   curMetric={allMetrics?.[0] || ''}
                                 />
                                 <Col span={1}>

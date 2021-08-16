@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Form, Select, AutoComplete, Col } from 'antd';
+import { Form, Select, AutoComplete, Col, FormInstance } from 'antd';
 import { tagFilterConditions } from '../../const';
 import { getTagKeys, getTagValuesByKey } from '@/services/warning';
 import _ from 'lodash';
 import { useTranslation } from 'react-i18next';
+import { FormListFieldData } from 'antd/lib/form/FormList';
+import { Metric } from '@/store/warningInterface';
+
 type tagFilterCondition = {
   value: string;
   multiple: boolean;
@@ -12,10 +15,16 @@ const multipleFuncs = tagFilterConditions
   .filter((r) => r.multiple)
   .map((r) => r.value);
 
-const TagFilterCondition = (props) => {
+interface Props {
+  field: FormListFieldData;
+  tagKeys: string[];
+  curMetric: Metric;
+  form: FormInstance;
+}
+const TagFilterCondition = (props: Props) => {
   const { t } = useTranslation();
   const { Option } = Select;
-  const { tagKeys, field, initObj } = props;
+  const { tagKeys, field, form } = props;
   const [tagValues, setTagValues] = useState<Array<string>>([]);
   const [fuzzySearchKeyOptions, setFuzzySearchKeyOptions] = useState<
     {
@@ -29,9 +38,7 @@ const TagFilterCondition = (props) => {
   >([]);
   const [fuzzySearchKey, setFuzzySearchKey] = useState('');
   const [fuzzySearchValue, setFuzzySearchValue] = useState('');
-  const [func, setFunc] = useState(
-    initObj?.func || tagFilterConditions[0].value,
-  ); // console.log('tagKeys', tagKeys, tagValues);
+  const [func, setFunc] = useState();
 
   const tagFilterConditionOptions = tagFilterConditions.map(
     (c: tagFilterCondition) => (
@@ -41,9 +48,9 @@ const TagFilterCondition = (props) => {
     ),
   );
   useEffect(() => {
-    if (!initObj?.key || tagKeys?.length === 0) return;
+    if (tagKeys?.length === 0) return;
     getTagValuesByKey({
-      tag_key: initObj?.key || tagKeys[0],
+      tag_key: tagKeys[0],
       params: [
         {
           metric: props.curMetric || '',
@@ -131,18 +138,10 @@ const TagFilterCondition = (props) => {
   const handleFuzzySearchTagValue = (v) => {
     debouncedGetTagValues(v);
   };
-
-  const changeFunc = (v) => {
-    setFunc(v);
-  };
-
   return (
     <>
       <Col span={8}>
-        <Form.Item
-          name={[field.name, 'key']}
-          initialValue={initObj?.key || tagKeys?.[0]}
-        >
+        <Form.Item name={[field.name, 'key']} initialValue={tagKeys?.[0]}>
           <AutoComplete
             placeholder={t('请输入标签key')}
             onChange={handleChangeTagKey}
@@ -160,19 +159,20 @@ const TagFilterCondition = (props) => {
       <Col span={7}>
         <Form.Item
           name={[field.name, 'func']}
-          initialValue={initObj?.func || tagFilterConditions?.[0]?.value}
+          initialValue={tagFilterConditions[0].value}
         >
-          <Select value={func} onChange={changeFunc}>
-            {tagFilterConditionOptions}
-          </Select>
+          <Select>{tagFilterConditionOptions}</Select>
         </Form.Item>
       </Col>
+
       <Col span={7}>
-        <Form.Item
-          name={[field.name, 'params']}
-          initialValue={initObj?.params || tagValues?.[0]}
-        >
-          {multipleFuncs.includes(func) ? (
+        {multipleFuncs.includes(
+          form.getFieldValue(['tags_filters', field.name, 'func']),
+        ) ? (
+          <Form.Item
+            name={[field.name, 'params']}
+            initialValue={tagValues?.[0]}
+          >
             <Select
               mode='tags'
               placeholder={t('请输入标签value')}
@@ -190,7 +190,9 @@ const TagFilterCondition = (props) => {
                     </Option>
                   ))}
             </Select>
-          ) : (
+          </Form.Item>
+        ) : (
+          <Form.Item name={[field.name, 'params', 0]}>
             <AutoComplete
               onSearch={handleFuzzySearchTagValue}
               options={
@@ -201,8 +203,8 @@ const TagFilterCondition = (props) => {
                     }))
               }
             ></AutoComplete>
-          )}
-        </Form.Item>
+          </Form.Item>
+        )}
       </Col>
     </>
   );
