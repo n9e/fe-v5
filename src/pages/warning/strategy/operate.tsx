@@ -283,7 +283,6 @@ const StrategyOperate: React.FC = () => {
         let initTagFilterConditions = [];
 
         if (curStrategyObj) {
-          console.log(curStrategyObj?.expression?.tags_filters);
           curStrategyObj?.expression?.tags_filters?.length > 0 &&
             (initTagFilterConditions =
               curStrategyObj?.expression?.tags_filters);
