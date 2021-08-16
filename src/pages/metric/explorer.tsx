@@ -216,7 +216,7 @@ export default function Explorer({ resourceGroupId, isIdent }: IExplorerProps) {
                 {metrics.length > 0
                   ? metrics.map((metric, i) => {
                       return (
-                        <Col key={i} span={24 / numPerLine}>
+                        <Col key={metric.name} span={24 / numPerLine}>
                           <D3Chart
                             cached
                             options={{
