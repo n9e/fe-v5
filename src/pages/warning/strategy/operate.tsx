@@ -283,6 +283,7 @@ const StrategyOperate: React.FC = () => {
         let initTagFilterConditions = [];
 
         if (curStrategyObj) {
+          console.log(curStrategyObj?.expression?.tags_filters);
           curStrategyObj?.expression?.tags_filters?.length > 0 &&
             (initTagFilterConditions =
               curStrategyObj?.expression?.tags_filters);
@@ -723,8 +724,9 @@ const StrategyOperate: React.FC = () => {
                             fields.map((field, index) => (
                               <Row gutter={[10, 10]} key={field.key}>
                                 <TagFilterConditionComponent
-                                  field={field} // initObj={initTagFilterConditions[field.key]}
+                                  field={field}
                                   tagKeys={tagKeys}
+                                  form={form}
                                   curMetric={allMetrics?.[0] || ''}
                                 />
                                 <Col span={1}>
