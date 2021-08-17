@@ -82,6 +82,26 @@ const TagFilterCondition = (props: Props) => {
   );
 
   const handleChangeTagKey = (v) => {
+    if (
+      multipleFuncs.includes(
+        form.getFieldValue(['tags_filters', field.name, 'func']),
+      )
+    ) {
+      form.setFields([
+        {
+          name: ['tags_filters', field.name, 'params'],
+          value: [],
+        },
+      ]);
+    } else {
+      form.setFields([
+        {
+          name: ['tags_filters', field.name, 'params', 0],
+          value: '',
+        },
+      ]);
+    }
+
     debouncedChangeTagKey(v);
   };
 
@@ -195,6 +215,11 @@ const TagFilterCondition = (props: Props) => {
           <Form.Item name={[field.name, 'params', 0]}>
             <AutoComplete
               onSearch={handleFuzzySearchTagValue}
+              onFocus={(e) => {
+                debouncedChangeTagKey(
+                  form.getFieldValue(['tags_filters', field.name, 'key']),
+                );
+              }}
               options={
                 fuzzySearchValue
                   ? fuzzySearchValueOptions
