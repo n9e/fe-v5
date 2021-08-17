@@ -63,7 +63,9 @@ const BaseTabTable: refFunction = function <RecordType>(
     }
   }, [activeKey, currentKey, init, currentGroup]);
   useEffect(() => {
-    refreshList(); //前端分页,所以修改prefix 手动触发刷新
+    if (init) {
+      refreshList(); //前端分页,所以修改prefix 手动触发刷新
+    }
   }, [prefix]);
   useEffect(() => {
     setSelectRowKeys([]);
@@ -85,7 +87,7 @@ const BaseTabTable: refFunction = function <RecordType>(
     getResourceGroups().then((res) => {
       setResourceList(res.dat.list);
     });
-  }, [selectRowKeys]);
+  }, [JSON.stringify(selectRowKeys)]);
   const getTableProps: () => IBaseTableProps<RecordType> = useCallback(() => {
     return {
       fetchParams: {
