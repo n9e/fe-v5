@@ -90,7 +90,7 @@ export default function Dashboard() {
     let { name, tags } = form.getFieldsValue();
     return createDashboard({
       name,
-      tags: tags.join(' '),
+      tags: tags && tags.length > 0 ? tags.join(' ') : '',
     });
   };
 
@@ -103,7 +103,7 @@ export default function Dashboard() {
           cloneId,
           {
             name,
-            tags: tags.join(' '),
+            tags: tags && tags.length > 0 ? tags.join(' ') : '',
           },
           {
             configs: dat.configs,
