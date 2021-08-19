@@ -11,17 +11,18 @@ import { useTranslation } from 'react-i18next';
 const Resource: React.FC = () => {
   const { t } = useTranslation();
   return (
-    // <PageLayout
-    //   icon={<DatabaseOutlined />}
-    //   title={'资源管理'}
-    //   // rightArea={
-    //   //   <FormButtonModal {...createResourceGroupModal()}></FormButtonModal>
-    //   // }
-    // >
-    <div className='resource-content'>
-      <LeftTree pageTitle={t('资源管理')} typeName={t('资源分组')}></LeftTree>
-      <PageTable></PageTable>
-    </div> // </PageLayout>
+    <PageLayout
+      title={t('资源管理')}
+      icon={<DatabaseOutlined />}
+      //   // rightArea={
+      //   //   <FormButtonModal {...createResourceGroupModal()}></FormButtonModal>
+      //   // }
+    >
+      <div className='resource-content'>
+        <LeftTree pageTitle={t('资源管理')} typeName={t('资源分组')}></LeftTree>
+        <PageTable></PageTable>
+      </div>
+    </PageLayout>
   );
 };
 

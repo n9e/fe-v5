@@ -7,23 +7,60 @@
 
   .page-top-header {
     width: 100%;
+
     .page-header-title {
       color: black;
       font-weight: bold;
-      font-size: @baseFontSizeMiddle;
+      font-size: 16px;
       .anticon {
         margin-right: 10px;
       }
     }
     .page-header-right-area {
+      display: flex;
+      align-items: center;
+      .language {
+        margin-right: 20px;
+        height: 20px;
+        line-height: 23px;
+        cursor: pointer;
+      }
+      .avator {
+        line-height: @baseFontSizeMiddle;
+        img {
+          width: @baseFontSizeMiddle;
+          height: @baseFontSizeMiddle;
+          border-radius: 50%;
+          transform: scale(1.5);
+          margin-right: 10px;
+          vertical-align: text-bottom;
+          display: inline-block;
+          // background: url('/image/avatar1.png') 100% 100% / cover;
+        }
+        .display-name {
+          padding-left: 10px;
+          padding-right: 10px;
+        }
+      }
     }
     .page-header-content {
       flex: 1;
       width: 100%;
-      padding: 20px 20px;
-      border-bottom: 1px solid @baseBorderColor;
+      height: 50px;
+      padding: 10px 20px;
       display: flex;
       justify-content: space-between;
+      align-items: center;
+    }
+
+    & + div {
+      overflow: auto;
+      padding: 10px;
+      background: #eee;
+      height: 100%;
+      & > * {
+        background: #fff;
+      }
     }
   }
 }

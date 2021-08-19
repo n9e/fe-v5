@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './App.css';
+import './App.less';
 import 'antd/dist/antd.less';
 import './global.variable.less';
 import { Provider } from 'react-redux';
@@ -25,6 +25,12 @@ function App() {
           }
           return document.body;
         }}
+        renderEmpty={() => (
+          <div style={{ padding: 20 }}>
+            <img src='/image/empty.png' width='64' />
+            <div className='ant-empty-description'>暂无数据</div>
+          </div>
+        )}
       >
         <Provider store={store as any}>
           <Router>

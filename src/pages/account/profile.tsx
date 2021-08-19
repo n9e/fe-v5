@@ -3,7 +3,7 @@ import { Tabs } from 'antd';
 import ChangePassword from './changePassword';
 import Info from './info';
 import SecretKey from './secretKey';
-import './profile.css';
+import './profile.less';
 import PageLayout from '@/components/pageLayout';
 import { useParams, useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';

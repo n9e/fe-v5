@@ -323,6 +323,8 @@
   "组件采集信息": "Component Collection",
   "端口信息": "Port",
   "复制已选项": "Copied successfully",
+  "复制": "Copied ",
+  "条数据到剪贴板": " records",
   "请先选择资源标识": "Select the resource logo first",
   "是否移除该资源?": "Remove this resource from the classpath?",
   "移除": "Unbind",

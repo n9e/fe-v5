@@ -11,6 +11,7 @@ import { SetTmpChartData } from '@/services/metric';
 import '@d3-charts/ts-graph/dist/index.css';
 import './index.less';
 import { useTranslation } from 'react-i18next';
+import PageLayout from '@/components/pageLayout';
 import type {
   ChartComponentProps,
   Param,
@@ -125,16 +126,16 @@ export default function Explorer({ resourceGroupId, isIdent }: IExplorerProps) {
     </h2>
   );
 
-  return (
+  const content = (
     <div className='explore'>
       <Row>
         <Col className='left' span={8}>
-          {!isIdent ? (
-            <div className={'page-title'}>
-              <LineChartOutlined />
-              {t('即时看图')}
-            </div>
-          ) : null}
+          {/* {!isIdent ? (
+        <div className={'page-title'}>
+          <LineChartOutlined />
+          {t('即时看图')}
+        </div>
+      ) : null} */}
           {isIdent ? (
             <ResourceTable onSelect={handleSelectIdent}></ResourceTable>
           ) : null}
@@ -198,43 +199,49 @@ export default function Explorer({ resourceGroupId, isIdent }: IExplorerProps) {
           </Button>
         </Col>
         <Col className='right' span={16}>
-          <div>
-            <div className='header'>
-              <div className='header-left'>
-                <DateRangePicker onChange={handleDateChange} />
-                <ResfeshIcon onClick={handleRefresh} className='reload-icon' />
-              </div>
-              <Radio.Group value={numPerLine} onChange={handleChange}>
-                <Radio.Button value={4}>XS</Radio.Button>
-                <Radio.Button value={3}>S</Radio.Button>
-                <Radio.Button value={2}>M</Radio.Button>
-                <Radio.Button value={1}>L</Radio.Button>
-              </Radio.Group>
+          <div className='header'>
+            <div className='header-left'>
+              <DateRangePicker onChange={handleDateChange} />
+              <ResfeshIcon onClick={handleRefresh} className='reload-icon' />
             </div>
-            <div className='chart-list'>
-              <Row gutter={15}>
-                {metrics.length > 0
-                  ? metrics.map((metric, i) => {
-                      return (
-                        <Col key={metric.name} span={24 / numPerLine}>
-                          <D3Chart
-                            cached
-                            options={{
-                              ...chartOption,
-                              idents: idents.length > 0 ? idents : undefined,
-                              metric: metric.name,
-                              description: metric.description,
-                            }}
-                          />
-                        </Col>
-                      );
-                    })
-                  : placeholder()}
-              </Row>
-            </div>
+            <Radio.Group value={numPerLine} onChange={handleChange}>
+              <Radio.Button value={4}>XS</Radio.Button>
+              <Radio.Button value={3}>S</Radio.Button>
+              <Radio.Button value={2}>M</Radio.Button>
+              <Radio.Button value={1}>L</Radio.Button>
+            </Radio.Group>
+          </div>
+          <div className='chart-list'>
+            <Row gutter={15}>
+              {metrics.length > 0
+                ? metrics.map((metric, i) => {
+                    return (
+                      <Col key={metric.name} span={24 / numPerLine}>
+                        <D3Chart
+                          cached
+                          options={{
+                            ...chartOption,
+                            idents: idents.length > 0 ? idents : undefined,
+                            metric: metric.name,
+                            description: metric.description,
+                          }}
+                        />
+                      </Col>
+                    );
+                  })
+                : placeholder()}
+            </Row>
           </div>
         </Col>
       </Row>
     </div>
+  );
+
+  return isIdent ? (
+    <div>{content}</div>
+  ) : (
+    <PageLayout title={t('即时看图')} icon={<LineChartOutlined />}>
+      {content}
+    </PageLayout>
   );
 }

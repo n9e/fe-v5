@@ -330,6 +330,7 @@ export default function Dashboard() {
           fetchParams={{
             query: query,
           }}
+          className='dashboard-table'
           columns={dashboardColumn}
           rowKey='id'
           rowSelection={{

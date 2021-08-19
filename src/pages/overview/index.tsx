@@ -7,6 +7,7 @@ import { OverListItem } from '@/store/overview';
 import { overListDefaut } from './const';
 import './index.less';
 import { useTranslation } from 'react-i18next';
+import PageLayout from '@/components/pageLayout';
 
 const Overview: React.FC = () => {
   const [isMounted, setIsMounted] = useState(true);
@@ -46,18 +47,20 @@ const Overview: React.FC = () => {
     getStatistic();
   }, [t]);
   return (
-    <div className='overview_con' id='overview_con'>
-      <div className='part'>
-        <div className='title'>{t('统计数据')}</div>
-        <Statistics list={overList} spanNum={4}></Statistics>
+    <PageLayout>
+      <div className='overview_con' id='overview_con'>
+        <div className='part'>
+          <div className='title'>{t('统计数据')}</div>
+          <Statistics list={overList} spanNum={4}></Statistics>
+        </div>
+        <Indicators></Indicators>
+        <Event
+          event_total_day={eventTotalDay}
+          event_total_week={eventTotalWeek}
+          event_total_month={eventTotalMonth}
+        ></Event>
       </div>
-      <Indicators></Indicators>
-      <Event
-        event_total_day={eventTotalDay}
-        event_total_week={eventTotalWeek}
-        event_total_month={eventTotalMonth}
-      ></Event>
-    </div>
+    </PageLayout>
   );
 };
 

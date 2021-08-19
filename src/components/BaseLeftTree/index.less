@@ -1,15 +1,14 @@
 @import '@/global.variable.less';
 
 .left-tree-area {
+  display: flex;
+  flex-direction: column;
   width: 266px;
   flex-shrink: 0;
-  // border-right: 1px solid black;
-  padding-right: 30px;
   position: relative;
-  margin-top: -12px;
-  padding-top: 20px;
-  min-height: 100vh;
-
+  padding: 10px;
+  padding-right: 30px;
+  // min-height: 100vh;
   &:before {
     content: '';
     display: block;
@@ -18,7 +17,7 @@
     bottom: 0;
     right: 0;
     width: 16px;
-    min-height: 100vh;
+    // min-height: 100vh;
     margin-left: 0;
     background: #f6f5f6;
     background-image: linear-gradient(

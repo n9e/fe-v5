@@ -19,7 +19,7 @@
       z-index: 2;
     }
     width: 100%;
-    padding: 20px 35px 20px 20px;
+    padding: 10px 25px 10px 10px;
     display: flex;
     flex-direction: column;
     .page-title {
@@ -34,7 +34,7 @@
       padding: 8px;
       background: @panelBackground;
       border-radius: 4px;
-      margin-top: 25px;
+      margin-bottom: 25px;
       .title {
         margin-bottom: 5px;
         font-size: 14px;
@@ -60,7 +60,9 @@
     }
   }
   .right {
-    overflow-y: auto;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
     background: #f6f5f6;
     .header {
       display: flex;
@@ -77,6 +79,8 @@
       }
     }
     .chart-list {
+      flex: 1;
+      overflow: auto;
       padding-right: 16px;
       .ant-col {
         margin-top: 15px;

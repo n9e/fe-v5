@@ -74,7 +74,7 @@ const ResourceTable: React.FC<ITableProps> = ({ activeKey, currentKey }) => {
                 if (copyValStr === '') {
                   message.warning(t('请先选择资源标识'));
                 } else {
-                  copyToClipBoard(copyValStr);
+                  copyToClipBoard(copyValStr, t);
                 }
               }}
             />
