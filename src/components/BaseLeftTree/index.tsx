@@ -236,7 +236,7 @@ const LeftTree: React.FC<ILeftTreeProps> = ({
 
   return (
     <div className={'left-tree-area'}>
-      <div className={'left-tree-area-item page-title'}>{pageTitle}</div>
+      {/* <div className={'left-tree-area-item page-title'}>{pageTitle}</div> */}
       <div className={'left-tree-area-item'}>
         <div className={'left-tree-area-item-title'}>
           {t('收藏的')}
@@ -289,7 +289,10 @@ const LeftTree: React.FC<ILeftTreeProps> = ({
           onSearch={handleSearch}
         ></SearchInput>
       </div>
-      <div className={'left-tree-area-item'}>
+      <div
+        className={'left-tree-area-item'}
+        style={{ flex: 1, overflow: 'auto' }}
+      >
         <div className={'left-tree-area-item-list'}>
           {common.map((item) => (
             <GroupMemoItem

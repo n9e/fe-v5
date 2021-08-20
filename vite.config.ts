@@ -45,6 +45,8 @@ export default defineConfig({
           'font-family':
             'verdana, Microsoft YaHei, Consolas, Deja Vu Sans Mono, Bitstream Vera Sans Mono',
           'text-color': '#333',
+          'menu-dark-bg': '#2C3D5E',
+          'menu-dark-inline-submenu-bg': '#2C3D5E',
         },
       },
     },

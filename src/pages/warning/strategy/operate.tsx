@@ -986,7 +986,7 @@ const StrategyOperate: React.FC = () => {
     <PageLayout title={t('strategy.single')} showBack>
       <Card
         style={{
-          background: '#eee',
+          paddingBottom: 0,
         }}
       >
         {OperateContent}

@@ -4,37 +4,39 @@
   &.collapse {
     width: 50px;
     padding-left: 0px;
-    // transition: all 0.1s cubic-bezier(0.2, 0, 0, 1) 0s;
     .name {
-      display: none;
+      .logo {
+        width: 24px;
+        display: inline-block;
+      }
     }
   }
   height: 100%;
-  // transition: all 0.9s cubic-bezier(0.2, 0, 0, 1) 0s;
   display: flex;
-  height: 60px;
-  background: #001529;
-  padding-top: 14px;
-  padding-left: 10px;
+  height: 50px;
+  background: #2c3d5e;
+  padding-top: 5px;
   strong {
     color: #fff;
-    margin-left: 10px;
+    margin-left: 5px;
   }
   .name {
     cursor: pointer;
     flex: 1;
+    text-align: center;
     .logo {
-      width: 32px;
-      height: 32px;
+      width: 112px;
       display: inline-block;
-      background: url('/image/logo.png') 100% 100% / cover;
-      border-radius: 16px;
     }
   }
-  .collapseBtn {
-    width: 50px;
-    background: #001529;
-    border-color: #001529;
+}
+.collapseBtn {
+  color: #fff;
+  background: #2c3d5e;
+  &:hover,
+  &:focus {
+    color: #fff;
+    background: #2c3d5e;
   }
 }
 .ant-menu {

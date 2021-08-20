@@ -428,7 +428,7 @@ export const getResourceDetailDrawerProps: (
             cursor: 'pointer',
           }}
           onClick={() => {
-            copyToClipBoard(record.ident);
+            copyToClipBoard(record.ident, t);
           }}
         />
       </div>

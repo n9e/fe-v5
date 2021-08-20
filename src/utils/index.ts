@@ -41,7 +41,7 @@ export const download = function (
 /**
  * 将文本添加到剪贴板
  */
-export const copyToClipBoard = (text: string): boolean => {
+export const copyToClipBoard = (text: string, t): boolean => {
   const fakeElem = document.createElement('textarea');
   fakeElem.style.border = '0';
   fakeElem.style.padding = '0';
@@ -59,12 +59,14 @@ export const copyToClipBoard = (text: string): boolean => {
   try {
     succeeded = document.execCommand('copy');
     if (text.includes('\n')) {
-      message.success(`复制${text.split('\n').length}条数据到剪贴板`);
+      message.success(
+        `${t('复制')}${text.split('\n').length}${t('条数据到剪贴板')}`,
+      );
     } else {
-      message.success('复制到剪贴板');
+      message.success(t('复制到剪贴板'));
     }
   } catch (err) {
-    message.error('复制失败');
+    message.error(t('复制失败'));
     succeeded = false;
   }
   if (succeeded) {

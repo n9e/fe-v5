@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
+import PageLayout from '@/components/pageLayout';
 import {
   Button,
   Table,
@@ -22,7 +23,6 @@ import {
   SmallDashOutlined,
 } from '@ant-design/icons';
 import BaseTable, { IBaseTableProps } from '@/components/BaseTable';
-import PageLayout from '../../components/pageLayout';
 import UserInfoModal from './component/createModal';
 import DelPopover from './component/delPopover';
 import { RootState, accountStoreState } from '@/store/accountInterface';
@@ -379,217 +379,225 @@ const Resource: React.FC = () => {
   };
 
   return (
-    <div className='user-manage-content'>
-      {activeKey === UserType.User && (
-        <div className='user-content'>
-          <div className={'user-manage-title'}>
-            <span>
-              <UserOutlined style={{ marginRight: 10 }} />
-              {t('用户管理')}
-            </span>
-          </div>
-          <Row className='event-table-search' style={{ paddingTop: 20 }}>
-            <div className='event-table-search-left'>
-              <Input
-                className={'searchInput'}
-                prefix={<SearchOutlined />}
-                onPressEnter={onSearchQuery}
-                placeholder={t('用户名、邮箱或手机')}
-              />
-            </div>
-            <div className='event-table-search-right'>
-              {activeKey === UserType.User && profile.roles.includes('Admin') && (
-                <div className='user-manage-operate'>
-                  <Button
-                    type='primary'
-                    onClick={() =>
-                      handleClick(
-                        activeKey === UserType.User
-                          ? ActionType.CreateUser
-                          : t('创建团队'),
-                      )
-                    }
-                  >
-                    {t('创建用户')}
-                  </Button>
-                </div>
-              )}
-            </div>
-          </Row>
-          <BaseTable
-            ref={userRef}
-            fetchHandle={getUserInfoList}
-            columns={userColumns}
-            rowKey='id'
-            needPagination={true}
-            fetchParams={{
-              query,
-            }}
-          ></BaseTable>
-        </div>
-      )}
-      {activeKey === UserType.Team && (
-        <div style={{ display: 'flex', height: '100%' }}>
-          <div className='left-tree-area'>
-            <div className={'title'}>{t('团队管理')}</div>
-            <div className='sub-title'>
-              {t('团队列表')}
-              <Button
-                style={{
-                  height: '30px',
-                }}
-                size='small'
-                type='link'
-                onClick={() => {
-                  handleClick(ActionType.CreateTeam);
-                }}
-              >
-                {t('新建团队')}
-              </Button>
-            </div>
-            <div style={{ display: 'flex', margin: '5px 0px 12px' }}>
-              <Input
-                prefix={<SearchOutlined />}
-                value={searchValue}
-                onChange={(e) => {
-                  setSearchValue(e.target.value);
-                }}
-                placeholder={t('搜索团队名称')}
-                onPressEnter={(e) => {
-                  setPageNumber(1);
-                  // @ts-ignore
-                  getTeamList(false, 1, e.target.value);
-                }}
-              />
-            </div>
-
-            <List
-              style={{
-                marginBottom: '12px',
+    <PageLayout
+      title={activeKey === UserType.User ? t('用户管理') : t('团队管理')}
+      icon={<UserOutlined />}
+    >
+      <div className='user-manage-content'>
+        {activeKey === UserType.User && (
+          <div className='user-content'>
+            {/* <div className={'user-manage-title'}>
+              <span>
+                <UserOutlined style={{ marginRight: 10 }} />
+                {t('用户管理')}
+              </span>
+            </div> */}
+            <Row className='event-table-search'>
+              <div className='event-table-search-left'>
+                <Input
+                  className={'searchInput'}
+                  prefix={<SearchOutlined />}
+                  onPressEnter={onSearchQuery}
+                  placeholder={t('用户名、邮箱或手机')}
+                />
+              </div>
+              <div className='event-table-search-right'>
+                {activeKey === UserType.User &&
+                  profile.roles.includes('Admin') && (
+                    <div className='user-manage-operate'>
+                      <Button
+                        type='primary'
+                        onClick={() =>
+                          handleClick(
+                            activeKey === UserType.User
+                              ? ActionType.CreateUser
+                              : t('创建团队'),
+                          )
+                        }
+                      >
+                        {t('创建用户')}
+                      </Button>
+                    </div>
+                  )}
+              </div>
+            </Row>
+            <BaseTable
+              ref={userRef}
+              fetchHandle={getUserInfoList}
+              columns={userColumns}
+              rowKey='id'
+              needPagination={true}
+              fetchParams={{
+                query,
               }}
-              dataSource={teamList}
-              size='small'
-              renderItem={(item) => (
-                <List.Item
-                  key={item.id}
-                  className={teamId === item.id ? 'is-active' : ''}
-                  onClick={() => setTeamId(item.id)}
-                >
-                  {item.name}
-                </List.Item>
-              )}
-            />
-
-            {PAGE_SIZE * pageNumber < total ? (
-              <SmallDashOutlined
-                className={'load-more'}
-                onClick={() => {
-                  setPageNumber(pageNumber + 1);
-                  getTeamList(true, pageNumber + 1);
-                }}
-              />
-            ) : null}
+            ></BaseTable>
           </div>
-          <div className='resource-table-content' style={{ margin: 20 }}>
-            <Row className='team-info'>
-              <Col
-                span='24'
-                style={{
-                  color: '#000',
-                  fontSize: '14px',
-                  fontWeight: 'bold',
-                  display: 'inline',
-                }}
-              >
-                {teamInfo && teamInfo.name}
-                <EditOutlined
-                  title={t('刷新')}
+        )}
+        {activeKey === UserType.Team && (
+          <div style={{ display: 'flex', height: '100%' }}>
+            <div className='left-tree-area'>
+              {/* <div className={'title'}>{t('团队管理')}</div> */}
+              <div className='sub-title'>
+                {t('团队列表')}
+                <Button
                   style={{
-                    marginLeft: '8px',
-                    fontSize: '14px',
+                    height: '30px',
                   }}
-                  onClick={() => handleClick(ActionType.EditTeam, teamId)}
-                ></EditOutlined>
-                {/* <DelPopover
+                  size='small'
+                  type='link'
+                  onClick={() => {
+                    handleClick(ActionType.CreateTeam);
+                  }}
+                >
+                  {t('新建团队')}
+                </Button>
+              </div>
+              <div style={{ display: 'flex', margin: '5px 0px 12px' }}>
+                <Input
+                  prefix={<SearchOutlined />}
+                  value={searchValue}
+                  onChange={(e) => {
+                    setSearchValue(e.target.value);
+                  }}
+                  placeholder={t('搜索团队名称')}
+                  onPressEnter={(e) => {
+                    setPageNumber(1);
+                    // @ts-ignore
+                    getTeamList(false, 1, e.target.value);
+                  }}
+                />
+              </div>
+
+              <List
+                style={{
+                  marginBottom: '12px',
+                  flex: 1,
+                  overflow: 'auto',
+                }}
+                dataSource={teamList}
+                size='small'
+                renderItem={(item) => (
+                  <List.Item
+                    key={item.id}
+                    className={teamId === item.id ? 'is-active' : ''}
+                    onClick={() => setTeamId(item.id)}
+                  >
+                    {item.name}
+                  </List.Item>
+                )}
+              />
+
+              {PAGE_SIZE * pageNumber < total ? (
+                <SmallDashOutlined
+                  className={'load-more'}
+                  onClick={() => {
+                    setPageNumber(pageNumber + 1);
+                    getTeamList(true, pageNumber + 1);
+                  }}
+                />
+              ) : null}
+            </div>
+            <div className='resource-table-content'>
+              <Row className='team-info'>
+                <Col
+                  span='24'
+                  style={{
+                    color: '#000',
+                    fontSize: '14px',
+                    fontWeight: 'bold',
+                    display: 'inline',
+                  }}
+                >
+                  {teamInfo && teamInfo.name}
+                  <EditOutlined
+                    title={t('刷新')}
+                    style={{
+                      marginLeft: '8px',
+                      fontSize: '14px',
+                    }}
+                    onClick={() => handleClick(ActionType.EditTeam, teamId)}
+                  ></EditOutlined>
+                  {/* <DelPopover
                  teamId={teamId}
                  userType='team'
                  isIcon={true}
                  onClose={() => handleClose()}
                 ></DelPopover> */}
-                <DeleteOutlined
+                  <DeleteOutlined
+                    style={{
+                      marginLeft: '8px',
+                      fontSize: '14px',
+                    }}
+                    onClick={() => {
+                      confirm({
+                        title: t('是否删除该团队'),
+                        onOk: () => {
+                          deleteTeam(teamId).then((_) => {
+                            message.success(t('团队删除成功'));
+                            handleClose(true);
+                          });
+                        },
+                        onCancel: () => {},
+                      });
+                    }}
+                  />
+                </Col>
+                <Col
                   style={{
-                    marginLeft: '8px',
-                    fontSize: '14px',
+                    marginTop: '8px',
+                    color: '#666',
                   }}
+                >
+                  {t('备注')}：{teamInfo && teamInfo.note ? teamInfo.note : '-'}
+                </Col>
+              </Row>
+              <Row justify='space-between' align='middle'>
+                <Col span='12'>
+                  <Input
+                    prefix={<SearchOutlined />}
+                    value={searchMemberValue}
+                    className={'searchInput'}
+                    onChange={(e) => setSearchMemberValue(e.target.value)}
+                    placeholder={t('成员名、邮箱或手机')}
+                    onPressEnter={(e) =>
+                      handleSearch('member', searchMemberValue)
+                    }
+                  />
+                </Col>
+                <Button
+                  type='primary'
                   onClick={() => {
-                    confirm({
-                      title: t('是否删除该团队'),
-                      onOk: () => {
-                        deleteTeam(teamId).then((_) => {
-                          message.success(t('团队删除成功'));
-                          handleClose(true);
-                        });
-                      },
-                      onCancel: () => {},
-                    });
+                    handleClick(ActionType.AddUser, teamId);
                   }}
-                />
-              </Col>
-              <Col
-                style={{
-                  marginTop: '8px',
-                  color: '#666',
-                }}
-              >
-                {t('备注')}：{teamInfo && teamInfo.note ? teamInfo.note : '-'}
-              </Col>
-            </Row>
-            <Row justify='space-between' align='middle'>
-              <Col span='12'>
-                <Input
-                  prefix={<SearchOutlined />}
-                  value={searchMemberValue}
-                  className={'searchInput'}
-                  onChange={(e) => setSearchMemberValue(e.target.value)}
-                  placeholder={t('成员名、邮箱或手机')}
-                  onPressEnter={(e) =>
-                    handleSearch('member', searchMemberValue)
-                  }
-                />
-              </Col>
-              <Button
-                type='primary'
-                onClick={() => {
-                  handleClick(ActionType.AddUser, teamId);
-                }}
-              >
-                {t('添加成员')}
-              </Button>
-            </Row>
+                >
+                  {t('添加成员')}
+                </Button>
+              </Row>
 
-            <Table
-              rowKey='id'
-              columns={teamMemberColumns}
-              dataSource={memberList}
-              loading={memberLoading}
-            />
+              <Table
+                rowKey='id'
+                columns={teamMemberColumns}
+                dataSource={memberList}
+                loading={memberLoading}
+              />
+            </div>
           </div>
-        </div>
-      )}
-      <UserInfoModal
-        visible={visible}
-        action={action as ActionType}
-        userType={activeKey}
-        onClose={handleClose}
-        onSearch={(val) => {
-          setSearchValue(val);
-          handleSearch('team', val);
-        }}
-        userId={userId}
-        teamId={teamId}
-        memberId={memberId}
-      />
-    </div>
+        )}
+        <UserInfoModal
+          visible={visible}
+          action={action as ActionType}
+          userType={activeKey}
+          onClose={handleClose}
+          onSearch={(val) => {
+            setSearchValue(val);
+            handleSearch('team', val);
+          }}
+          userId={userId}
+          teamId={teamId}
+          memberId={memberId}
+        />
+      </div>
+    </PageLayout>
   );
 };
 

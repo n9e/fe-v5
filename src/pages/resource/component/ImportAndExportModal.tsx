@@ -3,8 +3,7 @@ import { IFormButtonModalProps } from '@/components/BaseModal/formButtonModal';
 import { Form, Input } from 'antd';
 const { TextArea } = Input;
 import { cloneCollectSetting } from '@/services/resource';
-import { copyToClipBoard, download } from '@/utils';
-import { useTranslation } from 'react-i18next';
+import { download } from '@/utils';
 export const getMoreTypeModal: (
   type: string,
   t: any,

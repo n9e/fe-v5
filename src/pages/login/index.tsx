@@ -41,8 +41,7 @@ export default function Login() {
     <div className='login-warp'>
       <div className='banner'>
         <div className='banner-bg'>
-          <img src={'/image/logo.png'} className='logo'></img>
-          <div className='name'>{t('n9e')}</div>
+          <img src={'/image/logo-l.svg'} className='logo' width='132'></img>
         </div>
       </div>
       <div className='login-panel'>

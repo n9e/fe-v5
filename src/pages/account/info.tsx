@@ -31,7 +31,7 @@ export default function Info() {
   const [customAvatar, setCustomAvatar] = useState('');
   const dispatch = useDispatch();
   useEffect(() => {
-    const { id, nickname, email, phone, contacts } = profile;
+    const { id, nickname, email, phone, contacts, portrait } = profile;
 
     // if (id) {
     form.setFieldsValue({
@@ -41,6 +41,9 @@ export default function Info() {
       contacts,
     });
     // }
+    if (portrait.startsWith('http')) {
+      setCustomAvatar(portrait);
+    }
   }, [profile]);
   useEffect(() => {
     getContactsList().then((data: Array<ContactsItem>) => {
