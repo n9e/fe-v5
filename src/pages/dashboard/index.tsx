@@ -133,6 +133,7 @@ export default function Dashboard() {
     const queryItem = query.length > 0 ? query.split(' ') : [];
     if (queryItem.includes(tag)) return;
     setQuery((query) => query + ' ' + tag);
+    setsearchVal((searchVal) => searchVal + ' ' + tag);
   };
 
   const layout = {
@@ -226,7 +227,7 @@ export default function Dashboard() {
 
   const onSearchQuery = (e) => {
     let val = e.target.value;
-    setQuery(val);
+    setsearchVal(val);
   };
 
   const handleImportDashboard = (data) => {
@@ -329,7 +330,7 @@ export default function Dashboard() {
           ref={ref}
           fetchHandle={getDashboard}
           fetchParams={{
-            query: query,
+            query: searchVal,
           }}
           className='dashboard-table'
           columns={dashboardColumn}

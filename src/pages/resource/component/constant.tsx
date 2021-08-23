@@ -98,6 +98,7 @@ const ThresholdInput = ({ onChange = () => {}, value = 0 }) => {
         style={{
           width: 150,
         }}
+        min={1}
         onChange={onChange}
         value={value}
       />{' '}
@@ -694,11 +695,11 @@ export const createProcModal = (
           }}
         </Form.Item>
         <Form.Item
-          label={t('采集周期')}
+          label={t('采集频率')}
           rules={[
             {
               required: true,
-              message: t('采集周期必填'),
+              message: t('采集频率必填'),
             },
           ]}
           name='step'
@@ -889,11 +890,11 @@ export const createPortModal = (
           <ThresholdInput />
         </Form.Item>
         <Form.Item
-          label={t('采集周期')}
+          label={t('采集频率')}
           rules={[
             {
               required: true,
-              message: t('采集周期必填'),
+              message: t('采集频率必填'),
             },
           ]}
           initialValue={15}
@@ -1053,31 +1054,35 @@ export const createPluginModal = (
           ></KeyValueInput>
         </Form.Item>
         <Form.Item label={t('标准输入(Stdin)')} name='stdin' key='stdin'>
-          <TextArea placeholder={t('请输入参数')}></TextArea>
+          <TextArea></TextArea>
         </Form.Item>
         <Form.Item
-          label={t('采集周期')}
+          label={t('连接超时')}
           rules={[
             {
               required: true,
-              message: t('采集周期必填'),
+              message: t('连接超时必填'),
+            },
+          ]}
+          initialValue={15}
+          name='timeout'
+          key='timeout'
+        >
+          <ThresholdInput />
+        </Form.Item>
+        <Form.Item
+          label={t('采集频率')}
+          rules={[
+            {
+              required: true,
+              message: t('采集频率必填'),
             },
           ]}
           initialValue={60}
           name='step'
           key='step'
         >
-          <Select
-            style={{
-              width: 150,
-            }}
-          >
-            {collectSteps.map((collectItem) => (
-              <Option key={collectItem} value={collectItem}>
-                {collectItem}
-              </Option>
-            ))}
-          </Select>
+          <ThresholdCollectSelect></ThresholdCollectSelect>
         </Form.Item>
         <Form.Item label={t('备注')} name='note' key='note'>
           <Input></Input>
