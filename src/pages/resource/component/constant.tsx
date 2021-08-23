@@ -964,6 +964,7 @@ export const createPluginModal = (
         }
         form.setFieldsValue({
           ...data,
+          timeout: (optionData as pluginData)?.timeout || '',
           path: (optionData as pluginData)?.path || '',
           params: (optionData as pluginData)?.params || '',
           stdin: (optionData as pluginData)?.stdin || '',
@@ -980,6 +981,7 @@ export const createPluginModal = (
         params: values.params,
         stdin: values.stdin,
         env: values.env,
+        timeout: values.timeout,
       });
       values.prefix_match = values.prefix_match
         ? prefixType.Need
@@ -1057,7 +1059,7 @@ export const createPluginModal = (
           <TextArea></TextArea>
         </Form.Item>
         <Form.Item
-          label={t('连接超时')}
+          label={t('执行超时')}
           rules={[
             {
               required: true,
