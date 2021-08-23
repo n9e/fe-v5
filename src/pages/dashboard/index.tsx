@@ -290,7 +290,8 @@ export default function Dashboard() {
             <Input
               onPressEnter={onSearchQuery}
               className={'searchInput'}
-              value={query} // onChange={(e) => setQuery(e.target.value)}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
               prefix={<SearchOutlined />}
               placeholder={t('大盘名称')}
             />
