@@ -25,6 +25,7 @@ const { confirm } = Modal;
 interface Props {
   groupInfo: Group;
   range: Param | RangeItem;
+  step: number;
   variableConfig: TagFilterResponse | null;
   onAddChart: (data: number) => void;
   onUpdateChart: (group: Group, data: Chart) => void;
@@ -180,6 +181,7 @@ export default function ChartGroup(props: Props) {
   const {
     groupInfo,
     range,
+    step,
     variableConfig,
     onAddChart,
     onUpdateChart,
@@ -642,6 +644,7 @@ export default function ChartGroup(props: Props) {
                 ...item.configs,
                 prome_ql,
                 range,
+                step,
                 tags: tagsArr,
                 metric: metric,
                 limit: 50,
@@ -685,7 +688,7 @@ export default function ChartGroup(props: Props) {
         )}
       </div>
     );
-  }, [mounted, groupInfo.updateTime, range, variableConfig]);
+  }, [mounted, groupInfo.updateTime, range, variableConfig, step]);
   return (
     <Collapse defaultActiveKey={['0']}>
       <Panel

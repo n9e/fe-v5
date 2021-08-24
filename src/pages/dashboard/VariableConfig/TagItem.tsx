@@ -26,6 +26,8 @@ const TagItem: React.FC<ITagItemProps> = ({ tagData, index, isEditing }) => {
   const NAME_NON_EXISTENT = t('必须要有一个变量名');
   const NAME_DUPLICATE = t('变量名重复');
   const NAME_INVALID = t('变量名包含非法字符');
+  const NAME_REQUIRE = t('key, value必填');
+  const KEY_UNIQUE = t('key重复');
   const DEFAULT_VALUE = '*';
   const CLASS_PATH = 'classpath';
   const CLASS_PATH_VALUE = 'classpath';
@@ -57,6 +59,11 @@ const TagItem: React.FC<ITagItemProps> = ({ tagData, index, isEditing }) => {
     if (Array.isArray(data.nonNameList) && data.nonNameList.includes(index)) {
       nextErrorTip = NAME_NON_EXISTENT;
     } else if (
+      Array.isArray(data.requireList) &&
+      data.requireList.includes(index)
+    ) {
+      nextErrorTip = NAME_REQUIRE;
+    } else if (
       Array.isArray(data.invalidList) &&
       data.invalidList.includes(index)
     ) {
@@ -66,13 +73,20 @@ const TagItem: React.FC<ITagItemProps> = ({ tagData, index, isEditing }) => {
       data.duplicateList.includes(index)
     ) {
       nextErrorTip = NAME_DUPLICATE;
+    } else if (
+      Array.isArray(data.duplicateKeyList) &&
+      data.duplicateKeyList.includes(index)
+    ) {
+      nextErrorTip = KEY_UNIQUE;
     }
 
     setErrorTip(nextErrorTip);
   }, [
     JSON.stringify(data.duplicateList),
+    JSON.stringify(data.duplicateKeyList),
     JSON.stringify(data.nonNameList),
     JSON.stringify(data.invalidList),
+    JSON.stringify(data.requireList),
     t,
   ]);
   useEffect(() => {

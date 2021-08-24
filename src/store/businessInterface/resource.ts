@@ -66,6 +66,7 @@ export interface pluginData {
   params: string;
   stdin: string;
   env: string;
+  timeout: number;
 }
 
 export interface logData {

@@ -6,6 +6,7 @@ import DateRangePicker from '@/components/DateRangePicker';
 import { Param, RangeItem } from '@/store/chart';
 import { FieldNumberOutlined } from '@ant-design/icons';
 import ResfeshIcon from '@/components/RefreshIcon';
+import Resolution from '@/components/Resolution';
 import './index.less';
 import { useTranslation } from 'react-i18next';
 export default function Chart() {
@@ -16,6 +17,7 @@ export default function Chart() {
     }>();
   const [chartData, setChartData] = useState<Props[]>();
   const [range, setRange] = useState<Param | RangeItem>();
+  const [step, setStep] = useState(15);
   useEffect(() => {
     initChart();
   }, []);
@@ -52,6 +54,7 @@ export default function Chart() {
               onChange={handleDateChange}
               initValue={chartData[0].options.range}
             />
+            <Resolution onChange={(v) => setStep(v)} initialValue={step} />
             <ResfeshIcon onClick={handleRefresh} className='reload-icon' />
           </div>
           {chartData.map((item, index) => {
@@ -59,7 +62,7 @@ export default function Chart() {
             return (
               <D3Chart
                 key={index}
-                options={options}
+                options={{ ...options, step }}
                 title={item.title}
               ></D3Chart>
             );
