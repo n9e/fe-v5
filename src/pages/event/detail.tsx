@@ -2,7 +2,11 @@ import React, { useEffect, useState } from 'react';
 import PageLayout from '@/components/pageLayout';
 import { useParams, useHistory } from 'react-router-dom';
 import { RootState } from '@/store/common';
-import { eventStoreState, warningEventItem } from '@/store/eventInterface';
+import {
+  eventStoreState,
+  IsRecovery,
+  warningEventItem,
+} from '@/store/eventInterface';
 import { Form, Table, Divider, Tag } from 'antd';
 import { warningStatus } from '@/store/eventInterface';
 import dayjs from 'dayjs';
@@ -23,10 +27,12 @@ export const Detail: React.FC = () => {
   const [currentEdit, setCurrentEdit] = useState<warningEventItem>();
   const history = useHistory();
   const param = useParams();
+  const [ishistory, setisHistory] = useState<boolean>(false);
 
   useEffect(() => {
     console.log(history);
     const isHistory = history.location.pathname.includes('event-history');
+    setisHistory(isHistory);
     if (isHistory) {
       // 换全量告警接口
       getHistoryEventsById(id).then((res) => {
@@ -153,14 +159,14 @@ export const Detail: React.FC = () => {
               }
             </div>
           }
-          {
+          {/* {
             <div>
               <span className='event-detail-content-main-label'>
                 {t('资源标识')}：
               </span>{' '}
               {currentEdit?.res_ident}
             </div>
-          }
+          } */}
           {currentEdit?.res_classpaths && (
             <div>
               <span className='event-detail-content-main-label'>
@@ -181,6 +187,14 @@ export const Detail: React.FC = () => {
               }
             </div>
           )}
+          {ishistory && currentEdit?.runbook_url !== undefined && (
+            <div>
+              <span className='event-detail-content-main-label'>
+                {t('通知类型')}：
+              </span>{' '}
+              {currentEdit?.is_recovery === IsRecovery.Alert ? '告警' : '恢复'}
+            </div>
+          )}
           {currentEdit?.readable_expression && (
             <div>
               <span className='event-detail-content-main-label'>
@@ -192,7 +206,7 @@ export const Detail: React.FC = () => {
           {currentEdit?.runbook_url && (
             <div>
               <span className='event-detail-content-main-label'>
-                {t('预案手册')}：
+                {t('预案链接')}：
               </span>{' '}
               {currentEdit?.runbook_url}
             </div>
