@@ -37,6 +37,8 @@ const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = (
     duplicateList: [],
     invalidList: [],
     nonNameList: [],
+    duplicateKeyList: [],
+    requireList: [],
     hasClassPath: false,
     hasInit: false,
   });
