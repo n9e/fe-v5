@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Children } from 'react';
+import React, { useState, useEffect } from 'react';
 import { GetMetrics } from '@/services/metric';
 import { Metric } from '@/pages/metric/matric';
 import { Dashboard, Group, ChartConfig } from '@/store/dashboardInterface';
@@ -74,7 +74,6 @@ export default function ChartConfigModal(props: Props) {
       }
     }
     setpromeQl(chartForm.getFieldValue('prome_ql'));
-    console.log(chartForm.getFieldValue('prome_ql'));
   }, [initialValue]);
 
   const getMetrics = (metric?) => {
