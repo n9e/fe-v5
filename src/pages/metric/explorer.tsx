@@ -6,6 +6,7 @@ import D3Chart from '@/components/D3Chart';
 import DateRangePicker from '@/components/DateRangePicker';
 import ResourceTable from './resourceTable';
 import ResfeshIcon from '@/components/RefreshIcon';
+import Resolution from '@/components/Resolution';
 import { AreaChartOutlined, LineChartOutlined } from '@ant-design/icons';
 import { SetTmpChartData } from '@/services/metric';
 import '@d3-charts/ts-graph/dist/index.css';
@@ -29,6 +30,7 @@ export default function Explorer({ resourceGroupId, isIdent }: IExplorerProps) {
   const metricRef = useRef(null as any);
   const tagRef = useRef(null as any);
   const [numPerLine, setNumPerLine] = useState(1);
+  const [step, setStep] = useState(15);
   const [range, setRange] = useState<Param | RangeItem>({
     start: 0,
     end: 0,
@@ -202,7 +204,8 @@ export default function Explorer({ resourceGroupId, isIdent }: IExplorerProps) {
           <div className='header'>
             <div className='header-left'>
               <DateRangePicker onChange={handleDateChange} />
-              <ResfeshIcon onClick={handleRefresh} className='reload-icon' />
+              <Resolution onChange={(v) => setStep(v)} initialValue={step} />
+              <ResfeshIcon onClick={handleRefresh} />
             </div>
             <Radio.Group value={numPerLine} onChange={handleChange}>
               <Radio.Button value={4}>XS</Radio.Button>
@@ -221,6 +224,7 @@ export default function Explorer({ resourceGroupId, isIdent }: IExplorerProps) {
                           cached
                           options={{
                             ...chartOption,
+                            step,
                             idents: idents.length > 0 ? idents : undefined,
                             metric: metric.name,
                             description: metric.description,

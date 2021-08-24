@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
+import './index.less';
 interface Props {
   onClick: () => void;
   className?: string;
@@ -22,7 +23,7 @@ export default function RefreshIcon(props: Props) {
 
   return (
     <Button
-      className={className || ''}
+      className={className ? className + ' reload-icon' : 'reload-icon'}
       loading={refreshing}
       onClick={handleRefresh}
       icon={<ReloadOutlined className='refresh' spin={refreshing} />}

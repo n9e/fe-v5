@@ -32,10 +32,16 @@
   .tag-content-close {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     &-item {
       display: flex;
       flex-direction: row;
       margin-right: 12px;
+      margin-bottom: 10px;
+      width: 200px;
+      .ant-select {
+        flex: 1;
+      }
       &-tagName {
         line-height: 32px;
         padding: 0 8px;
