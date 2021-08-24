@@ -145,9 +145,18 @@ export const batchDeleteStrategy = function (ruleId, ids: Array<number>) {
  * 获取未恢复告警列表
  */
 export const getAlertEvents = function (data) {
+  return request(`${N9EAPI}/api/n9e/alert-events`, {
+    method: RequestMethod.Get,
+    params: data,
+  });
+};
+/**
+ * 获取全量告警历史页面
+ */
+export const getHistoryEvents = function (data) {
   console.log(data);
 
-  return request(`${N9EAPI}/api/n9e/alert-events`, {
+  return request(`${N9EAPI}/api/n9e/history-alert-events`, {
     method: RequestMethod.Get,
     params: data,
   });
@@ -159,6 +168,11 @@ export const getAlertEventsById = function (id) {
   });
 };
 
+export const getHistoryEventsById = function (id) {
+  return request(`${N9EAPI}/api/n9e/history-alert-event/${id}`, {
+    method: RequestMethod.Get,
+  });
+};
 /**
  * 批量删除(忽略)告警历史
  */

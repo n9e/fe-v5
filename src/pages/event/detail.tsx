@@ -6,7 +6,7 @@ import { eventStoreState, warningEventItem } from '@/store/eventInterface';
 import { Form, Table, Divider, Tag } from 'antd';
 import { warningStatus } from '@/store/eventInterface';
 import dayjs from 'dayjs';
-import { getAlertEventsById } from '@/services/warning';
+import { getAlertEventsById, getHistoryEventsById } from '@/services/warning';
 import D3Chart from '@/components/D3Chart';
 import { ChartComponentProps } from '@/store/chart';
 import classNames from 'classnames';
@@ -16,20 +16,47 @@ import { priorityColor } from '@/utils/constant';
 import ColorTag from '@/components/ColorTag';
 export const Detail: React.FC = () => {
   const { t } = useTranslation();
-  const { id } =
-    useParams<{
-      id: string;
-    }>();
+  const { id } = useParams<{
+    id: string;
+  }>();
   const [options, setOptions] = useState<ChartComponentProps | null>(null);
   const [currentEdit, setCurrentEdit] = useState<warningEventItem>();
   const history = useHistory();
+  const param = useParams();
+
   useEffect(() => {
-    getAlertEventsById(id).then((res) => {
-      if (res.dat) {
-        setCurrentEdit(res.dat);
-        const { history_points } = res.dat;
-      }
-    });
+    console.log(history);
+    const isHistory = history.location.pathname.includes('event-history');
+    if (isHistory) {
+      // 换全量告警接口
+      getHistoryEventsById(id).then((res) => {
+        console.log(res);
+        if (res === undefined) {
+          setTimeout(() => {
+            history.replace('/history-events');
+          }, 1000);
+          return;
+        }
+        if (res.dat) {
+          setCurrentEdit(res.dat);
+          const { history_points } = res.dat;
+        }
+      });
+    } else {
+      getAlertEventsById(id).then((res) => {
+        console.log(res);
+        if (res === undefined) {
+          setTimeout(() => {
+            history.replace('/event');
+          }, 1000);
+          return;
+        }
+        if (res.dat) {
+          setCurrentEdit(res.dat);
+          const { history_points } = res.dat;
+        }
+      });
+    }
   }, [id]);
   const columns = [
     {

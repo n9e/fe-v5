@@ -280,7 +280,15 @@ export const getCollectColumns = (
           }
 
           case 'script': {
-            return <>{targetData?.path}</>;
+            if (targetData?.path && targetData?.path.length > 20) {
+              return (
+                <Tooltip placement='top' title={targetData?.path}>
+                  {targetData?.path.substring(0, 20)}+...
+                </Tooltip>
+              );
+            } else {
+              return <>{targetData?.path}</>;
+            }
           }
 
           case 'log': {

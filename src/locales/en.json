@@ -1,8 +1,12 @@
 {
-  "classpath":{
+  "classpath": {
     "single": "Classpath"
   },
-  "strategy":{"create":"New", "single": "Alert Rule", "multiple": "Alert Rules"},
+  "strategy": {
+    "create": "New",
+    "single": "Alert Rule",
+    "multiple": "Alert Rules"
+  },
   "personalInfo": "Profile",
   "n9e": "DiDi Nightingale",
   "输入有误": "Incorrect input",
@@ -253,7 +257,7 @@
   "创建进程采集": "New collection",
   "进程采集详情": "Collection rule(Process)",
   "更新": "Update",
-  "采集规则成功":" collection rule successfully",
+  "采集规则成功": " collection rule successfully",
   "进程监控指标": "Metric",
   "所属资源分组": "Classpath",
   "资源分组必填": "Classpath is required",
@@ -314,7 +318,7 @@
   "资源详情": "Basic Information",
   "请选择所属资源分组": "Select the classpaths",
   "彻底删除资源": "Delete",
-  "两种情况会有彻底删除资源的需求": "There are two cases to delete resources", 
+  "两种情况会有彻底删除资源的需求": "There are two cases to delete resources",
   "资源对应的设备已经下线了，永远都不会有新的监控数据上报了": "The resource has been offline",
   "资源的ident(唯一标识)发生变化，老的ident需要手工清理掉": "The ident of the resource changes",
   "未选择任何规则": "No rules chosen",
@@ -444,7 +448,7 @@
   "预案链接": "Runbook",
   "监控看图": "Metrics",
   "策略配置": "Monitors",
-  "告警事件": "Events",
+  "告警事件": "Event",
   "用户": "Users",
   "团队": "Teams",
   "团队列表": "Team list",
@@ -489,5 +493,10 @@
   "维护标签": "Update tags",
   "修改备注": "Update remark",
   "修改标签": "Update tags",
-  "暂无数据": "None"
+  "暂无数据": "None",
+  "告警历史": "Events",
+  "全量告警": "All Event",
+  "全量告警历史": "History Alert Events",
+  "恢复": "Recovery",
+  "告警": "Alert"
 }
