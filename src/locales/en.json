@@ -489,5 +489,7 @@
   "维护标签": "Update tags",
   "修改备注": "Update remark",
   "修改标签": "Update tags",
-  "暂无数据": "None"
+  "暂无数据": "None",
+  "key, value必填": "key,value required",
+  "key重复": "Duplicate key"
 }
