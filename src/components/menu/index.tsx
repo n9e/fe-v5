@@ -95,9 +95,12 @@ const SideMenu: FC = () => {
           <Menu.Item key='/strategy'>{t('告警策略')}</Menu.Item>
           <Menu.Item key='/shield'>{t('屏蔽策略')}</Menu.Item>
         </SubMenu>
-        <Menu.Item key='/event' icon={<AlertOutlined />}>
-          {t('告警事件')}
-        </Menu.Item>
+        <SubMenu icon={<AlertOutlined />} title={t('告警历史')}>
+          <Menu.Item key='/event'>{t('未恢复告警')}</Menu.Item>
+
+          <Menu.Item key='/history-events'>{t('全部告警')}</Menu.Item>
+        </SubMenu>
+
         <SubMenu icon={<UserOutlined />} title={t('用户管理')}>
           <Menu.Item key='/manage/user'>{t('用户')}</Menu.Item>
           <Menu.Item key='/manage/group'>{t('团队')}</Menu.Item>

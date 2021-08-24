@@ -27,6 +27,7 @@ import ShieldDetail from '@/pages/warning/shield/detail';
 import Event from '@/pages/event';
 import EventDetail from '@/pages/event/detail';
 import Overview from '@/pages/overview';
+import historyEvents from '@/pages/historyEvents';
 
 export default function Content() {
   let { profile } = useSelector<RootState, accountStoreState>(
@@ -65,6 +66,8 @@ export default function Content() {
         <Route path='/chart/:ids' component={Chart} />
         <Route path='/resource/:id?' component={ResourcePage} />
         <Route path='/indicator' component={IndicatorPage} />
+        <Route path='/history-events' component={historyEvents} />
+
         <Route
           exact
           path='/strategy/add/:group_id'
@@ -77,6 +80,7 @@ export default function Content() {
         <Route exact path='/shield/detail/:id' component={ShieldDetail} />
         <Route exact path='/event' component={Event} />
         <Route exact path='/event/:id' component={EventDetail} />
+        <Route exact path='/event-history/:id' component={EventDetail} />
         <Route path='/' exact>
           <Redirect to='/overview' />
         </Route>

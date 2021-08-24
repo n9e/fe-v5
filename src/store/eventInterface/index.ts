@@ -9,6 +9,11 @@ export enum warningStatus {
   UnEnable = 1,
 }
 
+export enum IsRecovery {
+  Alert = 0,
+  Recovery = 1,
+}
+
 export enum warningLabel {
   Enable = '已触发',
   UnEnable = '已屏蔽',
@@ -24,7 +29,7 @@ export type warningEventItem = {
   res_classpaths: string; //资源所属的classpaths
   priority: warningPriority; //int 告警级别 1->p1 2->p2 3->p3
   status: warningStatus; // int 枚举,标识是否 被屏蔽, 1已屏蔽 2已触犯
-  is_recovery: string; //int 枚举, 0: alert, 1: recovery
+  is_recovery: IsRecovery; //int 枚举, 0: alert, 1: recovery
   history_points: Array<{
     metric: string;
     points: Array<{
