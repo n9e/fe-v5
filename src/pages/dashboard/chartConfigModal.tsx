@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Children } from 'react';
 import { GetMetrics } from '@/services/metric';
 import { Metric } from '@/pages/metric/matric';
 import { Dashboard, Group, ChartConfig } from '@/store/dashboardInterface';
@@ -60,6 +60,7 @@ export default function ChartConfigModal(props: Props) {
   const [resources, setResources] = useState<resourceItem[]>([]);
   const [selResource, setSelResource] = useState<string[]>();
   const [tags, setTags] = useState<TagItem[]>([]);
+  const [promeQl, setpromeQl] = useState<string[]>(['']);
   useEffect(() => {
     getMetrics();
     getClassPaths();
@@ -72,6 +73,8 @@ export default function ChartConfigModal(props: Props) {
         handleSelectChange(initialValue.configs.metric);
       }
     }
+    setpromeQl(chartForm.getFieldValue('prome_ql'));
+    console.log(chartForm.getFieldValue('prome_ql'));
   }, [initialValue]);
 
   const getMetrics = (metric?) => {
@@ -342,57 +345,79 @@ export default function ChartConfigModal(props: Props) {
                   marginBottom: 0,
                 }}
               >
-                <Form.List name='prome_ql' initialValue={['']}>
-                  {(fields, { add, remove }, { errors }) => (
-                    <>
-                      {fields.length ? (
-                        fields.map(
-                          ({ key, name, fieldKey, ...restField }, index) => {
-                            return (
-                              <Space
-                                key={name}
-                                style={{
-                                  display: 'flex',
-                                  marginBottom: 8,
-                                }}
-                                align='baseline'
-                              >
-                                <Form.Item
-                                  name={[name]}
-                                  validateTrigger={['onChange', 'onBlur']}
-                                  rules={[
-                                    {
-                                      validator: validatorLine,
-                                    },
-                                  ]}
+                <Form.List name='prome_ql' initialValue={promeQl}>
+                  {(fields, { add, remove }, { errors }) => {
+                    return (
+                      <>
+                        {fields.length ? (
+                          fields.map(
+                            ({ key, name, fieldKey, ...restField }, index) => {
+                              return (
+                                <Space
+                                  key={name}
+                                  style={{
+                                    display: 'flex',
+                                    marginBottom: 8,
+                                  }}
+                                  align='baseline'
                                 >
-                                  <Input
-                                    placeholder={t('请输入Promql')}
-                                    style={{
-                                      width: '340px',
-                                    }}
-                                  />
-                                </Form.Item>
-                                {fields.length > 1 ? (
-                                  <MinusCircleOutlined
-                                    onClick={() => {
-                                      remove(name);
-                                    }}
-                                  />
-                                ) : null}
-                                {index === fields.length - 1 && (
-                                  <PlusCircleOutlined onClick={() => add()} />
-                                )}
-                              </Space>
-                            );
-                          },
-                        )
-                      ) : (
-                        <PlusCircleOutlined onClick={() => add()} />
-                      )}
-                      <Form.ErrorList errors={errors} />
-                    </>
-                  )}
+                                  <Form.Item
+                                    name={[name]}
+                                    validateTrigger={['onChange', 'onBlur']}
+                                    rules={[
+                                      {
+                                        validator: validatorLine,
+                                      },
+                                    ]}
+                                  >
+                                    <Input
+                                      placeholder={t('请输入Promql')}
+                                      onChange={() => {
+                                        setpromeQl(
+                                          chartForm
+                                            .getFieldValue('prome_ql')
+                                            .filter((ele) => ele !== undefined),
+                                        );
+                                      }}
+                                      style={{
+                                        width: '340px',
+                                      }}
+                                    />
+                                  </Form.Item>
+                                  {fields.length > 1 ? (
+                                    <MinusCircleOutlined
+                                      onClick={() => {
+                                        remove(name);
+                                        setpromeQl(
+                                          chartForm
+                                            .getFieldValue('prome_ql')
+                                            .filter((ele) => ele !== undefined),
+                                        );
+                                      }}
+                                    />
+                                  ) : null}
+                                  {index === fields.length - 1 && (
+                                    <PlusCircleOutlined
+                                      onClick={() => {
+                                        add();
+                                      }}
+                                    />
+                                  )}
+                                </Space>
+                              );
+                            },
+                          )
+                        ) : (
+                          <PlusCircleOutlined
+                            onClick={() => {
+                              add();
+                            }}
+                          />
+                        )}
+                        <Form.ErrorList errors={errors} />
+                      </>
+                    );
+                  }}
                 </Form.List>
               </Form.Item>
             );
