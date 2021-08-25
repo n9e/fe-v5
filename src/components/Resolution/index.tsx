@@ -17,12 +17,13 @@ export default function Resolution(props: Props) {
   const [v, setV] = useState<string>(String(initialValue));
   const [realV, setRealV] = useState<number>(Number(initialValue));
 
-  const handleChange = (value) => {
-    setV(value);
-    const numV = Number(value);
-    if (Number.isInteger(numV) && numV > 0) {
-      setRealV(numV);
-      onChange(numV);
+  const handleEnter = (e) => {
+    if (e.keyCode === 13) {
+      const numV = Number(v);
+      if (Number.isInteger(numV) && numV > 0) {
+        setRealV(numV);
+        onChange(numV);
+      }
     }
   };
   const handleBlur = (event) => {
@@ -34,6 +35,12 @@ export default function Resolution(props: Props) {
       setV('' + realV);
     }
   };
+
+  const handelSelect = (v) => {
+    const numV = Number(v);
+    setRealV(numV);
+    onChange(numV);
+  };
   return (
     <div className='resolution'>
       <span className='label'>Step</span>
@@ -41,7 +48,9 @@ export default function Resolution(props: Props) {
         options={options}
         value={v}
         style={{ width: 60 }}
-        onChange={handleChange}
+        onChange={(value) => setV(value)}
+        onSelect={handelSelect}
+        onKeyDown={handleEnter}
         onBlur={handleBlur}
         placeholder='Step'
       ></AutoComplete>
