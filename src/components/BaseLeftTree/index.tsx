@@ -130,7 +130,7 @@ const GroupItem: React.FC<IGroupItemProps> = function ({
             : '',
         )}
         onClick={handleChooseItem}
-        onDoubleClick={handleEdit}
+        // onDoubleClick={handleEdit}
       >
         {item.isFavorite ? (
           <StarFilled
@@ -199,10 +199,9 @@ const LeftTree: React.FC<ILeftTreeProps> = ({
       setTeamList(data?.dat?.list || []);
     });
   }, []);
-  const params =
-    useParams<{
-      id: string;
-    }>();
+  const params = useParams<{
+    id: string;
+  }>();
   const {
     group: { favorite, common, commonTotal, currentPage },
   } = useSelector<RootState, any>((state) => state[treeType]);

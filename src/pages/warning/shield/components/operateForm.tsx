@@ -25,6 +25,8 @@ import { RootState } from '@/store/common';
 import { eventStoreState } from '@/store/eventInterface';
 import '../index.less';
 import { useTranslation } from 'react-i18next';
+import _ from 'lodash';
+
 const { Option } = Select;
 const { TextArea } = Input;
 const reg = /\w+=\w+/;
@@ -48,10 +50,9 @@ const OperateForm: React.FC<Props> = ({ detail, type = FormType.add }) => {
       offset: 2,
     },
   };
-  const params =
-    useParams<{
-      from: string;
-    }>();
+  const params = useParams<{
+    from: string;
+  }>();
   const { currentEdit } = useSelector<RootState, eventStoreState>(
     (state) => state.event,
   );
@@ -147,7 +148,7 @@ const OperateForm: React.FC<Props> = ({ detail, type = FormType.add }) => {
           >
             <AutoComplete
               placeholder={t('请输入指标名称')}
-              onSearch={getMetricsList}
+              onSearch={_.debounce(getMetricsList, 1000)}
             >
               {metrics.map((item) => {
                 return (
