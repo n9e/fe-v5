@@ -6,6 +6,7 @@ import { AreaChartOutlined } from '@ant-design/icons';
 import { Col, Drawer, Radio, Row } from 'antd';
 import React, { useEffect, useState } from 'react';
 import ResfeshIcon from '@/components/RefreshIcon';
+import Resolution from '@/components/Resolution';
 import { useTranslation } from 'react-i18next';
 interface Props {
   visible: boolean;
@@ -19,6 +20,7 @@ function ChartDrawer(props: Props) {
   const [numPerLine, setNumPerLine] = useState(1);
   const [idents, setIdents] = useState<Array<string>>([]);
   const [range, setRange] = useState<Param | RangeItem>({ start: 0, end: 0 });
+  const [step, setStep] = useState(15);
   const [chartOption, setChartOption] = useState<ChartComponentProps>({
     range: { start: 0, end: 0 },
     limit: 50,
@@ -28,7 +30,6 @@ function ChartDrawer(props: Props) {
 
   useEffect(() => {
     setMetrics(props.metrics);
-    console.log('fired', props.metrics);
   }, [props.metrics]);
 
   const { visible, onChange } = props;
@@ -41,12 +42,10 @@ function ChartDrawer(props: Props) {
     setChartOption({ ...chartOption, ...obj, range: newR });
   };
   const handleRefresh = () => {
-    console.log('handleRefresh');
     formatOption();
   };
 
   const handleDateChange = (e) => {
-    console.log(e, 'handleDateChange');
     setRange(e);
     formatOption({}, e);
   };
@@ -71,14 +70,9 @@ function ChartDrawer(props: Props) {
       <div className='header'>
         <div className='header-left'>
           <DateRangePicker onChange={handleDateChange} />
+          <Resolution onChange={(v) => setStep(v)} initialValue={step} />
           <ResfeshIcon onClick={handleRefresh} className='reload-icon' />
         </div>
-        {/* <Radio.Group value={numPerLine} onChange={handleChange}>
-          <Radio.Button value={4}>XS</Radio.Button>
-          <Radio.Button value={3}>S</Radio.Button>
-          <Radio.Button value={2}>M</Radio.Button>
-          <Radio.Button value={1}>L</Radio.Button>
-        </Radio.Group> */}
       </div>
       <div className='chart-list'>
         <Row gutter={15} style={{ width: '100%' }}>
@@ -90,6 +84,7 @@ function ChartDrawer(props: Props) {
                       options={{
                         ...chartOption,
                         idents: idents.length > 0 ? idents : undefined,
+                        step,
                         metric: metric.name,
                         description: metric.description,
                         prome_ql: metric.promql,

@@ -38,6 +38,7 @@ function Chart(props: Props) {
     prome_ql,
     yplotline,
     xplotline,
+    step,
   } = options;
 
   const [privateTags, setPrivateTags] = useState<TagType[]>([]);
@@ -132,6 +133,7 @@ function Chart(props: Props) {
       start,
       end,
       limit,
+      step,
     }).then((data) => {
       const dataY: DataSource[] = [];
       data.dat.forEach((dataItem) => {
@@ -360,7 +362,11 @@ function Chart(props: Props) {
 }
 
 function areEqual(pre, next) {
-  return pre.cached && pre.options.range === next.options.range;
+  return (
+    pre.cached &&
+    pre.options.range === next.options.range &&
+    pre.options.step === next.options.step
+  );
 }
 
 export default memo(Chart, areEqual);

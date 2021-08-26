@@ -27,6 +27,7 @@ import VariableConfig from './VariableConfig';
 import { TagFilterResponse } from './VariableConfig/definition';
 import './index.less';
 import { useTranslation } from 'react-i18next';
+import Resolution from '@/components/Resolution';
 interface URLParam {
   id: string;
 }
@@ -55,6 +56,7 @@ export default function DashboardDetail() {
     update_at: 0,
     update_by: '',
   });
+  const [step, setStep] = useState(15);
   const [titleEditing, setTitleEditing] = useState(false);
   const [chartGroup, setChartGroup] = useState<Group[]>([]);
   const [variableConfig, setVariableConfig] =
@@ -214,14 +216,6 @@ export default function DashboardDetail() {
             )}
             <EditOutlined className='edit' onClick={handleEdit} />
           </div>
-          <div className='dashboard-detail-header-right'>
-            <RefreshIcon
-              onClick={() => {
-                init();
-              }}
-            />
-            <DateRangePicker onChange={handleDateChange} />
-          </div>
         </div>
       }
     >
@@ -244,12 +238,22 @@ export default function DashboardDetail() {
             }}
           />
           <VariableConfig ref={variableRef} onChange={handleVariableChange} />
+          <div className='date-picker-area'>
+            <DateRangePicker onChange={handleDateChange} />
+            <Resolution onChange={(v) => setStep(v)} initialValue={step} />
+            <RefreshIcon
+              onClick={() => {
+                init();
+              }}
+            />
+          </div>
         </div>
 
         <div className='charts'>
           {chartGroup.map((item, i) => (
             <ChartGroup
               key={i}
+              step={step}
               groupInfo={item}
               onAddChart={handleAddChart}
               onUpdateChart={handleUpdateChart}
