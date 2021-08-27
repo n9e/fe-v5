@@ -216,6 +216,15 @@ export default function DashboardDetail() {
             )}
             <EditOutlined className='edit' onClick={handleEdit} />
           </div>
+          <div className='dashboard-detail-header-right'>
+            <DateRangePicker onChange={handleDateChange} />
+            <Resolution onChange={(v) => setStep(v)} initialValue={step} />
+            <RefreshIcon
+              onClick={() => {
+                init();
+              }}
+            />
+          </div>
         </div>
       }
     >
@@ -238,15 +247,6 @@ export default function DashboardDetail() {
             }}
           />
           <VariableConfig ref={variableRef} onChange={handleVariableChange} />
-          <div className='date-picker-area'>
-            <DateRangePicker onChange={handleDateChange} />
-            <Resolution onChange={(v) => setStep(v)} initialValue={step} />
-            <RefreshIcon
-              onClick={() => {
-                init();
-              }}
-            />
-          </div>
         </div>
 
         <div className='charts'>

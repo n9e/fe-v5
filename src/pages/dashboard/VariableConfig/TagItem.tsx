@@ -287,7 +287,6 @@ const TagItem: React.FC<ITagItemProps> = ({ tagData, index, isEditing }) => {
             showSearch
             loading={tagKeyLoading}
             value={tagData.key}
-            allowClear
             onClick={handleTagClick}
             dropdownClassName='overflow-230'
             placeholder={t('任意标签/资源分组')}
@@ -341,7 +340,9 @@ const TagItem: React.FC<ITagItemProps> = ({ tagData, index, isEditing }) => {
         </Col>
         {errorTip && (
           <Col span={5}>
-            <div className='error-tips'>{errorTip}</div>
+            <div className='error-tips'>
+              <span>{errorTip}</span>
+            </div>
           </Col>
         )}
       </Row>
