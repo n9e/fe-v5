@@ -1,5 +1,5 @@
 import React, { useEffect, ChangeEvent } from 'react';
-import { Button, Col, Modal, Row } from 'antd';
+import { Button, Col, Modal, Row, Image } from 'antd';
 import SearchInput from '../BaseSearchInput';
 import { useSelector, useDispatch } from 'react-redux';
 import { useState } from 'react';
@@ -8,8 +8,6 @@ import ErrorComponent from '../ErrorComponent';
 import {
   StarOutlined,
   StarFilled,
-  FormOutlined,
-  DeleteOutlined,
   ExclamationCircleOutlined,
   SmallDashOutlined,
 } from '@ant-design/icons';
@@ -30,6 +28,7 @@ import { createGroupModel } from '@/pages/warning/strategy/constant';
 import { getTeamInfoList } from '@/services/manage';
 import { Team } from '@/store/manageInterface';
 import { useTranslation } from 'react-i18next';
+import ListTree from '../ListTree';
 const { confirm } = Modal;
 interface ILeftTreeProps {
   pathKey?: string;
@@ -113,6 +112,8 @@ const GroupItem: React.FC<IGroupItemProps> = function ({
     history.push({
       pathname: `/${treeType}/${item.id}`,
     });
+    console.log(item);
+
     dispatch({
       type: `${treeType}/chooseGroupItem`,
       data: item,
@@ -192,7 +193,10 @@ const LeftTree: React.FC<ILeftTreeProps> = ({
   pageTitle,
 }) => {
   const { t, i18n } = useTranslation(); // 新增策略分组
-
+  const [isTree, setisTree] = useState<boolean>(
+    localStorage.getItem('isTree') === 'false' ? false : true,
+  );
+  const [treeQuery, settreeQuery] = useState<string>('');
   const [teamList, setTeamList] = useState<Array<Team>>([]);
   useEffect(() => {
     getTeamInfoList().then((data) => {
@@ -219,6 +223,7 @@ const LeftTree: React.FC<ILeftTreeProps> = ({
   };
 
   const handleSearch = (keyword: string) => {
+    settreeQuery(keyword);
     dispatch({
       type: `${treeType}/getGroup`,
       sign: 'search',
@@ -232,6 +237,17 @@ const LeftTree: React.FC<ILeftTreeProps> = ({
       sign: 'append',
     });
   };
+  const toTree = () => {
+    setisTree(() => {
+      localStorage.setItem('isTree', JSON.stringify(!isTree));
+      return !isTree;
+    });
+  };
+  const handleNewResource = () => {
+    console.log('新建');
+
+    createResourceGroupModal(t);
+  };
 
   return (
     <div className={'left-tree-area'}>
@@ -241,7 +257,10 @@ const LeftTree: React.FC<ILeftTreeProps> = ({
           {t('收藏的')}
           {typeName}
         </div>
-        <div className={'left-tree-area-item-list'}>
+        <div
+          className={'left-tree-area-item-list'}
+          style={{ maxHeight: 158, overflow: 'scroll' }}
+        >
           {favorite.map((item) => (
             <GroupMemoItem
               key={item.id}
@@ -282,30 +301,65 @@ const LeftTree: React.FC<ILeftTreeProps> = ({
             )}
           </Col>
         </Row>
-
-        <SearchInput
-          className={'left-tree-area-item-input'}
-          onSearch={handleSearch}
-        ></SearchInput>
+        {treeType == 'resource' ? (
+          <Row align='middle'>
+            <Col span={2}>
+              <div
+                style={{ cursor: 'pointer', paddingTop: 8, paddingLeft: 4 }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toTree();
+                }}
+              >
+                {isTree ? (
+                  <Image width={20} preview={false} src='/image/list1.png' />
+                ) : (
+                  <Image width={15} preview={false} src='/image/tree.png' />
+                )}
+              </div>
+            </Col>
+            <Col span={20} offset={2}>
+              <SearchInput
+                className={'left-tree-area-item-input'}
+                onSearch={handleSearch}
+              ></SearchInput>
+            </Col>
+          </Row>
+        ) : (
+          <SearchInput
+            className={'left-tree-area-item-input'}
+            onSearch={handleSearch}
+          ></SearchInput>
+        )}
       </div>
       <div
         className={'left-tree-area-item'}
         style={{ flex: 1, overflow: 'auto' }}
       >
         <div className={'left-tree-area-item-list'}>
-          {common.map((item) => (
-            <GroupMemoItem
-              key={item.id}
-              isFavorite={false}
-              item={item}
-              groupType={favoriteFrom.Common}
-              pathKey={pathKey}
+          {!isTree ? (
+            common.map((item) => {
+              return (
+                <GroupMemoItem
+                  key={item.id}
+                  isFavorite={false}
+                  item={item}
+                  groupType={favoriteFrom.Common}
+                  pathKey={pathKey}
+                  treeType={treeType}
+                  typeName={typeName}
+                ></GroupMemoItem>
+              );
+            })
+          ) : (
+            <ListTree
+              query={treeQuery}
+              isretry={common}
               treeType={treeType}
-              typeName={typeName}
-            ></GroupMemoItem>
-          ))}
+            ></ListTree>
+          )}
         </div>
-        {PAGE_SIZE * currentPage < commonTotal ? (
+        {isTree ? null : PAGE_SIZE * currentPage < commonTotal ? (
           <SmallDashOutlined className={'load-more'} onClick={handleAppend} />
         ) : null}
       </div>

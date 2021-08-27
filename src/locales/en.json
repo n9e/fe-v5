@@ -49,6 +49,7 @@
   "必须要有一个变量名": "Var name required",
   "变量名重复": "Duplicate variable name",
   "变量名包含非法字符": "The variable name contains illegal characters",
+  "资源分组路径含有非法字符": "The Classpath contains illegal characters",
   "变量名": "Variable name",
   "标签或资源分组": "Label or Classpath",
   "默认值": "Default value",
