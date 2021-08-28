@@ -243,11 +243,6 @@ const LeftTree: React.FC<ILeftTreeProps> = ({
       return !isTree;
     });
   };
-  const handleNewResource = () => {
-    console.log('新建');
-
-    createResourceGroupModal(t);
-  };
 
   return (
     <div className={'left-tree-area'}>
@@ -312,9 +307,14 @@ const LeftTree: React.FC<ILeftTreeProps> = ({
                 }}
               >
                 {isTree ? (
-                  <Image width={20} preview={false} src='/image/list1.png' />
+                  <Image width={20} preview={false} src={'/image/list.svg'} />
                 ) : (
-                  <Image width={15} preview={false} src='/image/tree.png' />
+                  <Image
+                    style={{ boxSizing: 'border-box', padding: 2 }}
+                    width={20}
+                    preview={false}
+                    src={'/image/tree.svg'}
+                  />
                 )}
               </div>
             </Col>

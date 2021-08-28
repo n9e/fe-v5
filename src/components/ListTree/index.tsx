@@ -43,15 +43,13 @@ interface currentData {
   isFavorite: boolean;
   icon: ReactNode;
 }
-const Resource: React.FC<TreeProps> = ({ treeType, isretry, query }) => {
-  const [paths, setpaths] = useState<Item[]>([]);
-  const [retry, setretry] = useState(false);
-  const [spinning, setspinning] = useState<boolean>(false);
+const ResourceTree: React.FC<TreeProps> = ({ treeType, isretry, query }) => {
+  const [paths, setPaths] = useState<Item[]>([]);
+  const [retry, setRetry] = useState(false);
+  const [spinning, setSpinning] = useState<boolean>(false);
   const dispatch = useDispatch();
   useEffect(() => {
-    console.log(isretry);
-
-    setspinning(true);
+    setSpinning(true);
     Promise.all([
       getFavoritesResourceGroups(),
       getResourceAllGroups(2000, 1, query),
@@ -75,21 +73,21 @@ const Resource: React.FC<TreeProps> = ({ treeType, isretry, query }) => {
       let paths = All.map((ele) => {
         return { path: ele.path, id: ele.id, isFavorite: ele.isFavorite };
       });
-      paths = tree(paths);
-      setpaths(paths);
-      settreeData(All);
+      paths = generateTree(paths);
+      setPaths(paths);
+      setTreeData(All);
     });
   }, [retry, query, isretry]);
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
   const [autoExpandParent, setAutoExpandParent] = useState<boolean>(true);
-  const [curData, setcurData] = useState<currentData | undefined>();
-  const [isModalVisible, setisModalVisible] = useState(false);
+  const [curData, setCurData] = useState<currentData | undefined>();
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const history = useHistory();
   const { t, i18n } = useTranslation(); // 新增策略分组
   const [form] = Form.useForm();
-  const [treeData, settreeData] = useState<currentData[] | undefined>();
+  const [treeData, setTreeData] = useState<currentData[] | undefined>();
 
-  function tree(arr): Item[] {
+  function generateTree(arr): Item[] {
     arr.sort();
     var longestCommonPrefix = function (strs: string | any[]) {
       //第一个元素是待匹配元素
@@ -175,18 +173,17 @@ const Resource: React.FC<TreeProps> = ({ treeType, isretry, query }) => {
       return heapTree;
     }
     let res = toTree(arr);
-    setspinning(false);
+    setSpinning(false);
     return res;
   }
 
   const handleFavorite = (e) => {
-    console.log(e);
     dispatch({
       type: `${treeType}/changeGroupFavorite`,
       id: e.id,
       favorType: e.isFavorite ? favoriteType.Delete : favoriteType.Add,
     });
-    setretry(!retry);
+    setRetry(!retry);
   };
   const onExpand = (expandedKeysValue: React.Key[]) => {
     setExpandedKeys(expandedKeysValue);
@@ -214,15 +211,15 @@ const Resource: React.FC<TreeProps> = ({ treeType, isretry, query }) => {
         if (!e.err) {
           message.success('新建成功');
           handleCancel();
-          setretry(!retry);
+          setRetry(!retry);
         }
       });
     });
   };
   const handleCancel = () => {
-    setisModalVisible(false);
+    setIsModalVisible(false);
     form.resetFields();
-    setcurData(undefined);
+    setCurData(undefined);
   };
 
   return (
@@ -235,7 +232,6 @@ const Resource: React.FC<TreeProps> = ({ treeType, isretry, query }) => {
         <Tree
           className={'mytree'}
           showIcon
-          // onRightClick={onRightClick}
           onExpand={onExpand}
           expandedKeys={expandedKeys}
           autoExpandParent={autoExpandParent}
@@ -253,13 +249,13 @@ const Resource: React.FC<TreeProps> = ({ treeType, isretry, query }) => {
                       <Menu>
                         <Menu.Item
                           onClick={(e) => {
-                            setcurData(() => {
+                            setCurData(() => {
                               form.setFieldsValue({ parentStr: nodeData.key });
                               return nodeData;
                             });
                             e.domEvent.stopPropagation();
                             setTimeout(() => {
-                              setisModalVisible(true);
+                              setIsModalVisible(true);
                             }, 1);
                           }}
                         >
@@ -341,4 +337,4 @@ const Resource: React.FC<TreeProps> = ({ treeType, isretry, query }) => {
   );
 };
 
-export default Resource;
+export default ResourceTree;
