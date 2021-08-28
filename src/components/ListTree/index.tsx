@@ -247,7 +247,8 @@ const Resource: React.FC<TreeProps> = ({ treeType, isretry, query }) => {
               <>
                 <Dropdown
                   trigger={['contextMenu']}
-                  overlay={(function (e) {
+                  placement='bottomLeft'
+                  overlay={(function () {
                     return (
                       <Menu>
                         <Menu.Item
@@ -267,7 +268,6 @@ const Resource: React.FC<TreeProps> = ({ treeType, isretry, query }) => {
                       </Menu>
                     );
                   })()}
-                  placement='bottomLeft'
                 >
                   <span>{nodeData.title}</span>
                 </Dropdown>

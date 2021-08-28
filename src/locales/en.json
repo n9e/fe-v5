@@ -396,6 +396,8 @@
   "请输入指标": "Enter metric",
   "请输入百分比": "Enter percentages",
   "新建策略分组": "New rule group",
+  "新建子节点": "New child node",
+
   "编辑策略组": "Edit rule Group",
   "策略组名称": "Name",
   "策略组名称必填": "Group name required",
