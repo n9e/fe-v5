@@ -236,7 +236,7 @@ export default function Dashboard() {
       return importDashboard(importData).then(() =>
         (ref?.current as any)?.refreshList(),
       );
-    } catch (err) {
+    } catch (err: any) {
       notification.error({
         message: err?.message || t('您的网络发生异常，无法连接服务器'),
       });
