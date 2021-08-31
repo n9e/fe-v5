@@ -218,7 +218,9 @@ const LeftTree: React.FC<ILeftTreeProps> = ({
   useEffect(() => {
     initData();
   }, []);
-
+  useEffect(() => {
+    handleSearch(treeQuery);
+  }, [isTree]);
   const initData = () => {
     dispatch({
       type: `${treeType}/getGroup`,
@@ -228,12 +230,16 @@ const LeftTree: React.FC<ILeftTreeProps> = ({
   };
 
   const handleSearch = (keyword: string) => {
-    settreeQuery(keyword);
-    dispatch({
-      type: `${treeType}/getGroup`,
-      sign: 'search',
-      data: keyword,
-    });
+    if (treeType === 'resource') {
+      settreeQuery(keyword);
+    }
+    if (!isTree || treeType !== 'resource') {
+      dispatch({
+        type: `${treeType}/getGroup`,
+        sign: 'search',
+        data: keyword,
+      });
+    }
   };
 
   const handleAppend = () => {

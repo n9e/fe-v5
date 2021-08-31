@@ -176,6 +176,8 @@
   "用户管理": "Users",
   "用户名、邮箱或手机": "User name, email or mobile phone",
   "创建": "Create",
+  "创建并关闭": "Create and close",
+
   "创建用户": "Create User",
   "团队管理": "Team Management",
   "搜索团队名称": "Team name",
@@ -502,5 +504,4 @@
   "全量告警历史": "History Alert Events",
   "恢复": "Recovery",
   "告警": "Alert"
-  
 }

@@ -1,5 +1,6 @@
 import React, { ReactNode, useEffect, useState } from 'react';
 import {
+  Button,
   Dropdown,
   Form,
   Input,
@@ -23,9 +24,11 @@ import {
   getResourceAllGroups,
 } from '@/services';
 import './index.less';
+import { filter } from './until';
 const { Option } = Select;
 
 interface Item {
+  id: string;
   key: string;
   title: string;
   children: Item[];
@@ -44,22 +47,38 @@ interface currentData {
   icon: ReactNode;
   path: string;
 }
-const ResourceTree: React.FC<TreeProps> = ({ treeType, isretry, query }) => {
-  const [paths, setPaths] = useState<Item[]>([]);
+interface originType {
+  create_at: number;
+  create_by: string;
+  id: number;
+  isFavorite: boolean;
+  note: string;
+  path: string;
+  preset: number;
+  update_at: number;
+}
+const ResourceTree: React.FC<TreeProps> = ({
+  treeType,
+  isretry, //dispatch会触发isretry，刷新本组件
+  query,
+}) => {
   const [retry, setRetry] = useState(false);
   const [spinning, setSpinning] = useState<boolean>(false);
-  const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
-  const [autoExpandParent, setAutoExpandParent] = useState<boolean>(true);
+  const [paths, setPaths] = useState<Item[]>([]); //初始化构建的整颗树
+  const [treeData, setTreeData] = useState<currentData[] | undefined>(); //树依赖的数据
+  const [dataLoading, setdataLoading] = useState<boolean>(false); //解决树的默认展开异步问题
+  const [dispatchTree, setdispatchTree] = useState<originType[]>([]);
+  const [expandedKeys, setExpandedKeys] = useState<string[]>([]);
   const [curData, setCurData] = useState<currentData | undefined>();
+  const [autoExpandParent, setAutoExpandParent] = useState<boolean>(true);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isQuery, setisQuery] = useState(false);
   const history = useHistory();
-  const { t, i18n } = useTranslation(); // 新增策略分组
+  const { t, i18n } = useTranslation();
   const [form] = Form.useForm();
-  const [treeData, setTreeData] = useState<currentData[] | undefined>();
-  const [originPaths, setOriginPaths] = useState<currentData[]>([]);
-  const [defaultExpandedKeys, setdefaultExpandedKeys] = useState<string[]>([]);
   const dispatch = useDispatch();
   useEffect(() => {
+    console.log(expandedKeys);
     setSpinning(true);
     Promise.all([
       getFavoritesResourceGroups(),
@@ -67,6 +86,7 @@ const ResourceTree: React.FC<TreeProps> = ({ treeType, isretry, query }) => {
     ]).then((e) => {
       let isFavoriteArr = e[0].dat;
       let All = e[1].dat.list;
+      setdispatchTree(All);
       All = All.map((ele) => {
         let flag = false;
         isFavoriteArr.forEach((element) => {
@@ -83,57 +103,50 @@ const ResourceTree: React.FC<TreeProps> = ({ treeType, isretry, query }) => {
       });
       let paths = All.map((ele) => {
         return { path: ele.path, id: ele.id, isFavorite: ele.isFavorite };
-      });
-      setOriginPaths(paths);
-      paths = generateTree(paths);
+      }); //合并收藏数组和全部数组
+      paths = generateTree(paths); // 初始树
+      setPaths(paths);
       if (query) {
         console.log(query);
-
-        filter(paths, query);
+        const { queryTree, defaultExpandedKeys } = filter(paths, query);
+        setTreeData(queryTree); //组件过滤树
+        console.log(defaultExpandedKeys);
+        setExpandedKeys(defaultExpandedKeys); //控制默认展开节点数组
+        setisQuery(true);
       } else {
-        setPaths(paths);
-      }
-      setTreeData(All);
-    });
-  }, [retry, isretry]);
-  useEffect(() => {
-    console.log(query === '');
-    if (query === '') {
-      setRetry(!retry);
-      setdefaultExpandedKeys([]);
-    } else {
-      filter(paths, query);
-    }
-  }, [query]);
-  function filter(tree, query) {
-    let defaultExpandedKeys = [];
-    let queryTree = tree.filter((ele) => {
-      ele.children = ele.children.filter((child) => {
-        return dfs(child, query);
-      });
-      return dfs(ele, query);
-    });
-    function dfs(node, query) {
-      //判读该节点和该节点的子元素key是否包含query
-      if (node) {
-        let temp = node.children.filter((e) => {
-          return dfs(e, query);
-        });
-        if (temp.length > 0) {
-          //该节点的子元素key包含query,该元素展开
-          console.log(node);
-
-          defaultExpandedKeys.push(node.key);
+        if (isQuery) {
+          setExpandedKeys([]); //如果从搜索状态恢复，收起所有展开
+          setisQuery(false);
+        } else {
+          setExpandedKeys(expandedKeys); //控制默认展开节点数组,为原始(作用1：model的连续创建)
         }
-        return node.key.includes(query) || (temp.length > 0 ? true : false);
+        setTreeData(paths);
+      }
+      setTimeout(() => {
+        setdataLoading(true);
+      }, 1);
+    });
+  }, [retry, isretry, query]);
+
+  //控制展开key
+  const onExpand = (expandedKeys, { expanded: bool, node }) => {
+    function delSon(node) {
+      if (node) {
+        node.children &&
+          node.children.forEach((ele) => {
+            if (expandedKeys.indexOf(ele.key) != -1) {
+              expandedKeys.splice(expandedKeys.indexOf(ele.key), 1);
+            }
+            delSon(ele);
+          });
       }
     }
-    defaultExpandedKeys = Array.from(new Set(defaultExpandedKeys));
-    console.log(queryTree);
-    console.log(defaultExpandedKeys);
-    setdefaultExpandedKeys(defaultExpandedKeys);
-    setPaths(queryTree);
-  }
+    //关闭所有子元素展开
+    delSon(node);
+    setExpandedKeys(expandedKeys);
+    setAutoExpandParent(false);
+  };
+
   function generateTree(arr): Item[] {
     arr.sort();
     var longestCommonPrefix = function (strs: string | any[]) {
@@ -230,20 +243,13 @@ const ResourceTree: React.FC<TreeProps> = ({ treeType, isretry, query }) => {
       id: e.id,
       favorType: e.isFavorite ? favoriteType.Delete : favoriteType.Add,
     });
-    setRetry(!retry);
-  };
-  const onExpand = (expandedKeysValue: React.Key[]) => {
-    setExpandedKeys(expandedKeysValue);
-    setAutoExpandParent(false);
   };
 
   const onSelect = (selectedKeysValue: React.Key[], info: any) => {
-    console.log(info.node);
-
     history.push({
       pathname: `/${treeType}/${info.node.id}`,
     });
-    let item = treeData?.find((ele) => ele.id === info.node.id);
+    let item = dispatchTree?.find((ele) => ele.id === info.node.id);
     dispatch({
       type: `${treeType}/chooseGroupItem`,
       data: item,
@@ -269,6 +275,22 @@ const ResourceTree: React.FC<TreeProps> = ({ treeType, isretry, query }) => {
     setIsModalVisible(false);
     form.resetFields();
     setCurData(undefined);
+    localStorage.removeItem('modalExpandedKey');
+  };
+  const handleSaveModel = () => {
+    form.validateFields().then((e) => {
+      let formVal = form.getFieldsValue();
+      let obj = {
+        path: formVal.parentStr + formVal.des + formVal.sonStr,
+        node: formVal.note,
+      };
+      addResourceGroup(obj).then((e) => {
+        if (!e.err) {
+          message.success(t('创建成功'));
+          setRetry(!retry);
+        }
+      });
+    });
   };
 
   return (
@@ -278,60 +300,80 @@ const ResourceTree: React.FC<TreeProps> = ({ treeType, isretry, query }) => {
         wrapperClassName={'Spin'}
         style={{ marginTop: 150 }}
       >
-        <Tree
-          className={'mytree'}
-          showIcon
-          defaultExpandedKeys={['/data-/szq', '/data-/szq-szqa']}
-          onExpand={onExpand}
-          expandedKeys={expandedKeys}
-          autoExpandParent={autoExpandParent}
-          onSelect={onSelect}
-          treeData={paths}
-          blockNode={true}
-          titleRender={(nodeData: currentData) => {
-            return (
-              <>
-                <Dropdown
-                  trigger={['contextMenu']}
-                  placement='bottomLeft'
-                  overlay={(function () {
-                    return (
-                      <Menu>
-                        <Menu.Item
-                          onClick={(e) => {
-                            setCurData(() => {
-                              form.setFieldsValue({ parentStr: nodeData.key });
-                              return nodeData;
-                            });
-                            e.domEvent.stopPropagation();
-                            setTimeout(() => {
-                              setIsModalVisible(true);
-                            }, 1);
-                          }}
-                        >
-                          <a>{t('新建子节点')}</a>
-                        </Menu.Item>
-                      </Menu>
-                    );
-                  })()}
-                >
-                  <span>{nodeData.title}</span>
-                </Dropdown>
-              </>
-            );
-          }}
-        />
+        {dataLoading && (
+          <Tree
+            className={'mytree'}
+            showIcon
+            onExpand={onExpand}
+            expandedKeys={expandedKeys}
+            autoExpandParent={autoExpandParent}
+            defaultExpandAll={true}
+            onSelect={onSelect}
+            treeData={treeData}
+            blockNode={true}
+            titleRender={(nodeData: currentData) => {
+              return (
+                <>
+                  <Dropdown
+                    trigger={['contextMenu']}
+                    placement='bottomLeft'
+                    overlay={(function () {
+                      return (
+                        <Menu>
+                          <Menu.Item
+                            onClick={(e) => {
+                              setCurData(() => {
+                                let tempArr = [...expandedKeys];
+                                tempArr.push(nodeData.key);
+                                setExpandedKeys(() => {
+                                  return tempArr;
+                                });
+                                form.setFieldsValue({
+                                  parentStr: nodeData.key,
+                                });
+                                return nodeData;
+                              });
+                              e.domEvent.stopPropagation();
+                              setTimeout(() => {
+                                setIsModalVisible(true);
+                              }, 1);
+                            }}
+                          >
+                            <a>{t('新建子节点')}</a>
+                          </Menu.Item>
+                        </Menu>
+                      );
+                    })()}
+                  >
+                    <span>{nodeData.title}</span>
+                  </Dropdown>
+                </>
+              );
+            }}
+          />
+        )}
       </Spin>
       <Modal
         title={t('新建资源分组')}
         visible={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
+        footer={[
+          <Button key='back' onClick={handleCancel}>
+            {t('取消')}
+          </Button>,
+          <Button key='submit' type='primary' onClick={handleOk}>
+            {t('创建并关闭')}
+          </Button>,
+          <Button key='link' type='primary' onClick={handleSaveModel}>
+            {t('创建')}
+          </Button>,
+        ]}
       >
         <Form
           form={form}
           layout={'vertical'}
-          validateTrigger={['onChange', 'trigger', 'onBlur', 'submit']}
+          validateTrigger={['onChange', 'onBlur']}
         >
           <Form.Item
             name={'path'}
