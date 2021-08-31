@@ -1,4 +1,4 @@
-import React, { useEffect, ChangeEvent } from 'react';
+import React, { useEffect, ChangeEvent, useRef } from 'react';
 import { Button, Col, Modal, Row, Image } from 'antd';
 import SearchInput from '../BaseSearchInput';
 import { useSelector, useDispatch } from 'react-redux';
@@ -194,10 +194,15 @@ const LeftTree: React.FC<ILeftTreeProps> = ({
 }) => {
   const { t, i18n } = useTranslation(); // 新增策略分组
   const [isTree, setisTree] = useState<boolean>(
-    localStorage.getItem('isTree') === 'false' ? false : true,
+    localStorage.getItem('isTree') === null
+      ? false
+      : localStorage.getItem('isTree') === 'false'
+      ? false
+      : true,
   );
   const [treeQuery, settreeQuery] = useState<string>('');
   const [teamList, setTeamList] = useState<Array<Team>>([]);
+  const searchRef = useRef(null);
   useEffect(() => {
     getTeamInfoList().then((data) => {
       setTeamList(data?.dat?.list || []);
@@ -254,7 +259,7 @@ const LeftTree: React.FC<ILeftTreeProps> = ({
         </div>
         <div
           className={'left-tree-area-item-list'}
-          style={{ maxHeight: 158, overflow: 'scroll' }}
+          style={{ maxHeight: 146, overflowY: 'scroll' }}
         >
           {favorite.map((item) => (
             <GroupMemoItem
@@ -300,21 +305,41 @@ const LeftTree: React.FC<ILeftTreeProps> = ({
           <Row align='middle'>
             <Col span={2}>
               <div
-                style={{ cursor: 'pointer', paddingTop: 8, paddingLeft: 4 }}
+                style={{ cursor: 'pointer', paddingTop: 8 }}
                 onClick={(e) => {
                   e.stopPropagation();
                   toTree();
                 }}
               >
                 {isTree ? (
-                  <Image width={20} preview={false} src={'/image/list.svg'} />
+                  <Button
+                    className={'treeImg'}
+                    style={{
+                      height: 32,
+                      marginBottom: 8,
+                      paddingTop: 7,
+                      padding: '0 5px',
+                    }}
+                  >
+                    <Image width={20} preview={false} src={'/image/list.svg'} />
+                  </Button>
                 ) : (
-                  <Image
-                    style={{ boxSizing: 'border-box', padding: 2 }}
-                    width={20}
-                    preview={false}
-                    src={'/image/tree.svg'}
-                  />
+                  <Button
+                    className={'treeImg'}
+                    style={{
+                      height: 32,
+                      marginBottom: 8,
+                      paddingTop: 7,
+                      padding: '0 5px',
+                    }}
+                  >
+                    <Image
+                      style={{ boxSizing: 'border-box', padding: 2 }}
+                      width={20}
+                      preview={false}
+                      src={'/image/tree.svg'}
+                    />
+                  </Button>
                 )}
               </div>
             </Col>
@@ -337,7 +362,13 @@ const LeftTree: React.FC<ILeftTreeProps> = ({
         style={{ flex: 1, overflow: 'auto' }}
       >
         <div className={'left-tree-area-item-list'}>
-          {!isTree ? (
+          {isTree && treeType === 'resource' ? (
+            <ListTree
+              query={treeQuery}
+              isretry={common}
+              treeType={treeType}
+            ></ListTree>
+          ) : (
             common.map((item) => {
               return (
                 <GroupMemoItem
@@ -351,15 +382,10 @@ const LeftTree: React.FC<ILeftTreeProps> = ({
                 ></GroupMemoItem>
               );
             })
-          ) : (
-            <ListTree
-              query={treeQuery}
-              isretry={common}
-              treeType={treeType}
-            ></ListTree>
           )}
         </div>
-        {isTree ? null : PAGE_SIZE * currentPage < commonTotal ? (
+        {isTree && treeType === 'resource' ? null : PAGE_SIZE * currentPage <
+          commonTotal ? (
           <SmallDashOutlined className={'load-more'} onClick={handleAppend} />
         ) : null}
       </div>

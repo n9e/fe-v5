@@ -42,17 +42,28 @@ interface currentData {
   id: string;
   isFavorite: boolean;
   icon: ReactNode;
+  path: string;
 }
 const ResourceTree: React.FC<TreeProps> = ({ treeType, isretry, query }) => {
   const [paths, setPaths] = useState<Item[]>([]);
   const [retry, setRetry] = useState(false);
   const [spinning, setSpinning] = useState<boolean>(false);
+  const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
+  const [autoExpandParent, setAutoExpandParent] = useState<boolean>(true);
+  const [curData, setCurData] = useState<currentData | undefined>();
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const history = useHistory();
+  const { t, i18n } = useTranslation(); // 新增策略分组
+  const [form] = Form.useForm();
+  const [treeData, setTreeData] = useState<currentData[] | undefined>();
+  const [originPaths, setOriginPaths] = useState<currentData[]>([]);
+  const [defaultExpandedKeys, setdefaultExpandedKeys] = useState<string[]>([]);
   const dispatch = useDispatch();
   useEffect(() => {
     setSpinning(true);
     Promise.all([
       getFavoritesResourceGroups(),
-      getResourceAllGroups(2000, 1, query),
+      getResourceAllGroups(2000, 1),
     ]).then((e) => {
       let isFavoriteArr = e[0].dat;
       let All = e[1].dat.list;
@@ -73,20 +84,56 @@ const ResourceTree: React.FC<TreeProps> = ({ treeType, isretry, query }) => {
       let paths = All.map((ele) => {
         return { path: ele.path, id: ele.id, isFavorite: ele.isFavorite };
       });
+      setOriginPaths(paths);
       paths = generateTree(paths);
-      setPaths(paths);
+      if (query) {
+        console.log(query);
+
+        filter(paths, query);
+      } else {
+        setPaths(paths);
+      }
       setTreeData(All);
     });
-  }, [retry, query, isretry]);
-  const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
-  const [autoExpandParent, setAutoExpandParent] = useState<boolean>(true);
-  const [curData, setCurData] = useState<currentData | undefined>();
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const history = useHistory();
-  const { t, i18n } = useTranslation(); // 新增策略分组
-  const [form] = Form.useForm();
-  const [treeData, setTreeData] = useState<currentData[] | undefined>();
+  }, [retry, isretry]);
+  useEffect(() => {
+    console.log(query === '');
+    if (query === '') {
+      setRetry(!retry);
+      setdefaultExpandedKeys([]);
+    } else {
+      filter(paths, query);
+    }
+  }, [query]);
+  function filter(tree, query) {
+    let defaultExpandedKeys = [];
+    let queryTree = tree.filter((ele) => {
+      ele.children = ele.children.filter((child) => {
+        return dfs(child, query);
+      });
+      return dfs(ele, query);
+    });
+    function dfs(node, query) {
+      //判读该节点和该节点的子元素key是否包含query
+      if (node) {
+        let temp = node.children.filter((e) => {
+          return dfs(e, query);
+        });
+        if (temp.length > 0) {
+          //该节点的子元素key包含query,该元素展开
+          console.log(node);
 
+          defaultExpandedKeys.push(node.key);
+        }
+        return node.key.includes(query) || (temp.length > 0 ? true : false);
+      }
+    }
+    defaultExpandedKeys = Array.from(new Set(defaultExpandedKeys));
+    console.log(queryTree);
+    console.log(defaultExpandedKeys);
+    setdefaultExpandedKeys(defaultExpandedKeys);
+    setPaths(queryTree);
+  }
   function generateTree(arr): Item[] {
     arr.sort();
     var longestCommonPrefix = function (strs: string | any[]) {
@@ -129,7 +176,7 @@ const ResourceTree: React.FC<TreeProps> = ({ treeType, isretry, query }) => {
           //不存在则构建这个节点并且放入这个层
           if (!obj) {
             curStr = perLen ? origin.path.slice(perLen) : origin.path;
-            curStr = curStr.replace(/^[\.|\_|\/]{1}/, '');
+            curStr = curStr.replace(/^[\.|\_|\/|\-]{1}/, '');
             curNodes.push({
               title: curStr,
               key: origin.path,
@@ -191,6 +238,8 @@ const ResourceTree: React.FC<TreeProps> = ({ treeType, isretry, query }) => {
   };
 
   const onSelect = (selectedKeysValue: React.Key[], info: any) => {
+    console.log(info.node);
+
     history.push({
       pathname: `/${treeType}/${info.node.id}`,
     });
@@ -209,7 +258,7 @@ const ResourceTree: React.FC<TreeProps> = ({ treeType, isretry, query }) => {
       };
       addResourceGroup(obj).then((e) => {
         if (!e.err) {
-          message.success('新建成功');
+          message.success(t('创建成功'));
           handleCancel();
           setRetry(!retry);
         }
@@ -232,6 +281,7 @@ const ResourceTree: React.FC<TreeProps> = ({ treeType, isretry, query }) => {
         <Tree
           className={'mytree'}
           showIcon
+          defaultExpandedKeys={['/data-/szq', '/data-/szq-szqa']}
           onExpand={onExpand}
           expandedKeys={expandedKeys}
           autoExpandParent={autoExpandParent}
@@ -299,11 +349,12 @@ const ResourceTree: React.FC<TreeProps> = ({ treeType, isretry, query }) => {
               <Form.Item name={['parentStr']}>
                 <Input disabled />
               </Form.Item>
-              <Form.Item name={'des'} initialValue='_'>
+              <Form.Item name={'des'} initialValue='-'>
                 <Select style={{ width: '50px', margin: '0 5px' }}>
                   <Option value='/'>/</Option>
                   <Option value='.'>.</Option>
                   <Option value='_'>_</Option>
+                  <Option value='-'>-</Option>
                 </Select>
               </Form.Item>
               <Form.Item
@@ -312,7 +363,7 @@ const ResourceTree: React.FC<TreeProps> = ({ treeType, isretry, query }) => {
                 rules={[
                   { required: true, message: t('资源分组路径必填') },
                   {
-                    pattern: /^[^\.|\_|\/]+$/g,
+                    pattern: /^[^\.|\_|\/|\-]+$/g,
                     message: t('资源分组路径含有非法字符'),
                   },
                 ]}
