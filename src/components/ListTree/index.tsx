@@ -81,13 +81,15 @@ const ResourceTree: React.FC<TreeProps> = ({
   const { t, i18n } = useTranslation();
   const [form] = Form.useForm();
   const dispatch = useDispatch();
+  // useEffect(() => {
+  //   console.log(treeHeight);
+  // }, [treeHeight]);
+  // useEffect(() => {
+  //   console.log(expandedKeys);
+  // }, [expandedKeys]);
   useEffect(() => {
-    console.log(treeHeight);
-  }, [treeHeight]);
-  useEffect(() => {
-    console.log(expandedKeys);
-  }, [expandedKeys]);
-  useEffect(() => {
+    console.log(query);
+
     setSpinning(true);
     Promise.all([
       getFavoritesResourceGroups(),
@@ -116,6 +118,7 @@ const ResourceTree: React.FC<TreeProps> = ({
       paths = generateTree(paths); // 初始树
       setPaths(paths);
       if (query) {
+        setdataLoading(false);
         const { queryTree, defaultExpandedKeys } = filter(paths, query);
         setTreeData(queryTree); //组件过滤树
         console.log(defaultExpandedKeys);
@@ -123,7 +126,13 @@ const ResourceTree: React.FC<TreeProps> = ({
           Array.from(new Set([...defaultExpandedKeys, ...expandedKeys])), //兼容搜索模式下在子节点下方连续添加
         ); //控制默认展开节点数组
         setisQuery(true);
+        setTimeout(() => {
+          setdataLoading(true);
+        }, 1);
       } else {
+        setdataLoading(false);
+        console.log(query);
+        console.log(paths);
         if (isQuery) {
           setExpandedKeys([]); //如果从搜索状态恢复，收起所有展开
           setisQuery(false);
@@ -132,7 +141,9 @@ const ResourceTree: React.FC<TreeProps> = ({
         }
         setTreeData(paths);
       }
-      setdataLoading(true);
+      setTimeout(() => {
+        setdataLoading(true); //防止数据未处理完并且为注入tree组件，tree已经渲染
+      }, 1);
     });
   }, [retry, isretry, query]);
 
