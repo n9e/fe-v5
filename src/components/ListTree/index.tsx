@@ -88,7 +88,7 @@ const ResourceTree: React.FC<TreeProps> = ({
   //   console.log(expandedKeys);
   // }, [expandedKeys]);
   useEffect(() => {
-    console.log(query);
+    // console.log(query);
 
     setSpinning(true);
     Promise.all([
@@ -114,14 +114,14 @@ const ResourceTree: React.FC<TreeProps> = ({
       });
       let paths = All.map((ele) => {
         return { path: ele.path, id: ele.id, isFavorite: ele.isFavorite };
-      }); //合并收藏数组和全部数组
+      }); //patch收藏数组和全部数组
       paths = generateTree(paths); // 初始树
       setPaths(paths);
       if (query) {
         setdataLoading(false);
         const { queryTree, defaultExpandedKeys } = filter(paths, query);
         setTreeData(queryTree); //组件过滤树
-        console.log(defaultExpandedKeys);
+        // console.log(defaultExpandedKeys);
         setExpandedKeys(
           Array.from(new Set([...defaultExpandedKeys, ...expandedKeys])), //兼容搜索模式下在子节点下方连续添加
         ); //控制默认展开节点数组
@@ -131,8 +131,7 @@ const ResourceTree: React.FC<TreeProps> = ({
         }, 1);
       } else {
         setdataLoading(false);
-        console.log(query);
-        console.log(paths);
+
         if (isQuery) {
           setExpandedKeys([]); //如果从搜索状态恢复，收起所有展开
           setisQuery(false);

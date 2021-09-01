@@ -114,8 +114,6 @@ const GroupItem: React.FC<IGroupItemProps> = function ({
     history.push({
       pathname: `/${treeType}/${item.id}`,
     });
-    console.log(item);
-
     dispatch({
       type: `${treeType}/chooseGroupItem`,
       data: item,
@@ -214,8 +212,6 @@ const LeftTree: React.FC<ILeftTreeProps> = ({
   //   setTreeheight(document.getElementById('treeList')?.offsetHeight as number);
   // };
   useLayoutEffect(() => {
-    console.log(document.getElementById('treeList')?.offsetHeight as number);
-
     setTreeheight(document.getElementById('treeList')?.offsetHeight as number);
   });
   const searchRef = useRef(null);
