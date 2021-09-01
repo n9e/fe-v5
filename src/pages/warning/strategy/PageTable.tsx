@@ -209,10 +209,10 @@ const PageTable: React.FC = () => {
       },
     },
     {
-      title: t('报警接收者'),
+      title: t('告警接收者'),
       dataIndex: 'notify_users_detail',
-      render: (data) => {
-        const array = data ? data : [];
+      render: (data, record) => {
+        const array = data.concat(record.notify_groups_detail);
         return (
           (array.length &&
             array.map(
@@ -220,12 +220,12 @@ const PageTable: React.FC = () => {
                 user: {
                   nickname: string;
                   username: string;
-                },
+                } & { name: string },
                 index: number,
               ) => {
                 return (
                   <ColorTag
-                    text={user.nickname || user.username}
+                    text={user.nickname || user.username || user.name}
                     key={index}
                   ></ColorTag>
                 );
