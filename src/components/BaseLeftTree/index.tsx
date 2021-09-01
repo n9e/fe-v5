@@ -1,4 +1,4 @@
-import React, { useEffect, ChangeEvent, useRef } from 'react';
+import React, { useEffect, ChangeEvent, useRef, useLayoutEffect } from 'react';
 import { Button, Col, Modal, Row, Image } from 'antd';
 import SearchInput from '../BaseSearchInput';
 import { useSelector, useDispatch } from 'react-redux';
@@ -204,8 +204,24 @@ const LeftTree: React.FC<ILeftTreeProps> = ({
   );
   const [treeQuery, setTreeQuery] = useState<string>('');
   const [teamList, setTeamList] = useState<Array<Team>>([]);
+  const [treeheight, setTreeheight] = useState<number>(
+    document.getElementById('treeList')?.offsetHeight as number,
+  );
+  // window.onresize = function () {
+  //   setTreeheight(document.getElementById('treeList')?.offsetHeight as number);
+  // };
+  // window.ondom = function () {
+  //   setTreeheight(document.getElementById('treeList')?.offsetHeight as number);
+  // };
+  useLayoutEffect(() => {
+    console.log(document.getElementById('treeList')?.offsetHeight as number);
+
+    setTreeheight(document.getElementById('treeList')?.offsetHeight as number);
+  });
   const searchRef = useRef(null);
   useEffect(() => {
+    setTreeheight(document.getElementById('treeList')?.offsetHeight as number);
+
     getTeamInfoList().then((data) => {
       setTeamList(data?.dat?.list || []);
     });
@@ -232,6 +248,9 @@ const LeftTree: React.FC<ILeftTreeProps> = ({
   };
 
   const handleSearch = (keyword: string) => {
+    if (treeType === 'resource' && isTree) {
+      setTreeQuery(keyword);
+    }
     if (!isTree || treeType !== 'resource') {
       dispatch({
         type: `${treeType}/getGroup`,
@@ -241,11 +260,11 @@ const LeftTree: React.FC<ILeftTreeProps> = ({
     }
   };
   // 给tree模式的搜素
-  const handleInput = debounce((val) => {
-    if (treeType === 'resource' && isTree) {
-      setTreeQuery(val.target.value);
-    }
-  }, 500);
+  // const handleInput = debounce((val) => {
+  //   if (treeType === 'resource' && isTree) {
+  //     setTreeQuery(val.target.value);
+  //   }
+  // }, 500);
 
   const handleAppend = () => {
     dispatch({
@@ -254,6 +273,11 @@ const LeftTree: React.FC<ILeftTreeProps> = ({
     });
   };
   const toTree = () => {
+    if (isTree) {
+      setTreeheight(
+        document.getElementById('treeList')?.offsetHeight as number,
+      );
+    }
     setisTree(() => {
       localStorage.setItem('isTree', JSON.stringify(!isTree));
       return !isTree;
@@ -270,7 +294,7 @@ const LeftTree: React.FC<ILeftTreeProps> = ({
         </div>
         <div
           className={'left-tree-area-item-list'}
-          style={{ maxHeight: 146, overflowY: 'scroll' }}
+          style={{ maxHeight: 146, overflowY: 'auto' }}
         >
           {favorite.map((item) => (
             <GroupMemoItem
@@ -358,7 +382,7 @@ const LeftTree: React.FC<ILeftTreeProps> = ({
               <SearchInput
                 className={'left-tree-area-item-input'}
                 onSearch={handleSearch}
-                onInput={handleInput}
+                // onInput={handleInput}
               ></SearchInput>
             </Col>
           </Row>
@@ -370,26 +394,21 @@ const LeftTree: React.FC<ILeftTreeProps> = ({
         )}
       </div>
 
-      {isTree && treeType === 'resource' ? (
-        <div
-          className={'left-tree-area-item'}
-          style={{ flex: 1, overflowY: 'hidden' }}
-        >
-          <div className={'left-tree-area-item-list'}>
+      <div
+        id='treeList'
+        className={'left-tree-area-item'}
+        style={{ flex: 1, overflowY: 'auto' }}
+      >
+        <div className={'left-tree-area-item-list'}>
+          {isTree && treeType === 'resource' ? (
             <ListTree
+              treeHeight={treeheight}
               query={treeQuery}
               isretry={common}
               treeType={treeType}
             ></ListTree>
-          </div>
-        </div>
-      ) : (
-        <div
-          className={'left-tree-area-item'}
-          style={{ flex: 1, overflowY: 'scroll' }}
-        >
-          <div className={'left-tree-area-item-list'}>
-            {common.map((item) => {
+          ) : (
+            common.map((item) => {
               return (
                 <GroupMemoItem
                   key={item.id}
@@ -401,15 +420,15 @@ const LeftTree: React.FC<ILeftTreeProps> = ({
                   typeName={typeName}
                 ></GroupMemoItem>
               );
-            })}
-          </div>
-
-          {isTree && treeType === 'resource' ? null : PAGE_SIZE * currentPage <
-            commonTotal ? (
-            <SmallDashOutlined className={'load-more'} onClick={handleAppend} />
-          ) : null}
+            })
+          )}
         </div>
-      )}
+
+        {isTree && treeType === 'resource' ? null : PAGE_SIZE * currentPage <
+          commonTotal ? (
+          <SmallDashOutlined className={'load-more'} onClick={handleAppend} />
+        ) : null}
+      </div>
     </div>
   );
 };

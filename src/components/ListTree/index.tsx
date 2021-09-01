@@ -35,6 +35,7 @@ interface Item {
   children: Item[];
 }
 interface TreeProps {
+  treeHeight: number;
   treeType: string;
   query: string;
   isretry: any;
@@ -63,6 +64,7 @@ const ResourceTree: React.FC<TreeProps> = ({
   treeType,
   isretry, //dispatch会触发isretry，刷新本组件
   query,
+  treeHeight,
 }) => {
   const [retry, setRetry] = useState(false);
   const [spinning, setSpinning] = useState<boolean>(false);
@@ -80,7 +82,12 @@ const ResourceTree: React.FC<TreeProps> = ({
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   useEffect(() => {
+    console.log(treeHeight);
+  }, [treeHeight]);
+  useEffect(() => {
     console.log(expandedKeys);
+  }, [expandedKeys]);
+  useEffect(() => {
     setSpinning(true);
     Promise.all([
       getFavoritesResourceGroups(),
@@ -109,11 +116,12 @@ const ResourceTree: React.FC<TreeProps> = ({
       paths = generateTree(paths); // 初始树
       setPaths(paths);
       if (query) {
-        console.log(query);
         const { queryTree, defaultExpandedKeys } = filter(paths, query);
         setTreeData(queryTree); //组件过滤树
         console.log(defaultExpandedKeys);
-        setExpandedKeys(defaultExpandedKeys); //控制默认展开节点数组
+        setExpandedKeys(
+          Array.from(new Set([...defaultExpandedKeys, ...expandedKeys])), //兼容搜索模式下在子节点下方连续添加
+        ); //控制默认展开节点数组
         setisQuery(true);
       } else {
         if (isQuery) {
@@ -124,9 +132,7 @@ const ResourceTree: React.FC<TreeProps> = ({
         }
         setTreeData(paths);
       }
-      // setTimeout(() => {
       setdataLoading(true);
-      // }, 1);
     });
   }, [retry, isretry, query]);
 
@@ -305,7 +311,8 @@ const ResourceTree: React.FC<TreeProps> = ({
       >
         {dataLoading && (
           <Tree
-            height={595}
+            height={treeHeight}
+            // style={{ flex: 1, overflowY: 'hidden' }}
             className={'mytree'}
             showIcon
             onExpand={onExpand}
@@ -329,15 +336,14 @@ const ResourceTree: React.FC<TreeProps> = ({
                               setCurData(() => {
                                 let tempArr = [...expandedKeys];
                                 tempArr.push(nodeData.key);
-                                setExpandedKeys(() => {
-                                  return tempArr;
-                                });
+                                setExpandedKeys(tempArr);
+                                setAutoExpandParent(false);
                                 form.setFieldsValue({
                                   parentStr: nodeData.originTitle,
                                 });
                                 return nodeData;
                               });
-                              e.domEvent.stopPropagation();
+                              // e.domEvent.stopPropagation();
                               setTimeout(() => {
                                 setIsModalVisible(true);
                               }, 1);
@@ -366,11 +372,11 @@ const ResourceTree: React.FC<TreeProps> = ({
           <Button key='back' onClick={handleCancel}>
             {t('取消')}
           </Button>,
-          <Button key='submit' type='primary' onClick={handleOk}>
-            {t('创建并关闭')}
-          </Button>,
           <Button key='link' type='primary' onClick={handleSaveModel}>
             {t('创建')}
+          </Button>,
+          <Button key='submit' type='primary' onClick={handleOk}>
+            {t('创建并关闭')}
           </Button>,
         ]}
       >

@@ -13,25 +13,6 @@ export function filter(tree, query) {
 
   function isIncludesQuery(node, query) {
     //判读该节点是否包含query（深度优先搜索）
-    // if (node) {
-    //   if (node.title.includes(query)) {
-    //     return true;
-    //   } else {
-    //     node.children =
-    //       node.children &&
-    //       node.children.filter((e) => {
-    //         //子节点层进行过滤
-    //         return isIncludesQuery(e, query);
-    //       });
-    //     if (node.children.length > 0) {
-    //       //记录路径（该节点的子节点存在query）
-    //       defaultExpandedKeys.push(node.key);
-    //       return true;
-    //     } else {
-    //       return false;
-    //     }
-    //   }
-    // }
     if (node) {
       let tempArr =
         node.children &&
@@ -54,7 +35,12 @@ export function filter(tree, query) {
           return false;
         }
       } else {
-        return node.title.includes(query);
+        if (node.title.includes(query)) {
+          defaultExpandedKeys.push(node.key);
+          return true;
+        } else {
+          return false;
+        }
       }
     }
   }
