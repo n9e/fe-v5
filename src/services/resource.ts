@@ -25,7 +25,18 @@ export const getResourceGroups = function (query?: string, p = 1) {
     method: RequestMethod.Get,
     params: {
       query,
-      limit: PAGE_SIZE,
+      limit: 30,
+      p,
+    },
+  });
+};
+// 获取分组列表
+export const getResourceAllGroups = function (limit, p = 1, query?: string) {
+  return request(`${N9EAPI}/api/n9e/classpaths`, {
+    method: RequestMethod.Get,
+    params: {
+      query,
+      limit,
       p,
     },
   });

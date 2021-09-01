@@ -49,6 +49,7 @@
   "必须要有一个变量名": "Var name required",
   "变量名重复": "Duplicate variable name",
   "变量名包含非法字符": "The variable name contains illegal characters",
+  "资源分组路径含有非法字符": "The Classpath contains illegal characters",
   "变量名": "Variable name",
   "标签或资源分组": "Label or Classpath",
   "默认值": "Default value",
@@ -175,6 +176,8 @@
   "用户管理": "Users",
   "用户名、邮箱或手机": "User name, email or mobile phone",
   "创建": "Create",
+  "创建并关闭": "Create and close",
+
   "创建用户": "Create User",
   "团队管理": "Team Management",
   "搜索团队名称": "Team name",
@@ -395,6 +398,8 @@
   "请输入指标": "Enter metric",
   "请输入百分比": "Enter percentages",
   "新建策略分组": "New rule group",
+  "新建子节点": "New child node",
+
   "编辑策略组": "Edit rule Group",
   "策略组名称": "Name",
   "策略组名称必填": "Group name required",
