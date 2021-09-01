@@ -1,28 +1,61 @@
+/**
+ *
+ * @param {*} tree //以构建的完整树形结构：数组对象
+ * @param {*} query
+ * @returns
+ */
 export function filter(tree, query) {
-  console.log(tree, query);
   let defaultExpandedKeys = [];
-  console.log();
   let queryTree = tree.filter((ele) => {
-    ele.children = ele.children.filter((child) => {
-      return dfs(child, query);
-    });
-    return dfs(ele, query);
+    //开启dfs
+    return isIncludesQuery(ele, query);
   });
-  function dfs(node, query) {
-    //判读该节点和该节点的子元素key是否包含query
+
+  function isIncludesQuery(node, query) {
+    //判读该节点是否包含query（深度优先搜索）
+    // if (node) {
+    //   if (node.title.includes(query)) {
+    //     return true;
+    //   } else {
+    //     node.children =
+    //       node.children &&
+    //       node.children.filter((e) => {
+    //         //子节点层进行过滤
+    //         return isIncludesQuery(e, query);
+    //       });
+    //     if (node.children.length > 0) {
+    //       //记录路径（该节点的子节点存在query）
+    //       defaultExpandedKeys.push(node.key);
+    //       return true;
+    //     } else {
+    //       return false;
+    //     }
+    //   }
+    // }
     if (node) {
-      let temp = node.children.filter((e) => {
-        e.children = e.children.filter((child) => {
-          //过滤最后一层
-          return dfs(child, query);
+      let tempArr =
+        node.children &&
+        node.children.filter((e) => {
+          //子节点层进行过滤
+          return isIncludesQuery(e, query);
         });
-        return dfs(e, query);
-      });
-      if (temp.length > 0) {
-        //该节点的子元素key包含query,该元素展开
-        defaultExpandedKeys.push(node.key);
+      if (tempArr.length > 0) {
+        node.children =
+          node.children &&
+          node.children.filter((e) => {
+            //子节点层进行过滤
+            return isIncludesQuery(e, query);
+          });
+        if (node.children.length > 0) {
+          //记录路径（该节点的子节点存在query）
+          defaultExpandedKeys.push(node.key);
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        return node.title.includes(query);
       }
-      return node.title.includes(query) || (temp.length > 0 ? true : false);
     }
   }
   defaultExpandedKeys = Array.from(new Set(defaultExpandedKeys));

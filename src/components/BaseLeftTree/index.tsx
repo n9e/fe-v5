@@ -18,6 +18,8 @@ import {
   RootState,
 } from '@/store/common';
 import { useHistory } from 'react-router';
+import { debounce } from 'lodash';
+
 import classNames from 'classnames';
 import { useParams } from 'react-router';
 import './index.less';
@@ -200,7 +202,7 @@ const LeftTree: React.FC<ILeftTreeProps> = ({
       ? false
       : true,
   );
-  const [treeQuery, settreeQuery] = useState<string>('');
+  const [treeQuery, setTreeQuery] = useState<string>('');
   const [teamList, setTeamList] = useState<Array<Team>>([]);
   const searchRef = useRef(null);
   useEffect(() => {
@@ -230,9 +232,6 @@ const LeftTree: React.FC<ILeftTreeProps> = ({
   };
 
   const handleSearch = (keyword: string) => {
-    if (treeType === 'resource') {
-      settreeQuery(keyword);
-    }
     if (!isTree || treeType !== 'resource') {
       dispatch({
         type: `${treeType}/getGroup`,
@@ -241,6 +240,12 @@ const LeftTree: React.FC<ILeftTreeProps> = ({
       });
     }
   };
+  // 给tree模式的搜素
+  const handleInput = debounce((val) => {
+    if (treeType === 'resource' && isTree) {
+      setTreeQuery(val.target.value);
+    }
+  }, 500);
 
   const handleAppend = () => {
     dispatch({
@@ -353,6 +358,7 @@ const LeftTree: React.FC<ILeftTreeProps> = ({
               <SearchInput
                 className={'left-tree-area-item-input'}
                 onSearch={handleSearch}
+                onInput={handleInput}
               ></SearchInput>
             </Col>
           </Row>
@@ -363,19 +369,27 @@ const LeftTree: React.FC<ILeftTreeProps> = ({
           ></SearchInput>
         )}
       </div>
-      <div
-        className={'left-tree-area-item'}
-        style={{ flex: 1, overflow: 'auto' }}
-      >
-        <div className={'left-tree-area-item-list'}>
-          {isTree && treeType === 'resource' ? (
+
+      {isTree && treeType === 'resource' ? (
+        <div
+          className={'left-tree-area-item'}
+          style={{ flex: 1, overflowY: 'hidden' }}
+        >
+          <div className={'left-tree-area-item-list'}>
             <ListTree
               query={treeQuery}
               isretry={common}
               treeType={treeType}
             ></ListTree>
-          ) : (
-            common.map((item) => {
+          </div>
+        </div>
+      ) : (
+        <div
+          className={'left-tree-area-item'}
+          style={{ flex: 1, overflowY: 'scroll' }}
+        >
+          <div className={'left-tree-area-item-list'}>
+            {common.map((item) => {
               return (
                 <GroupMemoItem
                   key={item.id}
@@ -387,14 +401,15 @@ const LeftTree: React.FC<ILeftTreeProps> = ({
                   typeName={typeName}
                 ></GroupMemoItem>
               );
-            })
-          )}
+            })}
+          </div>
+
+          {isTree && treeType === 'resource' ? null : PAGE_SIZE * currentPage <
+            commonTotal ? (
+            <SmallDashOutlined className={'load-more'} onClick={handleAppend} />
+          ) : null}
         </div>
-        {isTree && treeType === 'resource' ? null : PAGE_SIZE * currentPage <
-          commonTotal ? (
-          <SmallDashOutlined className={'load-more'} onClick={handleAppend} />
-        ) : null}
-      </div>
+      )}
     </div>
   );
 };

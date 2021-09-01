@@ -28,6 +28,7 @@ import { filter } from './until';
 const { Option } = Select;
 
 interface Item {
+  originTitle: string;
   id: string;
   key: string;
   title: string;
@@ -39,6 +40,7 @@ interface TreeProps {
   isretry: any;
 }
 interface currentData {
+  originTitle: string;
   title: string;
   key: string;
   children: currentData[];
@@ -122,9 +124,9 @@ const ResourceTree: React.FC<TreeProps> = ({
         }
         setTreeData(paths);
       }
-      setTimeout(() => {
-        setdataLoading(true);
-      }, 1);
+      // setTimeout(() => {
+      setdataLoading(true);
+      // }, 1);
     });
   }, [retry, isretry, query]);
 
@@ -161,8 +163,8 @@ const ResourceTree: React.FC<TreeProps> = ({
       let strkey;
       let strLen = strs.length;
       for (let i = 1; i < strLen; i++) {
-        len = strs[i].key.length;
-        strkey = strs[i].key;
+        len = strs[i].originTitle.length;
+        strkey = strs[i].originTitle;
         if (strs[0].substring(0, len) == strkey) {
           return strkey;
         }
@@ -185,14 +187,15 @@ const ResourceTree: React.FC<TreeProps> = ({
           //寻找待匹配字符和当前层的最大前缀元素
           objVal = longestCommonPrefix([origin.path, ...curNodes]);
           //找到对应节点
-          obj = curNodes.find((item: Item) => item.key == objVal);
+          obj = curNodes.find((item: Item) => item.originTitle == objVal);
           //不存在则构建这个节点并且放入这个层
           if (!obj) {
             curStr = perLen ? origin.path.slice(perLen) : origin.path;
             curStr = curStr.replace(/^[\.|\_|\/|\-]{1}/, '');
             curNodes.push({
               title: curStr,
-              key: origin.path,
+              originTitle: origin.path,
+              key: origin.id,
               children: [],
               id: origin.id,
               isFavorite: origin.isFavorite,
@@ -225,7 +228,7 @@ const ResourceTree: React.FC<TreeProps> = ({
             });
             break;
           }
-          perLen = obj.key.length;
+          perLen = obj.originTitle.length;
           // 存在则指针指向这个节点的children层
           curNodes = obj.children;
         }
@@ -302,6 +305,7 @@ const ResourceTree: React.FC<TreeProps> = ({
       >
         {dataLoading && (
           <Tree
+            height={595}
             className={'mytree'}
             showIcon
             onExpand={onExpand}
@@ -329,7 +333,7 @@ const ResourceTree: React.FC<TreeProps> = ({
                                   return tempArr;
                                 });
                                 form.setFieldsValue({
-                                  parentStr: nodeData.key,
+                                  parentStr: nodeData.originTitle,
                                 });
                                 return nodeData;
                               });
