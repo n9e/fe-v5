@@ -212,7 +212,9 @@ const PageTable: React.FC = () => {
       title: t('告警接收者'),
       dataIndex: 'notify_users_detail',
       render: (data, record) => {
-        const array = data.concat(record.notify_groups_detail);
+        const array = data
+          .concat(record.notify_groups_detail)
+          .filter((item) => !!item);
         return (
           (array.length &&
             array.map(
