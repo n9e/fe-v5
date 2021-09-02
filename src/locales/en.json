@@ -385,7 +385,7 @@
   "指标名称、资源标识、标签、屏蔽原因": "Metric, resource id, tag, mute cause",
   "是否确定删除该策略分组?": "Sure to delete the alert group?",
   "名称": "Name",
-  "报警接收者": "Recipients",
+  "告警接收者": "Recipients",
   "未选择任何采集策略": "No rules selected",
   "是否批量删除告警规则?": "Sure to delete the alert rules?",
   "请输入告警策略名称": "Search rule name",

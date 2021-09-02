@@ -48,6 +48,8 @@ const TagFilterCondition = (props: Props) => {
     ),
   );
   useEffect(() => {
+    const initTagKey = form.getFieldValue(['tags_filters', field.name, 'key']);
+    debouncedGetTagValues(initTagKey);
     if (tagKeys?.length === 0) return;
     getTagValuesByKey({
       tag_key: tagKeys[0],
