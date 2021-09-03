@@ -194,7 +194,7 @@ const StrategyOperate: React.FC = () => {
               curStrategyObj?.expression?.trigger_conditions.map(
                 (item) => item.metric,
               );
-
+            setAllMetrics(curMetricList);
             fetchTagKey(curMetricList);
           }
 
@@ -727,7 +727,7 @@ const StrategyOperate: React.FC = () => {
                                   field={field}
                                   tagKeys={tagKeys}
                                   form={form}
-                                  curMetric={allMetrics?.[0] || ''}
+                                  curMetric={allMetrics || []}
                                 />
                                 <Col span={1}>
                                   <MinusCircleOutlined
