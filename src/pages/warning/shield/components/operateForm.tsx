@@ -38,16 +38,19 @@ interface Props {
 }
 
 const OperateForm: React.FC<Props> = ({ detail, type = FormType.add }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const layout = {
     labelCol: {
-      span: 2,
+      span: i18n.language == 'en' ? 3 : 2,
     },
     wrapperCol: {
-      span: 22,
+      span: i18n.language == 'en' ? 21 : 22,
     },
   };
   const tailLayout = {
+    labelCol: {
+      // span: i18n.language == 'en' ? 1 : 2,
+    },
     wrapperCol: {
       offset: 2,
     },
@@ -103,7 +106,6 @@ const OperateForm: React.FC<Props> = ({ detail, type = FormType.add }) => {
       let paths = e.dat.list.map((e) => {
         return { value: e.path as string };
       });
-      console.log(paths);
       setOptions(paths);
     });
     form.setFieldsValue({ classpath_prefix: classpathPrefixVal });
@@ -142,11 +144,9 @@ const OperateForm: React.FC<Props> = ({ detail, type = FormType.add }) => {
     setBtnLoading(false);
   };
   const onSelect = _.debounce((data: string) => {
-    console.log('onChange', data);
     setclasspathPrefixVal(data);
   }, 800);
   const onChange = _.debounce((data: string) => {
-    console.log('onChange', data);
     setclasspathPrefixVal(data);
   }, 800);
 
@@ -217,7 +217,7 @@ const OperateForm: React.FC<Props> = ({ detail, type = FormType.add }) => {
               options={options}
               onSelect={onSelect}
               onChange={onChange}
-              placeholder='control mode'
+              placeholder={t('请输入资源分组前缀')}
             />
           </Form.Item>
 
@@ -238,11 +238,20 @@ const OperateForm: React.FC<Props> = ({ detail, type = FormType.add }) => {
           </Form.Item>
           <Form.Item {...tailLayout}>
             <Row gutter={[10, 10]} align='middle'>
-              <Col span={1}>
-                <Button type='primary' htmlType='submit' loading={btnLoading}>
-                  {t('创建')}
-                </Button>
-              </Col>
+              {i18n.language == 'en' ? (
+                <Col span={1} offset={1}>
+                  <Button type='primary' htmlType='submit' loading={btnLoading}>
+                    {t('创建')}
+                  </Button>
+                </Col>
+              ) : (
+                <Col span={1}>
+                  <Button type='primary' htmlType='submit' loading={btnLoading}>
+                    {t('创建')}
+                  </Button>
+                </Col>
+              )}
+
               <Col
                 span={1}
                 style={{
