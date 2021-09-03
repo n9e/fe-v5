@@ -26,6 +26,8 @@ import { eventStoreState } from '@/store/eventInterface';
 import '../index.less';
 import { useTranslation } from 'react-i18next';
 import _ from 'lodash';
+import { getResourceGroups } from '@/services';
+import { SSL_OP_NETSCAPE_REUSE_CIPHER_CHANGE_BUG } from 'constants';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -60,6 +62,9 @@ const OperateForm: React.FC<Props> = ({ detail, type = FormType.add }) => {
   const [form] = Form.useForm(null as any);
   const history = useHistory();
   const [btnLoading, setBtnLoading] = useState<boolean>(false);
+  const [classpathPrefixVal, setclasspathPrefixVal] = useState('');
+  const [options, setOptions] = useState<{ value: string }[]>([]);
+  const [Search, setSearch] = useState('');
   useEffect(() => {
     if (type === FormType.add && params.from === 'event' && currentEdit?.id) {
       const { history_points, res_ident, tags } = currentEdit;
@@ -93,6 +98,16 @@ const OperateForm: React.FC<Props> = ({ detail, type = FormType.add }) => {
   useEffect(() => {
     getMetricsList();
   }, []);
+  useEffect(() => {
+    getResourceGroups(classpathPrefixVal).then((e) => {
+      let paths = e.dat.list.map((e) => {
+        return { value: e.path as string };
+      });
+      console.log(paths);
+      setOptions(paths);
+    });
+    form.setFieldsValue({ classpath_prefix: classpathPrefixVal });
+  }, [classpathPrefixVal]);
 
   const handleTagsChange = (value: string[]) => {
     const top: string = value[value.length - 1];
@@ -112,6 +127,7 @@ const OperateForm: React.FC<Props> = ({ detail, type = FormType.add }) => {
       cause: values.cause,
       btime: values.time.btime,
       etime: values.time.etime,
+      classpath_prefix: values.classpath_prefix,
     };
     addShield(params)
       .then((_) => {
@@ -122,10 +138,17 @@ const OperateForm: React.FC<Props> = ({ detail, type = FormType.add }) => {
         setBtnLoading(false);
       });
   };
-
   const onFinishFailed = () => {
     setBtnLoading(false);
   };
+  const onSelect = _.debounce((data: string) => {
+    console.log('onChange', data);
+    setclasspathPrefixVal(data);
+  }, 800);
+  const onChange = _.debounce((data: string) => {
+    console.log('onChange', data);
+    setclasspathPrefixVal(data);
+  }, 800);
 
   const content =
     type === FormType.add ? (
@@ -188,6 +211,16 @@ const OperateForm: React.FC<Props> = ({ detail, type = FormType.add }) => {
               onChange={handleTagsChange}
             ></Select>
           </Form.Item>
+          <Form.Item label={t('资源分组前缀')} name='classpath_prefix'>
+            <AutoComplete
+              value={classpathPrefixVal}
+              options={options}
+              onSelect={onSelect}
+              onChange={onChange}
+              placeholder='control mode'
+            />
+          </Form.Item>
+
           <Form.Item label={t('屏蔽时间')} name='time'>
             <RangeDatePicker />
           </Form.Item>
