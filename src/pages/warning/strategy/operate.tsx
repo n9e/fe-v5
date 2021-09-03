@@ -678,6 +678,7 @@ const StrategyOperate: React.FC = () => {
                                   <ResourceFilterConditionComponent
                                     field={field} // initObj={initResourceFilterConditions[field.key]}
                                     classpathes={classpathes}
+                                    form={form}
                                     onFuncChange={handleFuncChange}
                                   />
                                   <Col span={1}>

@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Form, Input, InputNumber, Radio, Select, Row, Col } from 'antd';
+import {
+  Card,
+  Form,
+  Input,
+  InputNumber,
+  Radio,
+  Select,
+  FormInstance,
+  Col,
+} from 'antd';
 import { resourceFilterConditions } from '../../const';
 import { getResourceListAll } from '@/services/resource';
 import { resourceItem } from '@/store/businessInterface/resource';
@@ -17,13 +26,14 @@ interface Props {
   field: any;
   initObj?: any;
   onFuncChange: Function;
+  form: FormInstance;
 }
 const researceList = ['InResourceList', 'NotInResourceList'];
 
 const ResourceFilterCondition = (props: Props) => {
   const { t } = useTranslation();
   const { Option } = Select;
-  const { classpathes, field, initObj, onFuncChange } = props;
+  const { classpathes, field, initObj, onFuncChange, form } = props;
   const [resources, setResources] = useState<resourceItem[]>();
   useEffect(() => {
     getResourceListAll().then((res) => {
@@ -45,7 +55,7 @@ const ResourceFilterCondition = (props: Props) => {
   const resourcesOptions = resources
     ? resources.map((r: resourceItem) => (
         <Option key={r.id} value={r.ident}>
-          {r.alias + r.ident}
+          {r.ident + ' ' + r.alias}
         </Option>
       ))
     : [];
@@ -72,13 +82,17 @@ const ResourceFilterCondition = (props: Props) => {
         </Form.Item>
       </Col>
       <Col span={14}>
-        {multipleFuncs.includes(func) ? (
+        {multipleFuncs.includes(
+          form.getFieldValue(['res_filters', field.name, 'func']),
+        ) ? (
           <Form.Item
             name={[field.name, 'params']}
             initialValue={initObj?.params}
           >
             <Select mode='multiple' value={initObj?.params as Array<string>}>
-              {researceList.includes(func)
+              {researceList.includes(
+                form.getFieldValue(['res_filters', field.name, 'func']),
+              )
                 ? resourcesOptions
                 : classpathOptions}
             </Select>
