@@ -9,7 +9,7 @@ import {
   FileAddOutlined,
 } from '@ant-design/icons';
 import { Button, Input, Form, Modal, Divider, message } from 'antd';
-import { Param, RangeItem } from '@/store/chart';
+import { Range } from '@/components/DateRangePicker';
 import {
   getSingleDashboard,
   updateSingleDashboard,
@@ -65,7 +65,7 @@ export default function DashboardDetail() {
   const [chartModalVisible, setChartModalVisible] = useState(false);
   const [chartModalInitValue, setChartModalInitValue] =
     useState<Chart | null>();
-  const [range, setRange] = useState<Param | RangeItem>({
+  const [range, setRange] = useState<Range>({
     start: 0,
     end: 0,
   });

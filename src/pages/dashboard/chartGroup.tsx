@@ -17,14 +17,14 @@ import D3Chart from '@/components/D3Chart';
 import { SettingOutlined, LinkOutlined, DownOutlined } from '@ant-design/icons';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
-import { Param, RangeItem } from '@/store/chart';
+import { Range } from '@/components/DateRangePicker';
 import { TagFilterResponse } from './VariableConfig/definition';
 import { number } from 'echarts';
 import { useTranslation } from 'react-i18next';
 const { confirm } = Modal;
 interface Props {
   groupInfo: Group;
-  range: Param | RangeItem;
+  range: Range;
   step: number;
   variableConfig: TagFilterResponse | null;
   onAddChart: (data: number) => void;

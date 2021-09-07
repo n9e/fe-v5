@@ -5,9 +5,13 @@ import { DataSource, ChartComponentProps } from '@/store/chart';
 import { GetData } from '@/services/metric';
 import { ReloadOutlined, ShareAltOutlined } from '@ant-design/icons';
 import TagFilterForChart from '@/components/TagFilterForChart';
-import { Tag as TagType, Param, RangeItem, isParam } from '@/store/chart';
+import { Tag as TagType } from '@/store/chart';
 import { Checkbox, Tooltip, Button } from 'antd';
-import { generateTimeStampRange } from '@/components/DateRangePicker';
+import {
+  generateTimeStampRange,
+  isAbsoluteRange,
+  Range,
+} from '@/components/DateRangePicker';
 import OrderSort from '@/components/OrderSort';
 import { SetTmpChartData } from '@/services/metric';
 import './index.less';
@@ -56,11 +60,11 @@ function Chart(props: Props) {
       };
     } | null>(null); // transfer Param and RangeItem into timestamp
 
-  const formatDate = (r?: Param | RangeItem) => {
+  const formatDate = (r?: Range) => {
     let newR = r || range;
 
     if (newR) {
-      if (isParam(newR)) {
+      if (isAbsoluteRange(newR)) {
         const { start, end } = newR;
         return {
           start,
