@@ -505,5 +505,16 @@
   "恢复": "Recovery",
   "告警": "Alert",
   "key, value必填": "key,value required",
-  "key重复": "Duplicate key"
+  "key重复": "Duplicate key",
+  "自定义开始时间": "Cumson start time",
+  "自定义结束时间": "Cumson end time",
+  "最近": "Past ",
+  "minute": " minute",
+  "minutes": " minutes",
+  "hour": " hour",
+  "hours": " hours",
+  "周": " week",
+  "天": " day",
+  "月": " month",
+  "季度": " quarter"
 }

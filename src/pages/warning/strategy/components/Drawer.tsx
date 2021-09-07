@@ -1,6 +1,7 @@
 import D3Chart from '@/components/D3Chart';
 import DateRangePicker from '@/components/DateRangePicker';
-import { ChartComponentProps, Param, RangeItem } from '@/store/chart';
+import { ChartComponentProps } from '@/store/chart';
+import { Range } from '@/components/DateRangePicker';
 import { Metric } from '@/store/warningInterface';
 import { AreaChartOutlined } from '@ant-design/icons';
 import { Col, Drawer, Radio, Row } from 'antd';
@@ -19,7 +20,7 @@ function ChartDrawer(props: Props) {
   const [metrics, setMetrics] = useState<Metric[]>([]);
   const [numPerLine, setNumPerLine] = useState(1);
   const [idents, setIdents] = useState<Array<string>>([]);
-  const [range, setRange] = useState<Param | RangeItem>({ start: 0, end: 0 });
+  const [range, setRange] = useState<Range>({ start: 0, end: 0 });
   const [step, setStep] = useState(15);
   const [chartOption, setChartOption] = useState<ChartComponentProps>({
     range: { start: 0, end: 0 },
@@ -36,7 +37,7 @@ function ChartDrawer(props: Props) {
   const onClose = () => {
     onChange(false);
   };
-  const formatOption = (obj = {}, r?: Param | RangeItem) => {
+  const formatOption = (obj = {}, r?: Range) => {
     // 如果是其他参数变化，则不必传r参数，会使用缓存的range
     let newR = r || range;
     setChartOption({ ...chartOption, ...obj, range: newR });

@@ -13,12 +13,8 @@ import '@d3-charts/ts-graph/dist/index.css';
 import './index.less';
 import { useTranslation } from 'react-i18next';
 import PageLayout from '@/components/pageLayout';
-import type {
-  ChartComponentProps,
-  Param,
-  isParam,
-  RangeItem,
-} from '@/store/chart';
+import type { ChartComponentProps } from '@/store/chart';
+import { Range } from '@/components/DateRangePicker';
 const { Option } = Select;
 export interface IExplorerProps {
   isIdent?: boolean;
@@ -31,7 +27,7 @@ export default function Explorer({ resourceGroupId, isIdent }: IExplorerProps) {
   const tagRef = useRef(null as any);
   const [numPerLine, setNumPerLine] = useState(1);
   const [step, setStep] = useState(15);
-  const [range, setRange] = useState<Param | RangeItem>({
+  const [range, setRange] = useState<Range>({
     start: 0,
     end: 0,
   });
@@ -80,7 +76,7 @@ export default function Explorer({ resourceGroupId, isIdent }: IExplorerProps) {
     formatOption({}, e);
   };
 
-  const formatOption = (obj = {}, r?: Param | RangeItem) => {
+  const formatOption = (obj = {}, r?: Range) => {
     // 如果是其他参数变化，则不必传r参数，会使用缓存的range
     let newR = r || range;
     setChartOption({ ...chartOption, ...obj, range: newR });

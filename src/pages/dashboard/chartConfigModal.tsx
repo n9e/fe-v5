@@ -21,7 +21,6 @@ import {
   Space,
 } from 'antd';
 const { Option } = Select;
-import { ranges } from '@/utils/constant';
 import {
   getResourceGroups,
   getResourceList,

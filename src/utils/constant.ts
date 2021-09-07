@@ -1,5 +1,3 @@
-import { ChartProps, RangeItem } from '@/store/chart';
-
 export const PAGE_SIZE = 15;
 export const PAGE_SIZE_MAX = 100000;
 export const PAGE_SIZE_OPTION = 20;
@@ -63,56 +61,3 @@ export const chartDefaultOptions = {
   },
   animation: false,
 };
-
-export const ranges: RangeItem[] = [
-  {
-    num: 5,
-    unit: 'Minutes',
-    shortUnit: 'm',
-  },
-  {
-    num: 15,
-    unit: 'Minutes',
-    shortUnit: 'm',
-  },
-  {
-    num: 30,
-    unit: 'Minutes',
-    shortUnit: 'm',
-  },
-  {
-    num: 1,
-    unit: 'Hour',
-    shortUnit: 'h',
-  },
-  {
-    num: 2,
-    unit: 'Hours',
-    shortUnit: 'h',
-  },
-  {
-    num: 6,
-    unit: 'Hours',
-    shortUnit: 'h',
-  },
-  {
-    num: 12,
-    unit: 'Hours',
-    shortUnit: 'h',
-  },
-  {
-    num: 1,
-    unit: 'Day',
-    shortUnit: 'd',
-  },
-  {
-    num: 1,
-    unit: 'Week',
-    shortUnit: 'w',
-  },
-  {
-    num: 1,
-    unit: 'Month',
-    shortUnit: 'M',
-  },
-];
