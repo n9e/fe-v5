@@ -53,8 +53,13 @@ export const generateTimeStampRange = (
   };
 };
 
-export const formatPickerDate = (r: Range): AbsoluteTimeStampRange => {
-  const { start, end } = isAbsoluteRange(r) ? r : generateTimeStampRange(r);
+export const formatPickerDate = (
+  r: Range,
+  timeUnit: TimeUnit = 's',
+): AbsoluteTimeStampRange => {
+  const { start, end } = isAbsoluteRange(r)
+    ? r
+    : generateTimeStampRange(r, timeUnit);
   return {
     start,
     end,
