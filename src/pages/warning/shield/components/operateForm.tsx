@@ -83,9 +83,12 @@ const OperateForm: React.FC<Props> = ({ detail, type = FormType.add }) => {
     let metric = form.getFieldValue('metric');
     let resFilters = form.getFieldValue('res_filters');
     let tagsFilters = form.getFieldValue('tags_filters');
+    let classpathPrefixVal = form.getFieldValue('classpath_prefix');
 
-    if (!metric && !resFilters && !tagsFilters) {
-      callback(new Error(t('屏蔽标识、资源标识、屏蔽标签不能同时为空')));
+    if (!metric && !resFilters && !tagsFilters && !classpathPrefixVal) {
+      callback(
+        new Error(t('屏蔽标识、资源标识、屏蔽标签、资源分组前缀不能同时为空')),
+      );
     } else {
       callback();
     }
@@ -113,7 +116,6 @@ const OperateForm: React.FC<Props> = ({ detail, type = FormType.add }) => {
 
   const handleTagsChange = (value: string[]) => {
     const top: string = value[value.length - 1];
-
     if (top && !reg.test(top)) {
       let v = value.pop();
       message.error(`${t('不符合输入规范（格式为key=value）')}`);
@@ -183,6 +185,23 @@ const OperateForm: React.FC<Props> = ({ detail, type = FormType.add }) => {
             </AutoComplete>
           </Form.Item>
           <Form.Item
+            label={t('资源分组前缀')}
+            name='classpath_prefix'
+            rules={[
+              {
+                validator: validator,
+              },
+            ]}
+          >
+            <AutoComplete
+              value={classpathPrefixVal}
+              options={options}
+              onSelect={onSelect}
+              onChange={onChange}
+              placeholder={t('搜索资源分组前缀')}
+            />
+          </Form.Item>
+          <Form.Item
             label={t('资源标识')}
             name='res_filters'
             rules={[
@@ -210,15 +229,6 @@ const OperateForm: React.FC<Props> = ({ detail, type = FormType.add }) => {
               placeholder={t('请输入屏蔽标签(请用回车分割)')}
               onChange={handleTagsChange}
             ></Select>
-          </Form.Item>
-          <Form.Item label={t('资源分组前缀')} name='classpath_prefix'>
-            <AutoComplete
-              value={classpathPrefixVal}
-              options={options}
-              onSelect={onSelect}
-              onChange={onChange}
-              placeholder={t('请输入资源分组前缀')}
-            />
           </Form.Item>
 
           <Form.Item label={t('屏蔽时间')} name='time'>

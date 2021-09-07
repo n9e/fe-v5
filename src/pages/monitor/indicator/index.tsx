@@ -22,6 +22,7 @@ const { TextArea } = Input;
 import './index.less';
 import { download } from '@/utils';
 import { useTranslation } from 'react-i18next';
+import { useHistory } from 'react-router-dom';
 
 const Indicator: React.FC = () => {
   const { t } = useTranslation();
@@ -34,6 +35,7 @@ const Indicator: React.FC = () => {
   const [exportList, setExportList] = useState([] as string[]);
   const [editingKey, setEditingKey] = useState<Partial<InterfaceItem>>({});
   const [query, setQuery] = useState<string>('');
+  const history = useHistory();
   const moreOperations: MoreOptions = {
     导入指标: 'import',
     导出指标: 'export',
@@ -146,11 +148,15 @@ const Indicator: React.FC = () => {
       title: t('指标名称'),
       dataIndex: 'metric',
       key: 'metric',
-      render: (text: string) => {
+      render: (text: string, record: InterfaceItem) => {
         return (
           <a
-            style={{
-              color: 'black',
+            onClick={() => {
+              history.push(
+                `/metric/explorer/${text}/${encodeURIComponent(
+                  record.description,
+                )}`,
+              );
             }}
           >
             {text}

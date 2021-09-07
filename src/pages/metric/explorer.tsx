@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Row, Col, Select, Radio, Button } from 'antd';
 import MetricTable, { Metric } from './matric';
 import MatricTag from './tags';
@@ -18,6 +18,7 @@ import type {
   isParam,
   RangeItem,
 } from '@/store/chart';
+import { useParams } from 'react-router-dom';
 const { Option } = Select;
 export interface IExplorerProps {
   isIdent?: boolean;
@@ -34,6 +35,7 @@ export default function Explorer({ resourceGroupId, isIdent }: IExplorerProps) {
     end: 0,
   });
   const [metrics, setMetrics] = useState<Metric[]>([]);
+  const param = useParams();
   const [chartOption, setChartOption] = useState<ChartComponentProps>({
     range: {
       start: 0,
@@ -130,12 +132,6 @@ export default function Explorer({ resourceGroupId, isIdent }: IExplorerProps) {
     <div className='explore'>
       <Row>
         <Col className='left' span={8}>
-          {/* {!isIdent ? (
-        <div className={'page-title'}>
-          <LineChartOutlined />
-          {t('即时看图')}
-        </div>
-      ) : null} */}
           {isIdent ? (
             <ResourceTable onSelect={handleSelectIdent}></ResourceTable>
           ) : null}
@@ -143,6 +139,7 @@ export default function Explorer({ resourceGroupId, isIdent }: IExplorerProps) {
             <div className='title'>{t('监控指标')}</div>
             <MetricTable
               idents={idents}
+              initVal={param['name'] && param}
               onChange={handleMetricChange}
               ref={metricRef}
             />

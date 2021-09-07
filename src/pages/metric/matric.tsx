@@ -18,6 +18,7 @@ interface Props {
   multiple?: boolean;
   onChange: Function;
   idents?: Array<string>;
+  initVal?: Metric;
 }
 export interface Metric {
   name: string;
@@ -25,23 +26,29 @@ export interface Metric {
 }
 
 const MetricTable = (
-  { onChange, idents, multiple = true, value }: Props,
+  { onChange, idents, multiple = true, value, initVal }: Props,
   ref: any,
 ) => {
   const { t } = useTranslation();
   const [selMetrics, setSelMetrics] = useState<Metric[] | string>([]);
   const [metrics, setMetrics] = useState<Metric[]>([]);
   const [historyMetrics, setHistoryMetrics] = useState<Metric[]>([]);
-  // useEffect(() => {
-  //   getMetrics();
-  // }, []);
+  const [flag, setFlag] = useState(false);
+
   useEffect(() => {
     getMetrics();
+    console.log(idents, 'idents');
   }, [JSON.stringify(idents)]);
 
   useEffect(() => {
     value && setSelMetrics(value);
   }, [value]);
+  useEffect(() => {
+    if (historyMetrics.length && initVal && initVal['name']) {
+      !flag && multiple && handleSelectChange([initVal['name']]);
+      setFlag(true);
+    }
+  }, [historyMetrics]);
 
   const getMetrics = (query = '') => {
     if (query.length > 0 && query.length < 4) return; //因为后端性能问题，必须传入4字符才发起检索
@@ -52,8 +59,14 @@ const MetricTable = (
     };
     GetMetrics(queryData).then((res) => {
       if (res.dat.metrics) {
-        setMetrics(res.dat.metrics);
-        setHistoryMetrics(res.dat.metrics.concat(historyMetrics));
+        let history = res.dat.metrics.concat(historyMetrics);
+        let Metrics = res.dat.metrics;
+        if (initVal && initVal['name']) {
+          history = res.dat.metrics.concat(historyMetrics).concat(initVal);
+          Metrics = res.dat.metrics.concat(initVal);
+        }
+        setMetrics(Metrics);
+        setHistoryMetrics(history);
       }
     });
   };

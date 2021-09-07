@@ -55,6 +55,28 @@ const Shield: React.FC = () => {
       },
     },
     {
+      title: t('资源分组前缀'),
+      width: '15%',
+      dataIndex: 'classpath_prefix',
+      render: (text: string) => {
+        return (
+          <>
+            <Tooltip placement='topLeft' title={text}>
+              <div
+                style={{
+                  whiteSpace: 'nowrap',
+                  textOverflow: 'ellipsis',
+                  overflow: 'hidden',
+                }}
+              >
+                {text}
+              </div>
+            </Tooltip>
+          </>
+        );
+      },
+    },
+    {
       title: t('资源标识'),
       width: '20%',
       dataIndex: 'res_filters',
