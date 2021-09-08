@@ -61,8 +61,18 @@ const MetricTable = (
         let history = res.dat.metrics.concat(historyMetrics);
         let Metrics = res.dat.metrics;
         if (initVal && initVal['name']) {
-          history = res.dat.metrics.concat(historyMetrics).concat(initVal);
-          Metrics = res.dat.metrics.concat(initVal);
+          let history = res.dat.metrics.concat(historyMetrics);
+          let isHistoryHave = history.find((e) => e.name === initVal.name);
+          let isMetricsHave = res.dat.metrics.find(
+            (e) => e.name === initVal.name,
+          );
+
+          if (!isHistoryHave) {
+            history = history.concat(initVal);
+          }
+          if (!isMetricsHave) {
+            Metrics = res.dat.metrics.concat(initVal);
+          }
         }
         setMetrics(Metrics);
         setHistoryMetrics(history);
