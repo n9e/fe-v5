@@ -152,11 +152,11 @@ const Indicator: React.FC = () => {
         return (
           <a
             onClick={() => {
-              history.push(
-                `/metric/explorer/${text}/${encodeURIComponent(
-                  record.description,
-                )}`,
-              );
+              let path = {
+                pathname: `/metric/explorer/`,
+                state: { name: text, description: record.description },
+              };
+              history.push(path);
             }}
           >
             {text}

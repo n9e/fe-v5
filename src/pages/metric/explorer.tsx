@@ -18,7 +18,7 @@ import type {
   isParam,
   RangeItem,
 } from '@/store/chart';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 const { Option } = Select;
 export interface IExplorerProps {
   isIdent?: boolean;
@@ -35,7 +35,7 @@ export default function Explorer({ resourceGroupId, isIdent }: IExplorerProps) {
     end: 0,
   });
   const [metrics, setMetrics] = useState<Metric[]>([]);
-  const param = useParams();
+  const loction = useLocation();
   const [chartOption, setChartOption] = useState<ChartComponentProps>({
     range: {
       start: 0,
@@ -139,7 +139,7 @@ export default function Explorer({ resourceGroupId, isIdent }: IExplorerProps) {
             <div className='title'>{t('监控指标')}</div>
             <MetricTable
               idents={idents}
-              initVal={param['name'] && param}
+              initVal={loction.state as Metric}
               onChange={handleMetricChange}
               ref={metricRef}
             />

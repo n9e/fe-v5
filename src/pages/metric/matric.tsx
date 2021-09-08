@@ -37,7 +37,6 @@ const MetricTable = (
 
   useEffect(() => {
     getMetrics();
-    console.log(idents, 'idents');
   }, [JSON.stringify(idents)]);
 
   useEffect(() => {
