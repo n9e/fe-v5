@@ -1,5 +1,6 @@
 import { message } from 'antd';
-
+import React, { ReactNode, Component } from 'react';
+import { IStore } from '@/store/common';
 export const isPromise = (obj) => {
   return (
     !!obj &&
@@ -97,3 +98,85 @@ export function formatTrim(s: string) {
   }
   return i0 > 0 ? s.slice(0, i0) + s.slice(i1 + 1) : s;
 }
+
+const secondTime = 1 * 1000;
+const minuteTime = secondTime * 60;
+const hourTime = minuteTime * 60;
+const dayTime = 24 * hourTime;
+const dateArray: { time: number; unit: string }[] = [
+  { time: dayTime, unit: '天' },
+  {
+    time: hourTime,
+    unit: '时',
+  },
+  {
+    time: minuteTime,
+    unit: '分',
+  },
+  {
+    time: secondTime,
+    unit: '秒',
+  },
+];
+
+export function isString(value: any): value is string {
+  return typeof value === 'string';
+}
+
+// 对象字段首尾去掉空格
+export function trimObject<T extends Object>(obj: T): T {
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      let value = obj[key];
+      if (isString(value)) {
+        // @ts-ignore
+        obj[key] = value.trim();
+      }
+    }
+  }
+  return obj;
+}
+export function timeFormat(time: number): string {
+  let finalString = '';
+  const timeIterator = timeCore(time);
+  let currentStatus;
+  do {
+    currentStatus = timeIterator.next();
+    if (!currentStatus.done) {
+      finalString += currentStatus.value;
+    }
+  } while (!currentStatus.done);
+  return finalString;
+}
+
+const timeCore = function* (time: number) {
+  let nextTime = time;
+  for (let i = 0; i < dateArray.length; i++) {
+    const { unit, time: dateTime } = dateArray[i];
+    let current = Math.floor(nextTime / dateTime);
+    yield current > 0 ? `${current}${unit}` : '';
+    nextTime = nextTime % dateTime;
+  }
+};
+
+export function getPreThreeHours(time: number): number {
+  return time - 3 * hourTime;
+}
+
+interface Route {
+  path: string;
+  component: JSX.Element | Component;
+}
+export interface Entry {
+  menu?: {
+    weight?: number;
+    content: ReactNode;
+  };
+  routes: Route[];
+  module?: IStore<any>;
+}
+
+export const dynamicPackages = (): Entry[] => {
+  const Packages = import.meta.globEager('../Packages/*/entry.tsx');
+  return Object.values(Packages).map((obj) => obj.default);
+};

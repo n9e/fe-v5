@@ -7,6 +7,9 @@
     "allowJs": true,
     "baseUrl": ".",
     "paths": {
+      "@/store/eventWallInterface": [
+        "src/Packages/EventWall/interface/index.ts"
+      ],
       "@/*": ["src/*"]
     },
     "skipLibCheck": false,

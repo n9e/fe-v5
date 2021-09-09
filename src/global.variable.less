@@ -6,7 +6,7 @@
 @colorGray4: #666;
 @colorGray5: #f6f5f6;
 @colorGray6: #f3f6f9;
-@colorGray7: #e6e5e7;
+@colorGray7: #f5f6fa;
 @colorRed1: #ff5656;
 @colorRed2: #f53146;
 @colorRed3: #fdebed;
@@ -17,7 +17,7 @@
 @colorWarning: #e6a23c;
 @colorDanger: #ff5656;
 @colorDangerBackground: @colorRed3;
-
+@colorPrimary: @colorBlue; // 品牌色
 @baseFontSizeTiny: 12px;
 @baseFontSizeSmall: 14px;
 @baseFontSizeMiddle: 18px;
@@ -34,6 +34,14 @@
 @basePadding: 12px 24px 0 24px;
 
 @baseBorderColor: #d2d6dc;
+
+// 背景色
+@baseContentBgColor: @colorGray6;
+@baseTableHeaderBgColor: @colorGray7;
+@baseContentNormalBgColor: @colorGray7;
+
+// 分割线
+@baseDividerColor: @colorGray6;
 
 @baseTransition: transform 0.15s cubic-bezier(0.55, 0, 0.1, 1);
 @panelBackground: #f6f5f6;
@@ -117,3 +125,11 @@ input::placeholder {
     height: auto;
   }
 }
+
+// srm beginning
+.ellipsis {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+// srm ending
