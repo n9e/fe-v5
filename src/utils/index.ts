@@ -75,6 +75,29 @@ export const copyToClipBoard = (text: string, t): boolean => {
   }
   return succeeded;
 };
+
+export function formatTrim(s: string) {
+  out: for (var n = s.length, i = 1, i0 = -1, i1; i < n; ++i) {
+    switch (s[i]) {
+      case '.':
+        i0 = i1 = i;
+        break;
+
+      case '0':
+        if (i0 === 0) i0 = i;
+        i1 = i;
+        break;
+
+      default:
+        if (i0 > 0) {
+          if (!+s[i]) break out;
+          i0 = 0;
+        }
+        break;
+    }
+  }
+  return i0 > 0 ? s.slice(0, i0) + s.slice(i1 + 1) : s;
+}
 interface Route {
   path: string;
   component: JSX.Element | Component;
