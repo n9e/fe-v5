@@ -8,3 +8,4 @@ package-lock.json
 .idea/*
 pub
 deploy.sh
+src/Packages/*

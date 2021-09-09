@@ -3,6 +3,7 @@
   "version": "5.0.0",
   "scripts": {
     "dev": "vite --port 8765",
+    "preinstall": "sh beforeinstall.sh",
     "build": "tsc && vite build",
     "serve": "vite preview",
     "prepare": "husky install"
@@ -38,6 +39,7 @@
     "@babel/parser": "^7.14.7",
     "@commitlint/cli": "^12.1.1",
     "@commitlint/config-conventional": "^12.1.1",
+    "@rollup/pluginutils": "^4.1.1",
     "@types/jquery": "^3.5.5",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
@@ -55,7 +57,8 @@
     "prettier": "^2.2.1",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "^4.1.2",
-    "vite": "^2.1.5"
+    "vite": "^2.1.5",
+    "vite-plugin-react-svg": "^0.2.0"
   },
   "lint-staged": {
     "*.{ts,tsx,less}": [

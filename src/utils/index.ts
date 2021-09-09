@@ -1,5 +1,6 @@
 import { message } from 'antd';
-
+import React, { ReactNode, Component } from 'react';
+import { IStore } from '@/store/common';
 export const isPromise = (obj) => {
   return (
     !!obj &&
@@ -97,3 +98,20 @@ export function formatTrim(s: string) {
   }
   return i0 > 0 ? s.slice(0, i0) + s.slice(i1 + 1) : s;
 }
+interface Route {
+  path: string;
+  component: JSX.Element | Component;
+}
+export interface Entry {
+  menu?: {
+    weight?: number;
+    content: ReactNode;
+  };
+  routes: Route[];
+  module?: IStore<any>;
+}
+
+export const dynamicPackages = (): Entry[] => {
+  const Packages = import.meta.globEager('../Packages/*/entry.tsx');
+  return Object.values(Packages).map((obj) => obj.default);
+};
