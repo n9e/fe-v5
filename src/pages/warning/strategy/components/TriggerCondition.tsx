@@ -168,6 +168,7 @@ const TriggerConditon = (props) => {
       let params = form.getFieldValue('trigger_conditions')[field.name]?.params;
       mVal = params.length > 0 && params[0] !== 1 ? params[0] / 86400 : 1;
     } else {
+      let params = form.getFieldValue('trigger_conditions')[field.name]?.params;
       mVal = params[0] || 1;
     }
 
