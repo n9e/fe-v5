@@ -194,7 +194,7 @@ const StrategyOperate: React.FC = () => {
               curStrategyObj?.expression?.trigger_conditions.map(
                 (item) => item.metric,
               );
-
+            setAllMetrics(curMetricList);
             fetchTagKey(curMetricList);
           }
 
@@ -678,6 +678,7 @@ const StrategyOperate: React.FC = () => {
                                   <ResourceFilterConditionComponent
                                     field={field} // initObj={initResourceFilterConditions[field.key]}
                                     classpathes={classpathes}
+                                    form={form}
                                     onFuncChange={handleFuncChange}
                                   />
                                   <Col span={1}>
@@ -726,7 +727,7 @@ const StrategyOperate: React.FC = () => {
                                   field={field}
                                   tagKeys={tagKeys}
                                   form={form}
-                                  curMetric={allMetrics?.[0] || ''}
+                                  curMetric={allMetrics || []}
                                 />
                                 <Col span={1}>
                                   <MinusCircleOutlined

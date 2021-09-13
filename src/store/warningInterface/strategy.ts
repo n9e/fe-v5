@@ -101,6 +101,7 @@ export interface strategyItem {
   create_by: string;
   update_at: number;
   update_by: string;
+  notify_groups_detail: Array<strategyGroupItem>;
 }
 
 export enum strategyFrom {

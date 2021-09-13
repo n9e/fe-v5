@@ -105,12 +105,15 @@ request.interceptors.response.use(
         .clone()
         .json()
         .then((data) => {
-          if (data.err === '') {
-            if (
-              data.dat &&
-              Object.prototype.toString.call(data.dat.list) === '[object Null]'
-            ) {
-              data.dat.list = [];
+          if (data.err === '' || !data.error) {
+            if (data.data || data.dat) {
+              if (
+                data.dat &&
+                Object.prototype.toString.call(data.dat.list) ===
+                  '[object Null]'
+              ) {
+                data.dat.list = [];
+              }
             }
             return { ...data, success: true };
           } else {

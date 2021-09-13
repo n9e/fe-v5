@@ -85,7 +85,7 @@ const PageLayout: React.FC<IPageLayoutProps> = ({
               </span>
               <Dropdown overlay={menu} trigger={['click']}>
                 <span className='avator'>
-                  <img src={profile.portrait} alt='' />
+                  <img src={profile.portrait || '/image/avatar1.png'} alt='' />
                   <span className='display-name'>
                     {profile.nickname || profile.username}
                   </span>

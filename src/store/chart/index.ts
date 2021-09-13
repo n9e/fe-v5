@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import { Range } from '@/components/DateRangePicker';
 export enum ChartType {
   Line = 'line',
   Pie = 'pie',
@@ -73,26 +74,8 @@ export interface TagForVariable extends Tag {
   metric: string;
 }
 
-export interface Param {
-  start: number;
-  end: number;
-}
-
-export function isParam(range: any): range is Param {
-  if (range && range.start && range.end) {
-    return true;
-  }
-  return false;
-}
-
-export interface RangeItem {
-  num: number;
-  unit: string;
-  shortUnit: dayjs.OpUnitType;
-}
-
 export interface ChartComponentProps {
-  range: Param | RangeItem;
+  range: Range;
   limit: number;
   metric: string | string[];
   idents?: string[];
@@ -103,6 +86,7 @@ export interface ChartComponentProps {
   prome_ql?: string[] | string;
   yplotline?: number;
   xplotline?: number; //秒
+  step?: number;
 }
 
 export interface ChartFilterProps {

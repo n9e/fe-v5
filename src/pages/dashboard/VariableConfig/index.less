@@ -22,9 +22,12 @@
         box-sizing: border-box;
         line-height: 32px;
         padding: 0 20px;
-        font-size: @baseFontSizeSmall;
+        font-size: @baseFontSizeTiny;
         background: @colorDangerBackground;
         color: @fontColorLevel4;
+        span {
+          transform: scale(0.8);
+        }
       }
     }
   }
@@ -32,10 +35,16 @@
   .tag-content-close {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     &-item {
       display: flex;
       flex-direction: row;
       margin-right: 12px;
+      margin-bottom: 10px;
+      width: 200px;
+      .ant-select {
+        flex: 1;
+      }
       &-tagName {
         line-height: 32px;
         padding: 0 8px;
@@ -67,6 +76,7 @@
   .tag-control-area {
     display: flex;
     flex-direction: row;
+    margin-bottom: 10px;
     button {
       &:last-of-type {
         margin-left: 8px;

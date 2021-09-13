@@ -29,6 +29,25 @@ import EventDetail from '@/pages/event/detail';
 import Overview from '@/pages/overview';
 import historyEvents from '@/pages/historyEvents';
 
+import { dynamicPackages, Entry } from '@/utils';
+
+const Packages = dynamicPackages();
+let lazyRoutes = Packages.reduce((result: any, module: Entry) => {
+  return (result = result.concat(module.routes));
+}, []);
+
+function RouteWithSubRoutes(route) {
+  return (
+    <Route
+      path={route.path}
+      render={(props) => (
+        // pass the sub-routes down to keep nesting
+        <route.component {...props} routes={route.routes} />
+      )}
+    />
+  );
+}
+
 export default function Content() {
   let { profile } = useSelector<RootState, accountStoreState>(
     (state) => state.account,
@@ -85,6 +104,9 @@ export default function Content() {
         <Route exact path='/event' component={Event} />
         <Route exact path='/event/:id' component={EventDetail} />
         <Route exact path='/event-history/:id' component={EventDetail} />
+        {lazyRoutes.map((route, i) => (
+          <RouteWithSubRoutes key={i} {...route} />
+        ))}
         <Route path='/' exact>
           <Redirect to='/overview' />
         </Route>

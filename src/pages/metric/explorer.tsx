@@ -6,19 +6,16 @@ import D3Chart from '@/components/D3Chart';
 import DateRangePicker from '@/components/DateRangePicker';
 import ResourceTable from './resourceTable';
 import ResfeshIcon from '@/components/RefreshIcon';
+import Resolution from '@/components/Resolution';
 import { AreaChartOutlined, LineChartOutlined } from '@ant-design/icons';
 import { SetTmpChartData } from '@/services/metric';
 import '@d3-charts/ts-graph/dist/index.css';
 import './index.less';
 import { useTranslation } from 'react-i18next';
 import PageLayout from '@/components/pageLayout';
-import type {
-  ChartComponentProps,
-  Param,
-  isParam,
-  RangeItem,
-} from '@/store/chart';
 import { useLocation, useParams } from 'react-router-dom';
+import type { ChartComponentProps } from '@/store/chart';
+import { Range } from '@/components/DateRangePicker';
 const { Option } = Select;
 export interface IExplorerProps {
   isIdent?: boolean;
@@ -30,7 +27,8 @@ export default function Explorer({ resourceGroupId, isIdent }: IExplorerProps) {
   const metricRef = useRef(null as any);
   const tagRef = useRef(null as any);
   const [numPerLine, setNumPerLine] = useState(1);
-  const [range, setRange] = useState<Param | RangeItem>({
+  const [step, setStep] = useState(15);
+  const [range, setRange] = useState<Range>({
     start: 0,
     end: 0,
   });
@@ -80,7 +78,7 @@ export default function Explorer({ resourceGroupId, isIdent }: IExplorerProps) {
     formatOption({}, e);
   };
 
-  const formatOption = (obj = {}, r?: Param | RangeItem) => {
+  const formatOption = (obj = {}, r?: Range) => {
     // 如果是其他参数变化，则不必传r参数，会使用缓存的range
     let newR = r || range;
     setChartOption({ ...chartOption, ...obj, range: newR });
@@ -199,7 +197,8 @@ export default function Explorer({ resourceGroupId, isIdent }: IExplorerProps) {
           <div className='header'>
             <div className='header-left'>
               <DateRangePicker onChange={handleDateChange} />
-              <ResfeshIcon onClick={handleRefresh} className='reload-icon' />
+              <Resolution onChange={(v) => setStep(v)} initialValue={step} />
+              <ResfeshIcon onClick={handleRefresh} />
             </div>
             <Radio.Group value={numPerLine} onChange={handleChange}>
               <Radio.Button value={4}>XS</Radio.Button>
@@ -218,6 +217,7 @@ export default function Explorer({ resourceGroupId, isIdent }: IExplorerProps) {
                           cached
                           options={{
                             ...chartOption,
+                            step,
                             idents: idents.length > 0 ? idents : undefined,
                             metric: metric.name,
                             description: metric.description,
