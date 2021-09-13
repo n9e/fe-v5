@@ -77,7 +77,11 @@ export default function Content() {
       <Switch>
         <Route path='/login' component={Login} exact />
         <Route exact path='/overview' component={Overview} />
-        <Route path='/metric/explorer' component={Explore} exact />
+        <Route
+          path='/metric/explorer/:name?/:description?'
+          component={Explore}
+          exact
+        />
         <Route path='/account/profile/:tab' component={Profile} />
         <Route path='/manage/:type' component={Manage} />
         <Route path='/dashboard/:id' component={DashboardDetail} />

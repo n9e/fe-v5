@@ -26,6 +26,8 @@ import { eventStoreState } from '@/store/eventInterface';
 import '../index.less';
 import { useTranslation } from 'react-i18next';
 import _ from 'lodash';
+import { getResourceGroups } from '@/services';
+import { SSL_OP_NETSCAPE_REUSE_CIPHER_CHANGE_BUG } from 'constants';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -36,16 +38,19 @@ interface Props {
 }
 
 const OperateForm: React.FC<Props> = ({ detail, type = FormType.add }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const layout = {
     labelCol: {
-      span: 2,
+      span: i18n.language == 'en' ? 3 : 2,
     },
     wrapperCol: {
-      span: 22,
+      span: i18n.language == 'en' ? 21 : 22,
     },
   };
   const tailLayout = {
+    labelCol: {
+      // span: i18n.language == 'en' ? 1 : 2,
+    },
     wrapperCol: {
       offset: 2,
     },
@@ -60,6 +65,9 @@ const OperateForm: React.FC<Props> = ({ detail, type = FormType.add }) => {
   const [form] = Form.useForm(null as any);
   const history = useHistory();
   const [btnLoading, setBtnLoading] = useState<boolean>(false);
+  const [classpathPrefixVal, setclasspathPrefixVal] = useState('');
+  const [options, setOptions] = useState<{ value: string }[]>([]);
+  const [Search, setSearch] = useState('');
   useEffect(() => {
     if (type === FormType.add && params.from === 'event' && currentEdit?.id) {
       const { history_points, res_ident, tags } = currentEdit;
@@ -75,9 +83,12 @@ const OperateForm: React.FC<Props> = ({ detail, type = FormType.add }) => {
     let metric = form.getFieldValue('metric');
     let resFilters = form.getFieldValue('res_filters');
     let tagsFilters = form.getFieldValue('tags_filters');
+    let classpathPrefixVal = form.getFieldValue('classpath_prefix');
 
-    if (!metric && !resFilters && !tagsFilters) {
-      callback(new Error(t('屏蔽标识、资源标识、屏蔽标签不能同时为空')));
+    if (!metric && !resFilters && !tagsFilters && !classpathPrefixVal) {
+      callback(
+        new Error(t('屏蔽标识、资源标识、屏蔽标签、资源分组前缀不能同时为空')),
+      );
     } else {
       callback();
     }
@@ -93,10 +104,18 @@ const OperateForm: React.FC<Props> = ({ detail, type = FormType.add }) => {
   useEffect(() => {
     getMetricsList();
   }, []);
+  useEffect(() => {
+    getResourceGroups(classpathPrefixVal).then((e) => {
+      let paths = e.dat.list.map((e) => {
+        return { value: e.path as string };
+      });
+      setOptions(paths);
+    });
+    form.setFieldsValue({ classpath_prefix: classpathPrefixVal });
+  }, [classpathPrefixVal]);
 
   const handleTagsChange = (value: string[]) => {
     const top: string = value[value.length - 1];
-
     if (top && !reg.test(top)) {
       let v = value.pop();
       message.error(`${t('不符合输入规范（格式为key=value）')}`);
@@ -112,6 +131,7 @@ const OperateForm: React.FC<Props> = ({ detail, type = FormType.add }) => {
       cause: values.cause,
       btime: values.time.btime,
       etime: values.time.etime,
+      classpath_prefix: values.classpath_prefix,
     };
     addShield(params)
       .then((_) => {
@@ -122,10 +142,15 @@ const OperateForm: React.FC<Props> = ({ detail, type = FormType.add }) => {
         setBtnLoading(false);
       });
   };
-
   const onFinishFailed = () => {
     setBtnLoading(false);
   };
+  const onSelect = _.debounce((data: string) => {
+    setclasspathPrefixVal(data);
+  }, 800);
+  const onChange = _.debounce((data: string) => {
+    setclasspathPrefixVal(data);
+  }, 800);
 
   const content =
     type === FormType.add ? (
@@ -160,6 +185,23 @@ const OperateForm: React.FC<Props> = ({ detail, type = FormType.add }) => {
             </AutoComplete>
           </Form.Item>
           <Form.Item
+            label={t('资源分组前缀')}
+            name='classpath_prefix'
+            rules={[
+              {
+                validator: validator,
+              },
+            ]}
+          >
+            <AutoComplete
+              value={classpathPrefixVal}
+              options={options}
+              onSelect={onSelect}
+              onChange={onChange}
+              placeholder={t('搜索资源分组前缀')}
+            />
+          </Form.Item>
+          <Form.Item
             label={t('资源标识')}
             name='res_filters'
             rules={[
@@ -188,6 +230,7 @@ const OperateForm: React.FC<Props> = ({ detail, type = FormType.add }) => {
               onChange={handleTagsChange}
             ></Select>
           </Form.Item>
+
           <Form.Item label={t('屏蔽时间')} name='time'>
             <RangeDatePicker />
           </Form.Item>
@@ -205,11 +248,20 @@ const OperateForm: React.FC<Props> = ({ detail, type = FormType.add }) => {
           </Form.Item>
           <Form.Item {...tailLayout}>
             <Row gutter={[10, 10]} align='middle'>
-              <Col span={1}>
-                <Button type='primary' htmlType='submit' loading={btnLoading}>
-                  {t('创建')}
-                </Button>
-              </Col>
+              {i18n.language == 'en' ? (
+                <Col span={1} offset={1}>
+                  <Button type='primary' htmlType='submit' loading={btnLoading}>
+                    {t('创建')}
+                  </Button>
+                </Col>
+              ) : (
+                <Col span={1}>
+                  <Button type='primary' htmlType='submit' loading={btnLoading}>
+                    {t('创建')}
+                  </Button>
+                </Col>
+              )}
+
               <Col
                 span={1}
                 style={{

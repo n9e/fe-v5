@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Row, Col, Select, Radio, Button } from 'antd';
 import MetricTable, { Metric } from './matric';
 import MatricTag from './tags';
@@ -13,6 +13,7 @@ import '@d3-charts/ts-graph/dist/index.css';
 import './index.less';
 import { useTranslation } from 'react-i18next';
 import PageLayout from '@/components/pageLayout';
+import { useLocation, useParams } from 'react-router-dom';
 import type { ChartComponentProps } from '@/store/chart';
 import { Range } from '@/components/DateRangePicker';
 const { Option } = Select;
@@ -32,6 +33,7 @@ export default function Explorer({ resourceGroupId, isIdent }: IExplorerProps) {
     end: 0,
   });
   const [metrics, setMetrics] = useState<Metric[]>([]);
+  const loction = useLocation();
   const [chartOption, setChartOption] = useState<ChartComponentProps>({
     range: {
       start: 0,
@@ -128,12 +130,6 @@ export default function Explorer({ resourceGroupId, isIdent }: IExplorerProps) {
     <div className='explore'>
       <Row>
         <Col className='left' span={8}>
-          {/* {!isIdent ? (
-        <div className={'page-title'}>
-          <LineChartOutlined />
-          {t('即时看图')}
-        </div>
-      ) : null} */}
           {isIdent ? (
             <ResourceTable onSelect={handleSelectIdent}></ResourceTable>
           ) : null}
@@ -141,6 +137,7 @@ export default function Explorer({ resourceGroupId, isIdent }: IExplorerProps) {
             <div className='title'>{t('监控指标')}</div>
             <MetricTable
               idents={idents}
+              initVal={loction.state as Metric}
               onChange={handleMetricChange}
               ref={metricRef}
             />

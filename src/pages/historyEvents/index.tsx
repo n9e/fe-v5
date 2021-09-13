@@ -164,9 +164,11 @@ const Event: React.FC = () => {
                         </span>
                         <Divider type='vertical' />
                         <span>
-                          {ele.is_recovery === IsRecovery.Alert
-                            ? t('告警')
-                            : t('恢复')}
+                          {ele.is_recovery === IsRecovery.Alert ? (
+                            <a style={{ color: '#ff4d4f' }}>{t('告警')}</a>
+                          ) : (
+                            <a style={{ color: '#52c41a' }}>{t('恢复')}</a>
+                          )}
                         </span>
                         <Divider type='vertical' />
 
