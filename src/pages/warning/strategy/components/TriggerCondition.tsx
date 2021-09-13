@@ -32,7 +32,6 @@ const TriggerConditon = (props) => {
   const defaultThreshold = 60;
   const { field, expression, alertDuration, form, openDrawer, index } = props;
   const [func, setFunc] = useState(expression?.func || defaultFunc);
-  const [params, setParams] = useState(expression?.params || defaultParams);
   const [threshold, setThreshold] = useState(
     expression?.threshold !== undefined
       ? expression?.threshold
@@ -278,7 +277,13 @@ const TriggerConditon = (props) => {
   };
 
   const handleFuncChange = (v) => {
-    setFunc(v); // setParams(funcMap[v].defaultValue);
+    setFunc(v);
+    form.setFields([
+      {
+        name: ['trigger_conditions', field.name, 'params'],
+        value: funcMap(t)[v].defaultValue,
+      },
+    ]);
   };
 
   const handleThreshholdChange = (v) => {
