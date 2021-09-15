@@ -20,6 +20,14 @@ export default defineConfig({
         replacement: '/src/Packages/EventWall/interface',
       },
       {
+        find: '@/services/outfire',
+        replacement: '/src/Packages/Outfire/services/outfire',
+      },
+      {
+        find: '@/pages/outfire',
+        replacement: '/src/Packages/Outfire/pages',
+      },
+      {
         find: '@',
         replacement: '/src',
       },
