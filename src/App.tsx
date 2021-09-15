@@ -12,6 +12,8 @@ import zhCN from 'antd/lib/locale/zh_CN';
 import en from 'antd/lib/locale/en_US';
 import ErrorComponent from './components/ErrorComponent';
 import { useTranslation } from 'react-i18next';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 function App() {
   const { t, i18n } = useTranslation();
@@ -36,7 +38,9 @@ function App() {
           <Router>
             <ErrorComponent>
               <HeaderMenu></HeaderMenu>
-              <Content></Content>
+              <DndProvider backend={HTML5Backend}>
+                <Content></Content>
+              </DndProvider>
             </ErrorComponent>
           </Router>
         </Provider>

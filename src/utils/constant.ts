@@ -34,6 +34,11 @@ export const chartColor = [
   '#546570',
   '#c4ccd3',
 ];
+export const METRICS = {
+  TOTAL: 'total',
+  ERROR: 'error',
+  LATENCY: 'latency',
+};
 
 export const chartDefaultOptions = {
   color: chartColor,
