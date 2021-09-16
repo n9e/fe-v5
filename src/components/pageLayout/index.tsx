@@ -10,7 +10,7 @@ import { DownOutlined } from '@ant-design/icons';
 import { Logout } from '@/services/login';
 interface IPageLayoutProps {
   icon?: ReactNode;
-  title?: String;
+  title?: String | JSX.Element;
   children?: ReactNode;
   rightArea?: ReactNode;
   customArea?: ReactNode;
