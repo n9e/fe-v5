@@ -18,13 +18,16 @@ const multipleFuncs = tagFilterConditions
 interface Props {
   field: FormListFieldData;
   tagKeys: string[];
-  curMetric: Metric;
+  curMetric: Metric[];
   form: FormInstance;
 }
 const TagFilterCondition = (props: Props) => {
   const { t } = useTranslation();
   const { Option } = Select;
-  const { tagKeys, field, form } = props;
+  const { tagKeys, field, form, curMetric } = props;
+  const [tagValueLoading, setTagValueLoading] = useState<boolean>(false);
+  const [enableTagValueFocus, setDisableTagValueFocus] =
+    useState<boolean>(true);
   const [tagValues, setTagValues] = useState<Array<string>>([]);
   const [fuzzySearchKeyOptions, setFuzzySearchKeyOptions] = useState<
     {
@@ -48,14 +51,14 @@ const TagFilterCondition = (props: Props) => {
     ),
   );
   useEffect(() => {
+    //     const initTagKey = form.getFieldValue(['tags_filters', field.name, 'key']);
+    // debouncedGetTagValues(initTagKey);
     if (tagKeys?.length === 0) return;
     getTagValuesByKey({
       tag_key: tagKeys[0],
-      params: [
-        {
-          metric: props.curMetric || '',
-        },
-      ],
+      params: curMetric.map((metric) => ({
+        metric,
+      })),
       limit: 50,
     }).then((res) => {
       setTagValues(res?.dat?.values || []);
@@ -66,15 +69,15 @@ const TagFilterCondition = (props: Props) => {
   const debouncedChangeTagKey = useCallback(
     _.debounce((v) => {
       if (!v) return;
+      setTagValueLoading(true);
       getTagValuesByKey({
         tag_key: v,
-        params: [
-          {
-            metric: props.curMetric || '',
-          },
-        ],
+        params: curMetric.map((metric) => ({
+          metric,
+        })),
         limit: 50,
       }).then((res) => {
+        setTagValueLoading(false);
         setTagValues(res?.dat?.values || []);
       });
     }, 1000),
@@ -82,6 +85,7 @@ const TagFilterCondition = (props: Props) => {
   );
 
   const handleChangeTagKey = (v) => {
+    setDisableTagValueFocus(false); //未点击tagValue下拉框时，首次点击需fetch数据，tagKey change后因数据ready，故设为false
     if (
       multipleFuncs.includes(
         form.getFieldValue(['tags_filters', field.name, 'func']),
@@ -109,11 +113,9 @@ const TagFilterCondition = (props: Props) => {
     _.debounce((v) => {
       setFuzzySearchKey(v);
       const getTagKeysParam = {
-        params: [
-          {
-            metric: props.curMetric || '',
-          },
-        ],
+        params: curMetric.map((metric) => ({
+          metric,
+        })),
         limit: 50,
         tag_key: v,
       };
@@ -138,11 +140,9 @@ const TagFilterCondition = (props: Props) => {
       setFuzzySearchValue(v);
       getTagValuesByKey({
         tag_key: v,
-        params: [
-          {
-            metric: props.curMetric || '',
-          },
-        ],
+        params: curMetric.map((metric) => ({
+          metric,
+        })),
         limit: 50,
       }).then((res) => {
         setFuzzySearchValueOptions(
@@ -197,6 +197,14 @@ const TagFilterCondition = (props: Props) => {
               mode='tags'
               placeholder={t('请输入标签value')}
               onSearch={handleFuzzySearchTagValue}
+              loading={tagValueLoading}
+              onFocus={(e) => {
+                if (enableTagValueFocus) {
+                  debouncedChangeTagKey(
+                    form.getFieldValue(['tags_filters', field.name, 'key']),
+                  );
+                }
+              }}
             >
               {fuzzySearchValue
                 ? fuzzySearchValueOptions.map((o) => (

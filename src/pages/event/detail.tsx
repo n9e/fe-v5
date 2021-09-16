@@ -20,9 +20,7 @@ import { priorityColor } from '@/utils/constant';
 import ColorTag from '@/components/ColorTag';
 export const Detail: React.FC = () => {
   const { t } = useTranslation();
-  const { id } = useParams<{
-    id: string;
-  }>();
+  const { id } = useParams<{ id: string }>();
   const [options, setOptions] = useState<ChartComponentProps | null>(null);
   const [currentEdit, setCurrentEdit] = useState<warningEventItem>();
   const history = useHistory();
@@ -30,7 +28,6 @@ export const Detail: React.FC = () => {
   const [ishistory, setisHistory] = useState<boolean>(false);
 
   useEffect(() => {
-    console.log(history);
     const isHistory = history.location.pathname.includes('event-history');
     setisHistory(isHistory);
     if (isHistory) {
@@ -223,24 +220,19 @@ export const Detail: React.FC = () => {
                   value: tags[key],
                 };
               }),
-              //当前时间-触发时间<1小时，结束时间为触发时间，起始时间为  触发时间-2小时
               range:
-                //当前时间-触发时间>1小时，结束时间为触发时间+1小时，起始时间为  触发时间-1小时
-                dayjs().subtract(1, 'hour').unix() > currentEdit.trigger_time
-                  ? {
-                      start: dayjs(currentEdit.trigger_time * 1000)
-                        .subtract(1, 'hour')
-                        .unix(),
-                      end: dayjs(currentEdit.trigger_time * 1000)
-                        .add(1, 'hour')
-                        .unix(),
-                    }
-                  : {
-                      start: dayjs(currentEdit.trigger_time * 1000)
-                        .subtract(2, 'hour')
-                        .unix(),
-                      end: currentEdit.trigger_time,
-                    },
+                // 开始时间：触发时间减去1小时；结束时间：min(触发时间+1h，当前时间)
+                {
+                  start: dayjs(currentEdit.trigger_time * 1000)
+                    .subtract(1, 'hour')
+                    .unix(),
+                  end: Math.min(
+                    dayjs(currentEdit.trigger_time * 1000)
+                      .add(1, 'hour')
+                      .unix(),
+                    dayjs().unix(),
+                  ),
+                },
             };
 
             if (currentEdit.is_prome_pull) {

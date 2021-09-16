@@ -37,6 +37,8 @@ const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = (
     duplicateList: [],
     invalidList: [],
     nonNameList: [],
+    duplicateKeyList: [],
+    requireList: [],
     hasClassPath: false,
     hasInit: false,
   });
@@ -146,16 +148,26 @@ const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = (
 
   const buttonUseFul = useMemo(() => {
     if (!data) return true;
-    const { duplicateList, nonNameList, invalidList } = data;
+    const {
+      duplicateList,
+      nonNameList,
+      invalidList,
+      duplicateKeyList,
+      requireList,
+    } = data;
     return (
       duplicateList.length === 0 &&
+      duplicateKeyList.length === 0 &&
+      requireList.length === 0 &&
       nonNameList.length === 0 &&
       invalidList.length === 0
     );
   }, [
     JSON.stringify(data.duplicateList),
+    JSON.stringify(data.duplicateKeyList),
     JSON.stringify(data.nonNameList),
     JSON.stringify(data.invalidList),
+    JSON.stringify(data.requireList),
   ]);
   useImperativeHandle(ref, () => ({
     setInitData,

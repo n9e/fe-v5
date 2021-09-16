@@ -1,11 +1,24 @@
 import { defineConfig } from 'vite';
 import reactRefresh from '@vitejs/plugin-react-refresh';
+import { md } from './plugins/md';
+const reactSvgPlugin = require('vite-plugin-react-svg');
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [reactRefresh()],
+  plugins: [
+    md(),
+    reactRefresh(),
+    reactSvgPlugin({ defaultExport: 'component' }),
+  ],
+  define: {
+    'process.env': {},
+  },
   resolve: {
     alias: [
+      {
+        find: '@/store/eventWallInterface',
+        replacement: '/src/Packages/EventWall/interface',
+      },
       {
         find: '@',
         replacement: '/src',
@@ -18,8 +31,36 @@ export default defineConfig({
       // 字符串简写写法
       // '/foo': 'http://localhost:4567/foo',
       // 选项写法
-      '/api': {
-        target: 'http://116.85.69.138:8000',
+      // '/api': {
+      //   target: 'http://10.86.76.13:8085',
+      //   changeOrigin: true,
+      // },
+      '/api/n9e': {
+        target: 'http://10.86.76.13:8085',
+        changeOrigin: true,
+      },
+      '/filters': {
+        target: 'http://10.85.128.137',
+        changeOrigin: true,
+      },
+      '/integrations': {
+        target: 'http://10.85.128.137',
+        changeOrigin: true,
+      },
+      '/alerts': {
+        target: 'http://10.85.128.137',
+        changeOrigin: true,
+      },
+      '/changes': {
+        target: 'http://10.85.128.137',
+        changeOrigin: true,
+      },
+      '/dimension/api/v1': {
+        target: 'http://10.166.53.215:8089',
+        changeOrigin: true,
+      },
+      '/v1/api/fireplate': {
+        target: 'http://172.20.70.60:8010',
         changeOrigin: true,
       },
       // 正则表达式写法

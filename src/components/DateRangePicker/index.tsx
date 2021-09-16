@@ -1,169 +1,230 @@
 import React, { useState, useEffect } from 'react';
-import { Select } from 'antd';
-import RangePicker, { formatDate } from '@/components/BaseRangePicker';
-import { InsertRowAboveOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
-const { Option } = Select;
-import { isParam, Param, RangeItem } from '@/store/chart';
-import { ranges } from '@/utils/constant';
+import { Popover, Button, DatePicker } from 'antd';
+import { CaretDownOutlined } from '@ant-design/icons';
+import moment, { unitOfTime, Moment } from 'moment';
 import './index.less';
 import { useTranslation } from 'react-i18next';
+
+type TimeUnit = 's' | 'ms';
 interface Props {
-  initValue?: Param | RangeItem;
-  onChange: (data: Param | RangeItem) => void;
+  leftList?: RelativeRange[];
+  unit?: TimeUnit;
+  value?: Range;
+  onChange: (value: Range) => void;
 }
-export const generateTimeStampRange = (range: RangeItem): Param => {
-  const { num, shortUnit } = range;
-  let end = dayjs().unix();
-  let start = dayjs().subtract(num, shortUnit).unix();
+
+export type Range = RelativeRange | AbsoluteRange;
+
+export interface RelativeRange {
+  num: number;
+  unit: unitOfTime.DurationConstructor;
+  description: string;
+}
+
+export interface AbsoluteRange {
+  start: number; // 毫秒
+  end: number;
+}
+interface AbsoluteTimeStampRange {
+  start: number;
+  end: number;
+}
+
+export function isAbsoluteRange(range: any): range is AbsoluteRange {
+  if (range && range.start && range.end) {
+    return true;
+  }
+  return false;
+}
+
+export const generateTimeStampRange = (
+  range: RelativeRange,
+  timeUnit: TimeUnit = 's',
+): AbsoluteRange => {
+  const { num, unit } = range;
+  let end = timeUnit === 's' ? moment().unix() : moment().valueOf();
+  let start =
+    timeUnit === 's'
+      ? moment().subtract(num, unit).unix()
+      : moment().subtract(num, unit).valueOf();
   return {
     start,
     end,
   };
 };
-export const formatPickerDate = (r?: Param | RangeItem) => {
-  let newR = r;
 
-  if (newR) {
-    if (isParam(newR)) {
-      const { start, end } = newR;
-      return {
-        start,
-        end,
-      };
-    } else {
-      return generateTimeStampRange(newR);
-    }
-  }
-
+export const formatPickerDate = (
+  r: Range,
+  timeUnit: TimeUnit = 's',
+): AbsoluteTimeStampRange => {
+  const { start, end } = isAbsoluteRange(r)
+    ? r
+    : generateTimeStampRange(r, timeUnit);
   return {
-    start: 0,
-    end: 0,
+    start,
+    end,
   };
 };
+
 export default function DateRangePicker(props: Props) {
   const { t } = useTranslation();
-  const { onChange, initValue } = props;
-  const [time, setTime] = useState<string | number>('');
-  const [open, setOpen] = useState(false);
-  const [isFromCalendar, setIsFromCalendar] = useState(false);
-
-  const handleSelectChange = (e) => {
-    if (e > ranges.length - 1) {
-      setOpen(true);
-    } else {
-      setTime(e);
-      onChange(ranges[e]);
-      setIsFromCalendar(false);
-    }
-  };
-
-  const handleRangePickerChange = (e) => {
-    if (e.startDate && e.endDate) {
-      setOpen(false);
-      setTime(
-        `${formatDate(e['startDate'], 'YY-MM-DD')}  --  ${formatDate(
-          e['endDate'],
-          'YY-MM-DD',
-        )}`,
-      );
-      onChange({
-        start: dayjs(e['startDate']).unix(),
-        end: dayjs(e['endDate']).unix(),
-      });
-    }
-  };
-
-  const formatInitValue = (r?: Param | RangeItem) => {
-    if (isParam(r)) {
-      const { start, end } = r;
-      setTime(
-        `${dayjs(start * 1000).format('YY-MM-DD')}  --  ${dayjs(
-          end * 1000,
-        ).format('YY-MM-DD')}`,
-      );
-    } else {
-      const i = ranges.findIndex(
-        (item) => item.num === r?.num && item.unit === r.unit,
-      );
-      setTime(i);
-    }
-  };
+  const LeftItems: RelativeRange[] = [
+    { num: 5, unit: 'minutes', description: t('minute') },
+    { num: 15, unit: 'minutes', description: t('minutes') },
+    { num: 30, unit: 'minutes', description: t('minutes') },
+    { num: 1, unit: 'hour', description: t('hour') },
+    { num: 2, unit: 'hours', description: t('hours') },
+    { num: 6, unit: 'hours', description: t('hours') },
+    { num: 12, unit: 'hours', description: t('hours') },
+    { num: 1, unit: 'day', description: t('天') },
+    { num: 1, unit: 'week', description: t('周') },
+    { num: 1, unit: 'month', description: t('月') },
+    { num: 1, unit: 'quarter', description: t('季度') },
+  ];
+  const { onChange, value, unit = 's', leftList = LeftItems } = props;
+  const [visible, setVisible] = useState(false);
+  const [startTime, setStartTime] = useState<Moment>(moment());
+  const [endTime, setEndTime] = useState<Moment>(moment());
+  const [leftSelect, setLeftSelect] = useState<number>(-1);
+  const [label, setLabel] = useState<string>();
 
   useEffect(() => {
-    // 如果有默认值，则默认不向外抛事件
-    if (initValue) {
-      formatInitValue(initValue);
+    if (value && isAbsoluteRange(value) && value.start > 0 && value.end > 0) {
+      formatExternalAbsoluteTime(value);
     } else {
-      // emit the init value, now default value is 1 hour
-      setTime(3);
-      onChange(ranges[3]);
+      handleLeftClick(0);
     }
   }, []);
+
   useEffect(() => {
-    // 如果点击的是组件以外则关闭弹框
-    function hideTheCalendar(e) {
-      console.log('hideTheCalendar');
-      e.preventDefault();
-      let calendarIndex = [].findIndex.call(
-        e.path,
-        (item: { className: string }) => item.className === 'calendar',
+    // 如果外部被赋值，只需要改label和组件展示值，不需要向外抛
+    if (value && isAbsoluteRange(value) && value.start > 0 && value.end > 0) {
+      formatExternalAbsoluteTime(value);
+    }
+  }, [value]);
+
+  const formatLabel = (r: Range, unit: TimeUnit): string => {
+    if (isAbsoluteRange(r)) {
+      const { start, end } = r;
+      return (
+        moment(unit === 's' ? start * 1000 : start).format(
+          'YYYY.MM.DD HH:mm:ss',
+        ) +
+        ' 至 ' +
+        moment(unit === 's' ? end * 1000 : end).format('YYYY.MM.DD HH:mm:ss')
       );
-
-      if (calendarIndex < 0) {
-        setOpen(false);
-      }
+    } else {
+      const { num, description } = r;
+      return `${t('最近')} ${num} ${description}`;
     }
+  };
 
-    if (open) {
-      document.addEventListener('click', hideTheCalendar, true);
-    }
+  const formatExternalAbsoluteTime = (value: AbsoluteRange) => {
+    const { start, end } = value;
+    setStartTime(moment(start));
+    setEndTime(moment(end));
+    setLabel(formatLabel(value, unit));
+  };
 
-    return () => {
-      document.removeEventListener('click', hideTheCalendar, true);
-    };
-  }, [open]);
-  return (
-    <div className={isFromCalendar ? 'range-picker calendar' : 'range-picker'}>
-      {
-        <span
-          className={
-            isFromCalendar ? 'tag from-calendar show' : 'tag from-calendar'
-          }
-        >
-          5m
-        </span>
-      }
-      {/* <button style={{position: 'absolute', zIndex: 3}} onClick={() =>setOpen(false)}>close</button> */}
-      <Select
-        className='select'
-        value={time}
-        onChange={handleSelectChange}
-        dropdownStyle={{
-          marginLeft: '60px',
-        }}
-      >
-        {ranges.map((item, i) => (
-          <Option key={i} value={i}>
-            {' '}
-            <span className='tag'>
-              {item.num}
-              {item.shortUnit}
-            </span>
-            Past {item.num} {item.unit}
-          </Option>
+  const handleStartTimeChange = (time, timeString) => {
+    setStartTime(time);
+  };
+
+  const handleEndTimeChange = (time, timeString) => {
+    setEndTime(time);
+  };
+
+  function endDisabledDate(current) {
+    // Can not select days before today and before the start time
+    return (
+      // (current && current < startTime.endOf('seconds')) ||
+      current && current > moment().endOf('seconds')
+    );
+  }
+
+  function startDisabledDate(current) {
+    // Can not select days before today and today
+    return (
+      // (current && current > endTime.endOf('seconds')) ||
+      current && current > moment().endOf('seconds')
+    );
+  }
+
+  const handleRightOk = () => {
+    setVisible(false);
+    setLeftSelect(-1);
+    emitValue({
+      start: unit === 's' ? startTime.unix() : startTime.valueOf(),
+      end: unit === 's' ? endTime.unix() : endTime.valueOf(),
+    });
+  };
+
+  const handleLeftClick = (i) => {
+    setLeftSelect(i);
+    emitValue(leftList[i]);
+    setVisible(false);
+  };
+
+  const emitValue = (value: Range) => {
+    onChange(value);
+    setLabel(formatLabel(value, unit));
+  };
+
+  const content = (
+    <div className='time-range-picker-wrapper'>
+      <div className='time-range-picker-left'>
+        {leftList.map(({ num, unit, description }, i) => (
+          <Button
+            key={i}
+            type='link'
+            onClick={() => handleLeftClick(i)}
+            className={i === leftSelect ? 'active' : ''}
+          >
+            {t('最近')}
+            <span className='num'>{num}</span>
+            {description}
+          </Button>
         ))}
-        <Option key={ranges.length} value={ranges.length}>
-          {' '}
-          <span className='tag'>
-            <b>
-              <InsertRowAboveOutlined />
-            </b>
-          </span>
-          Select from calendar{' '}
-        </Option>
-      </Select>
-      <RangePicker open={open} onChange={handleRangePickerChange} />
+      </div>
+
+      <div className='time-range-picker-right'>
+        <p className='title'>{t('自定义开始时间')}</p>
+        <DatePicker
+          showTime
+          onChange={handleStartTimeChange}
+          value={startTime}
+          disabledDate={startDisabledDate}
+        />
+        <p className='title'>{t('自定义结束时间')}</p>
+        <DatePicker
+          showTime
+          onChange={handleEndTimeChange}
+          value={endTime}
+          disabledDate={endDisabledDate}
+        />
+        <div className='footer'>
+          <Button onClick={() => setVisible(false)}>{t('取消')}</Button>
+          <Button
+            type='primary'
+            onClick={handleRightOk}
+            disabled={startTime.endOf('seconds') >= endTime.endOf('seconds')}
+          >
+            {t('确定')}
+          </Button>
+        </div>
+      </div>
     </div>
+  );
+
+  return (
+    <Popover
+      content={content}
+      overlayClassName='time-range-picker'
+      visible={visible}
+    >
+      <Button onClick={() => setVisible(true)}>
+        {label} <CaretDownOutlined />
+      </Button>
+    </Popover>
   );
 }

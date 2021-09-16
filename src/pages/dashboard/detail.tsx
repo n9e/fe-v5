@@ -9,7 +9,7 @@ import {
   FileAddOutlined,
 } from '@ant-design/icons';
 import { Button, Input, Form, Modal, Divider, message } from 'antd';
-import { Param, RangeItem } from '@/store/chart';
+import { Range } from '@/components/DateRangePicker';
 import {
   getSingleDashboard,
   updateSingleDashboard,
@@ -27,6 +27,7 @@ import VariableConfig from './VariableConfig';
 import { TagFilterResponse } from './VariableConfig/definition';
 import './index.less';
 import { useTranslation } from 'react-i18next';
+import Resolution from '@/components/Resolution';
 interface URLParam {
   id: string;
 }
@@ -55,6 +56,7 @@ export default function DashboardDetail() {
     update_at: 0,
     update_by: '',
   });
+  const [step, setStep] = useState(15);
   const [titleEditing, setTitleEditing] = useState(false);
   const [chartGroup, setChartGroup] = useState<Group[]>([]);
   const [variableConfig, setVariableConfig] =
@@ -63,7 +65,7 @@ export default function DashboardDetail() {
   const [chartModalVisible, setChartModalVisible] = useState(false);
   const [chartModalInitValue, setChartModalInitValue] =
     useState<Chart | null>();
-  const [range, setRange] = useState<Param | RangeItem>({
+  const [range, setRange] = useState<Range>({
     start: 0,
     end: 0,
   });
@@ -215,12 +217,13 @@ export default function DashboardDetail() {
             <EditOutlined className='edit' onClick={handleEdit} />
           </div>
           <div className='dashboard-detail-header-right'>
+            <DateRangePicker onChange={handleDateChange} />
+            <Resolution onChange={(v) => setStep(v)} initialValue={step} />
             <RefreshIcon
               onClick={() => {
                 init();
               }}
             />
-            <DateRangePicker onChange={handleDateChange} />
           </div>
         </div>
       }
@@ -250,6 +253,7 @@ export default function DashboardDetail() {
           {chartGroup.map((item, i) => (
             <ChartGroup
               key={i}
+              step={step}
               groupInfo={item}
               onAddChart={handleAddChart}
               onUpdateChart={handleUpdateChart}

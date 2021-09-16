@@ -7,6 +7,9 @@
     "allowJs": true,
     "baseUrl": ".",
     "paths": {
+      "@/store/eventWallInterface": [
+        "src/Packages/EventWall/interface/index.ts"
+      ],
       "@/*": ["src/*"]
     },
     "skipLibCheck": false,
@@ -26,5 +29,5 @@
     "strictNullChecks": true
   },
   "include": ["./src"],
-  "exclude": ["./src/store/miniDva/*"]
+  "exclude": ["./src/store/miniDva/*", "./src/Packages/"]
 }

@@ -3,7 +3,14 @@ import ResourceStore from '@/module/resource';
 import ProfileStore from '@/module/account';
 import WarningStore from '@/module/warning';
 import EventStore from '@/module/event';
+import { dynamicPackages } from '@/utils';
 
+const Packages = dynamicPackages();
+for (let pkg of Packages) {
+  if (pkg.module) {
+    miniDva.addModel(pkg.module);
+  }
+}
 miniDva.addModel(ResourceStore);
 miniDva.addModel(ProfileStore);
 miniDva.addModel(WarningStore);

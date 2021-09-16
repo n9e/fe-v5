@@ -19,6 +19,14 @@ import { Logout } from '@/services/login';
 import { useTranslation } from 'react-i18next';
 const { SubMenu } = Menu;
 
+import { dynamicPackages, Entry } from '@/utils';
+
+const Packages = dynamicPackages();
+let lazyMenu = Packages.reduce((result: any, module: Entry) => {
+  const menu = module.menu;
+  return menu ? (result = result.concat(menu)) : result;
+}, []);
+
 const SideMenu: FC = () => {
   const { t, i18n } = useTranslation();
   let { profile } = useSelector<RootState, accountStoreState>(
@@ -105,6 +113,9 @@ const SideMenu: FC = () => {
           <Menu.Item key='/manage/user'>{t('用户')}</Menu.Item>
           <Menu.Item key='/manage/group'>{t('团队')}</Menu.Item>
         </SubMenu>
+        {lazyMenu
+          .sort((a, b) => b.weight - a.weight)
+          .map((item) => item.content)}
         {/* <Menu.Item className='holder'></Menu.Item> */}
         {/* <Menu.Item key='/manage' icon={<UserOutlined />}>
          用户管理

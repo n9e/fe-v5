@@ -1,47 +1,54 @@
-.range-picker {
-  width: 300px;
-  position: relative;
-  .ant-select-selection-item {
-    transition: none;
+.time-range-picker {
+  .ant-popover-inner-content {
+    padding: 0;
   }
-  .select {
-    width: 100%;
-    z-index: 2;
-  }
-  .picker {
-    width: 300px;
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    z-index: 1;
-  }
-  .tag {
-    background-color: #e9e8ea;
-    color: rgba(28, 43, 52, 0.68);
-    padding: 0 4px;
-    border-radius: 4px;
-    font-size: 13px;
-    width: 42px;
-    height: 22px;
-    margin-top: 4px;
-    line-height: 22px;
-    display: inline-block;
-    text-align: center;
-    margin-right: 5px;
-    z-index: 3;
-    &.from-calendar {
-      position: absolute;
-      top: 5px;
-      left: 11px;
-      display: none;
+  .time-range-picker-wrapper {
+    width: 370px;
+    height: 244px;
+    display: flex;
+    .time-range-picker-left {
+      width: 150px;
+      height: 100%;
+      padding-top: 5px;
+      border-right: 1px solid #d7dbec;
+      overflow: auto;
+      .num {
+        display: inline-block;
+        width: 15px;
+        text-align: center;
+        margin: 0 4px;
+      }
+      button {
+        color: #4c5273;
+        padding-left: 20px;
+        line-height: 20px;
+        width: 100%;
+        text-align: left;
+        &:hover {
+          color: #1473ff;
+          background: rgba(20, 115, 255, 0.06);
+        }
+        &.active {
+          color: #1473ff;
+        }
+      }
     }
-    &.show {
-      display: inline;
-    }
-  }
-  &.calendar {
-    .ant-select-selection-item {
-      margin-left: 46px;
+    .time-range-picker-right {
+      padding: 12px 20px;
+      .title {
+        color: #4c5273;
+        font-weight: bold;
+      }
+      .ant-picker {
+        margin-bottom: 16px;
+      }
+      .footer {
+        display: flex;
+        justify-content: flex-end;
+        button {
+          margin-left: 10px;
+        }
+      }
     }
   }
 }
