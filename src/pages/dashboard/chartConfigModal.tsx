@@ -32,6 +32,7 @@ import { formatTag, TagItem } from '@/components/TagFilterForChart';
 import { Chart } from './chartGroup';
 import { MinusCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
+import PromqlEditor from '@/components/PromqlEditor';
 const layout = {
   labelCol: {
     span: 4,
@@ -364,12 +365,15 @@ export default function ChartConfigModal(props: Props) {
                                     validateTrigger={['onChange', 'onBlur']}
                                     rules={[
                                       {
-                                        validator: validatorLine,
+                                        required: true,
+                                        message: t('请输入PromQL'),
                                       },
+                                      // {
+                                      //   validator: validatorLine,
+                                      // },
                                     ]}
                                   >
-                                    <Input
-                                      placeholder={t('请输入Promql')}
+                                    <PromqlEditor
                                       onChange={() => {
                                         setpromeQl(
                                           chartForm

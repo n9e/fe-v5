@@ -63,6 +63,7 @@ import { useTranslation } from 'react-i18next';
 import '../index.less';
 import ChartDrawer from './components/Drawer';
 import { AlertDurationInput } from './components/AlertDurationInput';
+import PromqlEditor from '@/components/PromqlEditor';
 
 const ThresholdInput = ({ onChange, value }) => {
   const { t } = useTranslation();
@@ -785,12 +786,12 @@ const StrategyOperate: React.FC = () => {
                       wrapperCol={{ span: 22 }}
                       rules={[
                         { required: true, message: t('请输入PromQL') },
-                        {
-                          validator: validator,
-                        },
+                        // {
+                        //   validator: validator,
+                        // },
                       ]}
                     >
-                      <TextArea rows={2} />
+                      <PromqlEditor className='promql-editor' />
                     </Form.Item>
                     <Tooltip title={t('预览')}>
                       <FundOutlined
