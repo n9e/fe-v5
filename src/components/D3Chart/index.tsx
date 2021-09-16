@@ -48,17 +48,17 @@ function Chart(props: Props) {
   const [privateTags, setPrivateTags] = useState<TagType[]>([]);
   const [multi, setMulti] = useState(false);
   const [sort, setSort] = useState<'desc' | 'asc'>('desc');
-  const [tooltipFormat, setTooltipFormat] =
-    useState<'origin' | 'short'>('origin');
-  const [instance, setInstance] =
-    useState<{
-      destroy: Function;
-      update: Function;
-      options: {
-        yAxis: object;
-        xAxis: object;
-      };
-    } | null>(null); // transfer Param and RangeItem into timestamp
+  const [tooltipFormat, setTooltipFormat] = useState<'origin' | 'short'>(
+    'origin',
+  );
+  const [instance, setInstance] = useState<{
+    destroy: Function;
+    update: Function;
+    options: {
+      yAxis: object;
+      xAxis: object;
+    };
+  } | null>(null); // transfer Param and RangeItem into timestamp
 
   const formatDate = (r?: Range) => {
     let newR = r || range;

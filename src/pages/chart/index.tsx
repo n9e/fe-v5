@@ -11,10 +11,9 @@ import './index.less';
 import { useTranslation } from 'react-i18next';
 export default function Chart() {
   const { t } = useTranslation();
-  const { ids } =
-    useParams<{
-      ids: string;
-    }>();
+  const { ids } = useParams<{
+    ids: string;
+  }>();
   const [chartData, setChartData] = useState<Props[]>();
   const [range, setRange] = useState<Range>();
   const [step, setStep] = useState(15);

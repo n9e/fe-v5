@@ -153,7 +153,7 @@ const Indicator: React.FC = () => {
           <a
             onClick={() => {
               let path = {
-                pathname: `/metric/explorer/`,
+                pathname: `/metric/explorer`,
                 state: { name: text, description: record.description },
               };
               history.push(path);

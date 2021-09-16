@@ -61,16 +61,15 @@ const MetricTable = (
         let history = res.dat.metrics.concat(historyMetrics);
         let Metrics = res.dat.metrics;
         if (initVal && initVal['name']) {
-          let history = res.dat.metrics.concat(historyMetrics);
           let isHistoryHave = history.find((e) => e.name === initVal.name);
           let isMetricsHave = res.dat.metrics.find(
             (e) => e.name === initVal.name,
           );
 
-          if (!isHistoryHave) {
+          if (isHistoryHave === undefined) {
             history = history.concat(initVal);
           }
-          if (!isMetricsHave) {
+          if (isMetricsHave === undefined) {
             Metrics = res.dat.metrics.concat(initVal);
           }
         }

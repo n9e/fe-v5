@@ -55,10 +55,9 @@ export default function Dashboard() {
   const [query, setQuery] = useState<string>('');
   const [defaultOptions, setDefaultOptions] = useState<string[]>([]);
   const [searchVal, setsearchVal] = useState<string>('');
-  const [cloneId, setCloneId] =
-    useState<{
-      id: number;
-    }>();
+  const [cloneId, setCloneId] = useState<{
+    id: number;
+  }>();
 
   const showModal = () => {
     setIsModalVisible(true);
