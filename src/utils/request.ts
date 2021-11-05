@@ -104,7 +104,7 @@ request.interceptors.response.use(
         .clone()
         .json()
         .then((data) => {
-          if (data.err === '' || !data.error) {
+          if (data.err === '') {
             if (data.data || data.dat) {
               if (
                 data.dat &&

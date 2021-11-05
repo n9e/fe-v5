@@ -70,14 +70,5 @@
     "typescript": "^4.1.2",
     "vite": "^2.1.5",
     "vite-plugin-react-svg": "^0.2.0"
-  },
-  "lint-staged": {
-    "*.{ts,tsx,less}": [
-      "prettier --write"
-    ],
-    "*.ts?(x)": [
-      "prettier --write",
-      "git add"
-    ]
   }
 }
