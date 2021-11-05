@@ -1,6 +1,7 @@
 /** Request 网络请求工具 更详细的 api 文档: https://github.com/umijs/umi-request */
 import { extend } from 'umi-request';
 import { notification } from 'antd';
+import { UpdateAccessToken } from '@/services/login';
 
 export function isValidKey(
   key: string | number | symbol,
@@ -85,9 +86,7 @@ request.interceptors.request.use((url, options) => {
   let headers = {
     ...options.headers,
   };
-  if (!window.location.pathname.startsWith('/chart/')) {
-    headers['X-CSRF-TOKEN'] = localStorage.getItem('csrfToken') || '';
-  }
+  headers['Authorization'] = `Bearer ${localStorage.getItem('access_token') || ''}`;
   return {
     url,
     options: { ...options, headers },
@@ -121,10 +120,18 @@ request.interceptors.response.use(
           }
         });
     }
-    if (status === 401 || status === 452) {
-      location.href = `/login${
-        location.pathname != '/' ? '?redirect=' + location.pathname : ''
-      }`;
+    if (status === 401) {
+      UpdateAccessToken().then(res => {
+        if (res.err) {
+          location.href = `/login${
+            location.pathname != '/' ? '?redirect=' + location.pathname : ''
+          }`;
+        } else {
+          const { access_token, refresh_token } = res.dat
+          localStorage.setItem('access_token', access_token);
+          localStorage.setItem('refresh_token', refresh_token);
+        }
+      })
     }
     if (status === 404) {
       return request

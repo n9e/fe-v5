@@ -44,7 +44,7 @@ export default defineConfig({
       //   changeOrigin: true,
       // },
       '/api/n9e': {
-        target: 'http://10.86.76.13:8085',
+        target: 'http://116.85.46.86:18000',
         changeOrigin: true,
       },
       '/filters': {

@@ -44,9 +44,10 @@ const accountStore: IStore<accountStoreState> = {
       { put, call, select }: any,
     ) {
       const { dat, err } = yield call(Login, username, password);
-      yield put({ type: SET_PROFILE, profile: dat });
-      const { dat: csrfToken } = yield call(GenCsrfToken);
-      localStorage.setItem('csrfToken', csrfToken);
+      yield put({ type: SET_PROFILE, profile: dat.user });
+      const { access_token, refresh_token } = dat;
+      localStorage.setItem('access_token', access_token);
+      localStorage.setItem('refresh_token', refresh_token);
       return err;
     },
     *getProfile({}, { put, call, select }: any) {

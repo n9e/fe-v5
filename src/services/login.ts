@@ -10,7 +10,17 @@ export const Login = function (username: string, password: string) {
   });
 };
 
-// 登录
+// 刷新accessToken
+export const UpdateAccessToken = function () {
+  return request(`${N9EAPI}/api/n9e/auth/login`, {
+    method: RequestMethod.Post,
+    data: {
+      refresh_token: localStorage.getItem('refresh_token')
+    },
+  });
+};
+
+// 更改密码
 export const UpdatePwd = function (oldpass: string, newpass: string) {
   return request(`${N9EAPI}/api/n9e/self/password`, {
     method: RequestMethod.Put,
@@ -28,6 +38,6 @@ export const GenCsrfToken = function () {
 // 退出
 export const Logout = function () {
   return request(`${N9EAPI}/api/n9e/auth/logout`, {
-    method: RequestMethod.Get,
+    method: RequestMethod.Post,
   });
 };
