@@ -1,8 +1,10 @@
+import { CommonStoreState } from './commonInterface';
 import { resourceStoreState } from './businessInterface';
 import { eventStoreState } from './eventInterface';
 import { warningStoreState } from './warningInterface';
 
 export type RootState = {
+  common: CommonStoreState;
   resource: resourceStoreState;
   strategy: warningStoreState;
   event: eventStoreState;
