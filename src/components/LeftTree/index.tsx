@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Checkbox, Input } from 'antd';
+import { Checkbox, Empty, Input } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/common';
+import { getBusiGroups } from '@/services/common';
 import { CommonStoreState } from '@/store/commonInterface';
 import './index.less';
 
@@ -10,11 +11,17 @@ const { Search } = Input;
 
 interface LeftTreeProps {
   additionGroupItems?: IGroupItemProps[];
-  isShowClusterGroup?: boolean;
+  showClusterGroup?: boolean;
+  showNotGroupBusiItem?: boolean;
 }
 interface IGroupItemProps {
   title: string | React.ReactNode;
   isShow?: boolean;
+  shrink?:
+    | boolean
+    | {
+        style: object;
+      };
   render: Function;
 }
 
@@ -43,8 +50,9 @@ export const SelectList: React.FC<SelectListProps> = ({
       ? defaultSelect[fieldNames.key || 'value'] || ''
       : defaultSelect,
   );
+
   return (
-    <div className='left-area-group-list'>
+    <div className='select-list'>
       {dataSource.map((item) => {
         const key = item[fieldNames.key || 'value'];
         const label = item[fieldNames.label || 'label'];
@@ -52,8 +60,8 @@ export const SelectList: React.FC<SelectListProps> = ({
         return (
           <div
             key={key}
-            className={`left-area-group-list-item ${
-              curSeletedKey === key ? 'left-area-item-list-item-active' : ''
+            className={`select-list-item ${
+              curSeletedKey === key ? 'select-list-item-active' : ''
             }`}
             onClick={(e) => {
               e.preventDefault();
@@ -74,37 +82,16 @@ export const SelectList: React.FC<SelectListProps> = ({
   );
 };
 
-// 侧栏分组
-const GroupItem: React.FC<IGroupItemProps> = ({
-  title,
-  isShow = true,
-  render,
-}) => {
-  return isShow ? (
-    <div className='left-area-group'>
-      <div className='left-area-group-title'>{title}</div>
-      {render()}
-    </div>
-  ) : (
-    <></>
-  );
-};
-
-// 左侧栏
-const LeftTree: React.FC<LeftTreeProps> = ({
-  additionGroupItems,
-  isShowClusterGroup = true,
-}) => {
+// 集群渲染内容
+const clustersGroupContent = (showClusterGroup: boolean): IGroupItemProps => {
   const dispatch = useDispatch();
-  const { clusters, selectedClusters, busiGroups, curBusiItem } = useSelector<
+  const { clusters, selectedClusters } = useSelector<
     RootState,
     CommonStoreState
   >((state) => state.common);
-
-  // 集群全选相关状态和方法
-  const [checkedList, setCheckedList] = React.useState(selectedClusters);
-  const [indeterminate, setIndeterminate] = React.useState(true);
-  const [checkAll, setCheckAll] = React.useState(false);
+  const [checkedList, setCheckedList] = useState(selectedClusters);
+  const [indeterminate, setIndeterminate] = useState(true);
+  const [checkAll, setCheckAll] = useState(false);
   const onCheckAllChange = (e) => {
     setCheckedList(e.target.checked ? clusters : []);
     setIndeterminate(false);
@@ -115,71 +102,156 @@ const LeftTree: React.FC<LeftTreeProps> = ({
     );
   };
 
-  const initGroupItems: IGroupItemProps[] = [
-    {
-      title: (
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <span>集群</span>
-          <Checkbox
-            indeterminate={indeterminate}
-            onChange={onCheckAllChange}
-            checked={checkAll}
-          >
-            全选
-          </Checkbox>
-        </div>
-      ),
-      isShow: isShowClusterGroup,
-      render() {
-        return (
-          <CheckboxGroup
-            options={clusters}
-            value={checkedList}
-            onChange={(list: string[]) => {
-              setCheckedList(list);
-              setIndeterminate(!!list.length && list.length < clusters.length);
-              setCheckAll(list.length === clusters.length);
-              dispatch({
-                type: 'common/saveData',
-                prop: 'selectedClusters',
-                data: list,
-              });
-              localStorage.setItem('selectedClusters', JSON.stringify(list));
-            }}
-          ></CheckboxGroup>
-        );
+  useEffect(() => {
+    dispatch({ type: 'common/getClusters' });
+  }, []);
+  useEffect(() => {
+    if (!checkedList.length) {
+      setCheckedList(selectedClusters.length ? selectedClusters : clusters);
+    }
+  }, [clusters]);
+
+  return {
+    title: (
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <span>集群</span>
+        <Checkbox
+          indeterminate={indeterminate}
+          onChange={onCheckAllChange}
+          checked={checkAll}
+        >
+          全选
+        </Checkbox>
+      </div>
+    ),
+    isShow: showClusterGroup,
+    shrink: {
+      style: {
+        flex: 'none',
+        maxHeight: '200px',
       },
     },
-    {
-      title: '业务组',
-      render() {
-        return (
-          <>
-            <Search
-              className='left-area-group-search'
-              placeholder='请输入业务组筛选'
-              onSearch={(value) => {
-                dispatch({ type: 'common/getBusiGroups', query: value });
-              }}
-            />
+    render() {
+      return (
+        <CheckboxGroup
+          options={clusters}
+          value={checkedList}
+          style={{
+            flexShrink: 1,
+            overflow: 'auto',
+          }}
+          onChange={(list: string[]) => {
+            setCheckedList(list);
+            setIndeterminate(!!list.length && list.length < clusters.length);
+            setCheckAll(list.length === clusters.length);
+            dispatch({
+              type: 'common/saveData',
+              prop: 'selectedClusters',
+              data: list,
+            });
+            localStorage.setItem('selectedClusters', JSON.stringify(list));
+          }}
+        ></CheckboxGroup>
+      );
+    },
+  };
+};
+
+// 业务组渲染内容
+const busiGroupContent = (showNotGroupBusiItem: boolean): IGroupItemProps => {
+  const dispatch = useDispatch();
+  const { busiGroups, curBusiItem } = useSelector<RootState, CommonStoreState>(
+    (state) => state.common,
+  );
+  const [filteredBusiGroups, setFilteredBusiGroups] = useState(busiGroups);
+  // 根据是否有未归组对象选项初始化选中项
+  const initCurBusiItem = useMemo(
+    () =>
+      showNotGroupBusiItem
+        ? JSON.parse(localStorage.getItem('objectCurBusiItem') || '{}')
+        : curBusiItem.id
+        ? curBusiItem
+        : busiGroups.length
+        ? busiGroups[0]
+        : {},
+    [],
+  );
+  console.log('filteredBusiGroups===', filteredBusiGroups);
+
+  useEffect(() => {
+    dispatch({ type: 'common/getBusiGroups' });
+  }, []);
+
+  useEffect(() => {
+    if (!filteredBusiGroups.length) {
+      setFilteredBusiGroups(busiGroups);
+    }
+  }, [busiGroups]);
+
+  return {
+    title: '业务组',
+    shrink: true,
+    render() {
+      return (
+        <>
+          <Search
+            className='left-area-group-search'
+            placeholder='请输入业务组名称进行筛选'
+            onSearch={(value) => {
+              if (value) {
+                getBusiGroups(value).then((res) => {
+                  setFilteredBusiGroups(res.dat || []);
+                });
+              } else {
+                setFilteredBusiGroups(busiGroups);
+              }
+            }}
+          />
+          {busiGroups.length !== 0 || showNotGroupBusiItem ? (
             <SelectList
-              dataSource={busiGroups}
+              dataSource={
+                showNotGroupBusiItem
+                  ? [{ id: -1, name: '未归组对象' }].concat(filteredBusiGroups)
+                  : filteredBusiGroups
+              }
               fieldNames={{ key: 'id', label: 'name', value: 'id' }}
               allowNotSelect={false}
-              defaultSelect={curBusiItem}
+              defaultSelect={initCurBusiItem}
               onChange={(value, item) => {
-                dispatch({
-                  type: 'common/saveData',
-                  prop: 'curBusiItem',
-                  data: item,
-                });
-                localStorage.setItem('curBusiItem', JSON.stringify(item));
+                if (showNotGroupBusiItem) {
+                  localStorage.setItem(
+                    'objectCurBusiItem',
+                    JSON.stringify(item),
+                  );
+                } else {
+                  dispatch({
+                    type: 'common/saveData',
+                    prop: 'curBusiItem',
+                    data: item,
+                  });
+                  localStorage.setItem('curBusiItem', JSON.stringify(item));
+                }
               }}
             />
-          </>
-        );
-      },
+          ) : (
+            <Empty />
+          )}
+        </>
+      );
     },
+  };
+};
+
+// 左侧栏
+const LeftTree: React.FC<LeftTreeProps> = ({
+  additionGroupItems,
+  showClusterGroup = true,
+  showNotGroupBusiItem = false,
+}) => {
+  const initGroupItems: IGroupItemProps[] = [
+    clustersGroupContent(showClusterGroup),
+    busiGroupContent(showNotGroupBusiItem),
+    // 活跃告警和预警告警相应内容，放到对应的页面
     // {
     //   title: '事件级别',
     //   render() {
@@ -216,16 +288,23 @@ const LeftTree: React.FC<LeftTreeProps> = ({
   ];
   const groupItems = initGroupItems.concat(additionGroupItems || []);
 
-  useEffect(() => {
-    dispatch({ type: 'common/getClusters' });
-    dispatch({ type: 'common/getBusiGroups' });
-  }, []);
-
   return (
     <div className='left-area'>
-      {groupItems.map((config) => (
-        <GroupItem {...config} />
-      ))}
+      {/* 遍历渲染左侧栏内容 */}
+      {groupItems.map(({ title, isShow = true, shrink = false, render }, i) =>
+        isShow ? (
+          <div
+            key={i}
+            className={`left-area-group ${shrink ? 'group-shrink' : ''}`}
+            style={typeof shrink === 'object' ? shrink.style : {}}
+          >
+            <div className='left-area-group-title'>{title}</div>
+            {render()}
+          </div>
+        ) : (
+          <></>
+        ),
+      )}
     </div>
   );
 };

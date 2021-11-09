@@ -38,12 +38,21 @@ const commonStore: IStore<CommonStoreState> = {
       }
     },
     *getBusiGroups({ query }, { put }) {
-      const { dat } = yield getBusiGroups(query);
+      const { dat: data } = yield getBusiGroups(query);
       yield put({
         type: 'saveData',
         prop: 'busiGroups',
-        data: dat,
+        data,
       });
+      // 初始化选中第一项业务组
+      if (!localStorage.getItem('curBusiItem') && data.length > 0) {
+        localStorage.setItem('curBusiItem', JSON.stringify(data[0]))
+        yield put({
+          type: 'saveData',
+          prop: 'curBusiItem',
+          data: data[0],
+        });
+      }
     },
   },
 };
