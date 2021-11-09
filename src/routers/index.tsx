@@ -18,6 +18,7 @@ import Dashboard from '@/pages/dashboard';
 import Chart from '@/pages/chart';
 import DashboardDetail from '@/pages/dashboard/detail';
 import Manage from '@/pages/manage';
+import Business from '@/pages/manage/business';
 import Explore from '@/pages/metric/explorer';
 import IndicatorPage from '@/pages/monitor/indicator';
 import StrategyOperate from '@/pages/warning/strategy/operate';
@@ -79,6 +80,7 @@ export default function Content() {
         <Route exact path='/overview' component={Overview} />
         <Route path='/metric/explorer' component={Explore} exact />
         <Route path='/account/profile/:tab' component={Profile} />
+        <Route path='/manage/business' component={Business} />
         <Route path='/manage/:type' component={Manage} />
         <Route path='/dashboard/:id' component={DashboardDetail} />
         <Route path='/dashboard' component={Dashboard} />

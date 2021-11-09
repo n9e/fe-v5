@@ -277,9 +277,9 @@ const Resource: React.FC = () => {
     };
     getTeamInfoList(params).then((data) => {
       if (isAppend) {
-        setTeamList(teamList.concat(data.dat.list || []));
+        setTeamList(teamList.concat(data.dat || []));
       } else {
-        setTeamList(data.dat.list || []);
+        setTeamList(data.dat || []);
       }
       setTotal(data.dat.total);
 

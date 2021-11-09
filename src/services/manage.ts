@@ -15,6 +15,50 @@ export const getTeamInfoList = function (params = {}) {
     params,
   });
 };
+export const getBusinessTeamList = function (params = {}) {
+  return request(`${N9EAPI}/api/n9e/busi-groups`, {
+    method: RequestMethod.Get,
+    params,
+  });
+};
+export const getBusinessTeamInfo = function (id: string) {
+  return request(`${N9EAPI}/api/n9e/busi-group/${id}`, {
+    method: RequestMethod.Get,
+  }).then((res) => res && res.dat);
+};
+export const createBusinessTeam = function (data: object) {
+  return request(`${N9EAPI}/api/n9e/busi-groups`, {
+    method: RequestMethod.Post,
+    data,
+  }).then((res) => res && res.dat);
+};
+export const changeBusinessTeam = function (id: string, data: object) {
+  return request(`${N9EAPI}/api/n9e/busi-group/${id}`, {
+    method: RequestMethod.Put,
+    data,
+  }).then((res) => res && res.dat);
+};
+
+export const deleteBusinessTeamMember = function (id: string, data: object) {
+  return request(`${N9EAPI}/api/n9e/busi-group/${id}/members`, {
+    method: RequestMethod.Delete,
+    data,
+  }).then((res) => res && res.dat);
+};
+
+export const deleteBusinessTeam = function (id: string) {
+  return request(`${N9EAPI}/api/n9e/busi-group/${id}`, {
+    method: RequestMethod.Delete,
+  }).then((res) => res && res.dat);
+};
+
+export const addBusinessMember = function (id: string, data: object) {
+  return request(`${N9EAPI}/api/n9e/busi-group/${id}/members`, {
+    method: RequestMethod.Post,
+    data,
+  }).then((res) => res && res.dat);
+};
+
 export const createUser = function (data: object) {
   return request(`${N9EAPI}/api/n9e/users`, {
     method: RequestMethod.Post,
@@ -97,6 +141,12 @@ export const getNotifiesList = function () {
 
 export const getContactsList = function () {
   return request(`${N9EAPI}/api/n9e/contact-channels`, {
+    method: RequestMethod.Get,
+  }).then((res) => res && res.dat);
+};
+
+export const getNotifyChannels = function () {
+  return request(`${N9EAPI}/api/n9e/notify-channels`, {
     method: RequestMethod.Get,
   }).then((res) => res && res.dat);
 };

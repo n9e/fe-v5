@@ -112,6 +112,7 @@ const SideMenu: FC = () => {
         <SubMenu icon={<UserOutlined />} title={t('用户管理')}>
           <Menu.Item key='/manage/user'>{t('用户')}</Menu.Item>
           <Menu.Item key='/manage/group'>{t('团队')}</Menu.Item>
+          <Menu.Item key='/manage/business'>{t('业务组')}</Menu.Item>
         </SubMenu>
         {lazyMenu
           .sort((a, b) => b.weight - a.weight)

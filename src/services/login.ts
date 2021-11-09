@@ -12,10 +12,10 @@ export const Login = function (username: string, password: string) {
 
 // 刷新accessToken
 export const UpdateAccessToken = function () {
-  return request(`${N9EAPI}/api/n9e/auth/login`, {
+  return request(`${N9EAPI}/api/n9e/auth/refresh`, {
     method: RequestMethod.Post,
     data: {
-      refresh_token: localStorage.getItem('refresh_token')
+      refresh_token: localStorage.getItem('refresh_token'),
     },
   });
 };
