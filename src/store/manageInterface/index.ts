@@ -41,12 +41,16 @@ export enum UserType {
   Team = '团队',
 }
 export interface TeamInfo {
-  user_group: Team;
+  user_groups?: Team;
+  user_group?: Team;
   users: Array<User>;
 }
 export enum ActionType {
   CreateUser = '创建用户',
   CreateTeam = '创建团队',
+  CreateBusiness = '创建业务组',
+  AddBusinessMember = '添加业务组成员',
+  EditBusiness = '编辑业务组',
   EditUser = '编辑用户信息',
   EditTeam = '编辑团队信息',
   Reset = '重置密码',
@@ -80,7 +84,9 @@ export interface ModalProps {
 export interface TeamProps {
   onClose?: any;
   teamId?: string;
+  businessId?: string;
   onSelect?: any;
+  action?: ActionType;
 }
 export interface UserAndPasswordFormProps {
   userId?: string;

@@ -232,19 +232,9 @@ const Resource: React.FC = () => {
 
   useEffect(() => {
     if (activeKey === UserType.Team && teamId) {
-      // if (teamList.find((t) => t.id === teamId)) {
-      //   getTeamInfoDetail(teamId);
-      // } else if (teamList.length > 0) {
-      //   getTeamInfoDetail(teamList[0].id);
-      // }
       getTeamInfoDetail(teamId);
     }
   }, [teamId]);
-  // useEffect(() => {
-  //   if (activeKey === UserType.Team) {
-  //     getTeamList(true);
-  //   }
-  // }, [pageNumber]);
 
   const getList = (isDeleteOrAdd = false) => {
     if (activeKey === UserType.User) {
@@ -269,17 +259,11 @@ const Resource: React.FC = () => {
     search?: string,
     isDelete?: boolean,
   ) => {
-    let params = {
-      query: search === undefined ? searchValue : search,
-      p: p || pageNumber,
-      limit: PAGE_SIZE,
-      isAppend,
-    };
-    getTeamInfoList(params).then((data) => {
+    getTeamInfoList().then((data) => {
       if (isAppend) {
-        setTeamList(teamList.concat(data.dat.list || []));
+        setTeamList(teamList.concat(data.dat || []));
       } else {
-        setTeamList(data.dat.list || []);
+        setTeamList(data.dat || []);
       }
       setTotal(data.dat.total);
 
@@ -386,12 +370,6 @@ const Resource: React.FC = () => {
       <div className='user-manage-content'>
         {activeKey === UserType.User && (
           <div className='user-content'>
-            {/* <div className={'user-manage-title'}>
-              <span>
-                <UserOutlined style={{ marginRight: 10 }} />
-                {t('用户管理')}
-              </span>
-            </div> */}
             <Row className='event-table-search'>
               <div className='event-table-search-left'>
                 <Input
@@ -436,7 +414,6 @@ const Resource: React.FC = () => {
         {activeKey === UserType.Team && (
           <div style={{ display: 'flex', height: '100%' }}>
             <div className='left-tree-area'>
-              {/* <div className={'title'}>{t('团队管理')}</div> */}
               <div className='sub-title'>
                 {t('团队列表')}
                 <Button
@@ -460,11 +437,11 @@ const Resource: React.FC = () => {
                     setSearchValue(e.target.value);
                   }}
                   placeholder={t('搜索团队名称')}
-                  onPressEnter={(e) => {
-                    setPageNumber(1);
-                    // @ts-ignore
-                    getTeamList(false, 1, e.target.value);
-                  }}
+                  // onPressEnter={(e) => {
+                  //   setPageNumber(1);
+                  //   // @ts-ignore
+                  //   getTeamList(false, 1, e.target.value);
+                  // }}
                 />
               </div>
 
@@ -474,7 +451,9 @@ const Resource: React.FC = () => {
                   flex: 1,
                   overflow: 'auto',
                 }}
-                dataSource={teamList}
+                dataSource={teamList.filter((i) =>
+                  i.name.includes(searchValue),
+                )}
                 size='small'
                 renderItem={(item) => (
                   <List.Item
@@ -517,12 +496,6 @@ const Resource: React.FC = () => {
                     }}
                     onClick={() => handleClick(ActionType.EditTeam, teamId)}
                   ></EditOutlined>
-                  {/* <DelPopover
-                 teamId={teamId}
-                 userType='team'
-                 isIcon={true}
-                 onClose={() => handleClose()}
-                ></DelPopover> */}
                   <DeleteOutlined
                     style={{
                       marginLeft: '8px',
