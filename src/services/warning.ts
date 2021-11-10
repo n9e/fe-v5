@@ -93,9 +93,10 @@ export const deleteFavoriteGroup = function (id: number) {
   });
 };
 
-export const getMetrics = function (): Promise<MetricListRes> {
-  return request(`${N9EAPI}/api/n9e/tag-metrics`, {
-    method: RequestMethod.Post,
+export const getMetrics = function (data = {}) {
+  return request(`${N9EAPI}/api/n9e/prometheus/api/v1/label/__name__/values`, {
+    method: RequestMethod.Get,
+    data
   });
 };
 
