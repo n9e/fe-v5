@@ -253,3 +253,9 @@ export const regCheck = function (data: {
     data,
   });
 };
+
+export const getHosts = () => {
+  return request(`${N9EAPI}/api/n9e/targets`, {
+    method: RequestMethod.Get
+  });
+}

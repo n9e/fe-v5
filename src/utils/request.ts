@@ -89,6 +89,7 @@ request.interceptors.request.use((url, options) => {
   headers['Authorization'] = `Bearer ${
     localStorage.getItem('access_token') || ''
   }`;
+  headers['X-Cluster'] = 'Default'
   return {
     url,
     options: { ...options, headers },
@@ -106,7 +107,7 @@ request.interceptors.response.use(
         .clone()
         .json()
         .then((data) => {
-          if (data.err === '') {
+          if (data.err === '' || data.status === 'success') {
             if (data.data || data.dat) {
               if (
                 data.dat &&
