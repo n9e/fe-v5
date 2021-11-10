@@ -4,9 +4,6 @@ import { getBusiGroups, getCommonClusters } from '@/services/common';
 
 const initData: CommonStoreState = {
   clusters: [],
-  selectedClusters: JSON.parse(
-    localStorage.getItem('selectedClusters') || '[]',
-  ),
   busiGroups: [],
   curBusiItem: JSON.parse(localStorage.getItem('curBusiItem') || '{}'),
 };
@@ -27,15 +24,6 @@ const commonStore: IStore<CommonStoreState> = {
         prop: 'clusters',
         data,
       });
-      // 初始化选中所有集群
-      if (!localStorage.getItem('selectedClusters')) {
-        localStorage.setItem('selectedClusters', JSON.stringify(data));
-        yield put({
-          type: 'saveData',
-          prop: 'selectedClusters',
-          data,
-        });
-      }
     },
     *getBusiGroups({ query }, { put }) {
       const { dat: data } = yield getBusiGroups(query);
