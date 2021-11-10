@@ -103,9 +103,6 @@ const clustersGroupContent = (showClusterGroup: boolean): IGroupItemProps => {
   };
 
   useEffect(() => {
-    dispatch({ type: 'common/getClusters' });
-  }, []);
-  useEffect(() => {
     if (!checkedList.length) {
       setCheckedList(selectedClusters.length ? selectedClusters : clusters);
     }
@@ -177,10 +174,6 @@ const busiGroupContent = (showNotGroupBusiItem: boolean): IGroupItemProps => {
     [],
   );
   console.log('filteredBusiGroups===', filteredBusiGroups);
-
-  useEffect(() => {
-    dispatch({ type: 'common/getBusiGroups' });
-  }, []);
 
   useEffect(() => {
     if (!filteredBusiGroups.length) {
