@@ -5,7 +5,7 @@ import { IndicatorParams } from '@/store/overview';
 
 // 统计数据
 export const getOver = function (data: object = {}) {
-  return request(`${N9EAPI}/api/n9e/status`, {
+  return request(`/api/n9e/status`, {
     method: RequestMethod.Get,
     params: data,
   });
@@ -16,7 +16,7 @@ export const getIndicator = function (data: IndicatorParams) {
   const end = Math.floor(new Date().getTime() / 1000);
   const start = end - 60 * 60;
   const res = { start, end, ...data };
-  return request(`${N9EAPI}/api/n9e/query`, {
+  return request(`/api/n9e/query`, {
     method: RequestMethod.Post,
     data: res,
   });
@@ -24,7 +24,7 @@ export const getIndicator = function (data: IndicatorParams) {
 
 // 指标
 export const instantquery = function (data: object = {}) {
-  return request(`${N9EAPI}/api/n9e/instant-query`, {
+  return request(`/api/n9e/instant-query`, {
     method: RequestMethod.Post,
     data,
   });
@@ -32,7 +32,7 @@ export const instantquery = function (data: object = {}) {
 
 // metric
 export const getMetric = function (data: object) {
-  return request(`${N9EAPI}/api/n9e/tag-metrics`, {
+  return request(`/api/n9e/tag-metrics`, {
     method: RequestMethod.Post,
     data,
   });
