@@ -18,7 +18,9 @@ import Dashboard from '@/pages/dashboard';
 import Chart from '@/pages/chart';
 import DashboardDetail from '@/pages/dashboard/detail';
 import Manage from '@/pages/manage';
+import Business from '@/pages/manage/business';
 import Explore from '@/pages/metric/explorer';
+import ObjectExplore from '@/pages/monitor/object';
 import IndicatorPage from '@/pages/monitor/indicator';
 import StrategyOperate from '@/pages/warning/strategy/operate';
 import StrategyAdd from '@/pages/warning/strategy/add';
@@ -62,6 +64,8 @@ export default function Content() {
     !location.pathname.startsWith('/chart/')
   ) {
     dispatch({ type: 'account/getProfile' });
+    dispatch({ type: 'common/getClusters' });
+    dispatch({ type: 'common/getBusiGroups' });
   }
 
   // // this is a workaround for D3Chart, it's destroy function has some problem
@@ -80,7 +84,9 @@ export default function Content() {
         <Route path='/login' component={Login} exact />
         <Route exact path='/overview' component={Overview} />
         <Route path='/metric/explorer' component={Explore} exact />
+        <Route path='/object/explorer' component={ObjectExplore} exact />
         <Route path='/account/profile/:tab' component={Profile} />
+        <Route path='/manage/business' component={Business} />
         <Route path='/manage/:type' component={Manage} />
         <Route path='/dashboard/:id' component={DashboardDetail} />
         <Route path='/dashboard' component={Dashboard} />
@@ -105,9 +111,9 @@ export default function Content() {
         {lazyRoutes.map((route, i) => (
           <RouteWithSubRoutes key={i} {...route} />
         ))}
-        <Route path='/' exact>
+        {/* <Route path='/' exact>
           <Redirect to='/overview' />
-        </Route>
+        </Route> */}
       </Switch>
     </div>
   );

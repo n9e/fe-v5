@@ -86,7 +86,10 @@ request.interceptors.request.use((url, options) => {
   let headers = {
     ...options.headers,
   };
-  headers['Authorization'] = `Bearer ${localStorage.getItem('access_token') || ''}`;
+  headers['Authorization'] = `Bearer ${
+    localStorage.getItem('access_token') || ''
+  }`;
+  headers['X-Cluster'] = 'Default'
   return {
     url,
     options: { ...options, headers },
@@ -104,7 +107,7 @@ request.interceptors.response.use(
         .clone()
         .json()
         .then((data) => {
-          if (data.err === '') {
+          if (data.err === '' || data.status === 'success') {
             if (data.data || data.dat) {
               if (
                 data.dat &&
@@ -121,17 +124,21 @@ request.interceptors.response.use(
         });
     }
     if (status === 401) {
-      UpdateAccessToken().then(res => {
-        if (res.err) {
-          location.href = `/login${
+      localStorage.getItem('refresh_token')
+        ? UpdateAccessToken().then((res) => {
+            if (res.err) {
+              location.href = `/login${
+                location.pathname != '/' ? '?redirect=' + location.pathname : ''
+              }`;
+            } else {
+              const { access_token, refresh_token } = res.dat;
+              localStorage.setItem('access_token', access_token);
+              localStorage.setItem('refresh_token', refresh_token);
+            }
+          })
+        : (location.href = `/login${
             location.pathname != '/' ? '?redirect=' + location.pathname : ''
-          }`;
-        } else {
-          const { access_token, refresh_token } = res.dat
-          localStorage.setItem('access_token', access_token);
-          localStorage.setItem('refresh_token', refresh_token);
-        }
-      })
+          }`);
     }
     if (status === 404) {
       return request

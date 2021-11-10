@@ -89,62 +89,34 @@ const SideMenu: FC = () => {
         onClick={handleClick}
         mode='inline'
       >
-        {/* currently we use the key to navigate */}
+        <SubMenu icon={<LineChartOutlined />} title={t('监控对象')}>
+          <Menu.Item key='/metric/explorer'>{t('对象列表')}</Menu.Item>
+        </SubMenu>
         <SubMenu key='1' icon={<LineChartOutlined />} title={t('监控看图')}>
-          <Menu.Item key='/metric/explorer'>{t('即时看图')}</Menu.Item>
-          {/* <Menu.Item key='/metric/explorer2'>即时看图2</Menu.Item> */}
+          <Menu.Item key='/metric/explorer'>{t('即时查询')}</Menu.Item>
+          <Menu.Item key='/object/explorer'>{t('对象视角')}</Menu.Item>
           <Menu.Item key='/dashboard'>{t('监控大盘')}</Menu.Item>
-          <Menu.Item key='/indicator'>{t('指标释义')}</Menu.Item>
         </SubMenu>
-        <Menu.Item key='/resource' icon={<DatabaseOutlined />}>
-          {t('资源管理')}
-        </Menu.Item>
-        <SubMenu icon={<SettingOutlined />} title={t('策略配置')}>
-          <Menu.Item key='/strategy'>{t('告警策略')}</Menu.Item>
-          <Menu.Item key='/shield'>{t('屏蔽策略')}</Menu.Item>
+        <SubMenu icon={<SettingOutlined />} title={t('告警管理')}>
+          <Menu.Item key='/strategy'>{t('告警规则')}</Menu.Item>
+          <Menu.Item key='/shield'>{t('屏蔽规则')}</Menu.Item>
+          <Menu.Item key='/shield'>{t('订阅规则')}</Menu.Item>
+          <Menu.Item key='/event'>{t('活跃告警')}</Menu.Item>
+          <Menu.Item key='/history-events'>{t('历史告警')}</Menu.Item>
         </SubMenu>
-        <SubMenu icon={<AlertOutlined />} title={t('告警历史')}>
-          <Menu.Item key='/event'>{t('未恢复告警')}</Menu.Item>
-
-          <Menu.Item key='/history-events'>{t('全部告警')}</Menu.Item>
+        <SubMenu icon={<AlertOutlined />} title={t('告警自愈')}>
+          <Menu.Item key='/event'>{t('自愈脚本')}</Menu.Item>
+          <Menu.Item key='/history-events'>{t('执行历史')}</Menu.Item>
         </SubMenu>
 
         <SubMenu icon={<UserOutlined />} title={t('用户管理')}>
           <Menu.Item key='/manage/user'>{t('用户')}</Menu.Item>
           <Menu.Item key='/manage/group'>{t('团队')}</Menu.Item>
+          <Menu.Item key='/manage/business'>{t('业务组')}</Menu.Item>
         </SubMenu>
         {lazyMenu
           .sort((a, b) => b.weight - a.weight)
           .map((item) => item.content)}
-        {/* <Menu.Item className='holder'></Menu.Item> */}
-        {/* <Menu.Item key='/manage' icon={<UserOutlined />}>
-         用户管理
-        </Menu.Item> */}
-
-        {/* <Menu.Item key='/account/profile/info'>
-         <span className='avator'>
-           <i></i>
-           {collapsed ? null : (
-             <span>{profile.nickname || profile.username}</span>
-           )}
-         </span>
-        </Menu.Item> */}
-        {/* <SubMenu
-          title={
-            <span className='avator'>
-              <img src={profile.portrait} alt='' />
-              {collapsed ? null : (
-                <span>{profile.nickname || profile.username}</span>
-              )}
-            </span>
-          }
-        >
-          <Menu.Item key='/account/profile/info'>{t('个人信息')}</Menu.Item>
-          <Menu.Item key='changeLanguage'>
-            {i18n.language == 'en' ? 'switch to Chinese' : '切换为英文'}
-          </Menu.Item>
-          <Menu.Item key='logout'>{t('退出')}</Menu.Item>
-        </SubMenu> */}
       </Menu>
       <Button type='text' onClick={toggleCollapsed} className='collapseBtn'>
         {React.createElement(collapsed ? MenuUnfoldOutlined : MenuFoldOutlined)}

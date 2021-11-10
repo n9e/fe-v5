@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { Modal, message, Button } from 'antd';
 import UserForm from '../userForm';
 import TeamForm from '../teamForm';
+import BusinessForm from '../businessForm';
 import PasswordForm from '../passwordForm';
 import AddUser from '../addUser';
 import {
@@ -11,6 +12,9 @@ import {
   changeTeamInfo,
   changeUserPassword,
   addTeamUser,
+  createBusinessTeam,
+  changeBusinessTeam,
+  addBusinessMember,
 } from '@/services/manage';
 import {
   ModalProps,
@@ -30,6 +34,11 @@ const CreateModal: React.FC<ModalProps> = (props: ModalProps) => {
   const userRef = useRef(null as any);
   const teamRef = useRef(null as any);
   const passwordRef = useRef(null as any);
+  const isBusinessForm =
+    userType === 'business' &&
+    (action === ActionType.CreateBusiness ||
+      action === ActionType.AddBusinessMember ||
+      action === ActionType.EditBusiness);
   const isUserForm: boolean =
     (action === ActionType.CreateUser || action === ActionType.EditUser) &&
     userType === UserType.User
@@ -112,6 +121,50 @@ const CreateModal: React.FC<ModalProps> = (props: ModalProps) => {
         onClose();
       });
     }
+    if (isBusinessForm) {
+      let form = teamRef.current.form;
+      const { name, members } = await form.validateFields();
+      console.log('members', members);
+      let params = {
+        name,
+        members: members
+          ? members.map(({ perm_flag, user_group_id }) => ({
+              user_group_id,
+              perm_flag: perm_flag ? 'rw' : 'ro',
+            }))
+          : undefined,
+      };
+
+      if (action === ActionType.CreateBusiness) {
+        createBusinessTeam(params).then((_) => {
+          message.success(t('业务组创建成功'));
+          onClose(true);
+
+          if (val === 'search') {
+            onSearch(params.name);
+          }
+        });
+      }
+
+      if (action === ActionType.EditBusiness && teamId) {
+        changeBusinessTeam(teamId, params).then((_) => {
+          message.success(t('业务组信息修改成功'));
+          onClose();
+        });
+      }
+
+      if (action === ActionType.AddBusinessMember && teamId) {
+        const params = members.map(({ perm_flag, user_group_id }) => ({
+          user_group_id,
+          perm_flag: perm_flag ? 'rw' : 'ro',
+          busi_group_id: teamId,
+        }));
+        addBusinessMember(teamId, params).then((_) => {
+          message.success(t('业务组成员添加成功'));
+          onClose();
+        });
+      }
+    }
   };
 
   const actionLabel = () => {
@@ -120,6 +173,15 @@ const CreateModal: React.FC<ModalProps> = (props: ModalProps) => {
     }
     if (action === ActionType.CreateTeam) {
       return t('创建团队');
+    }
+    if (action === ActionType.CreateBusiness) {
+      return t('创建业务组');
+    }
+    if (action === ActionType.AddBusinessMember) {
+      return t('添加业务组成员');
+    }
+    if (action === ActionType.EditBusiness) {
+      return t('编辑业务组');
     }
     if (action === ActionType.EditUser) {
       return t('编辑用户信息');
@@ -164,6 +226,9 @@ const CreateModal: React.FC<ModalProps> = (props: ModalProps) => {
     >
       {isUserForm && <UserForm ref={userRef} userId={userId} />}
       {isTeamForm && <TeamForm ref={teamRef} teamId={teamId} />}
+      {isBusinessForm && (
+        <BusinessForm ref={teamRef} businessId={teamId} action={action} />
+      )}
       {isPasswordForm && <PasswordForm ref={passwordRef} userId={userId} />}
       {isAddUser && (
         <AddUser
