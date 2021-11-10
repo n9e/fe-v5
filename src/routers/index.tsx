@@ -61,6 +61,8 @@ export default function Content() {
     !location.pathname.startsWith('/chart/')
   ) {
     dispatch({ type: 'account/getProfile' });
+    dispatch({ type: 'common/getClusters' });
+    dispatch({ type: 'common/getBusiGroups' });
   }
 
   // // this is a workaround for D3Chart, it's destroy function has some problem
