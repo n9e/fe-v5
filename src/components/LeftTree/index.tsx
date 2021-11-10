@@ -208,8 +208,6 @@ const busiGroupContent = (busiGroupProps: {
               defaultSelect={initCurBusiItem}
               onChange={(value, item) => {
                 if (showNotGroupItem) {
-                  busiGroupProps.onChange &&
-                    busiGroupProps.onChange(value, item);
                   localStorage.setItem(
                     'objectCurBusiItem',
                     JSON.stringify(item),
@@ -222,6 +220,7 @@ const busiGroupContent = (busiGroupProps: {
                   });
                   localStorage.setItem('curBusiItem', JSON.stringify(item));
                 }
+                busiGroupProps.onChange && busiGroupProps.onChange(value, item);
               }}
             />
           ) : (
@@ -279,17 +278,18 @@ const LeftTree: React.FC<LeftTreeProps> = ({
   return (
     <div className='left-area'>
       {/* 遍历渲染左侧栏内容 */}
-      {groupItems.map(({ title, isShow, shrink = false, render }: IGroupItemProps, i) =>
-        isShow && (
-          <div
-            key={i}
-            className={`left-area-group ${shrink ? 'group-shrink' : ''}`}
-            style={typeof shrink === 'object' ? shrink.style : {}}
-          >
-            <div className='left-area-group-title'>{title}</div>
-            {render()}
-          </div>
-        )
+      {groupItems.map(
+        ({ title, isShow, shrink = false, render }: IGroupItemProps, i) =>
+          isShow && (
+            <div
+              key={i}
+              className={`left-area-group ${shrink ? 'group-shrink' : ''}`}
+              style={typeof shrink === 'object' ? shrink.style : {}}
+            >
+              <div className='left-area-group-title'>{title}</div>
+              {render()}
+            </div>
+          ),
       )}
     </div>
   );
