@@ -18,6 +18,8 @@ import {
   Checkbox,
   Row,
   Col,
+  Table,
+  notification
 } from 'antd';
 import BaseTable from '@/components/BaseTable';
 import {
@@ -46,6 +48,7 @@ import {
 import { addOrEditStrategy, deleteStrategy } from '@/services/warning';
 import { priorityColor } from '@/utils/constant';
 import { ColumnType } from 'antd/lib/table';
+import { pageSizeOptionsDefault } from '../const';
 import dayjs from 'dayjs';
 import { RootState } from '@/store/common';
 import { createGroupModel } from './constant';
@@ -90,7 +93,7 @@ const PageTable: React.FC = () => {
   const [teamList, setTeamList] = useState<Array<Team>>([]);
   const [init, setInit] = useState<boolean>(false);
   const [selectRowKeys, setSelectRowKeys] = useState<React.Key[]>([]);
-  const [selectRows, setSelectRows] = useState<strategyItem[]>([]);
+  const [selectedRows, setSelectedRows] = useState<strategyItem[]>([]);
   const [exportData, setExportData] = useState<string>('');
   const [groupItemBase, setGroupItemBase] = useState<
     Partial<strategyGroupItemBase>
@@ -116,32 +119,62 @@ const PageTable: React.FC = () => {
   const [allChannels, setallChannels] = useState([]);
   const [appendTags, setnappendTags] = useState<string>('');
 
+  const [currentStrategyDataAll, setCurrentStrategyDataAll] = useState([]);
+  const [currentStrategyData, setCurrentStrategyData] = useState([]);
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
-    getTeamInfoList().then((res) => {
-      setallGroups(res.dat.list);
-    });
-    getUserInfoList().then((res) => {
-      setallnotifyUsers(res.dat.list);
-    });
-    getNotifiesList().then((res) => {
-      setallChannels(res);
-    });
+    // getTeamInfoList().then((res) => {
+    //   setallGroups(res.dat.list);
+    // });
+    // getUserInfoList().then((res) => {
+    //   setallnotifyUsers(res.dat.list);
+    // });
+    // getNotifiesList().then((res) => {
+    //   setallChannels(res);
+    // });
   }, []);
 
   useEffect(() => {
-    getTemplate(type).then((res) => {
-      setDefaultOptions(res.dat);
-    });
-    getTeamInfoList().then((data) => {
-      setTeamList(data?.dat?.list || []);
-    });
+    // getTemplate(type).then((res) => {
+    //   setDefaultOptions(res.dat);
+    // });
+    // getTeamInfoList().then((data) => {
+    //   setTeamList(data?.dat?.list || []);
+    // });
+    getAlertRules();
   }, []);
   useEffect(() => {
     if (currentGroup?.id) {
-      getGroupItemBaseData();
+      // getGroupItemBaseData();
       setInit(true);
+      getAlertRules();
     }
   }, [currentGroup?.id]);
+
+  useEffect(() => {
+    filterData();
+  }, [query, currentStrategyDataAll])
+
+  const getAlertRules = async () => {
+    setLoading(true);
+    const { success, dat } = await getStrategyGroupSubList({id: currentGroup?.id || 1});
+    console.log(dat)
+    if (success) {
+      setCurrentStrategyDataAll(dat || []);
+      setLoading(false);
+    }
+     
+  }
+
+  const filterData = () => {
+    const data = JSON.parse(JSON.stringify(currentStrategyDataAll));
+    console.log(query)
+    const res = data.filter(item => {
+      return item.name.indexOf(query) > -1 || item.append_tags.indexOf(query) > -1
+    })
+    setCurrentStrategyData(res || []);
+  }
 
   const getGroupItemBaseData = () => {
     if (currentGroup?.id) {
@@ -165,7 +198,7 @@ const PageTable: React.FC = () => {
   };
 
   const refreshList = () => {
-    (tableRef.current as any).refreshList();
+    getAlertRules();
   };
 
   const handleDelete = (e) => {
@@ -186,10 +219,17 @@ const PageTable: React.FC = () => {
 
   const columns: ColumnType<strategyItem>[] = [
     {
-      title: t('级别'),
-      dataIndex: 'priority',
+      title: t('集群'),
+      dataIndex: 'cluster',
       render: (data) => {
-        return <Tag color={priorityColor[data - 1]}>P{data}</Tag>;
+        return <div>{data}</div>;
+      },
+    },
+    {
+      title: t('级别'),
+      dataIndex: 'severity',
+      render: (data) => {
+        return <Tag color={priorityColor[data - 1]}>S{data}</Tag>;
       },
     },
     {
@@ -210,14 +250,12 @@ const PageTable: React.FC = () => {
     },
     {
       title: t('告警接收者'),
-      dataIndex: 'notify_users_detail',
+      dataIndex: 'notify_groups_obj',
       render: (data, record) => {
-        const array = data
-          .concat(record.notify_groups_detail)
-          .filter((item) => !!item);
+        
         return (
-          (array.length &&
-            array.map(
+          (data.length &&
+            data.map(
               (
                 user: {
                   nickname: string;
@@ -240,7 +278,7 @@ const PageTable: React.FC = () => {
       title: t('附加标签'),
       dataIndex: 'append_tags',
       render: (data) => {
-        const array = data ? data.split(' ') : [];
+        const array = data || [];
         return (
           (array.length &&
             array.map((tag: string, index: number) => {
@@ -256,17 +294,17 @@ const PageTable: React.FC = () => {
         dayjs(Number(text) * 1000).format('YYYY-MM-DD HH:mm:ss'),
     },
     {
-      title: t('状态'),
-      dataIndex: 'status',
-      render: (status, record) => (
+      title: t('启用'),
+      dataIndex: 'disabled',
+      render: (disabled, record) => (
         <Switch
-          checked={status === strategyStatus.Enable}
+          checked={disabled === strategyStatus.Enable}
           size='small'
           onChange={() => {
-            const { id, status } = record;
+            const { id, disabled } = record;
             updateAlertEventsStatus(
               [id],
-              status === strategyStatus.Enable
+              disabled === strategyStatus.Enable
                 ? strategyStatus.UnEnable
                 : strategyStatus.Enable,
             ).then(() => {
@@ -279,6 +317,8 @@ const PageTable: React.FC = () => {
     {
       title: t('操作'),
       dataIndex: 'operator',
+      fixed: 'right',
+      width: 100,
       render: (data, record) => {
         return (
           <div className='table-operator-area'>
@@ -296,7 +336,7 @@ const PageTable: React.FC = () => {
                 confirm({
                   title: t('是否删除该告警规则?'),
                   onOk: () => {
-                    deleteStrategy(record.id).then(() => {
+                    deleteStrategy([record.id], currentGroup.id).then(() => {
                       message.success(t('删除成功'));
                       refreshList();
                     });
@@ -324,24 +364,24 @@ const PageTable: React.FC = () => {
       },
     );
   }, [teamList, groupItemBase, currentGroup?.id]);
-  const toStr = (selectRows, name, isStr = false) => {
+  const toStr = (selectedRows, name, isStr = false) => {
     if (!isStr) {
       let set = new Set(
-        selectRows
+        selectedRows
           .map((ele) => ele[name])
           .join(' ')
           .split(' '),
       );
       return Array.from(set).join(' ').trim().replace(/\s+/g, ' ');
     } else {
-      let arr = selectRows.map((ele) => ele[name].split(' '));
+      let arr = selectedRows.map((ele) => ele[name].split(' '));
       return Array.from(
         new Set(arr.toString().replace(/\,+/g, ' ').trim().split(' ')),
       ).join(' ');
     }
   };
   // const toVal = (Name, name) => {
-  //   let arr = selectRows
+  //   let arr = selectedRows
   //     .map((ele) => {
   //       return ele[Name];
   //     })
@@ -481,13 +521,14 @@ const PageTable: React.FC = () => {
           className='ant-dropdown-menu-item'
           onClick={() => setModalType(ModalStatus.Import)}
         >
-          <span>{t('导入')}</span>
+          <span>{t('导入规则')}</span>
         </li>
         <li
           className='ant-dropdown-menu-item'
           onClick={() => {
-            if (selectRows.length) {
-              const exportData = selectRows.map((item) => {
+            console.log(selectedRows,888)
+            if (selectedRows.length) {
+              const exportData = selectedRows.map((item) => {
                 return { ...item, ...exportIgnoreAttrsObj };
               });
               setExportData(JSON.stringify(exportData, null, 2));
@@ -497,7 +538,7 @@ const PageTable: React.FC = () => {
             }
           }}
         >
-          <span>{t('导出')}</span>
+          <span>{t('导出规则')}</span>
         </li>
         <li
           className='ant-dropdown-menu-item'
@@ -506,9 +547,9 @@ const PageTable: React.FC = () => {
               confirm({
                 title: t('是否批量删除告警规则?'),
                 onOk: () => {
-                  batchDeleteStrategy(
-                    currentGroup?.id,
+                  deleteStrategy(
                     selectRowKeys as number[],
+                    currentGroup?.id,
                   ).then(() => {
                     message.success(t('删除成功'));
                     refreshList();
@@ -560,30 +601,41 @@ const PageTable: React.FC = () => {
     );
   }, [selectRowKeys, FetchList, t]);
 
-  const defaultStrategyMenu = (
-    <ul className='ant-dropdown-menu'>
-      {defaultOptions.map((item, index) => (
-        <li className='ant-dropdown-menu-item' key={index}>
-          <span onClick={() => handleImportDefault(item)}>{item}</span>
-        </li>
-      ))}
-    </ul>
-  );
+  // const defaultStrategyMenu = (
+  //   <ul className='ant-dropdown-menu'>
+  //     {defaultOptions.map((item, index) => (
+  //       <li className='ant-dropdown-menu-item' key={index}>
+  //         <span onClick={() => handleImportDefault(item)}>{item}</span>
+  //       </li>
+  //     ))}
+  //   </ul>
+  // );
 
-  const handleImportDefault = async (name) => {
-    let { dat: content } = await getTemplateContent(type, name);
-    await addOrEditStrategy(
-      content.map((item) => ({ ...item, group_id: currentGroup?.id })),
-    );
-    refreshList();
-  };
+  // const handleImportDefault = async (name) => {
+  //   let { dat: content } = await getTemplateContent(type, name);
+  //   await addOrEditStrategy(
+  //     content.map((item) => ({ ...item, group_id: currentGroup?.id })),
+  //   );
+  //   refreshList();
+  // };
 
-  const handleImportStrategy = (data) => {
+  const handleImportStrategy = async (data) => {
     try {
       let importData = JSON.parse(data);
-      return addOrEditStrategy(
-        importData.map((item) => ({ ...item, group_id: currentGroup?.id })),
-      ).then(() => refreshList());
+      console.log(currentGroup)
+
+      // return addOrEditStrategy(importData, String(currentGroup.id))
+
+      const { dat } = await addOrEditStrategy(importData, currentGroup.id);
+      console.log('导入接口返回', dat);
+      const msg = Object.keys(dat).map(key => {
+        return <p style={{color: dat[key] ? '#ff4d4f' : '#52c41a'}}>{key}: {dat[key] ? dat[key] : 'successfully'}</p>
+      });
+      notification.info({
+        message: msg
+      })
+      getAlertRules();
+      setModalType(ModalStatus.None);
     } catch (err) {
       return Promise.reject(err);
     }
@@ -591,7 +643,7 @@ const PageTable: React.FC = () => {
 
   return (
     <div className='strategy-table-content'>
-      <div className='strategy-table-title'>
+      {/* <div className='strategy-table-title'>
         <div className='strategy-table-title-label'>
           {currentGroup?.name || ''}
           <FormButtonModal {...editModel()}></FormButtonModal>
@@ -611,7 +663,7 @@ const PageTable: React.FC = () => {
               '-'}
           </div>
         </div>
-      </div>
+      </div> */}
       <div className='strategy-table-search table-handle'>
         <div className='strategy-table-search-left'>
           <RefreshIcon
@@ -622,7 +674,7 @@ const PageTable: React.FC = () => {
           />
           <SearchInput
             className={'searchInput'}
-            placeholder={t('请输入告警策略名称')}
+            placeholder={t('搜索名称或标签')}
             onSearch={setQuery}
             allowClear
           />
@@ -643,7 +695,7 @@ const PageTable: React.FC = () => {
             {t('新建告警策略')}
           </Button>
           <div className={'table-more-options'}>
-            <Dropdown overlay={defaultStrategyMenu} trigger={['click']}>
+            {/* <Dropdown overlay={defaultStrategyMenu} trigger={['click']}>
               <Button onClick={(e) => e.stopPropagation()}>
                 {t('导入内置策略')}
                 <DownOutlined
@@ -652,7 +704,7 @@ const PageTable: React.FC = () => {
                   }}
                 />
               </Button>
-            </Dropdown>
+            </Dropdown> */}
             <Dropdown overlay={menu} trigger={['click']}>
               <Button onClick={(e) => e.stopPropagation()}>
                 {t('更多操作')}
@@ -666,11 +718,11 @@ const PageTable: React.FC = () => {
           </div>
         </div>
       </div>
-      <BaseTable
+      {/* <BaseTable
         ref={tableRef}
         rowKey='id'
         columns={columns}
-        fetchParams={{ id: currentGroup?.id || '', query }}
+        fetchParams={{ id: currentGroup?.id || 1, query }}
         onFetchList={(res: strategyItem[]) => {
           setFetchList(res);
         }}
@@ -687,10 +739,38 @@ const PageTable: React.FC = () => {
           ) => {
             setSelectRowKeys(selectedRowKeys);
             console.log(selectedRowKeys, 'selectedRowKeys');
-            setSelectRows(selectedRows);
+            setSelectedRows(selectedRows);
           },
         }}
-      ></BaseTable>
+      ></BaseTable> */}
+      <Table
+        rowKey="id"
+        // sticky
+        pagination={{
+          total: currentStrategyData.length,
+          showQuickJumper: true,
+          showSizeChanger: true,
+          showTotal: (total) => {
+            return `共 ${total} 条数据`;
+          },
+          pageSizeOptions: pageSizeOptionsDefault,
+          defaultPageSize: 30
+        }}
+        loading={loading}
+        dataSource={currentStrategyData}
+        rowSelection={{
+          selectedRowKeys: selectedRows.map(item => item.id),
+          onChange: (
+            selectedRowKeys: React.Key[],
+            selectedRows: strategyItem[],
+          ) => {
+            setSelectRowKeys(selectedRowKeys);
+            console.log(selectedRowKeys, 'selectedRowKeys');
+            setSelectedRows(selectedRows);
+          },
+        }}
+        columns={columns}
+      />
       <ImportAndDownloadModal
         status={modalType}
         onClose={() => setModalType(ModalStatus.None)}

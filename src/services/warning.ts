@@ -55,11 +55,23 @@ export const updateStrategyGroup = function (
 };
 
 // 获得分组资源
+// export const getStrategyGroupSubList = function (
+//   params: { id: number } & IBasePagingParams,
+// ) {
+//   return request(
+//     `${N9EAPI}/api/n9e/alert-rule-group/${params.id}/alert-rules`,
+//     {
+//       method: RequestMethod.Get,
+//     },
+//   );
+// };
+
+//// 获取策略列表
 export const getStrategyGroupSubList = function (
-  params: { id: number } & IBasePagingParams,
+  params: { id: number },
 ) {
   return request(
-    `${N9EAPI}/api/n9e/alert-rule-group/${params.id}/alert-rules`,
+    `${N9EAPI}/api/n9e/busi-group/${params.id}/alert-rules`,
     {
       method: RequestMethod.Get,
     },
@@ -119,18 +131,27 @@ export const getWarningStrategy = function (id): Promise<any> {
   });
 };
 
-export const addOrEditStrategy = function (data: object, strategyId?: string) {
-  let url = `${N9EAPI}/api/n9e/alert-rules`;
-  if (strategyId) url = `${N9EAPI}/api/n9e/alert-rule/${strategyId}`;
-  return request(url, {
-    method: strategyId ? RequestMethod.Put : RequestMethod.Post,
-    data: strategyId ? data[0] : data,
+
+// export const addOrEditStrategy = function (data: object, strategyId?: string) {
+//   let url = `${N9EAPI}/api/n9e/alert-rules`;
+//   if (strategyId) url = `${N9EAPI}/api/n9e/alert-rule/${strategyId}`;
+//   return request(url, {
+//     method: strategyId ? RequestMethod.Put : RequestMethod.Post,
+//     data: strategyId ? data[0] : data,
+//   });
+// };
+
+export const addOrEditStrategy = function (data: any[], strategyId: number) {
+  return request(`${N9EAPI}/api/n9e/busi-group/${strategyId}/alert-rules`, {
+    method: RequestMethod.Post,
+    data: data,
   });
 };
 
-export const deleteStrategy = function (id) {
-  return request(`${N9EAPI}/api/n9e/alert-rule/${id}`, {
+export const deleteStrategy = function (ids: number[],  strategyId: number) {
+  return request(`${N9EAPI}/api/n9e/busi-group/${strategyId}/alert-rules`, {
     method: RequestMethod.Delete,
+    data: {ids}
   });
 };
 

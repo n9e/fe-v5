@@ -90,7 +90,7 @@ export const addTeamUser = function (id: string, data: object) {
   }).then((res) => res && res.dat);
 };
 export const getNotifiesList = function () {
-  return request(`${N9EAPI}/api/n9e/notify-channels`, {
+  return request(`${N9EAPI}api/n9e/notify-channels`, {
     method: RequestMethod.Get,
   }).then((res) => res && res.dat);
 };
