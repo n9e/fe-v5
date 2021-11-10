@@ -2,7 +2,7 @@
   "name": "n9e-fe",
   "version": "5.0.0",
   "scripts": {
-    "dev": "vite --port 8765",
+    "dev": "vite --port 8765 --host",
     "preinstall": "sh beforeinstall.sh",
     "build": "tsc && vite build",
     "serve": "vite preview",

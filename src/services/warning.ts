@@ -12,7 +12,7 @@ import { PAGE_SIZE } from '@/utils/constant';
 
 // 获得策略分组列表
 export const getStrategyGroupList = function (query?: string, p = 1) {
-  return request(`${N9EAPI}/api/n9e/alert-rule-groups`, {
+  return request(`/api/n9e/alert-rule-groups`, {
     method: RequestMethod.Get,
     params: {
       query,
@@ -24,7 +24,7 @@ export const getStrategyGroupList = function (query?: string, p = 1) {
 
 // 添加策略分组
 export const addStrategyGroup = function (data: strategyGroup) {
-  return request(`${N9EAPI}/api/n9e/alert-rule-groups`, {
+  return request(`/api/n9e/alert-rule-groups`, {
     method: RequestMethod.Post,
     data,
   });
@@ -32,14 +32,14 @@ export const addStrategyGroup = function (data: strategyGroup) {
 
 // 获取策略分组
 export const getStrategyGroup = function (id: number) {
-  return request(`${N9EAPI}/api/n9e/alert-rule-group/${id}`, {
+  return request(`/api/n9e/alert-rule-group/${id}`, {
     method: RequestMethod.Get,
   });
 };
 
 // 删除策略分组
 export const deleteStrategyGroup = function (id: number) {
-  return request(`${N9EAPI}/api/n9e/alert-rule-group/${id}`, {
+  return request(`/api/n9e/alert-rule-group/${id}`, {
     method: RequestMethod.Delete,
   });
 };
@@ -48,7 +48,7 @@ export const deleteStrategyGroup = function (id: number) {
 export const updateStrategyGroup = function (
   data: Partial<strategyGroup> & { id: number },
 ) {
-  return request(`${N9EAPI}/api/n9e/alert-rule-group/${data.id}`, {
+  return request(`/api/n9e/alert-rule-group/${data.id}`, {
     method: RequestMethod.Put,
     data,
   });
@@ -58,24 +58,21 @@ export const updateStrategyGroup = function (
 export const getStrategyGroupSubList = function (
   params: { id: number } & IBasePagingParams,
 ) {
-  return request(
-    `${N9EAPI}/api/n9e/alert-rule-group/${params.id}/alert-rules`,
-    {
-      method: RequestMethod.Get,
-    },
-  );
+  return request(`/api/n9e/alert-rule-group/${params.id}/alert-rules`, {
+    method: RequestMethod.Get,
+  });
 };
 
 // 获取收藏分组
 export const getFavoritesStrategyGroups = function () {
-  return request(`${N9EAPI}/api/n9e/alert-rule-groups/favorites`, {
+  return request(`/api/n9e/alert-rule-groups/favorites`, {
     method: RequestMethod.Get,
   });
 };
 
 // 添加收藏分组
 export const addFavoriteGroup = function (id: number) {
-  return request(`${N9EAPI}/api/n9e/alert-rule-group/${id}/favorites`, {
+  return request(`/api/n9e/alert-rule-group/${id}/favorites`, {
     method: RequestMethod.Post,
     data: {
       id,
@@ -85,7 +82,7 @@ export const addFavoriteGroup = function (id: number) {
 
 // 删除收藏分组
 export const deleteFavoriteGroup = function (id: number) {
-  return request(`${N9EAPI}/api/n9e/alert-rule-group/${id}/favorites`, {
+  return request(`/api/n9e/alert-rule-group/${id}/favorites`, {
     method: RequestMethod.Delete,
     data: {
       id,
@@ -93,35 +90,36 @@ export const deleteFavoriteGroup = function (id: number) {
   });
 };
 
-export const getMetrics = function (): Promise<MetricListRes> {
-  return request(`${N9EAPI}/api/n9e/tag-metrics`, {
-    method: RequestMethod.Post,
+export const getMetrics = function (data = {}) {
+  return request(`/api/n9e/prometheus/api/v1/label/__name__/values`, {
+    method: RequestMethod.Get,
+    data,
   });
 };
 
 export const getTagKeys = function (params): Promise<TagKeysRes> {
-  return request(`${N9EAPI}/api/n9e/tag-keys`, {
+  return request(`/api/n9e/tag-keys`, {
     method: RequestMethod.Post,
     data: params,
   });
 };
 
 export const getTagValuesByKey = function (params): Promise<TagValuesRes> {
-  return request(`${N9EAPI}/api/n9e/tag-values`, {
+  return request(`/api/n9e/tag-values`, {
     method: RequestMethod.Post,
     data: params,
   });
 };
 
 export const getWarningStrategy = function (id): Promise<any> {
-  return request(`${N9EAPI}/api/n9e/alert-rule/${id}`, {
+  return request(`/api/n9e/alert-rule/${id}`, {
     method: RequestMethod.Get,
   });
 };
 
 export const addOrEditStrategy = function (data: object, strategyId?: string) {
-  let url = `${N9EAPI}/api/n9e/alert-rules`;
-  if (strategyId) url = `${N9EAPI}/api/n9e/alert-rule/${strategyId}`;
+  let url = `/api/n9e/alert-rules`;
+  if (strategyId) url = `/api/n9e/alert-rule/${strategyId}`;
   return request(url, {
     method: strategyId ? RequestMethod.Put : RequestMethod.Post,
     data: strategyId ? data[0] : data,
@@ -129,13 +127,13 @@ export const addOrEditStrategy = function (data: object, strategyId?: string) {
 };
 
 export const deleteStrategy = function (id) {
-  return request(`${N9EAPI}/api/n9e/alert-rule/${id}`, {
+  return request(`/api/n9e/alert-rule/${id}`, {
     method: RequestMethod.Delete,
   });
 };
 
 export const batchDeleteStrategy = function (ruleId, ids: Array<number>) {
-  return request(`${N9EAPI}/api/n9e/alert-rule-group/${ruleId}/alert-rules`, {
+  return request(`/api/n9e/alert-rule-group/${ruleId}/alert-rules`, {
     method: RequestMethod.Delete,
     data: { ids },
   });
@@ -145,7 +143,7 @@ export const batchDeleteStrategy = function (ruleId, ids: Array<number>) {
  * 获取未恢复告警列表
  */
 export const getAlertEvents = function (data) {
-  return request(`${N9EAPI}/api/n9e/alert-events`, {
+  return request(`/api/n9e/alert-events`, {
     method: RequestMethod.Get,
     params: data,
   });
@@ -156,20 +154,20 @@ export const getAlertEvents = function (data) {
 export const getHistoryEvents = function (data) {
   console.log(data);
 
-  return request(`${N9EAPI}/api/n9e/history-alert-events`, {
+  return request(`/api/n9e/history-alert-events`, {
     method: RequestMethod.Get,
     params: data,
   });
 };
 
 export const getAlertEventsById = function (id) {
-  return request(`${N9EAPI}/api/n9e/alert-event/${id}`, {
+  return request(`/api/n9e/alert-event/${id}`, {
     method: RequestMethod.Get,
   });
 };
 
 export const getHistoryEventsById = function (id) {
-  return request(`${N9EAPI}/api/n9e/history-alert-event/${id}`, {
+  return request(`/api/n9e/history-alert-event/${id}`, {
     method: RequestMethod.Get,
   });
 };
@@ -177,7 +175,7 @@ export const getHistoryEventsById = function (id) {
  * 批量删除(忽略)告警历史
  */
 export const deleteAlertEvents = function (ids: Array<number>) {
-  return request(`${N9EAPI}/api/n9e/alert-events`, {
+  return request(`/api/n9e/alert-events`, {
     method: RequestMethod.Delete,
     data: {
       ids,
@@ -192,7 +190,7 @@ export const updateAlertEventsStatus = function (
   ids: Array<number>,
   status: strategyStatus,
 ) {
-  return request(`${N9EAPI}/api/n9e/alert-rules/status`, {
+  return request(`/api/n9e/alert-rules/status`, {
     method: RequestMethod.Put,
     data: {
       ids,
@@ -208,7 +206,7 @@ export const updateAlertEventsNotifyGroups = function (
   notify_groups: string,
   notify_users: string,
 ) {
-  return request(`${N9EAPI}/api/n9e/alert-rules/notify-groups`, {
+  return request(`/api/n9e/alert-rules/notify-groups`, {
     method: RequestMethod.Put,
     data: {
       ids,
@@ -224,7 +222,7 @@ export const updateAlertEventsNotifyUsers = function (
   ids: Array<number>,
   notify_users: string,
 ) {
-  return request(`${N9EAPI}/api/n9e/alert-rules/notify-users`, {
+  return request(`/api/n9e/alert-rules/notify-users`, {
     method: RequestMethod.Put,
     data: {
       ids,
@@ -239,7 +237,7 @@ export const updateAlertEventsNotifyChannels = function (
   ids: Array<number>,
   notify_channels: string,
 ) {
-  return request(`${N9EAPI}/api/n9e/alert-rules/notify-channels`, {
+  return request(`/api/n9e/alert-rules/notify-channels`, {
     method: RequestMethod.Put,
     data: {
       ids,
@@ -254,7 +252,7 @@ export const updateAlertEventsAppendTags = function (
   ids: Array<number>,
   append_tags: string,
 ) {
-  return request(`${N9EAPI}/api/n9e/alert-rules/append-tags`, {
+  return request(`/api/n9e/alert-rules/append-tags`, {
     method: RequestMethod.Put,
     data: {
       ids,

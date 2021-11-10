@@ -20,6 +20,7 @@ import DashboardDetail from '@/pages/dashboard/detail';
 import Manage from '@/pages/manage';
 import Business from '@/pages/manage/business';
 import Explore from '@/pages/metric/explorer';
+import ObjectExplore from '@/pages/monitor/object';
 import IndicatorPage from '@/pages/monitor/indicator';
 import StrategyOperate from '@/pages/warning/strategy/operate';
 import Shield from '@/pages/warning/shield';
@@ -81,6 +82,7 @@ export default function Content() {
         <Route path='/login' component={Login} exact />
         <Route exact path='/overview' component={Overview} />
         <Route path='/metric/explorer' component={Explore} exact />
+        <Route path='/object/explorer' component={ObjectExplore} exact />
         <Route path='/account/profile/:tab' component={Profile} />
         <Route path='/manage/business' component={Business} />
         <Route path='/manage/:type' component={Manage} />
@@ -107,9 +109,9 @@ export default function Content() {
         {lazyRoutes.map((route, i) => (
           <RouteWithSubRoutes key={i} {...route} />
         ))}
-        <Route path='/' exact>
+        {/* <Route path='/' exact>
           <Redirect to='/overview' />
-        </Route>
+        </Route> */}
       </Switch>
     </div>
   );
