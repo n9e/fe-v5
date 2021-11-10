@@ -170,6 +170,14 @@ const busiGroupContent = (busiGroupProps: {
     [],
   );
 
+  // 初始化后抛出默认选择项
+  useEffect(() => {
+    if (busiGroupProps.onChange) {
+      busiGroupProps.onChange(initCurBusiItem.id, initCurBusiItem);
+    }
+  }, []);
+
+  // 初始化展示所有业务组
   useEffect(() => {
     if (!filteredBusiGroups.length) {
       setFilteredBusiGroups(busiGroups);
