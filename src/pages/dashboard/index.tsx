@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, Link } from 'react-router-dom';
 import PageLayout from '@/components/pageLayout';
 import BaseTable, { IBaseTableProps } from '@/components/BaseTable';
 import { ColumnsType } from 'antd/lib/table';
@@ -10,12 +10,15 @@ import {
   removeDashboard,
   exportDashboard,
   importDashboard,
+  updateSingleDashboard,
 } from '@/services/dashboard';
 import {
   SearchOutlined,
   DownOutlined,
   FundOutlined,
   FundViewOutlined,
+  DownloadOutlined,
+  UploadOutlined,
 } from '@ant-design/icons';
 import {
   Button,
@@ -38,6 +41,7 @@ import {
   getTemplateContent,
   getSingleDashboard,
 } from '@/services/dashboard';
+import LeftTree from '@/components/LeftTree';
 import './index.less';
 import { useTranslation } from 'react-i18next';
 const { confirm } = Modal;
@@ -53,28 +57,20 @@ export default function Dashboard() {
   const [exportData, setExportData] = useState<string>('');
   const [editing, setEditing] = useState(false);
   const [query, setQuery] = useState<string>('');
-  const [defaultOptions, setDefaultOptions] = useState<string[]>([]);
   const [searchVal, setsearchVal] = useState<string>('');
-  const [cloneId, setCloneId] = useState<{
-    id: number;
-  }>();
+
+  const [busiId, setBusiId] = useState<number>();
 
   const showModal = () => {
     setIsModalVisible(true);
   };
 
-  useEffect(() => {
-    getTemplate(type).then((res) => {
-      setDefaultOptions(res.dat);
-    });
-  }, []);
-
   const handleOk = async () => {
     await form.validateFields();
 
     if (editing) {
-      await clone();
-      message.success(t('克隆大盘成功'));
+      await edit();
+      message.success(t('编辑大盘成功'));
     } else {
       await create();
       message.success(t('新建大盘成功'));
@@ -85,48 +81,40 @@ export default function Dashboard() {
     setEditing(false);
   };
 
+  useEffect(() => {
+    (ref?.current as any)?.refreshList();
+  }, [busiId]);
+
   const create = async () => {
     let { name, tags } = form.getFieldsValue();
-    return createDashboard({
+    return createDashboard(busiId, {
       name,
-      tags: tags && tags.length > 0 ? tags.join(' ') : '',
+      tags,
     });
   };
 
-  const clone = async () => {
-    if (cloneId?.id) {
-      const { dat } = await getSingleDashboard(cloneId?.id);
-      let { name, tags } = form.getFieldsValue();
-      return cloneDashboard(
-        Object.assign(
-          cloneId,
-          {
-            name,
-            tags: tags && tags.length > 0 ? tags.join(' ') : '',
-          },
-          {
-            configs: dat.configs,
-          },
-        ),
-      );
-    } else {
-      throw new Error('没有选择大盘');
-    }
+  const edit = async () => {
+    let { name, tags, id } = form.getFieldsValue();
+    console.log(name, tags, id);
+    return updateSingleDashboard(busiId, id, {
+      name,
+      tags,
+      pure: true,
+    });
   };
 
-  const handleClone = (record: DashboardType) => {
+  const handleEdit = (record: DashboardType) => {
     const { id, name, tags } = record;
-    const cloneName = 'Copy of ' + name;
     form.setFieldsValue({
-      name: cloneName,
-      tags: tags.length > 0 ? tags.split(' ') : [],
-    });
-    setCloneId({
+      name,
+      tags,
       id,
     });
     setIsModalVisible(true);
     setEditing(true);
   };
+
+  const handleClone = (record: DashboardType) => {};
 
   const handleTagClick = (tag) => {
     const queryItem = query.length > 0 ? query.split(' ') : [];
@@ -162,9 +150,9 @@ export default function Dashboard() {
     {
       title: t('分类标签'),
       dataIndex: 'tags',
-      render: (text: string) => (
+      render: (text: string[]) => (
         <>
-          {text.split(' ').map((tag, index) => {
+          {text.map((tag, index) => {
             return tag ? (
               <Tag
                 color='blue'
@@ -196,6 +184,12 @@ export default function Dashboard() {
       width: '240px',
       render: (text: string, record: DashboardType) => (
         <div className='table-operator-area'>
+          <div
+            className='table-operator-area-normal'
+            onClick={() => handleEdit(record)}
+          >
+            {t('编辑')}
+          </div>
           <div
             className='table-operator-area-normal'
             onClick={() => handleClone(record)}
@@ -243,107 +237,84 @@ export default function Dashboard() {
     }
   };
 
-  const handleImportDefault = async (name) => {
-    let { dat: content } = await getTemplateContent(type, name);
-    await importDashboard(content);
-    (ref?.current as any)?.refreshList();
-  };
-
-  const menu = (
-    <ul className='ant-dropdown-menu'>
-      <li
-        className='ant-dropdown-menu-item'
-        onClick={() => setModalType(ModalStatus.Import)}
-      >
-        <span>{t('导入')}</span>
-      </li>
-      <li
-        className='ant-dropdown-menu-item'
-        onClick={async () => {
-          if (selectRowKeys.length) {
-            let exportData = await exportDashboard(selectRowKeys);
-            setExportData(JSON.stringify(exportData.dat, null, 2));
-            setModalType(ModalStatus.Export);
-          } else {
-            message.warning(t('未选择任何大盘'));
-          }
-        }}
-      >
-        <span>{t('导出')}</span>
-      </li>
-    </ul>
-  );
-  const defaultDashboardMenu = (
-    <ul className='ant-dropdown-menu'>
-      {defaultOptions.map((item, index) => (
-        <li className='ant-dropdown-menu-item' key={index}>
-          <span onClick={() => handleImportDefault(item)}>{item}</span>
-        </li>
-      ))}
-    </ul>
-  );
   return (
     <PageLayout title={t('监控大盘')} icon={<FundViewOutlined />}>
-      <div className='dashboard'>
-        <div className='table-handle'>
-          <div className='table-handle-search'>
-            <Input
-              onPressEnter={onSearchQuery}
-              className={'searchInput'}
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              prefix={<SearchOutlined />}
-              placeholder={t('大盘名称')}
-            />
-          </div>
-          <div className='table-handle-buttons'>
-            <Button type='primary' onClick={showModal}>
-              {t('新建大盘')}
-            </Button>
-            <div className={'table-more-options'}>
-              <Dropdown overlay={defaultDashboardMenu} trigger={['click']}>
-                <Button onClick={(e) => e.stopPropagation()}>
-                  {t('导入内置大盘')}
-                  <DownOutlined
-                    style={{
-                      marginLeft: 2,
+      <div style={{ display: 'flex' }}>
+        <LeftTree busiGroup={{ onChange: (id) => setBusiId(id) }}></LeftTree>
+        <div className='dashboard' style={{ flex: 1 }}>
+          <div className='table-handle'>
+            <div className='table-handle-search'>
+              <Input
+                onPressEnter={onSearchQuery}
+                className={'searchInput'}
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                prefix={<SearchOutlined />}
+                placeholder={t('大盘名称')}
+              />
+            </div>
+            <div className='table-handle-buttons'>
+              <Button type='primary' onClick={showModal}>
+                {t('新建大盘')}
+              </Button>
+              <div className={'table-more-options'}>
+                <Button.Group>
+                  <Button
+                    size='middle'
+                    type='default'
+                    icon={<DownloadOutlined />}
+                    onClick={() => setModalType(ModalStatus.Import)}
+                  >
+                    {t('导入')}
+                  </Button>
+                  <Button
+                    size='middle'
+                    type='default'
+                    icon={<UploadOutlined />}
+                    onClick={async () => {
+                      if (selectRowKeys.length) {
+                        let exportData = await exportDashboard(selectRowKeys);
+                        setExportData(JSON.stringify(exportData.dat, null, 2));
+                        setModalType(ModalStatus.Export);
+                      } else {
+                        message.warning(t('未选择任何大盘'));
+                      }
                     }}
-                  />
-                </Button>
-              </Dropdown>
-              <Dropdown overlay={menu} trigger={['click']}>
-                <Button onClick={(e) => e.stopPropagation()}>
-                  {t('更多操作')}
-                  <DownOutlined
-                    style={{
-                      marginLeft: 2,
-                    }}
-                  />
-                </Button>
-              </Dropdown>
+                  >
+                    {t('导出')}
+                  </Button>
+                </Button.Group>
+              </div>
             </div>
           </div>
-        </div>
 
-        <BaseTable
-          ref={ref}
-          fetchHandle={getDashboard}
-          fetchParams={{
-            query: searchVal,
-          }}
-          className='dashboard-table'
-          columns={dashboardColumn}
-          rowKey='id'
-          rowSelection={{
-            selectedRowKeys: selectRowKeys,
-            onChange: (selectedRowKeys: number[]) => {
-              setSelectRowKeys(selectedRowKeys);
-            },
-          }}
-        ></BaseTable>
+          {busiId ? (
+            <BaseTable
+              ref={ref}
+              fetchHandle={() => getDashboard(busiId)}
+              fetchParams={{
+                query: searchVal,
+              }}
+              className='dashboard-table'
+              columns={dashboardColumn}
+              rowKey='id'
+              rowSelection={{
+                selectedRowKeys: selectRowKeys,
+                onChange: (selectedRowKeys: number[]) => {
+                  setSelectRowKeys(selectedRowKeys);
+                },
+              }}
+            ></BaseTable>
+          ) : (
+            <div>
+              监控大盘需要归属某个业务组，请先
+              <Link to='/manage/business'>创建业务组</Link>
+            </div>
+          )}
+        </div>
       </div>
       <Modal
-        title={editing ? t('克隆监控大盘') : t('创建新监控大盘')}
+        title={editing ? t('编辑监控大盘') : t('创建新监控大盘')}
         visible={isModalVisible}
         onOk={handleOk}
         onCancel={() => {
@@ -380,6 +351,9 @@ export default function Dashboard() {
               }}
               placeholder={t('请输入分类标签(请用回车分割)')}
             ></Select>
+          </Form.Item>
+          <Form.Item name='id' hidden>
+            <Input />
           </Form.Item>
         </Form>
       </Modal>
