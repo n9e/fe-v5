@@ -24,20 +24,20 @@ export const getTagValue = function (data: ISearchTagValueParams) {
 
 interface DashboardQuery {}
 // 大盘列表
-export const getDashboard = function (data: ISearchTagValueParams) {
-  return request(`/api/n9e/dashboards`, {
+export const getDashboard = function (id: number) {
+  return request(`/api/n9e/busi-group/${id}/dashboards?`, {
     method: RequestMethod.Get,
-    params: data,
   });
 };
 interface Dashboard {
   name: string;
   tags: string;
+  pure?: boolean;
   configs?: string;
 }
 // 创建大盘
-export const createDashboard = function (data: Dashboard) {
-  return request(`/api/n9e/dashboards`, {
+export const createDashboard = function (id: number, data: Dashboard) {
+  return request(`/api/n9e/busi-group/${id}/dashboards`, {
     method: RequestMethod.Post,
     data,
   });
@@ -82,8 +82,12 @@ export const getSingleDashboard = function (id: string | number) {
 };
 
 // 更新大盘
-export const updateSingleDashboard = function (id: string, data: Dashboard) {
-  return request(`/api/n9e/dashboard/${id}`, {
+export const updateSingleDashboard = function (
+  busiId: number,
+  id: string,
+  data: Dashboard,
+) {
+  return request(`/api/n9e/busi-group/${busiId}/dashboard/${id}`, {
     method: RequestMethod.Put,
     data,
   });

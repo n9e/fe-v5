@@ -17,7 +17,9 @@ const defaultData: warningStoreState = {
     currentPage: 1,
     commonTotal: 0,
   },
-  currentGroup: null,
+  currentGroup: {
+    id: 1
+  },
 };
 
 const resourceStore: IStore<warningStoreState> = {

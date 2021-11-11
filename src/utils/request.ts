@@ -89,7 +89,9 @@ request.interceptors.request.use((url, options) => {
   headers['Authorization'] = `Bearer ${
     localStorage.getItem('access_token') || ''
   }`;
-  headers['X-Cluster'] = 'Default'
+  if (!headers['X-Cluster']) {
+    headers['X-Cluster'] = 'Default';
+  }
   return {
     url,
     options: { ...options, headers },
