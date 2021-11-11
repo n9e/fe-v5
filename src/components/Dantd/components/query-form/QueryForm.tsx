@@ -4,8 +4,8 @@ import { ConfigProviderProps } from 'antd/es/config-provider';
 import useAntdMediaQuery from './use-media-antd-query';
 import { Button, Input, Form, Row, Col, Select, ConfigProvider } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
-import useDeepCompareEffect from '@/components/dantd/hooks/use-deep-compare-effect';
-import { intlZhMap } from '@/components/dantd/components/utils';
+import useDeepCompareEffect from '@/components/Dantd/hooks/use-deep-compare-effect';
+import { intlZhMap } from '@/components/Dantd/components/utils';
 
 declare const ItemSizes: ['large', 'default', 'small', string];
 export declare type ItemSize = typeof ItemSizes[number];
