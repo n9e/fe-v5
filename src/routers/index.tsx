@@ -31,6 +31,7 @@ import Event from '@/pages/event';
 import EventDetail from '@/pages/event/detail';
 import Overview from '@/pages/overview';
 import historyEvents from '@/pages/historyEvents';
+import Demo from '@/pages/demo';
 
 import { dynamicPackages, Entry } from '@/utils';
 
@@ -80,6 +81,7 @@ export default function Content() {
   return (
     <div className='content'>
       <Switch>
+        <Route path='/demo' component={Demo} />
         <Route path='/login' component={Login} exact />
         <Route exact path='/overview' component={Overview} />
         <Route path='/metric/explorer' component={Explore} exact />

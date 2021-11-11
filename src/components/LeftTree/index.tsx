@@ -8,10 +8,11 @@ import './index.less';
 
 const CheckboxGroup = Checkbox.Group;
 const { Search } = Input;
+type ChangeFunction = (value: number, item?: object) => void;
 
 interface groupProps {
   isShow?: boolean;
-  onChange?: Function;
+  onChange?: ChangeFunction;
 }
 
 interface LeftTreeProps {
@@ -20,7 +21,7 @@ interface LeftTreeProps {
   eventTypeGroup?: groupProps;
   busiGroup?: {
     showNotGroupItem?: boolean;
-    onChange?: Function;
+    onChange?: ChangeFunction;
   };
 }
 interface IGroupItemProps {
