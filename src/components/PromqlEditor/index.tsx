@@ -18,7 +18,7 @@ export default function PromqlEditor(props: Props) {
 
   useEffect(() => {
     const promQL = new PromQLExtension().setComplete({
-      remote: { url: 'http://10.86.76.13:8090/' },
+      remote: { url: 'http://10.86.76.13:8090' },
     });
     const v = new EditorView({
       state: EditorState.create({
