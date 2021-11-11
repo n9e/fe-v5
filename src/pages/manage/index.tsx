@@ -268,7 +268,7 @@ const Resource: React.FC = () => {
       setTotal(data.dat.total);
 
       if (!teamId || isDelete) {
-        setTeamId(data.dat.list[0].id);
+        setTeamId(data.dat[0].id);
       }
     });
   };
