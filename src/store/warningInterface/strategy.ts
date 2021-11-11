@@ -83,14 +83,16 @@ export interface strategyItem {
     promql: string;
   };
   alert_duration: number;
-  status: strategyStatus;
+  // status: strategyStatus;
+  disabled: strategyStatus;
   append_tags: string;
   enable_stime: string;
   enable_etime: string;
   enable_days_of_week: string;
   recovery_duration: number;
   recovery_notify: notifyType;
-  priority: strategyPriority;
+  // priority: strategyPriority;
+  severity: strategyPriority;
   notify_channels: string;
   notify_groups: string;
   notify_users: string;
@@ -101,7 +103,8 @@ export interface strategyItem {
   create_by: string;
   update_at: number;
   update_by: string;
-  notify_groups_detail: Array<strategyGroupItem>;
+  // notify_groups_detail: Array<strategyGroupItem>;
+  notify_groups_obj: Array<strategyGroupItem>;
 }
 
 export enum strategyFrom {
@@ -120,11 +123,15 @@ export type strategyGroupItemBase = {
   user_groups: Array<strategyGroupItem>;
 };
 
-export type strategyGroupItem = baseFavoriteItem & {
-  name: string;
+// export type strategyGroupItem = baseFavoriteItem & {
+//   name: string;
+// };
+
+export type strategyGroupItem = {
+  id: number;
 };
 
 export interface warningStoreState {
   group: favoriteGroup;
-  currentGroup: strategyGroupItem | null;
+  currentGroup: strategyGroupItem;
 }

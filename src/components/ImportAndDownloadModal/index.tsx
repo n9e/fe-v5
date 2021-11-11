@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { download } from '@/utils';
-import { Button, Modal, Form, Input, message, notification } from 'antd';
+import { Button, Modal, Form, Input, message, notification, Alert } from 'antd';
 import './index.less';
 import { useTranslation } from 'react-i18next';
 const { TextArea } = Input;
@@ -45,9 +45,22 @@ export default function ImportAndDownloadModal(props: Props) {
               onClick={async () => {
                 await form.validateFields();
                 const data = form.getFieldsValue();
-                await onSubmit(data.import);
-                message.success(t('导入成功'));
-                onClose();
+                try {
+                  JSON.parse(JSON.stringify(data));
+                  const { dat } = await onSubmit(data.import);
+                  // 每个业务各自处理onSubmit
+                  // onClose();
+                  // if (!res.err) {
+                  //   message.success(t('导入成功'));
+                  //   onClose();
+                  // } else {
+                  //   message.error(res.err);
+                  // }
+                  
+                } catch(error) {
+                  message.error(t('策略数据有误:') + error);
+                }
+                
               }}
             >
               {t('确定')}

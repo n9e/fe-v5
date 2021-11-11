@@ -23,6 +23,8 @@ import Explore from '@/pages/metric/explorer';
 import ObjectExplore from '@/pages/monitor/object';
 import IndicatorPage from '@/pages/monitor/indicator';
 import StrategyOperate from '@/pages/warning/strategy/operate';
+import StrategyAdd from '@/pages/warning/strategy/add';
+import StrategyEdit from '@/pages/warning/strategy/edit';
 import Shield from '@/pages/warning/shield';
 import AddShield from '@/pages/warning/shield/add';
 import ShieldDetail from '@/pages/warning/shield/detail';
@@ -98,9 +100,9 @@ export default function Content() {
         <Route
           exact
           path='/strategy/add/:group_id'
-          component={StrategyOperate}
+          component={StrategyAdd}
         />
-        <Route exact path='/strategy/edit/:id' component={StrategyOperate} />
+        <Route exact path='/strategy/edit/:id' component={StrategyEdit} />
         <Route exact path='/strategy/:id?' component={Strategy} />
         <Route exact path='/shield' component={Shield} />
         <Route exact path='/shield/add/:from?' component={AddShield} />

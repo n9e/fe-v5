@@ -192,3 +192,5 @@ export const tagFilterConditions = [
     multiple: false,
   },
 ];
+
+export const pageSizeOptionsDefault = ['30', '50', '100', '300'];
