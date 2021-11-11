@@ -680,19 +680,13 @@ const PageTable: React.FC = () => {
           />
         </div>
         <div className='strategy-table-search-right'>
-          {/* <RedoOutlined
-           className='strategy-table-search-left-refresh'
-           onClick={() => {
-             refreshList();
-           }}
-          /> */}
-
+          
           <Button
             type='primary'
             onClick={goToAddWarningStrategy}
             className='strategy-table-search-right-create'
           >
-            {t('新建告警策略')}
+            {t('新增告警策略')}
           </Button>
           <div className={'table-more-options'}>
             {/* <Dropdown overlay={defaultStrategyMenu} trigger={['click']}>

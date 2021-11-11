@@ -22,7 +22,6 @@ import Business from '@/pages/manage/business';
 import Explore from '@/pages/metric/explorer';
 import ObjectExplore from '@/pages/monitor/object';
 import IndicatorPage from '@/pages/monitor/indicator';
-import StrategyOperate from '@/pages/warning/strategy/operate';
 import StrategyAdd from '@/pages/warning/strategy/add';
 import StrategyEdit from '@/pages/warning/strategy/edit';
 import Shield from '@/pages/warning/shield';

@@ -19,7 +19,7 @@ const Strategy: React.FC = () => {
   //   });
   // }, []);
   return (
-    <PageLayout title={t('告警策略')} icon={<SettingOutlined />}>
+    <PageLayout title={t('告警规则')} icon={<SettingOutlined />}>
       <div className='strategy-content'>
         <LeftTree
           // pageTitle={t('告警策略')}

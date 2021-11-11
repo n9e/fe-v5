@@ -35,6 +35,7 @@ import {
   warningStoreState,
   Metric
 } from '@/store/warningInterface';
+import { CommonStoreState } from '@/store/commonInterface';
 import {
   getTeamInfoList,
   getNotifiesList,
@@ -73,8 +74,8 @@ const operateForm: React.FC<Props> = ({
   const history = useHistory(); // 创建的时候默认选中的值
 
   const [form] = Form.useForm();
-  const { clusterList } = useSelector<RootState, warningStoreState>(
-    (state) => state.strategy,
+  const { clusters: clusterList } = useSelector<RootState, CommonStoreState>(
+    (state) => state.common,
   );
   const { currentGroup } = useSelector<RootState, warningStoreState>(
     (state) => state.strategy,
@@ -121,7 +122,6 @@ const operateForm: React.FC<Props> = ({
   const getNotifyChannel = async () => {
     
     const res = await getNotifiesList();
-    console.log(888888, res)
     let contactList = res || [];
     setInitContactList(contactList);
   }
@@ -156,7 +156,6 @@ const operateForm: React.FC<Props> = ({
 
   const addSubmit = () => {
     form.validateFields().then(async (values) => {
-      console.log(values)
       const data = {
         ...values,
         enable_stime: values.enable_time[0].format('HH:mm'),
