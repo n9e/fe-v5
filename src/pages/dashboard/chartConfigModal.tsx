@@ -374,6 +374,7 @@ export default function ChartConfigModal(props: Props) {
                                     ]}
                                   >
                                     <PromqlEditor
+                                      xCluster='Default'
                                       onChange={() => {
                                         setpromeQl(
                                           chartForm
