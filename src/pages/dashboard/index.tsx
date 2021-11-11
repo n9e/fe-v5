@@ -87,20 +87,26 @@ export default function Dashboard() {
 
   const create = async () => {
     let { name, tags } = form.getFieldsValue();
-    return createDashboard(busiId, {
-      name,
-      tags,
-    });
+    return (
+      busiId &&
+      createDashboard(busiId, {
+        name,
+        tags,
+      })
+    );
   };
 
   const edit = async () => {
     let { name, tags, id } = form.getFieldsValue();
     console.log(name, tags, id);
-    return updateSingleDashboard(busiId, id, {
-      name,
-      tags,
-      pure: true,
-    });
+    return (
+      busiId &&
+      updateSingleDashboard(busiId, id, {
+        name,
+        tags,
+        pure: true,
+      })
+    );
   };
 
   const handleEdit = (record: DashboardType) => {

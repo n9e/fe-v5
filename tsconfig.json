@@ -29,5 +29,5 @@
     "strictNullChecks": true
   },
   "include": ["./src"],
-  "exclude": ["./src/store/miniDva/*", "./src/Packages/"]
+  "exclude": ["./src/store/miniDva/*", "./src/Packages/", "src/components/Dantd/**/*",]
 }
