@@ -16,47 +16,19 @@ import {
   changeBusinessTeam,
   addBusinessMember,
 } from '@/services/manage';
-import {
-  ModalProps,
-  User,
-  Team,
-  UserType,
-  ActionType,
-  Contacts,
-} from '@/store/manageInterface';
+import { ModalProps, User, Team, UserType, ActionType, Contacts } from '@/store/manageInterface';
 import { useTranslation } from 'react-i18next';
 
 const CreateModal: React.FC<ModalProps> = (props: ModalProps) => {
   const { t } = useTranslation();
-  const {
-    visible,
-    userType,
-    onClose,
-    action,
-    userId,
-    teamId,
-    onSearch,
-    width,
-  } = props;
+  const { visible, userType, onClose, action, userId, teamId, onSearch, width } = props;
   const [selectedUser, setSelectedUser] = useState<string[]>();
   const userRef = useRef(null as any);
   const teamRef = useRef(null as any);
   const passwordRef = useRef(null as any);
-  const isBusinessForm =
-    userType === 'business' &&
-    (action === ActionType.CreateBusiness ||
-      action === ActionType.AddBusinessMember ||
-      action === ActionType.EditBusiness);
-  const isUserForm: boolean =
-    (action === ActionType.CreateUser || action === ActionType.EditUser) &&
-    userType === UserType.User
-      ? true
-      : false;
-  const isTeamForm: boolean =
-    (action === ActionType.CreateTeam || action === ActionType.EditTeam) &&
-    userType === UserType.Team
-      ? true
-      : false;
+  const isBusinessForm = userType === 'business' && (action === ActionType.CreateBusiness || action === ActionType.AddBusinessMember || action === ActionType.EditBusiness);
+  const isUserForm: boolean = (action === ActionType.CreateUser || action === ActionType.EditUser) && userType === UserType.User ? true : false;
+  const isTeamForm: boolean = (action === ActionType.CreateTeam || action === ActionType.EditTeam) && userType === UserType.Team ? true : false;
   const isPasswordForm: boolean = action === ActionType.Reset ? true : false;
   const isAddUser: boolean = action === ActionType.AddUser ? true : false;
 
@@ -227,23 +199,16 @@ const CreateModal: React.FC<ModalProps> = (props: ModalProps) => {
         </Button>,
         action === ActionType.CreateTeam && (
           <Button type='primary' onClick={() => onOk('search')}>
-            {t('确认并搜索')}
+            {t('确定并搜索')}
           </Button>
         ),
       ]}
     >
       {isUserForm && <UserForm ref={userRef} userId={userId} />}
       {isTeamForm && <TeamForm ref={teamRef} teamId={teamId} />}
-      {isBusinessForm && (
-        <BusinessForm ref={teamRef} businessId={teamId} action={action} />
-      )}
+      {isBusinessForm && <BusinessForm ref={teamRef} businessId={teamId} action={action} />}
       {isPasswordForm && <PasswordForm ref={passwordRef} userId={userId} />}
-      {isAddUser && (
-        <AddUser
-          teamId={teamId}
-          onSelect={(val) => setSelectedUser(val)}
-        ></AddUser>
-      )}
+      {isAddUser && <AddUser teamId={teamId} onSelect={(val) => setSelectedUser(val)}></AddUser>}
     </Modal>
   );
 };
