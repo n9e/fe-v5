@@ -21,14 +21,14 @@ import queryString from 'query-string';
 import classNames from 'classnames';
 import Highlighter from 'react-highlight-words';
 import _ from 'lodash';
-import useDebounce from '@/components/dantd/hooks/use-debounce';
+import useDebounce from '@/components/Dantd/hooks/use-debounce';
 // import useDeepCompareEffect from '../use-deep-compare-effect';
 import { TableProps, ColumnProps } from 'antd/lib/table';
 import { TableRowSelection } from 'antd/lib/table/interface';
 import QueryForm, { IColumnsType } from '../query-form/QueryForm';
 import { PaginationProps } from 'antd/lib/pagination';
 import { pageSizeOptions, TSorterNames } from './config';
-import { intlZhMap } from '@/components/dantd/components/utils';
+import { intlZhMap } from '@/components/Dantd/components/utils';
 
 declare const ModeTypes: ['default', 'compact', string];
 export declare type ModeType = typeof ModeTypes[number];
@@ -248,7 +248,7 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
   const selectRowNum = rowSelection
     ? rowSelection.selectedRowKeys && rowSelection.selectedRowKeys.length
     : -1;
-    
+
   const sorterNames = {
     ascend: t('table.sort.ascend'),
     descend: t('table.sort.descend'),
@@ -450,12 +450,14 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
     setLoading(true);
     let transportOptions = {
       ...fetchOptions,
-    }
+    };
     if (fetchOptions.method && fetchOptions.method.toLowerCase() === 'post') {
-      transportOptions.data = fetchParams
+      transportOptions.data = fetchParams;
     }
     const res = request(fetchUrl, transportOptions);
-    props.rowSelection && props.rowSelection.onChange && props.rowSelection.onChange([]);
+    props.rowSelection &&
+      props.rowSelection.onChange &&
+      props.rowSelection.onChange([]);
     if ((res.status < 200 || res.status >= 300) && props.apiErrorCallback) {
       props.apiErrorCallback(res);
       setLoading(false);
@@ -787,7 +789,7 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
         ...paginationState,
         current: 1,
       });
-    }
+    },
   }));
 
   const renderColumns = () => {
@@ -1219,7 +1221,6 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
           )}
           {filterType === 'none' && showSearch && searchPos === 'right' && (
             <Row className={`${prefixCls}-header-filter`}>
-              {showReloadBtn2FilterLeft && renderReloadBtn()}
               <Col
                 data-testid='left-header'
                 className={classNames(
@@ -1227,14 +1228,15 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
                   props.leftHeader !== undefined &&
                     `${prefixCls}-header-filter-left-minh`,
                 )}
-                span={12}
+                span={14}
               >
+                {showReloadBtn2FilterLeft && renderReloadBtn()}
                 {props.leftHeader}
               </Col>
               <Col
                 data-testid='right-header'
                 className={`${prefixCls}-header-filter-right`}
-                span={12}
+                span={10}
               >
                 {renderSearch()}
               </Col>
