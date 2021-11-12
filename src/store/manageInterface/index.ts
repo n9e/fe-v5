@@ -80,6 +80,7 @@ export interface ModalProps {
   teamId?: string;
   memberId?: string;
   onSearch?: any;
+  width?: number;
 }
 export interface TeamProps {
   onClose?: any;

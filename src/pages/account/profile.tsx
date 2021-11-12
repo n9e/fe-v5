@@ -29,9 +29,9 @@ export default function Profile() {
         <TabPane tab={t('修改密码')} key='pwd'>
           <ChangePassword />
         </TabPane>
-        <TabPane tab={t('秘钥管理')} key='secret'>
+        {/* <TabPane tab={t('秘钥管理')} key='secret'>
           <SecretKey />
-        </TabPane>
+        </TabPane> */}
       </Tabs>
     </PageLayout>
   );

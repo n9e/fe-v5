@@ -36,11 +36,6 @@ import { Dashboard as DashboardType } from '@/store/dashboardInterface';
 import ImportAndDownloadModal, {
   ModalStatus,
 } from '@/components/ImportAndDownloadModal';
-import {
-  getTemplate,
-  getTemplateContent,
-  getSingleDashboard,
-} from '@/services/dashboard';
 import LeftTree from '@/components/LeftTree';
 import './index.less';
 import { useTranslation } from 'react-i18next';
@@ -120,8 +115,6 @@ export default function Dashboard() {
     setEditing(true);
   };
 
-  const handleClone = (record: DashboardType) => {};
-
   const handleTagClick = (tag) => {
     const queryItem = query.length > 0 ? query.split(' ') : [];
     if (queryItem.includes(tag)) return;
@@ -198,7 +191,18 @@ export default function Dashboard() {
           </div>
           <div
             className='table-operator-area-normal'
-            onClick={() => handleClone(record)}
+            onClick={async () => {
+              confirm({
+                title: `${t('是否克隆大盘')}${record.name}?`,
+                onOk: async () => {
+                  await cloneDashboard(busiId as number, record.id);
+                  message.success(t('克隆大盘成功'));
+                  (ref?.current as any)?.refreshList();
+                },
+
+                onCancel() {},
+              });
+            }}
           >
             {t('克隆')}
           </div>
@@ -206,7 +210,7 @@ export default function Dashboard() {
             className='table-operator-area-warning'
             onClick={async () => {
               confirm({
-                title: `${t('是否删除大盘')}?${record.name}`,
+                title: `${t('是否删除大盘')}${record.name}?`,
                 onOk: async () => {
                   await removeDashboard(record.id);
                   message.success(t('删除大盘成功'));
