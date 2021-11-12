@@ -51,23 +51,23 @@ export const cloneDashboard = function (busiId: number, id: number) {
 };
 
 // 删除大盘
-export const removeDashboard = function (id: number) {
-  return request(`/api/n9e/dashboard/${id}`, {
+export const removeDashboard = function (busiId: number, id: number) {
+  return request(`/api/n9e/busi-group/${busiId}/dashboard/${id}`, {
     method: RequestMethod.Delete,
   });
 };
 
 // 导出大盘
-export const exportDashboard = function (ids: number[]) {
-  return request(`/api/n9e/dashboards/export`, {
+export const exportDashboard = function (busiId: number, ids: number[]) {
+  return request(`/api/n9e/busi-group/${busiId}/dashboards/export`, {
     method: RequestMethod.Post,
     data: { ids },
   });
 };
 
 // 导入大盘
-export const importDashboard = function (data: any[]) {
-  return request(`/api/n9e/dashboards/import`, {
+export const importDashboard = function (busiId: number, data: any[]) {
+  return request(`/api/n9e/busi-group/${busiId}/dashboards/import`, {
     method: RequestMethod.Post,
     data,
   });

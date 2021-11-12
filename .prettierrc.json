@@ -9,7 +9,7 @@
   "bracketSpacing": true,
   "jsxBracketSameLine": false,
   "arrowParens": "always",
-  "printWidth": 80,
+  "printWidth": 180,
   "curly": "all",
   "eqeqeq": true
 }

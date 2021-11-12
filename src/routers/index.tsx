@@ -1,11 +1,5 @@
 import React, { useEffect } from 'react';
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  useLocation,
-  Redirect,
-} from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route, useLocation, Redirect } from 'react-router-dom';
 import Loadable from '@/routers/loadable';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, accountStoreState } from '@/store/accountInterface';
@@ -53,16 +47,10 @@ function RouteWithSubRoutes(route) {
 }
 
 export default function Content() {
-  let { profile } = useSelector<RootState, accountStoreState>(
-    (state) => state.account,
-  );
+  let { profile } = useSelector<RootState, accountStoreState>((state) => state.account);
   const location = useLocation();
   const dispatch = useDispatch();
-  if (
-    !profile.id &&
-    location.pathname != '/login' &&
-    !location.pathname.startsWith('/chart/')
-  ) {
+  if (!profile.id && location.pathname != '/login' && !location.pathname.startsWith('/chart/')) {
     dispatch({ type: 'account/getProfile' });
     dispatch({ type: 'common/getClusters' });
     dispatch({ type: 'common/getBusiGroups' });
@@ -96,11 +84,7 @@ export default function Content() {
         <Route path='/indicator' component={IndicatorPage} />
         <Route path='/history-events' component={historyEvents} />
 
-        <Route
-          exact
-          path='/strategy/add/:group_id'
-          component={StrategyAdd}
-        />
+        <Route exact path='/strategy/add/:group_id' component={StrategyAdd} />
         <Route exact path='/strategy/edit/:id' component={StrategyEdit} />
         <Route exact path='/strategy/:id?' component={Strategy} />
         <Route exact path='/shield' component={Shield} />

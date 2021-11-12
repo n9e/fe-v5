@@ -37,6 +37,7 @@ import ImportAndDownloadModal, {
   ModalStatus,
 } from '@/components/ImportAndDownloadModal';
 import LeftTree from '@/components/LeftTree';
+import BlankBusinessPlaceholder from '@/components/BlankBusinessPlaceholder';
 import './index.less';
 import { useTranslation } from 'react-i18next';
 const { confirm } = Modal;
@@ -212,7 +213,7 @@ export default function Dashboard() {
               confirm({
                 title: `${t('是否删除大盘')}${record.name}?`,
                 onOk: async () => {
-                  await removeDashboard(record.id);
+                  await removeDashboard(busiId as number, record.id);
                   message.success(t('删除大盘成功'));
                   (ref?.current as any)?.refreshList();
                 },
@@ -236,12 +237,12 @@ export default function Dashboard() {
   const handleImportDashboard = (data) => {
     try {
       let importData = JSON.parse(data);
-      return importDashboard(importData).then(() =>
+      return importDashboard(busiId as number, importData).then(() =>
         (ref?.current as any)?.refreshList(),
       );
     } catch (err: any) {
       notification.error({
-        message: err?.message || t('您的网络发生异常，无法连接服务器'),
+        message: err?.message,
       });
       return Promise.reject(err);
     }
@@ -283,7 +284,10 @@ export default function Dashboard() {
                     icon={<UploadOutlined />}
                     onClick={async () => {
                       if (selectRowKeys.length) {
-                        let exportData = await exportDashboard(selectRowKeys);
+                        let exportData = await exportDashboard(
+                          busiId as number,
+                          selectRowKeys,
+                        );
                         setExportData(JSON.stringify(exportData.dat, null, 2));
                         setModalType(ModalStatus.Export);
                       } else {
@@ -316,10 +320,7 @@ export default function Dashboard() {
               }}
             ></BaseTable>
           ) : (
-            <div>
-              监控大盘需要归属某个业务组，请先
-              <Link to='/manage/business'>创建业务组</Link>
-            </div>
+            <BlankBusinessPlaceholder text='监控大盘' />
           )}
         </div>
       </div>
