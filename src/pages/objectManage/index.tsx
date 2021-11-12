@@ -33,7 +33,7 @@ const ObjectManage: React.FC = () => {
   return (
     <PageLayout title={t('资源管理')} icon={<DatabaseOutlined />}>
       <div className='object-manage-page-content'>
-        <LeftTree showNotGroupBusiItem={true} />
+        <LeftTree />
         <div className='table-area'>
           <BasicTable columns={columns} dataSource={[]} />
         </div>
