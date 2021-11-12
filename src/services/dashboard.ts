@@ -44,10 +44,9 @@ export const createDashboard = function (id: number, data: Dashboard) {
 };
 
 // 克隆大盘
-export const cloneDashboard = function (data: Dashboard) {
-  return request(`/api/n9e/dashboards-clone`, {
+export const cloneDashboard = function (busiId: number, id: number) {
+  return request(`/api/n9e/busi-group/${busiId}/dashboard/${id}/clone`, {
     method: RequestMethod.Post,
-    data,
   });
 };
 
