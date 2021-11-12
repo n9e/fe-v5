@@ -8,7 +8,6 @@ import './index.less';
 
 const CheckboxGroup = Checkbox.Group;
 const { Search } = Input;
-
 type ChangeFunction = (value: any, item?: any) => void;
 
 interface groupProps {

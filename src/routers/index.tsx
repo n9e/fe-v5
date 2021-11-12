@@ -22,7 +22,8 @@ import Business from '@/pages/manage/business';
 import Explore from '@/pages/metric/explorer';
 import ObjectExplore from '@/pages/monitor/object';
 import IndicatorPage from '@/pages/monitor/indicator';
-import StrategyOperate from '@/pages/warning/strategy/operate';
+import StrategyAdd from '@/pages/warning/strategy/add';
+import StrategyEdit from '@/pages/warning/strategy/edit';
 import Shield from '@/pages/warning/shield';
 import AddShield from '@/pages/warning/shield/add';
 import ShieldDetail from '@/pages/warning/shield/detail';
@@ -31,6 +32,7 @@ import EventDetail from '@/pages/event/detail';
 import Overview from '@/pages/overview';
 import historyEvents from '@/pages/historyEvents';
 import MonObjectManage from '@/pages/monObjectManage';
+import Demo from '@/pages/demo';
 
 import { dynamicPackages, Entry } from '@/utils';
 
@@ -80,6 +82,7 @@ export default function Content() {
   return (
     <div className='content'>
       <Switch>
+        <Route path='/demo' component={Demo} />
         <Route path='/login' component={Login} exact />
         <Route exact path='/overview' component={Overview} />
         <Route path='/metric/explorer' component={Explore} exact />
@@ -94,12 +97,8 @@ export default function Content() {
         <Route path='/indicator' component={IndicatorPage} />
         <Route path='/history-events' component={historyEvents} />
 
-        <Route
-          exact
-          path='/strategy/add/:group_id'
-          component={StrategyOperate}
-        />
-        <Route exact path='/strategy/edit/:id' component={StrategyOperate} />
+        <Route exact path='/strategy/add/:group_id' component={StrategyAdd} />
+        <Route exact path='/strategy/edit/:id' component={StrategyEdit} />
         <Route exact path='/strategy/:id?' component={Strategy} />
         <Route exact path='/shield' component={Shield} />
         <Route exact path='/shield/add/:from?' component={AddShield} />

@@ -36,7 +36,7 @@ export default function ChangePassword() {
           },
         ]}
       >
-        <Input placeholder={t('请输入旧密码')} />
+        <Input placeholder={t('请输入旧密码')} type='password' />
       </Form.Item>
       <Form.Item
         label={<span>{t('新密码')}:</span>}
@@ -49,7 +49,7 @@ export default function ChangePassword() {
           },
         ]}
       >
-        <Input placeholder={t('请输入新密码')} />
+        <Input placeholder={t('请输入新密码')} type='password' />
       </Form.Item>
       <Form.Item
         label={<span>{t('确认密码')}: </span>}
@@ -62,7 +62,7 @@ export default function ChangePassword() {
           },
         ]}
       >
-        <Input placeholder={t('再次输入新密码')} />
+        <Input placeholder={t('再次输入新密码')} type='password' />
       </Form.Item>
 
       <Form.Item>

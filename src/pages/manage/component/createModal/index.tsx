@@ -28,8 +28,16 @@ import { useTranslation } from 'react-i18next';
 
 const CreateModal: React.FC<ModalProps> = (props: ModalProps) => {
   const { t } = useTranslation();
-  const { visible, userType, onClose, action, userId, teamId, onSearch } =
-    props;
+  const {
+    visible,
+    userType,
+    onClose,
+    action,
+    userId,
+    teamId,
+    onSearch,
+    width,
+  } = props;
   const [selectedUser, setSelectedUser] = useState<string[]>();
   const userRef = useRef(null as any);
   const teamRef = useRef(null as any);
@@ -207,7 +215,7 @@ const CreateModal: React.FC<ModalProps> = (props: ModalProps) => {
     <Modal
       title={actionLabel()}
       visible={visible}
-      width={700}
+      width={width ? width : 700}
       onCancel={onClose}
       destroyOnClose={true}
       footer={[

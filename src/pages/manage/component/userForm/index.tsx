@@ -206,7 +206,7 @@ const UserForm = React.forwardRef<ReactNode, UserAndPasswordFormProps>(
                     <Form.Item
                       {...restField}
                       style={{
-                        width: '330px',
+                        width: '170px',
                       }}
                       name={[name, 'value']}
                       fieldKey={[fieldKey, 'value']}

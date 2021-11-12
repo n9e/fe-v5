@@ -107,18 +107,18 @@ const Resource: React.FC = () => {
       dataIndex: 'roles',
       render: (text: [], record) => text.join(', '),
     },
-    {
-      title: t('启用'),
-      width: '80px',
-      render: (text: string, record) => (
-        <Switch
-          checked={record.status === 0}
-          disabled={!profile.roles.includes('Admin')}
-          size='small'
-          onChange={() => handleChecked(record.status, record.id)}
-        />
-      ),
-    },
+    // {
+    //   title: t('启用'),
+    //   width: '80px',
+    //   render: (text: string, record) => (
+    //     <Switch
+    //       checked={record.status === 0}
+    //       disabled={!profile.roles.includes('Admin')}
+    //       size='small'
+    //       onChange={() => handleChecked(record.status, record.id)}
+    //     />
+    //   ),
+    // },
     {
       title: t('操作'),
       width: '240px',
@@ -268,7 +268,7 @@ const Resource: React.FC = () => {
       setTotal(data.dat.total);
 
       if (!teamId || isDelete) {
-        setTeamId(data.dat.list[0].id);
+        setTeamId(data.dat[0].id);
       }
     });
   };
@@ -559,6 +559,7 @@ const Resource: React.FC = () => {
         <UserInfoModal
           visible={visible}
           action={action as ActionType}
+          width={activeKey === UserType.User ? 500 : 700}
           userType={activeKey}
           onClose={handleClose}
           onSearch={(val) => {
