@@ -58,7 +58,7 @@ export const SelectList: React.FC<SelectListProps> = ({
 }) => {
   const [curSeletedKey, setCurSelectedKey] = useState<string | number>(
     defaultSelect && typeof defaultSelect === 'object'
-      ? defaultSelect[fieldNames.key || 'value'] || ''
+      ? defaultSelect[fieldNames.key || 'value']
       : defaultSelect,
   );
 

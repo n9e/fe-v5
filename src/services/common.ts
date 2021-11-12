@@ -1,6 +1,5 @@
 import request from '@/utils/request';
 import { RequestMethod } from '@/store/common';
-import { N9EAPI } from '../../config/constant';
 
 // 获取集群信息
 export function getCommonClusters() {
