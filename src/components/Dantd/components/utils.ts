@@ -1,4 +1,4 @@
-import locale from '@/components/dantd/components/locale';
+import locale from '@/components/Dantd/components/locale';
 
 export const intlZhMap = (k: string) => {
   return locale['zh-CN'][k];

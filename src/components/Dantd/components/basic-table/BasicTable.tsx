@@ -20,10 +20,10 @@ import { TableProps, ColumnProps } from 'antd/lib/table';
 import { TableRowSelection } from 'antd/lib/table/interface';
 import _ from 'lodash';
 import QueryForm, { IColumnsType } from '../query-form/QueryForm';
-import useDebounce from '@/components/dantd/hooks/use-debounce';
-import useDeepCompareEffect from '@/components/dantd/hooks/use-deep-compare-effect';
+import useDebounce from '@/components/Dantd/hooks/use-debounce';
+import useDeepCompareEffect from '@/components/Dantd/hooks/use-deep-compare-effect';
 import { pageSizeOptions, TSorterNames } from './config';
-import { intlZhMap } from '@/components/dantd/components/utils';
+import { intlZhMap } from '@/components/Dantd/components/utils';
 
 declare const ModeTypes: ['default', 'compact', string];
 export declare type ModeType = typeof ModeTypes[number];

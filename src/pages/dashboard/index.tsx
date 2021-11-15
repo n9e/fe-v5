@@ -36,12 +36,8 @@ import { Dashboard as DashboardType } from '@/store/dashboardInterface';
 import ImportAndDownloadModal, {
   ModalStatus,
 } from '@/components/ImportAndDownloadModal';
-import {
-  getTemplate,
-  getTemplateContent,
-  getSingleDashboard,
-} from '@/services/dashboard';
 import LeftTree from '@/components/LeftTree';
+import BlankBusinessPlaceholder from '@/components/BlankBusinessPlaceholder';
 import './index.less';
 import { useTranslation } from 'react-i18next';
 const { confirm } = Modal;
@@ -87,20 +83,26 @@ export default function Dashboard() {
 
   const create = async () => {
     let { name, tags } = form.getFieldsValue();
-    return createDashboard(busiId, {
-      name,
-      tags,
-    });
+    return (
+      busiId &&
+      createDashboard(busiId, {
+        name,
+        tags,
+      })
+    );
   };
 
   const edit = async () => {
     let { name, tags, id } = form.getFieldsValue();
     console.log(name, tags, id);
-    return updateSingleDashboard(busiId, id, {
-      name,
-      tags,
-      pure: true,
-    });
+    return (
+      busiId &&
+      updateSingleDashboard(busiId, id, {
+        name,
+        tags,
+        pure: true,
+      })
+    );
   };
 
   const handleEdit = (record: DashboardType) => {
@@ -113,8 +115,6 @@ export default function Dashboard() {
     setIsModalVisible(true);
     setEditing(true);
   };
-
-  const handleClone = (record: DashboardType) => {};
 
   const handleTagClick = (tag) => {
     const queryItem = query.length > 0 ? query.split(' ') : [];
@@ -192,7 +192,18 @@ export default function Dashboard() {
           </div>
           <div
             className='table-operator-area-normal'
-            onClick={() => handleClone(record)}
+            onClick={async () => {
+              confirm({
+                title: `${t('是否克隆大盘')}${record.name}?`,
+                onOk: async () => {
+                  await cloneDashboard(busiId as number, record.id);
+                  message.success(t('克隆大盘成功'));
+                  (ref?.current as any)?.refreshList();
+                },
+
+                onCancel() {},
+              });
+            }}
           >
             {t('克隆')}
           </div>
@@ -200,9 +211,9 @@ export default function Dashboard() {
             className='table-operator-area-warning'
             onClick={async () => {
               confirm({
-                title: `${t('是否删除大盘')}?${record.name}`,
+                title: `${t('是否删除大盘')}${record.name}?`,
                 onOk: async () => {
-                  await removeDashboard(record.id);
+                  await removeDashboard(busiId as number, record.id);
                   message.success(t('删除大盘成功'));
                   (ref?.current as any)?.refreshList();
                 },
@@ -226,12 +237,12 @@ export default function Dashboard() {
   const handleImportDashboard = (data) => {
     try {
       let importData = JSON.parse(data);
-      return importDashboard(importData).then(() =>
+      return importDashboard(busiId as number, importData).then(() =>
         (ref?.current as any)?.refreshList(),
       );
     } catch (err: any) {
       notification.error({
-        message: err?.message || t('您的网络发生异常，无法连接服务器'),
+        message: err?.message,
       });
       return Promise.reject(err);
     }
@@ -273,7 +284,10 @@ export default function Dashboard() {
                     icon={<UploadOutlined />}
                     onClick={async () => {
                       if (selectRowKeys.length) {
-                        let exportData = await exportDashboard(selectRowKeys);
+                        let exportData = await exportDashboard(
+                          busiId as number,
+                          selectRowKeys,
+                        );
                         setExportData(JSON.stringify(exportData.dat, null, 2));
                         setModalType(ModalStatus.Export);
                       } else {
@@ -306,10 +320,7 @@ export default function Dashboard() {
               }}
             ></BaseTable>
           ) : (
-            <div>
-              监控大盘需要归属某个业务组，请先
-              <Link to='/manage/business'>创建业务组</Link>
-            </div>
+            <BlankBusinessPlaceholder text='监控大盘' />
           )}
         </div>
       </div>

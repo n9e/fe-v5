@@ -21,17 +21,19 @@ export default function PromqlEditor(props: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const url = '/api/n9e/prometheus';
 
-  function myHTTPClient<T>(resource: string): Promise<T> {
-    return request(resource, {
-      method: RequestMethod.Get,
-      headers: { 'X-Cluster': xCluster },
+  function myHTTPClient(resource: string): Promise<Response> {
+    return fetch(resource, {
+      method: 'Get',
+      headers: new Headers({
+        'X-Cluster': xCluster,
+        Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
+      }),
     });
   }
-
   useEffect(() => {
-    // https://github.com/prometheus/codemirror-promql/blob/61e0126561f8e27bedb0e95a4e62c45a0551738c/src/client/prometheus.ts#L212
     const promQL = new PromQLExtension().setComplete({
       remote: { fetchFn: myHTTPClient, url },
+      // remote: { url: 'http://10.86.76.13:8090' },
     });
     const v = new EditorView({
       state: EditorState.create({

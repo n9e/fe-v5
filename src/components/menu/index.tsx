@@ -109,10 +109,10 @@ const SideMenu: FC = () => {
           <Menu.Item key='/history-events'>{t('执行历史')}</Menu.Item>
         </SubMenu>
 
-        <SubMenu icon={<UserOutlined />} title={t('用户管理')}>
-          <Menu.Item key='/manage/user'>{t('用户')}</Menu.Item>
-          <Menu.Item key='/manage/group'>{t('团队')}</Menu.Item>
-          <Menu.Item key='/manage/business'>{t('业务组')}</Menu.Item>
+        <SubMenu icon={<UserOutlined />} title={t('人员组织')}>
+          <Menu.Item key='/manage/user'>{t('用户管理')}</Menu.Item>
+          <Menu.Item key='/manage/group'>{t('团队管理')}</Menu.Item>
+          <Menu.Item key='/manage/business'>{t('业务组管理')}</Menu.Item>
         </SubMenu>
         {lazyMenu
           .sort((a, b) => b.weight - a.weight)

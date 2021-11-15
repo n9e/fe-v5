@@ -11,7 +11,7 @@ import {
   Space,
   Select,
 } from 'antd';
-import { getContactsList } from '@/services/manage';
+import { getNotifyChannels } from '@/services/manage';
 import { RootState, accountStoreState } from '@/store/accountInterface';
 import { ContactsItem } from '@/store/manageInterface';
 import { MinusCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
@@ -21,7 +21,7 @@ export default function Info() {
   const { t } = useTranslation();
   const [form] = Form.useForm();
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [contactsList, setContactsList] = useState<ContactsItem[]>([]);
+  const [contactsList, setContactsList] = useState<string[]>([]);
   let { profile } = useSelector<RootState, accountStoreState>(
     (state) => state.account,
   );
@@ -32,21 +32,18 @@ export default function Info() {
   const dispatch = useDispatch();
   useEffect(() => {
     const { id, nickname, email, phone, contacts, portrait } = profile;
-
-    // if (id) {
     form.setFieldsValue({
       nickname,
       email,
       phone,
       contacts,
     });
-    // }
     if (portrait.startsWith('http')) {
       setCustomAvatar(portrait);
     }
   }, [profile]);
   useEffect(() => {
-    getContactsList().then((data: Array<ContactsItem>) => {
+    getNotifyChannels().then((data: Array<string>) => {
       setContactsList(data);
     });
   }, []);
@@ -174,12 +171,12 @@ export default function Info() {
               Object.keys(profile.contacts)
                 .sort()
                 .map((key, i) => {
-                  let contact = contactsList.find((item) => item.key === key);
+                  let contact = contactsList.find((item) => item === key);
                   return (
                     <>
                       {contact ? (
                         <Form.Item
-                          label={contact.label + '：'}
+                          label={contact + '：'}
                           name={['contacts', key]}
                           key={i}
                         >
@@ -217,9 +214,9 @@ export default function Info() {
                           ]}
                         >
                           <Select placeholder={t('请选择联系方式')}>
-                            {contactsList.map((item, index) => (
-                              <Option value={item.key} key={index}>
-                                {item.label}
+                            {contactsList.map((item) => (
+                              <Option value={item} key={item}>
+                                {item}
                               </Option>
                             ))}
                           </Select>

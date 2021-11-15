@@ -105,7 +105,7 @@ export default function DashboardDetail() {
   };
 
   const handleModifyTitle = async (e) => {
-    await updateSingleDashboard(id, { ...dashboard, name: e.target.value });
+    // await updateSingleDashboard(id, { ...dashboard, name: e.target.value });
     await init();
     setTitleEditing(false);
   };
@@ -193,7 +193,7 @@ export default function DashboardDetail() {
   };
 
   const handleVariableChange = (value) => {
-    updateSingleDashboard(id, { ...dashboard, configs: JSON.stringify(value) });
+    // updateSingleDashboard(id, { ...dashboard, configs: JSON.stringify(value) });
     setVariableConfig(value);
   };
 

@@ -8,7 +8,7 @@ import './index.less';
 
 const CheckboxGroup = Checkbox.Group;
 const { Search } = Input;
-type ChangeFunction = (value: number, item?: object) => void;
+type ChangeFunction = (value: any, item?: any) => void;
 
 interface groupProps {
   isShow?: boolean;
@@ -44,7 +44,7 @@ interface SelectListProps {
   };
   defaultSelect?: object | string | number;
   allowNotSelect?: boolean;
-  onChange?: Function;
+  onChange?: ChangeFunction;
 }
 
 // 内容可选列表
@@ -101,9 +101,11 @@ const clustersGroupContent = (clusterGroup: groupProps): IGroupItemProps => {
   const [indeterminate, setIndeterminate] = useState<boolean>(true);
   const [checkAll, setCheckAll] = useState<boolean>(false);
   const onCheckAllChange = (e) => {
-    setCheckedList(e.target.checked ? clusters : []);
+    const curCheckedList = e.target.checked ? clusters : [];
+    setCheckedList(curCheckedList);
     setIndeterminate(false);
     setCheckAll(e.target.checked);
+    clusterGroup.onChange && clusterGroup.onChange(curCheckedList);
   };
 
   return {
@@ -209,11 +211,11 @@ const busiGroupContent = (busiGroupProps: {
             <SelectList
               dataSource={
                 showNotGroupItem
-                  ? [{ id: -1, name: '未归组对象' }].concat(filteredBusiGroups)
+                  ? [{ id: 0, name: '未归组对象' }].concat(filteredBusiGroups)
                   : filteredBusiGroups
               }
               fieldNames={{ key: 'id', label: 'name', value: 'id' }}
-              allowNotSelect={false}
+              allowNotSelect={showNotGroupItem}
               defaultSelect={initCurBusiItem}
               onChange={(value, item) => {
                 if (showNotGroupItem) {

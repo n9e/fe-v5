@@ -2,46 +2,14 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import PageLayout from '@/components/pageLayout';
-import {
-  Button,
-  Table,
-  Input,
-  Switch,
-  message,
-  List,
-  Row,
-  Col,
-  Pagination,
-  Modal,
-} from 'antd';
-import {
-  DeleteTwoTone,
-  EditOutlined,
-  DeleteOutlined,
-  SearchOutlined,
-  UserOutlined,
-  SmallDashOutlined,
-} from '@ant-design/icons';
+import { Button, Table, Input, Switch, message, List, Row, Col, Pagination, Modal } from 'antd';
+import { DeleteTwoTone, EditOutlined, DeleteOutlined, SearchOutlined, UserOutlined, SmallDashOutlined } from '@ant-design/icons';
 import BaseTable, { IBaseTableProps } from '@/components/BaseTable';
 import UserInfoModal from './component/createModal';
 import DelPopover from './component/delPopover';
 import { RootState, accountStoreState } from '@/store/accountInterface';
-import {
-  getUserInfoList,
-  getTeamInfoList,
-  getTeamInfo,
-  changeStatus,
-  deleteUser,
-  deleteTeam,
-  deleteMember,
-} from '@/services/manage';
-import {
-  User,
-  Team,
-  UserType,
-  ActionType,
-  TeamInfo,
-} from '@/store/manageInterface';
+import { getUserInfoList, getTeamInfoList, getTeamInfo, changeStatus, deleteUser, deleteTeam, deleteMember } from '@/services/manage';
+import { User, Team, UserType, ActionType, TeamInfo } from '@/store/manageInterface';
 import './index.less';
 import { ColumnsType } from 'antd/lib/table';
 import { color } from 'echarts';
@@ -74,9 +42,7 @@ const Resource: React.FC = () => {
   const [searchValue, setSearchValue] = useState<string>('');
   const [searchMemberValue, setSearchMemberValue] = useState<string>('');
   const userRef = useRef(null as any);
-  let { profile } = useSelector<RootState, accountStoreState>(
-    (state) => state.account,
-  );
+  let { profile } = useSelector<RootState, accountStoreState>((state) => state.account);
   const userColumn: ColumnsType<User> = [
     {
       title: t('用户名'),
@@ -107,35 +73,27 @@ const Resource: React.FC = () => {
       dataIndex: 'roles',
       render: (text: [], record) => text.join(', '),
     },
-    {
-      title: t('启用'),
-      width: '80px',
-      render: (text: string, record) => (
-        <Switch
-          checked={record.status === 0}
-          disabled={!profile.roles.includes('Admin')}
-          size='small'
-          onChange={() => handleChecked(record.status, record.id)}
-        />
-      ),
-    },
+    // {
+    //   title: t('启用'),
+    //   width: '80px',
+    //   render: (text: string, record) => (
+    //     <Switch
+    //       checked={record.status === 0}
+    //       disabled={!profile.roles.includes('Admin')}
+    //       size='small'
+    //       onChange={() => handleChecked(record.status, record.id)}
+    //     />
+    //   ),
+    // },
     {
       title: t('操作'),
       width: '240px',
       render: (text: string, record) => (
         <>
-          <Button
-            className='oper-name'
-            type='link'
-            onClick={() => handleClick(ActionType.EditUser, record.id)}
-          >
+          <Button className='oper-name' type='link' onClick={() => handleClick(ActionType.EditUser, record.id)}>
             {t('编辑')}
           </Button>
-          <Button
-            className='oper-name'
-            type='link'
-            onClick={() => handleClick(ActionType.Reset, record.id)}
-          >
+          <Button className='oper-name' type='link' onClick={() => handleClick(ActionType.Reset, record.id)}>
             {t('重置密码')}
           </Button>
           {/* <DelPopover
@@ -243,22 +201,12 @@ const Resource: React.FC = () => {
       if (isDeleteOrAdd) {
         setPageNumber(1);
       }
-      getTeamList(
-        undefined,
-        isDeleteOrAdd ? 1 : undefined,
-        undefined,
-        isDeleteOrAdd,
-      );
+      getTeamList(undefined, isDeleteOrAdd ? 1 : undefined, undefined, isDeleteOrAdd);
     }
   };
 
   // 获取团队列表
-  const getTeamList = (
-    isAppend = false,
-    p?: number,
-    search?: string,
-    isDelete?: boolean,
-  ) => {
+  const getTeamList = (isAppend = false, p?: number, search?: string, isDelete?: boolean) => {
     getTeamInfoList().then((data) => {
       if (isAppend) {
         setTeamList(teamList.concat(data.dat || []));
@@ -268,7 +216,7 @@ const Resource: React.FC = () => {
       setTotal(data.dat.total);
 
       if (!teamId || isDelete) {
-        setTeamId(data.dat.list[0].id);
+        setTeamId(data.dat[0].id);
       }
     });
   };
@@ -296,6 +244,7 @@ const Resource: React.FC = () => {
         let newList = allMemberList.filter(
           (item) =>
             item.username.indexOf(val) !== -1 ||
+            item.nickname.indexOf(val) !== -1 ||
             item.id.toString().indexOf(val) !== -1 ||
             item.phone.indexOf(val) !== -1 ||
             item.email.indexOf(val) !== -1,
@@ -363,40 +312,22 @@ const Resource: React.FC = () => {
   };
 
   return (
-    <PageLayout
-      title={activeKey === UserType.User ? t('用户管理') : t('团队管理')}
-      icon={<UserOutlined />}
-    >
+    <PageLayout title={activeKey === UserType.User ? t('用户管理') : t('团队管理')} icon={<UserOutlined />}>
       <div className='user-manage-content'>
         {activeKey === UserType.User && (
           <div className='user-content'>
             <Row className='event-table-search'>
               <div className='event-table-search-left'>
-                <Input
-                  className={'searchInput'}
-                  prefix={<SearchOutlined />}
-                  onPressEnter={onSearchQuery}
-                  placeholder={t('用户名、邮箱或手机')}
-                />
+                <Input className={'searchInput'} prefix={<SearchOutlined />} onPressEnter={onSearchQuery} placeholder={t('用户名、邮箱或手机')} />
               </div>
               <div className='event-table-search-right'>
-                {activeKey === UserType.User &&
-                  profile.roles.includes('Admin') && (
-                    <div className='user-manage-operate'>
-                      <Button
-                        type='primary'
-                        onClick={() =>
-                          handleClick(
-                            activeKey === UserType.User
-                              ? ActionType.CreateUser
-                              : t('创建团队'),
-                          )
-                        }
-                      >
-                        {t('创建用户')}
-                      </Button>
-                    </div>
-                  )}
+                {activeKey === UserType.User && profile.roles.includes('Admin') && (
+                  <div className='user-manage-operate'>
+                    <Button type='primary' onClick={() => handleClick(activeKey === UserType.User ? ActionType.CreateUser : t('创建团队'))}>
+                      {t('创建用户')}
+                    </Button>
+                  </div>
+                )}
               </div>
             </Row>
             <BaseTable
@@ -451,16 +382,10 @@ const Resource: React.FC = () => {
                   flex: 1,
                   overflow: 'auto',
                 }}
-                dataSource={teamList.filter((i) =>
-                  i.name.includes(searchValue),
-                )}
+                dataSource={teamList.filter((i) => i.name.includes(searchValue))}
                 size='small'
                 renderItem={(item) => (
-                  <List.Item
-                    key={item.id}
-                    className={teamId === item.id ? 'is-active' : ''}
-                    onClick={() => setTeamId(item.id)}
-                  >
+                  <List.Item key={item.id} className={teamId === item.id ? 'is-active' : ''} onClick={() => setTeamId(item.id)}>
                     {item.name}
                   </List.Item>
                 )}
@@ -532,9 +457,7 @@ const Resource: React.FC = () => {
                     className={'searchInput'}
                     onChange={(e) => setSearchMemberValue(e.target.value)}
                     placeholder={t('成员名、邮箱或手机')}
-                    onPressEnter={(e) =>
-                      handleSearch('member', searchMemberValue)
-                    }
+                    onPressEnter={(e) => handleSearch('member', searchMemberValue)}
                   />
                 </Col>
                 <Button
@@ -547,18 +470,14 @@ const Resource: React.FC = () => {
                 </Button>
               </Row>
 
-              <Table
-                rowKey='id'
-                columns={teamMemberColumns}
-                dataSource={memberList}
-                loading={memberLoading}
-              />
+              <Table rowKey='id' columns={teamMemberColumns} dataSource={memberList} loading={memberLoading} />
             </div>
           </div>
         )}
         <UserInfoModal
           visible={visible}
           action={action as ActionType}
+          width={activeKey === UserType.User ? 500 : 700}
           userType={activeKey}
           onClose={handleClose}
           onSearch={(val) => {
