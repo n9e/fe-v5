@@ -22,8 +22,8 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react",
-    "checkJs": true,
+    "jsx": "react-jsx",
+    "checkJs": false,
     "sourceMap": true,
     "strictFunctionTypes": false,
     "strictNullChecks": true
