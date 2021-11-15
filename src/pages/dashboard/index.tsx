@@ -3,39 +3,12 @@ import { useHistory, Link } from 'react-router-dom';
 import PageLayout from '@/components/pageLayout';
 import BaseTable, { IBaseTableProps } from '@/components/BaseTable';
 import { ColumnsType } from 'antd/lib/table';
-import {
-  getDashboard,
-  createDashboard,
-  cloneDashboard,
-  removeDashboard,
-  exportDashboard,
-  importDashboard,
-  updateSingleDashboard,
-} from '@/services/dashboard';
-import {
-  SearchOutlined,
-  DownOutlined,
-  FundOutlined,
-  FundViewOutlined,
-  DownloadOutlined,
-  UploadOutlined,
-} from '@ant-design/icons';
-import {
-  Button,
-  Modal,
-  Form,
-  Input,
-  Tag,
-  message,
-  Dropdown,
-  notification,
-  Select,
-} from 'antd';
+import { getDashboard, createDashboard, cloneDashboard, removeDashboard, exportDashboard, importDashboard, updateSingleDashboard } from '@/services/dashboard';
+import { SearchOutlined, DownOutlined, FundOutlined, FundViewOutlined, DownloadOutlined, UploadOutlined } from '@ant-design/icons';
+import { Button, Modal, Form, Input, Tag, message, Dropdown, notification, Select } from 'antd';
 import dayjs from 'dayjs';
 import { Dashboard as DashboardType } from '@/store/dashboardInterface';
-import ImportAndDownloadModal, {
-  ModalStatus,
-} from '@/components/ImportAndDownloadModal';
+import ImportAndDownloadModal, { ModalStatus } from '@/components/ImportAndDownloadModal';
 import LeftTree from '@/components/LeftTree';
 import BlankBusinessPlaceholder from '@/components/BlankBusinessPlaceholder';
 import './index.less';
@@ -138,10 +111,7 @@ export default function Dashboard() {
       render: (text: string, record: DashboardType) => {
         const { t } = useTranslation();
         return (
-          <div
-            className='table-active-text'
-            onClick={() => history.push('/dashboard/' + record.id)}
-          >
+          <div className='table-active-text' onClick={() => history.push(`/dashboard/${busiId}/${record.id}`)}>
             {text}
           </div>
         );
@@ -172,8 +142,7 @@ export default function Dashboard() {
     {
       title: t('更新时间'),
       dataIndex: 'update_at',
-      render: (text: number) =>
-        dayjs(text * 1000).format('YYYY-MM-DD HH:mm:ss'),
+      render: (text: number) => dayjs(text * 1000).format('YYYY-MM-DD HH:mm:ss'),
     },
     {
       title: t('发布人'),
@@ -184,10 +153,7 @@ export default function Dashboard() {
       width: '240px',
       render: (text: string, record: DashboardType) => (
         <div className='table-operator-area'>
-          <div
-            className='table-operator-area-normal'
-            onClick={() => handleEdit(record)}
-          >
+          <div className='table-operator-area-normal' onClick={() => handleEdit(record)}>
             {t('编辑')}
           </div>
           <div
@@ -237,9 +203,7 @@ export default function Dashboard() {
   const handleImportDashboard = (data) => {
     try {
       let importData = JSON.parse(data);
-      return importDashboard(busiId as number, importData).then(() =>
-        (ref?.current as any)?.refreshList(),
-      );
+      return importDashboard(busiId as number, importData).then(() => (ref?.current as any)?.refreshList());
     } catch (err: any) {
       notification.error({
         message: err?.message,
@@ -270,12 +234,7 @@ export default function Dashboard() {
               </Button>
               <div className={'table-more-options'}>
                 <Button.Group>
-                  <Button
-                    size='middle'
-                    type='default'
-                    icon={<DownloadOutlined />}
-                    onClick={() => setModalType(ModalStatus.Import)}
-                  >
+                  <Button size='middle' type='default' icon={<DownloadOutlined />} onClick={() => setModalType(ModalStatus.Import)}>
                     {t('导入')}
                   </Button>
                   <Button
@@ -284,10 +243,7 @@ export default function Dashboard() {
                     icon={<UploadOutlined />}
                     onClick={async () => {
                       if (selectRowKeys.length) {
-                        let exportData = await exportDashboard(
-                          busiId as number,
-                          selectRowKeys,
-                        );
+                        let exportData = await exportDashboard(busiId as number, selectRowKeys);
                         setExportData(JSON.stringify(exportData.dat, null, 2));
                         setModalType(ModalStatus.Export);
                       } else {
@@ -368,13 +324,7 @@ export default function Dashboard() {
           </Form.Item>
         </Form>
       </Modal>
-      <ImportAndDownloadModal
-        status={modalType}
-        onClose={() => setModalType(ModalStatus.None)}
-        onSubmit={handleImportDashboard}
-        title={t('大盘')}
-        exportData={exportData}
-      />
+      <ImportAndDownloadModal status={modalType} onClose={() => setModalType(ModalStatus.None)} onSubmit={handleImportDashboard} title={t('大盘')} exportData={exportData} />
     </PageLayout>
   );
 }

@@ -4,8 +4,6 @@ import { PromQLExtension } from 'codemirror-promql';
 import { basicSetup } from '@codemirror/basic-setup';
 import { EditorState } from '@codemirror/state';
 import { EditorView, ViewUpdate } from '@codemirror/view';
-import request from '@/utils/request';
-import { RequestMethod } from '@/store/common';
 
 interface Props {
   style?: object;
@@ -30,11 +28,11 @@ export default function PromqlEditor(props: Props) {
       }),
     });
   }
+  const promQL = new PromQLExtension().setComplete({
+    remote: { fetchFn: myHTTPClient, url },
+    // remote: { url: 'http://10.86.76.13:8090' },
+  });
   useEffect(() => {
-    const promQL = new PromQLExtension().setComplete({
-      remote: { fetchFn: myHTTPClient, url },
-      // remote: { url: 'http://10.86.76.13:8090' },
-    });
     const v = new EditorView({
       state: EditorState.create({
         doc: value,
@@ -52,11 +50,6 @@ export default function PromqlEditor(props: Props) {
     });
     setView(v);
   }, []);
-  return (
-    <div
-      ref={containerRef}
-      className={className}
-      style={Object.assign({ fontSize: 16 }, style)}
-    ></div>
-  );
+
+  return <div ref={containerRef} className={className} style={Object.assign({ fontSize: 16 }, style)}></div>;
 }

@@ -24,10 +24,16 @@ interface Layout {
   i: string;
 }
 
+type QLItem = {
+  PromQL: string;
+  Legend: string;
+};
+
 export interface ChartConfig {
   layout?: Layout;
   tags: object;
   prome_ql?: string[];
+  QL: QLItem[];
   classpath_id?: number;
   classpath_prefix?: Boolean;
   researces?: string[];

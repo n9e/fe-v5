@@ -7,11 +7,7 @@ import { ReloadOutlined, ShareAltOutlined } from '@ant-design/icons';
 import TagFilterForChart from '@/components/TagFilterForChart';
 import { Tag as TagType } from '@/store/chart';
 import { Checkbox, Tooltip, Button } from 'antd';
-import {
-  generateTimeStampRange,
-  isAbsoluteRange,
-  Range,
-} from '@/components/DateRangePicker';
+import { generateTimeStampRange, isAbsoluteRange, Range } from '@/components/DateRangePicker';
 import OrderSort from '@/components/OrderSort';
 import { SetTmpChartData } from '@/services/metric';
 import './index.less';
@@ -30,35 +26,21 @@ function Chart(props: Props) {
   const [refreshing, setRefreshing] = useState(false);
   const chartRef = useRef(null);
   const location = useLocation();
-  const {
-    metric,
-    description = '',
-    tags,
-    range,
-    limit,
-    idents,
-    classpath_id,
-    classpath_prefix,
-    prome_ql,
-    yplotline,
-    xplotline,
-    step,
-  } = options;
+  const { metric, description = '', tags, range, limit, idents, classpath_id, classpath_prefix, prome_ql, yplotline, xplotline, step } = options;
 
   const [privateTags, setPrivateTags] = useState<TagType[]>([]);
   const [multi, setMulti] = useState(false);
   const [sort, setSort] = useState<'desc' | 'asc'>('desc');
-  const [tooltipFormat, setTooltipFormat] = useState<'origin' | 'short'>(
-    'origin',
-  );
-  const [instance, setInstance] = useState<{
-    destroy: Function;
-    update: Function;
-    options: {
-      yAxis: object;
-      xAxis: object;
-    };
-  } | null>(null); // transfer Param and RangeItem into timestamp
+  const [tooltipFormat, setTooltipFormat] = useState<'origin' | 'short'>('origin');
+  const [instance, setInstance] =
+    useState<{
+      destroy: Function;
+      update: Function;
+      options: {
+        yAxis: object;
+        xAxis: object;
+      };
+    } | null>(null); // transfer Param and RangeItem into timestamp
 
   const formatDate = (r?: Range) => {
     let newR = r || range;
@@ -95,12 +77,7 @@ function Chart(props: Props) {
           return {
             metric: item,
             classpath_id,
-            classpath_prefix:
-              classpath_prefix === undefined
-                ? undefined
-                : classpath_prefix
-                ? 1
-                : 0,
+            classpath_prefix: classpath_prefix === undefined ? undefined : classpath_prefix ? 1 : 0,
             prome_ql,
             tags: newTags && newTags.length > 0 ? newTags : undefined,
             idents,
@@ -111,12 +88,7 @@ function Chart(props: Props) {
           return {
             metric,
             classpath_id,
-            classpath_prefix:
-              classpath_prefix === undefined
-                ? undefined
-                : classpath_prefix
-                ? 1
-                : 0,
+            classpath_prefix: classpath_prefix === undefined ? undefined : classpath_prefix ? 1 : 0,
             prome_ql: item,
             tags: newTags && newTags.length > 0 ? newTags : undefined,
             idents,
@@ -132,111 +104,112 @@ function Chart(props: Props) {
             idents,
           },
         ];
-    GetData({
-      params,
-      start,
-      end,
-      limit,
-      step,
-    }).then((data) => {
-      const dataY: DataSource[] = [];
-      data.dat.forEach((dataItem) => {
-        dataY.push({
-          name: dataItem.metric,
-          data: dataItem.values.map((item) => item.v),
-        });
-      });
-      const series: Array<any> = [];
-      data.dat.forEach((dataItem) => {
-        const { metric, values, tags } = dataItem;
-        const seriesData = values.map((item) => {
-          return {
-            timestamp: item.t * 1000,
-            value: item.v,
-          };
-        });
-        series.push({
-          name: (metric ? `【${metric}】` : '') + tags,
-          data: seriesData,
-        });
-      }); // if (chartRef.current) {
-      //   // @ts-ignore
-      //   chartRef.current.innerHTML = '';
-      // }
+    // GetData({
+    //   params,
+    //   start,
+    //   end,
+    //   limit,
+    //   step,
+    // }).then((data) => {
+    //   const dataY: DataSource[] = [];
+    //   data.dat.forEach((dataItem) => {
+    //     dataY.push({
+    //       name: dataItem.metric,
+    //       data: dataItem.values.map((item) => item.v),
+    //     });
+    //   });
+    //   const series: Array<any> = [];
+    //   data.dat.forEach((dataItem) => {
+    //     const { metric, values, tags } = dataItem;
+    //     const seriesData = values.map((item) => {
+    //       return {
+    //         timestamp: item.t * 1000,
+    //         value: item.v,
+    //       };
+    //     });
+    //     series.push({
+    //       name: (metric ? `【${metric}】` : '') + tags,
+    //       data: seriesData,
+    //     });
+    //   });
+    //   // if (chartRef.current) {
+    //   //   // @ts-ignore
+    //   //   chartRef.current.innerHTML = '';
+    //   // }
 
-      let graphOption = instance
-        ? {
-            series: series,
-            tooltip: {
-              precision: tooltipFormat,
-              shared: multi,
-              sharedSortDirection: sort,
-            },
-            // 必须xAxis和yAxis必须将属性返回
-            yAxis: {
-              ...instance.options.yAxis,
-              plotLines: yplotline
-                ? [
-                    {
-                      value: yplotline,
-                      color: 'red',
-                    },
-                  ]
-                : undefined,
-            },
-            xAxis: {
-              ...instance.options.xAxis,
-              plotLines: xplotline
-                ? [
-                    {
-                      value: xplotline * 1000,
-                      color: 'red',
-                    },
-                  ]
-                : undefined,
-            },
-          }
-        : {
-            timestamp: 'x',
-            xkey: 'timestamp',
-            ykey: 'value',
-            chart: {
-              renderTo: chartRef.current,
-            },
-            yAxis: {
-              plotLines: yplotline
-                ? [
-                    {
-                      value: yplotline,
-                      color: 'red',
-                    },
-                  ]
-                : undefined,
-            },
-            xAxis: {
-              plotLines: xplotline
-                ? [
-                    {
-                      value: xplotline * 1000,
-                      color: 'red',
-                    },
-                  ]
-                : undefined,
-            },
-            series: series,
-            tooltip: {
-              precision: tooltipFormat,
-              shared: multi,
-              sharedSortDirection: sort,
-            },
-          };
+    //   let graphOption = instance
+    //     ? {
+    //         series: series,
+    //         tooltip: {
+    //           precision: tooltipFormat,
+    //           shared: multi,
+    //           sharedSortDirection: sort,
+    //         },
+    //         // 必须xAxis和yAxis必须将属性返回
+    //         yAxis: {
+    //           ...instance.options.yAxis,
+    //           plotLines: yplotline
+    //             ? [
+    //                 {
+    //                   value: yplotline,
+    //                   color: 'red',
+    //                 },
+    //               ]
+    //             : undefined,
+    //         },
+    //         xAxis: {
+    //           ...instance.options.xAxis,
+    //           plotLines: xplotline
+    //             ? [
+    //                 {
+    //                   value: xplotline * 1000,
+    //                   color: 'red',
+    //                 },
+    //               ]
+    //             : undefined,
+    //         },
+    //       }
+    //     : {
+    //         timestamp: 'x',
+    //         xkey: 'timestamp',
+    //         ykey: 'value',
+    //         chart: {
+    //           renderTo: chartRef.current,
+    //         },
+    //         yAxis: {
+    //           plotLines: yplotline
+    //             ? [
+    //                 {
+    //                   value: yplotline,
+    //                   color: 'red',
+    //                 },
+    //               ]
+    //             : undefined,
+    //         },
+    //         xAxis: {
+    //           plotLines: xplotline
+    //             ? [
+    //                 {
+    //                   value: xplotline * 1000,
+    //                   color: 'red',
+    //                 },
+    //               ]
+    //             : undefined,
+    //         },
+    //         series: series,
+    //         tooltip: {
+    //           precision: tooltipFormat,
+    //           shared: multi,
+    //           sharedSortDirection: sort,
+    //         },
+    //       };
 
-      if (instance) {
-        instance.update(graphOption);
-      } else {
-        setInstance(new TsGraph(graphOption));
-      }
-    });
+    //   if (instance) {
+    //     instance.update(graphOption);
+    //   } else {
+    //     setInstance(new TsGraph(graphOption));
+    //   }
+    // });
   };
 
   useEffect(() => {
@@ -287,11 +260,7 @@ function Chart(props: Props) {
         title={
           <>
             <span>{t('SI格式化:')}</span>
-            <a
-              type='link'
-              href='https://en.wikipedia.org/wiki/Metric_prefix#List_of_SI_prefixes'
-              target='_blank'
-            >
+            <a type='link' href='https://en.wikipedia.org/wiki/Metric_prefix#List_of_SI_prefixes' target='_blank'>
               {t('文档')}
             </a>
           </>
@@ -322,9 +291,7 @@ function Chart(props: Props) {
                 size='small'
                 onClick={async (e) => {
                   e.preventDefault();
-                  let { dat: ids } = await SetTmpChartData([
-                    { configs: JSON.stringify({ title, options, barControl }) },
-                  ]);
+                  let { dat: ids } = await SetTmpChartData([{ configs: JSON.stringify({ title, options, barControl }) }]);
                   window.open('/chart/' + ids);
                 }}
               >
@@ -336,11 +303,7 @@ function Chart(props: Props) {
       )}
       {!barControl && (
         <div className='chart-filter'>
-          <ReloadOutlined
-            className='refresh'
-            spin={refreshing}
-            onClick={handleRefresh}
-          />
+          <ReloadOutlined className='refresh' spin={refreshing} onClick={handleRefresh} />
           {renderMultiOrSort}
           {!prome_ql && (
             <TagFilterForChart
@@ -356,9 +319,7 @@ function Chart(props: Props) {
         </div>
       )}
 
-      {barControl === 'multiOrSort' && (
-        <div className='chart-filter'>{renderMultiOrSort}</div>
-      )}
+      {barControl === 'multiOrSort' && <div className='chart-filter'>{renderMultiOrSort}</div>}
 
       <div ref={chartRef} className='chart-content'></div>
     </div>
@@ -366,11 +327,7 @@ function Chart(props: Props) {
 }
 
 function areEqual(pre, next) {
-  return (
-    pre.cached &&
-    pre.options.range === next.options.range &&
-    pre.options.step === next.options.step
-  );
+  return pre.cached && pre.options.range === next.options.range && pre.options.step === next.options.step;
 }
 
 export default memo(Chart, areEqual);

@@ -77,7 +77,7 @@ export default function Content() {
         <Route path='/account/profile/:tab' component={Profile} />
         <Route path='/manage/business' component={Business} />
         <Route path='/manage/:type' component={Manage} />
-        <Route path='/dashboard/:id' component={DashboardDetail} />
+        <Route path='/dashboard/:busiId/:id' component={DashboardDetail} />
         <Route path='/dashboard' component={Dashboard} />
         <Route path='/chart/:ids' component={Chart} />
         <Route path='/resource/:id?' component={ResourcePage} />
