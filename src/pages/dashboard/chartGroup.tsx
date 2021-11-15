@@ -468,7 +468,7 @@ export default function ChartGroup(props: Props) {
             }}
             key={String(i)}
           >
-            <D3Chart
+            {/* <D3Chart
               barControl='multiOrSort'
               title={chartConfigs[i].configs.name}
               rightBar={
@@ -521,7 +521,7 @@ export default function ChartGroup(props: Props) {
                 step,
                 limit: 50,
               }}
-            />
+            /> */}
           </div>
         );
       })
