@@ -9,6 +9,7 @@ import type {
   TagValuesRes,
 } from '@/store/warningInterface';
 import { PAGE_SIZE } from '@/utils/constant';
+import React from 'react';
 
 // 获得策略分组列表
 export const getStrategyGroupList = function (query?: string, p = 1) {
@@ -141,18 +142,23 @@ export const getWarningStrategy = function (id): Promise<any> {
 //   });
 // };
 
-export const addOrEditStrategy = function (data: any[], strategyId: number) {
-  return request(`/api/n9e/busi-group/${strategyId}/alert-rules`, {
-    method: RequestMethod.Post,
+export const addOrEditStrategy = function (data: any[], busiId: number, method: string) {
+  return request(`/api/n9e/busi-group/${busiId}/alert-rules`, {
+    method: method,
+    data: data,
+  });
+};
+export const EditStrategy = function (data: any[], busiId: number, strategyId: number) {
+  return request(`/api/n9e/busi-group/${busiId}/alert-rule/${strategyId}`, {
+    method: RequestMethod.Put,
     data: data,
   });
 };
 
 export const deleteStrategy = function (ids: number[],  strategyId: number) {
   return request(`/api/n9e/busi-group/${strategyId}/alert-rules`, {
-
     method: RequestMethod.Delete,
-    data: {ids}
+    data: { ids }
   });
 };
 
@@ -160,6 +166,22 @@ export const batchDeleteStrategy = function (ruleId, ids: Array<number>) {
   return request(`/api/n9e/alert-rule-group/${ruleId}/alert-rules`, {
     method: RequestMethod.Delete,
     data: { ids },
+  });
+};
+
+/**
+ * 批量更新规则
+ */
+ export const updateAlertRules = function (
+  data: {
+    ids: React.Key[],
+    fields: any
+  },
+  busiId: number
+) {
+  return request(`/api/n9e/busi-group/${busiId}/alert-rules/fields`, {
+    method: RequestMethod.Put,
+    data: data,
   });
 };
 
@@ -206,6 +228,7 @@ export const deleteAlertEvents = function (ids: Array<number>) {
     },
   });
 };
+
 
 /**
  * 批量更新告警策略状态

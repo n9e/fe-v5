@@ -34,7 +34,7 @@ import { RootState } from '@/store/common';
 import { warningStoreState, Metric } from '@/store/warningInterface';
 import { CommonStoreState } from '@/store/commonInterface';
 import { getTeamInfoList, getNotifiesList } from '@/services/manage';
-import { addOrEditStrategy } from '@/services/warning';
+import { addOrEditStrategy, EditStrategy } from '@/services/warning';
 import PromqlEditor from '@/components/PromqlEditor';
 import ChartDrawer from './Drawer';
 
@@ -54,7 +54,7 @@ const tailLayout = {
 };
 
 interface Props {
-  detail?: object;
+  detail?: any;
   type?: number; // 1:编辑 2:克隆
 }
 
@@ -66,20 +66,34 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
   const { clusters: clusterList } = useSelector<RootState, CommonStoreState>(
     (state) => state.common,
   );
-  const { currentGroup } = useSelector<RootState, warningStoreState>(
-    (state) => state.strategy,
-  );
+  const { curBusiItem } = useSelector<RootState, CommonStoreState>(state => state.common);
+  
   const [metricsDrawer, setMetricsDrawer] = useState<Array<Metric>>([]);
   const [drawerVisible, setDrawerVisible] = useState<boolean>(false);
   const [yplotline, setYplotline] = useState<number>(0);
   const [contactList, setInitContactList] = useState([]);
   const [notifyGroups, setNotifyGroups] = useState([]);
+  const [initVal, setInitVal] = useState<any>({});
 
   useEffect(() => {
     getNotifyChannel();
     getGroups();
+    
     return () => {};
   }, []);
+
+  useEffect(() => {
+    const data = {
+      ...detail,
+      enable_time: detail?.enable_stime ? [detail.enable_stime, detail.enable_etime] : [],
+      enable_status: detail?.disabled === undefined ? true : !detail?.disabled
+    }
+    setInitVal(data);
+    console.log('detail', data)
+    return () => {
+      
+    }
+  }, [JSON.stringify(detail)])
 
   const enableDaysOfWeekOptions = [
     t('周日'),
@@ -147,22 +161,38 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
         enable_etime: values.enable_time[1].format('HH:mm'),
         disabled: !values.enable_status ? 1 : 0,
       };
-      const { dat } = await addOrEditStrategy([data], currentGroup.id);
-      let errorNum = 0;
-      const msg = Object.keys(dat).map((key) => {
-        dat[key] && errorNum++;
-        return (
-          <p style={{ color: dat[key] ? '#ff4d4f' : '#52c41a' }}>
-            {key}: {dat[key] ? dat[key] : 'successfully'}
-          </p>
-        );
-      });
-      notification.info({
-        message: msg,
-      });
-      if (!errorNum) {
-        history.push('/strategy');
+      let reqBody, method = 'Post';
+      if (type === 1) {
+        reqBody = data;
+        method = 'Put';
+        const res = await EditStrategy(reqBody, curBusiItem.id, detail.id);
+        if (res.err) {
+          message.error(res.error);
+        } else {
+          message.success('编辑成功！');
+          history.push('/strategy');
+        }
+      } else {
+        reqBody = [data];
+        const { dat } = await addOrEditStrategy(reqBody, curBusiItem.id, method);
+        let errorNum = 0;
+        const msg = Object.keys(dat).map((key) => {
+          dat[key] && errorNum++;
+          return (
+            <p style={{ color: dat[key] ? '#ff4d4f' : '#52c41a' }}>
+              {key}: {dat[key] ? dat[key] : 'successfully'}
+            </p>
+          );
+        });
+        notification.info({
+          message: msg,
+        });
+        if (!errorNum) {
+          history.push('/strategy');
+        }
       }
+      
+      
     });
   };
 
@@ -177,11 +207,14 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
         initialValues={{
           prom_eval_interval: 15,
           disabled: 0, // 0:立即启用 1:禁用  待修改
-          enable_status: true,
+          // enable_status: true,
           notify_recovered: 1, // 1:启用
-          enable_time: '', // 待修改
+          // enable_time: '', // 待修改
           cluster: 'Default', // 生效集群
           enable_days_of_week: ['1', '2', '3', '4', '5', '6', '0'],
+          ...detail,
+          enable_time: detail?.enable_stime ? [moment(detail.enable_stime, 'HH:mm'), moment(detail.enable_etime, 'HH:mm')] : [moment('00:00', 'HH:mm'), moment('23:59', 'HH:mm')],
+          enable_status: detail?.disabled === undefined ? true : !detail?.disabled
         }}
       >
         <Space direction='vertical' style={{ width: '100%' }}>
@@ -506,6 +539,7 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
           </Form.Item>
         </Space>
       </Form>
+      
     </div>
   );
 };

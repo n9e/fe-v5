@@ -27,32 +27,23 @@ import {
   getStrategyGroup,
   updateAlertEventsStatus,
   batchDeleteStrategy,
-  updateAlertEventsAppendTags,
-  updateAlertEventsNotifyChannels,
-  updateAlertEventsNotifyGroups,
+  updateAlertRules
 } from '@/services/warning';
 import SearchInput from '@/components/BaseSearchInput';
 import { useHistory } from 'react-router-dom';
-import {
-  getNotifiesList,
-  getTeamInfoList,
-  getUserInfoList,
-} from '@/services/manage';
+
 import FormButtonModal from '@/components/BaseModal/formButtonModal';
 import {
   strategyItem,
-  strategyGroupItemBase,
   strategyStatus,
-  warningStoreState,
 } from '@/store/warningInterface';
+import { CommonStoreState } from '@/store/commonInterface';
 import { addOrEditStrategy, deleteStrategy } from '@/services/warning';
 import { priorityColor } from '@/utils/constant';
 import { ColumnType } from 'antd/lib/table';
 import { pageSizeOptionsDefault } from '../const';
 import dayjs from 'dayjs';
 import { RootState } from '@/store/common';
-import { createGroupModel } from './constant';
-import { Team } from '@/store/manageInterface';
 import RefreshIcon from '@/components/RefreshIcon';
 import ColorTag from '@/components/ColorTag';
 import {
@@ -60,10 +51,10 @@ import {
   DeleteOutlined,
   ExclamationCircleOutlined,
 } from '@ant-design/icons';
-import { getTemplate, getTemplateContent } from '@/services/dashboard';
 import ImportAndDownloadModal, {
   ModalStatus,
 } from '@/components/ImportAndDownloadModal';
+import EditModal from './components/editModal';
 const { Option } = Select;
 const { confirm } = Modal;
 const type = 'alert_rule';
@@ -83,82 +74,53 @@ const exportIgnoreAttrsObj = Object.fromEntries(
   exportIgnoreAttrs.map((item) => [item, undefined]),
 );
 
-const PageTable: React.FC = () => {
+interface Props {
+  bgid?: number;
+  clusters?: string[];
+}
+
+const PageTable: React.FC<Props> = ({
+  bgid,
+  clusters
+}) => {
   const { t, i18n } = useTranslation();
   const history = useHistory();
-  const tableRef = useRef(null);
   const dispatch = useDispatch();
-  const exportTextRef = useRef(null as any);
   const [modalType, setModalType] = useState<ModalStatus>(ModalStatus.None);
-  const [teamList, setTeamList] = useState<Array<Team>>([]);
-  const [init, setInit] = useState<boolean>(false);
   const [selectRowKeys, setSelectRowKeys] = useState<React.Key[]>([]);
   const [selectedRows, setSelectedRows] = useState<strategyItem[]>([]);
   const [exportData, setExportData] = useState<string>('');
-  const [groupItemBase, setGroupItemBase] = useState<
-    Partial<strategyGroupItemBase>
-  >({});
-  const { currentGroup } = useSelector<RootState, warningStoreState>(
-    (state) => state.strategy,
-  );
-  const [defaultOptions, setDefaultOptions] = useState<string[]>([]);
+  const { curBusiItem } = useSelector<RootState, CommonStoreState>(state => state.common);
+
   const [query, setQuery] = useState<string>('');
-  const [isDesc, setIsDesc] = useState<boolean>(false);
   const [FetchList, setFetchList] = useState<strategyItem[]>([]);
   const [isModalVisible, setisModalVisible] = useState<boolean>(false);
-  const [allTodoTittle, setallTodoTittle] = useState<string>('');
-  const [ids, setIds] = useState<number[]>([]);
-  const [AllStatus, setAllStatus] = useState<number>(1);
-  const [currentItems, setCurrentItems] = useState<number>(0);
-  const [notifyUsers, setnotifyUsers] = useState<string>('');
+  
   const [allGroups, setallGroups] = useState([]);
   const [allnotifyUsers, setallnotifyUsers] = useState([]);
 
-  const [notifyGroups, setnotifyGroups] = useState<string>('');
-  const [notifyChannels, setnotifyChannels] = useState<string>('');
   const [allChannels, setallChannels] = useState([]);
-  const [appendTags, setnappendTags] = useState<string>('');
 
   const [currentStrategyDataAll, setCurrentStrategyDataAll] = useState([]);
   const [currentStrategyData, setCurrentStrategyData] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // getTeamInfoList().then((res) => {
-    //   setallGroups(res.dat.list);
-    // });
-    // getUserInfoList().then((res) => {
-    //   setallnotifyUsers(res.dat.list);
-    // });
-    // getNotifiesList().then((res) => {
-    //   setallChannels(res);
-    // });
-  }, []);
-
-  useEffect(() => {
-    // getTemplate(type).then((res) => {
-    //   setDefaultOptions(res.dat);
-    // });
-    // getTeamInfoList().then((data) => {
-    //   setTeamList(data?.dat?.list || []);
-    // });
-    getAlertRules();
-  }, []);
-  useEffect(() => {
-    if (currentGroup?.id) {
-      // getGroupItemBaseData();
-      setInit(true);
+    if (bgid) {
       getAlertRules();
     }
-  }, [currentGroup?.id]);
+  }, [bgid]);
 
   useEffect(() => {
     filterData();
-  }, [query, currentStrategyDataAll])
+  }, [query, clusters, currentStrategyDataAll])
 
   const getAlertRules = async () => {
+    if (!bgid) {
+      return;
+    }
     setLoading(true);
-    const { success, dat } = await getStrategyGroupSubList({id: currentGroup?.id || 1});
+    const { success, dat } = await getStrategyGroupSubList({id: bgid});
     console.log(dat)
     if (success) {
       setCurrentStrategyDataAll(dat || []);
@@ -169,31 +131,19 @@ const PageTable: React.FC = () => {
 
   const filterData = () => {
     const data = JSON.parse(JSON.stringify(currentStrategyDataAll));
-    console.log(query)
     const res = data.filter(item => {
-      return item.name.indexOf(query) > -1 || item.append_tags.indexOf(query) > -1
-    })
+      return item.name.indexOf(query) > -1 || item.append_tags.indexOf(query) > -1 || clusters && clusters?.indexOf(item.cluster) > -1
+    });
+    console.log('filterData:', res);
     setCurrentStrategyData(res || []);
   }
 
-  const getGroupItemBaseData = () => {
-    if (currentGroup?.id) {
-      getStrategyGroup(currentGroup.id).then((res) => {
-        const { success, dat } = res;
-
-        if (success) {
-          setGroupItemBase(dat);
-        }
-      });
-    }
-  };
-
   const goToAddWarningStrategy = () => {
-    currentGroup?.id && history.push(`/strategy/add/${currentGroup.id}`);
+    curBusiItem?.id && history.push(`/strategy/add/${curBusiItem.id}`);
   };
 
   const handleClickEdit = (id, isClone = false) => {
-    currentGroup?.id &&
+    curBusiItem?.id &&
       history.push(`/strategy/edit/${id}${isClone ? '?mode=clone' : ''}`);
   };
 
@@ -201,22 +151,7 @@ const PageTable: React.FC = () => {
     getAlertRules();
   };
 
-  const handleDelete = (e) => {
-    e.stopPropagation();
-    confirm({
-      title: t('是否确定删除该策略分组?'),
-      icon: <ExclamationCircleOutlined />,
-      onOk: () => {
-        dispatch({
-          type: `strategy/deleteGroup`,
-          id: currentGroup?.id,
-        });
-      },
-
-      onCancel() {},
-    });
-  };
-
+  
   const columns: ColumnType<strategyItem>[] = [
     {
       title: t('集群'),
@@ -336,7 +271,7 @@ const PageTable: React.FC = () => {
                 confirm({
                   title: t('是否删除该告警规则?'),
                   onOk: () => {
-                    deleteStrategy([record.id], currentGroup.id).then(() => {
+                    deleteStrategy([record.id], curBusiItem.id).then(() => {
                       message.success(t('删除成功'));
                       refreshList();
                     });
@@ -353,46 +288,7 @@ const PageTable: React.FC = () => {
       },
     },
   ];
-  const editModel = useCallback(() => {
-    return createGroupModel(
-      false,
-      teamList,
-      t,
-      { ...groupItemBase, id: currentGroup?.id },
-      () => {
-        getGroupItemBaseData();
-      },
-    );
-  }, [teamList, groupItemBase, currentGroup?.id]);
-  const toStr = (selectedRows, name, isStr = false) => {
-    if (!isStr) {
-      let set = new Set(
-        selectedRows
-          .map((ele) => ele[name])
-          .join(' ')
-          .split(' '),
-      );
-      return Array.from(set).join(' ').trim().replace(/\s+/g, ' ');
-    } else {
-      let arr = selectedRows.map((ele) => ele[name].split(' '));
-      return Array.from(
-        new Set(arr.toString().replace(/\,+/g, ' ').trim().split(' ')),
-      ).join(' ');
-    }
-  };
-  // const toVal = (Name, name) => {
-  //   let arr = selectedRows
-  //     .map((ele) => {
-  //       return ele[Name];
-  //     })
-  //     .filter((ele) => {
-  //       return ele != null;
-  //     });
-  //   let res = [];
-
-  //   toOneArr(arr, res, name);
-  //   return Array.from(new Set(res));
-  // };
+  
   const toOneArr = (arr, res, name) => {
     arr.forEach((ele) => {
       if (Array.isArray(ele)) {
@@ -407,73 +303,9 @@ const PageTable: React.FC = () => {
       message.warning(t('请先选择策略'));
       return;
     }
-    console.log(FetchList);
-    let _selectRows: strategyItem[] = [];
-    FetchList.forEach((ele, index) => {
-      if (selectRowKeys.indexOf(ele.id) !== -1) {
-        _selectRows.push(ele);
-      }
-    }); //通过selectRowKeys筛选最新返回的list
-
-    let ids = _selectRows.map((ele) => ele.id);
-    let notifyUsers = toStr(_selectRows, 'notify_users');
-    let _notifyGroups = toStr(_selectRows, 'notify_groups');
-    let notifyChannels = toStr(_selectRows, 'notify_channels', true);
-    let appendTags = toStr(_selectRows, 'append_tags', true);
-
-    console.log(_notifyGroups, 'notifyGroups');
-
-    setIds(ids);
-    setnotifyUsers(notifyUsers);
-    setnotifyGroups(_notifyGroups);
-    setnotifyChannels(notifyChannels);
-    setnappendTags(appendTags);
-    setCurrentItems(item);
-    setallTodoTittle(title);
     setisModalVisible(true);
   };
-  const modelOk = () => {
-    switch (currentItems) {
-      case 1:
-        updateAlertEventsNotifyGroups([...ids], notifyGroups, notifyUsers).then(
-          () => {
-            setisModalVisible(false);
-            message.success(t('修改接受者成功'));
-            refreshList();
-          },
-        );
-        break;
-      case 2:
-        updateAlertEventsNotifyChannels([...ids], notifyChannels).then(() => {
-          setisModalVisible(false);
-          message.success(t('修改媒介成功'));
-          refreshList();
-        });
-        break;
-      case 3:
-        updateAlertEventsStatus(
-          [...ids],
-          AllStatus === strategyStatus.Enable
-            ? strategyStatus.UnEnable
-            : strategyStatus.Enable,
-        ).then(() => {
-          setisModalVisible(false);
-          message.success(t('修改启停成功'));
-
-          refreshList();
-        });
-        break;
-      case 4:
-        updateAlertEventsAppendTags([...ids], appendTags).then(() => {
-          setisModalVisible(false);
-          message.success(t('修改附加标签成功'));
-          refreshList();
-        });
-        break;
-      default:
-        break;
-    }
-  };
+  
 
   const notifyGroupsOptions = allGroups.map((ele: { id; name }, index) => (
     <Option value={ele.id} key={index}>
@@ -494,26 +326,7 @@ const PageTable: React.FC = () => {
       </Checkbox>
     );
   });
-  const selectGroup = (val, options) => {
-    setnotifyGroups(val.join(' '));
-  };
-  const selectUsers = (val, options) => {
-    setnotifyUsers(val.join(' '));
-  };
-  const checkChannels = (val) => {
-    console.log(val);
-    setnotifyChannels(val.join(' '));
-  };
-  const handleTagsChange = (value: string[]) => {
-    let top: string = value[value.length - 1];
-    let reg = /\w+=\w+/;
-    if (top && !reg.test(top)) {
-      let v = value.pop();
-      message.error(`"${v}"${t('不符合输入规范(格式为key=value)')}`);
-    }
-
-    setnappendTags(value.join(' '));
-  };
+  
   const menu = useMemo(() => {
     return (
       <ul className='ant-dropdown-menu'>
@@ -521,7 +334,7 @@ const PageTable: React.FC = () => {
           className='ant-dropdown-menu-item'
           onClick={() => setModalType(ModalStatus.Import)}
         >
-          <span>{t('导入规则')}</span>
+          <span>{t('导入告警规则')}</span>
         </li>
         <li
           className='ant-dropdown-menu-item'
@@ -538,7 +351,7 @@ const PageTable: React.FC = () => {
             }
           }}
         >
-          <span>{t('导出规则')}</span>
+          <span>{t('导出告警规则')}</span>
         </li>
         <li
           className='ant-dropdown-menu-item'
@@ -549,7 +362,7 @@ const PageTable: React.FC = () => {
                 onOk: () => {
                   deleteStrategy(
                     selectRowKeys as number[],
-                    currentGroup?.id,
+                    curBusiItem?.id,
                   ).then(() => {
                     message.success(t('删除成功'));
                     refreshList();
@@ -563,70 +376,29 @@ const PageTable: React.FC = () => {
             }
           }}
         >
-          <span>{t('批量删除')}</span>
+          <span>{t('批量删除规则')}</span>
         </li>
         <li
           className='ant-dropdown-menu-item'
           onClick={() => {
-            openModel(t('修改告警接受者'), 1);
+            openModel(t('批量更新规则'), 1);
           }}
         >
-          <span>{t('修改告警接受者')}</span>
+          <span>{t('批量更新规则')}</span>
         </li>
-        <li
-          className='ant-dropdown-menu-item'
-          onClick={() => {
-            openModel(t('通知媒介'), 2);
-          }}
-        >
-          <span>{t('修改通知媒介')}</span>
-        </li>
-        <li
-          className='ant-dropdown-menu-item'
-          onClick={() => {
-            openModel(t('策略启用控制'), 3);
-          }}
-        >
-          <span>{t('策略启用控制')}</span>
-        </li>
-        <li
-          className='ant-dropdown-menu-item'
-          onClick={() => {
-            openModel(t('附加标签'), 4);
-          }}
-        >
-          <span>{t('修改附加标签')}</span>
-        </li>
+        
       </ul>
     );
   }, [selectRowKeys, FetchList, t]);
 
-  // const defaultStrategyMenu = (
-  //   <ul className='ant-dropdown-menu'>
-  //     {defaultOptions.map((item, index) => (
-  //       <li className='ant-dropdown-menu-item' key={index}>
-  //         <span onClick={() => handleImportDefault(item)}>{item}</span>
-  //       </li>
-  //     ))}
-  //   </ul>
-  // );
-
-  // const handleImportDefault = async (name) => {
-  //   let { dat: content } = await getTemplateContent(type, name);
-  //   await addOrEditStrategy(
-  //     content.map((item) => ({ ...item, group_id: currentGroup?.id })),
-  //   );
-  //   refreshList();
-  // };
-
   const handleImportStrategy = async (data) => {
     try {
       let importData = JSON.parse(data);
-      console.log(currentGroup)
+      console.log(curBusiItem)
 
-      // return addOrEditStrategy(importData, String(currentGroup.id))
+      // return addOrEditStrategy(importData, String(curBusiItem.id))
 
-      const { dat } = await addOrEditStrategy(importData, currentGroup.id);
+      const { dat } = await addOrEditStrategy(importData, curBusiItem.id, 'Post');
       console.log('导入接口返回', dat);
       const msg = Object.keys(dat).map(key => {
         return <p style={{color: dat[key] ? '#ff4d4f' : '#52c41a'}}>{key}: {dat[key] ? dat[key] : 'successfully'}</p>
@@ -641,29 +413,29 @@ const PageTable: React.FC = () => {
     }
   };
 
+  const editModalFinish = async (isOk, fieldsData?) => {
+    console.log(isOk, fieldsData);
+    if (isOk) {
+      const res = await updateAlertRules({
+        ids: selectRowKeys,
+        fields: fieldsData
+      }, curBusiItem.id)
+      if (!res.err) {
+        message.success('修改成功！');
+        refreshList();
+        setisModalVisible(false);
+      } else {
+        message.error(res.err);
+      }
+      
+    } else {
+      setisModalVisible(false);
+    }
+  }
+
   return (
     <div className='strategy-table-content'>
-      {/* <div className='strategy-table-title'>
-        <div className='strategy-table-title-label'>
-          {currentGroup?.name || ''}
-          <FormButtonModal {...editModel()}></FormButtonModal>
-          {currentGroup && (
-            <DeleteOutlined
-              onClick={handleDelete}
-              style={{
-                marginLeft: 8,
-              }}
-            />
-          )}
-        </div>
-        <div className='strategy-table-title-sub'>
-          <div className='strategy-table-title-sub-item'>
-            {t('管理团队')}：
-            {groupItemBase?.user_groups?.map((item) => item.name).join(' ') ||
-              '-'}
-          </div>
-        </div>
-      </div> */}
+      
       <div className='strategy-table-search table-handle'>
         <div className='strategy-table-search-left'>
           <RefreshIcon
@@ -689,16 +461,7 @@ const PageTable: React.FC = () => {
             {t('新增告警策略')}
           </Button>
           <div className={'table-more-options'}>
-            {/* <Dropdown overlay={defaultStrategyMenu} trigger={['click']}>
-              <Button onClick={(e) => e.stopPropagation()}>
-                {t('导入内置策略')}
-                <DownOutlined
-                  style={{
-                    marginLeft: 2,
-                  }}
-                />
-              </Button>
-            </Dropdown> */}
+            
             <Dropdown overlay={menu} trigger={['click']}>
               <Button onClick={(e) => e.stopPropagation()}>
                 {t('更多操作')}
@@ -712,31 +475,7 @@ const PageTable: React.FC = () => {
           </div>
         </div>
       </div>
-      {/* <BaseTable
-        ref={tableRef}
-        rowKey='id'
-        columns={columns}
-        fetchParams={{ id: currentGroup?.id || 1, query }}
-        onFetchList={(res: strategyItem[]) => {
-          setFetchList(res);
-        }}
-        fePaging
-        autoFetch={false}
-        initFetch={init}
-        feQueryParams={['name']}
-        fetchHandle={getStrategyGroupSubList}
-        rowSelection={{
-          selectedRowKeys: selectRowKeys,
-          onChange: (
-            selectedRowKeys: React.Key[],
-            selectedRows: strategyItem[],
-          ) => {
-            setSelectRowKeys(selectedRowKeys);
-            console.log(selectedRowKeys, 'selectedRowKeys');
-            setSelectedRows(selectedRows);
-          },
-        }}
-      ></BaseTable> */}
+      
       <Table
         rowKey="id"
         // sticky
@@ -772,131 +511,7 @@ const PageTable: React.FC = () => {
         title={t('策略')}
         exportData={exportData}
       />
-      <Modal
-        title={allTodoTittle}
-        visible={isModalVisible}
-        onOk={modelOk}
-        onCancel={() => {
-          setisModalVisible(false);
-        }}
-      >
-        {(() => {
-          switch (currentItems) {
-            case 1:
-              return (
-                <>
-                  <Row align='middle'>
-                    <Col span={4} style={{ textAlign: 'center' }}>
-                      <span>{t('报警接收团队')}:</span>
-                    </Col>
-                    <Col span={20}>
-                      <Select
-                        value={
-                          notifyGroups
-                            ? notifyGroups.split(' ').map((ele) => Number(ele))
-                            : []
-                        }
-                        mode='multiple'
-                        onChange={selectGroup}
-                        style={{
-                          width: '90%',
-                          marginLeft: 10,
-                        }}
-                      >
-                        {notifyGroupsOptions}
-                      </Select>
-                    </Col>
-                  </Row>
-                  <Row style={{ marginTop: 10 }} align='middle'>
-                    <Col span={4} style={{ textAlign: 'center' }}>
-                      <span>{t('报警接收人')}:</span>
-                    </Col>
-                    <Col span={20}>
-                      <Select
-                        value={
-                          notifyUsers
-                            ? notifyUsers.split(' ').map((ele) => Number(ele))
-                            : []
-                        }
-                        mode='multiple'
-                        onChange={selectUsers}
-                        style={{
-                          width: '90%',
-                          marginLeft: 10,
-                        }}
-                      >
-                        {notifyUsersOptions}
-                      </Select>
-                    </Col>
-                  </Row>
-                </>
-              );
-
-            case 2:
-              return (
-                <>
-                  <Row align='middle'>
-                    <Col span={4}>
-                      <span>{t('修改通知媒介')}:</span>
-                    </Col>
-                    <Col span={20}>
-                      <Checkbox.Group
-                        style={{ marginLeft: 10 }}
-                        defaultValue={notifyChannels.split(' ')}
-                        onChange={checkChannels}
-                      >
-                        {contactListCheckboxes}
-                      </Checkbox.Group>
-                    </Col>
-                  </Row>
-                </>
-              );
-            case 3:
-              return (
-                <>
-                  <Row align='middle'>
-                    <Col span={4} style={{ textAlign: 'center' }}>
-                      <span>{t('是否启停')}:</span>
-                    </Col>
-                    <Col span={20}>
-                      <Radio.Group
-                        style={{ marginLeft: 10, textAlign: 'center' }}
-                        onChange={(e) => {
-                          setAllStatus(e.target.value);
-                        }}
-                        value={AllStatus}
-                      >
-                        <Radio value={strategyStatus.Enable}>{t('否')}</Radio>
-                        <Radio value={strategyStatus.UnEnable}>{t('是')}</Radio>
-                      </Radio.Group>
-                    </Col>
-                  </Row>
-                </>
-              );
-            case 4:
-              return (
-                <>
-                  <Row align='middle'>
-                    <Col span={4} style={{ textAlign: 'center' }}>
-                      <span>{t('append_tags')}:</span>
-                    </Col>
-                    <Col span={20}>
-                      <Select
-                        style={{ width: '90%', marginLeft: 10 }}
-                        mode='tags'
-                        value={appendTags ? appendTags.split(' ') : []}
-                        onChange={handleTagsChange}
-                        placeholder={t('请输入附加标签，格式为key=value')}
-                      ></Select>
-                    </Col>
-                  </Row>
-                </>
-              );
-            default:
-              return null;
-          }
-        })()}
-      </Modal>
+      <EditModal isModalVisible={isModalVisible} editModalFinish={editModalFinish}/>
     </div>
   );
 };
