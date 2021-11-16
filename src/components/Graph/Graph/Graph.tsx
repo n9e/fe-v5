@@ -1,15 +1,29 @@
-import React, { Component } from 'react';
+import React, { Component, Ref } from 'react';
 import D3Graph from '@d3-charts/ts-graph';
 import '@d3-charts/ts-graph/dist/index.css';
 import _ from 'lodash';
 import * as util from '../util';
+import { AnyARecord } from 'dns';
+import './index.less';
 
-export default class Graph extends Component {
+interface GraphProps {
+  height?: number;
+  graphConfig: {
+    xAxis: number;
+    shared: any;
+    comparison: any;
+  };
+  series: object[];
+}
+
+export default class Graph extends Component<GraphProps> {
+  private graphWrapEle: any;
+  private chart: D3Graph;
   componentDidMount() {
     const chartOptions = {
       timestamp: 'x',
       chart: {
-        height: this.props.height,
+        height: this.props.height ? this.props.height : undefined,
         renderTo: this.graphWrapEle,
       },
       xAxis: this.props.graphConfig.xAxis,
@@ -61,7 +75,12 @@ export default class Graph extends Component {
 
   render() {
     return (
-      <div ref={(ref) => { this.graphWrapEle = ref; }} />
+      <div
+        ref={(ref) => {
+          this.graphWrapEle = ref;
+        }}
+        className='chart-content'
+      />
     );
   }
 }

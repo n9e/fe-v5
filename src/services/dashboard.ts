@@ -87,12 +87,13 @@ export const updateSingleDashboard = function (busiId: number, id: string, data:
 
 interface Group {
   id?: number;
+  dashboard_id: number;
   name: string;
   weight: number;
 }
 // 创建分组
-export const createChartGroup = function (id: string, data: Group) {
-  return request(`/api/n9e/dashboard/${id}/chart-groups`, {
+export const createChartGroup = function (busiId: string, data: Group) {
+  return request(`/api/n9e/busi-group/${busiId}/chart-groups`, {
     method: RequestMethod.Post,
     data,
   });
@@ -113,8 +114,8 @@ export const delChartGroup = function (id: number) {
 };
 
 // 更新分组
-export const updateChartGroup = function (data: Group[]) {
-  return request(`/api/n9e/chart-groups`, {
+export const updateChartGroup = function (busiId: string, data: Group[]) {
+  return request(`/api/n9e/busi-group/${busiId}/chart-groups`, {
     method: RequestMethod.Put,
     data,
   });
@@ -143,11 +144,11 @@ export const updateChart = function (chartId: number, data: Chart) {
 };
 
 // 批量更新Chart
-export const updateCharts = function (data: { configs: object }[]) {
+export const updateCharts = function (busiId: string, data: { configs: object }[]) {
   const transformedData = data.map((item) => {
     return { ...item, configs: JSON.stringify(item.configs) };
   });
-  return request(`/api/n9e/charts/configs`, {
+  return request(`/api/n9e/busi-group/${busiId}/charts`, {
     method: RequestMethod.Put,
     data: transformedData,
   });

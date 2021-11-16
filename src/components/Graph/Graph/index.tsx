@@ -1,15 +1,7 @@
-/* eslint-disable react/sort-comp */
-/* eslint-disable prefer-template */
-/* eslint-disable react/no-string-refs */
-/* eslint-disable class-methods-use-this */
-/* eslint-disable no-unused-expressions */
 import React, { Component, ReactNode } from 'react';
-import PropTypes from 'prop-types';
 import { Spin } from 'antd';
-import { DragOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import _ from 'lodash';
-import { SortableHandle } from 'react-sortable-hoc';
 import '@d3-charts/ts-graph/dist/index.css';
 import * as config from '../config';
 import * as util from '../util';
@@ -23,6 +15,7 @@ interface GraphProps {
   timeVal: number;
   ref?: any;
   data: {
+    title?: string;
     selectedHosts?: { ident: string }[];
     metric?: string;
     promqls?: string[];
@@ -86,7 +79,6 @@ export default class Graph extends Component<GraphProps, GraphState> {
       return acc;
     }, []);
     const series = util.normalizeSeries(rawSeries);
-    console.log('series', series);
     this.setState({ spinning: false, series });
   }
 
@@ -105,7 +97,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
 
   generateQuery(obj) {
     const { offset, curAggrFunc, curAggrGroup } = obj;
-    const { metric, promqls, selectedHosts } = this.props.data;
+    const { metric, selectedHosts } = this.props.data;
     if (metric && selectedHosts) {
       const idents = selectedHosts.map((h) => h.ident);
       const offsetSubQuery = offset ? ' offset ' + offset : '';
@@ -172,7 +164,8 @@ export default class Graph extends Component<GraphProps, GraphState> {
       return <div className='graph-errorText'>{errorText}</div>;
     }
     if (chartType === 'line') {
-      return <GraphChart graphConfig={graphConfig} height={height} series={series} />;
+      return <GraphChart graphConfig={graphConfig} series={series} />;
+      // return <GraphChart graphConfig={graphConfig} height={height} series={series} />;
     }
     return null;
   }
@@ -227,7 +220,8 @@ export default class Graph extends Component<GraphProps, GraphState> {
 
   render() {
     const { spinning } = this.state;
-    const { height, extraRender, data } = this.props;
+    const { extraRender, data } = this.props;
+    const { title, metric } = data;
     const graphConfig = this.getGraphConfig(data);
 
     return (
@@ -242,7 +236,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
           <div className='graph-extra'>
             <div style={{ display: 'inline-block' }}>{extraRender && _.isFunction(extraRender) ? extraRender(this) : null}</div>
           </div>
-          <div>{this.props.data.metric}</div>
+          <div>{title || metric}</div>
         </div>
         {this.props.graphConfigInnerVisible ? (
           <GraphConfigInner
@@ -252,9 +246,10 @@ export default class Graph extends Component<GraphProps, GraphState> {
             }}
           />
         ) : null}
-        <Spin spinning={spinning}>
-          <div style={{ height }}>{this.renderChart()}</div>
-        </Spin>
+        {/* 这个spin有点难搞，因为要第一时间获取chart容器的offsetheight */}
+        {/* <Spin spinning={spinning} wrapperClassName='graph-spin'> */}
+        {this.renderChart()}
+        {/* </Spin> */}
         <Legend
           style={{ display: graphConfig.legend ? 'block' : 'none' }}
           graphConfig={graphConfig}

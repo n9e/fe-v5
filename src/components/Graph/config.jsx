@@ -10,19 +10,23 @@ export const comparisonOptions = [
     label: '1小时',
     labelEn: '1 hour',
     value: '3600000',
-  }, {
+  },
+  {
     label: '2小时',
     labelEn: '2 hours',
     value: '7200000',
-  }, {
+  },
+  {
     label: '1天',
     labelEn: '1 day',
     value: '86400000',
-  }, {
+  },
+  {
     label: '2天',
     labelEn: '2 days',
     value: '172800000',
-  }, {
+  },
+  {
     label: '7天',
     labelEn: '7 days',
     value: '604800000',
@@ -33,18 +37,9 @@ export const graphPropTypes = {
   // 基础配置
   title: PropTypes.string,
   type: PropTypes.string,
-  now: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.number,
-  ]), // 记录的当前时间，用于计算出是否自定义时间
-  start: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.number,
-  ]), // 开始时间戳 ms
-  end: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.number,
-  ]), // 结束时间戳 ms
+  now: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), // 记录的当前时间，用于计算出是否自定义时间
+  start: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), // 开始时间戳 ms
+  end: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), // 结束时间戳 ms
   comparison: PropTypes.arrayOf(PropTypes.string), // 环比值 (ms eg. 一小时 3600000)
   comparisonOptions: PropTypes.array, // 环比待选项目
   relativeTimeComparison: PropTypes.bool, // 相对时间环比
@@ -86,12 +81,25 @@ export const graphDefaultConfig = {
   threshold: undefined,
   legend: false,
   shared: true,
-  linkVisible: true
+  linkVisible: true,
 };
 
 export const hexPalette = [
-  '#3399CC', '#CC9933', '#9966CC', '#66CC66', '#CC3333', '#99CCCC', '#CCCC66',
-  '#CC99CC', '#99CC99', '#CC6666', '#336699', '#996633', '#993399', '#339966', '#993333',
+  '#3399CC',
+  '#CC9933',
+  '#9966CC',
+  '#66CC66',
+  '#CC3333',
+  '#99CCCC',
+  '#CCCC66',
+  '#CC99CC',
+  '#99CC99',
+  '#CC6666',
+  '#336699',
+  '#996633',
+  '#993399',
+  '#339966',
+  '#993333',
 ];
 
 export const chart = {
@@ -100,7 +108,6 @@ export const chart = {
     marginRight: 10,
     marginTop: 1,
     marginBottom: 30,
-    height: 350,
     animation: false,
     ignoreHiddenSeries: false,
   },
@@ -192,27 +199,33 @@ export const time = [
     label: '1小时',
     labelEn: '1 hour',
     value: '3600000',
-  }, {
+  },
+  {
     label: '2小时',
     labelEn: '2 hours',
     value: '7140000', // 7200000 - 60000 避免边界问题导致的 刷新页面 效果不一致(step不一致)，JIRA #2566
-  }, {
+  },
+  {
     label: '1天',
     labelEn: '1 day',
     value: '86400000',
-  }, {
+  },
+  {
     label: '2天',
     labelEn: '2 days',
     value: '172800000',
-  }, {
+  },
+  {
     label: '7天',
     labelEn: '7 days',
     value: '604800000',
-  }, {
+  },
+  {
     label: '30天',
     labelEn: '30 days',
     value: '2592000000',
-  }, {
+  },
+  {
     label: '其它',
     labelEn: 'other',
     value: 'custom',
@@ -223,13 +236,16 @@ export const aggrOptions = [
   {
     label: '求和',
     value: 'sum',
-  }, {
+  },
+  {
     label: '均值',
     value: 'avg',
-  }, {
+  },
+  {
     label: '最大值',
     value: 'max',
-  }, {
+  },
+  {
     label: '最小值',
     value: 'min',
   },
@@ -242,8 +258,11 @@ export const timeFormatMap = {
 
 export const countersMaxLength = 100;
 
-export const counterListPropType = PropTypes.arrayOf(PropTypes.shape({ // 用于拉取 history 接口的数据
-  ns: PropTypes.string,
-  metric: PropTypes.string,
-  counter: PropTypes.string,
-}));
+export const counterListPropType = PropTypes.arrayOf(
+  PropTypes.shape({
+    // 用于拉取 history 接口的数据
+    ns: PropTypes.string,
+    metric: PropTypes.string,
+    counter: PropTypes.string,
+  }),
+);

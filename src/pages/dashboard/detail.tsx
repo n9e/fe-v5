@@ -120,10 +120,10 @@ export default function DashboardDetail() {
     if (isAddGroup) {
       let weightArr = chartGroup.map((item) => item.weight);
       let weight = Math.max(...weightArr) + 1;
-      await createChartGroup(id, { ...obj, weight });
+      await createChartGroup(busiId, { ...obj, weight, dashboard_id: Number(id) });
     } else {
       let group = chartGroup.find((item) => item.id === groupId);
-      await updateChartGroup([{ ...group, ...obj }]);
+      await updateChartGroup(busiId, [{ dashboard_id: Number(id), ...group, ...obj }]);
     }
 
     init();
@@ -143,7 +143,7 @@ export default function DashboardDetail() {
     if (!lessWeightGroup) return;
     lessWeightGroup.weight = weight;
     group.weight = weight - 1;
-    await updateChartGroup([lessWeightGroup, group]);
+    await updateChartGroup(busiId, [lessWeightGroup, group]);
     init();
   };
 
@@ -153,7 +153,7 @@ export default function DashboardDetail() {
     if (!lessWeightGroup) return;
     lessWeightGroup.weight = weight;
     group.weight = weight + 1;
-    await updateChartGroup([lessWeightGroup, group]);
+    await updateChartGroup(busiId, [lessWeightGroup, group]);
     init();
   };
 
@@ -241,6 +241,8 @@ export default function DashboardDetail() {
               onDelChartGroup={handleDelChartGroup}
               range={range}
               variableConfig={variableConfig}
+              moveUpEnable={i > 0}
+              moveDownEnable={i < chartGroup.length - 1}
             />
           ))}
         </div>

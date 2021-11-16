@@ -32,6 +32,8 @@ interface Props {
   onUpdateChartGroup: (group: Group) => void;
   onMoveUpChartGroup: (group: Group) => void;
   onMoveDownChartGroup: (group: Group) => void;
+  moveUpEnable: boolean;
+  moveDownEnable: boolean;
 }
 type Layouts = {
   lg: Array<Layout>;
@@ -54,6 +56,7 @@ const defColItem = 4; //一键规整列数
 export interface Chart {
   id: number;
   configs: ChartConfig;
+  group_id: number;
   weight: number;
 }
 const layouts: Layouts = {
@@ -176,11 +179,24 @@ const layouts: Layouts = {
 
 export default function ChartGroup(props: Props) {
   const { t } = useTranslation();
-  const { busiId, groupInfo, range, step, variableConfig, onAddChart, onUpdateChart, onDelChartGroup, onDelChart, onUpdateChartGroup, onMoveUpChartGroup, onMoveDownChartGroup } =
-    props;
+  const {
+    busiId,
+    groupInfo,
+    range,
+    step,
+    variableConfig,
+    onAddChart,
+    onUpdateChart,
+    onDelChartGroup,
+    onDelChart,
+    onUpdateChartGroup,
+    onMoveUpChartGroup,
+    onMoveDownChartGroup,
+    moveUpEnable,
+    moveDownEnable,
+  } = props;
   const [chartConfigs, setChartConfigs] = useState<Chart[]>([]);
   const [layout, setLayout] = useState<Layouts>(layouts); // const [colItem, setColItem] = useState<number>(defColItem);
-
   const [mounted, setMounted] = useState<boolean>(false);
   useEffect(() => {
     init();
@@ -190,9 +206,9 @@ export default function ChartGroup(props: Props) {
     setMounted(false);
     getCharts(busiId, groupInfo.id).then((res) => {
       let charts = res.dat
-        ? res.dat.map((item: { configs: string; id: any; weight: any }) => {
+        ? res.dat.map((item: { configs: string; id: any; weight: any; group_id: number }) => {
             let configs = item.configs ? JSON.parse(item.configs) : {};
-            return { id: item.id, configs, weight: item.weight };
+            return { id: item.id, configs, weight: item.weight, group_id: item.group_id };
           })
         : [];
 
@@ -211,7 +227,8 @@ export default function ChartGroup(props: Props) {
               }) => item.configs.layout,
             ),
             Number(index),
-          ); // return {
+          );
+          // return {
           //   x: 0,
           //   y: 0,
           //   w: unit,
@@ -294,8 +311,7 @@ export default function ChartGroup(props: Props) {
       return item;
     });
     // setLayout({ lg: [...layout] });
-    // 临时注释，需要重新实现
-    // updateCharts(currConfigs);
+    updateCharts(busiId, currConfigs);
   };
 
   const setArrange = (colItem: number, w = cols / colItem, h = unit / 3) => {
@@ -328,8 +344,7 @@ export default function ChartGroup(props: Props) {
       item.configs.layout = { h, w, x, y, i };
       return item;
     });
-    // 临时注释，需要重新实现
-    // updateCharts(currConfigs);
+    updateCharts(busiId, currConfigs);
     setLayout({ lg: [..._lg], sm: [..._lg], md: [..._lg], xs: [..._lg], xxs: [..._lg] });
     setChartConfigs(currConfigs);
     // setMounted(true);
@@ -401,6 +416,7 @@ export default function ChartGroup(props: Props) {
         <Button
           type='link'
           size='small'
+          disabled={!moveUpEnable}
           onClick={(event) => {
             event.stopPropagation();
             onMoveUpChartGroup(groupInfo);
@@ -412,6 +428,7 @@ export default function ChartGroup(props: Props) {
         <Button
           type='link'
           size='small'
+          disabled={!moveDownEnable}
           onClick={(event) => {
             event.stopPropagation();
             onMoveDownChartGroup(groupInfo);
@@ -446,7 +463,8 @@ export default function ChartGroup(props: Props) {
       chartConfigs &&
       chartConfigs.length > 0 &&
       chartConfigs.map((item, i) => {
-        let { QL } = item.configs;
+        console.log('item', item);
+        let { QL, name } = item.configs;
 
         // if (variableConfig) {
         //   variableConfig.tags.forEach((item) => {
@@ -474,8 +492,8 @@ export default function ChartGroup(props: Props) {
           >
             <Graph
               data={{
+                title: name,
                 promqls: QL.map((item) => item.PromQL),
-                selectedHosts: [],
               }}
               timeVal={360000}
               extraRender={(graph) => {
@@ -594,20 +612,14 @@ export default function ChartGroup(props: Props) {
       >
         {chartConfigs && chartConfigs.length > 0 ? (
           <ResponsiveReactGridLayout
-            cols={{
-              lg: cols,
-              sm: cols,
-              md: cols,
-              xs: cols,
-              xxs: cols,
-            }}
+            cols={{ lg: cols, sm: cols, md: cols, xs: cols, xxs: cols }}
             layouts={layout}
             onLayoutChange={onLayoutChange}
             measureBeforeMount={false}
             useCSSTransforms={false}
             preventCollision={false}
             isBounded={true}
-            draggableHandle='.chart-title'
+            draggableHandle='.graph-header'
           >
             {generateDOM()}
           </ResponsiveReactGridLayout>

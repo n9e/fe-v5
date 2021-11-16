@@ -11,6 +11,7 @@ export interface Dashboard {
 
 export interface Group {
   id: number;
+  dashboard_id: number;
   name: string;
   weight: number;
   updateTime: number;
