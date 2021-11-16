@@ -15,6 +15,9 @@ import { Range } from '@/components/DateRangePicker';
 import { TagFilterResponse } from './VariableConfig/definition';
 import { number } from 'echarts';
 import { useTranslation } from 'react-i18next';
+import Graph from '@/components/Graph';
+import moment from 'moment';
+
 const { confirm } = Modal;
 interface Props {
   busiId: string;
@@ -443,23 +446,24 @@ export default function ChartGroup(props: Props) {
       chartConfigs &&
       chartConfigs.length > 0 &&
       chartConfigs.map((item, i) => {
-        let { prome_ql } = item.configs;
+        let { QL } = item.configs;
 
-        if (variableConfig) {
-          variableConfig.tags.forEach((item) => {
-            if (prome_ql) {
-              if (Array.isArray(prome_ql)) {
-                prome_ql = prome_ql.map((i) => {
-                  if (item.value === '*') {
-                    return i.replaceAll('$' + item.key, '.+');
-                  }
+        // if (variableConfig) {
+        //   variableConfig.tags.forEach((item) => {
+        //     if (prome_ql) {
+        //       if (Array.isArray(prome_ql)) {
+        //         prome_ql = prome_ql.map((i) => {
+        //           if (item.value === '*') {
+        //             return i.replaceAll('$' + item.key, '.+');
+        //           }
 
-                  return i.replaceAll('$' + item.key, item.value);
-                });
-              } // prome_ql = prome_ql.replaceAll('$' + item.key, item.value);
-            }
-          });
-        }
+        //           return i.replaceAll('$' + item.key, item.value);
+        //         });
+        //       } // prome_ql = prome_ql.replaceAll('$' + item.key, item.value);
+        //     }
+        //   });
+        // }
+        const now = moment();
 
         return (
           <div
@@ -468,6 +472,58 @@ export default function ChartGroup(props: Props) {
             }}
             key={String(i)}
           >
+            <Graph
+              data={{
+                promqls: QL.map((item) => item.PromQL),
+                selectedHosts: [],
+              }}
+              timeVal={360000}
+              extraRender={(graph) => {
+                return (
+                  <>
+                    <Button
+                      type='link'
+                      size='small'
+                      onClick={(e) => {
+                        e.preventDefault();
+                        window.open(item.configs.link);
+                      }}
+                      disabled={!item.configs.link}
+                    >
+                      <LinkOutlined />
+                    </Button>
+                    <Dropdown
+                      trigger={['click']}
+                      overlay={
+                        <Menu>
+                          <Menu.Item onClick={() => onUpdateChart(groupInfo, item)}>{t('编辑图表')}</Menu.Item>
+
+                          <Menu.Item
+                            danger
+                            onClick={() => {
+                              confirm({
+                                title: `${t('是否删除图表')}：${item.configs.name}`,
+                                onOk: async () => {
+                                  onDelChart(groupInfo, item);
+                                },
+
+                                onCancel() {},
+                              });
+                            }}
+                          >
+                            {t('删除图表')}
+                          </Menu.Item>
+                        </Menu>
+                      }
+                    >
+                      <Button type='link' size='small' onClick={(e) => e.preventDefault()}>
+                        <SettingOutlined />
+                      </Button>
+                    </Dropdown>
+                  </>
+                );
+              }}
+            />
             {/* <D3Chart
               barControl='multiOrSort'
               title={chartConfigs[i].configs.name}

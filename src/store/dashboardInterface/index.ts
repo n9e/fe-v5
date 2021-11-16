@@ -32,7 +32,6 @@ type QLItem = {
 export interface ChartConfig {
   layout?: Layout;
   tags: object;
-  prome_ql?: string[];
   QL: QLItem[];
   classpath_id?: number;
   classpath_prefix?: Boolean;

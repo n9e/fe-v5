@@ -51,7 +51,7 @@ class Legend extends Component {
 
   handleInputChange = (e) => {
     this.setState({ searchText: e.target.value });
-  }
+  };
 
   handleSearch = () => {
     const { searchText } = this.state;
@@ -59,7 +59,7 @@ class Legend extends Component {
       filterDropdownVisible: false,
       filterVal: searchText,
     });
-  }
+  };
 
   handleContextMenu = (e, counter) => {
     e.preventDefault();
@@ -69,14 +69,14 @@ class Legend extends Component {
       contextMenuLeft: e.clientX,
       contextMenuTop: e.clientY,
     });
-  }
+  };
 
   handleClickCounter = (record) => {
     const { selectedKeys, highlightedKeys } = this.state;
     const highlightedKeysClone = _.clone(highlightedKeys);
 
     if (_.includes(highlightedKeysClone, record.id)) {
-      _.remove(highlightedKeysClone, o => o === record.id);
+      _.remove(highlightedKeysClone, (o) => o === record.id);
     } else {
       highlightedKeysClone.push(record.id);
     }
@@ -84,7 +84,7 @@ class Legend extends Component {
     this.setState({ highlightedKeys: highlightedKeysClone }, () => {
       this.props.onSelectedChange(selectedKeys, highlightedKeysClone);
     });
-  }
+  };
 
   filterData() {
     const { series } = this.props;
@@ -92,7 +92,7 @@ class Legend extends Component {
     const reg = new RegExp(filterVal, 'gi');
     const legendData = normalizeLegendData(series);
     return _.filter(legendData, (record) => {
-      return record.tags.match(reg);
+      return record.tags && record.tags.match(reg);
     });
   }
 
@@ -112,29 +112,26 @@ class Legend extends Component {
         title: <span> Series({data.length}) </span>,
         dataIndex: 'tags',
         filterDropdown: (
-          <div className="custom-filter-dropdown">
-            <Input
-              placeholder="Input serie name"
-              value={searchText}
-              onChange={this.handleInputChange}
-              onPressEnter={this.handleSearch}
-            />
-            <Button type="primary" onClick={this.handleSearch}>Search</Button>
+          <div className='custom-filter-dropdown'>
+            <Input placeholder='Input serie name' value={searchText} onChange={this.handleInputChange} onPressEnter={this.handleSearch} />
+            <Button type='primary' onClick={this.handleSearch}>
+              Search
+            </Button>
           </div>
         ),
         filterDropdownVisible: this.state.filterDropdownVisible,
-        onFilterDropdownVisibleChange: visible => this.setState({ filterDropdownVisible: visible }),
+        onFilterDropdownVisibleChange: (visible) => this.setState({ filterDropdownVisible: visible }),
         render: (text, record) => {
           const legendName = getLengendName(record, comparisonOptions);
           return (
             <span
               title={text}
               onClick={() => this.handleClickCounter(record)}
-              onContextMenu={e => this.handleContextMenu(e, text)}
+              onContextMenu={(e) => this.handleContextMenu(e, text)}
               style={{
                 cursor: 'pointer',
                 // eslint-disable-next-line no-nested-ternary
-                opacity: counterSelectedKeys.length ? _.includes(counterSelectedKeys, record.id) ? 1 : 0.5 : 1,
+                opacity: counterSelectedKeys.length ? (_.includes(counterSelectedKeys, record.id) ? 1 : 0.5) : 1,
               }}
             >
               <span style={{ color: record.color }}>● </span>
@@ -142,7 +139,8 @@ class Legend extends Component {
             </span>
           );
         },
-      }, {
+      },
+      {
         title: 'Max',
         dataIndex: 'max',
         className: 'alignRight',
@@ -152,7 +150,8 @@ class Legend extends Component {
           return <span style={{ paddingRight: 10 }}>{text !== null ? renderValue(text) : 'null'}</span>;
         },
         sorter: (a, b) => a.max - b.max,
-      }, {
+      },
+      {
         title: 'Min',
         dataIndex: 'min',
         className: 'alignRight',
@@ -162,7 +161,8 @@ class Legend extends Component {
           return <span style={{ paddingRight: 10 }}>{text !== null ? renderValue(text) : 'null'}</span>;
         },
         sorter: (a, b) => a.min - b.min,
-      }, {
+      },
+      {
         title: 'Avg',
         dataIndex: 'avg',
         className: 'alignRight',
@@ -172,7 +172,8 @@ class Legend extends Component {
           return <span style={{ paddingRight: 10 }}>{text !== null ? renderValue(text) : 'null'}</span>;
         },
         sorter: (a, b) => a.avg - b.avg,
-      }, {
+      },
+      {
         title: 'Sum',
         dataIndex: 'sum',
         className: 'alignRight',
@@ -182,7 +183,8 @@ class Legend extends Component {
           return <span style={{ paddingRight: 10 }}>{text !== null ? renderValue(text) : 'null'}</span>;
         },
         sorter: (a, b) => a.sum - b.sum,
-      }, {
+      },
+      {
         title: 'Last',
         dataIndex: 'last',
         className: 'alignRight',
@@ -195,7 +197,7 @@ class Legend extends Component {
       },
     ];
     const newRowSelection = {
-      selectedRowKeys: selectedKeys === 'normal' ? _.map(data, o => o.id) : selectedKeys,
+      selectedRowKeys: selectedKeys === 'normal' ? _.map(data, (o) => o.id) : selectedKeys,
       onChange: (selectedRowKeys) => {
         this.setState({ selectedKeys: selectedRowKeys }, () => {
           onSelectedChange(selectedRowKeys, highlightedKeys);
@@ -211,7 +213,6 @@ class Legend extends Component {
       });
     }
 
-
     let scrollX = 650;
 
     if (this.props.columnsKey) {
@@ -222,17 +223,20 @@ class Legend extends Component {
     }
 
     return (
-      <div className="graph-legend" style={{
-        ...this.props.style,
-        // margin: '0 5px 5px 5px',
-        height: '100%',
-      }}>
+      <div
+        className='graph-legend'
+        style={{
+          ...this.props.style,
+          // margin: '0 5px 5px 5px',
+          height: '100%',
+        }}
+      >
         <Table
-          className="auto-scroll-y"
+          className='auto-scroll-y'
           rowKey={(record) => {
             return `${record.id}${record.comparison}`;
           }}
-          size="middle"
+          size='middle'
           rowSelection={rowSelection !== null ? newRowSelection : null}
           columns={columns}
           dataSource={data}
@@ -252,7 +256,7 @@ class Legend extends Component {
   }
 }
 
-export default Legend
+export default Legend;
 
 export function normalizeLegendData(series = []) {
   const tableData = _.map(series, (serie) => {
@@ -335,7 +339,6 @@ function getLegendNums(points) {
   return { last, avg, max, min, sum };
 }
 
-
 /**
  * getLengendName
  * @param  {Object}  serie             [description]
@@ -349,9 +352,7 @@ function getLengendName(serie, comparisonOptions, locale = 'zh') {
     const currentComparison = _.find(comparisonOptions, { value: `${comparison}000` });
     if (currentComparison && currentComparison.label) {
       const enText = _.get(_.find(comparisonOptions, { value: String(Number(comparison) * 1000) }), 'labelEn');
-      const postfix = locale === 'zh' ?
-        `环比${currentComparison.label}` :
-        `(${enText} ago)`;
+      const postfix = locale === 'zh' ? `环比${currentComparison.label}` : `(${enText} ago)`;
       lname += ` ${postfix}`;
     }
   }
