@@ -2,22 +2,12 @@ import { message } from 'antd';
 import React, { ReactNode, Component } from 'react';
 import { IStore } from '@/store/common';
 export const isPromise = (obj) => {
-  return (
-    !!obj &&
-    (typeof obj === 'object' || typeof obj === 'function') &&
-    typeof obj.then === 'function'
-  );
+  return !!obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function';
 };
 
-export const download = function (
-  stringList: Array<string> | string,
-  name: string = 'download.txt',
-) {
+export const download = function (stringList: Array<string> | string, name: string = 'download.txt') {
   const element = document.createElement('a');
-  const file = new Blob(
-    [Array.isArray(stringList) ? stringList.join('\r\n') : stringList],
-    { type: 'text/plain' },
-  );
+  const file = new Blob([Array.isArray(stringList) ? stringList.join('\r\n') : stringList], { type: 'text/plain' });
   element.href = URL.createObjectURL(file);
   element.download = name;
   document.body.appendChild(element);
@@ -42,7 +32,7 @@ export const download = function (
 /**
  * 将文本添加到剪贴板
  */
-export const copyToClipBoard = (text: string, t): boolean => {
+export const copyToClipBoard = (text: string, t, spliter?: string): boolean => {
   const fakeElem = document.createElement('textarea');
   fakeElem.style.border = '0';
   fakeElem.style.padding = '0';
@@ -59,10 +49,8 @@ export const copyToClipBoard = (text: string, t): boolean => {
   let succeeded;
   try {
     succeeded = document.execCommand('copy');
-    if (text.includes('\n')) {
-      message.success(
-        `${t('复制')}${text.split('\n').length}${t('条数据到剪贴板')}`,
-      );
+    if (spliter && text.includes(spliter)) {
+      message.success(`${t('复制')}${text.split('\n').length}${t('条数据到剪贴板')}`);
     } else {
       message.success(t('复制到剪贴板'));
     }

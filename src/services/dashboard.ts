@@ -1,10 +1,7 @@
 import request from '@/utils/request';
 import { RequestMethod } from '@/store/common';
 import { N9EAPI } from '../../config/constant';
-import {
-  ISearchTagKeyParams,
-  ISearchTagValueParams,
-} from '@/components/FormComponents/MultipleDynamicSelect/definition';
+import { ISearchTagKeyParams, ISearchTagValueParams } from '@/components/FormComponents/MultipleDynamicSelect/definition';
 
 // 查询tagkey
 export const getTagKey = function (data: ISearchTagKeyParams) {
@@ -51,41 +48,37 @@ export const cloneDashboard = function (busiId: number, id: number) {
 };
 
 // 删除大盘
-export const removeDashboard = function (id: number) {
-  return request(`/api/n9e/dashboard/${id}`, {
+export const removeDashboard = function (busiId: number, id: number) {
+  return request(`/api/n9e/busi-group/${busiId}/dashboard/${id}`, {
     method: RequestMethod.Delete,
   });
 };
 
 // 导出大盘
-export const exportDashboard = function (ids: number[]) {
-  return request(`/api/n9e/dashboards/export`, {
+export const exportDashboard = function (busiId: number, ids: number[]) {
+  return request(`/api/n9e/busi-group/${busiId}/dashboards/export`, {
     method: RequestMethod.Post,
     data: { ids },
   });
 };
 
 // 导入大盘
-export const importDashboard = function (data: any[]) {
-  return request(`/api/n9e/dashboards/import`, {
+export const importDashboard = function (busiId: number, data: any[]) {
+  return request(`/api/n9e/busi-group/${busiId}/dashboards/import`, {
     method: RequestMethod.Post,
     data,
   });
 };
 
 // 创建大盘
-export const getSingleDashboard = function (id: string | number) {
-  return request(`/api/n9e/dashboard/${id}`, {
+export const getSingleDashboard = function (busiId: string, id: string | number) {
+  return request(`/api/n9e/busi-group/${busiId}/dashboard/${id}`, {
     method: RequestMethod.Get,
   });
 };
 
 // 更新大盘
-export const updateSingleDashboard = function (
-  busiId: number,
-  id: string,
-  data: Dashboard,
-) {
+export const updateSingleDashboard = function (busiId: number, id: string, data: Dashboard) {
   return request(`/api/n9e/busi-group/${busiId}/dashboard/${id}`, {
     method: RequestMethod.Put,
     data,
@@ -106,8 +99,8 @@ export const createChartGroup = function (id: string, data: Group) {
 };
 
 // 获取分组
-export const getChartGroup = function (id: string) {
-  return request(`/api/n9e/dashboard/${id}/chart-groups`, {
+export const getChartGroup = function (busiId: string, id: string) {
+  return request(`/api/n9e/busi-group/${busiId}/chart-groups?did=${id}`, {
     method: RequestMethod.Get,
   });
 };
@@ -130,11 +123,12 @@ export const updateChartGroup = function (data: Group[]) {
 interface Chart {
   configs: string;
   weight: number;
+  group_id: number;
 }
 
 // 创建Chart
-export const createChart = function (id: number, data: Chart) {
-  return request(`/api/n9e/chart-group/${id}/charts`, {
+export const createChart = function (busiId: string, data: Chart) {
+  return request(`/api/n9e/busi-group/${busiId}/charts`, {
     method: RequestMethod.Post,
     data,
   });
@@ -160,10 +154,7 @@ export const updateCharts = function (data: { configs: object }[]) {
 };
 
 // 移动Chart
-export const moveChart = function (
-  id: string,
-  data: { id: number; weight: number; group_id: number }[],
-) {
+export const moveChart = function (id: string, data: { id: number; weight: number; group_id: number }[]) {
   return request(`/api/n9e/charts/weights`, {
     method: RequestMethod.Put,
     data,
@@ -171,16 +162,17 @@ export const moveChart = function (
 };
 
 // 获取某图表分组下面的所有chart
-export const getCharts = function (id: number) {
-  return request(`/api/n9e/chart-group/${id}/charts`, {
+export const getCharts = function (busiId: string | number, id: number) {
+  return request(`/api/n9e/busi-group/${busiId}/charts?cgid=${id}`, {
     method: RequestMethod.Get,
   });
 };
 
 // 删除Chart
-export const removeChart = function (id: number) {
-  return request(`/api/n9e/chart/${id}`, {
+export const removeChart = function (busiId: string | number, id: number) {
+  return request(`/api/n9e/busi-group/${busiId}/charts`, {
     method: RequestMethod.Delete,
+    data: { ids: [id] },
   });
 };
 
@@ -199,10 +191,7 @@ export const getTemplate = function (type: 'alert_rule' | 'dashboard') {
   });
 };
 
-export const getTemplateContent = function (
-  type: 'alert_rule' | 'dashboard',
-  name: string,
-) {
+export const getTemplateContent = function (type: 'alert_rule' | 'dashboard', name: string) {
   return request(`/api/n9e/tpl/content?tpl_type=${type}&tpl_name=${name}`, {
     method: RequestMethod.Get,
   });

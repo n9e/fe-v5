@@ -1,46 +1,16 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import PageLayout from '@/components/pageLayout';
-import {
-  Button,
-  Table,
-  Input,
-  Switch,
-  message,
-  List,
-  Row,
-  Col,
-  Pagination,
-  Modal,
-} from 'antd';
-import {
-  DeleteTwoTone,
-  EditOutlined,
-  DeleteOutlined,
-  SearchOutlined,
-  UserOutlined,
-  SmallDashOutlined,
-} from '@ant-design/icons';
+import { Button, Table, Input, Switch, message, List, Row, Col, Pagination, Modal } from 'antd';
+import { DeleteTwoTone, EditOutlined, DeleteOutlined, SearchOutlined, UserOutlined, SmallDashOutlined } from '@ant-design/icons';
 import UserInfoModal from './component/createModal';
 import { RootState, accountStoreState } from '@/store/accountInterface';
-import {
-  changeStatus,
-  deleteBusinessTeamMember,
-  getBusinessTeamList,
-  getBusinessTeamInfo,
-  deleteBusinessTeam,
-} from '@/services/manage';
-import {
-  User,
-  Team,
-  UserType,
-  ActionType,
-  TeamInfo,
-} from '@/store/manageInterface';
+import { changeStatus, deleteBusinessTeamMember, getBusinessTeamList, getBusinessTeamInfo, deleteBusinessTeam } from '@/services/manage';
+import { User, Team, UserType, ActionType, TeamInfo } from '@/store/manageInterface';
 import './index.less';
 import { ColumnsType } from 'antd/lib/table';
-import { color } from 'echarts';
+import '@/components/BlankBusinessPlaceholder/index.less';
 import { useTranslation } from 'react-i18next';
 const { confirm } = Modal;
 
@@ -68,9 +38,7 @@ const Resource: React.FC = () => {
   const [searchValue, setSearchValue] = useState<string>('');
   const [searchMemberValue, setSearchMemberValue] = useState<string>('');
   const userRef = useRef(null as any);
-  let { profile } = useSelector<RootState, accountStoreState>(
-    (state) => state.account,
-  );
+  let { profile } = useSelector<RootState, accountStoreState>((state) => state.account);
 
   const teamMemberColumns: ColumnsType<any> = [
     {
@@ -222,110 +190,97 @@ const Resource: React.FC = () => {
               dataSource={teamList.filter((i) => i.name.includes(searchValue))}
               size='small'
               renderItem={(item) => (
-                <List.Item
-                  key={item.id}
-                  className={teamId === item.id ? 'is-active' : ''}
-                  onClick={() => setTeamId(item.id)}
-                >
+                <List.Item key={item.id} className={teamId === item.id ? 'is-active' : ''} onClick={() => setTeamId(item.id)}>
                   {item.name}
                 </List.Item>
               )}
             />
           </div>
-          <div className='resource-table-content'>
-            <Row className='team-info'>
-              <Col
-                span='24'
-                style={{
-                  color: '#000',
-                  fontSize: '14px',
-                  fontWeight: 'bold',
-                  display: 'inline',
-                }}
-              >
-                {teamInfo && teamInfo.name}
-                <EditOutlined
-                  title={t('刷新')}
+          {teamList.length > 0 ? (
+            <div className='resource-table-content'>
+              <Row className='team-info'>
+                <Col
+                  span='24'
                   style={{
-                    marginLeft: '8px',
+                    color: '#000',
                     fontSize: '14px',
+                    fontWeight: 'bold',
+                    display: 'inline',
                   }}
-                  onClick={() => handleClick(ActionType.EditBusiness, teamId)}
-                ></EditOutlined>
-                <DeleteOutlined
+                >
+                  {teamInfo && teamInfo.name}
+                  <EditOutlined
+                    title={t('刷新')}
+                    style={{
+                      marginLeft: '8px',
+                      fontSize: '14px',
+                    }}
+                    onClick={() => handleClick(ActionType.EditBusiness, teamId)}
+                  ></EditOutlined>
+                  <DeleteOutlined
+                    style={{
+                      marginLeft: '8px',
+                      fontSize: '14px',
+                    }}
+                    onClick={() => {
+                      confirm({
+                        title: t('是否删除该业务组'),
+                        onOk: () => {
+                          deleteBusinessTeam(teamId).then((_) => {
+                            message.success(t('业务组删除成功'));
+                            handleClose(true);
+                          });
+                        },
+                        onCancel: () => {},
+                      });
+                    }}
+                  />
+                </Col>
+                <Col
                   style={{
-                    marginLeft: '8px',
-                    fontSize: '14px',
+                    marginTop: '8px',
+                    color: '#666',
                   }}
+                >
+                  {t('备注')}：{t('告警规则，告警事件，监控对象，自愈脚本等都归属业务组，是一个在系统里可以自闭环的组织')}
+                </Col>
+              </Row>
+              <Row justify='space-between' align='middle'>
+                <Col span='12'>
+                  <Input
+                    prefix={<SearchOutlined />}
+                    value={searchMemberValue}
+                    className={'searchInput'}
+                    onChange={(e) => setSearchMemberValue(e.target.value)}
+                    placeholder={t('搜索团队名称')}
+                  />
+                </Col>
+                <Button
+                  type='primary'
                   onClick={() => {
-                    confirm({
-                      title: t('是否删除该业务组'),
-                      onOk: () => {
-                        deleteBusinessTeam(teamId).then((_) => {
-                          message.success(t('业务组删除成功'));
-                          handleClose(true);
-                        });
-                      },
-                      onCancel: () => {},
-                    });
+                    handleClick(ActionType.AddBusinessMember, teamId);
                   }}
-                />
-              </Col>
-              <Col
-                style={{
-                  marginTop: '8px',
-                  color: '#666',
-                }}
-              >
-                {t('备注')}：
-                {t(
-                  '告警规则，告警事件，监控对象，自愈脚本等都归属业务组，是一个在系统里可以自闭环的组织',
-                )}
-              </Col>
-            </Row>
-            <Row justify='space-between' align='middle'>
-              <Col span='12'>
-                <Input
-                  prefix={<SearchOutlined />}
-                  value={searchMemberValue}
-                  className={'searchInput'}
-                  onChange={(e) => setSearchMemberValue(e.target.value)}
-                  placeholder={t('搜索团队名称')}
-                />
-              </Col>
-              <Button
-                type='primary'
-                onClick={() => {
-                  handleClick(ActionType.AddBusinessMember, teamId);
-                }}
-              >
-                {t('添加团队')}
-              </Button>
-            </Row>
+                >
+                  {t('添加团队')}
+                </Button>
+              </Row>
 
-            <Table
-              rowKey='id'
-              columns={teamMemberColumns}
-              dataSource={
-                memberList.length > 0
-                  ? memberList.filter(
-                      (item) =>
-                        item.user_group.name.indexOf(searchMemberValue) !== -1,
-                    )
-                  : []
-              }
-              loading={memberLoading}
-            />
-          </div>
+              <Table
+                rowKey='id'
+                columns={teamMemberColumns}
+                dataSource={memberList.length > 0 ? memberList.filter((item) => item.user_group.name.indexOf(searchMemberValue) !== -1) : []}
+                loading={memberLoading}
+              />
+            </div>
+          ) : (
+            <div className='blank-busi-holder'>
+              业务组（监控大盘，告警规则，屏蔽规则，监控对象都要归属某个业务组）为空，请先
+              <a onClick={() => handleClick(ActionType.CreateBusiness)}>创建业务组</a>
+            </div>
+          )}
         </div>
       </div>
-      <UserInfoModal
-        visible={visible}
-        action={action as ActionType}
-        userType={'business'}
-        onClose={handleClose}
-        teamId={teamId}
-      />
+      <UserInfoModal visible={visible} action={action as ActionType} userType={'business'} onClose={handleClose} teamId={teamId} />
     </PageLayout>
   );
 };
