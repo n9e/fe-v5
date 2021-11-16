@@ -95,7 +95,6 @@
   "克隆": "Clone",
   "是否删除大盘": "Sure to delete the dashboard?",
   "删除大盘成功": "Deleted successfully",
-  "您的网络发生异常，无法连接服务器": "Cannot connect to the server, retry later please",
   "导入": "Import",
   "未选择任何大盘": "No dashboard chosen",
   "导出": "Export",

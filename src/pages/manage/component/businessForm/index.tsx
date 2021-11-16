@@ -120,11 +120,7 @@ const TeamForm = React.forwardRef<ReactNode, TeamProps>((props, ref) => {
                       fieldKey={[fieldKey, 'perm_flag']}
                       valuePropName='checked'
                     >
-                      <Switch
-                        checkedChildren='读写'
-                        unCheckedChildren='只读'
-                        defaultChecked
-                      />
+                      <Switch checkedChildren='读写' unCheckedChildren='只读' />
                     </Form.Item>
                     <MinusCircleOutlined onClick={() => remove(name)} />
                   </Space>

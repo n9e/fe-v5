@@ -1,8 +1,9 @@
 import React, { useRef } from 'react';
-import { download } from '@/utils';
+import { download, copyToClipBoard } from '@/utils';
 import { Button, Modal, Form, Input, message, notification, Alert } from 'antd';
 import './index.less';
 import { useTranslation } from 'react-i18next';
+import { CopyOutlined } from '@ant-design/icons';
 const { TextArea } = Input;
 export const enum ModalStatus {
   Import = 'import',
@@ -29,9 +30,7 @@ export default function ImportAndDownloadModal(props: Props) {
 
   return (
     <Modal
-      title={
-        status === ModalStatus.Export ? t('导出') + title : t('导入') + title
-      }
+      title={status === ModalStatus.Export ? t('导出') + title : t('导入') + title}
       destroyOnClose={true}
       footer={
         status === ModalStatus.Import && (
@@ -47,20 +46,11 @@ export default function ImportAndDownloadModal(props: Props) {
                 const data = form.getFieldsValue();
                 try {
                   JSON.parse(JSON.stringify(data));
-                  const { dat } = await onSubmit(data.import);
+                  await onSubmit(data.import);
                   // 每个业务各自处理onSubmit
-                  // onClose();
-                  // if (!res.err) {
-                  //   message.success(t('导入成功'));
-                  //   onClose();
-                  // } else {
-                  //   message.error(res.err);
-                  // }
-                  
-                } catch(error) {
-                  message.error(t('策略数据有误:') + error);
+                } catch (error) {
+                  message.error(t('数据有误:') + error);
                 }
-                
               }}
             >
               {t('确定')}
@@ -71,26 +61,27 @@ export default function ImportAndDownloadModal(props: Props) {
       onCancel={() => onClose()}
       visible={status !== 'hide'}
     >
-      <p
+      <div
         style={{
           color: '#999',
         }}
       >
-        {description}
+        {description && <p>{description}</p>}
         {status === ModalStatus.Export && (
-          <a onClick={handleExportTxt}>Download.json</a>
+          <p>
+            <a onClick={handleExportTxt}>Download.json</a>
+            <a style={{ float: 'right' }} onClick={() => copyToClipBoard(exportData, t)}>
+              <CopyOutlined />
+              复制JSON内容到剪贴板
+            </a>
+          </p>
         )}
-      </p>
+      </div>
       {(() => {
         switch (status) {
           case ModalStatus.Export:
             return (
-              <div
-                contentEditable='true'
-                suppressContentEditableWarning={true}
-                ref={exportTextRef}
-                className='export-dialog'
-              >
+              <div contentEditable='true' suppressContentEditableWarning={true} ref={exportTextRef} className='export-dialog'>
                 <pre>{exportData}</pre>
               </div>
             );
@@ -109,10 +100,7 @@ export default function ImportAndDownloadModal(props: Props) {
                     },
                   ]}
                 >
-                  <TextArea
-                    placeholder={t('请输入') + title}
-                    rows={4}
-                  ></TextArea>
+                  <TextArea placeholder={t('请输入') + title} rows={4}></TextArea>
                 </Form.Item>
               </Form>
             );
