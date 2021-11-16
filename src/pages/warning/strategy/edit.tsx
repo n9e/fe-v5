@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import { useHistory, useParams, useLocation } from 'react-router-dom';
 import PageLayout from '@/components/pageLayout';
 import OperateForm from './components/operateForm';
@@ -23,6 +23,7 @@ const StrategyEdit: React.FC = () => {
   const strategyId = useMemo(() => {
     return params.id;
   }, [params]);
+  const [curStrategy, setCurStrategy] = useState<any>({})
   useEffect(() => {
     getStrategy();
     return () => {
@@ -32,12 +33,13 @@ const StrategyEdit: React.FC = () => {
 
   const getStrategy = async () => {
     const res = await getWarningStrategy(strategyId);
-    console.log(res, 8888888)
+    setCurStrategy(res.dat || {})
   }
   console.log(strategyId)
   return (
     <PageLayout title={t('告警规则')} showBack>
-      <OperateForm type={isClone ? 2 : 1}/>
+      {curStrategy.id && <OperateForm  detail={curStrategy} type={!isClone ? 1 : 2}/>}
+      
     </PageLayout>
   );
 };
