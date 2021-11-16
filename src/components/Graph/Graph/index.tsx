@@ -114,8 +114,6 @@ export default class Graph extends Component<GraphProps, GraphState> {
         query = `${curAggrFunc}(${query}) by (${curAggrGroup.join(', ')})`;
       }
       return query;
-    } else if (promqls) {
-      return promqls;
     }
   }
 
@@ -132,29 +130,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
         query,
       });
     } catch (e) {
-      console.log(e);
-      if (e.statusText === 'abort') return;
-
-      let errorText = e.err || e.message;
-
-      if (e.statusText === 'error') {
-        errorText = 'The network has been disconnected, please check the network';
-      } else if (e.statusText === 'Not Found') {
-        errorText = '404 Not Found.';
-      } else if (e.responseJSON) {
-        errorText = _.get(e.responseJSON, 'msg', e.responseText);
-
-        if (!errorText || e.status === 500) {
-          errorText = 'Data loading exception, please refresh and reload';
-        }
-
-        // request entity too large
-        if (e.status === 413) {
-          errorText = 'Request condition is too large, please reduce the condition';
-        }
-      }
-
-      this.setState({ errorText, spinning: false });
+      this.setState({ spinning: false });
       return Promise.reject();
     }
   }
@@ -225,27 +201,25 @@ export default class Graph extends Component<GraphProps, GraphState> {
   }
 
   updateAllGraphs(aggrFunc, aggrGroups, offsets) {
+    const { promqls } = this.props.data;
     let obj: { curAggrFunc?: string; curAggrGroup?: string[]; offset?: string[] } = {};
     if (aggrFunc) obj.curAggrFunc = aggrFunc;
     if (aggrGroups && aggrGroups.length > 0) obj.curAggrGroup = aggrGroups;
-    const queryNoOffset = this.generateQuery(obj);
-
-    // 如果有环比，再单独请求
-    let queries = [];
-    if (offsets) {
-      queries = offsets.map((offset) => this.generateQuery({ ...obj, offset }));
-    }
-    const seriesPromises = queries.map((query) => this.fetchData(query));
-    if (Array.isArray(queryNoOffset)) {
-      const noOffsetPromise = queryNoOffset.map((query) => this.fetchData(query));
-      Promise.all([...seriesPromises, ...noOffsetPromise]).then((res) => {
-        console.log(res);
+    if (promqls) {
+      const noOffsetPromise = promqls.map((query) => this.fetchData(query));
+      Promise.all([...noOffsetPromise]).then((res) => {
         this.afterFetchChartDataOperations(res);
       });
     } else {
+      const queryNoOffset = this.generateQuery(obj);
+      // 如果有环比，再单独请求
+      let queries = [];
+      if (offsets) {
+        queries = offsets.map((offset) => this.generateQuery({ ...obj, offset }));
+      }
+      const seriesPromises = queries.map((query) => this.fetchData(query));
       const noOffsetPromise = this.fetchData(queryNoOffset);
       Promise.all([...seriesPromises, noOffsetPromise]).then((res) => {
-        console.log(res);
         this.afterFetchChartDataOperations(res);
       });
     }
