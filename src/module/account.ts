@@ -48,6 +48,12 @@ const accountStore: IStore<accountStoreState> = {
       const { access_token, refresh_token } = dat;
       localStorage.setItem('access_token', access_token);
       localStorage.setItem('refresh_token', refresh_token);
+      yield put({
+        type: 'common/getClusters',
+      });
+      yield put({
+        type: 'common/getBusiGroups',
+      });
       return err;
     },
     *getProfile({}, { put, call, select }: any) {
