@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Checkbox, Empty, Input } from 'antd';
+import { Checkbox, Empty, Input, Radio, Space } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/common';
 import { getBusiGroups } from '@/services/common';
 import { CommonStoreState } from '@/store/commonInterface';
 import './index.less';
+import { SearchOutlined } from '@ant-design/icons';
 
 const CheckboxGroup = Checkbox.Group;
 const { Search } = Input;
@@ -62,32 +63,35 @@ export const SelectList: React.FC<SelectListProps> = ({
   );
 
   return (
-    <div className='select-list'>
-      {dataSource.map((item) => {
-        const key = item[fieldNames.key || 'value'];
-        const label = item[fieldNames.label || 'label'];
-        const value = item[fieldNames.value || 'value'];
-        return (
-          <div
-            key={key}
-            className={`select-list-item ${
-              curSeletedKey === key ? 'select-list-item-active' : ''
-            }`}
-            onClick={(e) => {
-              e.preventDefault();
-              if (curSeletedKey !== key) {
-                setCurSelectedKey(key);
-                onChange && onChange(value, item);
-              } else if (allowNotSelect) {
-                setCurSelectedKey('');
-                onChange && onChange('', {});
-              }
-            }}
-          >
-            {label}
-          </div>
-        );
-      })}
+    <div className='radio-list'>
+      <Radio.Group className='radio-list-group' value={curSeletedKey}>
+        <Space className='radio-list-group-space' direction='vertical'>
+          {dataSource.map((item) => {
+            const label = item[fieldNames.label || 'label'];
+            const key = item[fieldNames.key || 'value'];
+            const value = item[fieldNames.value || 'value'];
+            return (
+              <Radio
+                className='radio-list-group-item'
+                key={key}
+                value={value}
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (curSeletedKey !== value) {
+                    setCurSelectedKey(value);
+                    onChange && onChange(value, item);
+                  } else if (allowNotSelect) {
+                    setCurSelectedKey('');
+                    onChange && onChange('', {});
+                  }
+                }}
+              >
+                {label}
+              </Radio>
+            );
+          })}
+        </Space>
+      </Radio.Group>
     </div>
   );
 };
@@ -98,7 +102,7 @@ const clustersGroupContent = (clusterGroup: groupProps): IGroupItemProps => {
     (state) => state.common,
   );
   const [checkedList, setCheckedList] = useState<string[]>([]);
-  const [indeterminate, setIndeterminate] = useState<boolean>(true);
+  const [indeterminate, setIndeterminate] = useState<boolean>(false);
   const [checkAll, setCheckAll] = useState<boolean>(false);
   const onCheckAllChange = (e) => {
     const curCheckedList = e.target.checked ? clusters : [];
@@ -194,18 +198,31 @@ const busiGroupContent = (busiGroupProps: {
     render() {
       return (
         <>
-          <Search
+          <Input
             className='left-area-group-search'
-            placeholder='请输入业务组名称进行筛选'
-            onSearch={(value) => {
+            prefix={<SearchOutlined />}
+            onPressEnter={(e) => {
+              e.preventDefault();
+              const value = e.currentTarget.value;
+              console.log('value-----', value);
               if (value) {
                 getBusiGroups(value).then((res) => {
                   setFilteredBusiGroups(res.dat || []);
                 });
               } else {
-                setFilteredBusiGroups(busiGroups);
+                console.log('112312312');
+                getBusiGroups('').then((res) => {
+                  const data = res.dat || [];
+                  setFilteredBusiGroups(data);
+                  dispatch({
+                    type: 'common/saveData',
+                    prop: 'busiGroups',
+                    data,
+                  });
+                });
               }
             }}
+            placeholder={'请输入业务组名称进行筛选'}
           />
           {busiGroups.length !== 0 || showNotGroupItem ? (
             <SelectList
