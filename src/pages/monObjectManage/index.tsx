@@ -1,7 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import PageLayout from '@/components/pageLayout';
 import LeftTree from '@/components/LeftTree';
-import { DatabaseOutlined, DownOutlined } from '@ant-design/icons';
+import {
+  DatabaseOutlined,
+  DownOutlined,
+  SearchOutlined,
+} from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import './index.less';
 import {
@@ -59,69 +63,6 @@ interface OperateionModalProps {
 }
 
 const { TextArea } = Input;
-
-const columns = [
-  {
-    title: '集群',
-    dataIndex: 'cluster',
-    width: 100,
-    fixed: 'left' as const,
-  },
-  {
-    title: '标识',
-    dataIndex: 'ident',
-    width: 140,
-  },
-  {
-    title: '标签',
-    dataIndex: 'tags',
-    ellipsis: {
-      showTitle: false,
-    },
-    render(tagArr) {
-      const content =
-        tagArr && tagArr.map((item) => <Tag key={item}>{item}</Tag>);
-      return (
-        tagArr && (
-          <Tooltip
-            title={content}
-            placement='topLeft'
-            getPopupContainer={() => document.body}
-            overlayClassName='mon-manage-table-tooltip'
-          >
-            {content}
-          </Tooltip>
-        )
-      );
-    },
-  },
-  {
-    title: '业务组',
-    dataIndex: 'group_obj',
-    width: 140,
-    render(groupObj: BusiGroupItem | null) {
-      return groupObj ? groupObj.name : '未归组';
-    },
-  },
-  {
-    title: '备注',
-    dataIndex: 'note',
-    ellipsis: {
-      showTitle: false,
-    },
-    render(note) {
-      return (
-        <Tooltip
-          title={note}
-          placement='topLeft'
-          getPopupContainer={() => document.body}
-        >
-          {note}
-        </Tooltip>
-      );
-    },
-  },
-];
 
 // 绑定标签弹窗内容
 const bindTagDetail = () => {
@@ -368,8 +309,8 @@ const OperationModal: React.FC<OperateionModalProps> = ({
 
   // 提交表单
   function submitForm() {
-    setConfirmLoading(true);
     form.validateFields().then((data) => {
+      setConfirmLoading(true);
       data.idents = data.idents.split('\n');
       requestFunc(data)
         .then(() => {
@@ -406,7 +347,7 @@ const OperationModal: React.FC<OperateionModalProps> = ({
         setTagsList(dat);
       });
     }
-  }, [operateType, identList]);
+  }, [identList]);
 
   return (
     <Modal
@@ -451,11 +392,13 @@ const OperationModal: React.FC<OperateionModalProps> = ({
   );
 };
 
-const ObjectManage: React.FC = () => {
+const MonObjectManage: React.FC = () => {
   const { t } = useTranslation();
   const tableRef = useRef({
     handleReload() {},
   });
+  const isAddTagToQueryInput = useRef(false);
+  const [tableQueryContent, setTableQueryContent] = useState<string>('');
   const [operateType, setOperateType] = useState<OperateType>(OperateType.None);
   const [curClusters, setCurClusters] = useState<string[]>([]);
   const [curBusiId, setCurBusiId] = useState<number>(-2);
@@ -464,7 +407,124 @@ const ObjectManage: React.FC = () => {
   );
   const [selectedIdents, setSelectedIdents] = useState<string[]>([]);
 
-  function showOperationModal(curOperateType: OperateType, defaultIdents = '') {
+  const columns = [
+    {
+      title: '集群',
+      dataIndex: 'cluster',
+      width: 100,
+      fixed: 'left' as const,
+    },
+    {
+      title: '标识',
+      dataIndex: 'ident',
+      width: 140,
+    },
+    {
+      title: '标签',
+      dataIndex: 'tags',
+      ellipsis: {
+        showTitle: false,
+      },
+      render(tagArr) {
+        const content =
+          tagArr &&
+          tagArr.map((item) => (
+            <Tag
+              color='blue'
+              key={item}
+              onClick={(e) => {
+                if (!tableQueryContent.includes(item)) {
+                  isAddTagToQueryInput.current = true;
+                  setTableQueryContent(
+                    tableQueryContent
+                      ? `${tableQueryContent.trim()} ${item}`
+                      : item,
+                  );
+                }
+              }}
+            >
+              {item}
+            </Tag>
+          ));
+        return (
+          tagArr && (
+            <Tooltip
+              title={content}
+              placement='topLeft'
+              getPopupContainer={() => document.body}
+              overlayClassName='mon-manage-table-tooltip'
+            >
+              {content}
+            </Tooltip>
+          )
+        );
+      },
+    },
+    {
+      title: '业务组',
+      dataIndex: 'group_obj',
+      width: 140,
+      render(groupObj: BusiGroupItem | null) {
+        return groupObj ? groupObj.name : '未归组';
+      },
+    },
+    {
+      title: '备注',
+      dataIndex: 'note',
+      ellipsis: {
+        showTitle: false,
+      },
+      render(note) {
+        return (
+          <Tooltip
+            title={note}
+            placement='topLeft'
+            getPopupContainer={() => document.body}
+          >
+            {note}
+          </Tooltip>
+        );
+      },
+    },
+  ];
+
+  function renderLeftHeader() {
+    return (
+      <div className='table-operate-box'>
+        <Input
+          className='search-input'
+          prefix={<SearchOutlined />}
+          placeholder='模糊搜索表格内容(多个关键词请用空格分隔)'
+          value={tableQueryContent}
+          onChange={(e) => setTableQueryContent(e.target.value)}
+          onPressEnter={(e) => tableRef.current.handleReload()}
+        />
+        <Dropdown
+          trigger={['click']}
+          overlay={
+            <Menu
+              onClick={({ key }) => {
+                showOperationModal(key as OperateType);
+              }}
+            >
+              <Menu.Item key={OperateType.BindTag}>绑定标签</Menu.Item>
+              <Menu.Item key={OperateType.UnbindTag}>解绑标签</Menu.Item>
+              <Menu.Item key={OperateType.UpdateBusi}>修改业务组</Menu.Item>
+              <Menu.Item key={OperateType.RemoveBusi}>移出业务组</Menu.Item>
+              <Menu.Item key={OperateType.UpdateNote}>修改备注</Menu.Item>
+              <Menu.Item key={OperateType.Delete}>批量删除</Menu.Item>
+            </Menu>
+          }
+        >
+          <Button>
+            批量操作 <DownOutlined />
+          </Button>
+        </Dropdown>
+      </div>
+    );
+  }
+
+  function showOperationModal(curOperateType: OperateType) {
     setOperateType(curOperateType);
   }
 
@@ -472,8 +532,15 @@ const ObjectManage: React.FC = () => {
     tableRef.current.handleReload();
   }, [curBusiId, curClusters]);
 
+  useEffect(() => {
+    if (isAddTagToQueryInput.current) {
+      tableRef.current.handleReload();
+      isAddTagToQueryInput.current = false;
+    }
+  }, [tableQueryContent]);
+
   return (
-    <PageLayout title={t('对象列表')}>
+    <PageLayout icon={<DatabaseOutlined />} title={t('对象列表')}>
       <div className='object-manage-page-content'>
         <LeftTree
           clusterGroup={{
@@ -486,6 +553,8 @@ const ObjectManage: React.FC = () => {
             showNotGroupItem: true,
             onChange(value) {
               setCurBusiId(typeof value === 'number' ? value : -1);
+              setSelectedRowKeys([]);
+              setSelectedIdents([]);
             },
           }}
         />
@@ -509,68 +578,29 @@ const ObjectManage: React.FC = () => {
                 scroll: { x: 800, y: 'calc(100vh - 252px)' },
               }}
               url='/api/n9e/targets'
-              customQueryCallback={(data) => {
-                const requestParams = Object.assign(
+              customQueryCallback={(data) =>
+                Object.assign(
                   data,
+                  tableQueryContent ? { query: tableQueryContent } : {},
                   curBusiId !== -1 ? { bgid: curBusiId } : {},
                   curClusters.length ? { clusters: curClusters.join(',') } : {},
-                );
-                return requestParams;
-              }}
+                )
+              }
               pageParams={{
                 curPageName: 'p',
                 pageSizeName: 'limit',
                 pageSize: 30,
                 pageSizeOptions: ['30', '100', '200', '500'],
               }}
-              apiCallback={({ dat: { list: data, total } }) => {
-                setSelectedRowKeys([]);
-                setSelectedIdents([]);
-                return {
-                  data,
-                  total,
-                };
-              }}
+              apiCallback={({ dat: { list: data, total } }) => ({
+                data,
+                total,
+              })}
               columns={columns}
               reloadBtnType='btn'
               reloadBtnPos='left'
-              filterType='none'
-              searchParams={{
-                apiName: 'query',
-                placeholder: '模糊搜索表格内容(多个关键词请用空格分隔)',
-              }}
-              searchPos='right'
-              leftHeader={
-                <Dropdown
-                  trigger={['click']}
-                  overlay={
-                    <Menu
-                      onClick={({ key }) => {
-                        showOperationModal(key as OperateType);
-                      }}
-                    >
-                      <Menu.Item key={OperateType.BindTag}>绑定标签</Menu.Item>
-                      <Menu.Item key={OperateType.UnbindTag}>
-                        解绑标签
-                      </Menu.Item>
-                      <Menu.Item key={OperateType.UpdateBusi}>
-                        修改业务组
-                      </Menu.Item>
-                      <Menu.Item key={OperateType.RemoveBusi}>
-                        移出业务组
-                      </Menu.Item>
-                      <Menu.Item key={OperateType.UpdateNote}>
-                        修改备注
-                      </Menu.Item>
-                      <Menu.Item key={OperateType.Delete}>批量删除</Menu.Item>
-                    </Menu>
-                  }
-                >
-                  <Button>
-                    批量操作 <DownOutlined />
-                  </Button>
-                </Dropdown>
-              }
+              filterType='flex'
+              leftHeader={renderLeftHeader()}
             />
           )}
         </div>
@@ -586,4 +616,4 @@ const ObjectManage: React.FC = () => {
   );
 };
 
-export default ObjectManage;
+export default MonObjectManage;

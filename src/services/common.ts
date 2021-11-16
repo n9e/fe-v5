@@ -11,9 +11,11 @@ export function getCommonClusters() {
 export function getBusiGroups(query: string, limit: number = 200) {
   return request(`/api/n9e/busi-groups`, {
     method: RequestMethod.Get,
-    params: {
-      query,
-      limit,
-    },
+    params: Object.assign(
+      {
+        limit,
+      },
+      query ? { query } : {},
+    ),
   });
 }

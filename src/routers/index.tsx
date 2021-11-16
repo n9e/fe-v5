@@ -106,7 +106,7 @@ export default function Content() {
         <Route exact path='/event' component={Event} />
         <Route exact path='/event/:id' component={EventDetail} />
         <Route exact path='/event-history/:id' component={EventDetail} />
-        <Route exact path='/mon-list' component={MonObjectManage} />
+        <Route exact path='/targets' component={MonObjectManage} />
         {lazyRoutes.map((route, i) => (
           <RouteWithSubRoutes key={i} {...route} />
         ))}
