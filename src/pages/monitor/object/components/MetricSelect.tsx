@@ -68,7 +68,7 @@ export default (props) => {
   const renderMetricList = (metrics = [], metricTabKey: string) => {
     const selectedMetrics = props.metrics;
     return (
-      <div className="tabPane" style={{maxHeight: 300, overflow: 'auto'}}>
+      <div className="tabPane" style={{maxHeight: 440, overflow: 'auto'}}>
         {
           metrics.length ?
             <ul className="metric-list" style={{ border: 'none' }}>

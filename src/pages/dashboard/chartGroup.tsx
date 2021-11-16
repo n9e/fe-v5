@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useContext,
-  useCallback,
-  ReactElement,
-} from 'react';
+import React, { useState, useEffect, useContext, useCallback, ReactElement } from 'react';
 import { Button, Collapse, Modal, Menu, Dropdown, Divider } from 'antd';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
@@ -21,8 +15,12 @@ import { Range } from '@/components/DateRangePicker';
 import { TagFilterResponse } from './VariableConfig/definition';
 import { number } from 'echarts';
 import { useTranslation } from 'react-i18next';
+import Graph from '@/components/Graph';
+import moment from 'moment';
+
 const { confirm } = Modal;
 interface Props {
+  busiId: string;
   groupInfo: Group;
   range: Range;
   step: number;
@@ -178,19 +176,8 @@ const layouts: Layouts = {
 
 export default function ChartGroup(props: Props) {
   const { t } = useTranslation();
-  const {
-    groupInfo,
-    range,
-    step,
-    variableConfig,
-    onAddChart,
-    onUpdateChart,
-    onDelChartGroup,
-    onDelChart,
-    onUpdateChartGroup,
-    onMoveUpChartGroup,
-    onMoveDownChartGroup,
-  } = props;
+  const { busiId, groupInfo, range, step, variableConfig, onAddChart, onUpdateChart, onDelChartGroup, onDelChart, onUpdateChartGroup, onMoveUpChartGroup, onMoveDownChartGroup } =
+    props;
   const [chartConfigs, setChartConfigs] = useState<Chart[]>([]);
   const [layout, setLayout] = useState<Layouts>(layouts); // const [colItem, setColItem] = useState<number>(defColItem);
 
@@ -201,79 +188,46 @@ export default function ChartGroup(props: Props) {
 
   const init = () => {
     setMounted(false);
-    getCharts(groupInfo.id).then((res) => {
+    getCharts(busiId, groupInfo.id).then((res) => {
       let charts = res.dat
         ? res.dat.map((item: { configs: string; id: any; weight: any }) => {
             let configs = item.configs ? JSON.parse(item.configs) : {};
-            return {
-              id: item.id,
-              configs,
-              weight: item.weight,
-            };
+            return { id: item.id, configs, weight: item.weight };
           })
         : [];
-      const realChart = charts.filter(
-        (item: {
-          configs: {
-            metric: any;
-            prome_ql: any;
-          };
-        }) => {
-          return item.configs.metric || item.configs.prome_ql;
-        },
-      );
-      const innerLayout = realChart.map(
-        (
-          item: {
-            configs: {
-              layout: {
-                i: string;
-              };
-            };
-          },
-          index: string | number,
-        ) => {
-          if (item.configs.layout) {
-            // 当Chart被删除后 layout中的i会中断，ResponsiveReactGridLayout会有问题
-            item.configs.layout.i = '' + index;
-            return item.configs.layout;
-          } else {
-            return getNewItemLayout(
-              realChart.slice(0, index).map(
-                (item: {
-                  configs: {
-                    layout: any;
-                  };
-                }) => item.configs.layout,
-              ),
-              Number(index),
-            ); // return {
-            //   x: 0,
-            //   y: 0,
-            //   w: unit,
-            //   h: unit / 2,
-            //   i: '' + index,
-            // };
-          }
-        },
-      );
-      const realLayout: Layouts = {
-        lg: innerLayout,
-        sm: innerLayout,
-        md: innerLayout,
-        xs: innerLayout,
-        xxs: innerLayout,
-      };
+
+      const innerLayout = charts.map((item: { configs: { layout: { i: string } } }, index: string | number) => {
+        if (item.configs.layout) {
+          // 当Chart被删除后 layout中的i会中断，ResponsiveReactGridLayout会有问题
+          item.configs.layout.i = '' + index;
+          return item.configs.layout;
+        } else {
+          return getNewItemLayout(
+            charts.slice(0, index).map(
+              (item: {
+                configs: {
+                  layout: any;
+                };
+              }) => item.configs.layout,
+            ),
+            Number(index),
+          ); // return {
+          //   x: 0,
+          //   y: 0,
+          //   w: unit,
+          //   h: unit / 2,
+          //   i: '' + index,
+          // };
+        }
+      });
+      const realLayout: Layouts = { lg: innerLayout, sm: innerLayout, md: innerLayout, xs: innerLayout, xxs: innerLayout };
       setLayout(realLayout);
-      setChartConfigs(realChart);
+      setChartConfigs(charts);
       setMounted(true);
     });
   };
 
-  const getNewItemLayout = function (
-    curentLayouts: Array<Layout>,
-    index: number,
-  ): Layout {
+  const getNewItemLayout = function (curentLayouts: Array<Layout>, index: number): Layout {
     const w = unit;
     const h = unit / 3;
     const layoutArrayLayoutFillArray = new Array<Array<number>>();
@@ -306,10 +260,7 @@ export default function ChartGroup(props: Props) {
 
       for (let x = i; x < i + w; x++) {
         for (let y = j; y < j + h; y++) {
-          if (
-            layoutArrayLayoutFillArray[x] &&
-            layoutArrayLayoutFillArray[x][y]
-          ) {
+          if (layoutArrayLayoutFillArray[x] && layoutArrayLayoutFillArray[x][y]) {
             flag = false;
           }
         }
@@ -333,37 +284,18 @@ export default function ChartGroup(props: Props) {
       nextLayoutY = layoutArrayLayoutFillArray.length;
     }
 
-    return {
-      w,
-      h,
-      x: nextLayoutX,
-      y: nextLayoutY,
-      i: '' + index,
-    };
+    return { w, h, x: nextLayoutX, y: nextLayoutY, i: '' + index };
   };
 
-  const onLayoutChange = async (
-    layout: {
-      h: any;
-      w: any;
-      x: any;
-      y: any;
-      i: any;
-    }[],
-  ) => {
+  const onLayoutChange = async (layout: { h: any; w: any; x: any; y: any; i: any }[]) => {
     let currConfigs = chartConfigs.map((item, index) => {
       const { h, w, x, y, i } = layout[index];
-      item.configs.layout = {
-        h,
-        w,
-        x,
-        y,
-        i,
-      };
+      item.configs.layout = { h, w, x, y, i };
       return item;
-    }); // setLayout({ lg: [...layout] });
-
-    updateCharts(currConfigs);
+    });
+    // setLayout({ lg: [...layout] });
+    // 临时注释，需要重新实现
+    // updateCharts(currConfigs);
   };
 
   const setArrange = (colItem: number, w = cols / colItem, h = unit / 3) => {
@@ -393,24 +325,14 @@ export default function ChartGroup(props: Props) {
     });
     let currConfigs = chartConfigs.map((item, index) => {
       const { h, w, x, y, i } = _lg[index];
-      item.configs.layout = {
-        h,
-        w,
-        x,
-        y,
-        i,
-      };
+      item.configs.layout = { h, w, x, y, i };
       return item;
     });
-    updateCharts(currConfigs);
-    setLayout({
-      lg: [..._lg],
-      sm: [..._lg],
-      md: [..._lg],
-      xs: [..._lg],
-      xxs: [..._lg],
-    });
-    setChartConfigs(currConfigs); // setMounted(true);
+    // 临时注释，需要重新实现
+    // updateCharts(currConfigs);
+    setLayout({ lg: [..._lg], sm: [..._lg], md: [..._lg], xs: [..._lg], xxs: [..._lg] });
+    setChartConfigs(currConfigs);
+    // setMounted(true);
 
     groupInfo.updateTime = Date.now();
   };
@@ -524,53 +446,24 @@ export default function ChartGroup(props: Props) {
       chartConfigs &&
       chartConfigs.length > 0 &&
       chartConfigs.map((item, i) => {
-        const { metric, tags = {} } = item.configs;
-        let { prome_ql } = item.configs;
-        let tagsArr: Tag[] = Object.keys(tags)
-          .filter((key) => tags[key])
-          .reduce((result, key) => {
-            result = result.concat(
-              tags[key].map((v: any) => ({
-                key,
-                value: v,
-              })),
-            );
-            return result;
-          }, []);
-        let classpath_id, classpath_prefix;
+        let { QL } = item.configs;
 
-        if (variableConfig) {
-          variableConfig.tags.forEach((item) => {
-            if (prome_ql) {
-              if (Array.isArray(prome_ql)) {
-                prome_ql = prome_ql.map((i) => {
-                  if (item.value === '*') {
-                    return i.replaceAll('$' + item.key, '.+');
-                  }
+        // if (variableConfig) {
+        //   variableConfig.tags.forEach((item) => {
+        //     if (prome_ql) {
+        //       if (Array.isArray(prome_ql)) {
+        //         prome_ql = prome_ql.map((i) => {
+        //           if (item.value === '*') {
+        //             return i.replaceAll('$' + item.key, '.+');
+        //           }
 
-                  return i.replaceAll('$' + item.key, item.value);
-                });
-              } // prome_ql = prome_ql.replaceAll('$' + item.key, item.value);
-            } else if (
-              !tagsArr.find((tag: Tag) => tag.key === item.key) &&
-              item.value !== '*'
-            ) {
-              const { key, value } = item;
-              tagsArr.push({
-                key,
-                value,
-              });
-            }
-          });
-          classpath_id =
-            variableConfig.classpath_id === '*'
-              ? undefined
-              : variableConfig.classpath_id;
-          classpath_prefix =
-            variableConfig.classpath_id === '*'
-              ? undefined
-              : variableConfig.classpath_prefix;
-        }
+        //           return i.replaceAll('$' + item.key, item.value);
+        //         });
+        //       } // prome_ql = prome_ql.replaceAll('$' + item.key, item.value);
+        //     }
+        //   });
+        // }
+        const now = moment();
 
         return (
           <div
@@ -579,7 +472,59 @@ export default function ChartGroup(props: Props) {
             }}
             key={String(i)}
           >
-            <D3Chart
+            <Graph
+              data={{
+                promqls: QL.map((item) => item.PromQL),
+                selectedHosts: [],
+              }}
+              timeVal={360000}
+              extraRender={(graph) => {
+                return (
+                  <>
+                    <Button
+                      type='link'
+                      size='small'
+                      onClick={(e) => {
+                        e.preventDefault();
+                        window.open(item.configs.link);
+                      }}
+                      disabled={!item.configs.link}
+                    >
+                      <LinkOutlined />
+                    </Button>
+                    <Dropdown
+                      trigger={['click']}
+                      overlay={
+                        <Menu>
+                          <Menu.Item onClick={() => onUpdateChart(groupInfo, item)}>{t('编辑图表')}</Menu.Item>
+
+                          <Menu.Item
+                            danger
+                            onClick={() => {
+                              confirm({
+                                title: `${t('是否删除图表')}：${item.configs.name}`,
+                                onOk: async () => {
+                                  onDelChart(groupInfo, item);
+                                },
+
+                                onCancel() {},
+                              });
+                            }}
+                          >
+                            {t('删除图表')}
+                          </Menu.Item>
+                        </Menu>
+                      }
+                    >
+                      <Button type='link' size='small' onClick={(e) => e.preventDefault()}>
+                        <SettingOutlined />
+                      </Button>
+                    </Dropdown>
+                  </>
+                );
+              }}
+            />
+            {/* <D3Chart
               barControl='multiOrSort'
               title={chartConfigs[i].configs.name}
               rightBar={
@@ -599,19 +544,13 @@ export default function ChartGroup(props: Props) {
                     trigger={['click']}
                     overlay={
                       <Menu>
-                        <Menu.Item
-                          onClick={() => onUpdateChart(groupInfo, item)}
-                        >
-                          {t('编辑图表')}
-                        </Menu.Item>
+                        <Menu.Item onClick={() => onUpdateChart(groupInfo, item)}>{t('编辑图表')}</Menu.Item>
 
                         <Menu.Item
                           danger
                           onClick={() => {
                             confirm({
-                              title: `${t('是否删除图表')}：${
-                                item.configs.name
-                              }`,
+                              title: `${t('是否删除图表')}：${item.configs.name}`,
                               onOk: async () => {
                                 onDelChart(groupInfo, item);
                               },
@@ -625,31 +564,20 @@ export default function ChartGroup(props: Props) {
                       </Menu>
                     }
                   >
-                    <Button
-                      type='link'
-                      size='small'
-                      onClick={(e) => e.preventDefault()}
-                    >
+                    <Button type='link' size='small' onClick={(e) => e.preventDefault()}>
                       <SettingOutlined />
                     </Button>
                   </Dropdown>
                 </>
               }
               options={{
-                classpath_id,
-                classpath_prefix:
-                  classpath_prefix === undefined
-                    ? undefined
-                    : !!classpath_prefix,
                 ...item.configs,
                 prome_ql,
                 range,
                 step,
-                tags: tagsArr,
-                metric: metric,
                 limit: 50,
               }}
-            />
+            /> */}
           </div>
         );
       })
@@ -691,11 +619,7 @@ export default function ChartGroup(props: Props) {
   }, [mounted, groupInfo.updateTime, range, variableConfig, step]);
   return (
     <Collapse defaultActiveKey={['0']}>
-      <Panel
-        header={<span className='panel-title'>{groupInfo.name}</span>}
-        key='0'
-        extra={generateRightButton()}
-      >
+      <Panel header={<span className='panel-title'>{groupInfo.name}</span>} key='0' extra={generateRightButton()}>
         {renderCharts()}
       </Panel>
     </Collapse>

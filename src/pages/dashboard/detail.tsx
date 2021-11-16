@@ -2,23 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import PageLayout from '@/components/pageLayout';
 import DateRangePicker from '@/components/DateRangePicker';
-import {
-  ReloadOutlined,
-  RollbackOutlined,
-  EditOutlined,
-  FileAddOutlined,
-} from '@ant-design/icons';
+import { ReloadOutlined, RollbackOutlined, EditOutlined, FileAddOutlined } from '@ant-design/icons';
 import { Button, Input, Form, Modal, Divider, message } from 'antd';
 import { Range } from '@/components/DateRangePicker';
-import {
-  getSingleDashboard,
-  updateSingleDashboard,
-  createChartGroup,
-  getChartGroup,
-  delChartGroup,
-  removeChart,
-  updateChartGroup,
-} from '@/services/dashboard';
+import { getSingleDashboard, updateSingleDashboard, createChartGroup, getChartGroup, delChartGroup, removeChart, updateChartGroup } from '@/services/dashboard';
 import { Dashboard, Group } from '@/store/dashboardInterface';
 import ChartGroup, { Chart } from './chartGroup';
 import ChartConfigModal from './chartConfigModal';
@@ -30,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import Resolution from '@/components/Resolution';
 interface URLParam {
   id: string;
+  busiId: string;
 }
 const layout = {
   labelCol: {
@@ -43,7 +31,7 @@ let groupId: number;
 let isAddGroup: boolean = true;
 export default function DashboardDetail() {
   const { t } = useTranslation();
-  const { id } = useParams<URLParam>();
+  const { id, busiId } = useParams<URLParam>();
   const [groupForm] = Form.useForm();
   const history = useHistory();
   const variableRef = useRef<any>(null);
@@ -59,12 +47,10 @@ export default function DashboardDetail() {
   const [step, setStep] = useState(15);
   const [titleEditing, setTitleEditing] = useState(false);
   const [chartGroup, setChartGroup] = useState<Group[]>([]);
-  const [variableConfig, setVariableConfig] =
-    useState<TagFilterResponse | null>(null);
+  const [variableConfig, setVariableConfig] = useState<TagFilterResponse | null>(null);
   const [groupModalVisible, setGroupModalVisible] = useState(false);
   const [chartModalVisible, setChartModalVisible] = useState(false);
-  const [chartModalInitValue, setChartModalInitValue] =
-    useState<Chart | null>();
+  const [chartModalInitValue, setChartModalInitValue] = useState<Chart | null>();
   const [range, setRange] = useState<Range>({
     start: 0,
     end: 0,
@@ -74,15 +60,15 @@ export default function DashboardDetail() {
   }, []);
 
   const init = () => {
-    getSingleDashboard(id).then((res) => {
+    getSingleDashboard(busiId, id).then((res) => {
       setDashboard(res.dat);
 
-      if (res.dat.configs) {
-        setVariableConfig(JSON.parse(res.dat.configs));
-        variableRef.current && variableRef.current.setInitData(res.dat.configs);
-      }
+      // if (res.dat.configs) {
+      //   setVariableConfig(JSON.parse(res.dat.configs));
+      //   variableRef.current && variableRef.current.setInitData(res.dat.configs);
+      // }
     });
-    getChartGroup(id).then((res) => {
+    getChartGroup(busiId, id).then((res) => {
       let arr = res.dat || [];
       setChartGroup(
         arr
@@ -123,7 +109,7 @@ export default function DashboardDetail() {
 
   const handleDelChart = (group: Group, item: Chart) => {
     groupId = group.id;
-    removeChart(item.id);
+    removeChart(busiId, item.id);
     refreshUpdateTimeByChartGroupId();
   };
 
@@ -202,18 +188,8 @@ export default function DashboardDetail() {
       customArea={
         <div className='dashboard-detail-header'>
           <div className='dashboard-detail-header-left'>
-            <RollbackOutlined
-              className='back'
-              onClick={() => history.push('/dashboard')}
-            />
-            {titleEditing ? (
-              <Input
-                defaultValue={dashboard.name}
-                onPressEnter={handleModifyTitle}
-              />
-            ) : (
-              <div className='title'>{dashboard.name}</div>
-            )}
+            <RollbackOutlined className='back' onClick={() => history.push('/dashboard')} />
+            {titleEditing ? <Input defaultValue={dashboard.name} onPressEnter={handleModifyTitle} /> : <div className='title'>{dashboard.name}</div>}
             <EditOutlined className='edit' onClick={handleEdit} />
           </div>
           <div className='dashboard-detail-header-right'>
@@ -252,6 +228,7 @@ export default function DashboardDetail() {
         <div className='charts'>
           {chartGroup.map((item, i) => (
             <ChartGroup
+              busiId={busiId}
               key={i}
               step={step}
               groupInfo={item}
@@ -293,12 +270,7 @@ export default function DashboardDetail() {
       </Modal>
 
       {chartModalVisible && (
-        <ChartConfigModal
-          initialValue={chartModalInitValue}
-          groupId={groupId}
-          show={chartModalVisible}
-          onVisibleChange={handleChartConfigVisibleChange}
-        />
+        <ChartConfigModal busiId={busiId} initialValue={chartModalInitValue} groupId={groupId} show={chartModalVisible} onVisibleChange={handleChartConfigVisibleChange} />
       )}
     </PageLayout>
   );
