@@ -49,3 +49,11 @@ export const GetTmpChartData = function (ids: string) {
     method: RequestMethod.Get,
   });
 };
+
+export const prometheusAPI = function (path: string, params, options) {
+  return request(`/api/n9e/prometheus/api/v1/${path}`, {
+    method: RequestMethod.Get,
+    params,
+    ...options
+  })
+}
