@@ -25,6 +25,7 @@ import Event from '@/pages/event';
 import EventDetail from '@/pages/event/detail';
 import Overview from '@/pages/overview';
 import historyEvents from '@/pages/historyEvents';
+import MonObjectManage from '@/pages/monObjectManage';
 import Demo from '@/pages/demo';
 
 import { dynamicPackages, Entry } from '@/utils';
@@ -93,6 +94,7 @@ export default function Content() {
         <Route exact path='/event' component={Event} />
         <Route exact path='/event/:id' component={EventDetail} />
         <Route exact path='/event-history/:id' component={EventDetail} />
+        <Route exact path='/targets' component={MonObjectManage} />
         {lazyRoutes.map((route, i) => (
           <RouteWithSubRoutes key={i} {...route} />
         ))}

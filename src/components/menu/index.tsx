@@ -59,8 +59,8 @@ const SideMenu: FC = () => {
       </div>
 
       <Menu theme='dark' inlineCollapsed={collapsed} onClick={handleClick} mode='inline'>
-        <SubMenu icon={<LineChartOutlined />} title={t('监控对象')}>
-          <Menu.Item key='/metric/explorer'>{t('对象列表')}</Menu.Item>
+        <SubMenu icon={<DatabaseOutlined />} title={t('监控对象')}>
+          <Menu.Item key='/targets'>{t('对象列表')}</Menu.Item>
         </SubMenu>
         <SubMenu key='1' icon={<LineChartOutlined />} title={t('监控看图')}>
           <Menu.Item key='/metric/explorer'>{t('即时查询')}</Menu.Item>
