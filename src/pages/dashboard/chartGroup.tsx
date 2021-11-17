@@ -465,10 +465,10 @@ export default function ChartGroup(props: Props) {
         <br />
         <Checkbox
           onChange={(e) => {
-            // let newGraphs = [...graphs];
-            // let dstGraph = newGraphs[i];
-            // dstGraph.legend = e.target.checked;
-            // setGraphs(newGraphs);
+            let newChartConfigs = [...chartConfigs];
+            let dstChartConfigs = newChartConfigs[i];
+            dstChartConfigs.configs.showLegend = e.target.checked;
+            setChartConfigs(newChartConfigs);
           }}
         >
           Show Legend
@@ -484,8 +484,7 @@ export default function ChartGroup(props: Props) {
       chartConfigs &&
       chartConfigs.length > 0 &&
       chartConfigs.map((item, i) => {
-        let { QL, name } = item.configs;
-
+        let { QL, name, showLegend } = item.configs;
         // if (variableConfig) {
         //   variableConfig.tags.forEach((item) => {
         //     if (prome_ql) {
@@ -511,13 +510,12 @@ export default function ChartGroup(props: Props) {
           >
             <Graph
               data={{
-                // legend: true,
+                legend: showLegend,
                 step,
                 range,
                 title: name,
                 promqls: QL.map((item) => item.PromQL),
               }}
-              timeVal={360000}
               extraRender={(graph) => {
                 return (
                   <>
