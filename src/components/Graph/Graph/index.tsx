@@ -22,9 +22,10 @@ interface GraphProps {
     title?: string;
     selectedHosts?: { ident: string }[];
     metric?: string;
-    promqls?: string[];
+    promqls?: string[] | { current: string }[];
   };
   graphConfigInnerVisible?: boolean;
+  showHeader?: boolean;
   extraRender?: (ReactNode) => ReactNode;
 }
 
@@ -202,7 +203,14 @@ export default class Graph extends Component<GraphProps, GraphState> {
     if (aggrFunc) obj.curAggrFunc = aggrFunc;
     if (aggrGroups && aggrGroups.length > 0) obj.curAggrGroup = aggrGroups;
     if (promqls) {
-      const noOffsetPromise = promqls.map((query) => this.fetchData(query));
+      // 取查询语句的正确值，并去掉查询条件为空的语句
+      const formattedPromqls = promqls
+        .map((promql: string | { current: string }) => {
+          return typeof promql === 'string' ? promql : promql.current;
+        })
+        .filter((promql) => promql);
+
+      const noOffsetPromise = formattedPromqls.map((query) => this.fetchData(query));
       Promise.all([...noOffsetPromise]).then((res) => {
         this.afterFetchChartDataOperations(res);
       });
@@ -223,24 +231,26 @@ export default class Graph extends Component<GraphProps, GraphState> {
 
   render() {
     const { spinning } = this.state;
-    const { extraRender, data } = this.props;
+    const { extraRender, data, showHeader = true } = this.props;
     const { title, metric } = data;
     const graphConfig = this.getGraphConfig(data);
 
     return (
       <div className={graphConfig.legend ? 'graph-container graph-container-hasLegend' : 'graph-container'}>
-        <div
-          className='graph-header'
-          style={{
-            height: this.headerHeight,
-            lineHeight: `${this.headerHeight}px`,
-          }}
-        >
-          <div className='graph-extra'>
-            <div style={{ display: 'inline-block' }}>{extraRender && _.isFunction(extraRender) ? extraRender(this) : null}</div>
+        {showHeader && (
+          <div
+            className='graph-header'
+            style={{
+              height: this.headerHeight,
+              lineHeight: `${this.headerHeight}px`,
+            }}
+          >
+            <div className='graph-extra'>
+              <div style={{ display: 'inline-block' }}>{extraRender && _.isFunction(extraRender) ? extraRender(this) : null}</div>
+            </div>
+            <div>{title || metric}</div>
           </div>
-          <div>{title || metric}</div>
-        </div>
+        )}
         {this.props.graphConfigInnerVisible ? (
           <GraphConfigInner
             data={graphConfig}
