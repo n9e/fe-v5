@@ -1,58 +1,47 @@
 /* eslint-disable no-use-before-define */
 import _ from 'lodash';
 import moment from 'moment';
-import numeral from 'numeral';
 
 const fmt = 'YYYY-MM-DD HH:mm:ss';
 
 export default function getTooltipsContent(activeTooltipData) {
-  const { isComparison, points } = activeTooltipData;
+  const { points, series, formatUnit, precision } = activeTooltipData;
   const tooltipWidth = window.innerWidth / 1.5;
-  const sortedPoints = _.orderBy(points, (point) => {
-    const { series = {} } = point;
-    if (isComparison) {
-      const { comparison } = series.userOptions || {};
-      return Number(comparison) || 0;
-    }
-    return _.get(series, 'userOptions.tags');
-  });
+  // const sortedPoints = _.orderBy(points, (point) => {
+  //   const { series = {} } = point;
+  //   if (isComparison) {
+  //     const { comparison } = series.userOptions || {};
+  //     return Number(comparison) || 0;
+  //   }
+  //   return _.get(point, 'tags');
+  // });
   let tooltipContent = '';
 
   tooltipContent += getHeaderStr(activeTooltipData);
 
-  _.each(sortedPoints, (point) => {
-    tooltipContent += singlePoint(point, activeTooltipData);
+  _.each(points, (point, index) => {
+    tooltipContent += singlePoint(point, series[index], formatUnit, precision);
   });
 
   return `<div style="table-layout: fixed;max-width: ${tooltipWidth}px;word-wrap: break-word;white-space: normal;">${tooltipContent}</div>`;
 }
 
-function singlePoint(pointData = {}, activeTooltipData) {
+function singlePoint(pointData = {}, serie = {}, formatUnit, precision) {
   const { color, filledNull, serieOptions = {}, timestamp } = pointData;
-  const { comparison: comparisons, isComparison } = activeTooltipData;
   const { tags } = serieOptions;
-  const value = numeral(pointData.value).format('0,0[.]000');
+  const value = pointData.value;
   let name = tags;
-
-  // 对比情况下 name 特殊处理
-  if (isComparison) {
-    const mDate = serieOptions.comparison && typeof serieOptions.comparison === 'number' ? moment(timestamp).subtract(serieOptions.comparison, 'seconds') : moment(timestamp);
-    const isAllDayLevelComparison = _.every(comparisons, (o) => {
-      return _.isInteger(Number(o) / 86400000);
-    });
-
-    if (isAllDayLevelComparison) {
-      const dateStr = mDate.format('YYYY-MM-DD');
-      name = `${dateStr}`;
-    } else {
-      const dateStr = mDate.format(fmt);
-      name = `${dateStr} ${name}`;
-    }
+  if (serie.comparison) {
+    name += ` offset ${serie.comparison}`
   }
+
+  const serieMetricLabels = serie?.metricLabels || {}
+  const labels = Object.keys(serieMetricLabels).map(label => `<span>${label}: ${serieMetricLabels[label]}</span>`)
 
   return (
     `<span style="color:${color}">● </span>
-    ${name}：<strong>${value}${filledNull ? '(空值填补,仅限看图使用)' : ''}</strong><br />`
+    ${name}：<strong>${sizeFormatter(value)}${filledNull ? '(空值填补,仅限看图使用)' : ''}</strong>
+    ${labels}<br/>`
   );
 }
 
@@ -61,4 +50,41 @@ function getHeaderStr(activeTooltipData) {
   const dateStr = moment(points[0].timestamp).format(fmt);
   const headerStr = `<span style="color: #666">${dateStr}</span><br/>`;
   return headerStr;
+}
+
+function sizeFormatter (val, fixedCount = 2, {
+  withUnit = true,
+  withByte = true,
+  trimZero = false,
+} = {
+  withUnit: true,
+  withByte: true,
+  trimZero: false
+}) {
+  const size = val ? Number(val) : 0
+  let result
+  let unit = ''
+
+  if (size < 0) {
+    result = 0
+  } else if (size < 1024) {
+    result = size.toFixed(fixedCount)
+  } else if (size < 1024 * 1024) {
+    result = (size / 1024).toFixed(fixedCount)
+    unit = 'K'
+  } else if (size < 1024 * 1024 * 1024) {
+    result = (size / 1024 / 1024).toFixed(fixedCount)
+    unit = 'M'
+  } else if (size < 1024 * 1024 * 1024 * 1024) {
+    result = (size / 1024 / 1024 / 1024).toFixed(fixedCount)
+    unit = 'G'
+  } else if (size < 1024 * 1024 * 1024 * 1024 * 1024) {
+    result = (size / 1024 / 1024 / 1024 / 1024).toFixed(fixedCount)
+    unit = 'T'
+  }
+
+  trimZero && (result = parseFloat(result))
+  withUnit && (result = `${result}${unit}`)
+  withByte && (result = `${result}B`)
+  return result
 }
