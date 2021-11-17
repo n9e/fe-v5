@@ -34,14 +34,8 @@ export interface ChartConfig {
   layout?: Layout;
   tags: object;
   QL: QLItem[];
-  classpath_id?: number;
-  classpath_prefix?: Boolean;
-  researces?: string[];
-  filterMode: string;
-  ident: string;
-  metric: string[];
-  mode: string;
   name: string;
   plotline?: number;
   link?: string;
+  showLegend?: boolean;
 }
