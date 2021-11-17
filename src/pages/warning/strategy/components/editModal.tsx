@@ -84,7 +84,7 @@ const fields = [
   {
     id: 12,
     field: 'append_tags',
-    name: '集群'
+    name: '附加标签'
   },
   {
     id: 7,
@@ -143,6 +143,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
   const [notifyGroups, setNotifyGroups] = useState([]);
 
   const [field, setField] = useState<string>('cluster');
+  const [refresh, setRefresh] = useState(true);
 
   useEffect(() => {
     getNotifyChannel();
@@ -201,8 +202,6 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
 
   const modelOk = () => {
     form.validateFields().then(async (values) => {
-      
-      console.log(values)
       const data = {...values};
       switch (values.field) {
         case 'enable_time':
@@ -213,6 +212,12 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
         case 'disabled':
           data.disabled = !values.enable_status ? 1 : 0;
           delete data.enable_status;
+          break;
+        case 'callbacks':
+          data.callbacks = values.callbacks.map(item => item.url);
+          break;
+        case 'notify_recovered':
+          data.notify_recovered = values.notify_recovered ? 1 : 0;
           break;
         default:
           break;
@@ -232,7 +237,6 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
   }
 
   const fieldChange = (val) => {
-    console.log(val);
     setField(val);
   }
 
@@ -250,6 +254,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
           {...layout}
           form={form}
           className='strategy-form'
+          layout={refresh ? 'horizontal' : 'horizontal'}
           initialValues={{
             prom_eval_interval: 15,
             disabled: 0, // 0:立即启用 1:禁用
@@ -262,7 +267,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
           }}
         >
           <Form.Item
-            label={t('规则备注：')}
+            label={t('字段：')}
             name='field'
             rules={[
               {
@@ -391,13 +396,15 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                           initialValue={15}
                           wrapperCol={{ span: 10 }}
                         >
-                          <InputNumber min={1} />
+                          <InputNumber min={1} onChange={(val) => {
+                    setRefresh(!refresh);
+                  }}/>
                         </Form.Item>
-                        秒{' '}
+                        秒
                         <Tooltip
                           title={t(
                             `每隔${form.getFieldValue(
-                              'prom_eval_interval',
+                              'prom_eval_interval'
                             )}秒，把PromQL作为查询条件，去查询后端存储，如果查到了数据就表示当次有监控数据触发了规则`,
                           )}
                         >
@@ -429,7 +436,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                         >
                           <InputNumber min={0} />
                         </Form.Item>
-                        秒{' '}
+                        秒
                         <Tooltip
                           title={t(
                             `通常持续时长大于执行频率，在持续时长内按照执行频率多次执行PromQL查询，每次都触发才生成告警；如果持续时长置为0，表示只要有一次PromQL查询触发阈值，就生成告警`,
@@ -486,9 +493,11 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                             },
                           ]}
                         >
-                          <InputNumber min={0} />
+                          <InputNumber min={0} onChange={(val) => {
+                    setRefresh(!refresh);
+                  }}/>
                         </Form.Item>
-                        分钟{' '}
+                        分钟
                         <Tooltip
                           title={t(
                             `如果告警持续未恢复，间隔${form.getFieldValue(
@@ -506,7 +515,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                 return (
                   <>
                     <Form.Item label={t('改为：')}>
-                      <Form.List name='callbacks' initialValue={['']}>
+                      <Form.List name='callbacks' initialValue={[{}]}>
                         {(fields, { add, remove }, { errors }) => (
                           <>
                             {fields.map((field, index) => (
@@ -581,7 +590,6 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                       <TimePicker.RangePicker
                         format='HH:mm'
                         onChange={(val, val2) => {
-                          console.log(val, val2, form.getFieldValue('enable_time'));
                           form.setFieldsValue({
                             enable_stime: val2[0],
                             enable_etime: val2[1],

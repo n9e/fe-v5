@@ -1,11 +1,9 @@
 import React, {
   useEffect,
   useState,
-  useRef,
-  useCallback,
   useMemo,
 } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import {
   Tag,
   Button,
@@ -14,25 +12,15 @@ import {
   message,
   Switch,
   Dropdown,
-  Radio,
-  Checkbox,
-  Row,
-  Col,
-  Table,
-  notification
+  Table
 } from 'antd';
-import BaseTable from '@/components/BaseTable';
 import {
   getStrategyGroupSubList,
-  getStrategyGroup,
-  updateAlertEventsStatus,
-  batchDeleteStrategy,
   updateAlertRules
 } from '@/services/warning';
 import SearchInput from '@/components/BaseSearchInput';
 import { useHistory } from 'react-router-dom';
 
-import FormButtonModal from '@/components/BaseModal/formButtonModal';
 import {
   strategyItem,
   strategyStatus,
@@ -48,8 +36,6 @@ import RefreshIcon from '@/components/RefreshIcon';
 import ColorTag from '@/components/ColorTag';
 import {
   DownOutlined,
-  DeleteOutlined,
-  ExclamationCircleOutlined,
 } from '@ant-design/icons';
 import ImportAndDownloadModal, {
   ModalStatus,
@@ -57,15 +43,16 @@ import ImportAndDownloadModal, {
 import EditModal from './components/editModal';
 const { Option } = Select;
 const { confirm } = Modal;
-const type = 'alert_rule';
+
 const exportIgnoreAttrs = [
-  'append_tags',
-  'callbacks',
+  'cluster',
   'create_by',
   'group_id',
   'id',
+  'notify_groups_obj',
   'notify_groups',
   'notify_users',
+  'create_at',
   'update_at',
   'update_by',
 ];
@@ -85,7 +72,6 @@ const PageTable: React.FC<Props> = ({
 }) => {
   const { t, i18n } = useTranslation();
   const history = useHistory();
-  const dispatch = useDispatch();
   const [modalType, setModalType] = useState<ModalStatus>(ModalStatus.None);
   const [selectRowKeys, setSelectRowKeys] = useState<React.Key[]>([]);
   const [selectedRows, setSelectedRows] = useState<strategyItem[]>([]);
@@ -93,13 +79,7 @@ const PageTable: React.FC<Props> = ({
   const { curBusiItem } = useSelector<RootState, CommonStoreState>(state => state.common);
 
   const [query, setQuery] = useState<string>('');
-  const [FetchList, setFetchList] = useState<strategyItem[]>([]);
   const [isModalVisible, setisModalVisible] = useState<boolean>(false);
-  
-  const [allGroups, setallGroups] = useState([]);
-  const [allnotifyUsers, setallnotifyUsers] = useState([]);
-
-  const [allChannels, setallChannels] = useState([]);
 
   const [currentStrategyDataAll, setCurrentStrategyDataAll] = useState([]);
   const [currentStrategyData, setCurrentStrategyData] = useState([]);
@@ -121,7 +101,6 @@ const PageTable: React.FC<Props> = ({
     }
     setLoading(true);
     const { success, dat } = await getStrategyGroupSubList({id: bgid});
-    console.log(dat)
     if (success) {
       setCurrentStrategyDataAll(dat || []);
       setLoading(false);
@@ -132,9 +111,8 @@ const PageTable: React.FC<Props> = ({
   const filterData = () => {
     const data = JSON.parse(JSON.stringify(currentStrategyDataAll));
     const res = data.filter(item => {
-      return item.name.indexOf(query) > -1 || item.append_tags.indexOf(query) > -1 || clusters && clusters?.indexOf(item.cluster) > -1
+      return item.name.indexOf(query) > -1 || item.append_tags.join(' ').indexOf(query) > -1 || clusters && clusters?.indexOf(item.cluster) > -1
     });
-    console.log('filterData:', res);
     setCurrentStrategyData(res || []);
   }
 
@@ -237,11 +215,12 @@ const PageTable: React.FC<Props> = ({
           size='small'
           onChange={() => {
             const { id, disabled } = record;
-            updateAlertEventsStatus(
-              [id],
-              disabled === strategyStatus.Enable
-                ? strategyStatus.UnEnable
-                : strategyStatus.Enable,
+            updateAlertRules({
+              ids: [id],
+              fields: {
+                disabled: !disabled ? 1 : 0
+              }
+            }, curBusiItem.id
             ).then(() => {
               refreshList();
             });
@@ -306,27 +285,6 @@ const PageTable: React.FC<Props> = ({
     setisModalVisible(true);
   };
   
-
-  const notifyGroupsOptions = allGroups.map((ele: { id; name }, index) => (
-    <Option value={ele.id} key={index}>
-      {ele.name}
-    </Option>
-  ));
-  const notifyUsersOptions = allnotifyUsers.map(
-    (ele: { id; username }, index) => (
-      <Option value={ele.id} key={index}>
-        {ele.username}
-      </Option>
-    ),
-  );
-  const contactListCheckboxes = allChannels.map((ele: string, index) => {
-    return (
-      <Checkbox value={ele} key={index}>
-        {ele}
-      </Checkbox>
-    );
-  });
-  
   const menu = useMemo(() => {
     return (
       <ul className='ant-dropdown-menu'>
@@ -339,7 +297,6 @@ const PageTable: React.FC<Props> = ({
         <li
           className='ant-dropdown-menu-item'
           onClick={() => {
-            console.log(selectedRows,888)
             if (selectedRows.length) {
               const exportData = selectedRows.map((item) => {
                 return { ...item, ...exportIgnoreAttrsObj };
@@ -347,7 +304,7 @@ const PageTable: React.FC<Props> = ({
               setExportData(JSON.stringify(exportData, null, 2));
               setModalType(ModalStatus.Export);
             } else {
-              message.warning(t('未选择任何采集策略'));
+              message.warning(t('未选择任何规则'));
             }
           }}
         >
@@ -372,7 +329,7 @@ const PageTable: React.FC<Props> = ({
                 onCancel() {},
               });
             } else {
-              message.warning(t('未选择任何采集策略'));
+              message.warning(t('未选择任何规则'));
             }
           }}
         >
@@ -389,32 +346,14 @@ const PageTable: React.FC<Props> = ({
         
       </ul>
     );
-  }, [selectRowKeys, FetchList, t]);
+  }, [selectRowKeys, t]);
 
   const handleImportStrategy = async (data) => {
-    try {
-      let importData = JSON.parse(data);
-      console.log(curBusiItem)
-
-      // return addOrEditStrategy(importData, String(curBusiItem.id))
-
-      const { dat } = await addOrEditStrategy(importData, curBusiItem.id, 'Post');
-      console.log('导入接口返回', dat);
-      const msg = Object.keys(dat).map(key => {
-        return <p style={{color: dat[key] ? '#ff4d4f' : '#52c41a'}}>{key}: {dat[key] ? dat[key] : 'successfully'}</p>
-      });
-      notification.info({
-        message: msg
-      })
-      getAlertRules();
-      setModalType(ModalStatus.None);
-    } catch (err) {
-      return Promise.reject(err);
-    }
+    const { dat } = await addOrEditStrategy(data, curBusiItem.id, 'Post');
+    return dat || {};
   };
 
   const editModalFinish = async (isOk, fieldsData?) => {
-    console.log(isOk, fieldsData);
     if (isOk) {
       const res = await updateAlertRules({
         ids: selectRowKeys,
@@ -506,12 +445,16 @@ const PageTable: React.FC<Props> = ({
       />
       <ImportAndDownloadModal
         status={modalType}
-        onClose={() => setModalType(ModalStatus.None)}
+        onClose={() => {
+          setModalType(ModalStatus.None);
+          getAlertRules();
+        }}
         onSubmit={handleImportStrategy}
         title={t('策略')}
         exportData={exportData}
       />
-      <EditModal isModalVisible={isModalVisible} editModalFinish={editModalFinish}/>
+      {isModalVisible && <EditModal isModalVisible={isModalVisible} editModalFinish={editModalFinish}/>}
+      
     </div>
   );
 };

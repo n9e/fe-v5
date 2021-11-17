@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory, useParams, useLocation } from 'react-router-dom';
-import { debounce } from 'lodash';
 import moment from 'moment';
 import {
   Card,
@@ -24,14 +23,13 @@ import {
 const { TextArea } = Input;
 const { Option } = Select;
 import {
-  FundOutlined,
   QuestionCircleFilled,
   MinusCircleOutlined,
   PlusCircleOutlined,
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { RootState } from '@/store/common';
-import { warningStoreState, Metric } from '@/store/warningInterface';
+import { Metric } from '@/store/warningInterface';
 import { CommonStoreState } from '@/store/commonInterface';
 import { getTeamInfoList, getNotifiesList } from '@/services/manage';
 import { addOrEditStrategy, EditStrategy } from '@/services/warning';
@@ -67,19 +65,17 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
     (state) => state.common,
   );
   const { curBusiItem } = useSelector<RootState, CommonStoreState>(state => state.common);
-  
-  const [metricsDrawer, setMetricsDrawer] = useState<Array<Metric>>([]);
-  const [drawerVisible, setDrawerVisible] = useState<boolean>(false);
-  const [yplotline, setYplotline] = useState<number>(0);
+
   const [contactList, setInitContactList] = useState([]);
   const [notifyGroups, setNotifyGroups] = useState([]);
   const [initVal, setInitVal] = useState<any>({});
+  const [refresh, setRefresh] = useState(true);
 
   useEffect(() => {
     getNotifyChannel();
     getGroups();
-    
-    return () => {};
+
+    return () => { };
   }, []);
 
   useEffect(() => {
@@ -89,10 +85,7 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
       enable_status: detail?.disabled === undefined ? true : !detail?.disabled
     }
     setInitVal(data);
-    console.log('detail', data)
-    return () => {
-      
-    }
+
   }, [JSON.stringify(detail)])
 
   const enableDaysOfWeekOptions = [
@@ -114,7 +107,7 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
   ));
 
   const notifyGroupsOptions = notifyGroups.map((ng: any) => (
-    <Option value={ng.id} key={ng.id}>
+    <Option value={String(ng.id)} key={ng.id}>
       {ng.name}
     </Option>
   ));
@@ -131,18 +124,6 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
     setNotifyGroups(data || []);
   };
 
-  const openDrawer = function (index?) {
-    let promql = form.getFieldValue('promql');
-    if (!promql) {
-      message.warning(t('请先输入指标'));
-      return;
-    }
-    let metricStrArr = [{ name: '', promql, description: '' }];
-    setMetricsDrawer(metricStrArr);
-
-    setDrawerVisible(true);
-  };
-
   const handleTagsChange = (value: string[]) => {
     let top: string = value[value.length - 1];
     let reg = /\w+=\w+/;
@@ -155,11 +136,14 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
 
   const addSubmit = () => {
     form.validateFields().then(async (values) => {
+      const callbacks = values.callbacks.map(item => item.url);
       const data = {
         ...values,
         enable_stime: values.enable_time[0].format('HH:mm'),
         enable_etime: values.enable_time[1].format('HH:mm'),
         disabled: !values.enable_status ? 1 : 0,
+        notify_recovered: values.notify_recovered ? 1 : 0,
+        callbacks
       };
       let reqBody, method = 'Post';
       if (type === 1) {
@@ -191,8 +175,7 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
           history.push('/strategy');
         }
       }
-      
-      
+
     });
   };
 
@@ -201,20 +184,20 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
       <Form
         {...layout}
         form={form}
-        // onFinish={onFinish}
-        // onFinishFailed={onFinishFailed}
         className='strategy-form'
+        layout={refresh ? 'horizontal' : 'horizontal'}
         initialValues={{
           prom_eval_interval: 15,
           disabled: 0, // 0:立即启用 1:禁用  待修改
-          // enable_status: true,
           notify_recovered: 1, // 1:启用
-          // enable_time: '', // 待修改
           cluster: 'Default', // 生效集群
           enable_days_of_week: ['1', '2', '3', '4', '5', '6', '0'],
           ...detail,
           enable_time: detail?.enable_stime ? [moment(detail.enable_stime, 'HH:mm'), moment(detail.enable_etime, 'HH:mm')] : [moment('00:00', 'HH:mm'), moment('23:59', 'HH:mm')],
-          enable_status: detail?.disabled === undefined ? true : !detail?.disabled
+          enable_status: detail?.disabled === undefined ? true : !detail?.disabled,
+          callbacks: !!detail?.callbacks ? detail.callbacks.map(item => ({
+            url: item
+          })) : [{}]
         }}
       >
         <Space direction='vertical' style={{ width: '100%' }}>
@@ -277,35 +260,21 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
                 ))}
               </Select>
             </Form.Item>
-            {drawerVisible && (
-              <ChartDrawer
-                visible={drawerVisible}
-                onChange={(e) => {
-                  setDrawerVisible(e);
-                }}
-                yplotline={yplotline}
-                metrics={metricsDrawer}
-              ></ChartDrawer>
-            )}
+
             <Form.Item label='PromQL' className={'Promeql-content'} required>
-              <Space style={{ width: '100%', display: 'block' }}>
-                <Form.Item
-                  name='prom_ql'
-                  // labelCol={{ span: 3 }}
-                  // wrapperCol={{ span: 23 }}
-                  rules={[{ required: true, message: t('请输入PromQL') }]}
-                >
-                  <PromqlEditor className='promql-editor' xCluster='Default' />
-                </Form.Item>
-                <Tooltip title={t('预览')}>
-                  <FundOutlined
-                    className='Promeql-icon-btn'
-                    onClick={() => {
-                      openDrawer();
-                    }}
-                  />
-                </Tooltip>
-              </Space>
+              <Form.Item
+                name='prom_ql'
+                // labelCol={{ span: 3 }}
+                // wrapperCol={{ span: 23 }}
+                validateTrigger={['onBlur']}
+                rules={[{ required: true, message: t('请输入PromQL') }]}
+
+              >
+                <PromqlEditor
+                  // className='promql-editor' 
+                  xCluster='Default'
+                />
+              </Form.Item>
             </Form.Item>
             <Form.Item
               required
@@ -324,14 +293,16 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
                   initialValue={15}
                   wrapperCol={{ span: 10 }}
                 >
-                  <InputNumber min={1} />
+                  <InputNumber
+                    min={1}
+                    onChange={(val) => {
+                      setRefresh(!refresh);
+                    }} />
                 </Form.Item>
-                秒{' '}
+                秒
                 <Tooltip
                   title={t(
-                    `每隔${form.getFieldValue(
-                      'prom_eval_interval',
-                    )}秒，把PromQL作为查询条件，去查询后端存储，如果查到了数据就表示当次有监控数据触发了规则`,
+                    `每隔${form.getFieldValue('prom_eval_interval')}秒，把PromQL作为查询条件，去查询后端存储，如果查到了数据就表示当次有监控数据触发了规则`,
                   )}
                 >
                   <QuestionCircleFilled />
@@ -357,7 +328,7 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
                 >
                   <InputNumber min={0} />
                 </Form.Item>
-                秒{' '}
+                秒
                 <Tooltip
                   title={t(
                     `通常持续时长大于执行频率，在持续时长内按照执行频率多次执行PromQL查询，每次都触发才生成告警；如果持续时长置为0，表示只要有一次PromQL查询触发阈值，就生成告警`,
@@ -423,7 +394,6 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
               <TimePicker.RangePicker
                 format='HH:mm'
                 onChange={(val, val2) => {
-                  console.log(val, val2, form.getFieldValue('enable_time'));
                   form.setFieldsValue({
                     enable_stime: val2[0],
                     enable_etime: val2[1],
@@ -444,7 +414,17 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
               name='notify_recovered'
               valuePropName='checked'
             >
-              <Switch />
+              <Space>
+                <Switch />
+                <Tooltip
+                  title={t(
+                    `告警恢复时也发送通知`,
+                  )}
+                >
+                  <QuestionCircleFilled />
+                </Tooltip>
+              </Space>
+
             </Form.Item>
             <Form.Item label={t('重复发送频率')} required>
               <Space>
@@ -459,10 +439,13 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
                       message: t('重复发送频率不能为空'),
                     },
                   ]}
+
                 >
-                  <InputNumber min={0} />
+                  <InputNumber min={0} onChange={(val) => {
+                    setRefresh(!refresh);
+                  }} />
                 </Form.Item>
-                分钟{' '}
+                分钟
                 <Tooltip
                   title={t(
                     `如果告警持续未恢复，间隔${form.getFieldValue(
@@ -474,14 +457,17 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
                 </Tooltip>
               </Space>
             </Form.Item>
-            <Form.Item label={t('报警回调')}>
-              <Form.List name='callbacks' initialValue={['']}>
-                {(fields, { add, remove }, { errors }) => (
+            <Form.Item label={t('回调地址')}>
+              <Form.List name='callbacks' initialValue={[{}]}>
+                {(fields, { add, remove }) => (
                   <>
-                    {fields.map((field, index) => (
+                    {fields.map((field) => (
                       <Row gutter={[10, 0]} key={field.key}>
                         <Col span={22}>
-                          <Form.Item name={[field.name, 'url']}>
+                          <Form.Item
+                            name={[field.name, 'url']}
+                            fieldKey={[field.fieldKey, 'url']}
+                          >
                             <Input />
                           </Form.Item>
                         </Col>
@@ -498,25 +484,13 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
                       className='control-icon-normal'
                       onClick={() => add()}
                     />
-
-                    {/* <span
-                      style={{
-                        fontSize: 12,
-                        marginTop: 4,
-                        color: '#ccc',
-                      }}
-                    >
-                      {t(
-                        '通知自己开发的系统（请确认是夜莺服务端可访问的地址）',
-                      )}
-                    </span> */}
                   </>
                 )}
               </Form.List>
             </Form.Item>
           </Card>
           <Form.Item
-            {...tailLayout}
+            // {...tailLayout}
             style={{
               marginTop: 20,
             }}
@@ -524,7 +498,7 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
             <Button
               type='primary'
               onClick={addSubmit}
-              style={{ margin: '0 8px' }}
+              style={{ marginRight: '8px' }}
             >
               {type === 1 ? t('编辑') : type === 2 ? t('克隆') : t('创建')}
             </Button>
@@ -539,7 +513,7 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
           </Form.Item>
         </Space>
       </Form>
-      
+
     </div>
   );
 };
