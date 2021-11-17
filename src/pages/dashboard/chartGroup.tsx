@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useCallback, ReactElement } from 'react';
-import { Button, Collapse, Modal, Menu, Dropdown, Divider } from 'antd';
+import { Button, Collapse, Modal, Menu, Dropdown, Divider, Popover, Checkbox } from 'antd';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 const { Panel } = Collapse;
@@ -8,7 +8,7 @@ import { Group, ChartConfig } from '@/store/dashboardInterface';
 import { Tag } from '@/store/chart';
 import { getCharts, updateCharts } from '@/services/dashboard';
 import D3Chart from '@/components/D3Chart';
-import { SettingOutlined, LinkOutlined, DownOutlined } from '@ant-design/icons';
+import { SettingOutlined, LinkOutlined, DownOutlined, EditOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import { Range } from '@/components/DateRangePicker';
@@ -458,14 +458,33 @@ export default function ChartGroup(props: Props) {
     );
   };
 
+  const getPopoverContent = (graph, i) => {
+    return (
+      <div>
+        <Checkbox onChange={() => {}}>Multi Series in Tooltip, order value desc</Checkbox>
+        <br />
+        <Checkbox
+          onChange={(e) => {
+            let newChartConfigs = [...chartConfigs];
+            let dstChartConfigs = newChartConfigs[i];
+            dstChartConfigs.configs.showLegend = e.target.checked;
+            setChartConfigs(newChartConfigs);
+          }}
+        >
+          Show Legend
+        </Checkbox>
+        <br />
+        <Checkbox onChange={() => {}}>Value format with: Ki, Mi, Gi by 1024</Checkbox>
+      </div>
+    );
+  };
+
   const generateDOM = () => {
     return (
       chartConfigs &&
       chartConfigs.length > 0 &&
       chartConfigs.map((item, i) => {
-        console.log('item', item);
-        let { QL, name } = item.configs;
-
+        let { QL, name, showLegend } = item.configs;
         // if (variableConfig) {
         //   variableConfig.tags.forEach((item) => {
         //     if (prome_ql) {
@@ -481,7 +500,6 @@ export default function ChartGroup(props: Props) {
         //     }
         //   });
         // }
-        const now = moment();
 
         return (
           <div
@@ -492,10 +510,12 @@ export default function ChartGroup(props: Props) {
           >
             <Graph
               data={{
+                legend: showLegend,
+                step,
+                range,
                 title: name,
                 promqls: QL.map((item) => item.PromQL),
               }}
-              timeVal={360000}
               extraRender={(graph) => {
                 return (
                   <>
@@ -510,34 +530,40 @@ export default function ChartGroup(props: Props) {
                     >
                       <LinkOutlined />
                     </Button>
-                    <Dropdown
-                      trigger={['click']}
-                      overlay={
-                        <Menu>
-                          <Menu.Item onClick={() => onUpdateChart(groupInfo, item)}>{t('编辑图表')}</Menu.Item>
-
-                          <Menu.Item
-                            danger
-                            onClick={() => {
-                              confirm({
-                                title: `${t('是否删除图表')}：${item.configs.name}`,
-                                onOk: async () => {
-                                  onDelChart(groupInfo, item);
-                                },
-
-                                onCancel() {},
-                              });
-                            }}
-                          >
-                            {t('删除图表')}
-                          </Menu.Item>
-                        </Menu>
-                      }
+                    <Button
+                      type='link'
+                      size='small'
+                      onClick={(e) => {
+                        e.preventDefault();
+                        onUpdateChart(groupInfo, item);
+                      }}
                     >
+                      <EditOutlined />
+                    </Button>
+
+                    <Popover placement='left' content={getPopoverContent(graph, i)} trigger='click'>
                       <Button type='link' size='small' onClick={(e) => e.preventDefault()}>
                         <SettingOutlined />
                       </Button>
-                    </Dropdown>
+                    </Popover>
+
+                    <Button
+                      type='link'
+                      size='small'
+                      onClick={(e) => {
+                        e.preventDefault();
+                        confirm({
+                          title: `${t('是否删除图表')}：${item.configs.name}`,
+                          onOk: async () => {
+                            onDelChart(groupInfo, item);
+                          },
+
+                          onCancel() {},
+                        });
+                      }}
+                    >
+                      <CloseCircleOutlined />
+                    </Button>
                   </>
                 );
               }}

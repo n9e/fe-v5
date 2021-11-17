@@ -11,9 +11,10 @@ export default function OrderSort(props: Props) {
   const { onChange, showLabel } = props;
   const [isDesc, setIsDesc] = useState<Boolean>(true);
 
-  const handleClick = () => {
+  const handleClick = (e) => {
     setIsDesc(!isDesc);
     onChange(!isDesc);
+    e.preventDefault()
   };
 
   return (

@@ -8,10 +8,13 @@ import './index.less';
 
 interface GraphProps {
   height?: number;
+  style?: object;
   graphConfig: {
     xAxis: number;
     shared: any;
     comparison: any;
+    sharedSortDirection: string;
+    precision: string;
   };
   series: object[];
 }
@@ -30,12 +33,12 @@ export default class Graph extends Component<GraphProps> {
       yAxis: util.getYAxis({}, this.props.graphConfig),
       tooltip: {
         shared: this.props.graphConfig.shared,
+        sharedSortDirection: this.props.graphConfig.sharedSortDirection,
+        precision: this.props.graphConfig.precision,
         formatter: (points) => {
           return util.getTooltipsContent({
             points,
-            chartWidth: this.graphWrapEle.offsetWidth - 40,
-            comparison: this.props.graphConfig.comparison,
-            isComparison: !!_.get(this.props.graphConfig.comparison, 'length'),
+            chartWidth: this.graphWrapEle.offsetWidth - 40
           });
         },
       },
@@ -52,20 +55,28 @@ export default class Graph extends Component<GraphProps> {
   }
 
   componentWillReceiveProps(nextProps) {
+    const isFormatUnit1024 = nextProps.graphConfig.formatUnit === 1024 && nextProps.graphConfig.precision === 'short'
     if (this.chart) {
       const chartOptions = {
         yAxis: util.getYAxis(this.chart.options.yAxis, nextProps.graphConfig),
-        tooltip: {
+        tooltip: isFormatUnit1024 ? {
           xAxis: nextProps.graphConfig.xAxis,
           shared: nextProps.graphConfig.shared,
+          sharedSortDirection: nextProps.graphConfig.sharedSortDirection,
           formatter: (points) => {
             return util.getTooltipsContent({
+              formatUnit: nextProps.graphConfig.formatUnit,
+              precision: nextProps.graphConfig.precision,
+              series: this.props.series,
               points,
-              chartWidth: this.graphWrapEle.offsetWidth - 40,
-              comparison: nextProps.graphConfig.comparison,
-              isComparison: !!_.get(nextProps.graphConfig.comparison, 'length'),
+              chartWidth: this.graphWrapEle.offsetWidth - 40
             });
           },
+        } : {
+          xAxis: nextProps.graphConfig.xAxis,
+          shared: nextProps.graphConfig.shared,
+          sharedSortDirection: nextProps.graphConfig.sharedSortDirection,
+          precision: nextProps.graphConfig.precision,
         },
         series: nextProps.series,
       };
@@ -76,6 +87,7 @@ export default class Graph extends Component<GraphProps> {
   render() {
     return (
       <div
+        style={{ ...this.props.style }}
         ref={(ref) => {
           this.graphWrapEle = ref;
         }}

@@ -80,8 +80,9 @@ export const graphDefaultConfig = {
   comparisonOptions,
   threshold: undefined,
   legend: false,
-  shared: true,
-  linkVisible: true,
+  precision: 'origin',
+  shared: false,
+  sharedSortDirection: 'desc'
 };
 
 export const hexPalette = [

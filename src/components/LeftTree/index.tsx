@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Checkbox, Empty, Input } from 'antd';
+import { Checkbox, Empty, Input, Radio, Space } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/common';
 import { getBusiGroups } from '@/services/common';
 import { CommonStoreState } from '@/store/commonInterface';
 import './index.less';
+import { SearchOutlined } from '@ant-design/icons';
 
 const CheckboxGroup = Checkbox.Group;
 const { Search } = Input;
@@ -48,57 +49,50 @@ interface SelectListProps {
 }
 
 // 内容可选列表
-export const SelectList: React.FC<SelectListProps> = ({
-  dataSource,
-  fieldNames = {},
-  allowNotSelect = true,
-  defaultSelect,
-  onChange,
-}) => {
+export const SelectList: React.FC<SelectListProps> = ({ dataSource, fieldNames = {}, allowNotSelect = true, defaultSelect, onChange }) => {
   const [curSeletedKey, setCurSelectedKey] = useState<string | number>(
-    defaultSelect && typeof defaultSelect === 'object'
-      ? defaultSelect[fieldNames.key || 'value'] || ''
-      : defaultSelect,
+    defaultSelect && typeof defaultSelect === 'object' ? defaultSelect[fieldNames.key || 'value'] : defaultSelect,
   );
 
   return (
-    <div className='select-list'>
-      {dataSource.map((item) => {
-        const key = item[fieldNames.key || 'value'];
-        const label = item[fieldNames.label || 'label'];
-        const value = item[fieldNames.value || 'value'];
-        return (
-          <div
-            key={key}
-            className={`select-list-item ${
-              curSeletedKey === key ? 'select-list-item-active' : ''
-            }`}
-            onClick={(e) => {
-              e.preventDefault();
-              if (curSeletedKey !== key) {
-                setCurSelectedKey(key);
-                onChange && onChange(value, item);
-              } else if (allowNotSelect) {
-                setCurSelectedKey('');
-                onChange && onChange('', {});
-              }
-            }}
-          >
-            {label}
-          </div>
-        );
-      })}
+    <div className='radio-list'>
+      <Radio.Group className='radio-list-group' value={curSeletedKey}>
+        <Space className='radio-list-group-space' direction='vertical'>
+          {dataSource.map((item) => {
+            const label = item[fieldNames.label || 'label'];
+            const key = item[fieldNames.key || 'value'];
+            const value = item[fieldNames.value || 'value'];
+            return (
+              <Radio
+                className='radio-list-group-item'
+                key={key}
+                value={value}
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (curSeletedKey !== value) {
+                    setCurSelectedKey(value);
+                    onChange && onChange(value, item);
+                  } else if (allowNotSelect) {
+                    setCurSelectedKey('');
+                    onChange && onChange('', {});
+                  }
+                }}
+              >
+                {label}
+              </Radio>
+            );
+          })}
+        </Space>
+      </Radio.Group>
     </div>
   );
 };
 
 // 集群渲染内容
 const clustersGroupContent = (clusterGroup: groupProps): IGroupItemProps => {
-  const { clusters } = useSelector<RootState, CommonStoreState>(
-    (state) => state.common,
-  );
+  const { clusters } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const [checkedList, setCheckedList] = useState<string[]>([]);
-  const [indeterminate, setIndeterminate] = useState<boolean>(true);
+  const [indeterminate, setIndeterminate] = useState<boolean>(false);
   const [checkAll, setCheckAll] = useState<boolean>(false);
   const onCheckAllChange = (e) => {
     const curCheckedList = e.target.checked ? clusters : [];
@@ -112,11 +106,7 @@ const clustersGroupContent = (clusterGroup: groupProps): IGroupItemProps => {
     title: (
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <span>集群</span>
-        <Checkbox
-          indeterminate={indeterminate}
-          onChange={onCheckAllChange}
-          checked={checkAll}
-        >
+        <Checkbox indeterminate={indeterminate} onChange={onCheckAllChange} checked={checkAll}>
           全选
         </Checkbox>
       </div>
@@ -150,26 +140,14 @@ const clustersGroupContent = (clusterGroup: groupProps): IGroupItemProps => {
 };
 
 // 业务组渲染内容
-const busiGroupContent = (busiGroupProps: {
-  showNotGroupItem?: boolean;
-  onChange?: Function;
-}): IGroupItemProps => {
+const busiGroupContent = (busiGroupProps: { showNotGroupItem?: boolean; onChange?: Function }): IGroupItemProps => {
   const dispatch = useDispatch();
-  const { busiGroups, curBusiItem } = useSelector<RootState, CommonStoreState>(
-    (state) => state.common,
-  );
+  const { busiGroups, curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const [filteredBusiGroups, setFilteredBusiGroups] = useState(busiGroups);
   const showNotGroupItem = busiGroupProps.showNotGroupItem;
   // 根据是否有未归组对象选项初始化选中项
   const initCurBusiItem = useMemo(
-    () =>
-      showNotGroupItem
-        ? JSON.parse(localStorage.getItem('objectCurBusiItem') || '{}')
-        : curBusiItem.id
-        ? curBusiItem
-        : busiGroups.length
-        ? busiGroups[0]
-        : {},
+    () => (showNotGroupItem ? JSON.parse(localStorage.getItem('objectCurBusiItem') || '{}') : curBusiItem.id ? curBusiItem : busiGroups.length ? busiGroups[0] : {}),
     [],
   );
 
@@ -194,35 +172,39 @@ const busiGroupContent = (busiGroupProps: {
     render() {
       return (
         <>
-          <Search
+          <Input
             className='left-area-group-search'
-            placeholder='请输入业务组名称进行筛选'
-            onSearch={(value) => {
+            prefix={<SearchOutlined />}
+            onPressEnter={(e) => {
+              e.preventDefault();
+              const value = e.currentTarget.value;
               if (value) {
                 getBusiGroups(value).then((res) => {
                   setFilteredBusiGroups(res.dat || []);
                 });
               } else {
-                setFilteredBusiGroups(busiGroups);
+                getBusiGroups('').then((res) => {
+                  const data = res.dat || [];
+                  setFilteredBusiGroups(data);
+                  dispatch({
+                    type: 'common/saveData',
+                    prop: 'busiGroups',
+                    data,
+                  });
+                });
               }
             }}
+            placeholder={'请输入业务组名称进行筛选'}
           />
           {busiGroups.length !== 0 || showNotGroupItem ? (
             <SelectList
-              dataSource={
-                showNotGroupItem
-                  ? [{ id: 0, name: '未归组对象' }].concat(filteredBusiGroups)
-                  : filteredBusiGroups
-              }
+              dataSource={showNotGroupItem ? [{ id: 0, name: '未归组对象' }].concat(filteredBusiGroups) : filteredBusiGroups}
               fieldNames={{ key: 'id', label: 'name', value: 'id' }}
               allowNotSelect={showNotGroupItem}
               defaultSelect={initCurBusiItem}
               onChange={(value, item) => {
                 if (showNotGroupItem) {
-                  localStorage.setItem(
-                    'objectCurBusiItem',
-                    JSON.stringify(item),
-                  );
+                  localStorage.setItem('objectCurBusiItem', JSON.stringify(item));
                 } else {
                   dispatch({
                     type: 'common/saveData',
@@ -244,12 +226,7 @@ const busiGroupContent = (busiGroupProps: {
 };
 
 // 左侧栏
-const LeftTree: React.FC<LeftTreeProps> = ({
-  clusterGroup = {},
-  busiGroup = {},
-  eventLevelGroup = {},
-  eventTypeGroup = {},
-}) => {
+const LeftTree: React.FC<LeftTreeProps> = ({ clusterGroup = {}, busiGroup = {}, eventLevelGroup = {}, eventTypeGroup = {} }) => {
   const groupItems: IGroupItemProps[] = [
     clustersGroupContent(clusterGroup),
     busiGroupContent(busiGroup),
@@ -292,11 +269,7 @@ const LeftTree: React.FC<LeftTreeProps> = ({
       {groupItems.map(
         ({ title, isShow, shrink = false, render }: IGroupItemProps, i) =>
           isShow && (
-            <div
-              key={i}
-              className={`left-area-group ${shrink ? 'group-shrink' : ''}`}
-              style={typeof shrink === 'object' ? shrink.style : {}}
-            >
+            <div key={i} className={`left-area-group ${shrink ? 'group-shrink' : ''}`} style={typeof shrink === 'object' ? shrink.style : {}}>
               <div className='left-area-group-title'>{title}</div>
               {render()}
             </div>

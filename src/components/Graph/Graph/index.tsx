@@ -9,12 +9,15 @@ import * as api from '../api';
 import Legend, { getSerieVisible, getSerieColor, getSerieIndex } from './Legend';
 import GraphConfigInner from '../GraphConfig/GraphConfigInner';
 import GraphChart from './Graph';
+import { Range, formatPickerDate } from '@/components/DateRangePicker';
 
 interface GraphProps {
   height?: number;
-  timeVal: number;
   ref?: any;
   data: {
+    step: number;
+    range: Range;
+    legend?: boolean;
     title?: string;
     selectedHosts?: { ident: string }[];
     metric?: string;
@@ -37,9 +40,7 @@ interface GraphState {
 
 export default class Graph extends Component<GraphProps, GraphState> {
   private readonly headerHeight: number = 35;
-  private readonly series: any[] = [];
   private readonly chart: any;
-  private readonly chartOptions: any = config.chart;
 
   constructor(props: GraphProps) {
     super(props);
@@ -64,7 +65,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
     const oldHosts = (prevProps.data.selectedHosts || []).map((h) => h.ident);
     const newHosts = (this.props.data.selectedHosts || []).map((h) => h.ident);
     const isHostsChanged = !_.isEqual(oldHosts, newHosts);
-    if (this.props.timeVal !== prevProps.timeVal || isHostsChanged) {
+    if (isHostsChanged || prevProps.data !== this.props.data) {
       this.updateAllGraphs(this.state.aggrFunc, this.state.aggrGroups, this.state.offsets);
     }
   }
@@ -74,8 +75,16 @@ export default class Graph extends Component<GraphProps, GraphState> {
   }
 
   afterFetchChartDataOperations(allResponseData) {
-    const rawSeries = allResponseData.reduce((acc, cur) => {
-      acc.push(...cur?.data?.result);
+    const offsets = this.state.offsets
+    const rawSeries = allResponseData.reduce((acc, cur, idx) => {
+      const arr = cur?.data?.result
+      // 添加环比信息
+      if (offsets) {
+        arr.forEach(item => {
+          item.offset = offsets[idx] || ''
+        })
+      }
+      acc.push(...arr);
       return acc;
     }, []);
     const series = util.normalizeSeries(rawSeries);
@@ -86,7 +95,6 @@ export default class Graph extends Component<GraphProps, GraphState> {
     return {
       ...config.graphDefaultConfig,
       ...graphConfig,
-      // eslint-disable-next-line no-nested-ternary
       now: graphConfig.now ? graphConfig.now : graphConfig.end ? graphConfig.end : config.graphDefaultConfig.now,
     };
   }
@@ -112,13 +120,15 @@ export default class Graph extends Component<GraphProps, GraphState> {
   fetchData(query) {
     this.setState({ spinning: true });
 
-    const { data, timeVal } = this.props;
-    const now = moment();
+    const {
+      data: { range, step },
+    } = this.props;
+    const { start, end } = formatPickerDate(range);
     try {
       return api.fetchHistory({
-        start: Math.round(Number(now.clone().subtract(timeVal, 'ms')) / 1000),
-        end: Math.round(Number(now.clone().format('x')) / 1000),
-        step: 1,
+        start,
+        end,
+        step,
         query,
       });
     } catch (e) {
@@ -164,26 +174,18 @@ export default class Graph extends Component<GraphProps, GraphState> {
       return <div className='graph-errorText'>{errorText}</div>;
     }
     if (chartType === 'line') {
-      return <GraphChart graphConfig={graphConfig} series={series} />;
+      return <GraphChart graphConfig={graphConfig} series={series} style={{ minHeight: '65%' }} />;
       // return <GraphChart graphConfig={graphConfig} height={height} series={series} />;
     }
     return null;
   }
 
-  updateGraphConfig(args) {
-    const changeObj = args[2] || {};
-    const aggrFunc = changeObj?.aggrFunc;
-    const aggrGroups = changeObj?.aggrGroups;
-    const offsets = changeObj?.comparison;
-    if (aggrFunc) {
-      this.setState({ aggrFunc });
-    }
-    if (aggrGroups) {
-      this.setState({ aggrGroups });
-    }
-    if (offsets) {
-      this.setState({ offsets });
-    }
+  updateGraphConfig (args) {
+    const changeObj = args[2] || {}
+    const aggrFunc = changeObj?.aggrFunc
+    const aggrGroups = changeObj?.aggrGroups
+    const offsets = changeObj?.comparison
+    this.setState({aggrFunc, aggrGroups, offsets})
     if (changeObj.legend !== undefined) {
       this.setState({
         showLegend: changeObj.legend,
@@ -251,7 +253,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
         {this.renderChart()}
         {/* </Spin> */}
         <Legend
-          style={{ display: graphConfig.legend ? 'block' : 'none' }}
+          style={{ display: graphConfig.legend ? 'block' : 'none', overflowY: 'auto', maxHeight: '35%' }}
           graphConfig={graphConfig}
           series={this.getZoomedSeries()}
           onSelectedChange={this.handleLegendRowSelectedChange}

@@ -17,19 +17,10 @@ interface IPageLayoutProps {
   showBack?: Boolean;
 }
 
-const PageLayout: React.FC<IPageLayoutProps> = ({
-  icon,
-  title,
-  rightArea,
-  children,
-  customArea,
-  showBack,
-}) => {
+const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, children, customArea, showBack }) => {
   const { t, i18n } = useTranslation();
   const history = useHistory();
-  let { profile } = useSelector<RootState, accountStoreState>(
-    (state) => state.account,
-  );
+  let { profile } = useSelector<RootState, accountStoreState>((state) => state.account);
 
   const menu = (
     <Menu>
@@ -43,6 +34,8 @@ const PageLayout: React.FC<IPageLayoutProps> = ({
       <Menu.Item
         onClick={() => {
           Logout().then((res) => {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
             history.push('/login');
           });
         }}
@@ -86,9 +79,7 @@ const PageLayout: React.FC<IPageLayoutProps> = ({
               <Dropdown overlay={menu} trigger={['click']}>
                 <span className='avator'>
                   <img src={profile.portrait || '/image/avatar1.png'} alt='' />
-                  <span className='display-name'>
-                    {profile.nickname || profile.username}
-                  </span>
+                  <span className='display-name'>{profile.nickname || profile.username}</span>
                   <DownOutlined />
                 </span>
               </Dropdown>

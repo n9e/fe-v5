@@ -22,22 +22,27 @@
     &-search {
       margin-bottom: 10px;
     }
-    .select-list {
+    .radio-list {
       flex-shrink: 1;
       overflow: auto;
-      &-item {
-        padding: 6px 8px;
-        &:hover {
-          cursor: pointer;
-          background-color: @colorGray2;
-        }
-        &.select-list-item-active {
-          background-color: @colorLightBlue;
-          &:hover {
-            background-color: @colorLightBlue;
-          }
-        }
+      &-group,
+      &-group-space,
+      &-group-item {
+        width: 100%;
       }
+      // &-item {
+      //   padding: 6px 8px;
+      //   &:hover {
+      //     cursor: pointer;
+      //     background-color: @colorGray2;
+      //   }
+      //   &.select-list-item-active {
+      //     background-color: @colorLightBlue;
+      //     &:hover {
+      //       background-color: @colorLightBlue;
+      //     }
+      //   }
+      // }
     }
     &:last-of-type {
       margin-bottom: 0;

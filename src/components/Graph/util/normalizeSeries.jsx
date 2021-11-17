@@ -12,11 +12,12 @@ export default function normalizeSeries(data, treeData) {
       id: i,
       name: id,
       tags: id,
-      data: (o.values || []).map((v) => [v[0] * 1000, parseInt(v[1])]) || [],
+      metricLabels: o.metric,
+      data: (o.values || []).map(v => ([ v[0] * 1000, Number(v[1]) ])) || [],
       lineWidth: 2,
       color,
       oldColor: color,
-      comparison: 0,
+      comparison: o.offset,
     };
     series.push(serie);
   });

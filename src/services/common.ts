@@ -1,6 +1,5 @@
 import request from '@/utils/request';
 import { RequestMethod } from '@/store/common';
-import { N9EAPI } from '../../config/constant';
 
 // 获取集群信息
 export function getCommonClusters() {
@@ -12,9 +11,11 @@ export function getCommonClusters() {
 export function getBusiGroups(query: string, limit: number = 200) {
   return request(`/api/n9e/busi-groups`, {
     method: RequestMethod.Get,
-    params: {
-      query,
-      limit,
-    },
+    params: Object.assign(
+      {
+        limit,
+      },
+      query ? { query } : {},
+    ),
   });
 }
