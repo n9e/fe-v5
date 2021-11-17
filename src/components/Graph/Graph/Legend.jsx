@@ -122,20 +122,20 @@ class Legend extends Component {
         filterDropdownVisible: this.state.filterDropdownVisible,
         onFilterDropdownVisibleChange: (visible) => this.setState({ filterDropdownVisible: visible }),
         render: (text, record) => {
-          const legendName = getLengendName(record, comparisonOptions);
+          const {sname, lname} = getLengendName(record, comparisonOptions);
           return (
             <span
-              title={text}
+              title={lname}
               onClick={() => this.handleClickCounter(record)}
-              onContextMenu={(e) => this.handleContextMenu(e, text)}
+              onContextMenu={e => this.handleContextMenu(e, text)}
               style={{
                 cursor: 'pointer',
                 // eslint-disable-next-line no-nested-ternary
-                opacity: counterSelectedKeys.length ? (_.includes(counterSelectedKeys, record.id) ? 1 : 0.5) : 1,
+                opacity: counterSelectedKeys.length ? _.includes(counterSelectedKeys, record.id) ? 1 : 0.5 : 1,
               }}
             >
               <span style={{ color: record.color }}>● </span>
-              {legendName}
+              {sname}
             </span>
           );
         },
@@ -236,20 +236,13 @@ class Legend extends Component {
           rowKey={(record) => {
             return `${record.id}${record.comparison}`;
           }}
-          size='middle'
-          rowSelection={rowSelection !== null ? newRowSelection : null}
+          size="middle"
+          rowSelection={false}
           columns={columns}
           dataSource={data}
           pagination={false}
           scroll={{ x: scrollX, y: true }}
-          onChange={(pagination, filters, sorter) => {
-            this.props.onChange('update', this.props.graphConfig.id, {
-              sortOrder: {
-                columnKey: sorter.columnKey,
-                order: sorter.order,
-              },
-            });
-          }}
+          showSorterTooltip={false}
         />
       </div>
     );
@@ -260,13 +253,14 @@ export default Legend;
 
 export function normalizeLegendData(series = []) {
   const tableData = _.map(series, (serie) => {
-    const { id, metric, tags, data, comparison } = serie;
+    const { id, metric, tags, data, comparison, metricLabels } = serie;
     const { last, avg, max, min, sum } = getLegendNums(data);
     return {
       id,
       metric,
       tags,
       comparison,
+      metricLabels,
       last: _.isNumber(last) ? last.toFixed(3) : null,
       avg: _.isNumber(avg) ? avg.toFixed(3) : null,
       max: _.isNumber(max) ? max.toFixed(3) : null,
@@ -345,8 +339,13 @@ function getLegendNums(points) {
  * @return {String}                   [description]
  */
 function getLengendName(serie, comparisonOptions, locale = 'zh') {
-  const { tags, comparison } = serie;
+  const { tags, comparison, metricLabels } = serie;
   let lname = tags;
+  let sname = ''
+  if (metricLabels) {
+    const labels = Object.keys(metricLabels).map(label => `${label}: ${metricLabels[label]}`)
+    lname = `${lname} ${labels}`
+  }
   // display comparison
   if (comparison && typeof comparison === 'number') {
     const currentComparison = _.find(comparisonOptions, { value: `${comparison}000` });
@@ -360,9 +359,11 @@ function getLengendName(serie, comparisonOptions, locale = 'zh') {
   if (lname.length > 80) {
     const leftStr = lname.substr(0, 40);
     const rightStr = lname.substr(-40);
-    lname = `${leftStr}......${rightStr}`;
+    sname = `${leftStr}......${rightStr}`;
+  } else {
+    sname = lname
   }
-  return lname;
+  return {lname, sname};
 }
 
 function isEqualSeries(series, nextSeries) {
