@@ -9,12 +9,16 @@ import * as api from '../api';
 import Legend, { getSerieVisible, getSerieColor, getSerieIndex } from './Legend';
 import GraphConfigInner from '../GraphConfig/GraphConfigInner';
 import GraphChart from './Graph';
+import { Range, formatPickerDate } from '@/components/DateRangePicker';
 
 interface GraphProps {
   height?: number;
-  timeVal: number;
+  timeVal?: number;
   ref?: any;
   data: {
+    step: number;
+    range: Range;
+    legend?: boolean;
     title?: string;
     selectedHosts?: { ident: string }[];
     metric?: string;
@@ -37,9 +41,7 @@ interface GraphState {
 
 export default class Graph extends Component<GraphProps, GraphState> {
   private readonly headerHeight: number = 35;
-  private readonly series: any[] = [];
   private readonly chart: any;
-  private readonly chartOptions: any = config.chart;
 
   constructor(props: GraphProps) {
     super(props);
@@ -64,7 +66,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
     const oldHosts = (prevProps.data.selectedHosts || []).map((h) => h.ident);
     const newHosts = (this.props.data.selectedHosts || []).map((h) => h.ident);
     const isHostsChanged = !_.isEqual(oldHosts, newHosts);
-    if (this.props.timeVal !== prevProps.timeVal || isHostsChanged) {
+    if (this.props.timeVal !== prevProps.timeVal || isHostsChanged || prevProps.data !== this.props.data) {
       this.updateAllGraphs(this.state.aggrFunc, this.state.aggrGroups, this.state.offsets);
     }
   }
@@ -86,7 +88,6 @@ export default class Graph extends Component<GraphProps, GraphState> {
     return {
       ...config.graphDefaultConfig,
       ...graphConfig,
-      // eslint-disable-next-line no-nested-ternary
       now: graphConfig.now ? graphConfig.now : graphConfig.end ? graphConfig.end : config.graphDefaultConfig.now,
     };
   }
@@ -112,13 +113,15 @@ export default class Graph extends Component<GraphProps, GraphState> {
   fetchData(query) {
     this.setState({ spinning: true });
 
-    const { data, timeVal } = this.props;
-    const now = moment();
+    const {
+      data: { range, step },
+    } = this.props;
+    const { start, end } = formatPickerDate(range);
     try {
       return api.fetchHistory({
-        start: Math.round(Number(now.clone().subtract(timeVal, 'ms')) / 1000),
-        end: Math.round(Number(now.clone().format('x')) / 1000),
-        step: 1,
+        start,
+        end,
+        step,
         query,
       });
     } catch (e) {
