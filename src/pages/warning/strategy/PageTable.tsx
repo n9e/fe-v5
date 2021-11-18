@@ -397,7 +397,7 @@ const PageTable: React.FC<Props> = ({
             onClick={goToAddWarningStrategy}
             className='strategy-table-search-right-create'
           >
-            {t('新增告警策略')}
+            {t('新增告警规则')}
           </Button>
           <div className={'table-more-options'}>
             

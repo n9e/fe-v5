@@ -13,7 +13,7 @@ import {
   Col,
   TimePicker,
   Checkbox,
-  notification,
+  Tag,
   message,
   Space,
   Switch,
@@ -123,6 +123,63 @@ const fields = [
   },
 
 ]
+
+// 校验单个标签格式是否正确
+function isTagValid(tag) {
+  const contentRegExp = /^[a-zA-Z_][\w]*={1}[^=]+$/;
+  return {
+    isCorrectFormat: contentRegExp.test(tag.toString()),
+    isLengthAllowed: tag.toString().length <= 64,
+  };
+}
+
+// 渲染标签
+function tagRender(content) {
+  const { isCorrectFormat, isLengthAllowed } = isTagValid(content.value);
+  return isCorrectFormat && isLengthAllowed ? (
+    <Tag
+      closable={content.closable}
+      onClose={content.onClose}
+      // style={{ marginTop: '2px' }}
+    >
+      {content.value}
+    </Tag>
+  ) : (
+    <Tooltip
+      title={
+        isCorrectFormat
+          ? '标签长度应小于等于 64 位'
+          : '标签格式应为 key=value。且 key 以字母或下划线开头，由字母、数字和下划线组成。'
+      }
+    >
+      <Tag
+        color='error'
+        closable={content.closable}
+        onClose={content.onClose}
+        style={{ marginTop: '2px' }}
+      >
+        {content.value}
+      </Tag>
+    </Tooltip>
+  );
+}
+
+// 校验所有标签格式
+function isValidFormat() {
+  return {
+    validator(_, value) {
+      const isInvalid = value.some((tag) => {
+        const { isCorrectFormat, isLengthAllowed } = isTagValid(tag);
+        if (!isCorrectFormat || !isLengthAllowed) {
+          return true;
+        }
+      });
+      return isInvalid
+        ? Promise.reject(new Error('标签格式不正确，请检查！'))
+        : Promise.resolve();
+    },
+  };
+}
 
 interface Props {
   isModalVisible: boolean;
@@ -548,18 +605,21 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                 return (
                   <>
                     <Form.Item
-                      label={t('改为：')}
-                      style={{
-                        marginTop: 20,
-                      }}
-                      name='append_tags'
-                    >
-                      <Select
-                        mode='tags'
-                        onChange={handleTagsChange}
-                        placeholder={t('请输入附加标签，格式为key=value')}
-                      ></Select>
-                    </Form.Item>
+              label='附加标签'
+              name='append_tags'
+              rules={[
+                { required: true, message: '请填写至少一项标签！' },
+                isValidFormat,
+              ]}
+            >
+              <Select
+                mode='tags'
+                tokenSeparators={[' ']}
+                open={false}
+                placeholder={'标签格式为 key=value ，使用回车或空格分隔'}
+                tagRender={tagRender}
+              />
+            </Form.Item>
                   </>
                 );
               case 'enable_time':

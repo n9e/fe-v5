@@ -19,6 +19,7 @@ import {
   Space,
   Switch,
   Tooltip,
+  Tag
 } from 'antd';
 const { TextArea } = Input;
 const { Option } = Select;
@@ -54,6 +55,63 @@ const tailLayout = {
 interface Props {
   detail?: any;
   type?: number; // 1:编辑 2:克隆
+}
+
+// 校验单个标签格式是否正确
+function isTagValid(tag) {
+  const contentRegExp = /^[a-zA-Z_][\w]*={1}[^=]+$/;
+  return {
+    isCorrectFormat: contentRegExp.test(tag.toString()),
+    isLengthAllowed: tag.toString().length <= 64,
+  };
+}
+
+// 渲染标签
+function tagRender(content) {
+  const { isCorrectFormat, isLengthAllowed } = isTagValid(content.value);
+  return isCorrectFormat && isLengthAllowed ? (
+    <Tag
+      closable={content.closable}
+      onClose={content.onClose}
+    // style={{ marginTop: '2px' }}
+    >
+      {content.value}
+    </Tag>
+  ) : (
+    <Tooltip
+      title={
+        isCorrectFormat
+          ? '标签长度应小于等于 64 位'
+          : '标签格式应为 key=value。且 key 以字母或下划线开头，由字母、数字和下划线组成。'
+      }
+    >
+      <Tag
+        color='error'
+        closable={content.closable}
+        onClose={content.onClose}
+        style={{ marginTop: '2px' }}
+      >
+        {content.value}
+      </Tag>
+    </Tooltip>
+  );
+}
+
+// 校验所有标签格式
+function isValidFormat() {
+  return {
+    validator(_, value) {
+      const isInvalid = value.some((tag) => {
+        const { isCorrectFormat, isLengthAllowed } = isTagValid(tag);
+        if (!isCorrectFormat || !isLengthAllowed) {
+          return true;
+        }
+      });
+      return isInvalid
+        ? Promise.reject(new Error('标签格式不正确，请检查！'))
+        : Promise.resolve();
+    },
+  };
 }
 
 const operateForm: React.FC<Props> = ({ type, detail }) => {
@@ -136,6 +194,7 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
 
   const addSubmit = () => {
     form.validateFields().then(async (values) => {
+      console.log(values)
       const callbacks = values.callbacks.map(item => item.url);
       const data = {
         ...values,
@@ -188,16 +247,20 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
         layout={refresh ? 'horizontal' : 'horizontal'}
         initialValues={{
           prom_eval_interval: 15,
+          prom_for_duration: 60,
+          severity: 2,
           disabled: 0, // 0:立即启用 1:禁用  待修改
-          notify_recovered: 1, // 1:启用
+          // notify_recovered: 1, // 1:启用
           cluster: 'Default', // 生效集群
           enable_days_of_week: ['1', '2', '3', '4', '5', '6', '0'],
           ...detail,
           enable_time: detail?.enable_stime ? [moment(detail.enable_stime, 'HH:mm'), moment(detail.enable_etime, 'HH:mm')] : [moment('00:00', 'HH:mm'), moment('23:59', 'HH:mm')],
           enable_status: detail?.disabled === undefined ? true : !detail?.disabled,
+          notify_recovered: detail?.notify_recovered == 1 ? true : false, // 1:启用 0:禁用
           callbacks: !!detail?.callbacks ? detail.callbacks.map(item => ({
             url: item
-          })) : [{}]
+          })) : [{}],
+
         }}
       >
         <Space direction='vertical' style={{ width: '100%' }}>
@@ -228,7 +291,6 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
             <Form.Item
               label={t('告警级别')}
               name='severity'
-              initialValue={2}
               rules={[
                 {
                   required: true,
@@ -323,7 +385,6 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
                 <Form.Item
                   style={{ marginBottom: 0 }}
                   name='prom_for_duration'
-                  initialValue={60}
                   wrapperCol={{ span: 10 }}
                 >
                   <InputNumber min={0} />
@@ -338,7 +399,7 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
                 </Tooltip>
               </Space>
             </Form.Item>
-            <Form.Item
+            {/* <Form.Item
               label={t('附加标签')}
               style={{
                 marginTop: 20,
@@ -350,6 +411,22 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
                 onChange={handleTagsChange}
                 placeholder={t('请输入附加标签，格式为key=value')}
               ></Select>
+            </Form.Item> */}
+            <Form.Item
+              label='附加标签'
+              name='append_tags'
+              rules={[
+                { required: true, message: '请填写至少一项标签！' },
+                isValidFormat,
+              ]}
+            >
+              <Select
+                mode='tags'
+                tokenSeparators={[' ']}
+                open={false}
+                placeholder={'标签格式为 key=value ，使用回车或空格分隔'}
+                tagRender={tagRender}
+              />
             </Form.Item>
             <Form.Item label={t('预案链接')} name='runbook_url'>
               <Input />
@@ -409,13 +486,16 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
             <Form.Item label={t('告警接收组')} name='notify_groups'>
               <Select mode='multiple'>{notifyGroupsOptions}</Select>
             </Form.Item>
-            <Form.Item
-              label={t('启用恢复通知')}
-              name='notify_recovered'
-              valuePropName='checked'
-            >
+            <Form.Item label={t('启用恢复通知')}>
               <Space>
-                <Switch />
+                <Form.Item
+                  name='notify_recovered'
+                  valuePropName='checked'
+                  style={{ marginBottom: 0 }}
+                >
+                  <Switch />
+
+                </Form.Item>
                 <Tooltip
                   title={t(
                     `告警恢复时也发送通知`,
@@ -426,6 +506,7 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
               </Space>
 
             </Form.Item>
+
             <Form.Item label={t('重复发送频率')} required>
               <Space>
                 <Form.Item
