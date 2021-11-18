@@ -8,6 +8,7 @@ import './index.less';
 
 interface GraphProps {
   height?: number;
+  style?: object;
   graphConfig: {
     xAxis: number;
     shared: any;
@@ -81,6 +82,7 @@ export default class Graph extends Component<GraphProps> {
   render() {
     return (
       <div
+        style={{ ...this.props.style }}
         ref={(ref) => {
           this.graphWrapEle = ref;
         }}

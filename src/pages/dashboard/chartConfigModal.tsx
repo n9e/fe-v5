@@ -1,19 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { GetMetrics } from '@/services/metric';
-import { Metric } from '@/pages/metric/matric';
 import { Dashboard, Group, ChartConfig } from '@/store/dashboardInterface';
-import { resourceGroupItem, resourceItem, prefixType } from '@/store/businessInterface/resource';
 import { debounce } from 'lodash';
 import { Radio, InputNumber, Input, Form, Modal, Select, Checkbox, Row, Col, Space } from 'antd';
-const { Option } = Select;
-import { getResourceGroups, getResourceList, getResourceListAll } from '@/services/resource';
-import { GetTagPairs } from '@/services/metric';
 import { createChart, updateChart, checkPromql } from '@/services/dashboard';
-import { formatTag, TagItem } from '@/components/TagFilterForChart';
 import { Chart } from './chartGroup';
 import { MinusCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import PromqlEditor from '@/components/PromqlEditor';
+import Resolution from '@/components/Resolution';
+import DateRangePicker, { Range } from '@/components/DateRangePicker';
+
 const layout = {
   labelCol: {
     span: 4,
@@ -36,8 +32,12 @@ export default function ChartConfigModal(props: Props) {
   const layout = initialValue?.configs.layout;
   const [chartForm] = Form.useForm();
   const [initialQL, setInitialQL] = useState([{ PromQL: '' }]);
+  const [step, setStep] = useState(15);
+  const [range, setRange] = useState<Range>({
+    start: 0,
+    end: 0,
+  });
   useEffect(() => {
-    console.log('initialValue', initialValue);
     if (initialValue) {
       chartForm.setFieldsValue(initialValue.configs);
       setInitialQL(initialValue.configs.QL);
@@ -105,6 +105,15 @@ export default function ChartConfigModal(props: Props) {
 
   return (
     <Modal
+      // title={
+      //   <div style={{ display: 'flex' }}>
+      //     <div>新建图表</div>
+      //     <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+      //       <DateRangePicker onChange={(e) => setRange(e)} />
+      //       <Resolution onChange={(v) => setStep(v)} initialValue={step} />
+      //     </div>
+      //   </div>
+      // }
       title={initialValue ? t('编辑图表') : t('新建图表')}
       visible={show}
       destroyOnClose={true}

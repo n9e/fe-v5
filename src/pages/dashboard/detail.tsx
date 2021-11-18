@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import PageLayout from '@/components/pageLayout';
 import DateRangePicker from '@/components/DateRangePicker';
-import { ReloadOutlined, RollbackOutlined, EditOutlined, FileAddOutlined } from '@ant-design/icons';
+import { ReloadOutlined, RollbackOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Input, Form, Modal, Divider, message } from 'antd';
 import { Range } from '@/components/DateRangePicker';
 import { getSingleDashboard, updateSingleDashboard, createChartGroup, getChartGroup, delChartGroup, removeChart, updateChartGroup } from '@/services/dashboard';
@@ -206,22 +206,6 @@ export default function DashboardDetail() {
     >
       <div className='dashboard-detail-content'>
         <div className='variable-area'>
-          <Button
-            type='link'
-            icon={<FileAddOutlined />}
-            style={{
-              paddingRight: 0,
-            }}
-            onClick={() => setGroupModalVisible(true)}
-          >
-            {t('新增图表分组')}
-          </Button>
-          <Divider
-            type='vertical'
-            style={{
-              height: 32,
-            }}
-          />
           <VariableConfig ref={variableRef} onChange={handleVariableChange} />
         </div>
 
@@ -245,6 +229,16 @@ export default function DashboardDetail() {
               moveDownEnable={i < chartGroup.length - 1}
             />
           ))}
+          <Button
+            block
+            icon={<PlusOutlined />}
+            style={{
+              paddingRight: 0,
+            }}
+            onClick={() => setGroupModalVisible(true)}
+          >
+            {t('新增图表分组')}
+          </Button>
         </div>
       </div>
       <Modal

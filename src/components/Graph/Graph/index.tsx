@@ -217,7 +217,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
       return <div className='graph-errorText'>{errorText}</div>;
     }
     if (chartType === 'line') {
-      return <GraphChart graphConfig={graphConfig} series={series} />;
+      return <GraphChart graphConfig={graphConfig} series={series} style={{ minHeight: '65%' }} />;
       // return <GraphChart graphConfig={graphConfig} height={height} series={series} />;
     }
     return null;
@@ -363,7 +363,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
         {this.renderChart()}
         {/* </Spin> */}
         <Legend
-          style={{ display: this.state.legend ? 'block' : 'none' }}
+          style={{ display: this.state.legend ? 'block' : 'none', overflowY: 'auto', maxHeight: '35%' }}
           graphConfig={graphConfig}
           series={this.getZoomedSeries()}
           onSelectedChange={this.handleLegendRowSelectedChange}
