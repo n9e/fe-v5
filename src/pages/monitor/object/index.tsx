@@ -53,62 +53,6 @@ export default () => {
   const handleRemoveGraphs = () => {
     setGraphs([]);
   };
-  const getContent = (graph, i) => {
-    return (
-      <div>
-        <Checkbox
-          onChange={(e) => {
-            let newGraphs = [...graphs];
-            let dstGraph = newGraphs[i];
-            dstGraph.shared = e.target.checked;
-            setGraphs(newGraphs);
-          }}
-        >
-          <div style={{ display: 'flex' }}>
-            <span>Multi Series in Tooltip, order value {sharedSortDirection}</span>
-            <OrderSort onChange={(bool) => {
-              const v = bool ? 'desc' : 'asc'
-              setSharedSortDirection(v);
-              let newGraphs = [...graphs];
-              let dstGraph = newGraphs[i];
-              dstGraph.sharedSortDirection = v
-              setGraphs(newGraphs);
-            }} />
-          </div>
-        </Checkbox>
-        <br />
-        <Checkbox
-          onChange={(e) => {
-            let newGraphs = [...graphs];
-            let dstGraph = newGraphs[i];
-            dstGraph.legend = e.target.checked;
-            setGraphs(newGraphs);
-          }}
-        >
-          Show Legend
-        </Checkbox>
-        <br />
-        <Checkbox onChange={(e) => {
-          let newGraphs = [...graphs];
-          let dstGraph = newGraphs[i];
-          dstGraph.precision = e.target.checked ? 'short' : 'origin';
-          setGraphs(newGraphs);
-        }}>
-          <div style={{ display: 'flex' }}>
-            <span>Value format with: Ki, Mi, Gi by {formatUnit}</span>
-            <OrderSort onChange={(bool) => {
-                const v = bool ? 1000 : 1024
-                setFormatUnit(v);
-                let newGraphs = [...graphs];
-                let dstGraph = newGraphs[i];
-                dstGraph.formatUnit = v
-                setGraphs(newGraphs);
-              }} />
-          </div>
-        </Checkbox>
-      </div>
-    );
-  };
 
   return (
     <PageLayout title={t('对象视角')} icon={<LineChartOutlined />}>
@@ -186,17 +130,6 @@ export default () => {
             return <div style={{ marginBottom: 10 }} key={i + o.metric}>
               <Graph ref={o.ref} data={{...o}} graphConfigInnerVisible={true} extraRender={graph => {
                 return [
-                  <span className="graph-operationbar-item" key="info">
-                    <Popover placement="left" content={getContent(graph, i)} trigger="click">
-                      <SettingOutlined />
-                    </Popover>
-                  </span>,
-                  <span className="graph-operationbar-item" key="sync">
-                    <SyncOutlined onClick={graph.refresh} />
-                  </span>,
-                  <span className="graph-operationbar-item" key="share">
-                    <ShareAltOutlined />
-                  </span>,
                   <span className="graph-operationbar-item" key="close">
                     <CloseCircleOutlined onClick={_ => {
                       console.log('graphs', graphs)

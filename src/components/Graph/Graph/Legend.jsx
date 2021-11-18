@@ -343,8 +343,8 @@ function getLengendName(serie, comparisonOptions, locale = 'zh') {
   let lname = tags;
   let sname = ''
   if (metricLabels) {
-    const labels = Object.keys(metricLabels).map(label => `${label}: ${metricLabels[label]}`)
-    lname = `${lname} ${labels}`
+    const labels = Object.keys(metricLabels).map(label => `${label}=${metricLabels[label]}`)
+    lname = `【${lname}】 ${labels}`
   }
   // display comparison
   if (comparison && typeof comparison === 'number') {
