@@ -67,6 +67,13 @@ request.interceptors.response.use(
             }
           })
         : (location.href = `/login${location.pathname != '/' ? '?redirect=' + location.pathname : ''}`);
+    } else if(status === 400) {
+      return response
+          .clone()
+          .json()
+          .then((data) => {
+            return data;
+          });
     } else {
       const contentType = response.headers.get('content-type');
       const isPlainText = contentType?.indexOf('text/plain; charset=utf-8') !== -1;

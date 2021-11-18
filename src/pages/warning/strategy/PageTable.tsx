@@ -117,12 +117,12 @@ const PageTable: React.FC<Props> = ({
   }
 
   const goToAddWarningStrategy = () => {
-    curBusiItem?.id && history.push(`/strategy/add/${curBusiItem.id}`);
+    curBusiItem?.id && history.push(`/alert-rules/add/${curBusiItem.id}`);
   };
 
   const handleClickEdit = (id, isClone = false) => {
     curBusiItem?.id &&
-      history.push(`/strategy/edit/${id}${isClone ? '?mode=clone' : ''}`);
+      history.push(`/alert-rules/edit/${id}${isClone ? '?mode=clone' : ''}`);
   };
 
   const refreshList = () => {
@@ -450,7 +450,7 @@ const PageTable: React.FC<Props> = ({
           getAlertRules();
         }}
         onSubmit={handleImportStrategy}
-        title={t('策略')}
+        title={t('告警规则')}
         exportData={exportData}
       />
       {isModalVisible && <EditModal isModalVisible={isModalVisible} editModalFinish={editModalFinish}/>}

@@ -14,7 +14,7 @@ import {
   Button,
   TimePicker,
   Checkbox,
-  notification,
+  Modal,
   message,
   Space,
   Switch,
@@ -30,12 +30,15 @@ import {
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { RootState } from '@/store/common';
-import { Metric } from '@/store/warningInterface';
 import { CommonStoreState } from '@/store/commonInterface';
 import { getTeamInfoList, getNotifiesList } from '@/services/manage';
-import { addOrEditStrategy, EditStrategy } from '@/services/warning';
+import {
+  addOrEditStrategy,
+  EditStrategy,
+  prometheusQuery,
+  deleteStrategy
+} from '@/services/warning';
 import PromqlEditor from '@/components/PromqlEditor';
-import ChartDrawer from './Drawer';
 
 const layout = {
   labelCol: {
@@ -114,7 +117,7 @@ function isValidFormat() {
   };
 }
 
-const operateForm: React.FC<Props> = ({ type, detail }) => {
+const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
   const { t, i18n } = useTranslation();
   const history = useHistory(); // 创建的时候默认选中的值
 
@@ -195,6 +198,11 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
   const addSubmit = () => {
     form.validateFields().then(async (values) => {
       console.log(values)
+      const res = await prometheusQuery({ query: values.prom_ql });
+      if (res.error) {
+        message.error(`PromQL${t('错误')}：${t(res.error)}`);
+        return false;
+      }
       const callbacks = values.callbacks.map(item => item.url);
       const data = {
         ...values,
@@ -212,8 +220,8 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
         if (res.err) {
           message.error(res.error);
         } else {
-          message.success('编辑成功！');
-          history.push('/strategy');
+          message.success(t('编辑成功！'));
+          history.push('/alert-rules');
         }
       } else {
         reqBody = [data];
@@ -222,16 +230,15 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
         const msg = Object.keys(dat).map((key) => {
           dat[key] && errorNum++;
           return (
-            <p style={{ color: dat[key] ? '#ff4d4f' : '#52c41a' }}>
-              {key}: {dat[key] ? dat[key] : 'successfully'}
-            </p>
+            dat[key]
           );
         });
-        notification.info({
-          message: msg,
-        });
+
         if (!errorNum) {
-          history.push('/strategy');
+          message.success(`${type === 2 ? t('告警规则克隆成功') : t('告警规则创建成功')}`);
+          history.push('/alert-rules');
+        } else {
+          message.error(t(msg));
         }
       }
 
@@ -251,12 +258,12 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
           severity: 2,
           disabled: 0, // 0:立即启用 1:禁用  待修改
           // notify_recovered: 1, // 1:启用
-          cluster: 'Default', // 生效集群
+          cluster: clusterList[0] || 'Default', // 生效集群
           enable_days_of_week: ['1', '2', '3', '4', '5', '6', '0'],
           ...detail,
           enable_time: detail?.enable_stime ? [moment(detail.enable_stime, 'HH:mm'), moment(detail.enable_etime, 'HH:mm')] : [moment('00:00', 'HH:mm'), moment('23:59', 'HH:mm')],
           enable_status: detail?.disabled === undefined ? true : !detail?.disabled,
-          notify_recovered: detail?.notify_recovered == 1 ? true : false, // 1:启用 0:禁用
+          notify_recovered: detail?.notify_recovered === 1 || detail?.notify_recovered === undefined ? true : false, // 1:启用 0:禁用
           callbacks: !!detail?.callbacks ? detail.callbacks.map(item => ({
             url: item
           })) : [{}],
@@ -416,7 +423,7 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
               label='附加标签'
               name='append_tags'
               rules={[
-                { required: true, message: '请填写至少一项标签！' },
+                { required: false, message: '请填写至少一项标签！' },
                 isValidFormat,
               ]}
             >
@@ -484,7 +491,13 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
               <Checkbox.Group>{contactListCheckboxes}</Checkbox.Group>
             </Form.Item>
             <Form.Item label={t('告警接收组')} name='notify_groups'>
-              <Select mode='multiple'>{notifyGroupsOptions}</Select>
+              <Select
+                mode='multiple'
+                showSearch
+                optionFilterProp="children"
+                filterOption={(input, option) =>
+                  option?.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                }>{notifyGroupsOptions}</Select>
             </Form.Item>
             <Form.Item label={t('启用恢复通知')}>
               <Space>
@@ -583,10 +596,31 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
             >
               {type === 1 ? t('编辑') : type === 2 ? t('克隆') : t('创建')}
             </Button>
+            {type === 1 && (
+              <Button
+                danger
+                style={{ marginRight: '8px' }}
+                onClick={() => {
+                  Modal.confirm({
+                    title: t('是否删除该告警规则?'),
+                    onOk: () => {
+                      deleteStrategy([detail.id], curBusiItem.id).then(() => {
+                        message.success(t('删除成功'));
+                        history.push('/alert-rules');
+                      });
+                    },
+
+                    onCancel() { },
+                  });
+                }}
+              >
+                {t('删除')}
+              </Button>
+            )}
 
             <Button
               onClick={() => {
-                history.push('/strategy');
+                history.push('/alert-rules');
               }}
             >
               {t('取消')}

@@ -152,6 +152,7 @@ export default function ImportAndDownloadModal(props: Props) {
                 <Form.Item
                   label={t('生效集群：')}
                   name='cluster'
+                  initialValue={clusterList[0] || 'Default'}
                   rules={[
                     {
                       required: true,

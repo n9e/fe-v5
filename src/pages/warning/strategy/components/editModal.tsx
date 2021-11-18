@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { useHistory, useParams, useLocation } from 'react-router-dom';
-import { debounce } from 'lodash';
+import { useSelector } from 'react-redux';
 import moment from 'moment';
 import {
   Form,
@@ -20,7 +18,6 @@ import {
   Tooltip,
   Modal
 } from 'antd';
-const { TextArea } = Input;
 const { Option } = Select;
 import {
   QuestionCircleFilled,
@@ -31,15 +28,14 @@ import { useTranslation } from 'react-i18next';
 import { RootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
 import { getTeamInfoList, getNotifiesList } from '@/services/manage';
-import { addOrEditStrategy, EditStrategy } from '@/services/warning';
 
 
 const layout = {
   labelCol: {
-    span: 5,
+    span: 3,
   },
   wrapperCol: {
-    span: 19,
+    span: 20,
   },
 };
 
@@ -140,7 +136,7 @@ function tagRender(content) {
     <Tag
       closable={content.closable}
       onClose={content.onClose}
-      // style={{ marginTop: '2px' }}
+    // style={{ marginTop: '2px' }}
     >
       {content.value}
     </Tag>
@@ -188,14 +184,12 @@ interface Props {
 
 const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
   const { t, i18n } = useTranslation();
-  const history = useHistory(); // 创建的时候默认选中的值
 
   const [form] = Form.useForm();
   const { clusters: clusterList } = useSelector<RootState, CommonStoreState>(
     (state) => state.common,
   );
-  const { curBusiItem } = useSelector<RootState, CommonStoreState>(state => state.common);
-
+  
   const [contactList, setInitContactList] = useState([]);
   const [notifyGroups, setNotifyGroups] = useState([]);
 
@@ -247,19 +241,9 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
     setNotifyGroups(data || []);
   };
 
-  const handleTagsChange = (value: string[]) => {
-    let top: string = value[value.length - 1];
-    let reg = /\w+=\w+/;
-
-    if (top && !reg.test(top)) {
-      let v = value.pop();
-      message.error(`"${v}${t('"不符合输入规范（格式为key=value）')}`);
-    }
-  };
-
   const modelOk = () => {
     form.validateFields().then(async (values) => {
-      const data = {...values};
+      const data = { ...values };
       switch (values.field) {
         case 'enable_time':
           data.enable_stime = values.enable_time[0].format('HH:mm');
@@ -300,13 +284,14 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
   return (
     <>
       <Modal
+        title={t('批量更新')}
         visible={isModalVisible}
         onOk={modelOk}
         onCancel={() => {
           editModalClose();
         }}
       >
-        
+
         <Form
           {...layout}
           form={form}
@@ -318,7 +303,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
             enable_status: true, // true:立即启用 false:禁用
             notify_recovered: 1, // 1:启用
             enable_time: [moment('00:00', 'HH:mm'), moment('23:59', 'HH:mm')],
-            cluster: 'Default', // 生效集群
+            cluster: clusterList[0] || 'Default', // 生效集群
             enable_days_of_week: ['1', '2', '3', '4', '5', '6', '0'],
             field: 'cluster'
           }}
@@ -437,7 +422,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                 return (
                   <>
                     <Form.Item
-                      
+
                       label={t('改为：')}
                       rules={[
                         {
@@ -454,8 +439,8 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                           wrapperCol={{ span: 10 }}
                         >
                           <InputNumber min={1} onChange={(val) => {
-                    setRefresh(!refresh);
-                  }}/>
+                            setRefresh(!refresh);
+                          }} />
                         </Form.Item>
                         秒
                         <Tooltip
@@ -475,7 +460,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                 return (
                   <>
                     <Form.Item
-                      
+
                       label={t('改为：')}
                       rules={[
                         {
@@ -517,7 +502,13 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                 return (
                   <>
                     <Form.Item label={t('改为：')} name='notify_groups'>
-                      <Select mode='multiple'>{notifyGroupsOptions}</Select>
+                      <Select
+                        mode='multiple'
+                        showSearch
+                        optionFilterProp="children"
+                        filterOption={(input, option) =>
+                          option?.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }>{notifyGroupsOptions}</Select>
                     </Form.Item>
                   </>
                 );
@@ -551,8 +542,8 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                           ]}
                         >
                           <InputNumber min={0} onChange={(val) => {
-                    setRefresh(!refresh);
-                  }}/>
+                            setRefresh(!refresh);
+                          }} />
                         </Form.Item>
                         分钟
                         <Tooltip
@@ -605,21 +596,21 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                 return (
                   <>
                     <Form.Item
-              label='附加标签'
-              name='append_tags'
-              rules={[
-                { required: true, message: '请填写至少一项标签！' },
-                isValidFormat,
-              ]}
-            >
-              <Select
-                mode='tags'
-                tokenSeparators={[' ']}
-                open={false}
-                placeholder={'标签格式为 key=value ，使用回车或空格分隔'}
-                tagRender={tagRender}
-              />
-            </Form.Item>
+                      label='附加标签'
+                      name='append_tags'
+                      rules={[
+                        { required: false, message: '请填写至少一项标签！' },
+                        isValidFormat,
+                      ]}
+                    >
+                      <Select
+                        mode='tags'
+                        tokenSeparators={[' ']}
+                        open={false}
+                        placeholder={'标签格式为 key=value ，使用回车或空格分隔'}
+                        tagRender={tagRender}
+                      />
+                    </Form.Item>
                   </>
                 );
               case 'enable_time':
