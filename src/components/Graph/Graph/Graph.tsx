@@ -31,17 +31,7 @@ export default class Graph extends Component<GraphProps> {
       },
       xAxis: this.props.graphConfig.xAxis,
       yAxis: util.getYAxis({}, this.props.graphConfig),
-      tooltip: {
-        shared: this.props.graphConfig.shared,
-        sharedSortDirection: this.props.graphConfig.sharedSortDirection,
-        precision: this.props.graphConfig.precision,
-        formatter: (points) => {
-          return util.getTooltipsContent({
-            points,
-            chartWidth: this.graphWrapEle.offsetWidth - 40
-          });
-        },
-      },
+      tooltip: this.genChartTooltipOptions(this.props),
       series: this.props.series,
       legend: {
         enabled: false,
@@ -55,32 +45,37 @@ export default class Graph extends Component<GraphProps> {
   }
 
   componentWillReceiveProps(nextProps) {
-    const isFormatUnit1024 = nextProps.graphConfig.formatUnit === 1024 && nextProps.graphConfig.precision === 'short'
+    console.log('componentWillReceiveProps yaxis', this.chart.options.yAxis, util.getYAxis(this.chart.options.yAxis, nextProps.graphConfig))
     if (this.chart) {
       const chartOptions = {
         yAxis: util.getYAxis(this.chart.options.yAxis, nextProps.graphConfig),
-        tooltip: isFormatUnit1024 ? {
-          xAxis: nextProps.graphConfig.xAxis,
-          shared: nextProps.graphConfig.shared,
-          sharedSortDirection: nextProps.graphConfig.sharedSortDirection,
-          formatter: (points) => {
-            return util.getTooltipsContent({
-              formatUnit: nextProps.graphConfig.formatUnit,
-              precision: nextProps.graphConfig.precision,
-              series: this.props.series,
-              points,
-              chartWidth: this.graphWrapEle.offsetWidth - 40
-            });
-          },
-        } : {
-          xAxis: nextProps.graphConfig.xAxis,
-          shared: nextProps.graphConfig.shared,
-          sharedSortDirection: nextProps.graphConfig.sharedSortDirection,
-          precision: nextProps.graphConfig.precision,
-        },
+        tooltip: this.genChartTooltipOptions(nextProps),
         series: nextProps.series,
       };
       this.chart.update(chartOptions);
+    }
+  }
+
+  genChartTooltipOptions (nextProps) {
+    const isFormatUnit1024 = nextProps.graphConfig.formatUnit === 1024 && nextProps.graphConfig.precision === 'short'
+    return isFormatUnit1024 ? {
+      xAxis: nextProps.graphConfig.xAxis,
+      shared: nextProps.graphConfig.shared,
+      sharedSortDirection: nextProps.graphConfig.sharedSortDirection,
+      formatter: (points) => {
+        return util.getTooltipsContent({
+          formatUnit: nextProps.graphConfig.formatUnit,
+          precision: nextProps.graphConfig.precision,
+          series: this.props.series,
+          points,
+          chartWidth: this.graphWrapEle.offsetWidth - 40
+        });
+      },
+    } : {
+      xAxis: nextProps.graphConfig.xAxis,
+      shared: nextProps.graphConfig.shared,
+      sharedSortDirection: nextProps.graphConfig.sharedSortDirection,
+      precision: nextProps.graphConfig.precision,
     }
   }
 
