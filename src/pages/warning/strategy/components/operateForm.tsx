@@ -104,7 +104,7 @@ function tagRender(content) {
 function isValidFormat() {
   return {
     validator(_, value) {
-      const isInvalid = value.some((tag) => {
+      const isInvalid = value && value.some((tag) => {
         const { isCorrectFormat, isLengthAllowed } = isTagValid(tag);
         if (!isCorrectFormat || !isLengthAllowed) {
           return true;
