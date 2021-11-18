@@ -1,16 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import {
-  Form,
-  Input,
-  Button,
-  Modal,
-  Row,
-  Col,
-  message,
-  Space,
-  Select,
-} from 'antd';
+import { Form, Input, Button, Modal, Row, Col, message, Space, Select } from 'antd';
 import { getNotifyChannels } from '@/services/manage';
 import { RootState, accountStoreState } from '@/store/accountInterface';
 import { ContactsItem } from '@/store/manageInterface';
@@ -21,13 +11,9 @@ export default function Info() {
   const { t } = useTranslation();
   const [form] = Form.useForm();
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [contactsList, setContactsList] = useState<string[]>([]);
-  let { profile } = useSelector<RootState, accountStoreState>(
-    (state) => state.account,
-  );
-  const [selectAvatar, setSelectAvatar] = useState<string>(
-    profile.portrait || '/image/avatar1.png',
-  );
+  const [contactsList, setContactsList] = useState<ContactsItem[]>([]);
+  let { profile } = useSelector<RootState, accountStoreState>((state) => state.account);
+  const [selectAvatar, setSelectAvatar] = useState<string>(profile.portrait || '/image/avatar1.png');
   const [customAvatar, setCustomAvatar] = useState('');
   const dispatch = useDispatch();
   useEffect(() => {
@@ -43,7 +29,7 @@ export default function Info() {
     }
   }, [profile]);
   useEffect(() => {
-    getNotifyChannels().then((data: Array<string>) => {
+    getNotifyChannels().then((data: Array<ContactsItem>) => {
       setContactsList(data);
     });
   }, []);
@@ -171,15 +157,11 @@ export default function Info() {
               Object.keys(profile.contacts)
                 .sort()
                 .map((key, i) => {
-                  let contact = contactsList.find((item) => item === key);
+                  let contact = contactsList.find((item) => item.key === key);
                   return (
                     <>
                       {contact ? (
-                        <Form.Item
-                          label={contact + '：'}
-                          name={['contacts', key]}
-                          key={i}
-                        >
+                        <Form.Item label={contact.label + '：'} name={['contacts', key]} key={i}>
                           <Input placeholder={`${t('请输入')}${key}`} />
                         </Form.Item>
                       ) : null}
@@ -214,9 +196,9 @@ export default function Info() {
                           ]}
                         >
                           <Select placeholder={t('请选择联系方式')}>
-                            {contactsList.map((item) => (
-                              <Option value={item} key={item}>
-                                {item}
+                            {contactsList.map((item, index) => (
+                              <Option value={item.key} key={index}>
+                                {item.label}
                               </Option>
                             ))}
                           </Select>
@@ -237,16 +219,10 @@ export default function Info() {
                         >
                           <Input placeholder={t('请输入值')} />
                         </Form.Item>
-                        <MinusCircleOutlined
-                          className='control-icon-normal'
-                          onClick={() => remove(name)}
-                        />
+                        <MinusCircleOutlined className='control-icon-normal' onClick={() => remove(name)} />
                       </Space>
                     ))}
-                    <PlusCircleOutlined
-                      className='control-icon-normal'
-                      onClick={() => add()}
-                    />
+                    <PlusCircleOutlined className='control-icon-normal' onClick={() => add()} />
                   </>
                 )}
               </Form.List>
@@ -261,46 +237,24 @@ export default function Info() {
           <Col span={4}>
             <div className='avatar'>
               <img src={profile.portrait || '/image/avatar1.png'} />
-              <Button
-                type='primary'
-                className='update-avatar'
-                onClick={() => setIsModalVisible(true)}
-              >
+              <Button type='primary' className='update-avatar' onClick={() => setIsModalVisible(true)}>
                 {t('更换头像')}
               </Button>
             </div>
           </Col>
         </Row>
       </Form>
-      <Modal
-        title={t('更换头像')}
-        visible={isModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
-        wrapClassName='avatar-modal'
-      >
+      <Modal title={t('更换头像')} visible={isModalVisible} onOk={handleOk} onCancel={handleCancel} wrapClassName='avatar-modal'>
         <div className='avatar-content'>
           {avatarList.map((i) => {
             return (
-              <div
-                key={i}
-                className={
-                  `/image/avatar${i}.png` === selectAvatar
-                    ? 'avatar active'
-                    : 'avatar'
-                }
-                onClick={() => handleImgClick(i)}
-              >
+              <div key={i} className={`/image/avatar${i}.png` === selectAvatar ? 'avatar active' : 'avatar'} onClick={() => handleImgClick(i)}>
                 <img src={`/image/avatar${i}.png`} />
               </div>
             );
           })}
         </div>
-        <Input
-          addonBefore={<span>{t('头像URL')}:</span>}
-          onChange={(e) => setCustomAvatar(e.target.value)}
-          value={customAvatar}
-        />
+        <Input addonBefore={<span>{t('头像URL')}:</span>} onChange={(e) => setCustomAvatar(e.target.value)} value={customAvatar} />
       </Modal>
     </>
   );

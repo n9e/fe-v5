@@ -146,7 +146,7 @@ export const getContactsList = function () {
 };
 
 export const getNotifyChannels = function () {
-  return request(`/api/n9e/notify-channels`, {
+  return request(`/api/n9e/contact-keys`, {
     method: RequestMethod.Get,
   }).then((res) => res && res.dat);
 };

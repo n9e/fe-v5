@@ -22,12 +22,12 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx",
+    "jsx": "react",
     "checkJs": false,
     "sourceMap": true,
     "strictFunctionTypes": false,
     "strictNullChecks": true
   },
   "include": ["./src"],
-  "exclude": ["./src/store/miniDva/*", "./src/Packages/", "src/components/Dantd/**/*",]
+  "exclude": ["./src/store/miniDva/*", "./src/Packages/", "src/components/Dantd/**/*", "./node_modules/**/*"]
 }
