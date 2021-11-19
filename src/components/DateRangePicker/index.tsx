@@ -37,29 +37,18 @@ export function isAbsoluteRange(range: any): range is AbsoluteRange {
   return false;
 }
 
-export const generateTimeStampRange = (
-  range: RelativeRange,
-  timeUnit: TimeUnit = 's',
-): AbsoluteRange => {
+export const generateTimeStampRange = (range: RelativeRange, timeUnit: TimeUnit = 's'): AbsoluteRange => {
   const { num, unit } = range;
   let end = timeUnit === 's' ? moment().unix() : moment().valueOf();
-  let start =
-    timeUnit === 's'
-      ? moment().subtract(num, unit).unix()
-      : moment().subtract(num, unit).valueOf();
+  let start = timeUnit === 's' ? moment().subtract(num, unit).unix() : moment().subtract(num, unit).valueOf();
   return {
     start,
     end,
   };
 };
 
-export const formatPickerDate = (
-  r: Range,
-  timeUnit: TimeUnit = 's',
-): AbsoluteTimeStampRange => {
-  const { start, end } = isAbsoluteRange(r)
-    ? r
-    : generateTimeStampRange(r, timeUnit);
+export const formatPickerDate = (r: Range, timeUnit: TimeUnit = 's'): AbsoluteTimeStampRange => {
+  const { start, end } = isAbsoluteRange(r) ? r : generateTimeStampRange(r, timeUnit);
   return {
     start,
     end,
@@ -89,30 +78,25 @@ export default function DateRangePicker(props: Props) {
   const [label, setLabel] = useState<string>();
 
   useEffect(() => {
-    if (value && isAbsoluteRange(value) && value.start > 0 && value.end > 0) {
-      formatExternalAbsoluteTime(value);
-    } else {
-      handleLeftClick(0);
+    if (!value) {
+      setLeftSelect(0);
+      emitValue(leftList[0]);
+      return;
     }
-  }, []);
-
-  useEffect(() => {
     // 如果外部被赋值，只需要改label和组件展示值，不需要向外抛
-    if (value && isAbsoluteRange(value) && value.start > 0 && value.end > 0) {
-      formatExternalAbsoluteTime(value);
+    if (isAbsoluteRange(value)) {
+      value.start > 0 && value.end > 0 && formatExternalAbsoluteTime(value);
+    } else {
+      const i = LeftItems.findIndex(({ num, unit }) => num === value.num && unit === value.unit);
+      setLeftSelect(i === -1 ? 0 : i);
+      emitValue(leftList[i]);
     }
   }, [value]);
 
   const formatLabel = (r: Range, unit: TimeUnit): string => {
     if (isAbsoluteRange(r)) {
       const { start, end } = r;
-      return (
-        moment(unit === 's' ? start * 1000 : start).format(
-          'YYYY.MM.DD HH:mm:ss',
-        ) +
-        ' 至 ' +
-        moment(unit === 's' ? end * 1000 : end).format('YYYY.MM.DD HH:mm:ss')
-      );
+      return moment(unit === 's' ? start * 1000 : start).format('YYYY.MM.DD HH:mm:ss') + ' 至 ' + moment(unit === 's' ? end * 1000 : end).format('YYYY.MM.DD HH:mm:ss');
     } else {
       const { num, description } = r;
       return `${t('最近')} ${num} ${description}`;
@@ -174,12 +158,7 @@ export default function DateRangePicker(props: Props) {
     <div className='time-range-picker-wrapper'>
       <div className='time-range-picker-left'>
         {leftList.map(({ num, unit, description }, i) => (
-          <Button
-            key={i}
-            type='link'
-            onClick={() => handleLeftClick(i)}
-            className={i === leftSelect ? 'active' : ''}
-          >
+          <Button key={i} type='link' onClick={() => handleLeftClick(i)} className={i === leftSelect ? 'active' : ''}>
             {t('最近')}
             <span className='num'>{num}</span>
             {description}
@@ -189,26 +168,12 @@ export default function DateRangePicker(props: Props) {
 
       <div className='time-range-picker-right'>
         <p className='title'>{t('自定义开始时间')}</p>
-        <DatePicker
-          showTime
-          onChange={handleStartTimeChange}
-          value={startTime}
-          disabledDate={startDisabledDate}
-        />
+        <DatePicker showTime onChange={handleStartTimeChange} value={startTime} disabledDate={startDisabledDate} />
         <p className='title'>{t('自定义结束时间')}</p>
-        <DatePicker
-          showTime
-          onChange={handleEndTimeChange}
-          value={endTime}
-          disabledDate={endDisabledDate}
-        />
+        <DatePicker showTime onChange={handleEndTimeChange} value={endTime} disabledDate={endDisabledDate} />
         <div className='footer'>
           <Button onClick={() => setVisible(false)}>{t('取消')}</Button>
-          <Button
-            type='primary'
-            onClick={handleRightOk}
-            disabled={startTime.endOf('seconds') >= endTime.endOf('seconds')}
-          >
+          <Button type='primary' onClick={handleRightOk} disabled={startTime.endOf('seconds') >= endTime.endOf('seconds')}>
             {t('确定')}
           </Button>
         </div>
@@ -217,11 +182,7 @@ export default function DateRangePicker(props: Props) {
   );
 
   return (
-    <Popover
-      content={content}
-      overlayClassName='time-range-picker'
-      visible={visible}
-    >
+    <Popover content={content} overlayClassName='time-range-picker' visible={visible}>
       <Button onClick={() => setVisible(true)}>
         {label} <CaretDownOutlined />
       </Button>

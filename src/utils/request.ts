@@ -5,9 +5,12 @@ import { UpdateAccessToken } from '@/services/login';
 
 /** 异常处理程序，所有的error都被这里处理，页面无法感知具体error */
 const errorHandler = (error: Error): Response => {
-  notification.error({
-    message: error.message,
-  });
+  // 忽略 AbortError 类型的报错
+  if (!(error.name === 'AbortError')) {
+    notification.error({
+      message: error.message,
+    });
+  }
   throw new Error();
 };
 
