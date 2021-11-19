@@ -35,6 +35,12 @@ interface GraphProps {
   defaultAggrFunc?: string;
   defaultAggrGroups?: string[];
   defaultOffsets?: string[];
+  highLevelConfig?: {
+    shared?: boolean;
+    sharedSortDirection?: 'desc' | 'asc';
+    precision?: 'short' | 'origin' | number;
+    formatUnit?: 1024 | 1000;
+  };
 }
 
 interface GraphState {
@@ -72,10 +78,10 @@ export default class Graph extends Component<GraphProps, GraphState> {
       aggrGroups: this.props.defaultAggrGroups || ['ident'],
       legend: true,
       highLevelConfig: {
-        shared: true,
-        sharedSortDirection: 'desc',
-        precision: 'short',
-        formatUnit: 1024,
+        shared: this.props.highLevelConfig?.shared === undefined ? true : this.props.highLevelConfig?.shared,
+        sharedSortDirection: this.props.highLevelConfig?.sharedSortDirection || 'desc',
+        precision: this.props.highLevelConfig?.precision || 'short',
+        formatUnit: this.props.highLevelConfig?.formatUnit || 1024,
       },
     };
   }
@@ -85,6 +91,25 @@ export default class Graph extends Component<GraphProps, GraphState> {
   }
 
   componentDidUpdate(prevProps) {
+    // 兼容及时查询页面操作图标属性
+    if (typeof prevProps.highLevelConfig === 'object') {
+      const {shared, sharedSortDirection} = prevProps.highLevelConfig
+      let showUpdate = false
+      const updateObj = Object.assign({}, this.state.highLevelConfig)
+      if (shared !== undefined && shared !== this.state.highLevelConfig.shared) {
+        updateObj.shared = shared
+        showUpdate = true
+      }
+      if (sharedSortDirection !== this.state.highLevelConfig.sharedSortDirection) {
+        updateObj.sharedSortDirection = sharedSortDirection
+        showUpdate = true
+      }
+      if (showUpdate) {
+        this.setState({
+          highLevelConfig: updateObj
+        })
+      }
+    }
     const oldHosts = (prevProps.data.selectedHosts || []).map((h) => h.ident);
     const newHosts = (this.props.data.selectedHosts || []).map((h) => h.ident);
     const isHostsChanged = !_.isEqual(oldHosts, newHosts);
