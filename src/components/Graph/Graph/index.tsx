@@ -1,5 +1,6 @@
 import React, { Component, ReactNode } from 'react';
-import { Spin } from 'antd';
+import { Checkbox, Popover, Select, Spin } from 'antd';
+import { SyncOutlined, SettingOutlined, ShareAltOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import _ from 'lodash';
 import '@d3-charts/ts-graph/dist/index.css';
@@ -10,22 +11,30 @@ import Legend, { getSerieVisible, getSerieColor, getSerieIndex } from './Legend'
 import GraphConfigInner from '../GraphConfig/GraphConfigInner';
 import GraphChart from './Graph';
 import { Range, formatPickerDate } from '@/components/DateRangePicker';
+import { SetTmpChartData } from '@/services/metric';
+
+export interface GraphDataProps {
+  step: number;
+  range: Range;
+  legend?: boolean;
+  title?: string;
+  selectedHosts?: { ident: string }[];
+  metric?: string;
+  promqls?: string[] | { current: string }[];
+  ref?: any;
+}
 
 interface GraphProps {
   height?: number;
   ref?: any;
-  data: {
-    step: number;
-    range: Range;
-    legend?: boolean;
-    title?: string;
-    selectedHosts?: { ident: string }[];
-    metric?: string;
-    promqls?: string[] | { current: string }[];
-  };
+  data: GraphDataProps;
   graphConfigInnerVisible?: boolean;
   showHeader?: boolean;
   extraRender?: (ReactNode) => ReactNode;
+  isShowShare?: boolean;
+  defaultAggrFunc?: string;
+  defaultAggrGroups?: string[];
+  defaultOffsets?: string[];
 }
 
 interface GraphState {
@@ -33,12 +42,19 @@ interface GraphState {
   errorText: string;
   series: any[];
   forceRender: boolean;
-  showLegend: boolean;
   offsets: string[];
   aggrFunc: string;
   aggrGroups: string[];
+  legend: boolean;
+  highLevelConfig: {
+    shared: boolean;
+    sharedSortDirection: 'desc' | 'asc';
+    precision: 'short' | 'origin' | number;
+    formatUnit: 1024 | 1000;
+  };
 }
 
+const { Option } = Select;
 export default class Graph extends Component<GraphProps, GraphState> {
   private readonly headerHeight: number = 35;
   private readonly chart: any;
@@ -50,11 +66,17 @@ export default class Graph extends Component<GraphProps, GraphState> {
       errorText: '', // 异常场景下的文案
       series: [],
       forceRender: false,
-      showLegend: false,
       // 刷新、切换hosts时，需要按照用户已经选择的环比、聚合条件重新刷新图表，所以需要将其记录到state中
-      offsets: [],
-      aggrFunc: 'avg',
-      aggrGroups: ['ident'],
+      offsets: this.props.defaultOffsets || [],
+      aggrFunc: this.props.defaultAggrFunc || 'avg',
+      aggrGroups: this.props.defaultAggrGroups || ['ident'],
+      legend: true,
+      highLevelConfig: {
+        shared: true,
+        sharedSortDirection: 'desc',
+        precision: 'short',
+        formatUnit: 1024,
+      },
     };
   }
 
@@ -76,14 +98,14 @@ export default class Graph extends Component<GraphProps, GraphState> {
   }
 
   afterFetchChartDataOperations(allResponseData) {
-    const offsets = this.state.offsets
+    const offsets = this.state.offsets;
     const rawSeries = allResponseData.reduce((acc, cur, idx) => {
-      const arr = cur?.data?.result
+      const arr = cur?.data?.result;
       // 添加环比信息
       if (offsets) {
-        arr.forEach(item => {
-          item.offset = offsets[idx] || ''
-        })
+        arr.forEach((item) => {
+          item.offset = offsets[idx] || '';
+        });
       }
       acc.push(...arr);
       return acc;
@@ -96,6 +118,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
     return {
       ...config.graphDefaultConfig,
       ...graphConfig,
+      ...this.state.highLevelConfig,
       now: graphConfig.now ? graphConfig.now : graphConfig.end ? graphConfig.end : config.graphDefaultConfig.now,
     };
   }
@@ -159,6 +182,26 @@ export default class Graph extends Component<GraphProps, GraphState> {
     this.updateAllGraphs(this.state.aggrFunc, this.state.aggrGroups, this.state.offsets);
   };
 
+  shareChart = () => {
+    let serielData = {
+      dataProps: { ...this.props.data },
+      state: {
+        defaultAggrFunc: this.state.aggrFunc,
+        defaultAggrGroups: this.state.aggrGroups,
+        defaultOffsets: this.state.offsets,
+      },
+    };
+    delete serielData.dataProps.ref;
+    SetTmpChartData([
+      {
+        configs: JSON.stringify(serielData),
+      },
+    ]).then((res) => {
+      const ids = res.dat;
+      window.open('/chart/' + ids);
+    });
+  };
+
   resize = () => {
     if (this.chart && this.chart.resizeHandle) {
       this.chart.resizeHandle();
@@ -181,18 +224,11 @@ export default class Graph extends Component<GraphProps, GraphState> {
     return null;
   }
 
-  updateGraphConfig (args) {
-    const changeObj = args[2] || {}
-    const aggrFunc = changeObj?.aggrFunc
-    const aggrGroups = changeObj?.aggrGroups
-    const offsets = changeObj?.comparison
-    this.setState({aggrFunc, aggrGroups, offsets})
-    if (changeObj.legend !== undefined) {
-      this.setState({
-        showLegend: changeObj.legend,
-      });
-      return;
-    }
+  updateGraphConfig(changeObj) {
+    const aggrFunc = changeObj?.aggrFunc;
+    const aggrGroups = changeObj?.aggrGroups;
+    const offsets = changeObj?.comparison;
+    this.setState({ aggrFunc, aggrGroups, offsets });
     this.updateAllGraphs(aggrFunc, aggrGroups, offsets);
   }
 
@@ -228,6 +264,79 @@ export default class Graph extends Component<GraphProps, GraphState> {
     }
   }
 
+  getContent() {
+    return (
+      <div>
+        <Checkbox
+          checked={this.state.highLevelConfig.shared}
+          onChange={(e) => {
+            this.setState({
+              highLevelConfig: {
+                ...this.state.highLevelConfig,
+                shared: e.target.checked,
+              },
+            });
+          }}
+        >
+          Multi Series in Tooltip, order value
+        </Checkbox>
+        <Select
+          value={this.state.highLevelConfig.sharedSortDirection}
+          onChange={(v: 'desc' | 'asc') => {
+            this.setState({
+              highLevelConfig: {
+                ...this.state.highLevelConfig,
+                sharedSortDirection: v,
+              },
+            });
+          }}
+        >
+          <Option value='desc'>desc</Option>
+          <Option value='asc'>asc</Option>
+        </Select>
+        <br />
+        <Checkbox
+          checked={this.state.legend}
+          onChange={(e) => {
+            this.setState({
+              legend: e.target.checked,
+            });
+          }}
+        >
+          Show Legend
+        </Checkbox>
+        <br />
+        <Checkbox
+          checked={this.state.highLevelConfig.precision === 'short'}
+          onChange={(e) => {
+            this.setState({
+              highLevelConfig: {
+                ...this.state.highLevelConfig,
+                precision: e.target.checked ? 'short' : 'origin',
+              },
+            });
+          }}
+        >
+          Value format with: Ki, Mi, Gi by
+        </Checkbox>
+        <Select
+          value={this.state.highLevelConfig.formatUnit}
+          onChange={(v: 1024 | 1000) => {
+            this.setState({
+              highLevelConfig: {
+                ...this.state.highLevelConfig,
+                formatUnit: v,
+              },
+            });
+          }}
+        >
+          <Option value={1024}>1024</Option>
+          <Option value={1000}>1000</Option>
+        </Select>
+      </div>
+    );
+  }
+
   render() {
     const { spinning } = this.state;
     const { extraRender, data, showHeader = true } = this.props;
@@ -235,7 +344,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
     const graphConfig = this.getGraphConfig(data);
 
     return (
-      <div className={graphConfig.legend ? 'graph-container graph-container-hasLegend' : 'graph-container'}>
+      <div className={this.state.legend ? 'graph-container graph-container-hasLegend' : 'graph-container'}>
         {showHeader && (
           <div
             className='graph-header'
@@ -245,16 +354,28 @@ export default class Graph extends Component<GraphProps, GraphState> {
             }}
           >
             <div className='graph-extra'>
-              <div style={{ display: 'inline-block' }}>{extraRender && _.isFunction(extraRender) ? extraRender(this) : null}</div>
+              <span className='graph-operationbar-item' key='info'>
+                <Popover placement='left' content={this.getContent()} trigger='click'>
+                  <SettingOutlined />
+                </Popover>
+              </span>
+              <span className='graph-operationbar-item' key='sync'>
+                <SyncOutlined onClick={this.refresh} />
+              </span>
+              {this.props.isShowShare === false ? null : (
+                <span className='graph-operationbar-item' key='share'>
+                  <ShareAltOutlined onClick={this.shareChart} />
+                </span>
+              )}
+              {extraRender && _.isFunction(extraRender) ? extraRender(this) : null}
             </div>
-            <div>{title || metric}</div>
           </div>
         )}
         {this.props.graphConfigInnerVisible ? (
           <GraphConfigInner
             data={graphConfig}
             onChange={(...args) => {
-              this.updateGraphConfig(args);
+              this.updateGraphConfig(args[2] || {});
             }}
           />
         ) : null}
@@ -263,7 +384,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
         {this.renderChart()}
         {/* </Spin> */}
         <Legend
-          style={{ display: graphConfig.legend ? 'block' : 'none', overflowY: 'auto', maxHeight: '35%' }}
+          style={{ display: this.state.legend ? 'block' : 'none', overflowY: 'auto', maxHeight: '35%' }}
           graphConfig={graphConfig}
           series={this.getZoomedSeries()}
           onSelectedChange={this.handleLegendRowSelectedChange}

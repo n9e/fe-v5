@@ -36,12 +36,12 @@ function singlePoint(pointData = {}, serie = {}, formatUnit, precision) {
   }
 
   const serieMetricLabels = serie?.metricLabels || {}
-  const labels = Object.keys(serieMetricLabels).map(label => `<span>${label}: ${serieMetricLabels[label]}</span>`)
+  const labels = Object.keys(serieMetricLabels).map(label => `<span>${label}=${serieMetricLabels[label]}</span>`)
 
   return (
     `<span style="color:${color}">● </span>
-    ${name}：<strong>${sizeFormatter(value)}${filledNull ? '(空值填补,仅限看图使用)' : ''}</strong>
-    ${labels}<br/>`
+    【${name}】${labels}：<strong>${value > 1000 ? sizeFormatter(value) : value.toFixed(2)}${filledNull ? '(空值填补,仅限看图使用)' : ''}</strong>
+    <br/>`
   );
 }
 
