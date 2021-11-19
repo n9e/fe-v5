@@ -2,9 +2,9 @@ name: Build With Vite
 
 on:
   push:
-    branches: [master, v5.1]
+    branches: [master, v5.1, v5.1-to-test-ci]
   pull_request:
-    branches: [master, v5.1]
+    branches: [master, v5.1, v5.1-to-test-ci]
 
 jobs:
   build:
