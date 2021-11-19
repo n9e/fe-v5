@@ -20,7 +20,7 @@ export interface GraphDataProps {
   title?: string;
   selectedHosts?: { ident: string }[];
   metric?: string;
-  promqls?: string[];
+  promqls?: string[] | { current: string }[];
   ref?: any;
 }
 
@@ -29,11 +29,18 @@ interface GraphProps {
   ref?: any;
   data: GraphDataProps;
   graphConfigInnerVisible?: boolean;
+  showHeader?: boolean;
   extraRender?: (ReactNode) => ReactNode;
   isShowShare?: boolean;
   defaultAggrFunc?: string;
   defaultAggrGroups?: string[];
   defaultOffsets?: string[];
+  highLevelConfig?: {
+    shared?: boolean;
+    sharedSortDirection?: 'desc' | 'asc';
+    precision?: 'short' | 'origin' | number;
+    formatUnit?: 1024 | 1000;
+  };
 }
 
 interface GraphState {
@@ -46,11 +53,11 @@ interface GraphState {
   aggrGroups: string[];
   legend: boolean;
   highLevelConfig: {
-    shared: boolean,
-    sharedSortDirection: 'desc' | 'asc',
-    precision: 'short' | 'origin' | number,
-    formatUnit: 1024 | 1000
-  }
+    shared: boolean;
+    sharedSortDirection: 'desc' | 'asc';
+    precision: 'short' | 'origin' | number;
+    formatUnit: 1024 | 1000;
+  };
 }
 
 const { Option } = Select;
@@ -71,11 +78,11 @@ export default class Graph extends Component<GraphProps, GraphState> {
       aggrGroups: this.props.defaultAggrGroups || ['ident'],
       legend: true,
       highLevelConfig: {
-        shared: true,
-        sharedSortDirection: 'desc',
-        precision: 'short',
-        formatUnit: 1024
-      }
+        shared: this.props.highLevelConfig?.shared === undefined ? true : this.props.highLevelConfig?.shared,
+        sharedSortDirection: this.props.highLevelConfig?.sharedSortDirection || 'desc',
+        precision: this.props.highLevelConfig?.precision || 'short',
+        formatUnit: this.props.highLevelConfig?.formatUnit || 1024,
+      },
     };
   }
 
@@ -84,6 +91,25 @@ export default class Graph extends Component<GraphProps, GraphState> {
   }
 
   componentDidUpdate(prevProps) {
+    // 兼容及时查询页面操作图标属性
+    if (typeof prevProps.highLevelConfig === 'object') {
+      const {shared, sharedSortDirection} = prevProps.highLevelConfig
+      let showUpdate = false
+      const updateObj = Object.assign({}, this.state.highLevelConfig)
+      if (shared !== undefined && shared !== this.state.highLevelConfig.shared) {
+        updateObj.shared = shared
+        showUpdate = true
+      }
+      if (sharedSortDirection !== this.state.highLevelConfig.sharedSortDirection) {
+        updateObj.sharedSortDirection = sharedSortDirection
+        showUpdate = true
+      }
+      if (showUpdate) {
+        this.setState({
+          highLevelConfig: updateObj
+        })
+      }
+    }
     const oldHosts = (prevProps.data.selectedHosts || []).map((h) => h.ident);
     const newHosts = (this.props.data.selectedHosts || []).map((h) => h.ident);
     const isHostsChanged = !_.isEqual(oldHosts, newHosts);
@@ -97,14 +123,14 @@ export default class Graph extends Component<GraphProps, GraphState> {
   }
 
   afterFetchChartDataOperations(allResponseData) {
-    const offsets = this.state.offsets
+    const offsets = this.state.offsets;
     const rawSeries = allResponseData.reduce((acc, cur, idx) => {
-      const arr = cur?.data?.result
+      const arr = cur?.data?.result;
       // 添加环比信息
       if (offsets) {
-        arr.forEach(item => {
-          item.offset = offsets[idx] || ''
-        })
+        arr.forEach((item) => {
+          item.offset = offsets[idx] || '';
+        });
       }
       acc.push(...arr);
       return acc;
@@ -187,19 +213,19 @@ export default class Graph extends Component<GraphProps, GraphState> {
       state: {
         defaultAggrFunc: this.state.aggrFunc,
         defaultAggrGroups: this.state.aggrGroups,
-        defaultOffsets: this.state.offsets
-      }
-    }
-    delete serielData.dataProps.ref
+        defaultOffsets: this.state.offsets,
+      },
+    };
+    delete serielData.dataProps.ref;
     SetTmpChartData([
       {
-        configs: JSON.stringify(serielData)
-      }
-    ]).then(res => {
-      const ids = res.dat
-      window.open('/chart/' + ids)
-    })
-  }
+        configs: JSON.stringify(serielData),
+      },
+    ]).then((res) => {
+      const ids = res.dat;
+      window.open('/chart/' + ids);
+    });
+  };
 
   resize = () => {
     if (this.chart && this.chart.resizeHandle) {
@@ -223,11 +249,11 @@ export default class Graph extends Component<GraphProps, GraphState> {
     return null;
   }
 
-  updateGraphConfig (changeObj) {
-    const aggrFunc = changeObj?.aggrFunc
-    const aggrGroups = changeObj?.aggrGroups
-    const offsets = changeObj?.comparison
-    this.setState({aggrFunc, aggrGroups, offsets})
+  updateGraphConfig(changeObj) {
+    const aggrFunc = changeObj?.aggrFunc;
+    const aggrGroups = changeObj?.aggrGroups;
+    const offsets = changeObj?.comparison;
+    this.setState({ aggrFunc, aggrGroups, offsets });
     this.updateAllGraphs(aggrFunc, aggrGroups, offsets);
   }
 
@@ -237,7 +263,14 @@ export default class Graph extends Component<GraphProps, GraphState> {
     if (aggrFunc) obj.curAggrFunc = aggrFunc;
     if (aggrGroups && aggrGroups.length > 0) obj.curAggrGroup = aggrGroups;
     if (promqls) {
-      const noOffsetPromise = promqls.map((query) => this.fetchData(query));
+      // 取查询语句的正确值，并去掉查询条件为空的语句
+      const formattedPromqls = promqls
+        .map((promql: string | { current: string }) => {
+          return typeof promql === 'string' ? promql : promql.current;
+        })
+        .filter((promql) => promql);
+
+      const noOffsetPromise = formattedPromqls.map((query) => this.fetchData(query));
       Promise.all([...noOffsetPromise]).then((res) => {
         this.afterFetchChartDataOperations(res);
       });
@@ -256,8 +289,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
     }
   }
 
-
-  getContent () {
+  getContent() {
     return (
       <div>
         <Checkbox
@@ -266,19 +298,24 @@ export default class Graph extends Component<GraphProps, GraphState> {
             this.setState({
               highLevelConfig: {
                 ...this.state.highLevelConfig,
-                shared: e.target.checked
-              }
-            })
+                shared: e.target.checked,
+              },
+            });
           }}
-        >Multi Series in Tooltip, order value</Checkbox>
-        <Select value={this.state.highLevelConfig.sharedSortDirection} onChange={(v: 'desc' | 'asc') => {
-          this.setState({
-            highLevelConfig: {
-              ...this.state.highLevelConfig,
-              sharedSortDirection: v
-            }
-          })
-        }}>
+        >
+          Multi Series in Tooltip, order value
+        </Checkbox>
+        <Select
+          value={this.state.highLevelConfig.sharedSortDirection}
+          onChange={(v: 'desc' | 'asc') => {
+            this.setState({
+              highLevelConfig: {
+                ...this.state.highLevelConfig,
+                sharedSortDirection: v,
+              },
+            });
+          }}
+        >
           <Option value='desc'>desc</Option>
           <Option value='asc'>asc</Option>
         </Select>
@@ -287,10 +324,12 @@ export default class Graph extends Component<GraphProps, GraphState> {
           checked={this.state.legend}
           onChange={(e) => {
             this.setState({
-              legend: e.target.checked
-            })
+              legend: e.target.checked,
+            });
           }}
-        >Show Legend</Checkbox>
+        >
+          Show Legend
+        </Checkbox>
         <br />
         <Checkbox
           checked={this.state.highLevelConfig.precision === 'short'}
@@ -298,18 +337,24 @@ export default class Graph extends Component<GraphProps, GraphState> {
             this.setState({
               highLevelConfig: {
                 ...this.state.highLevelConfig,
-                precision: e.target.checked ? 'short' : 'origin'
-              }
-            })
-          }}>Value format with: Ki, Mi, Gi by</Checkbox>
-        <Select value={this.state.highLevelConfig.formatUnit} onChange={(v: 1024 | 1000) => {
-          this.setState({
-            highLevelConfig: {
-              ...this.state.highLevelConfig,
-              formatUnit: v
-            }
-          })
-        }}>
+                precision: e.target.checked ? 'short' : 'origin',
+              },
+            });
+          }}
+        >
+          Value format with: Ki, Mi, Gi by
+        </Checkbox>
+        <Select
+          value={this.state.highLevelConfig.formatUnit}
+          onChange={(v: 1024 | 1000) => {
+            this.setState({
+              highLevelConfig: {
+                ...this.state.highLevelConfig,
+                formatUnit: v,
+              },
+            });
+          }}
+        >
           <Option value={1024}>1024</Option>
           <Option value={1000}>1000</Option>
         </Select>
@@ -319,37 +364,38 @@ export default class Graph extends Component<GraphProps, GraphState> {
 
   render() {
     const { spinning } = this.state;
-    const { extraRender, data } = this.props;
+    const { extraRender, data, showHeader = true } = this.props;
     const { title, metric } = data;
     const graphConfig = this.getGraphConfig(data);
 
     return (
       <div className={this.state.legend ? 'graph-container graph-container-hasLegend' : 'graph-container'}>
-        <div
-          className='graph-header'
-          style={{
-            height: this.headerHeight,
-            lineHeight: `${this.headerHeight}px`,
-          }}
-        >
-          <div className='graph-extra'>
-            <span className="graph-operationbar-item" key="info">
-              <Popover placement="left" content={this.getContent()} trigger="click">
-                <SettingOutlined />
-              </Popover>
-            </span>
-            <span className="graph-operationbar-item" key="sync">
-              <SyncOutlined onClick={this.refresh} />
-            </span>
-            {this.props.isShowShare === false ? null :
-            <span className="graph-operationbar-item" key="share">
-              <ShareAltOutlined onClick={this.shareChart} />
-            </span>
-            }
-            {extraRender && _.isFunction(extraRender) ? extraRender(this) : null}
+        {showHeader && (
+          <div
+            className='graph-header'
+            style={{
+              height: this.headerHeight,
+              lineHeight: `${this.headerHeight}px`,
+            }}
+          >
+            <div className='graph-extra'>
+              <span className='graph-operationbar-item' key='info'>
+                <Popover placement='left' content={this.getContent()} trigger='click'>
+                  <SettingOutlined />
+                </Popover>
+              </span>
+              <span className='graph-operationbar-item' key='sync'>
+                <SyncOutlined onClick={this.refresh} />
+              </span>
+              {this.props.isShowShare === false ? null : (
+                <span className='graph-operationbar-item' key='share'>
+                  <ShareAltOutlined onClick={this.shareChart} />
+                </span>
+              )}
+              {extraRender && _.isFunction(extraRender) ? extraRender(this) : null}
+            </div>
           </div>
-          <div>{title || metric}</div>
-        </div>
+        )}
         {this.props.graphConfigInnerVisible ? (
           <GraphConfigInner
             data={graphConfig}

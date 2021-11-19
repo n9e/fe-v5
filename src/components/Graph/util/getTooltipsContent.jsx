@@ -40,7 +40,7 @@ function singlePoint(pointData = {}, serie = {}, formatUnit, precision) {
 
   return (
     `<span style="color:${color}">● </span>
-    【${name}】${labels}：<strong>${value > 1000 ? sizeFormatter(value) : value.toFixed(2)}${filledNull ? '(空值填补,仅限看图使用)' : ''}</strong>
+    ${name ? `【${name}】`: ''}${labels}：<strong>${value > 1000 ? sizeFormatter(value) : value.toFixed(2)}${filledNull ? '(空值填补,仅限看图使用)' : ''}</strong>
     <br/>`
   );
 }
