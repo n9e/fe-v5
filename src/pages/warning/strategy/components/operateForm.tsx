@@ -19,7 +19,8 @@ import {
   Space,
   Switch,
   Tooltip,
-  Tag
+  Tag,
+  notification
 } from 'antd';
 const { TextArea } = Input;
 const { Option } = Select;
@@ -199,7 +200,9 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
     form.validateFields().then(async (values) => {
       const res = await prometheusQuery({ query: values.prom_ql });
       if (res.error) {
-        
+        notification.error({
+          message: res.error
+        });
         return false;
       }
       const callbacks = values.callbacks.map(item => item.url);

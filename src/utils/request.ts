@@ -87,11 +87,6 @@ request.interceptors.response.use(
           .json()
           .then((data) => {
             if (response.url.indexOf('/api/n9e/prometheus/api/v1/query') > -1) {
-              if (data.error) {
-                notification.error({
-                  message: data.error
-                });
-              }
               return data;
             }
             throw new Error(data.err ? data.err : data);
