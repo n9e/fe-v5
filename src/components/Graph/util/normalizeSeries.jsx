@@ -5,7 +5,7 @@ import { hexPalette } from '../config';
 export default function normalizeSeries(data, treeData) {
   const series = [];
   _.each(data, (o, i) => {
-    const id = o?.metric?.ident;
+    const id = o?.metric?.ident || o?.metric?.__name__;
     const color = getSerieColor(o, i);
 
     const serie = {
@@ -13,7 +13,7 @@ export default function normalizeSeries(data, treeData) {
       name: id,
       tags: id,
       metricLabels: o.metric,
-      data: (o.values || []).map(v => ([ v[0] * 1000, Number(v[1]) ])) || [],
+      data: (o.values || []).map((v) => [v[0] * 1000, Number(v[1])]) || [],
       lineWidth: 2,
       color,
       oldColor: color,
