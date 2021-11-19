@@ -2,13 +2,13 @@ name: Build With Vite
 
 on:
   push:
-    branches: [master, v5.1, v5.1-to-test-ci]
+    branches: [master, v5.1]
   pull_request:
-    branches: [master, v5.1, v5.1-to-test-ci]
+    branches: [master, v5.1]
 
 jobs:
   build:
-    runs-on: mac-10.13
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
