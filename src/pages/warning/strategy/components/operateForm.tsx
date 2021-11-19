@@ -199,10 +199,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
     form.validateFields().then(async (values) => {
       const res = await prometheusQuery({ query: values.prom_ql });
       if (res.error) {
-        message.error({
-          content: `PromQL${t('错误')}：
-                    ${t(res.error)}`
-        })
+        
         return false;
       }
       const callbacks = values.callbacks.map(item => item.url);

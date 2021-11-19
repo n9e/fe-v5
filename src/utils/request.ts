@@ -40,6 +40,7 @@ request.interceptors.request.use((url, options) => {
 request.interceptors.response.use(
   async (response) => {
     const { status } = response;
+    
     if (status === 200) {
       return response
         .clone()
@@ -70,13 +71,6 @@ request.interceptors.response.use(
             }
           })
         : (location.href = `/login${location.pathname != '/' ? '?redirect=' + location.pathname : ''}`);
-    } else if(status === 400) {
-      return response
-          .clone()
-          .json()
-          .then((data) => {
-            return data;
-          });
     } else {
       const contentType = response.headers.get('content-type');
       const isPlainText = contentType?.indexOf('text/plain; charset=utf-8') !== -1;
@@ -92,6 +86,14 @@ request.interceptors.response.use(
           .clone()
           .json()
           .then((data) => {
+            if (response.url.indexOf('/api/n9e/prometheus/api/v1/query') > -1) {
+              if (data.error) {
+                notification.error({
+                  message: data.error
+                });
+              }
+              return data;
+            }
             throw new Error(data.err ? data.err : data);
           });
       }
