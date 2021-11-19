@@ -40,6 +40,7 @@ request.interceptors.request.use((url, options) => {
 request.interceptors.response.use(
   async (response) => {
     const { status } = response;
+    
     if (status === 200) {
       return response
         .clone()
@@ -85,6 +86,9 @@ request.interceptors.response.use(
           .clone()
           .json()
           .then((data) => {
+            if (response.url.indexOf('/api/n9e/prometheus/api/v1/query') > -1) {
+              return data;
+            }
             throw new Error(data.err ? data.err : data);
           });
       }

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory, useParams, useLocation } from 'react-router-dom';
-import { debounce } from 'lodash';
 import moment from 'moment';
 import {
   Card,
@@ -15,28 +14,32 @@ import {
   Button,
   TimePicker,
   Checkbox,
-  notification,
+  Modal,
   message,
   Space,
   Switch,
   Tooltip,
+  Tag,
+  notification
 } from 'antd';
 const { TextArea } = Input;
 const { Option } = Select;
 import {
-  FundOutlined,
   QuestionCircleFilled,
   MinusCircleOutlined,
   PlusCircleOutlined,
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { RootState } from '@/store/common';
-import { warningStoreState, Metric } from '@/store/warningInterface';
 import { CommonStoreState } from '@/store/commonInterface';
 import { getTeamInfoList, getNotifiesList } from '@/services/manage';
-import { addOrEditStrategy, EditStrategy } from '@/services/warning';
+import {
+  addOrEditStrategy,
+  EditStrategy,
+  prometheusQuery,
+  deleteStrategy
+} from '@/services/warning';
 import PromqlEditor from '@/components/PromqlEditor';
-import ChartDrawer from './Drawer';
 
 const layout = {
   labelCol: {
@@ -58,7 +61,64 @@ interface Props {
   type?: number; // 1:编辑 2:克隆
 }
 
-const operateForm: React.FC<Props> = ({ type, detail }) => {
+// 校验单个标签格式是否正确
+function isTagValid(tag) {
+  const contentRegExp = /^[a-zA-Z_][\w]*={1}[^=]+$/;
+  return {
+    isCorrectFormat: contentRegExp.test(tag.toString()),
+    isLengthAllowed: tag.toString().length <= 64,
+  };
+}
+
+// 渲染标签
+function tagRender(content) {
+  const { isCorrectFormat, isLengthAllowed } = isTagValid(content.value);
+  return isCorrectFormat && isLengthAllowed ? (
+    <Tag
+      closable={content.closable}
+      onClose={content.onClose}
+    // style={{ marginTop: '2px' }}
+    >
+      {content.value}
+    </Tag>
+  ) : (
+    <Tooltip
+      title={
+        isCorrectFormat
+          ? '标签长度应小于等于 64 位'
+          : '标签格式应为 key=value。且 key 以字母或下划线开头，由字母、数字和下划线组成。'
+      }
+    >
+      <Tag
+        color='error'
+        closable={content.closable}
+        onClose={content.onClose}
+        style={{ marginTop: '2px' }}
+      >
+        {content.value}
+      </Tag>
+    </Tooltip>
+  );
+}
+
+// 校验所有标签格式
+function isValidFormat() {
+  return {
+    validator(_, value) {
+      const isInvalid = value && value.some((tag) => {
+        const { isCorrectFormat, isLengthAllowed } = isTagValid(tag);
+        if (!isCorrectFormat || !isLengthAllowed) {
+          return true;
+        }
+      });
+      return isInvalid
+        ? Promise.reject(new Error('标签格式不正确，请检查！'))
+        : Promise.resolve();
+    },
+  };
+}
+
+const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
   const { t, i18n } = useTranslation();
   const history = useHistory(); // 创建的时候默认选中的值
 
@@ -67,19 +127,17 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
     (state) => state.common,
   );
   const { curBusiItem } = useSelector<RootState, CommonStoreState>(state => state.common);
-  
-  const [metricsDrawer, setMetricsDrawer] = useState<Array<Metric>>([]);
-  const [drawerVisible, setDrawerVisible] = useState<boolean>(false);
-  const [yplotline, setYplotline] = useState<number>(0);
+
   const [contactList, setInitContactList] = useState([]);
   const [notifyGroups, setNotifyGroups] = useState([]);
   const [initVal, setInitVal] = useState<any>({});
+  const [refresh, setRefresh] = useState(true);
 
   useEffect(() => {
     getNotifyChannel();
     getGroups();
-    
-    return () => {};
+
+    return () => { };
   }, []);
 
   useEffect(() => {
@@ -89,10 +147,7 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
       enable_status: detail?.disabled === undefined ? true : !detail?.disabled
     }
     setInitVal(data);
-    console.log('detail', data)
-    return () => {
-      
-    }
+
   }, [JSON.stringify(detail)])
 
   const enableDaysOfWeekOptions = [
@@ -114,7 +169,7 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
   ));
 
   const notifyGroupsOptions = notifyGroups.map((ng: any) => (
-    <Option value={ng.id} key={ng.id}>
+    <Option value={String(ng.id)} key={ng.id}>
       {ng.name}
     </Option>
   ));
@@ -131,18 +186,6 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
     setNotifyGroups(data || []);
   };
 
-  const openDrawer = function (index?) {
-    let promql = form.getFieldValue('promql');
-    if (!promql) {
-      message.warning(t('请先输入指标'));
-      return;
-    }
-    let metricStrArr = [{ name: '', promql, description: '' }];
-    setMetricsDrawer(metricStrArr);
-
-    setDrawerVisible(true);
-  };
-
   const handleTagsChange = (value: string[]) => {
     let top: string = value[value.length - 1];
     let reg = /\w+=\w+/;
@@ -155,11 +198,21 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
 
   const addSubmit = () => {
     form.validateFields().then(async (values) => {
+      const res = await prometheusQuery({ query: values.prom_ql });
+      if (res.error) {
+        notification.error({
+          message: res.error
+        });
+        return false;
+      }
+      const callbacks = values.callbacks.map(item => item.url);
       const data = {
         ...values,
         enable_stime: values.enable_time[0].format('HH:mm'),
         enable_etime: values.enable_time[1].format('HH:mm'),
         disabled: !values.enable_status ? 1 : 0,
+        notify_recovered: values.notify_recovered ? 1 : 0,
+        callbacks
       };
       let reqBody, method = 'Post';
       if (type === 1) {
@@ -169,8 +222,8 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
         if (res.err) {
           message.error(res.error);
         } else {
-          message.success('编辑成功！');
-          history.push('/strategy');
+          message.success(t('编辑成功！'));
+          history.push('/alert-rules');
         }
       } else {
         reqBody = [data];
@@ -179,20 +232,18 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
         const msg = Object.keys(dat).map((key) => {
           dat[key] && errorNum++;
           return (
-            <p style={{ color: dat[key] ? '#ff4d4f' : '#52c41a' }}>
-              {key}: {dat[key] ? dat[key] : 'successfully'}
-            </p>
+            dat[key]
           );
         });
-        notification.info({
-          message: msg,
-        });
+
         if (!errorNum) {
-          history.push('/strategy');
+          message.success(`${type === 2 ? t('告警规则克隆成功') : t('告警规则创建成功')}`);
+          history.push('/alert-rules');
+        } else {
+          message.error(t(msg));
         }
       }
-      
-      
+
     });
   };
 
@@ -201,20 +252,24 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
       <Form
         {...layout}
         form={form}
-        // onFinish={onFinish}
-        // onFinishFailed={onFinishFailed}
         className='strategy-form'
+        layout={refresh ? 'horizontal' : 'horizontal'}
         initialValues={{
           prom_eval_interval: 15,
+          prom_for_duration: 60,
+          severity: 2,
           disabled: 0, // 0:立即启用 1:禁用  待修改
-          // enable_status: true,
-          notify_recovered: 1, // 1:启用
-          // enable_time: '', // 待修改
-          cluster: 'Default', // 生效集群
+          // notify_recovered: 1, // 1:启用
+          cluster: clusterList[0] || 'Default', // 生效集群
           enable_days_of_week: ['1', '2', '3', '4', '5', '6', '0'],
           ...detail,
           enable_time: detail?.enable_stime ? [moment(detail.enable_stime, 'HH:mm'), moment(detail.enable_etime, 'HH:mm')] : [moment('00:00', 'HH:mm'), moment('23:59', 'HH:mm')],
-          enable_status: detail?.disabled === undefined ? true : !detail?.disabled
+          enable_status: detail?.disabled === undefined ? true : !detail?.disabled,
+          notify_recovered: detail?.notify_recovered === 1 || detail?.notify_recovered === undefined ? true : false, // 1:启用 0:禁用
+          callbacks: !!detail?.callbacks ? detail.callbacks.map(item => ({
+            url: item
+          })) : [{}],
+
         }}
       >
         <Space direction='vertical' style={{ width: '100%' }}>
@@ -229,7 +284,7 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
                 },
               ]}
             >
-              <Input placeholder={t('请输入规则标题')} />
+              <Input placeholder={t('请输入规则标题')}/>
             </Form.Item>
             <Form.Item
               label={t('规则备注：')}
@@ -245,7 +300,6 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
             <Form.Item
               label={t('告警级别')}
               name='severity'
-              initialValue={2}
               rules={[
                 {
                   required: true,
@@ -277,35 +331,27 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
                 ))}
               </Select>
             </Form.Item>
-            {drawerVisible && (
-              <ChartDrawer
-                visible={drawerVisible}
-                onChange={(e) => {
-                  setDrawerVisible(e);
-                }}
-                yplotline={yplotline}
-                metrics={metricsDrawer}
-              ></ChartDrawer>
-            )}
+
             <Form.Item label='PromQL' className={'Promeql-content'} required>
-              <Space style={{ width: '100%', display: 'block' }}>
-                <Form.Item
-                  name='prom_ql'
-                  // labelCol={{ span: 3 }}
-                  // wrapperCol={{ span: 23 }}
-                  rules={[{ required: true, message: t('请输入PromQL') }]}
-                >
-                  <PromqlEditor className='promql-editor' xCluster='Default' />
-                </Form.Item>
-                <Tooltip title={t('预览')}>
-                  <FundOutlined
-                    className='Promeql-icon-btn'
-                    onClick={() => {
-                      openDrawer();
-                    }}
-                  />
-                </Tooltip>
-              </Space>
+              <Form.Item
+                name='prom_ql'
+                // labelCol={{ span: 3 }}
+                // wrapperCol={{ span: 23 }}
+                validateTrigger={['onBlur']}
+                trigger='onChange'
+                rules={[{ required: true, message: t('请输入PromQL') }]}
+                
+              >
+                <PromqlEditor
+                  // className='promql-editor' 
+                  xCluster='Default'
+                  onChange={(val) => {
+                    if (val) {
+                      form.validateFields(['prom_ql'])
+                    }
+                  }}
+                />
+              </Form.Item>
             </Form.Item>
             <Form.Item
               required
@@ -324,14 +370,16 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
                   initialValue={15}
                   wrapperCol={{ span: 10 }}
                 >
-                  <InputNumber min={1} />
+                  <InputNumber
+                    min={1}
+                    onChange={(val) => {
+                      setRefresh(!refresh);
+                    }} />
                 </Form.Item>
-                秒{' '}
+                秒
                 <Tooltip
                   title={t(
-                    `每隔${form.getFieldValue(
-                      'prom_eval_interval',
-                    )}秒，把PromQL作为查询条件，去查询后端存储，如果查到了数据就表示当次有监控数据触发了规则`,
+                    `每隔${form.getFieldValue('prom_eval_interval')}秒，把PromQL作为查询条件，去查询后端存储，如果查到了数据就表示当次有监控数据触发了规则`,
                   )}
                 >
                   <QuestionCircleFilled />
@@ -352,12 +400,11 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
                 <Form.Item
                   style={{ marginBottom: 0 }}
                   name='prom_for_duration'
-                  initialValue={60}
                   wrapperCol={{ span: 10 }}
                 >
                   <InputNumber min={0} />
                 </Form.Item>
-                秒{' '}
+                秒
                 <Tooltip
                   title={t(
                     `通常持续时长大于执行频率，在持续时长内按照执行频率多次执行PromQL查询，每次都触发才生成告警；如果持续时长置为0，表示只要有一次PromQL查询触发阈值，就生成告警`,
@@ -367,7 +414,7 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
                 </Tooltip>
               </Space>
             </Form.Item>
-            <Form.Item
+            {/* <Form.Item
               label={t('附加标签')}
               style={{
                 marginTop: 20,
@@ -379,6 +426,22 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
                 onChange={handleTagsChange}
                 placeholder={t('请输入附加标签，格式为key=value')}
               ></Select>
+            </Form.Item> */}
+            <Form.Item
+              label='附加标签'
+              name='append_tags'
+              rules={[
+                { required: false, message: '请填写至少一项标签！' },
+                isValidFormat,
+              ]}
+            >
+              <Select
+                mode='tags'
+                tokenSeparators={[' ']}
+                open={false}
+                placeholder={'标签格式为 key=value ，使用回车或空格分隔'}
+                tagRender={tagRender}
+              />
             </Form.Item>
             <Form.Item label={t('预案链接')} name='runbook_url'>
               <Input />
@@ -423,7 +486,6 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
               <TimePicker.RangePicker
                 format='HH:mm'
                 onChange={(val, val2) => {
-                  console.log(val, val2, form.getFieldValue('enable_time'));
                   form.setFieldsValue({
                     enable_stime: val2[0],
                     enable_etime: val2[1],
@@ -437,15 +499,35 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
               <Checkbox.Group>{contactListCheckboxes}</Checkbox.Group>
             </Form.Item>
             <Form.Item label={t('告警接收组')} name='notify_groups'>
-              <Select mode='multiple'>{notifyGroupsOptions}</Select>
+              <Select
+                mode='multiple'
+                showSearch
+                optionFilterProp="children"
+                filterOption={(input, option) =>
+                  option?.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                }>{notifyGroupsOptions}</Select>
             </Form.Item>
-            <Form.Item
-              label={t('启用恢复通知')}
-              name='notify_recovered'
-              valuePropName='checked'
-            >
-              <Switch />
+            <Form.Item label={t('启用恢复通知')}>
+              <Space>
+                <Form.Item
+                  name='notify_recovered'
+                  valuePropName='checked'
+                  style={{ marginBottom: 0 }}
+                >
+                  <Switch />
+
+                </Form.Item>
+                <Tooltip
+                  title={t(
+                    `告警恢复时也发送通知`,
+                  )}
+                >
+                  <QuestionCircleFilled />
+                </Tooltip>
+              </Space>
+
             </Form.Item>
+
             <Form.Item label={t('重复发送频率')} required>
               <Space>
                 <Form.Item
@@ -459,10 +541,13 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
                       message: t('重复发送频率不能为空'),
                     },
                   ]}
+
                 >
-                  <InputNumber min={0} />
+                  <InputNumber min={0} onChange={(val) => {
+                    setRefresh(!refresh);
+                  }} />
                 </Form.Item>
-                分钟{' '}
+                分钟
                 <Tooltip
                   title={t(
                     `如果告警持续未恢复，间隔${form.getFieldValue(
@@ -474,14 +559,17 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
                 </Tooltip>
               </Space>
             </Form.Item>
-            <Form.Item label={t('报警回调')}>
-              <Form.List name='callbacks' initialValue={['']}>
-                {(fields, { add, remove }, { errors }) => (
+            <Form.Item label={t('回调地址')}>
+              <Form.List name='callbacks' initialValue={[{}]}>
+                {(fields, { add, remove }) => (
                   <>
-                    {fields.map((field, index) => (
+                    {fields.map((field) => (
                       <Row gutter={[10, 0]} key={field.key}>
                         <Col span={22}>
-                          <Form.Item name={[field.name, 'url']}>
+                          <Form.Item
+                            name={[field.name, 'url']}
+                            fieldKey={[field.fieldKey, 'url']}
+                          >
                             <Input />
                           </Form.Item>
                         </Col>
@@ -498,25 +586,13 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
                       className='control-icon-normal'
                       onClick={() => add()}
                     />
-
-                    {/* <span
-                      style={{
-                        fontSize: 12,
-                        marginTop: 4,
-                        color: '#ccc',
-                      }}
-                    >
-                      {t(
-                        '通知自己开发的系统（请确认是夜莺服务端可访问的地址）',
-                      )}
-                    </span> */}
                   </>
                 )}
               </Form.List>
             </Form.Item>
           </Card>
           <Form.Item
-            {...tailLayout}
+            // {...tailLayout}
             style={{
               marginTop: 20,
             }}
@@ -524,14 +600,35 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
             <Button
               type='primary'
               onClick={addSubmit}
-              style={{ margin: '0 8px' }}
+              style={{ marginRight: '8px' }}
             >
               {type === 1 ? t('编辑') : type === 2 ? t('克隆') : t('创建')}
             </Button>
+            {type === 1 && (
+              <Button
+                danger
+                style={{ marginRight: '8px' }}
+                onClick={() => {
+                  Modal.confirm({
+                    title: t('是否删除该告警规则?'),
+                    onOk: () => {
+                      deleteStrategy([detail.id], curBusiItem.id).then(() => {
+                        message.success(t('删除成功'));
+                        history.push('/alert-rules');
+                      });
+                    },
+
+                    onCancel() { },
+                  });
+                }}
+              >
+                {t('删除')}
+              </Button>
+            )}
 
             <Button
               onClick={() => {
-                history.push('/strategy');
+                history.push('/alert-rules');
               }}
             >
               {t('取消')}
@@ -539,7 +636,7 @@ const operateForm: React.FC<Props> = ({ type, detail }) => {
           </Form.Item>
         </Space>
       </Form>
-      
+
     </div>
   );
 };

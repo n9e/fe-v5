@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { useHistory, useParams, useLocation } from 'react-router-dom';
-import { debounce } from 'lodash';
+import { useSelector } from 'react-redux';
 import moment from 'moment';
 import {
   Form,
@@ -13,14 +11,13 @@ import {
   Col,
   TimePicker,
   Checkbox,
-  notification,
+  Tag,
   message,
   Space,
   Switch,
   Tooltip,
   Modal
 } from 'antd';
-const { TextArea } = Input;
 const { Option } = Select;
 import {
   QuestionCircleFilled,
@@ -31,15 +28,14 @@ import { useTranslation } from 'react-i18next';
 import { RootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
 import { getTeamInfoList, getNotifiesList } from '@/services/manage';
-import { addOrEditStrategy, EditStrategy } from '@/services/warning';
 
 
 const layout = {
   labelCol: {
-    span: 5,
+    span: 3,
   },
   wrapperCol: {
-    span: 19,
+    span: 20,
   },
 };
 
@@ -84,7 +80,7 @@ const fields = [
   {
     id: 12,
     field: 'append_tags',
-    name: '集群'
+    name: '附加标签'
   },
   {
     id: 7,
@@ -124,6 +120,63 @@ const fields = [
 
 ]
 
+// 校验单个标签格式是否正确
+function isTagValid(tag) {
+  const contentRegExp = /^[a-zA-Z_][\w]*={1}[^=]+$/;
+  return {
+    isCorrectFormat: contentRegExp.test(tag.toString()),
+    isLengthAllowed: tag.toString().length <= 64,
+  };
+}
+
+// 渲染标签
+function tagRender(content) {
+  const { isCorrectFormat, isLengthAllowed } = isTagValid(content.value);
+  return isCorrectFormat && isLengthAllowed ? (
+    <Tag
+      closable={content.closable}
+      onClose={content.onClose}
+    // style={{ marginTop: '2px' }}
+    >
+      {content.value}
+    </Tag>
+  ) : (
+    <Tooltip
+      title={
+        isCorrectFormat
+          ? '标签长度应小于等于 64 位'
+          : '标签格式应为 key=value。且 key 以字母或下划线开头，由字母、数字和下划线组成。'
+      }
+    >
+      <Tag
+        color='error'
+        closable={content.closable}
+        onClose={content.onClose}
+        style={{ marginTop: '2px' }}
+      >
+        {content.value}
+      </Tag>
+    </Tooltip>
+  );
+}
+
+// 校验所有标签格式
+function isValidFormat() {
+  return {
+    validator(_, value) {
+      const isInvalid = value && value.some((tag) => {
+        const { isCorrectFormat, isLengthAllowed } = isTagValid(tag);
+        if (!isCorrectFormat || !isLengthAllowed) {
+          return true;
+        }
+      });
+      return isInvalid
+        ? Promise.reject(new Error('标签格式不正确，请检查！'))
+        : Promise.resolve();
+    },
+  };
+}
+
 interface Props {
   isModalVisible: boolean;
   editModalFinish: Function;
@@ -131,18 +184,17 @@ interface Props {
 
 const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
   const { t, i18n } = useTranslation();
-  const history = useHistory(); // 创建的时候默认选中的值
 
   const [form] = Form.useForm();
   const { clusters: clusterList } = useSelector<RootState, CommonStoreState>(
     (state) => state.common,
   );
-  const { curBusiItem } = useSelector<RootState, CommonStoreState>(state => state.common);
-
+  
   const [contactList, setInitContactList] = useState([]);
   const [notifyGroups, setNotifyGroups] = useState([]);
 
   const [field, setField] = useState<string>('cluster');
+  const [refresh, setRefresh] = useState(true);
 
   useEffect(() => {
     getNotifyChannel();
@@ -189,21 +241,9 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
     setNotifyGroups(data || []);
   };
 
-  const handleTagsChange = (value: string[]) => {
-    let top: string = value[value.length - 1];
-    let reg = /\w+=\w+/;
-
-    if (top && !reg.test(top)) {
-      let v = value.pop();
-      message.error(`"${v}${t('"不符合输入规范（格式为key=value）')}`);
-    }
-  };
-
   const modelOk = () => {
     form.validateFields().then(async (values) => {
-      
-      console.log(values)
-      const data = {...values};
+      const data = { ...values };
       switch (values.field) {
         case 'enable_time':
           data.enable_stime = values.enable_time[0].format('HH:mm');
@@ -213,6 +253,12 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
         case 'disabled':
           data.disabled = !values.enable_status ? 1 : 0;
           delete data.enable_status;
+          break;
+        case 'callbacks':
+          data.callbacks = values.callbacks.map(item => item.url);
+          break;
+        case 'notify_recovered':
+          data.notify_recovered = values.notify_recovered ? 1 : 0;
           break;
         default:
           break;
@@ -232,37 +278,38 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
   }
 
   const fieldChange = (val) => {
-    console.log(val);
     setField(val);
   }
 
   return (
     <>
       <Modal
+        title={t('批量更新')}
         visible={isModalVisible}
         onOk={modelOk}
         onCancel={() => {
           editModalClose();
         }}
       >
-        
+
         <Form
           {...layout}
           form={form}
           className='strategy-form'
+          layout={refresh ? 'horizontal' : 'horizontal'}
           initialValues={{
             prom_eval_interval: 15,
             disabled: 0, // 0:立即启用 1:禁用
             enable_status: true, // true:立即启用 false:禁用
             notify_recovered: 1, // 1:启用
             enable_time: [moment('00:00', 'HH:mm'), moment('23:59', 'HH:mm')],
-            cluster: 'Default', // 生效集群
+            cluster: clusterList[0] || 'Default', // 生效集群
             enable_days_of_week: ['1', '2', '3', '4', '5', '6', '0'],
             field: 'cluster'
           }}
         >
           <Form.Item
-            label={t('规则备注：')}
+            label={t('字段：')}
             name='field'
             rules={[
               {
@@ -375,7 +422,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                 return (
                   <>
                     <Form.Item
-                      
+
                       label={t('改为：')}
                       rules={[
                         {
@@ -391,13 +438,15 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                           initialValue={15}
                           wrapperCol={{ span: 10 }}
                         >
-                          <InputNumber min={1} />
+                          <InputNumber min={1} onChange={(val) => {
+                            setRefresh(!refresh);
+                          }} />
                         </Form.Item>
-                        秒{' '}
+                        秒
                         <Tooltip
                           title={t(
                             `每隔${form.getFieldValue(
-                              'prom_eval_interval',
+                              'prom_eval_interval'
                             )}秒，把PromQL作为查询条件，去查询后端存储，如果查到了数据就表示当次有监控数据触发了规则`,
                           )}
                         >
@@ -411,7 +460,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                 return (
                   <>
                     <Form.Item
-                      
+
                       label={t('改为：')}
                       rules={[
                         {
@@ -429,7 +478,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                         >
                           <InputNumber min={0} />
                         </Form.Item>
-                        秒{' '}
+                        秒
                         <Tooltip
                           title={t(
                             `通常持续时长大于执行频率，在持续时长内按照执行频率多次执行PromQL查询，每次都触发才生成告警；如果持续时长置为0，表示只要有一次PromQL查询触发阈值，就生成告警`,
@@ -453,7 +502,13 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                 return (
                   <>
                     <Form.Item label={t('改为：')} name='notify_groups'>
-                      <Select mode='multiple'>{notifyGroupsOptions}</Select>
+                      <Select
+                        mode='multiple'
+                        showSearch
+                        optionFilterProp="children"
+                        filterOption={(input, option) =>
+                          option?.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }>{notifyGroupsOptions}</Select>
                     </Form.Item>
                   </>
                 );
@@ -486,9 +541,11 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                             },
                           ]}
                         >
-                          <InputNumber min={0} />
+                          <InputNumber min={0} onChange={(val) => {
+                            setRefresh(!refresh);
+                          }} />
                         </Form.Item>
-                        分钟{' '}
+                        分钟
                         <Tooltip
                           title={t(
                             `如果告警持续未恢复，间隔${form.getFieldValue(
@@ -506,7 +563,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                 return (
                   <>
                     <Form.Item label={t('改为：')}>
-                      <Form.List name='callbacks' initialValue={['']}>
+                      <Form.List name='callbacks' initialValue={[{}]}>
                         {(fields, { add, remove }, { errors }) => (
                           <>
                             {fields.map((field, index) => (
@@ -539,17 +596,20 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                 return (
                   <>
                     <Form.Item
-                      label={t('改为：')}
-                      style={{
-                        marginTop: 20,
-                      }}
+                      label='附加标签'
                       name='append_tags'
+                      rules={[
+                        { required: false, message: '请填写至少一项标签！' },
+                        isValidFormat,
+                      ]}
                     >
                       <Select
                         mode='tags'
-                        onChange={handleTagsChange}
-                        placeholder={t('请输入附加标签，格式为key=value')}
-                      ></Select>
+                        tokenSeparators={[' ']}
+                        open={false}
+                        placeholder={'标签格式为 key=value ，使用回车或空格分隔'}
+                        tagRender={tagRender}
+                      />
                     </Form.Item>
                   </>
                 );
@@ -581,7 +641,6 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                       <TimePicker.RangePicker
                         format='HH:mm'
                         onChange={(val, val2) => {
-                          console.log(val, val2, form.getFieldValue('enable_time'));
                           form.setFieldsValue({
                             enable_stime: val2[0],
                             enable_etime: val2[1],
