@@ -197,10 +197,12 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
 
   const addSubmit = () => {
     form.validateFields().then(async (values) => {
-      console.log(values)
       const res = await prometheusQuery({ query: values.prom_ql });
       if (res.error) {
-        message.error(`PromQL${t('错误')}：${t(res.error)}`);
+        message.error({
+          content: `PromQL${t('错误')}：
+                    ${t(res.error)}`
+        })
         return false;
       }
       const callbacks = values.callbacks.map(item => item.url);
@@ -282,7 +284,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                 },
               ]}
             >
-              <Input placeholder={t('请输入规则标题')} />
+              <Input placeholder={t('请输入规则标题')}/>
             </Form.Item>
             <Form.Item
               label={t('规则备注：')}
@@ -336,12 +338,18 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                 // labelCol={{ span: 3 }}
                 // wrapperCol={{ span: 23 }}
                 validateTrigger={['onBlur']}
+                trigger='onChange'
                 rules={[{ required: true, message: t('请输入PromQL') }]}
-
+                
               >
                 <PromqlEditor
                   // className='promql-editor' 
                   xCluster='Default'
+                  onChange={(val) => {
+                    if (val) {
+                      form.validateFields(['prom_ql'])
+                    }
+                  }}
                 />
               </Form.Item>
             </Form.Item>

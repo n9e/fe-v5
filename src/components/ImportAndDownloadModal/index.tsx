@@ -140,7 +140,7 @@ export default function ImportAndDownloadModal(props: Props) {
         switch (status) {
           case ModalStatus.Export:
             return (
-              <div contentEditable='true' suppressContentEditableWarning={true} ref={exportTextRef} className='export-dialog'>
+              <div contentEditable='true' suppressContentEditableWarning={true} ref={exportTextRef} className='export-dialog code-area'>
                 <pre>{exportData}</pre>
               </div>
             );
@@ -179,7 +179,7 @@ export default function ImportAndDownloadModal(props: Props) {
                     },
                   ]}
                 >
-                  <TextArea placeholder={t('请输入') + title} rows={4}></TextArea>
+                  <TextArea className='code-area' placeholder={t('请输入') + title} rows={4}></TextArea>
                 </Form.Item>
               </Form>
             );

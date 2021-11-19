@@ -35,7 +35,7 @@ const StrategyEdit: React.FC = () => {
     const res = await getWarningStrategy(strategyId);
     setCurStrategy(res.dat || {})
   }
-  console.log(strategyId)
+
   return (
     <PageLayout title={t('告警规则')} showBack>
       {curStrategy.id && <OperateForm  detail={curStrategy} type={!isClone ? 1 : 2}/>}
