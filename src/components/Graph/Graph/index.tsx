@@ -76,7 +76,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
       offsets: this.props.defaultOffsets || [],
       aggrFunc: this.props.defaultAggrFunc || 'avg',
       aggrGroups: this.props.defaultAggrGroups || ['ident'],
-      legend: true,
+      legend: props.data.legend !== undefined ? props.data.legend : true,
       highLevelConfig: {
         shared: this.props.highLevelConfig?.shared === undefined ? true : this.props.highLevelConfig?.shared,
         sharedSortDirection: this.props.highLevelConfig?.sharedSortDirection || 'desc',
@@ -93,21 +93,21 @@ export default class Graph extends Component<GraphProps, GraphState> {
   componentDidUpdate(prevProps) {
     // 兼容及时查询页面操作图标属性
     if (typeof prevProps.highLevelConfig === 'object') {
-      const {shared, sharedSortDirection} = prevProps.highLevelConfig
-      let showUpdate = false
-      const updateObj = Object.assign({}, this.state.highLevelConfig)
+      const { shared, sharedSortDirection } = prevProps.highLevelConfig;
+      let showUpdate = false;
+      const updateObj = Object.assign({}, this.state.highLevelConfig);
       if (shared !== undefined && shared !== this.state.highLevelConfig.shared) {
-        updateObj.shared = shared
-        showUpdate = true
+        updateObj.shared = shared;
+        showUpdate = true;
       }
       if (sharedSortDirection !== this.state.highLevelConfig.sharedSortDirection) {
-        updateObj.sharedSortDirection = sharedSortDirection
-        showUpdate = true
+        updateObj.sharedSortDirection = sharedSortDirection;
+        showUpdate = true;
       }
       if (showUpdate) {
         this.setState({
-          highLevelConfig: updateObj
-        })
+          highLevelConfig: updateObj,
+        });
       }
     }
     const oldHosts = (prevProps.data.selectedHosts || []).map((h) => h.ident);
