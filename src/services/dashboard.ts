@@ -78,7 +78,7 @@ export const getSingleDashboard = function (busiId: string, id: string | number)
 };
 
 // 更新大盘
-export const updateSingleDashboard = function (busiId: number, id: string, data: Dashboard) {
+export const updateSingleDashboard = function (busiId: string | number, id: string, data: Dashboard) {
   return request(`/api/n9e/busi-group/${busiId}/dashboard/${id}`, {
     method: RequestMethod.Put,
     data,
@@ -122,9 +122,10 @@ export const updateChartGroup = function (busiId: string, data: Group[]) {
 };
 
 interface Chart {
-  configs: string;
+  configs: string | object;
   weight: number;
   group_id: number;
+  id?: number;
 }
 
 // 创建Chart
@@ -144,7 +145,7 @@ export const updateChart = function (chartId: number, data: Chart) {
 };
 
 // 批量更新Chart
-export const updateCharts = function (busiId: string, data: { configs: object }[]) {
+export const updateCharts = function (busiId: string, data: Chart[]) {
   const transformedData = data.map((item) => {
     return { ...item, configs: JSON.stringify(item.configs) };
   });

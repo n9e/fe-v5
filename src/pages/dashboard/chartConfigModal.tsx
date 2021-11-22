@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Dashboard, Group, ChartConfig } from '@/store/dashboardInterface';
 import { debounce } from 'lodash';
 import { Radio, InputNumber, Input, Form, Modal, Select, Checkbox, Row, Col, Space } from 'antd';
-import { createChart, updateChart, checkPromql } from '@/services/dashboard';
+import { createChart, updateCharts, checkPromql } from '@/services/dashboard';
 import { Chart } from './chartGroup';
 import { MinusCircleOutlined, PlusCircleOutlined, CloseOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
@@ -10,7 +10,6 @@ import PromqlEditor from '@/components/PromqlEditor';
 import Resolution from '@/components/Resolution';
 import DateRangePicker, { Range, formatPickerDate } from '@/components/DateRangePicker';
 import Graph from '@/components/Graph';
-import { fetchHistory } from '@/components/Graph/api';
 const { Option } = Select;
 const layout = {
   labelCol: {
@@ -51,24 +50,26 @@ export default function ChartConfigModal(props: Props) {
   const handleAddChart = async (e) => {
     try {
       const values = await chartForm.validateFields();
-      console.log('values', values);
       let formData: ChartConfig = Object.assign(chartForm.getFieldsValue(), {
         layout,
       });
 
-      // if (initialValue && initialValue.id) {
-      //   await updateChart(initialValue.id, {
-      //     configs: JSON.stringify(formData),
-      //     weight: 0,
-      //     groupId,
-      //   });
-      // } else {
-      await createChart(busiId, {
-        configs: JSON.stringify(formData),
-        weight: 0,
-        group_id: groupId,
-      });
-      // }
+      if (initialValue && initialValue.id) {
+        await updateCharts(busiId, [
+          {
+            configs: formData,
+            weight: 0,
+            group_id: groupId,
+            id: initialValue.id,
+          },
+        ]);
+      } else {
+        await createChart(busiId, {
+          configs: JSON.stringify(formData),
+          weight: 0,
+          group_id: groupId,
+        });
+      }
 
       onVisibleChange(true);
     } catch (errorInfo) {

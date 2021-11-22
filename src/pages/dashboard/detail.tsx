@@ -91,7 +91,7 @@ export default function DashboardDetail() {
   };
 
   const handleModifyTitle = async (e) => {
-    // await updateSingleDashboard(id, { ...dashboard, name: e.target.value });
+    await updateSingleDashboard(busiId, id, { ...dashboard, name: e.target.value });
     await init();
     setTitleEditing(false);
   };
