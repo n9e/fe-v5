@@ -1,17 +1,72 @@
 .object-view {
   .host-select {
+    padding-bottom: 8px;
     .top-bar {
       display: flex;
+      .host-input {
+        height: 32px;
+        .ant-input-group-addon {
+          padding: 0;
+          background: #fff;
+          border-radius: 0;
+          .host-add-on {
+            display: flex;
+            .title {
+              width: 71px;
+              height: 30px;
+              line-height: 30px;
+              border-right: 1px solid #d9d9d9;
+            }
+            .select-before {
+              width: 112px;
+              height: 30px;
+              line-height: 30px;
+            }
+          }
+        }
+        .ant-input {
+          border-radius: 0;
+        }
+      }
     }
     .host-list {
+      border: 1px solid #d9d9d9;
+      border-top: none;
       .ant-table {
-        min-height: 300px;
+        min-height: 442px;
+        border-left: none;
+        border-right: none;
+        border-top: none;
+      }
+      .ant-pagination {
+        margin: 12px 0;
+        padding-right: 8px;
+      }
+    }
+    .host-list-empty {
+      .ant-table {
+        min-height: 490px;
       }
     }
   }
   .metric-select {
     .top-bar {
       display: flex;
+      .metric-search {
+        .ant-input-group-addon {
+          border-radius: 0;
+          background-color: #fff;
+          .ant-input-search-button {
+            border-radius: 0;
+          }
+        }
+      }
+    }
+    .metric-tab {
+      padding: 8px;
+      border: 1px solid #d9d9d9;
+      border-top: 0;
+      padding-top: 0;
     }
     .metric-list {
       list-style: none;
@@ -24,7 +79,7 @@
   }
   .empty-graph {
     height: 300px;
-    border: 1px solid #eee;
+    border: 1px solid #d9d9d9;
     line-height: 300px;
     text-align: center;
   }

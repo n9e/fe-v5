@@ -92,7 +92,8 @@ class Legend extends Component {
     const reg = new RegExp(filterVal, 'gi');
     const legendData = normalizeLegendData(series);
     return _.filter(legendData, (record) => {
-      return record.tags && record.tags.match(reg);
+      console.log('record', record)
+      return record.tags && record.tags.match(reg) || record.metricLabels && JSON.stringify(record.metricLabels).match(reg);
     });
   }
 

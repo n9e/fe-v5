@@ -45,7 +45,6 @@ export default class Graph extends Component<GraphProps> {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log('componentWillReceiveProps yaxis', this.chart.options.yAxis, util.getYAxis(this.chart.options.yAxis, nextProps.graphConfig))
     if (this.chart) {
       const chartOptions = {
         yAxis: util.getYAxis(this.chart.options.yAxis, nextProps.graphConfig),

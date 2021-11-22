@@ -28,19 +28,19 @@ export default function getTooltipsContent(activeTooltipData) {
 
 function singlePoint(pointData = {}, serie = {}, formatUnit, precision) {
   const { color, filledNull, serieOptions = {}, timestamp } = pointData;
-  const { tags } = serieOptions;
   const value = pointData.value;
-  let name = tags;
+  let comparison = '';
   if (serie.comparison) {
-    name += ` offset ${serie.comparison}`
+    comparison += ` offset ${serie.comparison}`
   }
 
   const serieMetricLabels = serie?.metricLabels || {}
-  const labels = Object.keys(serieMetricLabels).map(label => `<span>${label}=${serieMetricLabels[label]}</span>`)
+  const metricName = serieMetricLabels.__name__
+  const labels = Object.keys(serieMetricLabels).filter(ml => ml !== '__name__').map(label => `<span>${label}=${serieMetricLabels[label]}</span>`)
 
   return (
     `<span style="color:${color}">● </span>
-    【${name}】${labels}：<strong>${value > 1000 ? sizeFormatter(value) : value.toFixed(2)}${filledNull ? '(空值填补,仅限看图使用)' : ''}</strong>
+    ${metricName || ''} ${comparison} {${labels}}：<strong>${value > 1000 ? sizeFormatter(value) : value.toFixed(2)}${filledNull ? '(空值填补,仅限看图使用)' : ''}</strong>
     <br/>`
   );
 }
