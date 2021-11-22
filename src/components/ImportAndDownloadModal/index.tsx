@@ -16,6 +16,7 @@ export const enum ModalStatus {
 }
 interface Props {
   title?: string;
+  crossCluster?: boolean;
   description?: string;
   status: ModalStatus;
   exportData: string;
@@ -25,11 +26,9 @@ interface Props {
 export default function ImportAndDownloadModal(props: Props) {
   const { t } = useTranslation();
   const exportTextRef = useRef(null as any);
-  const { status, title, exportData, description, onClose, onSubmit } = props;
+  const { status, title, exportData, description, onClose, onSubmit, crossCluster = true } = props;
   const [form] = Form.useForm();
-  const { clusters: clusterList } = useSelector<RootState, CommonStoreState>(
-    (state) => state.common,
-  );
+  const { clusters: clusterList } = useSelector<RootState, CommonStoreState>((state) => state.common);
 
   const handleExportTxt = () => {
     download([exportData], 'download.json');
@@ -51,30 +50,29 @@ export default function ImportAndDownloadModal(props: Props) {
               onClick={async () => {
                 await form.validateFields();
                 const data = form.getFieldsValue();
-                console.log('formdata=', data);
                 try {
                   const importData = JSON.parse(data.import);
-                  console.log('importData=', importData);
                   if (!Array.isArray(importData)) {
-                    message.error('告警规则JSON需要时数组');
+                    message.error(title + 'JSON需要时数组');
                     return;
                   }
-                  const requstBody = importData.map(item => {
+                  const requstBody = importData.map((item) => {
                     return {
                       ...item,
-                      cluster: data.cluster
-                    }
+                      cluster: crossCluster ? data.cluster : undefined,
+                    };
                   });
+
                   const dat = await onSubmit(requstBody);
                   let errNum = 0;
-                  const dataSource = Object.keys(dat).map(key => {
+                  const dataSource = Object.keys(dat).map((key) => {
                     dat[key] && errNum++;
                     return {
                       name: key,
                       key: key,
                       isTrue: !dat[key],
-                      msg: dat[key]
-                    }
+                      msg: dat[key],
+                    };
                   });
                   const columns = [
                     {
@@ -85,15 +83,17 @@ export default function ImportAndDownloadModal(props: Props) {
                       title: '结果',
                       dataIndex: 'isTrue',
                       render: (data) => {
-                        return data ?
-                          <CheckCircleOutlined style={{ color: '#389e0d', fontSize: '18px' }} /> :
-                          <CloseCircleOutlined style={{ color: '#d4380d', fontSize: '18px' }} />;
-                      }
+                        return data ? (
+                          <CheckCircleOutlined style={{ color: '#389e0d', fontSize: '18px' }} />
+                        ) : (
+                          <CloseCircleOutlined style={{ color: '#d4380d', fontSize: '18px' }} />
+                        );
+                      },
                     },
                     {
                       title: '错误消息',
                       dataIndex: 'msg',
-                    }
+                    },
                   ];
                   Modal.success({
                     title: '导入结果',
@@ -101,11 +101,11 @@ export default function ImportAndDownloadModal(props: Props) {
                     icon: null,
                     closable: true,
                     maskClosable: true,
-                    content: <Table className="samll_table" dataSource={dataSource} columns={columns} pagination={false} size="small" />,
+                    content: <Table className='samll_table' dataSource={dataSource} columns={columns} pagination={false} size='small' />,
                     onOk: () => {
                       !errNum && onClose();
-                    }
-                  })
+                    },
+                  });
                   // 每个业务各自处理onSubmit
                 } catch (error) {
                   message.error(t('数据有误:') + error);
@@ -148,28 +148,30 @@ export default function ImportAndDownloadModal(props: Props) {
 
           case ModalStatus.Import:
             return (
-              <Form form={form} preserve={false} layout="vertical">
+              <Form form={form} preserve={false} layout='vertical'>
+                {crossCluster ? (
+                  <Form.Item
+                    label={t('生效集群：')}
+                    name='cluster'
+                    initialValue={clusterList[0] || 'Default'}
+                    rules={[
+                      {
+                        required: true,
+                        message: t('生效集群不能为空'),
+                      },
+                    ]}
+                  >
+                    <Select>
+                      {clusterList?.map((item) => (
+                        <Option value={item} key={item}>
+                          {item}
+                        </Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                ) : null}
                 <Form.Item
-                  label={t('生效集群：')}
-                  name='cluster'
-                  initialValue={clusterList[0] || 'Default'}
-                  rules={[
-                    {
-                      required: true,
-                      message: t('生效集群不能为空'),
-                    },
-                  ]}
-                >
-                  <Select>
-                    {clusterList?.map((item) => (
-                      <Option value={item} key={item}>
-                        {item}
-                      </Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-                <Form.Item
-                  label={t('告警规则JSON：')}
+                  label={title + t('JSON：')}
                   name='import'
                   rules={[
                     {
