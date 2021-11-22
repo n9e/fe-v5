@@ -22,6 +22,7 @@ export interface GraphDataProps {
   metric?: string;
   promqls?: string[] | { current: string }[];
   ref?: any;
+  yAxis?: any;
 }
 
 interface GraphProps {
@@ -92,23 +93,24 @@ export default class Graph extends Component<GraphProps, GraphState> {
 
   componentDidUpdate(prevProps) {
     // 兼容及时查询页面操作图标属性
+    // 接受外部format，legend，multi等属性并更新视图
     if (typeof prevProps.highLevelConfig === 'object') {
-      const { shared, sharedSortDirection } = prevProps.highLevelConfig;
       let showUpdate = false;
       const updateObj = Object.assign({}, this.state.highLevelConfig);
-      if (shared !== undefined && shared !== this.state.highLevelConfig.shared) {
-        updateObj.shared = shared;
-        showUpdate = true;
-      }
-      if (sharedSortDirection !== this.state.highLevelConfig.sharedSortDirection) {
-        updateObj.sharedSortDirection = sharedSortDirection;
-        showUpdate = true;
+      for (let key of Object.keys(updateObj)) {
+        if (updateObj[key] !== prevProps.highLevelConfig[key]) {
+          updateObj[key] = prevProps.highLevelConfig[key];
+          showUpdate = true;
+        }
       }
       if (showUpdate) {
         this.setState({
           highLevelConfig: updateObj,
         });
       }
+    }
+    if (this.props.data.legend !== undefined && this.props.data.legend !== this.state.legend) {
+      this.setState({ legend: this.props.data.legend });
     }
     const oldHosts = (prevProps.data.selectedHosts || []).map((h) => h.ident);
     const newHosts = (this.props.data.selectedHosts || []).map((h) => h.ident);
@@ -394,6 +396,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
               )}
               {extraRender && _.isFunction(extraRender) ? extraRender(this) : null}
             </div>
+            <div>{title || metric}</div>
           </div>
         )}
         {this.props.graphConfigInnerVisible ? (

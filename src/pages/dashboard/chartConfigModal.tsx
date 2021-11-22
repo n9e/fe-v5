@@ -140,7 +140,7 @@ export default function ChartConfigModal(props: Props) {
     >
       <Form {...layout} form={chartForm} preserve={false}>
         <Row>
-          <Col span={11}>
+          <Col span={12}>
             <Form.Item
               label={t('标题')}
               name='name'
@@ -159,119 +159,115 @@ export default function ChartConfigModal(props: Props) {
             >
               <Input />
             </Form.Item>
-          </Col>
-          <Col span={11} offset={2}>
             <Form.Item label={t('下钻链接')} name='link' labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
               <Input />
             </Form.Item>
-          </Col>
-        </Row>
 
-        <Form.Item
-          wrapperCol={{
-            span: 24,
-          }}
-          style={{
-            marginBottom: '0px',
-          }}
-        >
-          <Form.List name='QL' initialValue={initialQL}>
-            {(fields, { add, remove }, { errors }) => {
-              return (
-                <>
-                  {fields.length ? (
-                    fields.map(({ key, name, fieldKey, ...restField }, index) => {
-                      return (
-                        <div key={name + fieldKey}>
-                          <Form.Item
-                            label='PromQL'
-                            name={[name, 'PromQL']}
-                            labelCol={{
-                              span: 2,
-                            }}
-                            wrapperCol={{
-                              span: 22,
-                            }}
-                            validateTrigger={['onBlur']}
-                            rules={[
-                              {
-                                required: true,
-                                message: t('请输入PromQL'),
-                              },
-                            ]}
-                          >
-                            <PromqlEditorField
-                              key={name + fieldKey}
-                              name={name}
-                              fields={fields}
-                              index={index}
-                              remove={remove}
-                              add={add}
-                              // onChange={(e) => {
-                              //   handleChartOptions(e);
-                              // }}
-                            />
-                          </Form.Item>
-                          <Form.Item
-                            label='Legend'
-                            name={[name, 'Legend']}
-                            labelCol={{
-                              span: 2,
-                            }}
-                            wrapperCol={{
-                              span: 22,
-                            }}
-                          >
-                            <Input
-                            // onChange={(e) => {
-                            //   handleChartOptions(e);
-                            // }}
-                            />
-                          </Form.Item>
-                        </div>
-                      );
-                    })
-                  ) : (
-                    <PlusCircleOutlined
-                      onClick={() => {
-                        add();
-                      }}
-                    />
-                  )}
-                  <Form.ErrorList errors={errors} />
-                </>
-              );
-            }}
-          </Form.List>
-        </Form.Item>
-        <Row>
-          <Col span={5}>
-            <Form.Item label={t('预警值')} name='yplotline-1' labelCol={{ span: 9 }} wrapperCol={{ span: 16 }}>
-              <InputNumber />
+            <Form.Item
+              wrapperCol={{
+                span: 24,
+              }}
+              style={{
+                marginBottom: '0px',
+              }}
+            >
+              <Form.List name='QL' initialValue={initialQL}>
+                {(fields, { add, remove }, { errors }) => {
+                  return (
+                    <>
+                      {fields.length ? (
+                        fields.map(({ key, name, fieldKey, ...restField }, index) => {
+                          return (
+                            <div key={name + fieldKey}>
+                              <Form.Item
+                                label='PromQL'
+                                name={[name, 'PromQL']}
+                                labelCol={{
+                                  span: 4,
+                                }}
+                                wrapperCol={{
+                                  span: 20,
+                                }}
+                                validateTrigger={['onBlur']}
+                                rules={[
+                                  {
+                                    required: true,
+                                    message: t('请输入PromQL'),
+                                  },
+                                ]}
+                              >
+                                <PromqlEditorField
+                                  key={name + fieldKey}
+                                  name={name}
+                                  fields={fields}
+                                  index={index}
+                                  remove={remove}
+                                  add={add}
+                                  // onChange={(e) => {
+                                  //   handleChartOptions(e);
+                                  // }}
+                                />
+                              </Form.Item>
+                              <Form.Item
+                                label='Legend'
+                                name={[name, 'Legend']}
+                                labelCol={{
+                                  span: 4,
+                                }}
+                                wrapperCol={{
+                                  span: 20,
+                                }}
+                              >
+                                <Input
+                                // onChange={(e) => {
+                                //   handleChartOptions(e);
+                                // }}
+                                />
+                              </Form.Item>
+                            </div>
+                          );
+                        })
+                      ) : (
+                        <PlusCircleOutlined
+                          onClick={() => {
+                            add();
+                          }}
+                        />
+                      )}
+                      <Form.ErrorList errors={errors} />
+                    </>
+                  );
+                }}
+              </Form.List>
             </Form.Item>
-          </Col>
-          <Col span={5} offset={1}>
-            <Form.Item label={t('警告值')} name='yplotline-2' labelCol={{ span: 7 }} wrapperCol={{ span: 20 }}>
-              <InputNumber />
-            </Form.Item>
-          </Col>
+            <Row>
+              <Col span={11}>
+                <Form.Item label={t('预警值')} name='yplotline1' labelCol={{ span: 9 }} wrapperCol={{ span: 16 }}>
+                  <InputNumber />
+                </Form.Item>
+              </Col>
+              <Col span={12} offset={1}>
+                <Form.Item label={t('警告值')} name='yplotline2' labelCol={{ span: 7 }} wrapperCol={{ span: 20 }}>
+                  <InputNumber />
+                </Form.Item>
+              </Col>
 
-          <Col span={3} offset={1}>
-            <Form.Item label={t('Multi')} name='multip' valuePropName='checked' labelCol={{ span: 16 }} wrapperCol={{ span: 10 }} initialValue={true}>
-              <Checkbox></Checkbox>
-            </Form.Item>
-          </Col>
-          <Col span={3} offset={1}>
-            <Form.Item label={t('Legend')} valuePropName='checked' name='legend' labelCol={{ span: 20 }} wrapperCol={{ span: 10 }}>
-              <Checkbox></Checkbox>
-            </Form.Item>
-          </Col>
-          <Col span={3} offset={1}>
-            <Form.Item label={t('Format')} valuePropName='checked' name='format' labelCol={{ span: 20 }} wrapperCol={{ span: 10 }} initialValue={true}>
-              <Checkbox></Checkbox>
-            </Form.Item>
-          </Col>
-          {/* <Col span={5} offset={1}>
+              <Col span={7}>
+                <Form.Item label={t('Multi')} name='multi' valuePropName='checked' labelCol={{ span: 14 }} wrapperCol={{ span: 10 }} initialValue={true}>
+                  <Checkbox></Checkbox>
+                </Form.Item>
+              </Col>
+              <Col span={7} offset={1}>
+                <Form.Item label={t('Legend')} valuePropName='checked' name='legend' labelCol={{ span: 20 }} wrapperCol={{ span: 10 }} initialValue={false}>
+                  <Checkbox></Checkbox>
+                </Form.Item>
+              </Col>
+              <Col span={7} offset={1}>
+                <Form.Item label={t('Format')} valuePropName='checked' name='format' labelCol={{ span: 20 }} wrapperCol={{ span: 10 }} initialValue={true}>
+                  <Checkbox></Checkbox>
+                </Form.Item>
+              </Col>
+              {/* <Col span={5} offset={1}>
             <Form.Item label={t('排序')} name='order' labelCol={{ span: 7 }} wrapperCol={{ span: 20 }} initialValue={'desc'}>
               <Select>
                 <Option value='desc'>desc</Option>
@@ -279,7 +275,7 @@ export default function ChartConfigModal(props: Props) {
               </Select>
             </Form.Item>
           </Col> */}
-          {/* <Col span={5} offset={1}>
+              {/* <Col span={5} offset={1}>
             <Form.Item label={t('Format Unit')} name='format' labelCol={{ span: 10 }} wrapperCol={{ span: 20 }} initialValue={1000}>
               <Select>
                 <Option value='desc'>1000</Option>
@@ -287,37 +283,48 @@ export default function ChartConfigModal(props: Props) {
               </Select>
             </Form.Item>
           </Col> */}
+            </Row>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              wrapperCol={{ span: 22, offset: 2 }}
+              shouldUpdate={(prevValues, curValues) =>
+                prevValues.QL !== curValues.QL || prevValues.multi === curValues.multi || prevValues.legend === curValues.legend || prevValues.format === curValues.format
+              }
+            >
+              {({ getFieldsValue }) => {
+                const { QL = [], multi, legend, format, yplotline1, yplotline2 } = getFieldsValue();
+                // return QL.filter((item) => item && item.PromQL).map((item) => item.PromQL).length > 0 ? (
+                return (
+                  <Graph
+                    showHeader={false}
+                    graphConfigInnerVisible={false}
+                    highLevelConfig={{ shared: multi, precision: format ? 'short' : 'origin' }}
+                    data={{
+                      yAxis: {
+                        plotLines: [
+                          {
+                            value: yplotline1,
+                            color: 'red',
+                          },
+                          {
+                            value: yplotline2,
+                            color: 'green',
+                          },
+                        ],
+                      },
+                      legend: legend,
+                      step,
+                      range,
+                      promqls: QL.filter((item) => item && item.PromQL).map((item) => item.PromQL),
+                    }}
+                  />
+                );
+                // ) : null;
+              }}
+            </Form.Item>
+          </Col>
         </Row>
-
-        <Form.Item wrapperCol={{ span: 22, offset: 2 }} shouldUpdate={(prevValues, curValues) => prevValues.QL !== curValues.QL}>
-          {({ getFieldValue }) => {
-            const QL = getFieldValue('QL') || [];
-            const { start, end } = formatPickerDate(range);
-            console.log('QL', QL);
-            let flag = false;
-            // for (let item of QL) {
-            //   const { PromQL } = item;
-            //   if (PromQL && PromQL.length > 0) {
-            //     console.log('PromQL', PromQL);
-            //     const { status } = await fetchHistory({ query: PromQL, step, start, end });
-            //     if (status === 'success') {
-            //       flag = true;
-            //     }
-            //   }
-            // }
-            return QL.filter((item) => item && item.PromQL).map((item) => item.PromQL).length > 0 ? (
-              <Graph
-                graphConfigInnerVisible={false}
-                data={{
-                  legend: false,
-                  step,
-                  range,
-                  promqls: QL.filter((item) => item && item.PromQL).map((item) => item.PromQL),
-                }}
-              />
-            ) : null;
-          }}
-        </Form.Item>
       </Form>
     </Modal>
   );

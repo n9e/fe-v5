@@ -4,7 +4,7 @@ import { PromQLExtension } from 'codemirror-promql';
 import { basicSetup } from '@codemirror/basic-setup';
 import { EditorState } from '@codemirror/state';
 import { EditorView, ViewUpdate } from '@codemirror/view';
-
+import { baseTheme } from './CMTheme';
 interface Props {
   style?: object;
   className?: string;
@@ -37,6 +37,7 @@ export default function PromqlEditor(props: Props) {
       state: EditorState.create({
         doc: value,
         extensions: [
+          baseTheme,
           basicSetup,
           promQL.asExtension(),
           EditorView.updateListener.of((update: ViewUpdate): void => {

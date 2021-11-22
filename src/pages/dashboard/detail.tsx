@@ -49,7 +49,7 @@ export default function DashboardDetail() {
   const [chartGroup, setChartGroup] = useState<Group[]>([]);
   const [variableConfig, setVariableConfig] = useState<TagFilterResponse | null>(null);
   const [groupModalVisible, setGroupModalVisible] = useState(false);
-  const [chartModalVisible, setChartModalVisible] = useState(true);
+  const [chartModalVisible, setChartModalVisible] = useState(false);
   const [chartModalInitValue, setChartModalInitValue] = useState<Chart | null>();
   const [range, setRange] = useState<Range>({
     start: 0,
