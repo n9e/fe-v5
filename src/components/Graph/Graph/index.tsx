@@ -24,6 +24,12 @@ export interface GraphDataProps {
   ref?: any;
 }
 
+export interface ErrorInfoType {
+  status: string;
+  error: string;
+  errorType: string;
+}
+
 interface GraphProps {
   height?: number;
   ref?: any;
@@ -41,6 +47,7 @@ interface GraphProps {
     precision?: 'short' | 'origin' | number;
     formatUnit?: 1024 | 1000;
   };
+  onErrorOccured?: (errorArr: ErrorInfoType[]) => void;
 }
 
 interface GraphState {
@@ -58,6 +65,7 @@ interface GraphState {
     precision: 'short' | 'origin' | number;
     formatUnit: 1024 | 1000;
   };
+  onErrorOccured?: (errorArr: ErrorInfoType[]) => void;
 }
 
 const { Option } = Select;
@@ -83,6 +91,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
         precision: this.props.highLevelConfig?.precision || 'short',
         formatUnit: this.props.highLevelConfig?.formatUnit || 1024,
       },
+      onErrorOccured: this.props.onErrorOccured,
     };
   }
 
@@ -93,21 +102,21 @@ export default class Graph extends Component<GraphProps, GraphState> {
   componentDidUpdate(prevProps) {
     // 兼容及时查询页面操作图标属性
     if (typeof prevProps.highLevelConfig === 'object') {
-      const {shared, sharedSortDirection} = prevProps.highLevelConfig
-      let showUpdate = false
-      const updateObj = Object.assign({}, this.state.highLevelConfig)
+      const { shared, sharedSortDirection } = prevProps.highLevelConfig;
+      let showUpdate = false;
+      const updateObj = Object.assign({}, this.state.highLevelConfig);
       if (shared !== undefined && shared !== this.state.highLevelConfig.shared) {
-        updateObj.shared = shared
-        showUpdate = true
+        updateObj.shared = shared;
+        showUpdate = true;
       }
       if (sharedSortDirection !== this.state.highLevelConfig.sharedSortDirection) {
-        updateObj.sharedSortDirection = sharedSortDirection
-        showUpdate = true
+        updateObj.sharedSortDirection = sharedSortDirection;
+        showUpdate = true;
       }
       if (showUpdate) {
         this.setState({
-          highLevelConfig: updateObj
-        })
+          highLevelConfig: updateObj,
+        });
       }
     }
     const oldHosts = (prevProps.data.selectedHosts || []).map((h) => h.ident);
@@ -123,8 +132,13 @@ export default class Graph extends Component<GraphProps, GraphState> {
   }
 
   afterFetchChartDataOperations(allResponseData) {
+    const errorSeries: ErrorInfoType[] = [];
     const offsets = this.state.offsets;
     const rawSeries = allResponseData.reduce((acc, cur, idx) => {
+      if (cur.status === 'error') {
+        errorSeries.push(cur);
+        return acc;
+      }
       const arr = cur?.data?.result;
       // 添加环比信息
       if (offsets) {
@@ -137,6 +151,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
     }, []);
     const series = util.normalizeSeries(rawSeries);
     this.setState({ spinning: false, series });
+    this.state.onErrorOccured && this.state.onErrorOccured(errorSeries);
   }
 
   getGraphConfig(graphConfig) {
