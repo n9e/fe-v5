@@ -100,18 +100,19 @@ const PageTable: React.FC<Props> = ({
       return;
     }
     setLoading(true);
-    const { success, dat } = await getStrategyGroupSubList({id: bgid});
+    const { success, dat } = await getStrategyGroupSubList({ id: bgid });
     if (success) {
       setCurrentStrategyDataAll(dat || []);
       setLoading(false);
     }
-     
+
   }
 
   const filterData = () => {
     const data = JSON.parse(JSON.stringify(currentStrategyDataAll));
     const res = data.filter(item => {
-      return item.name.indexOf(query) > -1 || item.append_tags.join(' ').indexOf(query) > -1 || clusters && clusters?.indexOf(item.cluster) > -1
+      return (item.name.indexOf(query) > -1 || item.append_tags.join(' ').indexOf(query) > -1) &&
+        (clusters && clusters?.indexOf(item.cluster) > -1 || clusters?.length === 0)
     });
     setCurrentStrategyData(res || []);
   }
@@ -129,7 +130,7 @@ const PageTable: React.FC<Props> = ({
     getAlertRules();
   };
 
-  
+
   const columns: ColumnType<strategyItem>[] = [
     {
       title: t('集群'),
@@ -165,7 +166,7 @@ const PageTable: React.FC<Props> = ({
       title: t('告警接收者'),
       dataIndex: 'notify_groups_obj',
       render: (data, record) => {
-        
+
         return (
           (data.length &&
             data.map(
@@ -256,7 +257,7 @@ const PageTable: React.FC<Props> = ({
                     });
                   },
 
-                  onCancel() {},
+                  onCancel() { },
                 });
               }}
             >
@@ -267,7 +268,7 @@ const PageTable: React.FC<Props> = ({
       },
     },
   ];
-  
+
   const toOneArr = (arr, res, name) => {
     arr.forEach((ele) => {
       if (Array.isArray(ele)) {
@@ -284,7 +285,7 @@ const PageTable: React.FC<Props> = ({
     }
     setisModalVisible(true);
   };
-  
+
   const menu = useMemo(() => {
     return (
       <ul className='ant-dropdown-menu'>
@@ -326,7 +327,7 @@ const PageTable: React.FC<Props> = ({
                   });
                 },
 
-                onCancel() {},
+                onCancel() { },
               });
             } else {
               message.warning(t('未选择任何规则'));
@@ -343,7 +344,7 @@ const PageTable: React.FC<Props> = ({
         >
           <span>{t('批量更新规则')}</span>
         </li>
-        
+
       </ul>
     );
   }, [selectRowKeys, t]);
@@ -366,7 +367,7 @@ const PageTable: React.FC<Props> = ({
       } else {
         message.error(res.err);
       }
-      
+
     } else {
       setisModalVisible(false);
     }
@@ -374,7 +375,7 @@ const PageTable: React.FC<Props> = ({
 
   return (
     <div className='strategy-table-content'>
-      
+
       <div className='strategy-table-search table-handle'>
         <div className='strategy-table-search-left'>
           <RefreshIcon
@@ -391,7 +392,7 @@ const PageTable: React.FC<Props> = ({
           />
         </div>
         <div className='strategy-table-search-right'>
-          
+
           <Button
             type='primary'
             onClick={goToAddWarningStrategy}
@@ -400,7 +401,7 @@ const PageTable: React.FC<Props> = ({
             {t('新增告警规则')}
           </Button>
           <div className={'table-more-options'}>
-            
+
             <Dropdown overlay={menu} trigger={['click']}>
               <Button onClick={(e) => e.stopPropagation()}>
                 {t('更多操作')}
@@ -414,7 +415,7 @@ const PageTable: React.FC<Props> = ({
           </div>
         </div>
       </div>
-      
+
       <Table
         rowKey="id"
         // sticky
@@ -453,8 +454,8 @@ const PageTable: React.FC<Props> = ({
         title={t('告警规则')}
         exportData={exportData}
       />
-      {isModalVisible && <EditModal isModalVisible={isModalVisible} editModalFinish={editModalFinish}/>}
-      
+      {isModalVisible && <EditModal isModalVisible={isModalVisible} editModalFinish={editModalFinish} />}
+
     </div>
   );
 };
