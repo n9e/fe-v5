@@ -23,7 +23,7 @@ const UserForm = React.forwardRef<ReactNode, UserAndPasswordFormProps>(
     const [form] = Form.useForm();
     const [initialValues, setInitialValues] = useState<User>();
     const [loading, setLoading] = useState<boolean>(true);
-    const [contactsList, setContactsList] = useState<string[]>([]);
+    const [contactsList, setContactsList] = useState<ContactsItem[]>([]);
     const roleList = [
       {
         value: 'Admin',
@@ -52,7 +52,7 @@ const UserForm = React.forwardRef<ReactNode, UserAndPasswordFormProps>(
     }, []);
 
     const getContacts = () => {
-      getNotifyChannels().then((data: Array<string>) => {
+      getNotifyChannels().then((data: Array<ContactsItem>) => {
         setContactsList(data);
       });
     };
@@ -197,8 +197,8 @@ const UserForm = React.forwardRef<ReactNode, UserAndPasswordFormProps>(
                     >
                       <Select placeholder={t('请选择联系方式')}>
                         {contactsList.map((item, index) => (
-                          <Option value={item} key={index}>
-                            {item}
+                          <Option value={item.key} key={index}>
+                            {item.label}
                           </Option>
                         ))}
                       </Select>

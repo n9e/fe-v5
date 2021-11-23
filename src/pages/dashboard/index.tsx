@@ -200,16 +200,9 @@ export default function Dashboard() {
     setsearchVal(val);
   };
 
-  const handleImportDashboard = (data) => {
-    try {
-      let importData = JSON.parse(data);
-      return importDashboard(busiId as number, importData).then(() => (ref?.current as any)?.refreshList());
-    } catch (err: any) {
-      notification.error({
-        message: err?.message,
-      });
-      return Promise.reject(err);
-    }
+  const handleImportDashboard = async (data) => {
+    const { dat } = await importDashboard(busiId as number, data);
+    return dat || {};
   };
 
   return (
@@ -324,7 +317,17 @@ export default function Dashboard() {
           </Form.Item>
         </Form>
       </Modal>
-      <ImportAndDownloadModal status={modalType} onClose={() => setModalType(ModalStatus.None)} onSubmit={handleImportDashboard} title={t('大盘')} exportData={exportData} />
+      <ImportAndDownloadModal
+        crossCluster={false}
+        status={modalType}
+        onClose={() => {
+          setModalType(ModalStatus.None);
+          (ref?.current as any)?.refreshList();
+        }}
+        onSubmit={handleImportDashboard}
+        title={t('大盘')}
+        exportData={exportData}
+      />
     </PageLayout>
   );
 }

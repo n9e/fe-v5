@@ -85,9 +85,9 @@ export default function Content() {
         <Route path='/indicator' component={IndicatorPage} />
         <Route path='/history-events' component={historyEvents} />
 
-        <Route exact path='/strategy/add/:group_id' component={StrategyAdd} />
-        <Route exact path='/strategy/edit/:id' component={StrategyEdit} />
-        <Route exact path='/strategy/:id?' component={Strategy} />
+        <Route exact path='/alert-rules/add/:group_id' component={StrategyAdd} />
+        <Route exact path='/alert-rules/edit/:id' component={StrategyEdit} />
+        <Route exact path='/alert-rules/:id?' component={Strategy} />
         <Route exact path='/shield' component={Shield} />
         <Route exact path='/shield/add/:from?' component={AddShield} />
         <Route exact path='/shield/detail/:id' component={ShieldDetail} />

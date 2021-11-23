@@ -3,7 +3,7 @@
 /* eslint-disable no-use-before-define */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Table, Input, Button, Modal } from 'antd';
+import { Table, Input, Button, Modal, Tooltip } from 'antd';
 import Color from 'color';
 import _ from 'lodash';
 
@@ -86,7 +86,7 @@ class Legend extends Component {
     });
   };
 
-  filterData() {
+  filterData(comparisonOptions) {
     const { series } = this.props;
     const { filterVal } = this.state;
     const reg = new RegExp(filterVal, 'gi');
@@ -106,7 +106,7 @@ class Legend extends Component {
     const sortOrder = _.cloneDeep(_.get(graphConfig, 'sortOrder', {}));
     const { searchText, selectedKeys, highlightedKeys } = this.state;
     const counterSelectedKeys = highlightedKeys;
-    const data = this.filterData();
+    const data = this.filterData(comparisonOptions);
     const firstData = data[0];
     let columns = [
       {
@@ -120,24 +120,32 @@ class Legend extends Component {
             </Button>
           </div>
         ),
+        ellipsis: true,
         filterDropdownVisible: this.state.filterDropdownVisible,
         onFilterDropdownVisibleChange: (visible) => this.setState({ filterDropdownVisible: visible }),
         render: (text, record) => {
-          const {sname, lname} = getLengendName(record, comparisonOptions);
+          const { sname, lname } = getLengendName(record, comparisonOptions);
+          const titleContent = lname
+            .replaceAll(',', '\n')
+            .replace(' __', '\n__')
+            .split('\n')
+            .map((substr) => <div>{substr}</div>);
           return (
-            <span
-              title={lname}
-              onClick={() => this.handleClickCounter(record)}
-              onContextMenu={e => this.handleContextMenu(e, text)}
-              style={{
-                cursor: 'pointer',
-                // eslint-disable-next-line no-nested-ternary
-                opacity: counterSelectedKeys.length ? _.includes(counterSelectedKeys, record.id) ? 1 : 0.5 : 1,
-              }}
-            >
-              <span style={{ color: record.color }}>● </span>
-              {sname}
-            </span>
+            <Tooltip title={titleContent} getPopupContainer={() => document.body}>
+              <span
+                title={lname}
+                onClick={() => this.handleClickCounter(record)}
+                onContextMenu={(e) => this.handleContextMenu(e, text)}
+                style={{
+                  cursor: 'pointer',
+                  // eslint-disable-next-line no-nested-ternary
+                  opacity: counterSelectedKeys.length ? (_.includes(counterSelectedKeys, record.id) ? 1 : 0.5) : 1,
+                }}
+              >
+                <span style={{ color: record.color }}>● </span>
+                {sname}
+              </span>
+            </Tooltip>
           );
         },
       },
@@ -145,7 +153,7 @@ class Legend extends Component {
         title: 'Max',
         dataIndex: 'max',
         className: 'alignRight',
-        width: 100,
+        width: 120,
         defaultSortOrder: sortOrder.columnKey === 'max' ? sortOrder.order : undefined,
         render(text) {
           return <span style={{ paddingRight: 10 }}>{text !== null ? renderValue(text) : 'null'}</span>;
@@ -156,7 +164,7 @@ class Legend extends Component {
         title: 'Min',
         dataIndex: 'min',
         className: 'alignRight',
-        width: 100,
+        width: 120,
         defaultSortOrder: sortOrder.columnKey === 'min' ? sortOrder.order : undefined,
         render(text) {
           return <span style={{ paddingRight: 10 }}>{text !== null ? renderValue(text) : 'null'}</span>;
@@ -167,7 +175,7 @@ class Legend extends Component {
         title: 'Avg',
         dataIndex: 'avg',
         className: 'alignRight',
-        width: 100,
+        width: 120,
         defaultSortOrder: sortOrder.columnKey === 'avg' ? sortOrder.order : undefined,
         render(text) {
           return <span style={{ paddingRight: 10 }}>{text !== null ? renderValue(text) : 'null'}</span>;
@@ -178,7 +186,7 @@ class Legend extends Component {
         title: 'Sum',
         dataIndex: 'sum',
         className: 'alignRight',
-        width: 100,
+        width: 120,
         defaultSortOrder: sortOrder.columnKey === 'sum' ? sortOrder.order : undefined,
         render(text) {
           return <span style={{ paddingRight: 10 }}>{text !== null ? renderValue(text) : 'null'}</span>;
@@ -189,7 +197,7 @@ class Legend extends Component {
         title: 'Last',
         dataIndex: 'last',
         className: 'alignRight',
-        width: 100,
+        width: 120,
         defaultSortOrder: sortOrder.columnKey === 'last' ? sortOrder.order : undefined,
         render(text) {
           return <span style={{ paddingRight: 10 }}>{text !== null ? renderValue(text) : 'null'}</span>;
@@ -237,7 +245,7 @@ class Legend extends Component {
           rowKey={(record) => {
             return `${record.id}${record.comparison}`;
           }}
-          size="middle"
+          size='middle'
           rowSelection={false}
           columns={columns}
           dataSource={data}
@@ -342,10 +350,10 @@ function getLegendNums(points) {
 function getLengendName(serie, comparisonOptions, locale = 'zh') {
   const { tags, comparison, metricLabels } = serie;
   let lname = tags;
-  let sname = ''
+  let sname = '';
   if (metricLabels) {
     const labels = Object.keys(metricLabels).map(label => `${label}=${metricLabels[label]}`)
-    lname = `【${lname}】 ${labels}`
+    lname = lname ? `【${lname}】 ${labels}` : `${labels}`
   }
   // display comparison
   if (comparison && typeof comparison === 'number') {
@@ -362,9 +370,9 @@ function getLengendName(serie, comparisonOptions, locale = 'zh') {
     const rightStr = lname.substr(-40);
     sname = `${leftStr}......${rightStr}`;
   } else {
-    sname = lname
+    sname = lname;
   }
-  return {lname, sname};
+  return { lname, sname };
 }
 
 function isEqualSeries(series, nextSeries) {

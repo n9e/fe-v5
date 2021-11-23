@@ -1,6 +1,5 @@
 import request from '@/utils/request';
 import { RequestMethod, IBasePagingParams } from '@/store/common';
-import { N9EAPI } from '../../config/constant';
 import type {
   MetricListRes,
   strategyGroup,
@@ -54,18 +53,6 @@ export const updateStrategyGroup = function (
     data,
   });
 };
-
-// 获得分组资源
-// export const getStrategyGroupSubList = function (
-//   params: { id: number } & IBasePagingParams,
-// ) {
-//   return request(
-//     `/api/n9e/alert-rule-group/${params.id}/alert-rules`,
-//     {
-//       method: RequestMethod.Get,
-//     },
-//   );
-// };
 
 //// 获取策略列表
 export const getStrategyGroupSubList = function (
@@ -173,6 +160,13 @@ export const batchDeleteStrategy = function (ruleId, ids: Array<number>) {
   return request(`/api/n9e/alert-rule-group/${ruleId}/alert-rules`, {
     method: RequestMethod.Delete,
     data: { ids },
+  });
+};
+
+export const prometheusQuery = function (data): Promise<any> {
+  return request(`/api/n9e/prometheus/api/v1/query`, {
+    method: RequestMethod.Get,
+    params: data,
   });
 };
 

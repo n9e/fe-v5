@@ -5,9 +5,12 @@ import { UpdateAccessToken } from '@/services/login';
 
 /** 异常处理程序，所有的error都被这里处理，页面无法感知具体error */
 const errorHandler = (error: Error): Response => {
-  notification.error({
-    message: error.message,
-  });
+  // 忽略 AbortError 类型的报错
+  if (!(error.name === 'AbortError')) {
+    notification.error({
+      message: error.message,
+    });
+  }
   throw new Error();
 };
 
@@ -37,6 +40,7 @@ request.interceptors.request.use((url, options) => {
 request.interceptors.response.use(
   async (response) => {
     const { status } = response;
+
     if (status === 200) {
       return response
         .clone()
@@ -57,7 +61,7 @@ request.interceptors.response.use(
     if (status === 401) {
       localStorage.getItem('refresh_token')
         ? UpdateAccessToken().then((res) => {
-            console.log('401 err', res)
+            console.log('401 err', res);
             if (res.err) {
               location.href = `/login${location.pathname != '/' ? '?redirect=' + location.pathname : ''}`;
             } else {
@@ -82,6 +86,9 @@ request.interceptors.response.use(
           .clone()
           .json()
           .then((data) => {
+            if (response.url.indexOf('/api/n9e/prometheus/api/v1/query') > -1) {
+              return data;
+            }
             throw new Error(data.err ? data.err : data);
           });
       }

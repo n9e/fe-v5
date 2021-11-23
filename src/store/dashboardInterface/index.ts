@@ -37,5 +37,7 @@ export interface ChartConfig {
   name: string;
   plotline?: number;
   link?: string;
-  showLegend?: boolean;
+  legend?: boolean;
+  yplotline1?: number;
+  yplotline2?: number;
 }
