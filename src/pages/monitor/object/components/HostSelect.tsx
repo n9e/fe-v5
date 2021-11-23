@@ -1,10 +1,17 @@
 import React, { useEffect, useState } from 'react'
 import { Button, Input, Select, Table, Tooltip } from 'antd';
+import SelectedHosts from './SelectedHosts';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/store/common';
+import { BusiGroupItem, CommonStoreState } from '@/store/commonInterface';
 
 export default (props) => {
-  const { allHosts, changeSelectedHosts } = props
+  const { allHosts, changeSelectedHosts, changeBusiGroup } = props
   const { Option } = Select
   const [selectedHostsKeys, setSelectedHostsKeys] = useState<string[]>([])
+  const [selectedHosts, setSelectedHosts] = useState<any[]>([])
+  const { busiGroups, curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
+  const dispatch = useDispatch()
   const columns = [
     { title: '对象标识', dataIndex: 'ident', width: 150 },
     {
@@ -21,29 +28,59 @@ export default (props) => {
     }
   ]
   useEffect(() => {
-    setSelectedHostsKeys(allHosts.map(h => h.ident))
+    const selectedHosts = allHosts.slice(0, 10)
+    setSelectedHostsKeys(selectedHosts.map(h => h.ident))
+    setSelectedHosts(selectedHosts)
+    changeSelectedHosts && changeSelectedHosts(selectedHosts)
   }, [allHosts.length])
   const selectBefore = (
-    <Select defaultValue="bg" className="select-before">
-      <Option value="bg">按业务组筛选</Option>
-    </Select>
+    <div className='host-add-on'>
+      <div className='title'>监控对象</div>
+      <div className="select-before">
+        <Select value={curBusiItem.id} style={{ width: '100%', textAlign: 'left' }} onChange={(busiItemId) => {
+          const data = busiGroups.find(bg => bg.id === busiItemId)
+          dispatch({
+            type: 'common/saveData',
+            prop: 'curBusiItem',
+            data: busiItemId === 0 ? {
+              id: 0,
+              name: '未归组对象'
+            } : data as BusiGroupItem,
+          })
+          changeBusiGroup && changeBusiGroup(data)
+        }}>
+          <Option key={0} value={0}>未归组对象</Option>
+          {busiGroups.map(bg => <Option key={bg.id} value={bg.id}>{bg.name}</Option>)}
+        </Select>
+      </div>
+    </div>
   )
   return <div className='host-select'>
     <div className='top-bar'>
-      <Button>监控对象</Button>
-      <Input addonBefore={selectBefore} />
+      <Input addonBefore={selectBefore} className='host-input' />
     </div>
     <Table
-      className='host-list'
+      className={allHosts.length > 0 ? 'host-list' : 'host-list-empty'}
       rowKey='ident'
       rowSelection={{
         selectedRowKeys: selectedHostsKeys,
         onChange: (selectedRowKeys: string[], selectedRows) => {
           setSelectedHostsKeys(selectedRowKeys)
+          setSelectedHosts(selectedRows)
           changeSelectedHosts && changeSelectedHosts(selectedRows)
         }
       }}
       columns={columns}
-      dataSource={allHosts}></Table>
+      dataSource={allHosts}
+      pagination={{simple: true}}></Table>
+    <div style={{marginTop: -44}}>
+      <Button type='link' style={{ paddingRight: 4 }} onClick={() => {
+        setSelectedHostsKeys(allHosts.map(h => h.ident))
+      }}>全选所有</Button>|<SelectedHosts selectedHosts={selectedHosts} allHosts={allHosts} changeSelectedHosts={(selectedHosts) => {
+        changeSelectedHosts(selectedHosts)
+        setSelectedHosts(selectedHosts)
+        setSelectedHostsKeys(selectedHosts.map(sh => sh.ident))
+      }}></SelectedHosts>
+    </div>
   </div>
 }

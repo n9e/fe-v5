@@ -5,7 +5,8 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
 import moment from 'moment';
-import { Button, Select, Popover, Input, InputNumber } from 'antd';
+import { Button, Dropdown, Menu, Select, Tag, Popover, Input, InputNumber } from 'antd';
+import { PlusCircleOutlined } from '@ant-design/icons'
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 
 interface Props {
@@ -82,71 +83,44 @@ export default class Comparison extends Component<Props, State> {
     });
   }
 
-  handleRelativeTimeComparisonChange = (e: CheckboxChangeEvent) => {
-    const { onChange, comparison, comparisonOptions } = this.props;
-    onChange({
-      ...this.refresh(),
-      comparison,
-      relativeTimeComparison: e.target.checked,
-      comparisonOptions,
-    });
-  }
-
-  handleCustomValueChange = (value: number | undefined) => {
-    if (value) {
-      this.setState({
-        customValue: value,
-        errorText: '',
-      });
-    } else {
-      this.setState({
-        customValue: value,
-        errorText: '自定义值不能为空',
-      });
-    }
-  }
-
-  handleCustomTypeChange = (value: string) => {
-    this.setState({ customType: value });
-  }
-
-  handleCustomBtnClick = () => {
-    const { onChange, comparison, relativeTimeComparison, comparisonOptions } = this.props;
-    const { customValue, customType } = this.state;
-    const currentCustomTypeObj = _.find(customTypeOptions, { value: customType });
-
-    if (!customValue || !currentCustomTypeObj) {
-      this.setState({
-        errorText: '自定义值不能为空',
-      });
-    } else {
-      this.setState({
-        errorText: '',
-      }, () => {
-        const ms = currentCustomTypeObj.ms * customValue;
-        const comparisonOptionsClone = _.cloneDeep(comparisonOptions);
-        const comparisonClone = _.cloneDeep(comparison);
-        comparisonClone.push(_.toString(ms));
-        comparisonOptionsClone.push({
-          label: `${customValue}${currentCustomTypeObj.label}`,
-          value: _.toString(ms),
-        });
-        const newComparisonOptions = _.unionBy(comparisonOptionsClone, 'value');
-        onChange({
-          ...this.refresh(),
-          comparison: comparisonClone,
-          relativeTimeComparison,
-          comparisonOptions: newComparisonOptions,
-        });
-      });
-    }
-  }
-
   render() {
     const { curComparison } = this.state;
+    const handleClick = (e) => {
+      const index = this.state.curComparison.findIndex(cc => cc === e.key)
+      let newCurComparison
+      if (index === -1) {
+        newCurComparison = [
+          ...this.state.curComparison,
+          e.key
+        ]
+        this.setState({
+          curComparison: newCurComparison
+        })
+      } else {
+        let curComparisonCopy = [...this.state.curComparison]
+        curComparisonCopy.splice(index, 1)
+        newCurComparison = curComparisonCopy
+        this.setState({
+          curComparison: curComparisonCopy
+        })
+      }
+      const { onChange, relativeTimeComparison, comparisonOptions } = this.props;
+      onChange({
+        ...this.refresh(),
+        comparison: newCurComparison,
+        relativeTimeComparison,
+        comparisonOptions,
+      });
+    }
+    const menu = (
+      <Menu onClick={handleClick} selectedKeys={curComparison}>
+        <Menu.Item key='1d'>1d</Menu.Item>
+        <Menu.Item key='7d'>7d</Menu.Item>
+      </Menu>
+    )
     return (
       <div className="graph-config-inner-comparison">
-        <Select
+        {/* <Select
           dropdownMatchSelectWidth={false}
           mode="multiple"
           style={{ minWidth: 80, width: 'auto', verticalAlign: 'middle' }}
@@ -154,7 +128,19 @@ export default class Comparison extends Component<Props, State> {
           onChange={this.handleComparisonChange}>
           <Option key={'1d'} value={'1d'}>1天</Option>
           <Option key={'7d'} value={'7d'}>7天</Option>
-        </Select>
+        </Select> */}
+        {this.state.curComparison.map(cc =>
+          <Tag key={cc} closable onClose={e => {
+            handleClick({key: cc})
+          }}>
+            {cc}
+          </Tag>
+        )}
+        <Dropdown overlay={menu}>
+          <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+            <PlusCircleOutlined />
+          </a>
+        </Dropdown>
       </div>
     );
   }

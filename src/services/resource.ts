@@ -254,8 +254,9 @@ export const regCheck = function (data: {
   });
 };
 
-export const getHosts = () => {
+export const getHosts = (params) => {
   return request(`/api/n9e/targets`, {
     method: RequestMethod.Get,
+    params
   });
 };

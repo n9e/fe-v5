@@ -81,6 +81,7 @@ export default function Chart() {
               //   title={item.title}
               // ></D3Chart>
               <Graph
+                key={index}
                 data={{ ...newItem }}
                 graphConfigInnerVisible={false}
                 isShowShare={false}

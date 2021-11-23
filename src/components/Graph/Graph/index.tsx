@@ -1,6 +1,6 @@
 import React, { Component, ReactNode } from 'react';
-import { Checkbox, Popover, Select, Spin } from 'antd';
-import { SyncOutlined, SettingOutlined, ShareAltOutlined } from '@ant-design/icons';
+import { Button, Checkbox, Dropdown, Menu, Popover, Select, Spin } from 'antd';
+import { DownOutlined, SyncOutlined, SettingOutlined, ShareAltOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import _ from 'lodash';
 import '@d3-charts/ts-graph/dist/index.css';
@@ -251,11 +251,12 @@ export default class Graph extends Component<GraphProps, GraphState> {
     return null;
   }
 
-  updateGraphConfig(changeObj) {
-    const aggrFunc = changeObj?.aggrFunc;
-    const aggrGroups = changeObj?.aggrGroups;
-    const offsets = changeObj?.comparison;
-    this.setState({ aggrFunc, aggrGroups, offsets });
+  updateGraphConfig (changeObj) {
+    console.log('updateGraphConfig', changeObj)
+    const aggrFunc = changeObj?.aggrFunc
+    const aggrGroups = changeObj?.aggrGroups
+    const offsets = changeObj?.comparison
+    this.setState({aggrFunc, aggrGroups, offsets})
     this.updateAllGraphs(aggrFunc, aggrGroups, offsets);
   }
 
@@ -291,7 +292,34 @@ export default class Graph extends Component<GraphProps, GraphState> {
     }
   }
 
-  getContent() {
+
+  getContent () {
+    const aggrFuncMenu = (
+      <Menu onClick={(sort) => {
+        this.setState({
+          highLevelConfig: {
+            ...this.state.highLevelConfig,
+            sharedSortDirection: (sort as {key: 'desc' | 'asc'}).key
+          }
+        })
+      }} selectedKeys={[this.state.highLevelConfig.sharedSortDirection]}>
+        <Menu.Item key='desc'>desc</Menu.Item>
+        <Menu.Item key='asc'>asc</Menu.Item>
+      </Menu>
+    )
+    const precisionMenu = (
+      <Menu onClick={(precision) => {
+        this.setState({
+          highLevelConfig: {
+            ...this.state.highLevelConfig,
+            formatUnit: (Number(precision.key)) as 1024|1000
+          }
+        })
+      }} selectedKeys={[String(this.state.highLevelConfig.formatUnit)]}>
+        <Menu.Item key={'1024'}>1024</Menu.Item>
+        <Menu.Item key={'1000'}>1000</Menu.Item>
+      </Menu>
+    )
     return (
       <div>
         <Checkbox
@@ -304,23 +332,23 @@ export default class Graph extends Component<GraphProps, GraphState> {
               },
             });
           }}
-        >
-          Multi Series in Tooltip, order value
-        </Checkbox>
-        <Select
-          value={this.state.highLevelConfig.sharedSortDirection}
-          onChange={(v: 'desc' | 'asc') => {
-            this.setState({
-              highLevelConfig: {
-                ...this.state.highLevelConfig,
-                sharedSortDirection: v,
-              },
-            });
-          }}
-        >
+        >Multi Series in Tooltip, order value</Checkbox>
+        {/* <Select value={this.state.highLevelConfig.sharedSortDirection} onChange={(v: 'desc' | 'asc') => {
+          this.setState({
+            highLevelConfig: {
+              ...this.state.highLevelConfig,
+              sharedSortDirection: v
+            }
+          })
+        }}>
           <Option value='desc'>desc</Option>
           <Option value='asc'>asc</Option>
-        </Select>
+        </Select> */}
+        <Dropdown overlay={aggrFuncMenu}>
+          <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+            {this.state.highLevelConfig.sharedSortDirection} <DownOutlined />
+          </a>
+        </Dropdown>
         <br />
         <Checkbox
           checked={this.state.legend}
@@ -339,27 +367,26 @@ export default class Graph extends Component<GraphProps, GraphState> {
             this.setState({
               highLevelConfig: {
                 ...this.state.highLevelConfig,
-                precision: e.target.checked ? 'short' : 'origin',
-              },
-            });
-          }}
-        >
-          Value format with: Ki, Mi, Gi by
-        </Checkbox>
-        <Select
-          value={this.state.highLevelConfig.formatUnit}
-          onChange={(v: 1024 | 1000) => {
-            this.setState({
-              highLevelConfig: {
-                ...this.state.highLevelConfig,
-                formatUnit: v,
-              },
-            });
-          }}
-        >
+                precision: e.target.checked ? 'short' : 'origin'
+              }
+            })
+          }}>Value format with: Ki, Mi, Gi by</Checkbox>
+        {/* <Select value={this.state.highLevelConfig.formatUnit} onChange={(v: 1024 | 1000) => {
+          this.setState({
+            highLevelConfig: {
+              ...this.state.highLevelConfig,
+              formatUnit: v
+            }
+          })
+        }}>
           <Option value={1024}>1024</Option>
           <Option value={1000}>1000</Option>
-        </Select>
+        </Select> */}
+        <Dropdown overlay={precisionMenu}>
+          <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+            {this.state.highLevelConfig.formatUnit} <DownOutlined />
+          </a>
+        </Dropdown>
       </div>
     );
   }
@@ -387,11 +414,15 @@ export default class Graph extends Component<GraphProps, GraphState> {
                 </Popover>
               </span>
               <span className='graph-operationbar-item' key='sync'>
-                <SyncOutlined onClick={this.refresh} />
+                <Button type='link' size='small' onClick={(e) => e.preventDefault()}>
+                  <SyncOutlined onClick={this.refresh} />
+                </Button>
               </span>
               {this.props.isShowShare === false ? null : (
                 <span className='graph-operationbar-item' key='share'>
-                  <ShareAltOutlined onClick={this.shareChart} />
+                  <Button type='link' size='small' onClick={(e) => e.preventDefault()}>
+                    <ShareAltOutlined onClick={this.shareChart} />
+                  </Button>
                 </span>
               )}
               {extraRender && _.isFunction(extraRender) ? extraRender(this) : null}
