@@ -11,11 +11,11 @@ import { highlightSelectionMatches } from '@codemirror/search';
 import { commentKeymap } from '@codemirror/comment';
 import { lintKeymap } from '@codemirror/lint';
 import { autocompletion, completionKeymap, CompletionContext, CompletionResult } from '@codemirror/autocomplete';
-import { baseTheme, promqlHighlighter } from './CMTheme';
+import { baseTheme, promqlHighlighter } from '@/components/PromqlEditor/CMTheme';
 
 import { CompleteStrategy, PromQLExtension } from 'codemirror-promql';
 import { newCompleteStrategy } from 'codemirror-promql/cjs/complete';
-import { LoadingOutlined, SearchOutlined, SettingFilled } from '@ant-design/icons';
+import { GlobalOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 
 import MetricsExplorer from './metricsExplorer';
@@ -98,7 +98,7 @@ const ExpressionInput: FC<CMExpressionInputProps> = ({ value, onExpressionChange
         //   }),
         //   queryHistory,
         // ),
-        remote: { fetchFn: myHTTPClient, url },
+        remote: { url, fetchFn: myHTTPClient, cache: { initialMetricList: metricNames } },
       });
 
     // Create or reconfigure the editor.
@@ -186,13 +186,13 @@ const ExpressionInput: FC<CMExpressionInputProps> = ({ value, onExpressionChange
     <>
       <div className='prometheus-input-box'>
         <div className='input-prefix'>
-          <span>{isLoading ? <LoadingOutlined /> : <SearchOutlined />} PromQL: </span>
+          <span>PromQL: </span>
         </div>
         <div className='input'>
           <div ref={containerRef} style={{ fontSize: 16 }} />
         </div>
         <div className='suffix'>
-          <Button size='large' className='metrics' icon={<SettingFilled />} onClick={() => setShowMetricsExplorer(true)}></Button>
+          <Button size='large' className='metrics' icon={<GlobalOutlined />} onClick={() => setShowMetricsExplorer(true)}></Button>
           <Button size='large' type='primary' className='execute' onClick={executeQuery}>
             Execute
           </Button>

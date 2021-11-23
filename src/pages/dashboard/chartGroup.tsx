@@ -458,48 +458,12 @@ export default function ChartGroup(props: Props) {
     );
   };
 
-  const getPopoverContent = (graph, i) => {
-    return (
-      <div>
-        <Checkbox onChange={() => {}}>Multi Series in Tooltip, order value desc</Checkbox>
-        <br />
-        <Checkbox
-          onChange={(e) => {
-            let newChartConfigs = [...chartConfigs];
-            let dstChartConfigs = newChartConfigs[i];
-            dstChartConfigs.configs.showLegend = e.target.checked;
-            setChartConfigs(newChartConfigs);
-          }}
-        >
-          Show Legend
-        </Checkbox>
-        <br />
-        <Checkbox onChange={() => {}}>Value format with: Ki, Mi, Gi by 1024</Checkbox>
-      </div>
-    );
-  };
-
   const generateDOM = () => {
     return (
       chartConfigs &&
       chartConfigs.length > 0 &&
       chartConfigs.map((item, i) => {
-        let { QL, name, showLegend } = item.configs;
-        // if (variableConfig) {
-        //   variableConfig.tags.forEach((item) => {
-        //     if (prome_ql) {
-        //       if (Array.isArray(prome_ql)) {
-        //         prome_ql = prome_ql.map((i) => {
-        //           if (item.value === '*') {
-        //             return i.replaceAll('$' + item.key, '.+');
-        //           }
-
-        //           return i.replaceAll('$' + item.key, item.value);
-        //         });
-        //       } // prome_ql = prome_ql.replaceAll('$' + item.key, item.value);
-        //     }
-        //   });
-        // }
+        let { QL, name, legend, yplotline1, yplotline2 } = item.configs;
 
         return (
           <div
@@ -510,7 +474,19 @@ export default function ChartGroup(props: Props) {
           >
             <Graph
               data={{
-                legend: showLegend,
+                yAxis: {
+                  plotLines: [
+                    {
+                      value: yplotline1,
+                      color: 'red',
+                    },
+                    {
+                      value: yplotline2,
+                      color: 'green',
+                    },
+                  ],
+                },
+                legend: legend,
                 step,
                 range,
                 title: name,
@@ -540,12 +516,6 @@ export default function ChartGroup(props: Props) {
                     >
                       <EditOutlined />
                     </Button>
-
-                    <Popover placement='left' content={getPopoverContent(graph, i)} trigger='click'>
-                      <Button type='link' size='small' onClick={(e) => e.preventDefault()}>
-                        <SettingOutlined />
-                      </Button>
-                    </Popover>
 
                     <Button
                       type='link'

@@ -1,74 +1,27 @@
 import React, { useEffect, useState } from 'react'
 import { Button, Input, Tabs, Tooltip } from 'antd';
-import { metricMap, metricsMeta } from '../config';
+import { SyncOutlined } from '@ant-design/icons';
 import { filterMetrics, matchMetrics } from '../utils';
 import _ from 'lodash'
 
 const { TabPane } = Tabs
-const { Search } = Input
-function getCurrentMetricMeta(metric: string) {
-  if (metricsMeta[metric]) {
-    return metricsMeta[metric];
-  }
-  let currentMetricMeta;
-  _.each(metricsMeta, (val, key) => {
-    if (key.indexOf('$Name') > -1) {
-      const keySplit = key.split('$Name');
-      if (metric.indexOf(keySplit[0]) === 0 && metric.indexOf(keySplit[1]) > 0) {
-        currentMetricMeta = val;
-      }
-    }
-  });
-  return currentMetricMeta;
-}
 export default (props) => {
-  const { metrics, handleMetricClick } = props
-  const [selectedHostsKeys, setSelectedHostsKeys] = useState<string[]>([])
+  const { metrics, metricDescs, selectedMetrics, handleMetricClick, handleRefreshMetrics } = props
   const [searchValue, setSearchValue] = useState<string>('')
-  const [activeKey, setActiveKey] = useState<string>('ALL')
-  const [metricTipVisible, setMetricTipVisible] = useState({})
+  const [activeKey, setActiveKey] = useState<string>('all')
   const handleMetricTabsChange = (key: string) => {
     setActiveKey(key)
   }
-  function getSelectedMetricsLen(metric: string, selectedMetrics: string) {
-    const filtered = _.filter(selectedMetrics, o => o === metric);
-    if (filtered.length) {
-      return <span style={{ color: '#999' }}> +{filtered.length}</span>;
-    }
-    return null;
-  }
   const normalizMetrics = (key: string) => {
     let newMetrics = _.cloneDeep(metrics);
-    if (key !== 'ALL') {
-      const { filter, data } = metricMap[key];
-      if (filter && filter.type && filter.value) {
-        return filterMetrics(filter.type, filter.value, metrics);
-      } else if (data && data.length !== 0) {
-        newMetrics = matchMetrics(data, metrics);
-        return _.concat([], newMetrics);
-      }
-      return [];
+    if (key !== 'all') {
+      return filterMetrics('prefix', `${key}_`, newMetrics);
     }
     return newMetrics;
   }
-  const dynamicMetricMaps = () => {
-    return _.filter(metricMap, (val) => {
-      const { dynamic, filter } = val;
-      if (!dynamic) return true;
-      if (filter && filter.type && filter.value) {
-        const newMetrics = filterMetrics(filter.type, filter.value, metrics);
-        if (newMetrics && newMetrics.length !== 0) {
-          return true;
-        }
-        return false;
-      }
-      return false;
-    });
-  }
   const renderMetricList = (metrics = [], metricTabKey: string) => {
-    const selectedMetrics = props.metrics;
     return (
-      <div className="tabPane" style={{maxHeight: 440, overflow: 'auto'}}>
+      <div className="tabPane" style={{height: 432, overflow: 'auto'}}>
         {
           metrics.length ?
             <ul className="metric-list" style={{ border: 'none' }}>
@@ -79,34 +32,11 @@ export default (props) => {
                       <Tooltip
                         key={`${metricTabKey}_${metric}`}
                         placement="right"
-                        visible={metricTipVisible[`${metricTabKey}_${metric}`]}
-                        title={() => {
-                          const currentMetricMeta = getCurrentMetricMeta(metric);
-                          if (currentMetricMeta) {
-                            return (
-                              <div>
-                                <p>含义：{currentMetricMeta.meaning}</p>
-                                <p>单位：{currentMetricMeta.unit}</p>
-                              </div>
-                            );
-                          }
-                          return '';
-                        }}
-                        onVisibleChange={(visible) => {
-                          const key = `${metricTabKey}_${metric}`;
-                          const currentMetricMeta = getCurrentMetricMeta(metric);
-                          const metricTipVisibleCopy = JSON.parse(JSON.stringify(metricTipVisible));
-                          if (visible && currentMetricMeta) {
-                            metricTipVisibleCopy[key] = true;
-                          } else {
-                            metricTipVisibleCopy[key] = false;
-                          }
-                          setMetricTipVisible(metricTipVisibleCopy);
-                        }}
+                        title={() => metricDescs[metric]}
                       >
                         <span>{metric}</span>
                       </Tooltip>
-                      {getSelectedMetricsLen(metric, selectedMetrics)}
+                      {selectedMetrics.find(sm => sm === metric) ? <span style={{marginLeft: 8}}>+1</span> : null}
                     </li>
                   );
                 })
@@ -118,36 +48,47 @@ export default (props) => {
     );
   }
   const renderMetricTabs = () => {
-    const metrics = normalizMetrics(activeKey);
-    let newMetrics = metrics;
+    let filteredMetrics = normalizMetrics(activeKey);
+    _.forEachRight(selectedMetrics, (value) => {
+      const index = filteredMetrics.findIndex(metric => metric === value)
+      const curMetric = filteredMetrics[index]
+      if (curMetric) {
+        filteredMetrics.splice(index,  1)
+        filteredMetrics.unshift(curMetric)
+      }
+    });
+    let newMetrics = filteredMetrics;
     if (searchValue) {
       try {
         const reg = new RegExp(searchValue, 'i');
-        newMetrics = _.filter(metrics, (item) => {
+        newMetrics = _.filter(filteredMetrics, (item) => {
           return reg.test(item);
         });
       } catch (e) {
         newMetrics = [];
       }
     }
-    const newMetricMap = dynamicMetricMaps();
-    const tabPanes = _.map(newMetricMap, (val) => {
-      const tabName = val.alias;
+    const metricPrefixes = metrics.map(m => {
+      const a = m.split('_')
+      return a[0]
+    }).filter(m => m)
+    const metricPrefixesUnique = Array.from(new Set(metricPrefixes))
+    const tabPanes = _.map(metricPrefixesUnique, (val) => {
       return (
-        <TabPane tab={tabName} key={val.key}>
-          { renderMetricList(newMetrics, val.key) }
+        <TabPane tab={val} key={val}>
+          {renderMetricList(newMetrics, val)}
         </TabPane>
       );
     });
     tabPanes.unshift(
-      <TabPane tab='全部' key="ALL">
-        { renderMetricList(newMetrics, 'ALL') }
+      <TabPane tab='all' key="all">
+        {renderMetricList(newMetrics, 'all')}
       </TabPane>,
     );
 
     return (
       <Tabs
-        style={{padding: 8, border: '1px solid #eee', paddingTop: 0}}
+        className='metric-tab'
         tabBarStyle={{marginBottom: 10, height: 40}}
         activeKey={activeKey}
         onChange={handleMetricTabsChange}
@@ -162,8 +103,14 @@ export default (props) => {
   }
   return <div className='metric-select'>
     <div className='top-bar'>
-      <Button>监控对象</Button>
-      <Search onChange={handleMetricsSearch} />
+      <Input addonBefore={
+        <div className='search-title'>监控指标</div>
+      } addonAfter={
+        <SyncOutlined onClick={() => {
+          // 不直接写成onClick={handleRefreshMetrics}是为了避免将事件对象e传给外面，造成不必要的麻烦
+          handleRefreshMetrics && handleRefreshMetrics()
+        }} />
+      } className='metric-search' onChange={handleMetricsSearch} />
     </div>
     {renderMetricTabs()}
   </div>

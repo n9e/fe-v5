@@ -1,5 +1,8 @@
+// @ts-nocheck
+// TODO: 类型校验补充
+
 import React, { Component, Ref } from 'react';
-import D3Graph from '@d3-charts/ts-graph';
+import D3Graph from '@/components/D3Charts/src/index';
 import '@d3-charts/ts-graph/dist/index.css';
 import _ from 'lodash';
 import * as util from '../util';
@@ -45,7 +48,6 @@ export default class Graph extends Component<GraphProps> {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log('componentWillReceiveProps yaxis', this.chart.options.yAxis, util.getYAxis(this.chart.options.yAxis, nextProps.graphConfig))
     if (this.chart) {
       const chartOptions = {
         yAxis: util.getYAxis(this.chart.options.yAxis, nextProps.graphConfig),
@@ -56,27 +58,29 @@ export default class Graph extends Component<GraphProps> {
     }
   }
 
-  genChartTooltipOptions (nextProps) {
-    const isFormatUnit1024 = nextProps.graphConfig.formatUnit === 1024 && nextProps.graphConfig.precision === 'short'
-    return isFormatUnit1024 ? {
-      xAxis: nextProps.graphConfig.xAxis,
-      shared: nextProps.graphConfig.shared,
-      sharedSortDirection: nextProps.graphConfig.sharedSortDirection,
-      formatter: (points) => {
-        return util.getTooltipsContent({
-          formatUnit: nextProps.graphConfig.formatUnit,
+  genChartTooltipOptions(nextProps) {
+    const isFormatUnit1024 = nextProps.graphConfig.formatUnit === 1024 && nextProps.graphConfig.precision === 'short';
+    return isFormatUnit1024
+      ? {
+          xAxis: nextProps.graphConfig.xAxis,
+          shared: nextProps.graphConfig.shared,
+          sharedSortDirection: nextProps.graphConfig.sharedSortDirection,
+          formatter: (points) => {
+            return util.getTooltipsContent({
+              formatUnit: nextProps.graphConfig.formatUnit,
+              precision: nextProps.graphConfig.precision,
+              series: this.props.series,
+              points,
+              chartWidth: this.graphWrapEle.offsetWidth - 40,
+            });
+          },
+        }
+      : {
+          xAxis: nextProps.graphConfig.xAxis,
+          shared: nextProps.graphConfig.shared,
+          sharedSortDirection: nextProps.graphConfig.sharedSortDirection,
           precision: nextProps.graphConfig.precision,
-          series: this.props.series,
-          points,
-          chartWidth: this.graphWrapEle.offsetWidth - 40
-        });
-      },
-    } : {
-      xAxis: nextProps.graphConfig.xAxis,
-      shared: nextProps.graphConfig.shared,
-      sharedSortDirection: nextProps.graphConfig.sharedSortDirection,
-      precision: nextProps.graphConfig.precision,
-    }
+        };
   }
 
   render() {

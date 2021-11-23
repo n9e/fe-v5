@@ -1,6 +1,6 @@
 import React, { Component, ReactNode } from 'react';
-import { Checkbox, Popover, Select, Spin } from 'antd';
-import { SyncOutlined, SettingOutlined, ShareAltOutlined } from '@ant-design/icons';
+import { Button, Checkbox, Dropdown, Menu, Popover, Select, Spin } from 'antd';
+import { DownOutlined, SyncOutlined, SettingOutlined, ShareAltOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import _ from 'lodash';
 import '@d3-charts/ts-graph/dist/index.css';
@@ -22,6 +22,13 @@ export interface GraphDataProps {
   metric?: string;
   promqls?: string[] | { current: string }[];
   ref?: any;
+  yAxis?: any;
+}
+
+export interface ErrorInfoType {
+  status: string;
+  error: string;
+  errorType: string;
 }
 
 interface GraphProps {
@@ -41,6 +48,7 @@ interface GraphProps {
     precision?: 'short' | 'origin' | number;
     formatUnit?: 1024 | 1000;
   };
+  onErrorOccured?: (errorArr: ErrorInfoType[]) => void;
 }
 
 interface GraphState {
@@ -58,6 +66,7 @@ interface GraphState {
     precision: 'short' | 'origin' | number;
     formatUnit: 1024 | 1000;
   };
+  onErrorOccured?: (errorArr: ErrorInfoType[]) => void;
 }
 
 const { Option } = Select;
@@ -76,13 +85,14 @@ export default class Graph extends Component<GraphProps, GraphState> {
       offsets: this.props.defaultOffsets || [],
       aggrFunc: this.props.defaultAggrFunc || 'avg',
       aggrGroups: this.props.defaultAggrGroups || ['ident'],
-      legend: true,
+      legend: props.data.legend !== undefined ? props.data.legend : true,
       highLevelConfig: {
         shared: this.props.highLevelConfig?.shared === undefined ? true : this.props.highLevelConfig?.shared,
         sharedSortDirection: this.props.highLevelConfig?.sharedSortDirection || 'desc',
         precision: this.props.highLevelConfig?.precision || 'short',
         formatUnit: this.props.highLevelConfig?.formatUnit || 1024,
       },
+      onErrorOccured: this.props.onErrorOccured,
     };
   }
 
@@ -92,23 +102,24 @@ export default class Graph extends Component<GraphProps, GraphState> {
 
   componentDidUpdate(prevProps) {
     // 兼容及时查询页面操作图标属性
+    // 接受外部format，legend，multi等属性并更新视图
     if (typeof prevProps.highLevelConfig === 'object') {
-      const {shared, sharedSortDirection} = prevProps.highLevelConfig
-      let showUpdate = false
-      const updateObj = Object.assign({}, this.state.highLevelConfig)
-      if (shared !== undefined && shared !== this.state.highLevelConfig.shared) {
-        updateObj.shared = shared
-        showUpdate = true
-      }
-      if (sharedSortDirection !== this.state.highLevelConfig.sharedSortDirection) {
-        updateObj.sharedSortDirection = sharedSortDirection
-        showUpdate = true
+      let showUpdate = false;
+      const updateObj = Object.assign({}, this.state.highLevelConfig);
+      for (let key of Object.keys(updateObj)) {
+        if (updateObj[key] !== prevProps.highLevelConfig[key]) {
+          updateObj[key] = prevProps.highLevelConfig[key];
+          showUpdate = true;
+        }
       }
       if (showUpdate) {
         this.setState({
-          highLevelConfig: updateObj
-        })
+          highLevelConfig: updateObj,
+        });
       }
+    }
+    if (this.props.data.legend !== undefined && this.props.data.legend !== this.state.legend) {
+      this.setState({ legend: this.props.data.legend });
     }
     const oldHosts = (prevProps.data.selectedHosts || []).map((h) => h.ident);
     const newHosts = (this.props.data.selectedHosts || []).map((h) => h.ident);
@@ -123,8 +134,13 @@ export default class Graph extends Component<GraphProps, GraphState> {
   }
 
   afterFetchChartDataOperations(allResponseData) {
+    const errorSeries: ErrorInfoType[] = [];
     const offsets = this.state.offsets;
     const rawSeries = allResponseData.reduce((acc, cur, idx) => {
+      if (cur.status === 'error') {
+        errorSeries.push(cur);
+        return acc;
+      }
       const arr = cur?.data?.result;
       // 添加环比信息
       if (offsets) {
@@ -137,6 +153,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
     }, []);
     const series = util.normalizeSeries(rawSeries);
     this.setState({ spinning: false, series });
+    this.state.onErrorOccured && this.state.onErrorOccured(errorSeries);
   }
 
   getGraphConfig(graphConfig) {
@@ -249,11 +266,12 @@ export default class Graph extends Component<GraphProps, GraphState> {
     return null;
   }
 
-  updateGraphConfig(changeObj) {
-    const aggrFunc = changeObj?.aggrFunc;
-    const aggrGroups = changeObj?.aggrGroups;
-    const offsets = changeObj?.comparison;
-    this.setState({ aggrFunc, aggrGroups, offsets });
+  updateGraphConfig (changeObj) {
+    console.log('updateGraphConfig', changeObj)
+    const aggrFunc = changeObj?.aggrFunc
+    const aggrGroups = changeObj?.aggrGroups
+    const offsets = changeObj?.comparison
+    this.setState({aggrFunc, aggrGroups, offsets})
     this.updateAllGraphs(aggrFunc, aggrGroups, offsets);
   }
 
@@ -289,7 +307,34 @@ export default class Graph extends Component<GraphProps, GraphState> {
     }
   }
 
-  getContent() {
+
+  getContent () {
+    const aggrFuncMenu = (
+      <Menu onClick={(sort) => {
+        this.setState({
+          highLevelConfig: {
+            ...this.state.highLevelConfig,
+            sharedSortDirection: (sort as {key: 'desc' | 'asc'}).key
+          }
+        })
+      }} selectedKeys={[this.state.highLevelConfig.sharedSortDirection]}>
+        <Menu.Item key='desc'>desc</Menu.Item>
+        <Menu.Item key='asc'>asc</Menu.Item>
+      </Menu>
+    )
+    const precisionMenu = (
+      <Menu onClick={(precision) => {
+        this.setState({
+          highLevelConfig: {
+            ...this.state.highLevelConfig,
+            formatUnit: (Number(precision.key)) as 1024|1000
+          }
+        })
+      }} selectedKeys={[String(this.state.highLevelConfig.formatUnit)]}>
+        <Menu.Item key={'1024'}>1024</Menu.Item>
+        <Menu.Item key={'1000'}>1000</Menu.Item>
+      </Menu>
+    )
     return (
       <div>
         <Checkbox
@@ -302,23 +347,23 @@ export default class Graph extends Component<GraphProps, GraphState> {
               },
             });
           }}
-        >
-          Multi Series in Tooltip, order value
-        </Checkbox>
-        <Select
-          value={this.state.highLevelConfig.sharedSortDirection}
-          onChange={(v: 'desc' | 'asc') => {
-            this.setState({
-              highLevelConfig: {
-                ...this.state.highLevelConfig,
-                sharedSortDirection: v,
-              },
-            });
-          }}
-        >
+        >Multi Series in Tooltip, order value</Checkbox>
+        {/* <Select value={this.state.highLevelConfig.sharedSortDirection} onChange={(v: 'desc' | 'asc') => {
+          this.setState({
+            highLevelConfig: {
+              ...this.state.highLevelConfig,
+              sharedSortDirection: v
+            }
+          })
+        }}>
           <Option value='desc'>desc</Option>
           <Option value='asc'>asc</Option>
-        </Select>
+        </Select> */}
+        <Dropdown overlay={aggrFuncMenu}>
+          <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+            {this.state.highLevelConfig.sharedSortDirection} <DownOutlined />
+          </a>
+        </Dropdown>
         <br />
         <Checkbox
           checked={this.state.legend}
@@ -337,27 +382,26 @@ export default class Graph extends Component<GraphProps, GraphState> {
             this.setState({
               highLevelConfig: {
                 ...this.state.highLevelConfig,
-                precision: e.target.checked ? 'short' : 'origin',
-              },
-            });
-          }}
-        >
-          Value format with: Ki, Mi, Gi by
-        </Checkbox>
-        <Select
-          value={this.state.highLevelConfig.formatUnit}
-          onChange={(v: 1024 | 1000) => {
-            this.setState({
-              highLevelConfig: {
-                ...this.state.highLevelConfig,
-                formatUnit: v,
-              },
-            });
-          }}
-        >
+                precision: e.target.checked ? 'short' : 'origin'
+              }
+            })
+          }}>Value format with: Ki, Mi, Gi by</Checkbox>
+        {/* <Select value={this.state.highLevelConfig.formatUnit} onChange={(v: 1024 | 1000) => {
+          this.setState({
+            highLevelConfig: {
+              ...this.state.highLevelConfig,
+              formatUnit: v
+            }
+          })
+        }}>
           <Option value={1024}>1024</Option>
           <Option value={1000}>1000</Option>
-        </Select>
+        </Select> */}
+        <Dropdown overlay={precisionMenu}>
+          <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+            {this.state.highLevelConfig.formatUnit} <DownOutlined />
+          </a>
+        </Dropdown>
       </div>
     );
   }
@@ -385,15 +429,20 @@ export default class Graph extends Component<GraphProps, GraphState> {
                 </Popover>
               </span>
               <span className='graph-operationbar-item' key='sync'>
-                <SyncOutlined onClick={this.refresh} />
+                <Button type='link' size='small' onClick={(e) => e.preventDefault()}>
+                  <SyncOutlined onClick={this.refresh} />
+                </Button>
               </span>
               {this.props.isShowShare === false ? null : (
                 <span className='graph-operationbar-item' key='share'>
-                  <ShareAltOutlined onClick={this.shareChart} />
+                  <Button type='link' size='small' onClick={(e) => e.preventDefault()}>
+                    <ShareAltOutlined onClick={this.shareChart} />
+                  </Button>
                 </span>
               )}
               {extraRender && _.isFunction(extraRender) ? extraRender(this) : null}
             </div>
+            <div>{title || metric}</div>
           </div>
         )}
         {this.props.graphConfigInnerVisible ? (
