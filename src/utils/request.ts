@@ -26,7 +26,7 @@ request.interceptors.request.use((url, options) => {
   };
   headers['Authorization'] = `Bearer ${localStorage.getItem('access_token') || ''}`;
   if (!headers['X-Cluster']) {
-    headers['X-Cluster'] = 'Default';
+    headers['X-Cluster'] = localStorage.getItem('curCluster') || '';
   }
   return {
     url,

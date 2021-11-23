@@ -6,11 +6,12 @@ import { RootState } from '@/store/common';
 import { BusiGroupItem, CommonStoreState } from '@/store/commonInterface';
 
 export default (props) => {
-  const { allHosts, changeSelectedHosts, changeBusiGroup } = props
+  const { allHosts, changeSelectedHosts, changeBusiGroup, onSearchHostName } = props
   const { Option } = Select
   const [selectedHostsKeys, setSelectedHostsKeys] = useState<string[]>([])
   const [selectedHosts, setSelectedHosts] = useState<any[]>([])
   const { busiGroups, curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
+  const [curBusiItemInHostSelect, setCurBusiItemInHostSelect] = useState(curBusiItem)
   const dispatch = useDispatch()
   const columns = [
     { title: '对象标识', dataIndex: 'ident', width: 150 },
@@ -32,22 +33,27 @@ export default (props) => {
     setSelectedHostsKeys(selectedHosts.map(h => h.ident))
     setSelectedHosts(selectedHosts)
     changeSelectedHosts && changeSelectedHosts(selectedHosts)
-  }, [allHosts.length])
+  }, [allHosts.map(h => h.id + '').join('')])
   const selectBefore = (
     <div className='host-add-on'>
       <div className='title'>监控对象</div>
       <div className="select-before">
-        <Select value={curBusiItem.id} style={{ width: '100%', textAlign: 'left' }} onChange={(busiItemId) => {
-          const data = busiGroups.find(bg => bg.id === busiItemId)
-          dispatch({
-            type: 'common/saveData',
-            prop: 'curBusiItem',
-            data: busiItemId === 0 ? {
+        <Select value={curBusiItemInHostSelect.id} style={{ width: '100%', textAlign: 'left' }} onChange={(busiItemId) => {
+          let data = busiGroups.find(bg => bg.id === busiItemId)
+          if (busiItemId !== 0) {
+            dispatch({
+              type: 'common/saveData',
+              prop: 'curBusiItem',
+              data: data as BusiGroupItem,
+            })
+          } else {
+            data = {
               id: 0,
               name: '未归组对象'
-            } : data as BusiGroupItem,
-          })
+            } as BusiGroupItem
+          }
           changeBusiGroup && changeBusiGroup(data)
+          setCurBusiItemInHostSelect(data as BusiGroupItem)
         }}>
           <Option key={0} value={0}>未归组对象</Option>
           {busiGroups.map(bg => <Option key={bg.id} value={bg.id}>{bg.name}</Option>)}
@@ -57,7 +63,10 @@ export default (props) => {
   )
   return <div className='host-select'>
     <div className='top-bar'>
-      <Input addonBefore={selectBefore} className='host-input' />
+      <Input addonBefore={selectBefore} className='host-input' onChange={e => {
+        const { value } = e.target;
+        onSearchHostName && onSearchHostName(value)
+      }} />
     </div>
     <Table
       className={allHosts.length > 0 ? 'host-list' : 'host-list-empty'}
