@@ -23,7 +23,7 @@ const PanelList: React.FC<PanelListProps> = ({ metrics }) => {
       ...panelList,
       {
         id: generateID(),
-        options: PanelDefaultOptions,
+        options: {...PanelDefaultOptions},
       },
     ]);
   }
@@ -35,7 +35,7 @@ const PanelList: React.FC<PanelListProps> = ({ metrics }) => {
 
   return (
     <>
-      {panelList.map(({ id, options }) => (
+      {panelList.map(({ id, options }) => 
         <Panel
           key={id}
           options={options}
@@ -45,7 +45,10 @@ const PanelList: React.FC<PanelListProps> = ({ metrics }) => {
           metrics={metrics}
           removePanel={() => removePanel(id)}
         />
-      ))}
+        // Panel(metrics, options, (opts) => {
+        //   setPanelList(panelList.map((p) => (id === p.id ? { ...p, options: opts } : p)));
+        // }, () => removePanel(id))
+      )}
       <div className='add-prometheus-panel'>
         <Button size='large' onClick={addPanel}>
           <PlusOutlined />
