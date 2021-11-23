@@ -1,5 +1,8 @@
+// @ts-nocheck
+// TODO: 类型校验补充
+
 import React, { Component, Ref } from 'react';
-import D3Graph from '@d3-charts/ts-graph';
+import D3Graph from '@/components/D3Charts/src/index';
 import '@d3-charts/ts-graph/dist/index.css';
 import _ from 'lodash';
 import * as util from '../util';

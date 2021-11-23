@@ -25,6 +25,12 @@ export interface GraphDataProps {
   yAxis?: any;
 }
 
+export interface ErrorInfoType {
+  status: string;
+  error: string;
+  errorType: string;
+}
+
 interface GraphProps {
   height?: number;
   ref?: any;
@@ -42,6 +48,7 @@ interface GraphProps {
     precision?: 'short' | 'origin' | number;
     formatUnit?: 1024 | 1000;
   };
+  onErrorOccured?: (errorArr: ErrorInfoType[]) => void;
 }
 
 interface GraphState {
@@ -59,6 +66,7 @@ interface GraphState {
     precision: 'short' | 'origin' | number;
     formatUnit: 1024 | 1000;
   };
+  onErrorOccured?: (errorArr: ErrorInfoType[]) => void;
 }
 
 const { Option } = Select;
@@ -84,6 +92,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
         precision: this.props.highLevelConfig?.precision || 'short',
         formatUnit: this.props.highLevelConfig?.formatUnit || 1024,
       },
+      onErrorOccured: this.props.onErrorOccured,
     };
   }
 
@@ -125,8 +134,13 @@ export default class Graph extends Component<GraphProps, GraphState> {
   }
 
   afterFetchChartDataOperations(allResponseData) {
+    const errorSeries: ErrorInfoType[] = [];
     const offsets = this.state.offsets;
     const rawSeries = allResponseData.reduce((acc, cur, idx) => {
+      if (cur.status === 'error') {
+        errorSeries.push(cur);
+        return acc;
+      }
       const arr = cur?.data?.result;
       // 添加环比信息
       if (offsets) {
@@ -139,6 +153,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
     }, []);
     const series = util.normalizeSeries(rawSeries);
     this.setState({ spinning: false, series });
+    this.state.onErrorOccured && this.state.onErrorOccured(errorSeries);
   }
 
   getGraphConfig(graphConfig) {

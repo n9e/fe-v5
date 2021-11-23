@@ -129,7 +129,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
   const { curBusiItem } = useSelector<RootState, CommonStoreState>(state => state.common);
 
   const [contactList, setInitContactList] = useState([]);
-  const [notifyGroups, setNotifyGroups] = useState([]);
+  const [notifyGroups, setNotifyGroups] = useState<any[]>([]);
   const [initVal, setInitVal] = useState<any>({});
   const [refresh, setRefresh] = useState(true);
 
@@ -147,7 +147,11 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
       enable_status: detail?.disabled === undefined ? true : !detail?.disabled
     }
     setInitVal(data);
-
+    if (type == 1) {
+      const groups = notifyGroups.concat(detail.notify_groups_obj || []);
+      setNotifyGroups(groups);
+    }
+    
   }, [JSON.stringify(detail)])
 
   const enableDaysOfWeekOptions = [
@@ -184,16 +188,6 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
     const res = await getTeamInfoList();
     const data = res.dat || res;
     setNotifyGroups(data || []);
-  };
-
-  const handleTagsChange = (value: string[]) => {
-    let top: string = value[value.length - 1];
-    let reg = /\w+=\w+/;
-
-    if (top && !reg.test(top)) {
-      let v = value.pop();
-      message.error(`"${v}${t('"不符合输入规范（格式为key=value）')}`);
-    }
   };
 
   const addSubmit = () => {
@@ -414,19 +408,6 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                 </Tooltip>
               </Space>
             </Form.Item>
-            {/* <Form.Item
-              label={t('附加标签')}
-              style={{
-                marginTop: 20,
-              }}
-              name='append_tags'
-            >
-              <Select
-                mode='tags'
-                onChange={handleTagsChange}
-                placeholder={t('请输入附加标签，格式为key=value')}
-              ></Select>
-            </Form.Item> */}
             <Form.Item
               label='附加标签'
               name='append_tags'

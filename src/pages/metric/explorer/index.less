@@ -38,6 +38,9 @@
         height: 100%;
       }
     }
+    .error-alert {
+      margin-bottom: 10px;
+    }
     .remove-panel-btn {
       position: absolute;
       top: -16px;
@@ -47,6 +50,24 @@
       cursor: pointer;
       &:hover {
         color: #ff7875;
+      }
+    }
+    .panel-tab-box {
+      .table-timestamp {
+        margin-bottom: 10px;
+      }
+      .table-list {
+        max-height: 700px;
+        overflow: auto;
+      }
+      .graph-operate-box {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        .left, .right {
+          display: flex;
+          align-items: center;
+        }
       }
     }
   }

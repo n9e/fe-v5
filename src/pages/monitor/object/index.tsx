@@ -97,7 +97,6 @@ export default () => {
                   setBusiGroup(busiGroup)
                 }}
                 changeSelectedHosts={(hosts) => {
-                  console.log('changeSelectedHosts', hosts)
                   setSelectedHosts(hosts);
                 }}
                 onSearchHostName={value => {
