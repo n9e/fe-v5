@@ -3,7 +3,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-import { Select } from 'antd';
+import { Dropdown, Menu, Select, Tag } from 'antd';
+import { DownOutlined, PlusCircleOutlined } from '@ant-design/icons'
 import Comparison from './Comparison';
 import * as config from '../config';
 import { fetchAggrGroups } from '../api';
@@ -58,7 +59,6 @@ class GraphConfigInner extends Component {
         `${metric}{ident=~"${idents.join('|')}"}`
       ]
     }).then(res => {
-      console.log('res', res)
       this.setState({
         aggrGroups: res.data
       })
@@ -110,6 +110,52 @@ class GraphConfigInner extends Component {
   render() {
     const { data, onChange } = this.props;
     const { now, start, end, comparison } = data;
+    const handleAggrFuncClick = e => {
+      this.handleAggrFuncChange(e.key)
+    }
+    const aggrFuncMenu = (
+      <Menu onClick={handleAggrFuncClick} selectedKeys={[this.state.curAggrFunc]}>
+        <Menu.Item key='sum'>sum</Menu.Item>
+        <Menu.Item key='avg'>avg</Menu.Item>
+        <Menu.Item key='max'>max</Menu.Item>
+        <Menu.Item key='min'>min</Menu.Item>
+      </Menu>
+    )
+
+    const handleAggrGroupsClick = ag => {
+      const index = this.state.curAggrGroups.findIndex(cag => cag === ag.key)
+      let newCurAggrGroups
+      if (index === -1) {
+        newCurAggrGroups = [
+          ...this.state.curAggrGroups,
+          ag.key
+        ]
+        this.setState({
+          curAggrGroups: newCurAggrGroups
+        })
+      } else {
+        let curComparisonCopy = [...this.state.curAggrGroups]
+        curComparisonCopy.splice(index, 1)
+        newCurAggrGroups = curComparisonCopy
+        this.setState({
+          curAggrGroups: curComparisonCopy
+        })
+      }
+      this.handleAggrGroupsChange(newCurAggrGroups)
+    }
+
+    const aggrGroupsMenu = (
+      <Menu onClick={handleAggrGroupsClick} selectedKeys={[this.state.curAggrGroups]}>
+        {this.state.aggrGroups.map(ag => <Menu.Item key={ag}>{ag}</Menu.Item>)}
+      </Menu>
+    )
+
+    const handleDeleteAggrGroupClick = (ag) => {
+      let newCurAggrGroups = [...this.state.curAggrGroups]
+      let idx = newCurAggrGroups.findIndex(cag => cag === ag)
+      if (idx >= 0) newCurAggrGroups.splice(idx, 1)
+      this.handleAggrGroupsChange(newCurAggrGroups)
+    }
 
     return (
       <div className="graph-config-inner">
@@ -133,7 +179,7 @@ class GraphConfigInner extends Component {
         <div className="graph-config-inner-item">
           聚合函数
           ：
-          <Select
+          {/* <Select
             allowClear
             size="small"
             style={{ width: 80 }}
@@ -144,7 +190,12 @@ class GraphConfigInner extends Component {
             <Option value="avg">avg</Option>
             <Option value="max">max</Option>
             <Option value="min">min</Option>
-          </Select>
+          </Select> */}
+          <Dropdown overlay={aggrFuncMenu}>
+            <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+              {this.state.curAggrFunc} <DownOutlined />
+            </a>
+          </Dropdown>
         </div>
         {
           this.state.curAggrFunc ?
@@ -153,7 +204,7 @@ class GraphConfigInner extends Component {
                 聚合维度
                 ：
               </span>
-              <Select
+              {/* <Select
                 mode="multiple"
                 size="small"
                 style={{ minWidth: 60 }}
@@ -162,7 +213,19 @@ class GraphConfigInner extends Component {
                 onChange={this.handleAggrGroupsChange}
               >
                 {this.state.aggrGroups.map(ag => <Option key={ag} value={ag}>{ag}</Option>)}
-              </Select>
+              </Select> */}
+              {this.state.curAggrGroups.map(ag =>
+                <Tag key={ag} closable onClose={e => {
+                  handleDeleteAggrGroupClick(ag)
+                }}>
+                  {ag}
+                </Tag>
+              )}
+              <Dropdown overlay={aggrGroupsMenu} overlayStyle={{ maxHeight: 400, overflow: 'auto' }}>
+                <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+                  <PlusCircleOutlined />
+                </a>
+              </Dropdown>
             </div> : null
         }
       </div>

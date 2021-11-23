@@ -93,9 +93,16 @@ export const deleteFavoriteGroup = function (id: number) {
   });
 };
 
-export const getMetrics = function (data = {}) {
+export const getMetrics = function (params = {}) {
   return request(`/api/n9e/prometheus/api/v1/label/__name__/values`, {
     method: RequestMethod.Get,
+    params,
+  });
+};
+
+export const getMetricsDesc = function (data = []) {
+  return request(`/api/n9e/metrics/desc`, {
+    method: RequestMethod.Post,
     data,
   });
 };

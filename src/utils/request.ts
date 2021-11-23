@@ -40,7 +40,7 @@ request.interceptors.request.use((url, options) => {
 request.interceptors.response.use(
   async (response) => {
     const { status } = response;
-    
+
     if (status === 200) {
       return response
         .clone()
@@ -61,7 +61,7 @@ request.interceptors.response.use(
     if (status === 401) {
       localStorage.getItem('refresh_token')
         ? UpdateAccessToken().then((res) => {
-            console.log('401 err', res)
+            console.log('401 err', res);
             if (res.err) {
               location.href = `/login${location.pathname != '/' ? '?redirect=' + location.pathname : ''}`;
             } else {

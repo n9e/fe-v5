@@ -45,7 +45,6 @@ export default class Graph extends Component<GraphProps> {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log('componentWillReceiveProps yaxis', this.chart.options.yAxis, util.getYAxis(this.chart.options.yAxis, nextProps.graphConfig))
     if (this.chart) {
       const chartOptions = {
         yAxis: util.getYAxis(this.chart.options.yAxis, nextProps.graphConfig),
@@ -56,27 +55,29 @@ export default class Graph extends Component<GraphProps> {
     }
   }
 
-  genChartTooltipOptions (nextProps) {
-    const isFormatUnit1024 = nextProps.graphConfig.formatUnit === 1024 && nextProps.graphConfig.precision === 'short'
-    return isFormatUnit1024 ? {
-      xAxis: nextProps.graphConfig.xAxis,
-      shared: nextProps.graphConfig.shared,
-      sharedSortDirection: nextProps.graphConfig.sharedSortDirection,
-      formatter: (points) => {
-        return util.getTooltipsContent({
-          formatUnit: nextProps.graphConfig.formatUnit,
+  genChartTooltipOptions(nextProps) {
+    const isFormatUnit1024 = nextProps.graphConfig.formatUnit === 1024 && nextProps.graphConfig.precision === 'short';
+    return isFormatUnit1024
+      ? {
+          xAxis: nextProps.graphConfig.xAxis,
+          shared: nextProps.graphConfig.shared,
+          sharedSortDirection: nextProps.graphConfig.sharedSortDirection,
+          formatter: (points) => {
+            return util.getTooltipsContent({
+              formatUnit: nextProps.graphConfig.formatUnit,
+              precision: nextProps.graphConfig.precision,
+              series: this.props.series,
+              points,
+              chartWidth: this.graphWrapEle.offsetWidth - 40,
+            });
+          },
+        }
+      : {
+          xAxis: nextProps.graphConfig.xAxis,
+          shared: nextProps.graphConfig.shared,
+          sharedSortDirection: nextProps.graphConfig.sharedSortDirection,
           precision: nextProps.graphConfig.precision,
-          series: this.props.series,
-          points,
-          chartWidth: this.graphWrapEle.offsetWidth - 40
-        });
-      },
-    } : {
-      xAxis: nextProps.graphConfig.xAxis,
-      shared: nextProps.graphConfig.shared,
-      sharedSortDirection: nextProps.graphConfig.sharedSortDirection,
-      precision: nextProps.graphConfig.precision,
-    }
+        };
   }
 
   render() {

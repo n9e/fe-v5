@@ -187,7 +187,7 @@ export const lightTheme = EditorView.theme(
       },
     },
   },
-  { dark: false }
+  { dark: false },
 );
 
 export const darkTheme = EditorView.theme(
@@ -220,7 +220,7 @@ export const darkTheme = EditorView.theme(
       },
     },
   },
-  { dark: true }
+  { dark: true },
 );
 
 export const promqlHighlighter = HighlightStyle.define([

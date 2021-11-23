@@ -1,55 +1,71 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, InputNumber, Layout, Row, Col, Checkbox, Popover, Select } from 'antd';
-import { LineChartOutlined, SettingOutlined, SyncOutlined, CloseCircleOutlined, ShareAltOutlined } from '@ant-design/icons';
+import { LineChartOutlined, SyncOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import PageLayout from '@/components/pageLayout';
-import OrderSort from '@/components/OrderSort';
 import { useTranslation } from 'react-i18next';
 import HostSelect from './components/HostSelect';
 import MetricSelect from './components/MetricSelect';
 import DateRangePicker from '@/components/DateRangePicker';
 import { Range } from '@/components/DateRangePicker';
 import { getHosts } from '@/services';
-import { getMetrics } from '@/services/warning';
+import { getMetrics, getMetricsDesc } from '@/services/warning';
 import _ from 'lodash';
-import moment from 'moment';
 import './index.less';
 import Graph from '@/components/Graph';
 import Resolution from '@/components/Resolution';
-import * as config from '@/components/Graph/config';
-import * as graphUtil from '@/components/Graph/util';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/common';
+import { CommonStoreState } from '@/store/commonInterface';
 
 export default () => {
   const { t, i18n } = useTranslation();
   const [hosts, setHosts] = useState([]);
   const [selectedHosts, setSelectedHosts] = useState([]);
+  const { busiGroups, curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const [metrics, setMetrics] = useState([]);
+  const [metricDescs, setMetricDescs] = useState({});
   const [graphs, setGraphs] = useState<Array<any>>([]);
   const [step, setStep] = useState(15);
-  const [sharedSortDirection, setSharedSortDirection] = useState('desc');
-  const [formatUnit, setFormatUnit] = useState(1000);
   const [range, setRange] = useState<Range>({
     start: 0,
     end: 0,
   });
-
-  useEffect(() => {
-    getHosts().then((res) => {
-      console.log('res', res);
+  const getHostsRequest = () => {
+    return getHosts({
+      bgid: curBusiItem.id
+    }).then((res) => {
       const allHosts = res?.dat?.list || [];
       setHosts(allHosts);
-      setSelectedHosts(allHosts);
-      getMetrics().then((res) => {
-        setMetrics(res.data);
-      });
+      return allHosts
     });
-  }, []);
+  }
+
   useEffect(() => {
-    const newGraphs = graphs.map((graph) => ({
-      ...graph,
-      selectedHosts,
-    }));
-    setGraphs(newGraphs);
-  }, [selectedHosts.map((h: any) => h.ident).join('')]);
+    getHostsRequest().then(allHosts => {
+      getMetricsAndDesc(allHosts.slice(0, 10));
+    })
+  }, [])
+
+  useEffect(() => {
+    getHostsRequest()
+  }, [curBusiItem]);
+  const getMetricsAndDesc = (hosts) => {
+    const showHosts = hosts || selectedHosts
+    const hostsMatchParams = `ident=~"${showHosts.map((h: any) => h.ident).join('|')}"`
+    getMetrics({
+      match: [hostsMatchParams]
+    }).then((res) => {
+      setMetrics(res.data);
+      const newGraphs = graphs.map((graph) => ({
+        ...graph,
+        showHosts,
+      }));
+      setGraphs(newGraphs);
+      getMetricsDesc(res.data).then(res => {
+        setMetricDescs(res.dat)
+      })
+    });
+  };
   const handleRemoveGraphs = () => {
     setGraphs([]);
   };
@@ -63,7 +79,6 @@ export default () => {
               <HostSelect
                 allHosts={hosts}
                 changeSelectedHosts={(hosts) => {
-                  console.log('host select hosts', hosts);
                   setSelectedHosts(hosts);
                 }}
               />
@@ -71,17 +86,27 @@ export default () => {
             <Col span={12}>
               <MetricSelect
                 metrics={metrics}
+                metricDescs={metricDescs}
+                selectedMetrics={graphs.map(g => g.metric)}
                 handleMetricClick={(metric) => {
                   let newGraphs = [...graphs];
-                  newGraphs.push({
-                    step,
-                    range,
-                    selectedHosts,
-                    metric,
-                    ref: React.createRef(),
-                  });
+                  const alreadyHaveGraphIndex = newGraphs.findIndex(g => g.metric === metric)
+                  const orgGraph = newGraphs[alreadyHaveGraphIndex]
+                  if (alreadyHaveGraphIndex !== -1) {
+                    newGraphs.splice(alreadyHaveGraphIndex, 1)
+                    newGraphs.unshift(orgGraph)
+                  } else {
+                    newGraphs.unshift({
+                      step,
+                      range,
+                      selectedHosts,
+                      metric,
+                      ref: React.createRef(),
+                    });
+                  }
                   setGraphs(newGraphs);
                 }}
+                handleRefreshMetrics={getMetricsAndDesc}
               />
             </Col>
           </Row>
@@ -130,14 +155,14 @@ export default () => {
             return <div style={{ marginBottom: 10 }} key={i + o.metric}>
               <Graph ref={o.ref} data={{...o}} graphConfigInnerVisible={true} extraRender={graph => {
                 return [
-                  <span className="graph-operationbar-item" key="close">
+                  <Button type='link' size='small' onClick={(e) => e.preventDefault()}>
                     <CloseCircleOutlined onClick={_ => {
                       console.log('graphs', graphs)
                       const newGraphs = [...graphs]
                       newGraphs.splice(i, 1)
                       setGraphs(newGraphs)
                     }} />
-                  </span>
+                </Button>
                 ]
               }}></Graph>
             </div>

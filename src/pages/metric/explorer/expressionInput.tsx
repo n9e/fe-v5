@@ -11,7 +11,7 @@ import { highlightSelectionMatches } from '@codemirror/search';
 import { commentKeymap } from '@codemirror/comment';
 import { lintKeymap } from '@codemirror/lint';
 import { autocompletion, completionKeymap, CompletionContext, CompletionResult } from '@codemirror/autocomplete';
-import { baseTheme, promqlHighlighter } from './CMTheme';
+import { baseTheme, promqlHighlighter } from '@/components/PromqlEditor/CMTheme';
 
 import { CompleteStrategy, PromQLExtension } from 'codemirror-promql';
 import { newCompleteStrategy } from 'codemirror-promql/cjs/complete';
