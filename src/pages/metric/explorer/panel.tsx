@@ -192,7 +192,7 @@ const Panel: React.FC<PanelProps> = ({ metrics, options, onOptionsChanged, remov
       credentials: 'same-origin',
       signal: abortController.signal,
     })
-      .then((res) => {
+      .then((res: any) => {
         console.log('res-----', res);
         abortInFlightFetch.current = null;
         setIsLoading(false);
