@@ -375,7 +375,7 @@ function getLengendName(serie, comparisonOptions, locale = 'zh') {
   return { lname, sname };
 }
 
-function isEqualSeries(series, nextSeries) {
+export function isEqualSeries(series, nextSeries) {
   const pureSeries = _.map(series, (serie) => {
     return serie.id;
   });

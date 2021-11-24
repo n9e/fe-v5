@@ -5,13 +5,15 @@ import XAxis from './xAxis';
 import YAxis from './yAxis';
 import Tooltip from './tooltip';
 import Line from './line';
+import StackArea from './stackArea';
 import Zoom from './zoom';
 import Legend from './legend';
-import { TsGraphType, Options, EventPosition, Transform, Serie, SerieDataItem, XScales, YScales } from './interface';
+import { TsGraphType, Options, EventPosition, Transform, Serie, SerieDataItem, XScales, YScales, ChartType } from './interface';
 import { getTouchPosition } from './utils';
 import '../assets/style.less';
 
 export default class TsGraph {
+  baseSeries!: Serie[];
   options!: Options;
   container!: HTMLElement;
   frontContext!: CanvasRenderingContext2D;
@@ -23,16 +25,18 @@ export default class TsGraph {
   xScales!: XScales;
   yAxis!: YAxis;
   yScales!: YScales;
-  line!: Line;
+  chartContent!: Line | StackArea;
   legend!: Legend;
   tooltip!: Tooltip;
   zoom!: Zoom;
   transform!: Transform;
   constructor(userOptions: Options) {
     const defaultOptions = {
+      charType: ChartType.Line,
       ratio: window.devicePixelRatio || 1,
       xkey: 0,
       ykey: 1,
+      y0key: 2,
       timestamp: 'x',
       chart: {
         id: uniqueId('ts-graph-'),
@@ -96,6 +100,7 @@ export default class TsGraph {
       tooltip: {
         shared: true,
       },
+      baseSeries: [],
       series: [],
       legend: {
         align: 'center',
@@ -117,17 +122,17 @@ export default class TsGraph {
 
   init(options: Options) {
     const { chart } = options;
-
+    this.baseSeries = options.series;
     this.options = options;
     this.options.notDisplayedSeries = [];
     this.options.chart.containerWidth = chart.width;
     this.options.chart.containerHeight = chart.height;
     this.options.chart.width = chart.width - chart.marginLeft - chart.marginRight;
     this.options.chart.height = chart.height - chart.marginTop - chart.marginBottom;
+    this.options.chartType === ChartType.Line ? this.initLine() : this.initStackArea();
     this.createContainer();
     this.createCanvas();
     this.initEvent();
-    this.initLine();
     this.initLegend();
     this.initTooltip();
     this.initZoom();
@@ -148,7 +153,7 @@ export default class TsGraph {
   draw() {
     this.clearRect(this.backContext);
     this.yAxis.drawGridLine(this.yScales);
-    this.line.draw(this.xScales, this.yScales);
+    this.chartContent.draw(this.xScales, this.yScales);
     this.xAxis.draw(this.xScales);
     this.yAxis.draw(this.yScales);
     this.xAxis.drawPlotLines(this.xScales);
@@ -167,7 +172,7 @@ export default class TsGraph {
     }
     this.options = options;
     this.initSeries();
-    this.initLine();
+    this.options.chartType === ChartType.Line ? this.initLine() : this.initStackArea();
     this.initTooltip();
     this.initScales();
     // this.initScales(); // TODO: 更新偶尔会出现 colsePath 的情况，但是触发两次 initScales 就不会出现 closePath 情况
@@ -401,21 +406,57 @@ export default class TsGraph {
   }
 
   initSeries() {
-    const { fillNull, series, xkey, ykey, yAxis } = this.options;
+    const { chartType, fillNull, series, xkey, ykey, y0key: y0keyNum, yAxis } = this.options;
+
     let xmin = -Infinity;
     let xmax = Infinity;
     let ymin = yAxis.min;
     let ymax = yAxis.max;
 
     if (Array.isArray(series)) {
+      const y0key = Number(y0keyNum);
       const newSeries: Serie[] = [];
-      for (const serie of series) {
-        const data = Array.isArray(serie.data) ? serie.data : [];
+      const seriesArr = Object.values(series);
+      // 复制坐标点，以防影响源 series 对象中的数据
+      const clonedSeriesData = seriesArr.map((serie) => {
+        return JSON.parse(JSON.stringify(serie.data));
+      });
+      clonedSeriesData.forEach((serieData, i) => {
+        const data = [...(Array.isArray(serieData) ? serieData : [])];
         const newData: SerieDataItem[] = [];
         let flag = false; // 起始标记，后面有连续空值即丢掉
         let dataIdx;
         for (dataIdx = 0; dataIdx < data.length; dataIdx++) {
           const item = data[dataIdx];
+
+          if (chartType === ChartType.StackArea) {
+            // 当类型为堆叠图时，y0 和 y 分别代表该 serie 的下标和上标，需要对数据进行处理
+            // 第一条 serie，进行特殊处理
+            if (i === 0) {
+              // 设置第一条 serie 的下标为 0
+              item[y0key] = 0;
+              if (!item[y0key + 1]) {
+                // 保存默认的上标值
+                item[y0key + 1] = item[ykey];
+              } else {
+                // 这种情况表示在 series 列表中选中了某几条 series 进行展示，需要把第一条 serie 的上标值恢复为默认的上标值
+                item[ykey] = item[y0key + 1];
+              }
+            } else {
+              // 找到上一条 serie 该点的上标作为当前 serie 点的下标
+              const previousYValue = clonedSeriesData[i - 1][dataIdx][ykey];
+              item[y0key] = previousYValue;
+
+              // 将默认的上标值（未叠加）保存，用于之后判断上标值是否进行叠加
+              if (!item[y0key + 1]) {
+                item[y0key + 1] = item[ykey];
+              }
+
+              // 将 serie 的上标值进行叠加，获得实际需要的上标值
+              item[ykey] = previousYValue + item[y0key + 1];
+            }
+          }
+
           const x = item[xkey];
           const y = item[ykey];
 
@@ -456,12 +497,13 @@ export default class TsGraph {
           }
         }
         newSeries.push({
-          ...serie,
+          ...seriesArr[i],
           data: newData,
         });
-      }
+      });
       // TODO: 这里不能直接 set，应该保留用户的 options
-      this.options.series = newSeries;
+      // this.options.series = newSeries;
+      this.baseSeries = newSeries;
       this.options.xmin = xmin;
       this.options.xmax = xmax;
       this.options.ymin = ymin;
@@ -471,7 +513,11 @@ export default class TsGraph {
 
   initLine() {
     // TODO: 涉及重复实例导
-    this.line = new Line(this.options, this.backContext);
+    this.chartContent = new Line(Object.assign(this.options, { series: this.baseSeries }), this.backContext);
+  }
+
+  initStackArea() {
+    this.chartContent = new StackArea(Object.assign(this.options, { series: this.baseSeries }), this.backContext);
   }
 
   initTooltip() {
