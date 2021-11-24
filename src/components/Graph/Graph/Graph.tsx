@@ -29,7 +29,7 @@ export default class Graph extends Component<GraphProps> {
   private chart: D3Graph;
   componentDidMount() {
     const chartOptions = {
-      chartType: this.props.graphConfig.chartType ? this.props.graphType : ChartType.Line,
+      chartType: this.props.graphConfig.chartType || ChartType.Line,
       timestamp: 'x',
       chart: {
         height: this.props.height ? this.props.height : undefined,
@@ -56,7 +56,7 @@ export default class Graph extends Component<GraphProps> {
         yAxis: util.getYAxis(this.chart.options.yAxis, nextProps.graphConfig),
         tooltip: this.genChartTooltipOptions(nextProps),
         series: nextProps.series,
-        chartType: nextProps.graphConfig.chartType,
+        chartType: nextProps.graphConfig.chartType || ChartType.Line,
       };
       this.chart.update(chartOptions);
     }
