@@ -92,7 +92,6 @@ class Legend extends Component {
     const reg = new RegExp(filterVal, 'gi');
     const legendData = normalizeLegendData(series);
     return _.filter(legendData, (record) => {
-      console.log('record', record)
       return record.tags && record.tags.match(reg) || record.metricLabels && JSON.stringify(record.metricLabels).match(reg);
     });
   }
@@ -349,21 +348,23 @@ function getLegendNums(points) {
  */
 function getLengendName(serie, comparisonOptions, locale = 'zh') {
   const { tags, comparison, metricLabels } = serie;
-  let lname = tags;
+  let lname = '';
   let sname = '';
-  if (metricLabels) {
-    const labels = Object.keys(metricLabels).map(label => `${label}=${metricLabels[label]}`)
-    lname = lname ? `【${lname}】 ${labels}` : `${labels}`
-  }
+  let comparisonTxt = ''
+
+  const serieMetricLabels = serie?.metricLabels || {}
+  const metricName = serieMetricLabels.__name__
+  const labels = Object.keys(serieMetricLabels).filter(ml => ml !== '__name__').map(label => `${label}=${serieMetricLabels[label]}`)
+
   // display comparison
   if (comparison && typeof comparison === 'number') {
     const currentComparison = _.find(comparisonOptions, { value: `${comparison}000` });
     if (currentComparison && currentComparison.label) {
       const enText = _.get(_.find(comparisonOptions, { value: String(Number(comparison) * 1000) }), 'labelEn');
-      const postfix = locale === 'zh' ? `环比${currentComparison.label}` : `(${enText} ago)`;
-      lname += ` ${postfix}`;
+      comparisonTxt = locale === 'zh' ? `环比${currentComparison.label}` : `(${enText} ago)`;
     }
   }
+  lname = `${metricName || ''} ${comparisonTxt} {${labels}}`
   // shorten name
   if (lname.length > 80) {
     const leftStr = lname.substr(0, 40);
