@@ -25,9 +25,11 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, childr
   const history = useHistory();
   let { profile } = useSelector<AccountRootState, accountStoreState>((state) => state.account);
   const { clusters } = useSelector<CommonRootState, CommonStoreState>((state) => state.common);
+  console.log('clusters', clusters)
   const localCluster = localStorage.getItem('curCluster')
   const [curCluster, setCurCluster] = useState<string>(localCluster || clusters[0]);
-  if (!localCluster) {
+  if (!localCluster && clusters.length > 0) {
+    setCurCluster(clusters[0])
     localStorage.setItem('curCluster', clusters[0])
   }
 
