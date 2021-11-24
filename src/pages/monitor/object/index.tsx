@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Button, InputNumber, Layout, Row, Col, Checkbox, Popover, Select } from 'antd';
 import { LineChartOutlined, SyncOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import PageLayout from '@/components/pageLayout';
@@ -22,18 +22,25 @@ export default () => {
   const [hosts, setHosts] = useState([]);
   const [selectedHosts, setSelectedHosts] = useState([]);
   const { busiGroups, curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
+  const [busiGroup, setBusiGroup] = useState(curBusiItem)
   const [metrics, setMetrics] = useState([]);
   const [metricDescs, setMetricDescs] = useState({});
   const [graphs, setGraphs] = useState<Array<any>>([]);
   const [step, setStep] = useState(15);
+  const [queryHost, setQueryHost] = useState('');
+  const [curCluster, setCurCluster] = useState('');
   const [range, setRange] = useState<Range>({
     start: 0,
     end: 0,
   });
   const getHostsRequest = () => {
-    return getHosts({
-      bgid: curBusiItem.id
-    }).then((res) => {
+    const cluster = localStorage.getItem('curCluster')
+    let transportData = {
+      bgid: busiGroup.id,
+      query: queryHost,
+      clusters: cluster
+    }
+    return getHosts(transportData).then((res) => {
       const allHosts = res?.dat?.list || [];
       setHosts(allHosts);
       return allHosts
@@ -48,7 +55,7 @@ export default () => {
 
   useEffect(() => {
     getHostsRequest()
-  }, [curBusiItem]);
+  }, [busiGroup, queryHost, curCluster]);
   const getMetricsAndDesc = (hosts) => {
     const showHosts = hosts || selectedHosts
     const hostsMatchParams = `ident=~"${showHosts.map((h: any) => h.ident).join('|')}"`
@@ -69,17 +76,31 @@ export default () => {
   const handleRemoveGraphs = () => {
     setGraphs([]);
   };
+  const debouncedChangeHostName = useCallback(
+    _.debounce((v) => {
+      setQueryHost(v)
+    }, 1000),
+    [],
+  );
 
   return (
-    <PageLayout title={t('对象视角')} icon={<LineChartOutlined />}>
+    <PageLayout title={t('对象视角')} icon={<LineChartOutlined />} onChangeCluster={cluster => {
+      setCurCluster(cluster)
+    }}>
       <div className='object-view'>
         <Layout style={{ padding: 10 }}>
           <Row gutter={10}>
             <Col span={12}>
               <HostSelect
                 allHosts={hosts}
+                changeBusiGroup={(busiGroup) => {
+                  setBusiGroup(busiGroup)
+                }}
                 changeSelectedHosts={(hosts) => {
                   setSelectedHosts(hosts);
+                }}
+                onSearchHostName={value => {
+                  debouncedChangeHostName(value)
                 }}
               />
             </Col>
