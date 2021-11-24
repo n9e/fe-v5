@@ -64,27 +64,26 @@ export default class Graph extends Component<GraphProps> {
 
   genChartTooltipOptions(nextProps) {
     const isFormatUnit1024 = nextProps.graphConfig.formatUnit === 1024 && nextProps.graphConfig.precision === 'short';
-    return isFormatUnit1024
-      ? {
-          xAxis: nextProps.graphConfig.xAxis,
-          shared: nextProps.graphConfig.shared,
-          sharedSortDirection: nextProps.graphConfig.sharedSortDirection,
-          formatter: (points) => {
-            return util.getTooltipsContent({
-              formatUnit: nextProps.graphConfig.formatUnit,
-              precision: nextProps.graphConfig.precision,
-              series: this.props.series,
-              points,
-              chartWidth: this.graphWrapEle.offsetWidth - 40,
-            });
-          },
-        }
-      : {
-          xAxis: nextProps.graphConfig.xAxis,
-          shared: nextProps.graphConfig.shared,
-          sharedSortDirection: nextProps.graphConfig.sharedSortDirection,
+    let options = {
+      xAxis: nextProps.graphConfig.xAxis,
+      shared: nextProps.graphConfig.shared,
+      sharedSortDirection: nextProps.graphConfig.sharedSortDirection,
+      formatter: (points) => {
+        return util.getTooltipsContent({
+          formatUnit: nextProps.graphConfig.formatUnit,
           precision: nextProps.graphConfig.precision,
-        };
+          series: this.props.series,
+          points,
+          chartWidth: this.graphWrapEle.offsetWidth - 40,
+        });
+      },
+    }
+    if (isFormatUnit1024) {
+      Object.assign(options, {
+        precision: nextProps.graphConfig.precision
+      })
+    }
+    return options
   }
 
   render() {
