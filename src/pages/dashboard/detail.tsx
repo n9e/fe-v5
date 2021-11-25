@@ -10,8 +10,7 @@ import { Dashboard, Group } from '@/store/dashboardInterface';
 import ChartGroup, { Chart } from './chartGroup';
 import ChartConfigModal from './chartConfigModal';
 import RefreshIcon from '@/components/RefreshIcon';
-import VariableConfig from './VariableConfig';
-import { TagFilterResponse } from './VariableConfig/definition';
+import VariableConfig, { VariableType } from './VariableConfig';
 import './index.less';
 import { useTranslation } from 'react-i18next';
 import Resolution from '@/components/Resolution';
@@ -47,7 +46,7 @@ export default function DashboardDetail() {
   const [step, setStep] = useState(15);
   const [titleEditing, setTitleEditing] = useState(false);
   const [chartGroup, setChartGroup] = useState<Group[]>([]);
-  const [variableConfig, setVariableConfig] = useState<TagFilterResponse | null>(null);
+  const [variableConfig, setVariableConfig] = useState<VariableType | null>(null);
   const [groupModalVisible, setGroupModalVisible] = useState(false);
   const [chartModalVisible, setChartModalVisible] = useState(false);
   const [chartModalInitValue, setChartModalInitValue] = useState<Chart | null>();
@@ -62,11 +61,11 @@ export default function DashboardDetail() {
   const init = () => {
     getSingleDashboard(busiId, id).then((res) => {
       setDashboard(res.dat);
-
-      // if (res.dat.configs) {
-      //   setVariableConfig(JSON.parse(res.dat.configs));
-      //   variableRef.current && variableRef.current.setInitData(res.dat.configs);
-      // }
+      if (res.dat.configs) {
+        const configs = JSON.parse(res.dat.configs);
+        setVariableConfig(configs);
+        variableRef.current && variableRef.current.setInitData(configs);
+      }
     });
     getChartGroup(busiId, id).then((res) => {
       let arr = res.dat || [];
@@ -179,7 +178,7 @@ export default function DashboardDetail() {
   };
 
   const handleVariableChange = (value) => {
-    // updateSingleDashboard(id, { ...dashboard, configs: JSON.stringify(value) });
+    updateSingleDashboard(busiId, id, { ...dashboard, configs: JSON.stringify(value) });
     setVariableConfig(value);
   };
 
