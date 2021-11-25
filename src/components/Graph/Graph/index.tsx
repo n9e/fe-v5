@@ -13,9 +13,10 @@ import GraphChart from './Graph';
 import { Range, formatPickerDate } from '@/components/DateRangePicker';
 import { SetTmpChartData } from '@/services/metric';
 import { ChartType } from '@/components/D3Charts/src/interface';
+import { QueryStats } from '@/pages/metric/explorer/QueryStatsView';
 
 export interface GraphDataProps {
-  step: number;
+  step: number | null;
   range: Range;
   legend?: boolean;
   title?: string;
@@ -51,6 +52,7 @@ interface GraphProps {
     formatUnit?: 1024 | 1000;
   };
   onErrorOccured?: (errorArr: ErrorInfoType[]) => void;
+  onRequestCompleted?: (requestInfo: QueryStats) => void;
 }
 
 interface GraphState {
@@ -71,6 +73,7 @@ interface GraphState {
     formatUnit: 1024 | 1000;
   };
   onErrorOccured?: (errorArr: ErrorInfoType[]) => void;
+  onRequestCompleted?: (requestInfo: QueryStats) => void;
 }
 
 const { Option } = Select;
@@ -99,6 +102,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
         formatUnit: this.props.highLevelConfig?.formatUnit || 1024,
       },
       onErrorOccured: this.props.onErrorOccured,
+      onRequestCompleted: this.props.onRequestCompleted,
     };
   }
 
@@ -106,15 +110,15 @@ export default class Graph extends Component<GraphProps, GraphState> {
     this.updateAllGraphs(this.state.aggrFunc, this.state.aggrGroups, this.state.offsets);
   }
 
-  componentDidUpdate(prevProps) {
+  componentWillReceiveProps(nextProps) {
     // 兼容及时查询页面操作图标属性
     // 接受外部format，legend，multi等属性并更新视图
-    if (typeof prevProps.highLevelConfig === 'object') {
+    if (typeof nextProps.highLevelConfig === 'object') {
       let showUpdate = false;
       const updateObj = Object.assign({}, this.state.highLevelConfig);
       for (let key of Object.keys(updateObj)) {
-        if (updateObj[key] !== prevProps.highLevelConfig[key]) {
-          updateObj[key] = prevProps.highLevelConfig[key];
+        if (updateObj[key] !== nextProps.highLevelConfig[key]) {
+          updateObj[key] = nextProps.highLevelConfig[key];
           showUpdate = true;
         }
       }
@@ -124,13 +128,16 @@ export default class Graph extends Component<GraphProps, GraphState> {
         });
       }
     }
+  }
+
+  componentDidUpdate(prevProps) {
     if (this.props.data.legend !== undefined && this.props.data.legend !== this.state.legend) {
       this.setState({ legend: this.props.data.legend });
     }
     const oldHosts = (prevProps.data.selectedHosts || []).map((h) => h.ident);
     const newHosts = (this.props.data.selectedHosts || []).map((h) => h.ident);
     const isHostsChanged = !_.isEqual(oldHosts, newHosts);
-    if (isHostsChanged || prevProps.data !== this.props.data) {
+    if (isHostsChanged || !_.isEqualWith(prevProps.data, this.props.data)) {
       this.updateAllGraphs(this.state.aggrFunc, this.state.aggrGroups, this.state.offsets);
     }
   }
@@ -139,7 +146,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
     this.chart && this.chart.destroy();
   }
 
-  afterFetchChartDataOperations(allResponseData) {
+  afterFetchChartDataOperations(allResponseData, queryStart, step) {
     const errorSeries: ErrorInfoType[] = [];
     const { offsets, series: previousSeries, legendHighlightedKeys } = this.state;
     const rawSeries = allResponseData.reduce((acc, cur, idx) => {
@@ -160,11 +167,20 @@ export default class Graph extends Component<GraphProps, GraphState> {
     const series = util.normalizeSeries(rawSeries);
     const isEqualSeriesResult = isEqualSeries(previousSeries, series);
     this.setState(Object.assign({ spinning: false, series, chartShowSeries: series, legendHighlightedKeys: isEqualSeriesResult ? legendHighlightedKeys : [] }));
-    // 如果数据相同，同步图表展示内容
+    // 如果数据源相同，同步图表展示内容
     if (isEqualSeriesResult) {
       this.handleLegendRowSelectedChange('normal', this.state.legendHighlightedKeys);
     }
+
+    // 回显错误信息和请求结果信息，即时查询页需要
     this.state.onErrorOccured && this.state.onErrorOccured(errorSeries);
+    !errorSeries.length &&
+      this.state.onRequestCompleted &&
+      this.state.onRequestCompleted({
+        loadTime: Date.now() - queryStart,
+        resolution: step,
+        resultSeries: series.length,
+      });
   }
 
   getGraphConfig(graphConfig) {
@@ -194,13 +210,8 @@ export default class Graph extends Component<GraphProps, GraphState> {
     }
   }
 
-  fetchData(query) {
+  fetchData(query, { start, end, step }) {
     this.setState({ spinning: true });
-
-    const {
-      data: { range, step },
-    } = this.props;
-    const { start, end } = formatPickerDate(range);
     try {
       return api.fetchHistory({
         start,
@@ -229,7 +240,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
         ...serie,
         visible: getSerieVisible(serie, selectedKeys),
         zIndex: getSerieIndex(serie, highlightedKeys, series.length, i),
-        color: curChartType === ChartType.Line ? getSerieColor(serie, highlightedKeys, oldColor) : oldColor,
+        color: curChartType === ChartType.StackArea ? oldColor : getSerieColor(serie, highlightedKeys, oldColor),
         oldColor,
       };
     });
@@ -270,16 +281,11 @@ export default class Graph extends Component<GraphProps, GraphState> {
     const { errorText, chartShowSeries } = this.state;
     const { height, data } = this.props;
     const graphConfig = this.getGraphConfig(data);
-    const chartType = _.get(data, 'chartTypeOptions.chartType') || 'line';
 
     if (errorText) {
       return <div className='graph-errorText'>{errorText}</div>;
     }
-    if (chartType === 'line') {
-      return <GraphChart graphConfig={graphConfig} series={chartShowSeries} style={{ minHeight: '65%' }} />;
-      // return <GraphChart graphConfig={graphConfig} height={height} series={series} />;
-    }
-    return null;
+    return <GraphChart graphConfig={graphConfig} series={chartShowSeries} style={{ minHeight: '65%' }} />;
   }
 
   updateGraphConfig(changeObj) {
@@ -291,10 +297,16 @@ export default class Graph extends Component<GraphProps, GraphState> {
   }
 
   updateAllGraphs(aggrFunc, aggrGroups, offsets) {
-    const { promqls } = this.props.data;
+    const queryStart = Date.now();
+    let { promqls, range, step } = this.props.data;
+    const { start, end } = formatPickerDate(range);
+    // 如果没有 step(resolution)，计算一个默认的 step 值
+    if (!step) step = Math.max(Math.floor((end - start) / 250), 1);
+
     let obj: { curAggrFunc?: string; curAggrGroup?: string[]; offset?: string[] } = {};
     if (aggrFunc) obj.curAggrFunc = aggrFunc;
     if (aggrGroups && aggrGroups.length > 0) obj.curAggrGroup = aggrGroups;
+
     if (promqls) {
       // 取查询语句的正确值，并去掉查询条件为空的语句
       const formattedPromqls = promqls
@@ -303,10 +315,12 @@ export default class Graph extends Component<GraphProps, GraphState> {
         })
         .filter((promql) => promql);
 
-      const noOffsetPromise = formattedPromqls.map((query) => this.fetchData(query));
-      Promise.all([...noOffsetPromise]).then((res) => {
-        this.afterFetchChartDataOperations(res);
-      });
+      if (formattedPromqls.length) {
+        const noOffsetPromise = formattedPromqls.map((query) => this.fetchData(query, { start, end, step }));
+        Promise.all([...noOffsetPromise]).then((res) => {
+          this.afterFetchChartDataOperations(res, queryStart, step);
+        });
+      }
     } else {
       const queryNoOffset = this.generateQuery(obj);
       // 如果有环比，再单独请求
@@ -314,10 +328,10 @@ export default class Graph extends Component<GraphProps, GraphState> {
       if (offsets) {
         queries = offsets.map((offset) => this.generateQuery({ ...obj, offset }));
       }
-      const seriesPromises = queries.map((query) => this.fetchData(query));
-      const noOffsetPromise = this.fetchData(queryNoOffset);
+      const seriesPromises = queries.map((query) => this.fetchData(query, { start, end, step }));
+      const noOffsetPromise = this.fetchData(queryNoOffset, { start, end, step });
       Promise.all([...seriesPromises, noOffsetPromise]).then((res) => {
-        this.afterFetchChartDataOperations(res);
+        this.afterFetchChartDataOperations(res, queryStart, step);
       });
     }
   }
