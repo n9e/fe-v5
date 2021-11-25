@@ -23,7 +23,7 @@ interface Props {
   busiId: string;
   groupInfo: Group;
   range: Range;
-  step: number;
+  step: number | null;
   variableConfig: TagFilterResponse | null;
   onAddChart: (data: number) => void;
   onUpdateChart: (group: Group, data: Chart) => void;

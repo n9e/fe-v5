@@ -44,7 +44,7 @@ export default function DashboardDetail() {
     update_at: 0,
     update_by: '',
   });
-  const [step, setStep] = useState(15);
+  const [step, setStep] = useState<number | null>(null);
   const [titleEditing, setTitleEditing] = useState(false);
   const [chartGroup, setChartGroup] = useState<Group[]>([]);
   const [variableConfig, setVariableConfig] = useState<TagFilterResponse | null>(null);
