@@ -3,7 +3,7 @@ import { sortBy } from 'lodash';
 import { getColor } from './utils';
 import { Options, Serie, SerieDataItem, XScales, YScales } from './interface';
 
-export default class Line {
+export default class StackArea {
   options: Options;
   ctx: CanvasRenderingContext2D;
   constructor(userOptions: Options, ctx: CanvasRenderingContext2D) {
