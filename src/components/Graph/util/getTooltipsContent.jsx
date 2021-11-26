@@ -18,31 +18,46 @@ export default function getTooltipsContent(activeTooltipData) {
   let tooltipContent = '';
 
   tooltipContent += getHeaderStr(activeTooltipData);
-
+  const isSinglePoint = points.length === 1;
   _.each(points, (point, index) => {
-    tooltipContent += singlePoint(point, series[index], formatUnit, precision);
+    tooltipContent += renderPointContent(isSinglePoint, point, series[index], formatUnit, precision);
   });
 
   return `<div style="table-layout: fixed;max-width: ${tooltipWidth}px;word-wrap: break-word;white-space: normal;">${tooltipContent}</div>`;
 }
 
-function singlePoint(pointData = {}, serie = {}, formatUnit, precision) {
+function renderPointContent(isSingle, pointData = {}, serie = {}, formatUnit, precision) {
   const { color, filledNull, serieOptions = {}, timestamp } = pointData;
   const value = pointData.value;
   let comparison = '';
-  if (serie.comparison) {
-    comparison += ` offset ${serie.comparison}`
+  if (serieOptions.comparison) {
+    comparison += ` offset ${serieOptions.comparison}`;
   }
 
-  const serieMetricLabels = serie?.metricLabels || {}
-  const metricName = serieMetricLabels.__name__
-  const labels = Object.keys(serieMetricLabels).filter(ml => ml !== '__name__').map(label => `<span>${label}=${serieMetricLabels[label]}</span>`)
+  const serieMetricLabels = serieOptions?.metricLabels || {};
+  const metricName = serieMetricLabels.__name__ || '';
+  const labelKeys = Object.keys(serieMetricLabels).filter((ml) => ml !== '__name__');
 
-  return (
-    `<span style="color:${color}">● </span>
-    ${metricName || ''} ${comparison} {${labels}}：<strong>${value > 1000 ? sizeFormatter(value) : value.toFixed(2)}${filledNull ? '(空值填补,仅限看图使用)' : ''}</strong>
-    <br/>`
-  );
+  const renderMultiSeriesPointContent = () => {
+    const labelContents = labelKeys.map((label) => `<span>${label}=${serieMetricLabels[label]}</span>`);
+    return `<span style="color:${color}">● </span>
+      ${metricName} ${comparison} {${labelContents}}：<strong>${value > 1000 ? sizeFormatter(value) : value.toFixed(2)}${filledNull ? '(空值填补,仅限看图使用)' : ''}</strong>
+      <br/>`;
+  };
+
+  const renderSingleSeriesPointContent = () => {
+    const labelContents = labelKeys.map((label) => `<div><strong>${label}</strong>: ${serieMetricLabels[label]}</div>`);
+    return `<span style="color:${color}">● </span>
+      ${metricName} ${comparison}${metricName || comparison ? ': ' : ''}<strong>${value > 1000 ? sizeFormatter(value) : value.toFixed(2)}${
+      filledNull ? '(空值填补,仅限看图使用)' : ''
+    }</strong>
+      <div /><br />
+      <div><strong>Series:</strong></div>
+      ${metricName ? `<div><strong>${metricName}</strong></div>` : ''}
+      ${labelContents.join('')}`;
+  };
+
+  return isSingle ? renderSingleSeriesPointContent() : renderMultiSeriesPointContent();
 }
 
 function getHeaderStr(activeTooltipData) {
@@ -52,39 +67,39 @@ function getHeaderStr(activeTooltipData) {
   return headerStr;
 }
 
-function sizeFormatter (val, fixedCount = 2, {
-  withUnit = true,
-  withByte = true,
-  trimZero = false,
-} = {
-  withUnit: true,
-  withByte: true,
-  trimZero: false
-}) {
-  const size = val ? Number(val) : 0
-  let result
-  let unit = ''
+function sizeFormatter(
+  val,
+  fixedCount = 2,
+  { withUnit = true, withByte = true, trimZero = false } = {
+    withUnit: true,
+    withByte: true,
+    trimZero: false,
+  },
+) {
+  const size = val ? Number(val) : 0;
+  let result;
+  let unit = '';
 
   if (size < 0) {
-    result = 0
+    result = 0;
   } else if (size < 1024) {
-    result = size.toFixed(fixedCount)
+    result = size.toFixed(fixedCount);
   } else if (size < 1024 * 1024) {
-    result = (size / 1024).toFixed(fixedCount)
-    unit = 'K'
+    result = (size / 1024).toFixed(fixedCount);
+    unit = 'K';
   } else if (size < 1024 * 1024 * 1024) {
-    result = (size / 1024 / 1024).toFixed(fixedCount)
-    unit = 'M'
+    result = (size / 1024 / 1024).toFixed(fixedCount);
+    unit = 'M';
   } else if (size < 1024 * 1024 * 1024 * 1024) {
-    result = (size / 1024 / 1024 / 1024).toFixed(fixedCount)
-    unit = 'G'
+    result = (size / 1024 / 1024 / 1024).toFixed(fixedCount);
+    unit = 'G';
   } else if (size < 1024 * 1024 * 1024 * 1024 * 1024) {
-    result = (size / 1024 / 1024 / 1024 / 1024).toFixed(fixedCount)
-    unit = 'T'
+    result = (size / 1024 / 1024 / 1024 / 1024).toFixed(fixedCount);
+    unit = 'T';
   }
 
-  trimZero && (result = parseFloat(result))
-  withUnit && (result = `${result}${unit}`)
-  withByte && (result = `${result}B`)
-  return result
+  trimZero && (result = parseFloat(result));
+  withUnit && (result = `${result}${unit}`);
+  withByte && (result = `${result}B`);
+  return result;
 }

@@ -8,6 +8,7 @@ import _ from 'lodash';
 import * as util from '../util';
 import { AnyARecord } from 'dns';
 import './index.less';
+import { ChartType } from '@/components/D3Charts/src/interface';
 
 interface GraphProps {
   height?: number;
@@ -18,6 +19,7 @@ interface GraphProps {
     comparison: any;
     sharedSortDirection: string;
     precision: string;
+    chartType?: ChartType;
   };
   series: object[];
 }
@@ -27,6 +29,7 @@ export default class Graph extends Component<GraphProps> {
   private chart: D3Graph;
   componentDidMount() {
     const chartOptions = {
+      chartType: this.props.graphConfig.chartType || ChartType.Line,
       timestamp: 'x',
       chart: {
         height: this.props.height ? this.props.height : undefined,
@@ -53,6 +56,7 @@ export default class Graph extends Component<GraphProps> {
         yAxis: util.getYAxis(this.chart.options.yAxis, nextProps.graphConfig),
         tooltip: this.genChartTooltipOptions(nextProps),
         series: nextProps.series,
+        chartType: nextProps.graphConfig.chartType || ChartType.Line,
       };
       this.chart.update(chartOptions);
     }

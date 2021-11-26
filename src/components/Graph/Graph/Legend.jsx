@@ -92,7 +92,7 @@ class Legend extends Component {
     const reg = new RegExp(filterVal, 'gi');
     const legendData = normalizeLegendData(series);
     return _.filter(legendData, (record) => {
-      return record.tags && record.tags.match(reg) || record.metricLabels && JSON.stringify(record.metricLabels).match(reg);
+      return (record.tags && record.tags.match(reg)) || (record.metricLabels && JSON.stringify(record.metricLabels).match(reg));
     });
   }
 
@@ -123,16 +123,10 @@ class Legend extends Component {
         filterDropdownVisible: this.state.filterDropdownVisible,
         onFilterDropdownVisibleChange: (visible) => this.setState({ filterDropdownVisible: visible }),
         render: (text, record) => {
-          const { sname, lname } = getLengendName(record, comparisonOptions);
-          const titleContent = lname
-            .replaceAll(',', '\n')
-            .replace(' __', '\n__')
-            .split('\n')
-            .map((substr) => <div>{substr}</div>);
+          const { legendName, titleName } = getLengendName(record, comparisonOptions);
           return (
-            <Tooltip title={titleContent} getPopupContainer={() => document.body}>
+            <Tooltip title={titleName} getPopupContainer={() => document.body}>
               <span
-                title={lname}
                 onClick={() => this.handleClickCounter(record)}
                 onContextMenu={(e) => this.handleContextMenu(e, text)}
                 style={{
@@ -142,7 +136,7 @@ class Legend extends Component {
                 }}
               >
                 <span style={{ color: record.color }}>● </span>
-                {sname}
+                {legendName}
               </span>
             </Tooltip>
           );
@@ -241,9 +235,7 @@ class Legend extends Component {
       >
         <Table
           className='auto-scroll-y'
-          rowKey={(record) => {
-            return `${record.id}${record.comparison}`;
-          }}
+          rowKey={({id, comparison}) => `${id}${comparison}`}
           size='middle'
           rowSelection={false}
           columns={columns}
@@ -348,35 +340,32 @@ function getLegendNums(points) {
  */
 function getLengendName(serie, comparisonOptions, locale = 'zh') {
   const { tags, comparison, metricLabels } = serie;
-  let lname = '';
-  let sname = '';
-  let comparisonTxt = ''
+  let legendName = '', titleName = '';
 
-  const serieMetricLabels = serie?.metricLabels || {}
-  const metricName = serieMetricLabels.__name__
-  const labels = Object.keys(serieMetricLabels).filter(ml => ml !== '__name__').map(label => `${label}=${serieMetricLabels[label]}`)
+  const serieMetricLabels = serie?.metricLabels || {};
+  const metricName = serieMetricLabels.__name__;
+  const labels = Object.keys(serieMetricLabels)
+    .filter((ml) => ml !== '__name__')
+    .map((label) => `${label}=${serieMetricLabels[label]}`);
 
   // display comparison
-  if (comparison && typeof comparison === 'number') {
-    const currentComparison = _.find(comparisonOptions, { value: `${comparison}000` });
-    if (currentComparison && currentComparison.label) {
-      const enText = _.get(_.find(comparisonOptions, { value: String(Number(comparison) * 1000) }), 'labelEn');
-      comparisonTxt = locale === 'zh' ? `环比${currentComparison.label}` : `(${enText} ago)`;
-    }
-  }
-  lname = `${metricName || ''} ${comparisonTxt} {${labels}}`
-  // shorten name
-  if (lname.length > 80) {
-    const leftStr = lname.substr(0, 40);
-    const rightStr = lname.substr(-40);
-    sname = `${leftStr}......${rightStr}`;
-  } else {
-    sname = lname;
-  }
-  return { lname, sname };
+  // if (comparison && typeof comparison === 'number') {
+  //   const currentComparison = _.find(comparisonOptions, { value: `${comparison}000` });
+  //   if (currentComparison && currentComparison.label) {
+  //     const enText = _.get(_.find(comparisonOptions, { value: String(Number(comparison) * 1000) }), 'labelEn');
+  //     comparisonTxt = locale === 'zh' ? `环比${currentComparison.label}` : `(${enText} ago)`;
+  //   }
+  // }
+  legendName = `${metricName || ''} ${comparison ? `offset ${comparison}` : ''} {${labels}}`;
+  titleName = <div>
+    <div>{metricName} {comparison ? `offset ${comparison}` : ''}</div>
+    {labels.map(label => <div>{label}</div>)}
+  </div>;
+
+  return { legendName, titleName };
 }
 
-function isEqualSeries(series, nextSeries) {
+export function isEqualSeries(series, nextSeries) {
   const pureSeries = _.map(series, (serie) => {
     return serie.id;
   });

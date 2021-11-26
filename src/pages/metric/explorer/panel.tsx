@@ -1,5 +1,5 @@
-import { AreaChartOutlined, CloseCircleOutlined, LineChartOutlined } from '@ant-design/icons';
-import { Tabs, List, DatePicker, Radio, Button, Checkbox, Select, Alert } from 'antd';
+import { AreaChartOutlined, CloseCircleOutlined, DownOutlined, LineChartOutlined } from '@ant-design/icons';
+import { Tabs, List, DatePicker, Radio, Button, Checkbox, Select, Alert, Dropdown, Menu } from 'antd';
 import moment, { Moment } from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import ExpressionInput from './expressionInput';
@@ -9,20 +9,20 @@ import Resolution from '@/components/Resolution';
 import { Range, RelativeRange, AbsoluteRange } from '@/components/DateRangePicker';
 import Graph from '@/components/Graph';
 import { ErrorInfoType } from '@/components/Graph/Graph';
+import { ChartType } from '@/components/D3Charts/src/interface';
+import QueryStatsView, { QueryStats } from './QueryStatsView';
 
 interface PanelProps {
-  options: PanelOptions;
   metrics: string[];
-  onOptionsChanged(opts: PanelOptions): void;
   removePanel: () => void;
 }
 
 export interface PanelOptions {
   expr: string;
   type: PanelType;
-  range: number; // Range in milliseconds.
-  endTime: number | null; // Timestamp in milliseconds.
-  resolution: number; // Resolution in seconds.
+  range: number; // 单位为毫秒
+  endTime: number | null; // 单位为毫秒
+  resolution: number | null;
   stacked: boolean;
   showExemplars: boolean;
 }
@@ -32,139 +32,169 @@ export enum PanelType {
   Table = 'table',
 }
 
-enum ChartType {
-  Line = 'line',
-  Area = 'area',
-}
-
 interface VectorDataType {
   resultType: 'vector';
   result: {
-    metric: ResDataMetricType;
+    metric: {
+      instance: string;
+      job: string;
+      quantile: string;
+      __name__: string;
+    };
     value: [number, string];
   }[];
 }
 
-interface MatrixDataType {
-  resultType: 'matrix';
-  result: {
-    metric: ResDataMetricType;
-    values: [number, string][];
-  }[];
-}
+const { TabPane } = Tabs;
+const { Option } = Select;
 
-interface ResDataMetricType {
-  instance: string;
-  job: string;
-  quantile: string;
-  __name__: string;
-}
-
-export const PanelDefaultOptions: PanelOptions = {
+export const panelDefaultOptions: PanelOptions = {
   type: PanelType.Table,
   expr: '',
-  range: 5 * 60 * 1000,
+  range: 60 * 60 * 1000,
   endTime: null,
-  resolution: 15,
+  resolution: null,
   stacked: false,
   showExemplars: false,
 };
 
-const { TabPane } = Tabs;
-const { Option } = Select;
+// 格式化 Table 列表数据
+function getListItemContent(metrics) {
+  const metricName = metrics.__name__;
+  const labels = Object.keys(metrics)
+    .filter((ml) => ml !== '__name__')
+    .map((label, i, labels) => (
+      <span>
+        <span className='bold-text'>{label}</span>="{metrics[label]}"{i === labels.length - 1 ? '' : ', '}
+      </span>
+    ));
+  return (
+    <>
+      {metricName}
+      {'{'}
+      {labels}
+      {'}'}
+    </>
+  );
+}
 
-const Panel: React.FC<PanelProps> = ({ metrics, options, onOptionsChanged, removePanel }) => {
-  // const Panel = (metrics, options, onOptionsChanged, removePanel) => {
-  const graphRef = useRef(null);
+const Panel: React.FC<PanelProps> = ({ metrics, removePanel }) => {
+  const curPanelTab = useRef<PanelType>(PanelType.Table);
   const inputValue = useRef('');
   const lastEndTime = useRef<number | null>(null);
-  const optionsRecord = useRef(options);
   const abortInFlightFetch = useRef<(() => void) | null>(null);
-  const [vectorData, setVectorData] = useState<VectorDataType | null>(null);
+
+  // 公共状态
+  const [queryStats, setQueryStats] = useState<QueryStats | null>(null);
   const [chartType, setChartType] = useState<ChartType>(ChartType.Line);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [optionsRecord, setOptionsRecord] = useState<PanelOptions>(panelDefaultOptions);
   const [errorContent, setErrorContent] = useState<string>('');
+  // Table 相关状态
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [vectorData, setVectorData] = useState<VectorDataType | null>(null);
+  // Graph 相关状态
   const [dateRangePickerValue, setDateRangePickerValue] = useState<Range>({ num: 1, unit: 'hour', description: 'hour' });
   const [isMultiSeries, setIsMultiSeries] = useState<boolean>(true);
   const [seriesOrderType, setSeriesOrderType] = useState<'desc' | 'asc'>('desc');
+  const [graphRangeData, setGraphRangeData] = useState({
+    start: (getEndTime() - optionsRecord.range) / 1000,
+    end: getEndTime() / 1000,
+  });
 
+  // 更新输入框表达式内容
   function handleExpressionChange(value: string) {
     inputValue.current = value;
   }
 
   function handleTabChange(type: PanelType) {
-    if (options.type !== type) {
-      if (type === PanelType.Graph && lastEndTime.current !== optionsRecord.current.endTime) {
-        if (optionsRecord.current.endTime === null) {
+    if (optionsRecord.type !== type) {
+      // 同步 Table 页时间戳和 Graph 时间选择组件的时间
+      if (type === PanelType.Graph && lastEndTime.current !== optionsRecord.endTime) {
+        if (optionsRecord.endTime === null) {
           setDateRangePickerValue({ num: 1, unit: 'hour', description: 'hour' });
         } else {
           setDateRangePickerValue({
-            start: optionsRecord.current.endTime - 60 * 60 * 1000,
-            end: optionsRecord.current.endTime,
+            start: optionsRecord.endTime - 60 * 60 * 1000,
+            end: optionsRecord.endTime,
           });
         }
       } else {
-        lastEndTime.current = optionsRecord.current.endTime;
+        lastEndTime.current = optionsRecord.endTime;
       }
-      optionsRecord.current.type = type;
+
+      curPanelTab.current = type;
       setOptions({ type });
+      setQueryStats(null);
     }
   }
 
-  function getEndTime(): number {
-    return options.endTime === null ? moment().valueOf() : options.endTime;
+  // 获取请求的结束时间戳
+  function getEndTime(endTime = optionsRecord.endTime): number {
+    return endTime === null ? moment().valueOf() : endTime;
   }
 
-  function handleChangeEndTime(endTime: Moment | null): void {
+  // 更新时间戳
+  function handleTimestampChange(endTime: Moment | null): void {
     setOptions({ endTime: endTime ? endTime?.valueOf() : null });
   }
 
-  function handleDateChange(e: Range) {
-    const { start, end } = formatPickerDate(e);
-    setOptions({
-      endTime: e.hasOwnProperty('unit') ? null : end * 1000,
-      range: (end - start) * 1000,
+  function setOptions(opts: Partial<PanelOptions>): void {
+    let newOptionsRecord = { ...optionsRecord, ...opts };
+    setOptionsRecord((optionsRecord) => {
+      newOptionsRecord = { ...optionsRecord, ...opts };
+      return newOptionsRecord;
+    });
+    setGraphRangeData({
+      start: (getEndTime(newOptionsRecord.endTime) - newOptionsRecord.range) / 1000,
+      end: getEndTime(newOptionsRecord.endTime) / 1000,
     });
   }
 
-  function handleStepChange(v: number) {
-    setOptions({ resolution: v });
+  // 图表选中时间改变，触发更新
+  function handleGraphDateChange(e: Range) {
+    const { start, end } = formatPickerDate(e);
+    const endTime = e.hasOwnProperty('unit') ? null : end;
+    const range = e.hasOwnProperty('unit') ? (end - start) * 1000 : end - start;
+    if (endTime !== optionsRecord.endTime || range !== optionsRecord.range) {
+      executeQuery(true, {
+        endTime,
+        range,
+      });
+    }
   }
 
-  function setOptions(opts: Partial<PanelOptions>): void {
-    const newOpts = { ...optionsRecord.current, ...opts };
-    optionsRecord.current = newOpts;
-    onOptionsChanged(newOpts);
+  // 更新图表请求的范围参数
+  function refreshGraphRangeData() {
+    setGraphRangeData({
+      start: (getEndTime() - optionsRecord.range) / 1000,
+      end: getEndTime() / 1000,
+    });
   }
 
-  function onErrorOccured(errorArr: ErrorInfoType[]) {
-    if (errorArr.length) {
-      const errInfo = errorArr[0].error;
-      setErrorContent(errInfo);
-    } else {
-      setErrorContent('');
+  // 图表请求完成，回填请求信息
+  function onGraphRequestCompleted(newQueryStats: QueryStats) {
+    if (curPanelTab.current === PanelType.Graph) {
+      setQueryStats(newQueryStats);
     }
   }
 
   // 该函数传入输入框组件，只被初始化一次，注意产生的 props 和 state 不同步问题
-  function executeQuery(isExecute: boolean = true) {
-    if (!isExecute) return;
+  function executeQuery(isExecute: boolean = true, grpahExtraData = {}) {
     const expr = inputValue.current;
+    if (!isExecute || expr === '') return;
 
-    // 图标模式下直接调用图标组件的刷新方法
-    if (optionsRecord.current.type === PanelType.Graph) {
-      setOptions({ expr });
+    // 图标模式下直接调用图表组件的刷新方法
+    if (curPanelTab.current === PanelType.Graph) {
+      setQueryStats(null);
+      setOptions(Object.assign({ expr }, grpahExtraData));
       return;
     }
     // 存储查询历史
     // this.props.onExecuteQuery(expr);
     // 设置外部 options 参数
-    // if (this.props.options.expr !== expr) {
+    // if (this.props.optionsRecord.expr !== expr) {
     //   this.setOptions({ expr });
     // }
-    if (expr === '') {
-      return;
-    }
 
     // 如果正在进行上一个请求，那么终止
     if (abortInFlightFetch.current) {
@@ -176,6 +206,8 @@ const Panel: React.FC<PanelProps> = ({ metrics, options, onOptionsChanged, remov
     const abortController = new AbortController();
     abortInFlightFetch.current = () => abortController.abort();
     setIsLoading(true);
+    setQueryStats(null);
+    const queryStart = Date.now();
 
     // 初始化参数
     const endTime = getEndTime() / 1000;
@@ -193,11 +225,17 @@ const Panel: React.FC<PanelProps> = ({ metrics, options, onOptionsChanged, remov
       signal: abortController.signal,
     })
       .then((res: any) => {
-        console.log('res-----', res);
         abortInFlightFetch.current = null;
         setIsLoading(false);
+        if (curPanelTab.current === PanelType.Graph) {
+          return;
+        }
         if (res.hasOwnProperty('status') && res.status === 'success') {
           setVectorData(res.data);
+          setQueryStats({
+            loadTime: Date.now() - queryStart,
+            resultSeries: res.data.result.length,
+          });
           setErrorContent('');
         } else {
           setVectorData(null);
@@ -209,15 +247,25 @@ const Panel: React.FC<PanelProps> = ({ metrics, options, onOptionsChanged, remov
       });
   }
 
-  // 当结束时间变更时，重新获取数据
+  // 请求发生错误时，展示错误信息
+  function onErrorOccured(errorArr: ErrorInfoType[]) {
+    if (errorArr.length) {
+      const errInfo = errorArr[0].error;
+      setErrorContent(errInfo);
+    } else {
+      setErrorContent('');
+    }
+  }
+
+  // 当时间戳变更时，重新获取数据
   useEffect(() => {
-    executeQuery();
-  }, [options.endTime]);
+    optionsRecord.type === PanelType.Table && executeQuery();
+  }, [optionsRecord.endTime]);
 
   // 切换标签到 Table 时获取数据
   useEffect(() => {
-    executeQuery(options.type === 'table');
-  }, [options.type]);
+    optionsRecord.type === PanelType.Table && executeQuery();
+  }, [optionsRecord.type]);
 
   return (
     <div className='panel'>
@@ -231,8 +279,8 @@ const Panel: React.FC<PanelProps> = ({ metrics, options, onOptionsChanged, remov
         executeQuery={executeQuery}
       />
       {errorContent && <Alert className='error-alert' message={errorContent} type='error' />}
-
-      <Tabs className='panel-tab-box' type='card' activeKey={options.type} onChange={handleTabChange}>
+      {!isLoading && !errorContent && queryStats && <QueryStatsView {...queryStats} />}
+      <Tabs className='panel-tab-box' type='card' activeKey={optionsRecord.type} onChange={handleTabChange}>
         <TabPane tab='Table' key='table'>
           <div className='table-timestamp'>
             Timestamp:{' '}
@@ -241,8 +289,8 @@ const Panel: React.FC<PanelProps> = ({ metrics, options, onOptionsChanged, remov
               showTime
               showNow={false}
               disabledDate={(current) => current > moment()}
-              value={optionsRecord.current.endTime ? moment(optionsRecord.current.endTime) : null}
-              onChange={handleChangeEndTime}
+              value={optionsRecord.endTime ? moment(optionsRecord.endTime) : null}
+              onChange={handleTimestampChange}
             />
           </div>
           <List
@@ -251,8 +299,13 @@ const Panel: React.FC<PanelProps> = ({ metrics, options, onOptionsChanged, remov
             bordered
             loading={isLoading}
             dataSource={vectorData ? vectorData.result : []}
-            renderItem={({ metric: { __name__: name, instance, job, quantile }, value }) => (
-              <List.Item>{`${name}{instance="${instance}",job="${job}",quantile="${quantile}"} ${value[1]}`}</List.Item>
+            renderItem={({ metric, value }) => (
+              <List.Item>
+                <div className='list-item-content'>
+                  <div className='left'>{getListItemContent(metric)}</div>
+                  <div className='right'>{value[1] || '-'}</div>
+                </div>
+              </List.Item>
             )}
           />
         </TabPane>
@@ -260,16 +313,17 @@ const Panel: React.FC<PanelProps> = ({ metrics, options, onOptionsChanged, remov
           {/* 操作栏 */}
           <div className='graph-operate-box'>
             <div className='left'>
-              <DateRangePicker value={dateRangePickerValue} unit='ms' onChange={handleDateChange} />
-              <Resolution onChange={handleStepChange} initialValue={options.resolution} />
+              <DateRangePicker value={dateRangePickerValue} unit='ms' onChange={handleGraphDateChange} />
+              <Resolution onChange={(v: number) => setOptions({ resolution: v })} initialValue={optionsRecord.resolution} />
               <Radio.Group
                 options={[
                   { label: <LineChartOutlined />, value: ChartType.Line },
-                  { label: <AreaChartOutlined />, value: ChartType.Area },
+                  { label: <AreaChartOutlined />, value: ChartType.StackArea },
                 ]}
                 onChange={(e) => {
                   e.preventDefault();
                   setChartType(e.target.value);
+                  refreshGraphRangeData();
                 }}
                 value={chartType}
                 optionType='button'
@@ -280,34 +334,40 @@ const Panel: React.FC<PanelProps> = ({ metrics, options, onOptionsChanged, remov
               <Checkbox
                 checked={isMultiSeries}
                 onChange={(e) => {
-                  console.log(e.target.checked);
                   setIsMultiSeries(e.target.checked);
                 }}
               >
                 Multi Series in Tooltip, order value
               </Checkbox>
-              <Select value={seriesOrderType} onChange={(v: 'desc' | 'asc') => setSeriesOrderType(v)}>
-                <Option value='desc'>desc</Option>
-                <Option value='asc'>asc</Option>
-              </Select>
+              <Dropdown
+                overlay={
+                  <Menu
+                    onClick={(sort) => {
+                      setSeriesOrderType(sort.key as 'desc' | 'asc');
+                    }}
+                    selectedKeys={[seriesOrderType]}
+                  >
+                    <Menu.Item key='desc'>desc</Menu.Item>
+                    <Menu.Item key='asc'>asc</Menu.Item>
+                  </Menu>
+                }
+              >
+                <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
+                  {seriesOrderType} <DownOutlined />
+                </a>
+              </Dropdown>
             </div>
           </div>
           {/* 图 */}
           <div>
-            {options.type === PanelType.Graph && (
+            {optionsRecord.type === PanelType.Graph && (
               <Graph
-                ref={graphRef}
                 showHeader={false}
                 data={{
-                  step: options.resolution,
-                  range: {
-                    start: (getEndTime() - options.range) / 1000,
-                    end: getEndTime() / 1000,
-                  },
+                  step: optionsRecord.resolution,
+                  range: graphRangeData,
                   promqls: [inputValue],
-                  // chartTypeOptions: {
-                  //   chartType,
-                  // },
+                  chartType: chartType,
                   legend: true,
                 }}
                 highLevelConfig={{
@@ -315,6 +375,7 @@ const Panel: React.FC<PanelProps> = ({ metrics, options, onOptionsChanged, remov
                   sharedSortDirection: seriesOrderType,
                 }}
                 onErrorOccured={onErrorOccured}
+                onRequestCompleted={onGraphRequestCompleted}
               />
             )}
           </div>

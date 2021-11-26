@@ -34,7 +34,7 @@ export default function ChartConfigModal(props: Props) {
   const [chartForm] = Form.useForm();
   const [initialQL, setInitialQL] = useState([{ PromQL: '' }]);
   const [chartPromQL, setChartPromQl] = useState<string[]>([]);
-  const [step, setStep] = useState(15);
+  const [step, setStep] = useState<number | null>(null);
   const [chartVisible, setChartVisible] = useState<Boolean>(false);
   const [range, setRange] = useState<Range>({
     start: 0,
