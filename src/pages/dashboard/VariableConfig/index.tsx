@@ -14,16 +14,32 @@ export type VariableType = FormType;
 
 interface ITagFilterProps {
   isOpen?: boolean;
+  editable?: boolean;
+  value?: FormType;
   onChange: (data: FormType) => void;
 }
 
-const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = ({ isOpen = false, onChange }, ref) => {
+const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = ({ isOpen = false, value, onChange, editable = true }, ref) => {
   const { t } = useTranslation();
   const [editing, setEditing] = useState<boolean>(isOpen);
   const [data, setData] = useState<FormType>();
   const handleEditClose = (v: FormType) => {
-    v && onChange(v);
+    if (v) {
+      onChange(v);
+      setData(v);
+    }
     setEditing(false);
+  };
+
+  useEffect(() => {
+    value && setData(value);
+  }, [value]);
+
+  const handleVariableChange = (index: number, v: string) => {
+    const newData = data ? { var: [...data.var] } : { var: [] };
+    newData.var[index].selected = v;
+    setData(newData);
+    onChange(newData);
   };
 
   const setInitData = (initData: VariableType) => {
@@ -34,17 +50,22 @@ const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = ({ isOpe
   }));
   return (
     <div className='tag-area'>
-      <div className={classNames('tag-content', !editing ? 'tag-content-close' : '')}>
-        <DisplayItem data={data}></DisplayItem>
-        {/* {editing ? null : Array.isArray(data.tagList) && data.tagList.length ? (
-          <EditOutlined className='icon' onClick={handleEdit}></EditOutlined>
-        ) : ( */}
-        <div className='add-variable-tips' onClick={() => setEditing(true)}>
-          {t('添加大盘变量')}
-        </div>
-        {/* )} */}
+      <div className={classNames('tag-content', 'tag-content-close')}>
+        {data?.var.length && (
+          <>
+            {data.var.map((expression, index) => (
+              <DisplayItem expression={expression} index={index} data={data.var} onChange={handleVariableChange}></DisplayItem>
+            ))}
+            {editable && <EditOutlined className='icon' onClick={() => setEditing(true)}></EditOutlined>}
+          </>
+        )}
+        {data?.var.length === 0 && editable && (
+          <div className='add-variable-tips' onClick={() => setEditing(true)}>
+            {t('添加大盘变量')}
+          </div>
+        )}
       </div>
-      <EditItem visible={editing} onChange={handleEditClose} />
+      <EditItem visible={editing} onChange={handleEditClose} value={data} />
     </div>
   );
 };

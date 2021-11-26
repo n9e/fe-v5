@@ -1,5 +1,8 @@
 export interface Variable {
   name: string;
-  difinition: string;
+  definition: string;
   reg?: string;
+  selected?: string | string[];
+  multi: boolean;
+  allOption: boolean;
 }

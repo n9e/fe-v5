@@ -46,7 +46,7 @@ export default function DashboardDetail() {
   const [step, setStep] = useState(15);
   const [titleEditing, setTitleEditing] = useState(false);
   const [chartGroup, setChartGroup] = useState<Group[]>([]);
-  const [variableConfig, setVariableConfig] = useState<VariableType | null>(null);
+  const [variableConfig, setVariableConfig] = useState<VariableType>();
   const [groupModalVisible, setGroupModalVisible] = useState(false);
   const [chartModalVisible, setChartModalVisible] = useState(false);
   const [chartModalInitValue, setChartModalInitValue] = useState<Chart | null>();
@@ -64,7 +64,6 @@ export default function DashboardDetail() {
       if (res.dat.configs) {
         const configs = JSON.parse(res.dat.configs);
         setVariableConfig(configs);
-        variableRef.current && variableRef.current.setInitData(configs);
       }
     });
     getChartGroup(busiId, id).then((res) => {
@@ -205,7 +204,7 @@ export default function DashboardDetail() {
     >
       <div className='dashboard-detail-content'>
         <div className='variable-area'>
-          <VariableConfig ref={variableRef} onChange={handleVariableChange} />
+          <VariableConfig onChange={handleVariableChange} value={variableConfig} />
         </div>
 
         <div className='charts'>
@@ -223,7 +222,7 @@ export default function DashboardDetail() {
               onDelChart={handleDelChart}
               onDelChartGroup={handleDelChartGroup}
               range={range}
-              variableConfig={variableConfig}
+              variableConfig={variableConfig!}
               moveUpEnable={i > 0}
               moveDownEnable={i < chartGroup.length - 1}
             />
@@ -265,7 +264,14 @@ export default function DashboardDetail() {
       </Modal>
 
       {chartModalVisible && (
-        <ChartConfigModal busiId={busiId} initialValue={chartModalInitValue} groupId={groupId} show={chartModalVisible} onVisibleChange={handleChartConfigVisibleChange} />
+        <ChartConfigModal
+          busiId={busiId}
+          initialValue={chartModalInitValue}
+          groupId={groupId}
+          show={chartModalVisible}
+          onVisibleChange={handleChartConfigVisibleChange}
+          variableConfig={variableConfig}
+        />
       )}
     </PageLayout>
   );

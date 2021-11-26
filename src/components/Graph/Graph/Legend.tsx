@@ -7,25 +7,31 @@ import { Table, Input, Button, Modal, Tooltip } from 'antd';
 import Color from 'color';
 import _ from 'lodash';
 
-class Legend extends Component {
-  static propTypes = {
-    style: PropTypes.object,
-    series: PropTypes.array,
-    onSelectedChange: PropTypes.func,
-    rowSelection: PropTypes.object,
-    renderValue: PropTypes.func,
-  };
+interface LegendProps {
+  series: any;
+  style: object;
+  onSelectedChange: Function;
+  rowSelection?: object;
+  renderValue?: Function;
+  comparisonOptions: any;
+  graphConfig: any;
+  columnsKey?: any;
+}
 
-  static defaultProps = {
-    style: {},
-    series: [],
-    onSelectedChange: _.noop,
-    renderValue: (text) => {
-      return text;
-    },
-  };
+interface LegendState {
+  searchText: string;
+  filterVal: string;
+  filterDropdownVisible: boolean;
+  contextMenuVisiable: boolean;
+  contextMenuTop: number;
+  contextMenuLeft: number;
+  selectedKeys: string;
+  highlightedKeys: string[];
+  currentCounter?: number;
+}
 
-  constructor(props) {
+class Legend extends Component<LegendProps, LegendState> {
+  constructor(props: LegendProps) {
     super(props);
     this.state = {
       searchText: '',
@@ -86,18 +92,18 @@ class Legend extends Component {
     });
   };
 
-  filterData(comparisonOptions) {
+  filterData() {
     const { series } = this.props;
     const { filterVal } = this.state;
     const reg = new RegExp(filterVal, 'gi');
     const legendData = normalizeLegendData(series);
     return _.filter(legendData, (record) => {
-      return record.tags && record.tags.match(reg) || record.metricLabels && JSON.stringify(record.metricLabels).match(reg);
+      return (record.tags && record.tags.match(reg)) || (record.metricLabels && JSON.stringify(record.metricLabels).match(reg));
     });
   }
 
   render() {
-    const { comparisonOptions, onSelectedChange, rowSelection, renderValue } = this.props;
+    const { comparisonOptions, onSelectedChange, rowSelection, renderValue = () => {} } = this.props;
     const { graphConfig } = this.props;
 
     if (!graphConfig) return null;
@@ -105,9 +111,9 @@ class Legend extends Component {
     const sortOrder = _.cloneDeep(_.get(graphConfig, 'sortOrder', {}));
     const { searchText, selectedKeys, highlightedKeys } = this.state;
     const counterSelectedKeys = highlightedKeys;
-    const data = this.filterData(comparisonOptions);
+    const data = this.filterData();
     const firstData = data[0];
-    let columns = [
+    let columns: any[] = [
       {
         title: <span> Series({data.length}) </span>,
         dataIndex: 'tags',
@@ -235,7 +241,6 @@ class Legend extends Component {
         className='graph-legend'
         style={{
           ...this.props.style,
-          // margin: '0 5px 5px 5px',
           height: '100%',
         }}
       >
@@ -245,10 +250,12 @@ class Legend extends Component {
             return `${record.id}${record.comparison}`;
           }}
           size='middle'
+          // @ts-ignore
           rowSelection={false}
           columns={columns}
           dataSource={data}
           pagination={false}
+          // @ts-ignore
           scroll={{ x: scrollX, y: true }}
           showSorterTooltip={false}
         />
@@ -303,11 +310,11 @@ export function getSerieIndex(serie, highlightedKeys, seriesLength, serieIndex) 
  * @return {Object}        {max,min,avg,sum,last}
  */
 function getLegendNums(points) {
-  let last = null;
-  let avg = null;
-  let max = null;
-  let min = null;
-  let sum = null;
+  let last = 0;
+  let avg = 0;
+  let max = 0;
+  let min = 0;
+  let sum = 0;
   let len = 0;
 
   if (!_.isArray(points)) {
@@ -350,11 +357,13 @@ function getLengendName(serie, comparisonOptions, locale = 'zh') {
   const { tags, comparison, metricLabels } = serie;
   let lname = '';
   let sname = '';
-  let comparisonTxt = ''
+  let comparisonTxt = '';
 
-  const serieMetricLabels = serie?.metricLabels || {}
-  const metricName = serieMetricLabels.__name__
-  const labels = Object.keys(serieMetricLabels).filter(ml => ml !== '__name__').map(label => `${label}=${serieMetricLabels[label]}`)
+  const serieMetricLabels = serie?.metricLabels || {};
+  const metricName = serieMetricLabels.__name__;
+  const labels = Object.keys(serieMetricLabels)
+    .filter((ml) => ml !== '__name__')
+    .map((label) => `${label}=${serieMetricLabels[label]}`);
 
   // display comparison
   if (comparison && typeof comparison === 'number') {
@@ -364,7 +373,7 @@ function getLengendName(serie, comparisonOptions, locale = 'zh') {
       comparisonTxt = locale === 'zh' ? `环比${currentComparison.label}` : `(${enText} ago)`;
     }
   }
-  lname = `${metricName || ''} ${comparisonTxt} {${labels}}`
+  lname = `${metricName || ''} ${comparisonTxt} {${labels}}`;
   // shorten name
   if (lname.length > 80) {
     const leftStr = lname.substr(0, 40);
