@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Button, Input, Select, Table, Tooltip } from 'antd';
+import { SearchOutlined } from '@ant-design/icons';
 import SelectedHosts from './SelectedHosts';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/common';
@@ -14,18 +15,16 @@ export default (props) => {
   const [curBusiItemInHostSelect, setCurBusiItemInHostSelect] = useState(curBusiItem)
   const dispatch = useDispatch()
   const columns = [
-    { title: '对象标识', dataIndex: 'ident', width: 150 },
+    { title: '对象标识', dataIndex: 'ident', render: (t) => <div style={{ maxWidth: '100px' }}>{t}</div> },
     {
       title: '备注',
       dataIndex: 'note',
-      width: 100,
-      render: (t) => <div style={{width: '100px', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap'}} title={t}>{t}</div>
+      render: (t) => <div style={{maxWidth: '100px', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap'}} title={t}>{t}</div>
     },
     {
       title: '标签',
       dataIndex: 'tags',
-      width: 200,
-      render: (t) => <div style={{width: '200px', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap'}} title={t}>{t}</div>
+      render: (t) => <div style={{maxWidth: '150px', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap'}} title={t}>{t}</div>
     }
   ]
   useEffect(() => {
@@ -59,11 +58,12 @@ export default (props) => {
           {busiGroups.map(bg => <Option key={bg.id} value={bg.id}>{bg.name}</Option>)}
         </Select>
       </div>
+      <SearchOutlined style={{position: 'absolute',left: 190, zIndex: 2, top: 9}} />
     </div>
   )
   return <div className='host-select'>
     <div className='top-bar'>
-      <Input addonBefore={selectBefore} className='host-input' onChange={e => {
+      <Input placeholder='搜索，空格分隔多个关键字' addonBefore={selectBefore} className='host-input' onChange={e => {
         const { value } = e.target;
         onSearchHostName && onSearchHostName(value)
       }} />

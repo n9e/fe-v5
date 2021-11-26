@@ -9,6 +9,7 @@ import type {
 } from '@/store/warningInterface';
 import { PAGE_SIZE } from '@/utils/constant';
 import React from 'react';
+import queryString from 'query-string';
 
 // 获得策略分组列表
 export const getStrategyGroupList = function (query?: string, p = 1) {
@@ -97,6 +98,9 @@ export const getMetrics = function (params = {}) {
   return request(`/api/n9e/prometheus/api/v1/label/__name__/values`, {
     method: RequestMethod.Get,
     params,
+    paramsSerializer: function (params) {
+      return queryString.stringify(params, {arrayFormat: 'bracket'})
+    },
   });
 };
 
