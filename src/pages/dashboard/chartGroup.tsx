@@ -25,7 +25,7 @@ interface Props {
   busiId: string;
   groupInfo: Group;
   range: Range;
-  step: number;
+  step: number | null;
   variableConfig: VariableType;
   onAddChart: (data: number) => void;
   onUpdateChart: (group: Group, data: Chart) => void;
