@@ -111,6 +111,9 @@ export default class Graph extends Component<GraphProps, GraphState> {
   }
 
   componentWillReceiveProps(nextProps) {
+    if (this.props.data.legend !== undefined && this.props.data.legend !== nextProps.data.legend) {
+      this.setState({ legend: nextProps.data.legend });
+    }
     // 兼容及时查询页面操作图标属性
     // 接受外部format，legend，multi等属性并更新视图
     if (typeof nextProps.highLevelConfig === 'object') {
@@ -131,9 +134,6 @@ export default class Graph extends Component<GraphProps, GraphState> {
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.data.legend !== undefined && this.props.data.legend !== this.state.legend) {
-      this.setState({ legend: this.props.data.legend });
-    }
     const oldHosts = (prevProps.data.selectedHosts || []).map((h) => h.ident);
     const newHosts = (this.props.data.selectedHosts || []).map((h) => h.ident);
     const isHostsChanged = !_.isEqual(oldHosts, newHosts);
