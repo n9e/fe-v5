@@ -10,6 +10,8 @@ import PromqlEditor from '@/components/PromqlEditor';
 import Resolution from '@/components/Resolution';
 import DateRangePicker, { Range, formatPickerDate } from '@/components/DateRangePicker';
 import Graph from '@/components/Graph';
+import VariableConfig, { VariableType } from './VariableConfig';
+import { replaceExpressionVars } from './VariableConfig/constant';
 const { Option } = Select;
 const layout = {
   labelCol: {
@@ -25,12 +27,14 @@ interface Props {
   show: boolean;
   onVisibleChange: (data: boolean) => void;
   initialValue?: Chart | null;
+  variableConfig: VariableType | undefined;
 } // 新增图表和编辑图表均在此组件
 
 export default function ChartConfigModal(props: Props) {
   const { t } = useTranslation();
-  const { busiId, groupId, show, onVisibleChange, initialValue } = props;
+  const { busiId, groupId, show, onVisibleChange, initialValue, variableConfig } = props;
   const layout = initialValue?.configs.layout;
+  const [innerVariableConfig, setInnerVariableConfig] = useState<VariableType | undefined>(variableConfig);
   const [chartForm] = Form.useForm();
   const [initialQL, setInitialQL] = useState([{ PromQL: '' }]);
   const [chartPromQL, setChartPromQl] = useState<string[]>([]);
@@ -113,6 +117,10 @@ export default function ChartConfigModal(props: Props) {
     );
   };
 
+  const handleVariableChange = (value) => {
+    setInnerVariableConfig(value);
+  };
+
   return (
     <Modal
       title={
@@ -142,6 +150,8 @@ export default function ChartConfigModal(props: Props) {
       <Form {...layout} form={chartForm} preserve={false}>
         <Row>
           <Col span={12}>
+            <VariableConfig onChange={handleVariableChange} value={innerVariableConfig} editable={false} />
+            <br />
             <Form.Item
               label={t('标题')}
               name='name'
@@ -197,17 +207,7 @@ export default function ChartConfigModal(props: Props) {
                                   },
                                 ]}
                               >
-                                <PromqlEditorField
-                                  key={name + fieldKey}
-                                  name={name}
-                                  fields={fields}
-                                  index={index}
-                                  remove={remove}
-                                  add={add}
-                                  // onChange={(e) => {
-                                  //   handleChartOptions(e);
-                                  // }}
-                                />
+                                <PromqlEditorField key={name + fieldKey} name={name} fields={fields} index={index} remove={remove} add={add} />
                               </Form.Item>
                               <Form.Item
                                 label='Legend'
@@ -219,11 +219,7 @@ export default function ChartConfigModal(props: Props) {
                                   span: 20,
                                 }}
                               >
-                                <Input
-                                // onChange={(e) => {
-                                //   handleChartOptions(e);
-                                // }}
-                                />
+                                <Input />
                               </Form.Item>
                             </div>
                           );
@@ -295,7 +291,9 @@ export default function ChartConfigModal(props: Props) {
             >
               {({ getFieldsValue }) => {
                 const { QL = [], multi, legend, format, yplotline1, yplotline2 } = getFieldsValue();
-                // return QL.filter((item) => item && item.PromQL).map((item) => item.PromQL).length > 0 ? (
+                const promqls = QL.filter((item) => item && item.PromQL).map((item) =>
+                  innerVariableConfig ? replaceExpressionVars(item.PromQL, innerVariableConfig, innerVariableConfig.var.length) : item.PromQL,
+                );
                 return (
                   <Graph
                     showHeader={false}
@@ -317,7 +315,7 @@ export default function ChartConfigModal(props: Props) {
                       legend: legend,
                       step,
                       range,
-                      promqls: QL.filter((item) => item && item.PromQL).map((item) => item.PromQL),
+                      promqls: promqls,
                     }}
                   />
                 );
