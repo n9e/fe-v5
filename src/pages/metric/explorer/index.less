@@ -1,9 +1,19 @@
 .prometheus-page {
+  padding: 20px;
   .panel {
     position: relative;
     padding: 16px;
     border-radius: 4px;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
+    .query-stats {
+      position: absolute;
+      right: 16px;
+      opacity: 1;
+      transition: opacity .3s ease;
+    }
+    .query-state-hide {
+      opacity: 0;
+    }
     .prometheus-input-box {
       display: flex;
       width: 100%;
@@ -22,7 +32,10 @@
         flex: auto;
         border: 1px solid #ced4da;
         overflow-x: auto;
-        padding: 4px 0 0 8px;
+        padding: 5px 0 0 8px;
+        .input-content {
+          font-size: 14px;
+        }
       }
       .suffix {
         display: flex;
@@ -42,10 +55,12 @@
       margin-bottom: 10px;
     }
     .remove-panel-btn {
+      opacity: 0;
+      transition: opacity 0.3s ease;
       position: absolute;
-      top: -16px;
-      right: -10px;
-      font-size: 20px;
+      top: -10px;
+      right: -4px;
+      font-size: 18px;
       color: #ff4d4f;
       cursor: pointer;
       &:hover {
@@ -62,12 +77,42 @@
       }
       .graph-operate-box {
         display: flex;
+        flex-flow: row wrap;
         justify-content: space-between;
         margin-bottom: 10px;
-        .left, .right {
+        .left {
           display: flex;
           align-items: center;
+          margin-right: 10px;
         }
+        .right {
+          padding-top: 4px;
+        }
+      }
+      .ant-list-item {
+        cursor: default;
+      }
+      .list-item-content {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        .left {
+          width: 100%;
+          word-break: break-word;
+          padding-right: 40px;
+        }
+        .right {
+          padding-right: 4%;
+        }
+        .bold-text {
+          color: #000;
+          font-weight: bold;
+        }
+      }
+    }
+    &:hover {
+      .remove-panel-btn {
+        opacity: 1;
       }
     }
   }

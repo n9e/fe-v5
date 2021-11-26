@@ -10,11 +10,11 @@ export const baseTheme = EditorView.theme({
   },
   '.cm-scroller': {
     overflow: 'hidden',
-    fontFamily: '"DejaVu Sans Mono", monospace',
+    fontFamily: 'verdana, Microsoft YaHei, Consolas, Deja Vu Sans Mono, Bitstream Vera Sans Mono;',
   },
   '.cm-placeholder': {
-    fontFamily:
-      '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji"',
+    // fontFamily:
+    //   '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji"',
   },
 
   '.cm-matchingBracket': {
