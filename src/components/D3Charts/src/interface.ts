@@ -2,11 +2,17 @@ export type TsGraphType = {
   [index: string]: any,
 }
 
+export enum ChartType {
+  Line = 'line',
+  StackArea = 'stackArea'
+}
+
 export type Timestamp = 'x' | 'X';
 
 export type BaseOptions = {
   xkey: number | string,
   ykey: number | string,
+  y0key: number | string,
   timestamp: Timestamp,
 }
 
@@ -131,6 +137,7 @@ export interface GetNearestPointsFnParam extends BaseOptions {
 }
 
 export interface Options extends BaseOptions {
+  chartType: ChartType,
   ratio: number,
   chart: Chart,
   xAxis: XAxis,
@@ -150,6 +157,7 @@ export interface Options extends BaseOptions {
   ymax: number,
   onClick: (d3Event: any) => any,
   onZoom: (getZoomedSeries: () => Series) => any,
+  formatUnit: 1024 | 1000 | 'humantime'
 }
 
 export type EventPosition = {

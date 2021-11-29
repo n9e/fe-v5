@@ -198,3 +198,36 @@ export const getTemplateContent = function (type: 'alert_rule' | 'dashboard', na
     method: RequestMethod.Get,
   });
 };
+
+export const getLabelNames = function () {
+  return request(`/api/n9e/prometheus/api/v1/labels`, {
+    method: RequestMethod.Get,
+  });
+};
+
+export const getLabelValues = function (label) {
+  return request(`/api/n9e/prometheus/api/v1/label/${label}/values`, {
+    method: RequestMethod.Get,
+  });
+};
+
+export const getMetricSeries = function (data) {
+  return request(`/api/n9e/prometheus/api/v1/series`, {
+    method: RequestMethod.Get,
+    params: { ...data },
+  });
+};
+
+export const getMetric = function (data = {}) {
+  return request(`/api/n9e/prometheus/api/v1/label/__name__/values`, {
+    method: RequestMethod.Get,
+    params: { ...data },
+  });
+};
+
+export const getQueryResult = function (data) {
+  return request(`/api/n9e/prometheus/api/v1/query`, {
+    method: RequestMethod.Get,
+    params: { query: data },
+  });
+};

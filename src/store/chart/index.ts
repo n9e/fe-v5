@@ -86,7 +86,7 @@ export interface ChartComponentProps {
   prome_ql?: string[] | string;
   yplotline?: number;
   xplotline?: number; //秒
-  step?: number;
+  step?: number | null;
 }
 
 export interface ChartFilterProps {

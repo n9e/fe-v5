@@ -21,7 +21,7 @@ function ChartDrawer(props: Props) {
   const [numPerLine, setNumPerLine] = useState(1);
   const [idents, setIdents] = useState<Array<string>>([]);
   const [range, setRange] = useState<Range>({ start: 0, end: 0 });
-  const [step, setStep] = useState(15);
+  const [step, setStep] = useState<number | null>(null);
   const [chartOption, setChartOption] = useState<ChartComponentProps>({
     range: { start: 0, end: 0 },
     limit: 50,

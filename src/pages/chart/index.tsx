@@ -28,7 +28,7 @@ export default function Chart() {
   const [range, setRange] = useState<Range>({
     start: 0, end: 0
   });
-  const [step, setStep] = useState(15);
+  const [step, setStep] = useState<number | null>(null);
   useEffect(() => {
     initChart();
   }, []);

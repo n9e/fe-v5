@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Button, InputNumber, Layout, Row, Col, Checkbox, Popover, Select } from 'antd';
 import { LineChartOutlined, SyncOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import PageLayout from '@/components/pageLayout';
@@ -22,18 +22,23 @@ export default () => {
   const [hosts, setHosts] = useState([]);
   const [selectedHosts, setSelectedHosts] = useState([]);
   const { busiGroups, curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
+  const [busiGroup, setBusiGroup] = useState(curBusiItem)
   const [metrics, setMetrics] = useState([]);
   const [metricDescs, setMetricDescs] = useState({});
   const [graphs, setGraphs] = useState<Array<any>>([]);
-  const [step, setStep] = useState(15);
-  const [range, setRange] = useState<Range>({
-    start: 0,
-    end: 0,
-  });
+  const [step, setStep] = useState<number | null>(null);
+  const [queryHost, setQueryHost] = useState('');
+  const [curCluster, setCurCluster] = useState('');
+  const [range, setRange] = useState<Range>({ num: 1, unit: 'hour', description: 'hour' });
+  const [getHostsTimes, setGetHostsTimes] = useState(0);
   const getHostsRequest = () => {
-    return getHosts({
-      bgid: curBusiItem.id
-    }).then((res) => {
+    const cluster = localStorage.getItem('curCluster') || ''
+    let transportData = {
+      bgid: busiGroup.id,
+      query: queryHost,
+      clusters: cluster
+    }
+    return getHosts(transportData).then((res) => {
       const allHosts = res?.dat?.list || [];
       setHosts(allHosts);
       return allHosts
@@ -42,16 +47,15 @@ export default () => {
 
   useEffect(() => {
     getHostsRequest().then(allHosts => {
+      if (getHostsTimes > 0) return
+      setGetHostsTimes(getHostsTimes + 1)
       getMetricsAndDesc(allHosts.slice(0, 10));
     })
-  }, [])
-
-  useEffect(() => {
-    getHostsRequest()
-  }, [curBusiItem]);
+  }, [busiGroup, queryHost, curCluster]);
   const getMetricsAndDesc = (hosts) => {
     const showHosts = hosts || selectedHosts
-    const hostsMatchParams = `ident=~"${showHosts.map((h: any) => h.ident).join('|')}"`
+    if (showHosts.length === 0) return
+    const hostsMatchParams = `{ident=~"${showHosts.map((h: any) => h.ident).join('|')}"}`
     getMetrics({
       match: [hostsMatchParams]
     }).then((res) => {
@@ -69,17 +73,31 @@ export default () => {
   const handleRemoveGraphs = () => {
     setGraphs([]);
   };
+  const debouncedChangeHostName = useCallback(
+    _.debounce((v) => {
+      setQueryHost(v)
+    }, 1000),
+    [],
+  );
 
   return (
-    <PageLayout title={t('对象视角')} icon={<LineChartOutlined />}>
+    <PageLayout title={t('对象视角')} icon={<LineChartOutlined />} onChangeCluster={cluster => {
+      setCurCluster(cluster)
+    }}>
       <div className='object-view'>
         <Layout style={{ padding: 10 }}>
           <Row gutter={10}>
             <Col span={12}>
               <HostSelect
                 allHosts={hosts}
+                changeBusiGroup={(busiGroup) => {
+                  setBusiGroup(busiGroup)
+                }}
                 changeSelectedHosts={(hosts) => {
                   setSelectedHosts(hosts);
+                }}
+                onSearchHostName={value => {
+                  debouncedChangeHostName(value)
                 }}
               />
             </Col>
@@ -113,8 +131,8 @@ export default () => {
           <Row style={{ padding: '10px 0' }}>
             <Col span={8}>
             <div style={{display: 'flex'}}>
-              <DateRangePicker onChange={(e) => {
-                setRange(e);
+              <DateRangePicker value={range} onChange={(e) => {
+                // setRange(e);
                 let newGraphs = [...graphs];
                 newGraphs.forEach(graph => {
                   graph.range = e
@@ -130,7 +148,7 @@ export default () => {
                 setGraphs(newGraphs);
               }} initialValue={step} />
               <Button
-                style={{ marginLeft: 8 }}
+                style={{ padding: '4px 8px' }}
                 onClick={() => {
                   graphs.forEach(graph => {
                     const graphInstance = graph.ref?.current
@@ -155,7 +173,7 @@ export default () => {
             return <div style={{ marginBottom: 10 }} key={i + o.metric}>
               <Graph ref={o.ref} data={{...o}} graphConfigInnerVisible={true} extraRender={graph => {
                 return [
-                  <Button type='link' size='small' onClick={(e) => e.preventDefault()}>
+                  <Button type='link' danger size='small' onClick={(e) => e.preventDefault()}>
                     <CloseCircleOutlined onClick={_ => {
                       console.log('graphs', graphs)
                       const newGraphs = [...graphs]

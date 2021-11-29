@@ -189,7 +189,7 @@ const ExpressionInput: FC<CMExpressionInputProps> = ({ value, onExpressionChange
           <span>PromQL: </span>
         </div>
         <div className='input'>
-          <div ref={containerRef} style={{ fontSize: 16 }} />
+          <div className='input-content' ref={containerRef} />
         </div>
         <div className='suffix'>
           <Button size='large' className='metrics' icon={<GlobalOutlined />} onClick={() => setShowMetricsExplorer(true)}></Button>

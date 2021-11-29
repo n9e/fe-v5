@@ -12,19 +12,21 @@ import { SettingOutlined, LinkOutlined, DownOutlined, EditOutlined, CloseCircleO
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import { Range } from '@/components/DateRangePicker';
-import { TagFilterResponse } from './VariableConfig/definition';
+import { VariableType } from './VariableConfig';
 import { number } from 'echarts';
 import { useTranslation } from 'react-i18next';
 import Graph from '@/components/Graph';
 import moment from 'moment';
+// 它可以和15行合并为一个import
+import { convertExpressionToQuery, replaceExpressionVars } from './VariableConfig/constant';
 
 const { confirm } = Modal;
 interface Props {
   busiId: string;
   groupInfo: Group;
   range: Range;
-  step: number;
-  variableConfig: TagFilterResponse | null;
+  step: number | null;
+  variableConfig: VariableType;
   onAddChart: (data: number) => void;
   onUpdateChart: (group: Group, data: Chart) => void;
   onDelChart: (group: Group, data: Chart) => void;
@@ -464,7 +466,7 @@ export default function ChartGroup(props: Props) {
       chartConfigs.length > 0 &&
       chartConfigs.map((item, i) => {
         let { QL, name, legend, yplotline1, yplotline2 } = item.configs;
-
+        const promqls = QL.map((item) => replaceExpressionVars(item.PromQL, variableConfig, variableConfig.var.length));
         return (
           <div
             style={{
@@ -490,7 +492,8 @@ export default function ChartGroup(props: Props) {
                 step,
                 range,
                 title: name,
-                promqls: QL.map((item) => item.PromQL),
+                promqls,
+                // promqls: QL.map((item) => item.PromQL),
               }}
               extraRender={(graph) => {
                 return (

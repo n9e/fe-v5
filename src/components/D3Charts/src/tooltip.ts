@@ -63,6 +63,7 @@ export default class Tooltip {
       tooltip: { shared },
       xkey,
       ykey,
+      y0key,
       timestamp,
       fillNull,
     } = this.options;
@@ -72,6 +73,7 @@ export default class Tooltip {
       x,
       xkey,
       ykey,
+      y0key,
       timestamp,
       fillNull,
     };

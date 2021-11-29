@@ -8,6 +8,7 @@ import _ from 'lodash';
 import * as util from '../util';
 import { AnyARecord } from 'dns';
 import './index.less';
+import { ChartType } from '@/components/D3Charts/src/interface';
 
 interface GraphProps {
   height?: number;
@@ -18,6 +19,7 @@ interface GraphProps {
     comparison: any;
     sharedSortDirection: string;
     precision: string;
+    chartType?: ChartType;
   };
   series: object[];
 }
@@ -27,6 +29,7 @@ export default class Graph extends Component<GraphProps> {
   private chart: D3Graph;
   componentDidMount() {
     const chartOptions = {
+      chartType: this.props.graphConfig.chartType || ChartType.Line,
       timestamp: 'x',
       chart: {
         height: this.props.height ? this.props.height : undefined,
@@ -53,6 +56,7 @@ export default class Graph extends Component<GraphProps> {
         yAxis: util.getYAxis(this.chart.options.yAxis, nextProps.graphConfig),
         tooltip: this.genChartTooltipOptions(nextProps),
         series: nextProps.series,
+        chartType: nextProps.graphConfig.chartType || ChartType.Line,
       };
       this.chart.update(chartOptions);
     }
@@ -60,27 +64,26 @@ export default class Graph extends Component<GraphProps> {
 
   genChartTooltipOptions(nextProps) {
     const isFormatUnit1024 = nextProps.graphConfig.formatUnit === 1024 && nextProps.graphConfig.precision === 'short';
-    return isFormatUnit1024
-      ? {
-          xAxis: nextProps.graphConfig.xAxis,
-          shared: nextProps.graphConfig.shared,
-          sharedSortDirection: nextProps.graphConfig.sharedSortDirection,
-          formatter: (points) => {
-            return util.getTooltipsContent({
-              formatUnit: nextProps.graphConfig.formatUnit,
-              precision: nextProps.graphConfig.precision,
-              series: this.props.series,
-              points,
-              chartWidth: this.graphWrapEle.offsetWidth - 40,
-            });
-          },
-        }
-      : {
-          xAxis: nextProps.graphConfig.xAxis,
-          shared: nextProps.graphConfig.shared,
-          sharedSortDirection: nextProps.graphConfig.sharedSortDirection,
+    let options = {
+      xAxis: nextProps.graphConfig.xAxis,
+      shared: nextProps.graphConfig.shared,
+      sharedSortDirection: nextProps.graphConfig.sharedSortDirection,
+      formatter: (points) => {
+        return util.getTooltipsContent({
+          formatUnit: nextProps.graphConfig.formatUnit,
           precision: nextProps.graphConfig.precision,
-        };
+          series: this.props.series,
+          points,
+          chartWidth: this.graphWrapEle.offsetWidth - 40,
+        });
+      },
+    }
+    if (isFormatUnit1024) {
+      Object.assign(options, {
+        precision: nextProps.graphConfig.precision
+      })
+    }
+    return options
   }
 
   render() {

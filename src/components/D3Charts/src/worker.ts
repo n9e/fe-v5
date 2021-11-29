@@ -26,6 +26,7 @@ ctx.addEventListener('message', (event) => {
     x: data.x,
     xkey: data.xkey,
     ykey: data.ykey,
+    y0key: data.y0key,
     timestamp: data.timestamp,
     series: series[data.id],
     fillNull: data.fillNull,

@@ -7,14 +7,16 @@ import '@d3-charts/ts-graph/dist/index.css';
 import * as config from '../config';
 import * as util from '../util';
 import * as api from '../api';
-import Legend, { getSerieVisible, getSerieColor, getSerieIndex } from './Legend';
+import Legend, { getSerieVisible, getSerieColor, getSerieIndex, isEqualSeries } from './Legend';
 import GraphConfigInner from '../GraphConfig/GraphConfigInner';
 import GraphChart from './Graph';
 import { Range, formatPickerDate } from '@/components/DateRangePicker';
 import { SetTmpChartData } from '@/services/metric';
+import { ChartType } from '@/components/D3Charts/src/interface';
+import { QueryStats } from '@/pages/metric/explorer/QueryStatsView';
 
 export interface GraphDataProps {
-  step: number;
+  step: number | null;
   range: Range;
   legend?: boolean;
   title?: string;
@@ -23,6 +25,7 @@ export interface GraphDataProps {
   promqls?: string[] | { current: string }[];
   ref?: any;
   yAxis?: any;
+  chartType?: ChartType;
 }
 
 export interface ErrorInfoType {
@@ -46,15 +49,18 @@ interface GraphProps {
     shared?: boolean;
     sharedSortDirection?: 'desc' | 'asc';
     precision?: 'short' | 'origin' | number;
-    formatUnit?: 1024 | 1000;
+    formatUnit?: 1024 | 1000 | 'humantime';
   };
   onErrorOccured?: (errorArr: ErrorInfoType[]) => void;
+  onRequestCompleted?: (requestInfo: QueryStats) => void;
 }
 
 interface GraphState {
   spinning: boolean;
   errorText: string;
   series: any[];
+  chartShowSeries: any[];
+  legendHighlightedKeys: number[];
   forceRender: boolean;
   offsets: string[];
   aggrFunc: string;
@@ -64,9 +70,16 @@ interface GraphState {
     shared: boolean;
     sharedSortDirection: 'desc' | 'asc';
     precision: 'short' | 'origin' | number;
-    formatUnit: 1024 | 1000;
+    formatUnit: 1024 | 1000 | 'humantime';
   };
   onErrorOccured?: (errorArr: ErrorInfoType[]) => void;
+  onRequestCompleted?: (requestInfo: QueryStats) => void;
+}
+
+const formatUnitInfoMap = {
+  1024: 'Ki, Mi, Gi by 1024',
+  1000: 'Ki, Mi, Gi by 1000',
+  humantime: 'Human time duration'
 }
 
 const { Option } = Select;
@@ -80,6 +93,8 @@ export default class Graph extends Component<GraphProps, GraphState> {
       spinning: false,
       errorText: '', // 异常场景下的文案
       series: [],
+      chartShowSeries: [],
+      legendHighlightedKeys: [],
       forceRender: false,
       // 刷新、切换hosts时，需要按照用户已经选择的环比、聚合条件重新刷新图表，所以需要将其记录到state中
       offsets: this.props.defaultOffsets || [],
@@ -93,6 +108,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
         formatUnit: this.props.highLevelConfig?.formatUnit || 1024,
       },
       onErrorOccured: this.props.onErrorOccured,
+      onRequestCompleted: this.props.onRequestCompleted,
     };
   }
 
@@ -100,15 +116,18 @@ export default class Graph extends Component<GraphProps, GraphState> {
     this.updateAllGraphs(this.state.aggrFunc, this.state.aggrGroups, this.state.offsets);
   }
 
-  componentDidUpdate(prevProps) {
+  componentWillReceiveProps(nextProps) {
+    if (this.props.data.legend !== undefined && this.props.data.legend !== nextProps.data.legend) {
+      this.setState({ legend: nextProps.data.legend });
+    }
     // 兼容及时查询页面操作图标属性
     // 接受外部format，legend，multi等属性并更新视图
-    if (typeof prevProps.highLevelConfig === 'object') {
+    if (typeof nextProps.highLevelConfig === 'object') {
       let showUpdate = false;
       const updateObj = Object.assign({}, this.state.highLevelConfig);
       for (let key of Object.keys(updateObj)) {
-        if (updateObj[key] !== prevProps.highLevelConfig[key]) {
-          updateObj[key] = prevProps.highLevelConfig[key];
+        if (updateObj[key] !== nextProps.highLevelConfig[key]) {
+          updateObj[key] = nextProps.highLevelConfig[key];
           showUpdate = true;
         }
       }
@@ -118,13 +137,13 @@ export default class Graph extends Component<GraphProps, GraphState> {
         });
       }
     }
-    if (this.props.data.legend !== undefined && this.props.data.legend !== this.state.legend) {
-      this.setState({ legend: this.props.data.legend });
-    }
+  }
+
+  componentDidUpdate(prevProps) {
     const oldHosts = (prevProps.data.selectedHosts || []).map((h) => h.ident);
     const newHosts = (this.props.data.selectedHosts || []).map((h) => h.ident);
     const isHostsChanged = !_.isEqual(oldHosts, newHosts);
-    if (isHostsChanged || prevProps.data !== this.props.data) {
+    if (isHostsChanged || !_.isEqualWith(prevProps.data, this.props.data)) {
       this.updateAllGraphs(this.state.aggrFunc, this.state.aggrGroups, this.state.offsets);
     }
   }
@@ -133,9 +152,9 @@ export default class Graph extends Component<GraphProps, GraphState> {
     this.chart && this.chart.destroy();
   }
 
-  afterFetchChartDataOperations(allResponseData) {
+  afterFetchChartDataOperations(allResponseData, queryStart, step) {
     const errorSeries: ErrorInfoType[] = [];
-    const offsets = this.state.offsets;
+    const { offsets, series: previousSeries, legendHighlightedKeys } = this.state;
     const rawSeries = allResponseData.reduce((acc, cur, idx) => {
       if (cur.status === 'error') {
         errorSeries.push(cur);
@@ -152,8 +171,22 @@ export default class Graph extends Component<GraphProps, GraphState> {
       return acc;
     }, []);
     const series = util.normalizeSeries(rawSeries);
-    this.setState({ spinning: false, series });
+    const isEqualSeriesResult = isEqualSeries(previousSeries, series);
+    this.setState(Object.assign({ spinning: false, series, chartShowSeries: series, legendHighlightedKeys: isEqualSeriesResult ? legendHighlightedKeys : [] }));
+    // 如果数据源相同，同步图表展示内容
+    if (isEqualSeriesResult) {
+      this.handleLegendRowSelectedChange('normal', this.state.legendHighlightedKeys);
+    }
+
+    // 回显错误信息和请求结果信息，即时查询页需要
     this.state.onErrorOccured && this.state.onErrorOccured(errorSeries);
+    !errorSeries.length &&
+      this.state.onRequestCompleted &&
+      this.state.onRequestCompleted({
+        loadTime: Date.now() - queryStart,
+        resolution: step,
+        resultSeries: series.length,
+      });
   }
 
   getGraphConfig(graphConfig) {
@@ -183,13 +216,8 @@ export default class Graph extends Component<GraphProps, GraphState> {
     }
   }
 
-  fetchData(query) {
+  fetchData(query, { start, end, step }) {
     this.setState({ spinning: true });
-
-    const {
-      data: { range, step },
-    } = this.props;
-    const { start, end } = formatPickerDate(range);
     try {
       return api.fetchHistory({
         start,
@@ -205,6 +233,12 @@ export default class Graph extends Component<GraphProps, GraphState> {
 
   handleLegendRowSelectedChange = (selectedKeys, highlightedKeys) => {
     const { series } = this.state;
+    const curChartType = this.props.data.chartType;
+    const newChartShowSeries: any[] = [];
+    // 图表类型为堆叠图并且选中部分图表时，过滤展示的 series
+    if (curChartType === ChartType.StackArea && highlightedKeys.length) {
+      highlightedKeys.forEach((i: number) => newChartShowSeries.push(series[i]));
+    }
 
     const newSeries = _.map(series, (serie, i) => {
       const oldColor = _.get(serie, 'oldColor', serie.color);
@@ -212,12 +246,11 @@ export default class Graph extends Component<GraphProps, GraphState> {
         ...serie,
         visible: getSerieVisible(serie, selectedKeys),
         zIndex: getSerieIndex(serie, highlightedKeys, series.length, i),
-        color: getSerieColor(serie, highlightedKeys, oldColor),
+        color: curChartType === ChartType.StackArea ? oldColor : getSerieColor(serie, highlightedKeys, oldColor),
         oldColor,
       };
     });
-
-    this.setState({ series: newSeries });
+    this.setState({ series: newSeries, chartShowSeries: newChartShowSeries.length ? newChartShowSeries : newSeries, legendHighlightedKeys: highlightedKeys });
   };
 
   refresh = () => {
@@ -251,35 +284,36 @@ export default class Graph extends Component<GraphProps, GraphState> {
   };
 
   renderChart() {
-    const { errorText, series } = this.state;
+    const { errorText, chartShowSeries } = this.state;
     const { height, data } = this.props;
     const graphConfig = this.getGraphConfig(data);
-    const chartType = _.get(data, 'chartTypeOptions.chartType') || 'line';
 
     if (errorText) {
       return <div className='graph-errorText'>{errorText}</div>;
     }
-    if (chartType === 'line') {
-      return <GraphChart graphConfig={graphConfig} series={series} style={{ minHeight: '65%' }} />;
-      // return <GraphChart graphConfig={graphConfig} height={height} series={series} />;
-    }
-    return null;
+    return <GraphChart graphConfig={graphConfig} series={chartShowSeries} style={{ minHeight: '65%' }} />;
   }
 
-  updateGraphConfig (changeObj) {
-    console.log('updateGraphConfig', changeObj)
-    const aggrFunc = changeObj?.aggrFunc
-    const aggrGroups = changeObj?.aggrGroups
-    const offsets = changeObj?.comparison
-    this.setState({aggrFunc, aggrGroups, offsets})
+  updateGraphConfig(changeObj) {
+    const aggrFunc = changeObj?.aggrFunc;
+    const aggrGroups = changeObj?.aggrGroups;
+    const offsets = changeObj?.comparison;
+    this.setState({ aggrFunc, aggrGroups, offsets });
+    if (changeObj.changeType === 'aggrFuncChange' && aggrGroups.length === 0) return;
     this.updateAllGraphs(aggrFunc, aggrGroups, offsets);
   }
 
   updateAllGraphs(aggrFunc, aggrGroups, offsets) {
-    const { promqls } = this.props.data;
+    const queryStart = Date.now();
+    let { promqls, range, step } = this.props.data;
+    const { start, end } = formatPickerDate(range);
+    // 如果没有 step(resolution)，计算一个默认的 step 值
+    if (!step) step = Math.max(Math.floor((end - start) / 250), 1);
+
     let obj: { curAggrFunc?: string; curAggrGroup?: string[]; offset?: string[] } = {};
     if (aggrFunc) obj.curAggrFunc = aggrFunc;
     if (aggrGroups && aggrGroups.length > 0) obj.curAggrGroup = aggrGroups;
+
     if (promqls) {
       // 取查询语句的正确值，并去掉查询条件为空的语句
       const formattedPromqls = promqls
@@ -288,10 +322,12 @@ export default class Graph extends Component<GraphProps, GraphState> {
         })
         .filter((promql) => promql);
 
-      const noOffsetPromise = formattedPromqls.map((query) => this.fetchData(query));
-      Promise.all([...noOffsetPromise]).then((res) => {
-        this.afterFetchChartDataOperations(res);
-      });
+      if (formattedPromqls.length) {
+        const noOffsetPromise = formattedPromqls.map((query) => this.fetchData(query, { start, end, step }));
+        Promise.all([...noOffsetPromise]).then((res) => {
+          this.afterFetchChartDataOperations(res, queryStart, step);
+        });
+      }
     } else {
       const queryNoOffset = this.generateQuery(obj);
       // 如果有环比，再单独请求
@@ -299,42 +335,46 @@ export default class Graph extends Component<GraphProps, GraphState> {
       if (offsets) {
         queries = offsets.map((offset) => this.generateQuery({ ...obj, offset }));
       }
-      const seriesPromises = queries.map((query) => this.fetchData(query));
-      const noOffsetPromise = this.fetchData(queryNoOffset);
+      const seriesPromises = queries.map((query) => this.fetchData(query, { start, end, step }));
+      const noOffsetPromise = this.fetchData(queryNoOffset, { start, end, step });
       Promise.all([...seriesPromises, noOffsetPromise]).then((res) => {
-        this.afterFetchChartDataOperations(res);
+        this.afterFetchChartDataOperations(res, queryStart, step);
       });
     }
   }
 
-
-  getContent () {
+  getContent() {
     const aggrFuncMenu = (
-      <Menu onClick={(sort) => {
-        this.setState({
-          highLevelConfig: {
-            ...this.state.highLevelConfig,
-            sharedSortDirection: (sort as {key: 'desc' | 'asc'}).key
-          }
-        })
-      }} selectedKeys={[this.state.highLevelConfig.sharedSortDirection]}>
+      <Menu
+        onClick={(sort) => {
+          this.setState({
+            highLevelConfig: {
+              ...this.state.highLevelConfig,
+              sharedSortDirection: (sort as { key: 'desc' | 'asc' }).key,
+            },
+          });
+        }}
+        selectedKeys={[this.state.highLevelConfig.sharedSortDirection]}
+      >
         <Menu.Item key='desc'>desc</Menu.Item>
         <Menu.Item key='asc'>asc</Menu.Item>
       </Menu>
-    )
+    );
     const precisionMenu = (
       <Menu onClick={(precision) => {
+        const precisionKey = isNaN(Number(precision.key)) ? precision.key : Number(precision.key)
         this.setState({
           highLevelConfig: {
             ...this.state.highLevelConfig,
-            formatUnit: (Number(precision.key)) as 1024|1000
+            formatUnit: precisionKey as 1024 | 1000 | 'humantime'
           }
         })
       }} selectedKeys={[String(this.state.highLevelConfig.formatUnit)]}>
-        <Menu.Item key={'1024'}>1024</Menu.Item>
-        <Menu.Item key={'1000'}>1000</Menu.Item>
+        <Menu.Item key={'1024'}>Ki, Mi, Gi by 1024</Menu.Item>
+        <Menu.Item key={'1000'}>Ki, Mi, Gi by 1000</Menu.Item>
+        <Menu.Item key={'humantime'}>Human time duration</Menu.Item>
       </Menu>
-    )
+    );
     return (
       <div>
         <Checkbox
@@ -347,7 +387,9 @@ export default class Graph extends Component<GraphProps, GraphState> {
               },
             });
           }}
-        >Multi Series in Tooltip, order value</Checkbox>
+        >
+          Multi Series in Tooltip, order value
+        </Checkbox>
         {/* <Select value={this.state.highLevelConfig.sharedSortDirection} onChange={(v: 'desc' | 'asc') => {
           this.setState({
             highLevelConfig: {
@@ -360,7 +402,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
           <Option value='asc'>asc</Option>
         </Select> */}
         <Dropdown overlay={aggrFuncMenu}>
-          <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+          <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
             {this.state.highLevelConfig.sharedSortDirection} <DownOutlined />
           </a>
         </Dropdown>
@@ -384,8 +426,8 @@ export default class Graph extends Component<GraphProps, GraphState> {
                 ...this.state.highLevelConfig,
                 precision: e.target.checked ? 'short' : 'origin'
               }
-            })
-          }}>Value format with: Ki, Mi, Gi by</Checkbox>
+            });
+          }}>Value format with: </Checkbox>
         {/* <Select value={this.state.highLevelConfig.formatUnit} onChange={(v: 1024 | 1000) => {
           this.setState({
             highLevelConfig: {
@@ -399,7 +441,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
         </Select> */}
         <Dropdown overlay={precisionMenu}>
           <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
-            {this.state.highLevelConfig.formatUnit} <DownOutlined />
+          {formatUnitInfoMap[this.state.highLevelConfig.formatUnit]} <DownOutlined />
           </a>
         </Dropdown>
       </div>
@@ -425,7 +467,9 @@ export default class Graph extends Component<GraphProps, GraphState> {
             <div className='graph-extra'>
               <span className='graph-operationbar-item' key='info'>
                 <Popover placement='left' content={this.getContent()} trigger='click'>
-                  <SettingOutlined />
+                  <Button className='' type='link' size='small' onClick={(e) => e.preventDefault()}>
+                    <SettingOutlined />
+                  </Button>
                 </Popover>
               </span>
               <span className='graph-operationbar-item' key='sync'>

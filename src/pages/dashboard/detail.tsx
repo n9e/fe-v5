@@ -10,8 +10,7 @@ import { Dashboard, Group } from '@/store/dashboardInterface';
 import ChartGroup, { Chart } from './chartGroup';
 import ChartConfigModal from './chartConfigModal';
 import RefreshIcon from '@/components/RefreshIcon';
-import VariableConfig from './VariableConfig';
-import { TagFilterResponse } from './VariableConfig/definition';
+import VariableConfig, { VariableType } from './VariableConfig';
 import './index.less';
 import { useTranslation } from 'react-i18next';
 import Resolution from '@/components/Resolution';
@@ -44,10 +43,10 @@ export default function DashboardDetail() {
     update_at: 0,
     update_by: '',
   });
-  const [step, setStep] = useState(15);
+  const [step, setStep] = useState<number | null>(null);
   const [titleEditing, setTitleEditing] = useState(false);
   const [chartGroup, setChartGroup] = useState<Group[]>([]);
-  const [variableConfig, setVariableConfig] = useState<TagFilterResponse | null>(null);
+  const [variableConfig, setVariableConfig] = useState<VariableType>();
   const [groupModalVisible, setGroupModalVisible] = useState(false);
   const [chartModalVisible, setChartModalVisible] = useState(false);
   const [chartModalInitValue, setChartModalInitValue] = useState<Chart | null>();
@@ -62,11 +61,10 @@ export default function DashboardDetail() {
   const init = () => {
     getSingleDashboard(busiId, id).then((res) => {
       setDashboard(res.dat);
-
-      // if (res.dat.configs) {
-      //   setVariableConfig(JSON.parse(res.dat.configs));
-      //   variableRef.current && variableRef.current.setInitData(res.dat.configs);
-      // }
+      if (res.dat.configs) {
+        const configs = JSON.parse(res.dat.configs);
+        setVariableConfig(configs);
+      }
     });
     getChartGroup(busiId, id).then((res) => {
       let arr = res.dat || [];
@@ -179,7 +177,7 @@ export default function DashboardDetail() {
   };
 
   const handleVariableChange = (value) => {
-    // updateSingleDashboard(id, { ...dashboard, configs: JSON.stringify(value) });
+    updateSingleDashboard(busiId, id, { ...dashboard, configs: JSON.stringify(value) });
     setVariableConfig(value);
   };
 
@@ -206,7 +204,7 @@ export default function DashboardDetail() {
     >
       <div className='dashboard-detail-content'>
         <div className='variable-area'>
-          <VariableConfig ref={variableRef} onChange={handleVariableChange} />
+          <VariableConfig onChange={handleVariableChange} value={variableConfig} />
         </div>
 
         <div className='charts'>
@@ -224,7 +222,7 @@ export default function DashboardDetail() {
               onDelChart={handleDelChart}
               onDelChartGroup={handleDelChartGroup}
               range={range}
-              variableConfig={variableConfig}
+              variableConfig={variableConfig!}
               moveUpEnable={i > 0}
               moveDownEnable={i < chartGroup.length - 1}
             />
@@ -266,7 +264,14 @@ export default function DashboardDetail() {
       </Modal>
 
       {chartModalVisible && (
-        <ChartConfigModal busiId={busiId} initialValue={chartModalInitValue} groupId={groupId} show={chartModalVisible} onVisibleChange={handleChartConfigVisibleChange} />
+        <ChartConfigModal
+          busiId={busiId}
+          initialValue={chartModalInitValue}
+          groupId={groupId}
+          show={chartModalVisible}
+          onVisibleChange={handleChartConfigVisibleChange}
+          variableConfig={variableConfig}
+        />
       )}
     </PageLayout>
   );

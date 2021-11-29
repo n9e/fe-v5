@@ -1,10 +1,12 @@
-import React, { ReactNode } from 'react';
+import React, { useState, ReactNode } from 'react';
 import './index.less';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { RollbackOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { RootState, accountStoreState } from '@/store/accountInterface';
+import { RootState as AccountRootState, accountStoreState } from '@/store/accountInterface';
+import { RootState as CommonRootState } from '@/store/common';
+import { CommonStoreState } from '@/store/commonInterface';
 import { Menu, Dropdown, Switch } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import { Logout } from '@/services/login';
@@ -15,12 +17,20 @@ interface IPageLayoutProps {
   rightArea?: ReactNode;
   customArea?: ReactNode;
   showBack?: Boolean;
+  onChangeCluster?: (string) => void;
 }
 
-const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, children, customArea, showBack }) => {
+const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, children, customArea, showBack, onChangeCluster }) => {
   const { t, i18n } = useTranslation();
   const history = useHistory();
-  let { profile } = useSelector<RootState, accountStoreState>((state) => state.account);
+  let { profile } = useSelector<AccountRootState, accountStoreState>((state) => state.account);
+  const { clusters } = useSelector<CommonRootState, CommonStoreState>((state) => state.common);
+  const localCluster = localStorage.getItem('curCluster')
+  const [curCluster, setCurCluster] = useState<string>(localCluster || clusters[0]);
+  if (!localCluster && clusters.length > 0) {
+    setCurCluster(clusters[0])
+    localStorage.setItem('curCluster', clusters[0])
+  }
 
   const menu = (
     <Menu>
@@ -45,6 +55,16 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, childr
     </Menu>
   );
 
+  const clusterMenu = (
+    <Menu selectedKeys={[curCluster]}>
+      {clusters.map(cluster => <Menu.Item key={cluster} onClick={_ => {
+        setCurCluster(cluster)
+        onChangeCluster && onChangeCluster(cluster)
+        localStorage.setItem('curCluster', cluster)
+      }}>{cluster}</Menu.Item>)}
+    </Menu>
+  )
+
   return (
     <div className={'page-wrapper'}>
       {customArea ? (
@@ -66,6 +86,15 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, childr
             </div>
             {/* <div className={'page-header-right-area'}>{rightArea}</div> */}
             <div className={'page-header-right-area'}>
+              <div style={{ marginRight: 20 }}>
+                <Dropdown
+                  overlay={clusterMenu}
+                >
+                  <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+                    {curCluster} <DownOutlined />
+                  </a>
+                </Dropdown>
+              </div>
               <span
                 className='language'
                 onClick={() => {
