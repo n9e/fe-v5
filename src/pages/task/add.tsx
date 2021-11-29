@@ -2,37 +2,35 @@ import React, { useState, useEffect } from 'react';
 import { Button, Spin, message } from 'antd';
 import _ from 'lodash';
 import queryString from 'query-string';
-import request from '@pkgs/request';
-import api from '@common/api';
-import useFormatMessage from '@pkgs/hooks/useFormatMessage';
-import CreateIncludeNsTree from '@pkgs/Layout/CreateIncludeNsTree';
-import TplForm from '../taskTpl/TplForm';
+import { useTranslation } from 'react-i18next';
+import request from '@/utils/request';
+import api from '@/utils/api';
+import TplForm from '../taskTpl/tplForm';
 
 const Add = (props: any) => {
-  const intlFmtMsg = useFormatMessage();
+  const query = queryString.parse(_.get(props, 'location.search'));
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState();
   const [action, setAction] = useState('');
   const handleSubmit = (values: any) => {
-    if (action) {
-      request(api.tasks, {
+    if (action && typeof query.nid === 'string') {
+      request(api.tasks(query.nid), {
         method: 'POST',
         body: JSON.stringify({
           ...values,
           action,
         }),
       }).then((taskId) => {
-        message.success(intlFmtMsg({ id: 'msg.create.success' }));
+        message.success(t('msg.create.success'));
         props.history.push({
-          pathname: `/tasks/${taskId}/result`,
+          pathname: `/job-tasks/${taskId}/result`,
         });
       });
     }
   };
 
   useEffect(() => {
-    const query = queryString.parse(_.get(props, 'location.search'));
-
     if (_.isPlainObject(query)) {
       if (query.tpl !== undefined) {
         setLoading(true);
@@ -91,4 +89,4 @@ const Add = (props: any) => {
   );
 };
 
-export default CreateIncludeNsTree(Add, { visible: false });
+export default Add;

@@ -13,12 +13,11 @@ const BindTags = (props) => {
   const handleOk = () => {
     const { selectedIds } = props;
     form.validateFields().then((values: any) => {
-      request(`${api.tasktpls}/tags`, {
-        method: 'PUT',
+      request(`${api.tasktpls(props.busiId)}/tags`, {
+        method: 'POST',
         body: JSON.stringify({
-          tags: _.join(values.tags, ','),
+          tags: values.tags,
           ids: selectedIds,
-          act: 'bind',
         }),
       }).then(() => {
         message.success(t('tpl.tag.bind.success'));

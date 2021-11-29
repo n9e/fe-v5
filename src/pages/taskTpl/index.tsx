@@ -19,7 +19,7 @@ import UnBindTags from './unBindTags';
 function getTableData(options: any, busiGroup: number | undefined, query: string) {
   if (busiGroup) {
     return request(`${api.tasktpls(busiGroup)}?limit=${options.pageSize}&p=${options.current}&query=${query}`).then((res) => {
-      return { data: res.list, total: res.total };
+      return { data: res.dat.list, total: res.dat.total };
     });
   }
   return Promise.resolve({ data: [], total: 0 });
@@ -40,12 +40,14 @@ const index = (_props: any) => {
   }
 
   function handleDelBtnClick(id: number) {
-    request(`${api.tasktpl}/${id}`, {
-      method: 'DELETE',
-    }).then(() => {
-      message.success(t('msg.delete.success'));
-      refresh();
-    });
+    if (busiId) {
+      request(`${api.tasktpl(busiId)}/${id}`, {
+        method: 'DELETE',
+      }).then(() => {
+        message.success(t('msg.delete.success'));
+        refresh();
+      });
+    }
   }
 
   function handleBatchBindTags () {
@@ -53,6 +55,7 @@ const index = (_props: any) => {
       BindTags({
         language: i18n.language,
         selectedIds,
+        busiId,
         onOk: () => {
           refresh();
         },
@@ -71,6 +74,7 @@ const index = (_props: any) => {
         language: i18n.language,
         selectedIds,
         uniqueTags,
+        busiId,
         onOk: () => {
           refresh();
         },
@@ -98,7 +102,7 @@ const index = (_props: any) => {
       title: t('tpl.title'),
       dataIndex: 'title',
       render: (text, record) => {
-        return <Link to={{ pathname: `/tpls/${record.id}/detail` }}>{text}</Link>;
+        return <Link to={{ pathname: `/job-tpls/${record.id}/detail`, search: `nid=${busiId}` }}>{text}</Link>;
       },
     }, {
       title: t('tpl.tags'),
@@ -109,14 +113,14 @@ const index = (_props: any) => {
       },
     }, {
       title: t('tpl.creator'),
-      dataIndex: 'creator',
+      dataIndex: 'create_by',
       width: 150,
     }, {
       title: t('tpl.last_updated'),
-      dataIndex: 'last_updated',
+      dataIndex: 'update_at',
       width: 160,
       render: (text) => {
-        return moment(text).format('YYYY-MM-DD HH:mm:ss');
+        return moment.unix(text).format('YYYY-MM-DD HH:mm:ss');
       },
     }, {
       title: t('table.operations'),
@@ -124,11 +128,11 @@ const index = (_props: any) => {
       render: (_text, record) => {
         return (
           <span>
-            <Link to={{ pathname: `/tasks-add`, search: `tpl=${record.id}` }}>
+            <Link to={{ pathname: `/job-tasks/add`, search: `tpl=${record.id}` }}>
               {t('task.create')}
             </Link>
             <Divider type="vertical" />
-            <Link to={{ pathname: `/tpls/${record.id}/modify` }}>
+            <Link to={{ pathname: `/job-tpls/${record.id}/modify`, search: `nid=${busiId}` }}>
               {t('table.modify')}
             </Link>
             <Divider type="vertical" />

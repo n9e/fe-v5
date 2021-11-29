@@ -3,23 +3,27 @@ import { Button, message } from 'antd';
 import _ from 'lodash';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import queryString from 'query-string';
 import PageLayout from '@/components/pageLayout';
 import request from '@/utils/request';
 import api from '@/utils/api';
 import TplForm from './tplForm';
 
 const Add = (props: any) => {
+  const query = queryString.parse(props.location.search);
   const { t } = useTranslation();
   const handleSubmit = (values: any) => {
-    request(`${api.tasktpls}?nid=${values.nid}`, {
-      method: 'POST',
-      body: JSON.stringify(values),
-    }).then(() => {
-      message.success(t('msg.create.success'));
-      props.history.push({
-        pathname: `/tpls`,
+    if (typeof query.nid === 'string') {
+      request(`${api.tasktpls(query.nid)}`, {
+        method: 'POST',
+        body: JSON.stringify(values),
+      }).then(() => {
+        message.success(t('msg.create.success'));
+        props.history.push({
+          pathname: `/job-tpls`,
+        });
       });
-    });
+    }
   };
 
   return (

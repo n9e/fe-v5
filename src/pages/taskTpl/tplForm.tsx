@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import _ from 'lodash';
-import queryString from 'query-string';
 import { withRouter } from 'react-router-dom';
 import { Form, Input, InputNumber, Select } from 'antd';
 import { useTranslation } from 'react-i18next';
@@ -15,7 +14,6 @@ const { TextArea } = Input;
 const TplForm = (props) => {
   const { t } = useTranslation();
   const [form] = Form.useForm();
-  const [habitsId, setHabitsId] = useState('ident');
 
   useEffect(() => {
     // 获取服务列表
@@ -24,25 +22,17 @@ const TplForm = (props) => {
   const handleSubmit = (values) => {
     props.onSubmit({
       ...values,
-      tags: _.join(values.tags, ','),
       hosts: _.split(values.hosts, '\n'),
     });
   }
 
   const { initialValues, type } = props;
-  // const { getFieldDecorator } = form;
-  const search = _.get(props, 'location.search');
-  const query = queryString.parse(search);
 
-  // if (type === 'tpl') {
-  //   getFieldDecorator('nid', {
-  //     initialValue: initialValues.nid || query.nid,
-  //   });
-  // }
+  console.log('initialValues', initialValues);
 
   return (
     <div className="job-tpl-form">
-      <Form onFinish={handleSubmit} layout="vertical">
+      <Form onFinish={handleSubmit} form={form} layout="vertical">
         <FormItem
           label={
             <>
@@ -66,7 +56,7 @@ const TplForm = (props) => {
                 </>
               }
               name="tags"
-              initialValue={initialValues.tags ? _.split(initialValues.tags, ',') : []}
+              initialValue={initialValues.tags}
             >
               <Select
                 mode="tags"
@@ -129,7 +119,7 @@ const TplForm = (props) => {
           label={
             <span>
               <strong>Pause:</strong>
-              {t('tpl.pause.help', { habitsId })}
+              {t('tpl.pause.help')}
             </span>
           }
           name="pause"
@@ -169,7 +159,7 @@ const TplForm = (props) => {
         <FormItem
           label={
             <>
-              <strong>Host {habitsId}:</strong>
+              <strong>Host:</strong>
               {t('tpl.host.help')}
             </>
           }
@@ -177,7 +167,7 @@ const TplForm = (props) => {
           initialValue={_.join(initialValues.hosts, '\n')}
           rules={[{ required: type !== 'tpl' , message: '必填项！'}]}
         >
-          <TextArea autoSize={{ minRows: 3, maxRows: 8 }} />,
+          <TextArea autoSize={{ minRows: 3, maxRows: 8 }} />
         </FormItem>
         <FormItem
           label={
@@ -222,7 +212,7 @@ TplForm.defaultProps = {
     pause: '',
     script: '#!/bin/bash\n# e.g.\nexport PATH=/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:~/bin\nss -tln',
     args: '',
-    tags: '',
+    tags: undefined,
     account: 'root',
     hosts: [],
     treeData: [],

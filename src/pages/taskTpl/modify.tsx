@@ -1,57 +1,71 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Spin, message } from 'antd';
 import _ from 'lodash';
-import request from '@pkgs/request';
-import api from '@common/api';
-import useFormatMessage from '@pkgs/hooks/useFormatMessage';
-import CreateIncludeNsTree from '@pkgs/Layout/CreateIncludeNsTree';
-import TplForm from './TplForm';
+import queryString from 'query-string';
+import { useTranslation } from 'react-i18next';
+import PageLayout from '@/components/pageLayout';
+import request from '@/utils/request';
+import api from '@/utils/api';
+import TplForm from './tplForm';
 
 const Modify = (props: any) => {
   const id = _.get(props, 'match.params.id');
-  const intlFmtMsg = useFormatMessage();
+  const query = queryString.parse(props.location.search);
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState({});
+  const [data, setData] = useState<any>({});
   const handleSubmit = (values: any) => {
-    request(`${api.tasktpl}/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(values),
-    }).then(() => {
-      message.success(intlFmtMsg({ id: 'msg.modify.success'}));
-      props.history.push({
-        pathname: `/tpls`,
+    if (typeof query.nid === 'string') {
+      request(`${api.tasktpl(query.nid)}/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(values),
+      }).then(() => {
+        message.success(t('msg.modify.success'));
+        props.history.push({
+          pathname: `/job-tpls`,
+        });
       });
-    });
+    }
   };
 
   useEffect(() => {
-    if (id) {
+    if (id && typeof query.nid === 'string') {
       setLoading(true);
-      request(`${api.tasktpl}/${id}`).then((data) => {
+      request(`${api.tasktpl(query.nid)}/${id}`).then((data) => {
+        const { dat } = data;
         setData({
-          ...data.tpl,
-          hosts: data.hosts,
-          grp: data.grp,
+          ...dat.tpl,
+          hosts: dat.hosts,
+          grp: dat.grp,
         });
       }).finally(() => {
         setLoading(false);
       });
     }
-  }, [id])
+  }, [id, query.nid]);
+
+  console.log(data);
 
   return (
-    <Spin spinning={loading}>
-      <TplForm
-        onSubmit={handleSubmit}
-        initialValues={data}
-        footer={
-          <Button type="primary" htmlType="submit">
-            {intlFmtMsg({ id: 'form.submit' })}
-          </Button>
-        }
-      />
-    </Spin>
+    <PageLayout title={t('修改任务模板')}>
+      <div style={{ padding: 20, background: '#fff' }}>
+        <Spin spinning={loading}>
+          {
+            data.title ?
+            <TplForm
+              onSubmit={handleSubmit}
+              initialValues={data}
+              footer={
+                <Button type="primary" htmlType="submit">
+                  {t('form.submit')}
+                </Button>
+              }
+            /> : null
+          }
+        </Spin>
+      </div>
+    </PageLayout>
   )
 }
 
-export default CreateIncludeNsTree(Modify, { visible: false });
+export default Modify;

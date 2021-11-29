@@ -15,12 +15,11 @@ const UnBindTags = (props) => {
   const handleOk = () => {
     const { selectedIds } = props;
     form.validateFields().then((values: any) => {
-      request(`${api.tasktpl}s/tags`, {
-        method: 'PUT',
+      request(`${api.tasktpl(props.busiId)}s/tags`, {
+        method: 'DELETE',
         body: JSON.stringify({
-          tags: _.join(values.tags, ','),
+          tags: values.tags,
           ids: selectedIds,
-          act: 'unbind',
         }),
       }).then(() => {
         message.success(t('tpl.tag.unbind.success'));

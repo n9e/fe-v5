@@ -3,12 +3,11 @@ import { Link } from 'react-router-dom';
 import { Table, Divider, Tag, Row, Col, Button } from 'antd';
 import { ColumnProps } from 'antd/lib/table';
 import _ from 'lodash';
+import { useTranslation } from 'react-i18next';
 import { useAntdTable } from '@umijs/hooks';
-import useFormatMessage from '@pkgs/hooks/useFormatMessage';
-import request from '@pkgs/request';
-import FieldCopy from '@cpts/FieldCopy';
-import api from '@common/api';
-import { prefixCls } from '@common/config';
+import FieldCopy from './FieldCopy';
+import request from '@/utils/request';
+import api from '@/utils/api';
 
 interface HostItem {
   host: string,
@@ -16,11 +15,10 @@ interface HostItem {
 }
 
 const index = (props: any) => {
-  const taskResultCls = `${prefixCls}-task-result`;
+  const taskResultCls = 'job-task-result';
   const { params } = props.match;
   const taskId = params.id;
-  // const intl = getIntl();
-  const intlFmtMsg = useFormatMessage();
+  const { t } = useTranslation();
   const [activeStatus, setActiveStatus] = useState('total');
   const [data, setData] = useState({} as any);
   const getTableData = () => {
@@ -76,7 +74,7 @@ const index = (props: any) => {
       ),
       dataIndex: 'host',
     }, {
-      title: intlFmtMsg({ id: 'task.status' }),
+      title: t('task.status'),
       dataIndex: 'status',
       render: (text) => {
         if (text === 'success') {
@@ -89,7 +87,7 @@ const index = (props: any) => {
         return <Tag>{text}</Tag>;
       },
     }, {
-      title: intlFmtMsg({ id: 'task.output' }),
+      title: t('task.output'),
       render: (_text, record) => {
         return (
           <span>
@@ -113,7 +111,7 @@ const index = (props: any) => {
   ];
   if (!data.done) {
     columns.push({
-      title: intlFmtMsg({ id: 'table.operations' }),
+      title: t('table.operations'),
       render: (_text, record) => {
         return (
           <span>
@@ -152,9 +150,9 @@ const index = (props: any) => {
         <Col span={18}>
           <h3 style={{ marginBottom: 10, fontSize: 12, fontWeight: 'bolder' }}>{data.title}</h3>
           <div className={taskResultCls}>
-            <Link to={{ pathname: '/tasks' }}>{'<'}返回列表</Link>
+            <Link to={{ pathname: '/job-tasks' }}>{'<'}返回列表</Link>
             <Divider type="vertical" />
-            {intlFmtMsg({ id: 'task.done' })}: {_.toString(data.done)}
+            {t('task.done')}: {_.toString(data.done)}
             <Divider type="vertical" />
             <a href={`/task-output/${taskId}/stdout`} target="_blank">stdouts</a>
             <Divider type="vertical" />
@@ -163,11 +161,11 @@ const index = (props: any) => {
             <a className={activeStatus === 'total' ? 'active' : ''} onClick={() => setActiveStatus('total')}>total ({tableProps.dataSource.length})</a>
             <Divider type="vertical" />
             {renderHostStatusFilter()}
-            <Link to={{ pathname: `/tasks/${taskId}/detail` }}>{intlFmtMsg({ id: 'task.meta' })}</Link>
+            <Link to={{ pathname: `/job-tasks/${taskId}/detail` }}>{t('task.meta')}</Link>
             <Divider type="vertical" />
-            <Link to={{ pathname: '/tasks-add', search: `task=${taskId}` }}>{intlFmtMsg({ id: 'task.clone' })}</Link>
+            <Link to={{ pathname: '/job-tasks/add', search: `task=${taskId}` }}>{t('task.clone')}</Link>
             <Divider type="vertical" />
-            <a onClick={() => { refresh(); }}>{intlFmtMsg({ id: 'task.refresh' })}</a>
+            <a onClick={() => { refresh(); }}>{t('task.refresh')}</a>
           </div>
         </Col>
         <Col span={6} className="textAlignRight">
@@ -188,13 +186,13 @@ const index = (props: any) => {
       <Table
         rowKey="host"
         columns={columns as any}
-        {...tableProps}
-        dataSource={tableDataSource}
+        {...tableProps as any}
+        dataSource={tableDataSource as any}
         pagination={{
           ...tableProps.pagination,
           showSizeChanger: true,
           pageSizeOptions: ['10', '50', '100', '500', '1000'],
-        }}
+        } as any}
       />
     </>
   )

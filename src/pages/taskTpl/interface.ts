@@ -11,9 +11,9 @@ export interface Tpl {
   tags: string, // 任务模板的标签,
   account: string, // 运行账号,
   hosts: string[],
-  creator: string,
-  created: string,
-  last_updator: string,
-  last_updated: string,
+  create_by: string,
+  create_at: number,
+  update_by: string,
+  update_at: number,
   // grp: Group,
 }

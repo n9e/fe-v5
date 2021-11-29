@@ -1,33 +1,37 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Table, Divider, Checkbox, Row, Col, Input, Select, Button } from 'antd';
+import { Table, Divider, Checkbox, Row, Col, Input, Select } from 'antd';
 import { ColumnProps } from 'antd/lib/table';
 import _ from 'lodash';
 import moment from 'moment';
+import { useTranslation } from 'react-i18next';
 import { useAntdTable } from '@umijs/hooks';
-import CreateIncludeNsTree from '@pkgs/Layout/CreateIncludeNsTree';
-import useFormatMessage from '@pkgs/hooks/useFormatMessage';
-import request from '@pkgs/request';
-import api from '@common/api';
+import request from '@/utils/request';
+import api from '@/utils/api';
+import LeftTree from '@/components/LeftTree';
+import PageLayout from '@/components/pageLayout';
 
 interface DataItem {
   id: number,
   title: string,
 }
 
-function getTableData(options: any, query: string, mine: boolean, days: number) {
-  return request(`${api.tasks}?limit=${options.pageSize}&p=${options.current}&query=${query}&mine=${mine ? 1 : 0}&days=${days}`).then((res) => {
-    return { data: res.list, total: res.total };
-  });
+function getTableData(options: any, busiId: number | undefined, query: string, mine: boolean, days: number) {
+  if (busiId) {
+    return request(`${api.tasks(busiId)}?limit=${options.pageSize}&p=${options.current}&query=${query}&mine=${mine ? 1 : 0}&days=${days}`).then((res) => {
+      return { data: res.list, total: res.total };
+    });
+  }
+  return Promise.resolve({ data: [], total: 0 });
 }
 
 const index = (_props: any) => {
-  // const intl = getIntl();
-  const intlFmtMsg = useFormatMessage();
+  const { t } = useTranslation();
   const [query, setQuery] = useState('');
   const [mine, setMine] = useState(true);
   const [days, setDays] = useState(7);
-  const { tableProps } = useAntdTable((options) => getTableData(options, query, mine, days), [query, mine, days]);
+  const [busiId, setBusiId] = useState<number>();
+  const { tableProps } = useAntdTable((options) => getTableData(options, busiId, query, mine, days), [query, mine, days]);
 
   const columns: ColumnProps<DataItem>[] = [
     {
@@ -35,37 +39,37 @@ const index = (_props: any) => {
       dataIndex: 'id',
       width: 100,
     }, {
-      title: intlFmtMsg({ id: 'task.title' }),
+      title: t('task.title'),
       dataIndex: 'title',
       width: 200,
       render: (text, record) => {
-        return <Link to={{ pathname: `/tasks/${record.id}/result` }}>{text}</Link>;
+        return <Link to={{ pathname: `/job-tasks/${record.id}/result` }}>{text}</Link>;
       },
     }, {
-      title: intlFmtMsg({ id: 'table.operations' }),
+      title: t('table.operations'),
       width: 150,
       render: (_text, record) => {
         return (
           <span>
-            <Link to={{ pathname: '/tasks-add', search: `task=${record.id}` }}>{intlFmtMsg({ id: 'task.clone' })}</Link>
+            <Link to={{ pathname: '/job-tasks/add', search: `task=${record.id}` }}>{t('task.clone')}</Link>
             <Divider type="vertical" />
-            <Link to={{ pathname: `/tasks/${record.id}/detail` }}>{intlFmtMsg({ id: 'task.meta' })}</Link>
+            <Link to={{ pathname: `/job-tasks/${record.id}/detail` }}>{t('task.meta')}</Link>
           </span>
         );
       },
     }, {
-      title: intlFmtMsg({ id: 'task.done' }),
+      title: t('task.done'),
       dataIndex: 'done',
       width: 100,
       render: (text) => {
         return _.toString(text);
       },
     }, {
-      title: intlFmtMsg({ id: 'task.creator' }),
+      title: t('task.creator'),
       dataIndex: 'creator',
       width: 100,
     }, {
-      title: intlFmtMsg({ id: 'task.created' }),
+      title: t('task.created'),
       dataIndex: 'created',
       width: 160,
       render: (text) => {
@@ -74,42 +78,47 @@ const index = (_props: any) => {
     },
   ];
   return (
-    <>
-      <Row>
-        <Col span={16} className="mb10">
-          <Input.Search
-            style={{ width: 200, marginLeft: 8 }}
-            className="mr10"
-            onSearch={(val) => setQuery(val)}
+    <PageLayout title={t('监控大盘')}>
+      <div style={{ display: 'flex' }}>
+        <LeftTree busiGroup={{ onChange: (id) => setBusiId(id) }}></LeftTree>
+        <div style={{ flex: 1, padding: 20 }}>
+          <Row>
+            <Col span={16} className="mb10">
+              <Input.Search
+                style={{ width: 200, marginLeft: 8 }}
+                className="mr10"
+                onSearch={(val) => setQuery(val)}
+              />
+              <Select
+                className="mr10"
+                style={{ marginRight: 10 }}
+                value={days}
+                onChange={(val: number) => {
+                  setDays(val);
+                }}
+              >
+                <Select.Option value={7}>{t('last.7.days')}</Select.Option>
+                <Select.Option value={15}>{t('last.15.days')}</Select.Option>
+                <Select.Option value={30}>{t('last.30.days')}</Select.Option>
+                <Select.Option value={60}>{t('last.60.days')}</Select.Option>
+                <Select.Option value={90}>{t('last.90.days')}</Select.Option>
+              </Select>
+              <Checkbox checked={mine} onChange={(e) => {
+                setMine(e.target.checked);
+              }}>
+                {t('task.only.mine')}
+              </Checkbox>
+            </Col>
+          </Row>
+          <Table
+            rowKey="id"
+            columns={columns as any}
+            {...tableProps as any}
           />
-          <Select
-            className="mr10"
-            style={{ marginRight: 10 }}
-            value={days}
-            onChange={(val: number) => {
-              setDays(val);
-            }}
-          >
-            <Select.Option value={7}>{intlFmtMsg({ id: 'last.7.days' })}</Select.Option>
-            <Select.Option value={15}>{intlFmtMsg({ id: 'last.15.days' })}</Select.Option>
-            <Select.Option value={30}>{intlFmtMsg({ id: 'last.30.days' })}</Select.Option>
-            <Select.Option value={60}>{intlFmtMsg({ id: 'last.60.days' })}</Select.Option>
-            <Select.Option value={90}>{intlFmtMsg({ id: 'last.90.days' })}</Select.Option>
-          </Select>
-          <Checkbox checked={mine} onChange={(e) => {
-            setMine(e.target.checked);
-          }}>
-            {intlFmtMsg({ id: 'task.only.mine' })}
-          </Checkbox>
-        </Col>
-      </Row>
-      <Table
-        rowKey="id"
-        columns={columns as any}
-        {...tableProps}
-      />
-    </>
+        </div>
+      </div>
+    </PageLayout>
   )
 }
 
-export default CreateIncludeNsTree(index, { visible: false });
+export default index;

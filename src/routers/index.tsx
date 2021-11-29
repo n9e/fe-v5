@@ -28,7 +28,13 @@ import historyEvents from '@/pages/historyEvents';
 import MonObjectManage from '@/pages/monObjectManage';
 import Demo from '@/pages/demo';
 import TaskTpl from '@/pages/taskTpl';
-import TaskTplAdd from '@/pages/taskTpl/add'
+import TaskTplAdd from '@/pages/taskTpl/add';
+import TaskTplDetail from '@/pages/taskTpl/detail';
+import TaskTplModify from '@/pages/taskTpl/modify';
+import Task from '@/pages/task';
+import TaskAdd from '@/pages/task/add';
+import TaskResult from '@/pages/task/result';
+import TaskDetail from '@/pages/task/detail';
 
 import { dynamicPackages, Entry } from '@/utils';
 
@@ -100,12 +106,12 @@ export default function Content() {
 
         <Route exact path="/job-tpls" component={TaskTpl as any} />
         <Route exact path="/job-tpls/add" component={TaskTplAdd as any} />
-        {/* <Route exact path="/tpls/:id/detail" component={TaskTplDetail as any} />
-        <Route exact path="/tpls/:id/modify" component={TaskTplModify as any} />
-        <Route exact path="/tasks" component={Task as any} />
-        <Route exact path="/tasks-add" component={TaskAdd as any} />
-        <Route exact path="/tasks/:id/result" component={TaskResult as any} />
-        <Route exact path="/tasks/:id/detail" component={TaskDetail as any} /> */}
+        <Route exact path="/job-tpls/:id/detail" component={TaskTplDetail as any} />
+        <Route exact path="/job-tpls/:id/modify" component={TaskTplModify as any} />
+        <Route exact path="/job-tasks" component={Task as any} />
+        <Route exact path="/job-tasks/add" component={TaskAdd as any} />
+        <Route exact path="/job-tasks/:id/result" component={TaskResult as any} />
+        <Route exact path="/job-tasks/:id/detail" component={TaskDetail as any} />
         {lazyRoutes.map((route, i) => (
           <RouteWithSubRoutes key={i} {...route} />
         ))}

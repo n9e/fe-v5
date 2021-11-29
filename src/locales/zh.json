@@ -27,6 +27,10 @@
   "hour": "小时",
   "hours": "小时",
 
+  "breadcrumb.groups": "分组列表",
+  "breadcrumb.tpls": "模板列表",
+  "breadcrumb.tpl": "模板详情",
+
   "tpl.create": "创建",
   "tpl.tag.bind": "绑定标签",
   "tpl.tag.unbind": "解绑标签",
@@ -51,7 +55,7 @@
   "tpl.batch.help": "并发度，默认是0，表示全并发执行，1表示顺序执行，2表示每次执行2台",
   "tpl.tolerance.help": "容忍几台机器失败，默认是0，表示一台都不容忍，只要失败了，立马暂停",
   "tpl.timeout.help": "单机脚本执行的超时时间，单位是秒",
-  "tpl.pause.help": "暂停点，做完某台之后暂停一下，要暂停多台，写多个 host {habitsId}，逗号分隔",
+  "tpl.pause.help": "暂停点，做完某台之后暂停一下，要暂停多台，写多个 host，逗号分隔",
   "tpl.host.help": "要执行的机器列表",
   "tpl.script.help": "要执行的脚本内容",
   "tpl.args.help": "附于脚本之后的参数，多个参数之间用双逗号,,分隔，比如arg1,,arg2,,arg3",
@@ -95,6 +99,36 @@
   "last.60.days": "最近 60 天",
   "last.90.days": "最近 90 天",
 
+  "table.nodata": "暂无数据",
+  "table.create": "创建",
   "table.operations": "操作",
-  "table.batch.operations": "批量操作"
+  "table.batch.operations": "批量操作",
+  "table.detail": "详情",
+  "table.modify": "修改",
+  "table.delete": "删除",
+  "table.delete.batch": "批量删除",
+  "table.clone": "克隆",
+  "table.delete.sure": "确定要删除吗？",
+  "table.delete.there.sure": "确定要删除这些吗?",
+  "table.ident": "英文标识",
+  "table.name": "显示名",
+  "table.cate": "类别",
+  "table.creator": "创建者",
+  "table.lastupdated": "修改时间",
+  "table.note": "备注",
+
+  "form.submit": "提 交",
+  "form.save": "保 存",
+  "form.submit.and.save": "提交保存",
+  "form.login": "登 录",
+  "form.goback": "返 回",
+
+  "msg.submit.success": "提交成功",
+  "msg.modify.success": "修改成功",
+  "msg.create.success": "创建成功",
+  "msg.add.success": "添加成功",
+  "msg.delete.success": "删除成功",
+  "msg.clone.success": "克隆成功",
+  "msg.clone.error": "克隆失败",
+  "msg.sort.success": "排序成功"
 }
