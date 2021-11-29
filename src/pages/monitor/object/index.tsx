@@ -60,11 +60,11 @@ export default () => {
       match: [hostsMatchParams]
     }).then((res) => {
       setMetrics(res.data);
-      const newGraphs = graphs.map((graph) => ({
-        ...graph,
-        showHosts,
-      }));
-      setGraphs(newGraphs);
+      // const newGraphs = graphs.map((graph) => ({
+      //   ...graph,
+      //   showHosts,
+      // }));
+      // setGraphs(newGraphs);
       getMetricsDesc(res.data).then(res => {
         setMetricDescs(res.dat)
       })
