@@ -69,7 +69,7 @@ const SideMenu: FC = () => {
         </SubMenu>
         <SubMenu icon={<SettingOutlined />} title={t('告警管理')}>
           <Menu.Item key='/alert-rules'>{t('告警规则')}</Menu.Item>
-          <Menu.Item key='/shield'>{t('屏蔽规则')}</Menu.Item>
+          <Menu.Item key='/alert-mutes'>{t('屏蔽规则')}</Menu.Item>
           <Menu.Item key='/shield'>{t('订阅规则')}</Menu.Item>
           <Menu.Item key='/event'>{t('活跃告警')}</Menu.Item>
           <Menu.Item key='/history-events'>{t('历史告警')}</Menu.Item>

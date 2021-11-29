@@ -3,140 +3,116 @@ import {
   Form,
   Input,
   Card,
-  AutoComplete,
   Select,
   Col,
   Button,
   Row,
   message,
-  Tag,
+  DatePicker,
+  Tooltip
 } from 'antd';
-import { GetMetrics } from '@/services/metric';
-import type { Metric } from '@/pages/metric/matric';
-import RangeDatePicker from '@/components/FormComponents/RangeDatePicker';
+import {
+  QuestionCircleFilled,
+  PlusCircleOutlined
+} from '@ant-design/icons';
+import moment from 'moment';
+
+import TagItem from './tagItem';
 import { addShield } from '@/services/shield';
 import { useHistory } from 'react-router';
-import { shieldItem, FormType, shieldDetail } from '@/store/warningInterface';
-import { randomColor } from '@/utils/constant';
-import dayjs from 'dayjs';
-import { useParams } from 'react-router';
+import { shieldItem } from '@/store/warningInterface';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/common';
-import { eventStoreState } from '@/store/eventInterface';
+import { CommonStoreState } from '@/store/commonInterface';
 import '../index.less';
 import { useTranslation } from 'react-i18next';
 import _ from 'lodash';
-import { getResourceGroups } from '@/services';
-import { SSL_OP_NETSCAPE_REUSE_CIPHER_CHANGE_BUG } from 'constants';
+import { timeLensDefault } from '../../const';
 
 const { Option } = Select;
 const { TextArea } = Input;
-const reg = /\w+=\w+/;
+
+const btimeDefault = new Date().getTime();
+const etimeDefault = new Date().getTime() + 1 * 60 * 60 * 1000; // 默认时长1h
 interface Props {
   detail?: shieldItem;
-  type?: string;
+  type?: number;
 }
 
-const OperateForm: React.FC<Props> = ({ detail, type = FormType.add }) => {
+const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
   const { t, i18n } = useTranslation();
+  const { clusters: clusterList } = useSelector<RootState, CommonStoreState>(
+    (state) => state.common,
+  );
   const layout = {
     labelCol: {
-      span: i18n.language == 'en' ? 3 : 2,
+      span: 24
     },
     wrapperCol: {
-      span: i18n.language == 'en' ? 21 : 22,
+      span: 24
     },
   };
   const tailLayout = {
     labelCol: {
-      // span: i18n.language == 'en' ? 1 : 2,
+      span: 0
     },
     wrapperCol: {
-      offset: 2,
+      span: 24
     },
   };
-  const params = useParams<{
-    from: string;
-  }>();
-  const { currentEdit } = useSelector<RootState, eventStoreState>(
-    (state) => state.event,
-  );
-  const [metrics, setMetrics] = useState<Metric[]>([]);
+  
   const [form] = Form.useForm(null as any);
   const history = useHistory();
   const [btnLoading, setBtnLoading] = useState<boolean>(false);
-  const [classpathPrefixVal, setclasspathPrefixVal] = useState('');
-  const [options, setOptions] = useState<{ value: string }[]>([]);
-  const [Search, setSearch] = useState('');
-  useEffect(() => {
-    if (type === FormType.add && params.from === 'event' && currentEdit?.id) {
-      const { history_points, res_ident, tags } = currentEdit;
-      form.setFieldsValue({
-        metric: history_points[0].metric,
-        res_filters: res_ident,
-        tags_filters: tags === '' ? [] : tags.split(' '),
-      });
-    }
-  }, [params.from]);
-
-  const validator = (rule, value, callback) => {
-    let metric = form.getFieldValue('metric');
-    let resFilters = form.getFieldValue('res_filters');
-    let tagsFilters = form.getFieldValue('tags_filters');
-    let classpathPrefixVal = form.getFieldValue('classpath_prefix');
-
-    if (!metric && !resFilters && !tagsFilters && !classpathPrefixVal) {
-      callback(
-        new Error(t('屏蔽标识、资源标识、屏蔽标签、资源分组前缀不能同时为空')),
-      );
-    } else {
-      callback();
-    }
-  };
-
-  const getMetricsList = async (value?: string) => {
-    const { dat, error } = await GetMetrics({
-      metric: value,
-    });
-    setMetrics(dat.metrics);
-  };
+  const [timeLen, setTimeLen] = useState('1h');
+  const { curBusiItem } = useSelector<RootState, CommonStoreState>(state => state.common);
 
   useEffect(() => {
-    getMetricsList();
-  }, []);
-  useEffect(() => {
-    getResourceGroups(classpathPrefixVal).then((e) => {
-      let paths = e.dat.list.map((e) => {
-        return { value: e.path as string };
-      });
-      setOptions(paths);
-    });
-    form.setFieldsValue({ classpath_prefix: classpathPrefixVal });
-  }, [classpathPrefixVal]);
-
-  const handleTagsChange = (value: string[]) => {
-    const top: string = value[value.length - 1];
-    if (top && !reg.test(top)) {
-      let v = value.pop();
-      message.error(`${t('不符合输入规范（格式为key=value）')}`);
+    const btime = form.getFieldValue('btime');
+    const etime = form.getFieldValue('etime');
+    if (!!etime && !!btime) {
+      const d = moment.duration(etime - btime).days();
+      const h = moment.duration(etime - btime).hours();
+      const m = moment.duration(etime - btime).minutes();
+      const s = moment.duration(etime - btime).seconds();
+      console.log(d, h, m, s)
     }
-  };
+    return () => {
+
+    }
+  }, [form])
+
+  const timeChange = () => {
+    const btime = form.getFieldValue('btime');
+    const etime = form.getFieldValue('etime');
+    if (!!etime && !!btime) {
+      const d = Math.floor(moment.duration(etime - btime).asDays());
+      const h = Math.floor(moment.duration(etime - btime).hours());
+      const m = Math.floor(moment.duration(etime - btime).minutes());
+      const s = Math.floor(moment.duration(etime - btime).seconds());
+      const timeLen = `${d}.${h}:${m}:${s}`;
+      setTimeLen(timeLen);
+    }
+  }
 
   const onFinish = (values) => {
     setBtnLoading(true);
+    const tags = values?.tags?.map(item => {
+      return {
+        ...item,
+        value: item.value.indexOf('\n') > -1 ? item.value.split('\n').join(' ') : item.value
+      }
+    })
     const params = {
-      metric: values.metric,
-      res_filters: values.res_filters,
-      tags_filters: values?.tags_filters ? values.tags_filters.join(' ') : '',
-      cause: values.cause,
-      btime: values.time.btime,
-      etime: values.time.etime,
-      classpath_prefix: values.classpath_prefix,
+      ...values,
+      btime: moment(values.btime).unix(),
+      etime: moment(values.etime).unix(),
+      tags
     };
-    addShield(params)
+    addShield(params, curBusiItem.id)
       .then((_) => {
         message.success(t('新建告警屏蔽成功'));
-        history.push('/shield');
+        history.push('/alert-mutes');
       })
       .finally(() => {
         setBtnLoading(false);
@@ -145,168 +121,195 @@ const OperateForm: React.FC<Props> = ({ detail, type = FormType.add }) => {
   const onFinishFailed = () => {
     setBtnLoading(false);
   };
-  const onSelect = _.debounce((data: string) => {
-    setclasspathPrefixVal(data);
-  }, 800);
-  const onChange = _.debounce((data: string) => {
-    setclasspathPrefixVal(data);
-  }, 800);
+
+  const timeLenChange = (val: string) => {
+    setTimeLen(val);
+
+    const time = new Date().getTime();
+    if (val === 'forever') {
+      const longTime = 7 * 24 * 3600 * 1000 * 10000;
+      form.setFieldsValue({
+        btime: moment(time),
+        etime: moment(time).add({
+          seconds: longTime
+        })
+      })
+      return;
+    }
+    const unit = val.charAt(val.length - 1);
+    const num = val.substr(0, val.length - 1);
+    form.setFieldsValue({
+      btime: moment(time),
+      etime: moment(time).add({
+        [unit]: num
+      })
+    })
+  }
 
   const content =
-    type === FormType.add ? (
-      <Form
-        form={form}
-        {...layout}
-        className='operate-form'
-        onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
-      >
-        <Card>
-          <Form.Item
-            label={t('屏蔽指标')}
-            name='metric'
-            rules={[
-              {
-                validator: validator,
-              },
-            ]}
-          >
-            <AutoComplete
-              placeholder={t('请输入指标名称')}
-              onSearch={_.debounce(getMetricsList, 1000)}
-            >
-              {metrics.map((item) => {
-                return (
-                  <Option key={item.name} value={item.name}>
-                    {item.name} {item.description}
-                  </Option>
-                );
-              })}
-            </AutoComplete>
-          </Form.Item>
-          <Form.Item
-            label={t('资源分组前缀')}
-            name='classpath_prefix'
-            rules={[
-              {
-                validator: validator,
-              },
-            ]}
-          >
-            <AutoComplete
-              value={classpathPrefixVal}
-              options={options}
-              onSelect={onSelect}
-              onChange={onChange}
-              placeholder={t('搜索资源分组前缀')}
-            />
-          </Form.Item>
-          <Form.Item
-            label={t('资源标识')}
-            name='res_filters'
-            rules={[
-              {
-                validator: validator,
-              },
-            ]}
-          >
-            <Input placeholder={t('请输入资源标识的正则表达式')} />
-          </Form.Item>
-          <Form.Item
-            label={t('屏蔽标签')}
-            name='tags_filters'
-            rules={[
-              {
-                validator: validator,
-              },
-            ]}
-          >
-            <Select
-              mode='tags'
-              dropdownStyle={{
-                display: 'none',
-              }}
-              placeholder={t('请输入屏蔽标签(请用回车分割)')}
-              onChange={handleTagsChange}
-            ></Select>
-          </Form.Item>
+    <Form
+      form={form}
+      {...layout}
+      layout='vertical'
+      className='operate-form'
+      onFinish={onFinish}
+      onFinishFailed={onFinishFailed}
+      initialValues={{
+        ...detail,
+        btime: detail?.btime ? moment(detail.btime) : moment(btimeDefault),
+        etime: detail?.etime ? moment(detail.etime) : moment(etimeDefault),
+      }}
+    >
+      <Card>
+        <Form.Item
+          label={t('生效集群：')}
+          name='cluster'
+          rules={[
+            {
+              required: true,
+              message: t('生效集群不能为空'),
+            },
+          ]}
+        >
+          <Select>
+            {clusterList?.map((item) => (
+              <Option value={item} key={item}>
+                {item}
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
+        
+        <Row gutter={10}>
+          <Col span={8}>
+            <Form.Item label={t('屏蔽开始时间：')} name='btime'>
+              <DatePicker showTime onChange={timeChange} />
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item label={t('屏蔽时长：')}>
 
-          <Form.Item label={t('屏蔽时间')} name='time'>
-            <RangeDatePicker />
-          </Form.Item>
-          <Form.Item
-            label={t('屏蔽原因')}
-            name='cause'
-            rules={[
-              {
-                required: true,
-                message: t('请填写屏蔽原因'),
-              },
-            ]}
-          >
-            <TextArea rows={3} />
-          </Form.Item>
-          <Form.Item {...tailLayout}>
-            <Row gutter={[10, 10]} align='middle'>
-              {i18n.language == 'en' ? (
-                <Col span={1} offset={1}>
-                  <Button type='primary' htmlType='submit' loading={btnLoading}>
-                    {t('创建')}
-                  </Button>
-                </Col>
-              ) : (
-                <Col span={1}>
-                  <Button type='primary' htmlType='submit' loading={btnLoading}>
-                    {t('创建')}
-                  </Button>
-                </Col>
-              )}
-
-              <Col
-                span={1}
-                style={{
-                  marginLeft: 40,
-                }}
+              <Select
+                placeholder={t('请选择屏蔽时长')}
+                onChange={timeLenChange}
+                value={timeLen}
               >
-                <Button onClick={() => window.history.back()}>
-                  {t('取消')}
+                {
+                  timeLensDefault.map((item: any, index: number) => (
+                    <Option key={index} value={item.value}>{item.value}</Option>
+                  ))
+                }
+
+
+              </Select>
+            </Form.Item>
+
+          </Col>
+          <Col span={8}>
+            <Form.Item label={t('屏蔽结束时间：')} name='etime'>
+              <DatePicker showTime onChange={timeChange} />
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row gutter={[10, 10]} style={{ marginBottom: '8px' }}>
+          <Col span={5}>
+            {t('屏蔽事件标签Key：')}<Tooltip
+              title={t(
+                `这里的标签是指告警事件的标签，通过如下标签匹配规则过滤告警事件`,
+              )}
+            >
+              <QuestionCircleFilled />
+            </Tooltip>
+          </Col>
+          <Col span={3}>
+            {t('运算符：')}<Tooltip
+              title={t(
+                `运算符如果选择in，value的输入框中自动出现placeholder：
+                    可以输入多个值，用回车分隔
+                    运算符如果选择~=，value的输入框中自动出现placeholder：
+                    请输入正则表达式匹配标签value
+                    运算符如果选择==，value的输入框中清空placeholder`,
+              )}
+            >
+              <QuestionCircleFilled />
+            </Tooltip>
+
+          </Col>
+          <Col span={16}>
+            {t('标签Value：')}
+          </Col>
+        </Row>
+        <Form.List name="tags" initialValue={[{}]}>
+          {(fields, { add, remove }) => (
+            <>
+              {fields.map((field, index) => (
+                <TagItem
+                  field={field}
+                  fields={fields}
+                  key={index}
+                  remove={remove}
+                  add={add}
+                  form={form}
+                />
+
+
+              ))}
+              <Form.Item>
+                <PlusCircleOutlined
+                  className='control-icon-normal'
+                  onClick={() => add()}
+                />
+              </Form.Item>
+            </>
+          )}
+        </Form.List>
+
+
+        {/* <Form.Item label={t('屏蔽时间')} name='time'>
+          <RangeDatePicker />
+        </Form.Item> */}
+        <Form.Item
+          label={t('屏蔽原因')}
+          name='cause'
+          rules={[
+            {
+              required: true,
+              message: t('请填写屏蔽原因'),
+            },
+          ]}
+        >
+          <TextArea rows={3} />
+        </Form.Item>
+        <Form.Item {...tailLayout}>
+          <Row gutter={[10, 10]} >
+            {i18n.language == 'en' ? (
+              <Col span={1} offset={1}>
+                <Button type='primary' htmlType='submit'>
+                  {t('创建')}
                 </Button>
               </Col>
-            </Row>
-          </Form.Item>
-        </Card>
-      </Form>
-    ) : detail ? (
-      <Form {...layout} className='operate-form'>
-        <Card>
-          <Form.Item label={t('屏蔽指标')}>{detail.metric}</Form.Item>
-          <Form.Item label={t('资源标识')}>
-            {detail.res_filters || <div>{t('暂无')}</div>}
-          </Form.Item>
-          <Form.Item label={t('屏蔽标签')}>
-            {(detail.tags_filters &&
-              detail.tags_filters
-                .split(' ')
-                .map((tag: string, index: number) => {
-                  let i = Math.random() * randomColor.length;
-                  let color = randomColor[Math.floor(i)];
-                  return (
-                    <Tag color={color} key={index}>
-                      {tag}
-                    </Tag>
-                  );
-                })) || <div>{t('暂无')}</div>}
-          </Form.Item>
-          <Form.Item label={t('屏蔽时间')}>
-            {dayjs(detail.btime * 1000).format('YYYY-MM-DD HH:mm:ss')} -{' '}
-            {dayjs(detail.etime * 1000).format('YYYY-MM-DD HH:mm:ss')}
-          </Form.Item>
-          <Form.Item label={t('屏蔽原因')}>{detail.cause}</Form.Item>
-        </Card>
-      </Form>
-    ) : (
-      <div></div>
-    );
+            ) : (
+              <Col span={1}>
+                <Button type='primary' htmlType='submit'>
+                  {t('创建')}
+                </Button>
+              </Col>
+            )}
+
+            <Col
+              span={1}
+              style={{
+                marginLeft: 40,
+              }}
+            >
+              <Button onClick={() => window.history.back()}>
+                {t('取消')}
+              </Button>
+            </Col>
+          </Row>
+        </Form.Item>
+      </Card>
+    </Form>
   return <div className='operate-form-index'>{content}</div>;
 };
 

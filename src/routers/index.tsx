@@ -21,6 +21,7 @@ import StrategyEdit from '@/pages/warning/strategy/edit';
 import Shield from '@/pages/warning/shield';
 import AddShield from '@/pages/warning/shield/add';
 import ShieldDetail from '@/pages/warning/shield/detail';
+import ShieldEdit from '@/pages/warning/shield/edit';
 import Event from '@/pages/event';
 import EventDetail from '@/pages/event/detail';
 import Overview from '@/pages/overview';
@@ -88,9 +89,10 @@ export default function Content() {
         <Route exact path='/alert-rules/add/:group_id' component={StrategyAdd} />
         <Route exact path='/alert-rules/edit/:id' component={StrategyEdit} />
         <Route exact path='/alert-rules/:id?' component={Strategy} />
-        <Route exact path='/shield' component={Shield} />
+        <Route exact path='/alert-mutes' component={Shield} />
         <Route exact path='/shield/add/:from?' component={AddShield} />
         <Route exact path='/shield/detail/:id' component={ShieldDetail} />
+        <Route exact path='/alert-mutes/edit/:id' component={ShieldEdit} />
         <Route exact path='/event' component={Event} />
         <Route exact path='/event/:id' component={EventDetail} />
         <Route exact path='/event-history/:id' component={EventDetail} />
