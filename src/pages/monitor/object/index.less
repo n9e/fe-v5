@@ -25,6 +25,7 @@
           }
         }
         .ant-input {
+          padding-left: 24px;
           border-radius: 0;
         }
       }
@@ -34,10 +35,11 @@
       border-top: none;
       .ant-table {
         margin-top: 0;
-        min-height: 442px;
+        min-height: 250px;
         border-left: none;
         border-right: none;
         border-top: none;
+        border-radius: 0;
       }
       .ant-pagination {
         margin: 12px 0;
@@ -47,7 +49,9 @@
     .host-list-empty {
       .ant-table {
         margin-top: 0;
-        min-height: 490px;
+        min-height: 299px;
+        border-top: none;
+        border-radius: 0;
       }
     }
   }
@@ -62,6 +66,9 @@
             border-radius: 0;
           }
         }
+        .ant-input {
+          padding-left: 24px;
+        }
       }
     }
     .metric-tab {
@@ -70,12 +77,20 @@
       border-top: 0;
       padding-top: 0;
     }
+    .metric-tab-empty {
+      height: 299px;
+      border: 1px solid #d9d9d9;
+      border-top: 0;
+      line-height: 299px;
+      text-align: center;
+    }
     .metric-list {
       list-style: none;
       padding: 0;
       margin-bottom: 0;
       .item {
         height: 24px;
+        cursor: pointer;
       }
     }
   }

@@ -71,6 +71,7 @@ class GraphConfigInner extends Component {
       curAggrFunc: val
     })
     onChange('update', data.id, {
+      changeType: 'aggrFuncChange',
       comparison: this.state.curComparisonValue.comparison,
       relativeTimeComparison: this.state.curComparisonValue.relativeTimeComparison,
       comparisonOptions: this.state.curComparisonValue.comparisonOptions,

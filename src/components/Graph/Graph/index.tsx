@@ -49,7 +49,7 @@ interface GraphProps {
     shared?: boolean;
     sharedSortDirection?: 'desc' | 'asc';
     precision?: 'short' | 'origin' | number;
-    formatUnit?: 1024 | 1000;
+    formatUnit?: 1024 | 1000 | 'humantime';
   };
   onErrorOccured?: (errorArr: ErrorInfoType[]) => void;
   onRequestCompleted?: (requestInfo: QueryStats) => void;
@@ -70,10 +70,16 @@ interface GraphState {
     shared: boolean;
     sharedSortDirection: 'desc' | 'asc';
     precision: 'short' | 'origin' | number;
-    formatUnit: 1024 | 1000;
+    formatUnit: 1024 | 1000 | 'humantime';
   };
   onErrorOccured?: (errorArr: ErrorInfoType[]) => void;
   onRequestCompleted?: (requestInfo: QueryStats) => void;
+}
+
+const formatUnitInfoMap = {
+  1024: 'Ki, Mi, Gi by 1024',
+  1000: 'Ki, Mi, Gi by 1000',
+  humantime: 'Human time duration'
 }
 
 const { Option } = Select;
@@ -293,6 +299,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
     const aggrGroups = changeObj?.aggrGroups;
     const offsets = changeObj?.comparison;
     this.setState({ aggrFunc, aggrGroups, offsets });
+    if (changeObj.changeType === 'aggrFuncChange' && aggrGroups.length === 0) return;
     this.updateAllGraphs(aggrFunc, aggrGroups, offsets);
   }
 
@@ -354,19 +361,18 @@ export default class Graph extends Component<GraphProps, GraphState> {
       </Menu>
     );
     const precisionMenu = (
-      <Menu
-        onClick={(precision) => {
-          this.setState({
-            highLevelConfig: {
-              ...this.state.highLevelConfig,
-              formatUnit: Number(precision.key) as 1024 | 1000,
-            },
-          });
-        }}
-        selectedKeys={[String(this.state.highLevelConfig.formatUnit)]}
-      >
-        <Menu.Item key={'1024'}>1024</Menu.Item>
-        <Menu.Item key={'1000'}>1000</Menu.Item>
+      <Menu onClick={(precision) => {
+        const precisionKey = isNaN(Number(precision.key)) ? precision.key : Number(precision.key)
+        this.setState({
+          highLevelConfig: {
+            ...this.state.highLevelConfig,
+            formatUnit: precisionKey as 1024 | 1000 | 'humantime'
+          }
+        })
+      }} selectedKeys={[String(this.state.highLevelConfig.formatUnit)]}>
+        <Menu.Item key={'1024'}>Ki, Mi, Gi by 1024</Menu.Item>
+        <Menu.Item key={'1000'}>Ki, Mi, Gi by 1000</Menu.Item>
+        <Menu.Item key={'humantime'}>Human time duration</Menu.Item>
       </Menu>
     );
     return (
@@ -418,13 +424,10 @@ export default class Graph extends Component<GraphProps, GraphState> {
             this.setState({
               highLevelConfig: {
                 ...this.state.highLevelConfig,
-                precision: e.target.checked ? 'short' : 'origin',
-              },
+                precision: e.target.checked ? 'short' : 'origin'
+              }
             });
-          }}
-        >
-          Value format with: Ki, Mi, Gi by
-        </Checkbox>
+          }}>Value format with: </Checkbox>
         {/* <Select value={this.state.highLevelConfig.formatUnit} onChange={(v: 1024 | 1000) => {
           this.setState({
             highLevelConfig: {
@@ -437,8 +440,8 @@ export default class Graph extends Component<GraphProps, GraphState> {
           <Option value={1000}>1000</Option>
         </Select> */}
         <Dropdown overlay={precisionMenu}>
-          <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
-            {this.state.highLevelConfig.formatUnit} <DownOutlined />
+          <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+          {formatUnitInfoMap[this.state.highLevelConfig.formatUnit]} <DownOutlined />
           </a>
         </Dropdown>
       </div>
@@ -464,7 +467,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
             <div className='graph-extra'>
               <span className='graph-operationbar-item' key='info'>
                 <Popover placement='left' content={this.getContent()} trigger='click'>
-                  <Button type='link' size='small' onClick={(e) => e.preventDefault()}>
+                  <Button className='' type='link' size='small' onClick={(e) => e.preventDefault()}>
                     <SettingOutlined />
                   </Button>
                 </Popover>

@@ -107,3 +107,41 @@ export const dynamicPackages = (): Entry[] => {
 export const generateID = (): string => {
   return `_${Math.random().toString(36).substr(2, 9)}`;
 };
+
+export const sizeFormatter = (
+  val,
+  fixedCount = 2,
+  { withUnit = true, withByte = true, trimZero = false, convertNum = 1024 } = {
+    withUnit: true,
+    withByte: true,
+    trimZero: false,
+    convertNum: 1024 | 1000
+  },
+) => {
+  const size = val ? Number(val) : 0;
+  let result;
+  let unit = '';
+
+  if (size < 0) {
+    result = 0;
+  } else if (size < convertNum) {
+    result = size.toFixed(fixedCount);
+  } else if (size < convertNum * convertNum) {
+    result = (size / convertNum).toFixed(fixedCount);
+    unit = 'K';
+  } else if (size < convertNum * convertNum * convertNum) {
+    result = (size / convertNum / convertNum).toFixed(fixedCount);
+    unit = 'M';
+  } else if (size < convertNum * convertNum * convertNum * convertNum) {
+    result = (size / convertNum / convertNum / convertNum).toFixed(fixedCount);
+    unit = 'G';
+  } else if (size < convertNum * convertNum * convertNum * convertNum * convertNum) {
+    result = (size / convertNum / convertNum / convertNum / convertNum).toFixed(fixedCount);
+    unit = 'T';
+  }
+
+  trimZero && (result = parseFloat(result));
+  withUnit && (result = `${result}${unit}`);
+  withByte && (result = `${result}B`);
+  return result;
+}

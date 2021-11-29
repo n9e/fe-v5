@@ -370,8 +370,8 @@ function getLengendName(serie, comparisonOptions, locale = 'zh') {
       <div>
         {metricName} {comparison ? `offset ${comparison}` : ''}
       </div>
-      {labels.map((label) => (
-        <div>{label}</div>
+      {labels.map((label, index) => (
+        <div key={index}>{label}</div>
       ))}
     </div>
   );
