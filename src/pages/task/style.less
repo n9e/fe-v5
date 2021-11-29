@@ -1,0 +1,25 @@
+@task-table-prefix-cls: ~"@{prefix-cls}-zeus-task-table";
+@task-result-prefix-cls: ~"@{prefix-cls}-zeus-task-result";
+
+.@{task-table-prefix-cls} {
+  .ant-table-small > .ant-table-content > .ant-table-body {
+    margin: 0;
+  }
+  .ant-table-small > .ant-table-content > .ant-table-body > table > .ant-table-tbody > tr > td:first-child {
+    font-weight: 500;
+    text-align: right;
+  }
+  pre {
+    margin-bottom: 0;
+    border-radius: 4px;
+    code {
+      padding: 15px;
+    }
+  }
+}
+
+.@{task-result-prefix-cls} {
+  .active {
+    text-decoration: underline;
+  }
+}

@@ -75,8 +75,8 @@ const SideMenu: FC = () => {
           <Menu.Item key='/history-events'>{t('历史告警')}</Menu.Item>
         </SubMenu>
         <SubMenu icon={<AlertOutlined />} title={t('告警自愈')}>
-          <Menu.Item key='/event'>{t('自愈脚本')}</Menu.Item>
-          <Menu.Item key='/history-events'>{t('执行历史')}</Menu.Item>
+          <Menu.Item key='/job-tpls'>{t('自愈脚本')}</Menu.Item>
+          <Menu.Item key='/job-tasks'>{t('执行历史')}</Menu.Item>
         </SubMenu>
 
         <SubMenu icon={<UserOutlined />} title={t('人员组织')}>
