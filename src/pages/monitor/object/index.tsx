@@ -148,7 +148,7 @@ export default () => {
                 setGraphs(newGraphs);
               }} initialValue={step} />
               <Button
-                style={{ marginLeft: 8 }}
+                style={{ padding: '4px 8px' }}
                 onClick={() => {
                   graphs.forEach(graph => {
                     const graphInstance = graph.ref?.current

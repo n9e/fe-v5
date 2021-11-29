@@ -37,7 +37,7 @@ export default (props) => {
     <div className='host-add-on'>
       <div className='title'>监控对象</div>
       <div className="select-before">
-        <Select value={curBusiItemInHostSelect.id} style={{ width: '100%', textAlign: 'left' }} onChange={(busiItemId) => {
+        <Select value={busiGroups.find(bg => bg.id === curBusiItemInHostSelect.id) ? curBusiItemInHostSelect.id : ''} style={{ width: '100%', textAlign: 'left' }} onChange={(busiItemId) => {
           let data = busiGroups.find(bg => bg.id === busiItemId)
           if (busiItemId !== 0) {
             dispatch({
