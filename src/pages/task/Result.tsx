@@ -3,11 +3,16 @@ import { Link } from 'react-router-dom';
 import { Table, Divider, Tag, Row, Col, Button } from 'antd';
 import { ColumnProps } from 'antd/lib/table';
 import _ from 'lodash';
+import queryString from 'query-string';
 import { useTranslation } from 'react-i18next';
+import PageLayout from '@/components/pageLayout';
 import { useAntdTable } from '@umijs/hooks';
 import FieldCopy from './FieldCopy';
 import request from '@/utils/request';
 import api from '@/utils/api';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/common';
+import { CommonStoreState } from '@/store/commonInterface';
 
 interface HostItem {
   host: string,
@@ -16,19 +21,21 @@ interface HostItem {
 
 const index = (props: any) => {
   const taskResultCls = 'job-task-result';
+  const query = queryString.parse(_.get(props, 'location.search'));
+  const { curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const { params } = props.match;
   const taskId = params.id;
   const { t } = useTranslation();
   const [activeStatus, setActiveStatus] = useState('total');
   const [data, setData] = useState({} as any);
   const getTableData = () => {
-    return request(`${api.task}/${params.id}`).then((data) => {
+    return request(`${api.task(curBusiItem.id)}/${params.id}`).then((data) => {
       setData({
-        ...data.meta,
-        action: data.action,
+        ...data.dat.meta,
+        action: data.dat.action,
       });
       return {
-        data: data.hosts,
+        data: data.dat.hosts,
       };
     });
   };
@@ -145,10 +152,10 @@ const index = (props: any) => {
     });
   }
   return (
-    <>
-      <Row style={{ marginBottom: 20 }}>
+    <PageLayout title={data.title}>
+      <div style={{ padding: 20 }}>
+      <Row style={{ marginBottom: 20, padding: 20  }}>
         <Col span={18}>
-          <h3 style={{ marginBottom: 10, fontSize: 12, fontWeight: 'bolder' }}>{data.title}</h3>
           <div className={taskResultCls}>
             <Link to={{ pathname: '/job-tasks' }}>{'<'}返回列表</Link>
             <Divider type="vertical" />
@@ -184,6 +191,7 @@ const index = (props: any) => {
         </Col>
       </Row>
       <Table
+        style={{ padding: 20 }}
         rowKey="host"
         columns={columns as any}
         {...tableProps as any}
@@ -194,7 +202,8 @@ const index = (props: any) => {
           pageSizeOptions: ['10', '50', '100', '500', '1000'],
         } as any}
       />
-    </>
+      </div>
+    </PageLayout>
   )
 }
 

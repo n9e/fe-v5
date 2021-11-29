@@ -19,7 +19,7 @@ interface DataItem {
 function getTableData(options: any, busiId: number | undefined, query: string, mine: boolean, days: number) {
   if (busiId) {
     return request(`${api.tasks(busiId)}?limit=${options.pageSize}&p=${options.current}&query=${query}&mine=${mine ? 1 : 0}&days=${days}`).then((res) => {
-      return { data: res.list, total: res.total };
+      return { data: res.dat.list, total: res.dat.total };
     });
   }
   return Promise.resolve({ data: [], total: 0 });
@@ -66,14 +66,14 @@ const index = (_props: any) => {
       },
     }, {
       title: t('task.creator'),
-      dataIndex: 'creator',
+      dataIndex: 'create_by',
       width: 100,
     }, {
       title: t('task.created'),
-      dataIndex: 'created',
+      dataIndex: 'create_at',
       width: 160,
       render: (text) => {
-        return moment(text).format('YYYY-MM-DD HH:mm:ss');
+        return moment.unix(text).format('YYYY-MM-DD HH:mm:ss');
       },
     },
   ];

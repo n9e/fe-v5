@@ -128,7 +128,7 @@ const index = (_props: any) => {
       render: (_text, record) => {
         return (
           <span>
-            <Link to={{ pathname: `/job-tasks/add`, search: `tpl=${record.id}` }}>
+            <Link to={{ pathname: `/job-tasks/add`, search: `tpl=${record.id}&nid=${busiId}` }}>
               {t('task.create')}
             </Link>
             <Divider type="vertical" />
