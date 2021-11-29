@@ -73,10 +73,11 @@ export default () => {
   const handleRemoveGraphs = () => {
     setGraphs([]);
   };
+  // 不需要输入的时候就触发，所以不需要防抖了
   const debouncedChangeHostName = useCallback(
     _.debounce((v) => {
       setQueryHost(v)
-    }, 1000),
+    }, 0),
     [],
   );
 
@@ -170,7 +171,7 @@ export default () => {
         </Row>
         <div>
           {_.map(graphs, (o, i) => {
-            return <div style={{ marginBottom: 10 }} key={i + o.metric}>
+            return <div style={{ marginBottom: 10 }} key={o.metric}>
               <Graph ref={o.ref} data={{...o}} graphConfigInnerVisible={true} extraRender={graph => {
                 return [
                   <Button type='link' danger size='small' onClick={(e) => e.preventDefault()}>

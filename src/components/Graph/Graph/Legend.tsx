@@ -103,7 +103,7 @@ class Legend extends Component<LegendProps, LegendState> {
   }
 
   render() {
-    const { comparisonOptions, onSelectedChange, rowSelection, renderValue = () => {} } = this.props;
+    const { comparisonOptions, onSelectedChange, rowSelection, renderValue = v => v } = this.props;
     const { graphConfig } = this.props;
 
     if (!graphConfig) return null;

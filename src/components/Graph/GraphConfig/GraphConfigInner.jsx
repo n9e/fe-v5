@@ -26,7 +26,6 @@ class GraphConfigInner extends Component {
 
   constructor(props) {
     super(props);
-    console.log('GraphConfigInner', props.data)
     this.state = {
       curAggrFunc: 'avg',
       curAggrGroups: ['ident'],
@@ -147,7 +146,7 @@ class GraphConfigInner extends Component {
 
     const aggrGroupsMenu = (
       <Menu onClick={handleAggrGroupsClick} selectedKeys={[this.state.curAggrGroups]}>
-        {this.state.aggrGroups.map(ag => <Menu.Item key={ag}>{ag}</Menu.Item>)}
+        {this.state.aggrGroups.filter(n => n !== '__name__').map(ag => <Menu.Item key={ag}>{ag}</Menu.Item>)}
       </Menu>
     )
 
