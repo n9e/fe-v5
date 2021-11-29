@@ -157,6 +157,7 @@ export interface Options extends BaseOptions {
   ymax: number,
   onClick: (d3Event: any) => any,
   onZoom: (getZoomedSeries: () => Series) => any,
+  formatUnit: 1024 | 1000 | 'humantime'
 }
 
 export type EventPosition = {

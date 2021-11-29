@@ -362,7 +362,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
     );
     const precisionMenu = (
       <Menu onClick={(precision) => {
-        const precisionKey = typeof precision.key === 'number' ? Number(precision.key) : precision.key
+        const precisionKey = isNaN(Number(precision.key)) ? precision.key : Number(precision.key)
         this.setState({
           highLevelConfig: {
             ...this.state.highLevelConfig,
