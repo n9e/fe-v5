@@ -3,8 +3,6 @@ import _ from 'lodash';
 import { withRouter } from 'react-router-dom';
 import { Form, Input, InputNumber, Select } from 'antd';
 import { useTranslation } from 'react-i18next';
-import request from '@/utils/request';
-import api from '@/utils/api';
 import Editor from './editor';
 import './style.less';
 

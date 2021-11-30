@@ -4,8 +4,6 @@ import { Button, Spin, Divider, Card, Breadcrumb } from 'antd';
 import { RollbackOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import moment from 'moment';
-import Highlight from 'react-highlight';
-import 'highlight.js/styles/vs2015.css';
 import { useTranslation } from 'react-i18next';
 import PageLayout from '@/components/pageLayout';
 import request from '@/utils/request';
@@ -13,6 +11,7 @@ import api from '@/utils/api';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
+import Editor from './editor';
 import { Tpl } from './interface';
 
 const Detail = (props: any) => {
@@ -88,9 +87,7 @@ const Detail = (props: any) => {
                       <tr className="ant-table-row ant-table-row-level-0">
                         <td>{t('task.script')}</td>
                         <td>
-                          <Highlight className="bash">
-                            {data.script}
-                          </Highlight>
+                          <Editor value={data.script} readOnly height="200px" />
                         </td>
                       </tr>
                       <tr className="ant-table-row ant-table-row-level-0">

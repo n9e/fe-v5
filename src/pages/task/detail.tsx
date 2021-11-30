@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { Spin, Divider, Button, Card } from 'antd';
 import { RollbackOutlined } from '@ant-design/icons';
-import Highlight from 'react-highlight';
-import 'highlight.js/styles/vs2015.css';
 import moment from 'moment';
 import _ from 'lodash';
 import { useTranslation } from 'react-i18next';
@@ -13,6 +11,7 @@ import { CommonStoreState } from '@/store/commonInterface';
 import request from '@/utils/request';
 import api from '@/utils/api';
 import PageLayout from '@/components/pageLayout';
+import Editor from '../taskTpl/editor';
 import './style.less';
 
 
@@ -85,9 +84,7 @@ const Detail = (props: any) => {
                       <tr className="ant-table-row ant-table-row-level-0">
                         <td>{t('task.script')}</td>
                         <td>
-                          <Highlight className="bash">
-                            {data.script}
-                          </Highlight>
+                          <Editor value={data.script} readOnly height="200px" />
                         </td>
                       </tr>
                       <tr className="ant-table-row ant-table-row-level-0">
