@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useCallback, ReactElement } from 'react';
+import React, { useState, useEffect, useContext, useCallback, ReactElement, RefObject } from 'react';
 import { Button, Collapse, Modal, Menu, Dropdown, Divider, Popover, Checkbox } from 'antd';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
@@ -22,6 +22,7 @@ import { convertExpressionToQuery, replaceExpressionVars } from './VariableConfi
 
 const { confirm } = Modal;
 interface Props {
+  cluster: string;
   busiId: string;
   groupInfo: Group;
   range: Range;
@@ -182,6 +183,7 @@ const layouts: Layouts = {
 export default function ChartGroup(props: Props) {
   const { t } = useTranslation();
   const {
+    cluster,
     busiId,
     groupInfo,
     range,
@@ -198,11 +200,20 @@ export default function ChartGroup(props: Props) {
     moveDownEnable,
   } = props;
   const [chartConfigs, setChartConfigs] = useState<Chart[]>([]);
+  const [Refs, setRefs] = useState<RefObject<any>[]>();
   const [layout, setLayout] = useState<Layouts>(layouts); // const [colItem, setColItem] = useState<number>(defColItem);
   const [mounted, setMounted] = useState<boolean>(false);
   useEffect(() => {
     init();
   }, [groupInfo.updateTime]);
+
+  useEffect(() => {
+    Refs &&
+      Refs.forEach((ref) => {
+        const graphInstance = ref.current;
+        graphInstance && graphInstance.refresh();
+      });
+  }, [cluster]);
 
   const init = () => {
     setMounted(false);
@@ -242,6 +253,7 @@ export default function ChartGroup(props: Props) {
       const realLayout: Layouts = { lg: innerLayout, sm: innerLayout, md: innerLayout, xs: innerLayout, xxs: innerLayout };
       setLayout(realLayout);
       setChartConfigs(charts);
+      setRefs(new Array(charts.length).fill(0).map((_) => React.createRef()));
       setMounted(true);
     });
   };
@@ -466,7 +478,9 @@ export default function ChartGroup(props: Props) {
       chartConfigs.length > 0 &&
       chartConfigs.map((item, i) => {
         let { QL, name, legend, yplotline1, yplotline2 } = item.configs;
-        const promqls = QL.map((item) => replaceExpressionVars(item.PromQL, variableConfig, variableConfig.var.length));
+        const promqls = QL.map((item) =>
+          variableConfig && variableConfig.var && variableConfig.var.length ? replaceExpressionVars(item.PromQL, variableConfig, variableConfig.var.length) : item.PromQL,
+        );
         const legendTitleFormats = QL.map((item) => item.Legend);
         return (
           <div
@@ -476,16 +490,17 @@ export default function ChartGroup(props: Props) {
             key={String(i)}
           >
             <Graph
+              ref={Refs![i]}
               data={{
                 yAxis: {
                   plotLines: [
                     {
                       value: yplotline1,
-                      color: 'red',
+                      color: 'orange',
                     },
                     {
                       value: yplotline2,
-                      color: 'green',
+                      color: 'red',
                     },
                   ],
                 },

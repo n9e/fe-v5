@@ -244,7 +244,7 @@ export default function ChartConfigModal(props: Props) {
                 </Form.Item>
               </Col>
               <Col span={12} offset={1}>
-                <Form.Item label={t('警告值')} name='yplotline2' labelCol={{ span: 7 }} wrapperCol={{ span: 20 }}>
+                <Form.Item label={t('危险值')} name='yplotline2' labelCol={{ span: 7 }} wrapperCol={{ span: 20 }}>
                   <InputNumber />
                 </Form.Item>
               </Col>
@@ -305,11 +305,11 @@ export default function ChartConfigModal(props: Props) {
                         plotLines: [
                           {
                             value: yplotline1,
-                            color: 'red',
+                            color: 'orange',
                           },
                           {
                             value: yplotline2,
-                            color: 'green',
+                            color: 'red',
                           },
                         ],
                       },

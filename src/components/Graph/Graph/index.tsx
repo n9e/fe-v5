@@ -36,7 +36,6 @@ export interface ErrorInfoType {
 }
 
 interface GraphProps {
-  cluster?: string;
   height?: number;
   ref?: any;
   data: GraphDataProps;
@@ -63,7 +62,6 @@ interface GraphState {
   series: any[];
   chartShowSeries: any[];
   legendHighlightedKeys: number[];
-  forceRender: boolean;
   offsets: string[];
   aggrFunc: string;
   aggrGroups: string[];
@@ -81,8 +79,8 @@ interface GraphState {
 const formatUnitInfoMap = {
   1024: 'Ki, Mi, Gi by 1024',
   1000: 'Ki, Mi, Gi by 1000',
-  humantime: 'Human time duration'
-}
+  humantime: 'Human time duration',
+};
 
 const { Option } = Select;
 export default class Graph extends Component<GraphProps, GraphState> {
@@ -97,7 +95,6 @@ export default class Graph extends Component<GraphProps, GraphState> {
       series: [],
       chartShowSeries: [],
       legendHighlightedKeys: [],
-      forceRender: false,
       // 刷新、切换hosts时，需要按照用户已经选择的环比、聚合条件重新刷新图表，所以需要将其记录到state中
       offsets: this.props.defaultOffsets || [],
       aggrFunc: this.props.defaultAggrFunc || 'avg',
@@ -365,15 +362,18 @@ export default class Graph extends Component<GraphProps, GraphState> {
       </Menu>
     );
     const precisionMenu = (
-      <Menu onClick={(precision) => {
-        const precisionKey = isNaN(Number(precision.key)) ? precision.key : Number(precision.key)
-        this.setState({
-          highLevelConfig: {
-            ...this.state.highLevelConfig,
-            formatUnit: precisionKey as 1024 | 1000 | 'humantime'
-          }
-        })
-      }} selectedKeys={[String(this.state.highLevelConfig.formatUnit)]}>
+      <Menu
+        onClick={(precision) => {
+          const precisionKey = isNaN(Number(precision.key)) ? precision.key : Number(precision.key);
+          this.setState({
+            highLevelConfig: {
+              ...this.state.highLevelConfig,
+              formatUnit: precisionKey as 1024 | 1000 | 'humantime',
+            },
+          });
+        }}
+        selectedKeys={[String(this.state.highLevelConfig.formatUnit)]}
+      >
         <Menu.Item key={'1024'}>Ki, Mi, Gi by 1024</Menu.Item>
         <Menu.Item key={'1000'}>Ki, Mi, Gi by 1000</Menu.Item>
         <Menu.Item key={'humantime'}>Human time duration</Menu.Item>
@@ -428,10 +428,13 @@ export default class Graph extends Component<GraphProps, GraphState> {
             this.setState({
               highLevelConfig: {
                 ...this.state.highLevelConfig,
-                precision: e.target.checked ? 'short' : 'origin'
-              }
+                precision: e.target.checked ? 'short' : 'origin',
+              },
             });
-          }}>Value format with: </Checkbox>
+          }}
+        >
+          Value format with:{' '}
+        </Checkbox>
         {/* <Select value={this.state.highLevelConfig.formatUnit} onChange={(v: 1024 | 1000) => {
           this.setState({
             highLevelConfig: {
@@ -444,8 +447,8 @@ export default class Graph extends Component<GraphProps, GraphState> {
           <Option value={1000}>1000</Option>
         </Select> */}
         <Dropdown overlay={precisionMenu}>
-          <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
-          {formatUnitInfoMap[this.state.highLevelConfig.formatUnit]} <DownOutlined />
+          <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
+            {formatUnitInfoMap[this.state.highLevelConfig.formatUnit]} <DownOutlined />
           </a>
         </Dropdown>
       </div>

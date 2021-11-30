@@ -243,6 +243,7 @@ export default function DashboardDetail() {
         <div className='charts'>
           {chartGroup.map((item, i) => (
             <ChartGroup
+              cluster={curCluster}
               busiId={busiId}
               key={i}
               step={step}

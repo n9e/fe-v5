@@ -79,8 +79,9 @@ export default function DateRangePicker(props: Props) {
 
   useEffect(() => {
     if (!value) {
-      setLeftSelect(0);
-      emitValue(leftList[0]);
+      const defaultSelect = 3;
+      setLeftSelect(defaultSelect);
+      emitValue(leftList[defaultSelect]);
       return;
     }
     // 如果外部被赋值，只需要改label和组件展示值，不需要向外抛
