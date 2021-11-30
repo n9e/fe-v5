@@ -472,7 +472,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
           >
             <div className='graph-extra'>
               <span className='graph-operationbar-item' key='info'>
-                <Popover placement='left' content={this.getContent()} trigger='click'>
+                <Popover placement='left' content={this.getContent()} trigger='click' autoAdjustOverflow={false} getPopupContainer={() => document.body}>
                   <Button className='' type='link' size='small' onClick={(e) => e.preventDefault()}>
                     <SettingOutlined />
                   </Button>
