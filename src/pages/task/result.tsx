@@ -6,7 +6,7 @@ import _ from 'lodash';
 import queryString from 'query-string';
 import { useTranslation } from 'react-i18next';
 import PageLayout from '@/components/pageLayout';
-import { useAntdTable } from '@umijs/hooks';
+import { useAntdTable } from 'ahooks';
 import FieldCopy from './FieldCopy';
 import request from '@/utils/request';
 import api from '@/utils/api';
@@ -35,11 +35,11 @@ const index = (props: any) => {
         action: data.dat.action,
       });
       return {
-        data: data.dat.hosts,
+        list: data.dat.hosts,
       };
     });
   };
-  const { tableProps, refresh } = useAntdTable(() => getTableData(), []);
+  const { tableProps, refresh } = useAntdTable(() => getTableData(), {});
   let tableDataSource = tableProps.dataSource;
   if (activeStatus !== 'total') {
     tableDataSource = _.filter(tableDataSource, (item: any) => {
