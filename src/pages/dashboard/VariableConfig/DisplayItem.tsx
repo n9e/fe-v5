@@ -13,20 +13,31 @@ interface Props {
   onChange: (index: number, value: string | string[]) => void;
 }
 
+const stringToRegex = (str) => {
+  // Main regex
+  const main = str.match(/\/(.+)\/.*/)[1];
+
+  // Regex options
+  const options = str.match(/\/.+\/(.*)/)[1];
+
+  // Compiled regex
+  return new RegExp(main, options);
+};
+
 const DisplayItem: React.FC<Props> = ({ expression, index, data, onChange }) => {
   const { t } = useTranslation();
   const [options, setOptions] = useState<string[]>([]);
   const [exp, setExp] = useState<string>();
-
+  const { definition, multi, allOption, name, reg, selected } = expression;
   useEffect(() => {
     if (expression) {
-      var newExpression = replaceExpressionVars(expression.definition, { var: data }, index);
+      var newExpression = replaceExpressionVars(definition, { var: data }, index);
       if (exp !== newExpression) {
         setExp(newExpression);
         convertExpressionToQuery(newExpression).then((res) => {
           setOptions(res);
           if (exp && newExpression && exp !== newExpression) {
-            onChange(index, expression.multi ? [] : '');
+            onChange(index, multi ? [] : '');
           }
         });
       }
@@ -34,9 +45,9 @@ const DisplayItem: React.FC<Props> = ({ expression, index, data, onChange }) => 
   }, [expression, data, index]);
 
   const handleChange = (v) => {
-    if (expression.multi && expression.allOption && v.includes('all')) {
+    if (multi && allOption && v.includes('all')) {
       onChange(index, ['all']);
-    } else if (expression.multi && !expression.allOption) {
+    } else if (multi && !allOption) {
       let allIndex = v.indexOf('all');
       if (allIndex !== -1) {
         v.splice(allIndex, 1);
@@ -50,9 +61,9 @@ const DisplayItem: React.FC<Props> = ({ expression, index, data, onChange }) => 
   return (
     <div>
       <div className='tag-content-close-item'>
-        <div className='tag-content-close-item-tagName'>{expression.name}</div>
+        <div className='tag-content-close-item-tagName'>{name}</div>
 
-        {expression.multi ? (
+        {multi ? (
           <Select
             mode='tags'
             style={{
@@ -61,27 +72,31 @@ const DisplayItem: React.FC<Props> = ({ expression, index, data, onChange }) => 
             onChange={handleChange}
             defaultActiveFirstOption={false}
             showSearch
-            value={expression.selected}
+            value={selected}
             dropdownClassName='overflow-586'
           >
-            {expression.allOption && (
+            {allOption && (
               <Option key={'all'} value={'all'}>
                 all
               </Option>
             )}
-            {options.map((value) => (
-              <Option key={value} value={value}>
-                {value}
-              </Option>
-            ))}
+            {options
+              .filter((i) => !reg || stringToRegex(reg).test(i))
+              .map((value) => (
+                <Option key={value} value={value}>
+                  {value}
+                </Option>
+              ))}
           </Select>
         ) : (
-          <AutoComplete style={{ width: 180 }} onChange={(v) => onChange(index, v)} placeholder='input here' value={expression.selected as string} dropdownClassName='overflow-586'>
-            {options.map((value) => (
-              <Option key={value} value={value}>
-                {value}
-              </Option>
-            ))}
+          <AutoComplete style={{ width: 180 }} onChange={(v) => onChange(index, v)} placeholder='input here' value={selected as string} dropdownClassName='overflow-586'>
+            {options
+              .filter((i) => !reg || stringToRegex(reg).test(i))
+              .map((value) => (
+                <Option key={value} value={value}>
+                  {value}
+                </Option>
+              ))}
           </AutoComplete>
         )}
       </div>

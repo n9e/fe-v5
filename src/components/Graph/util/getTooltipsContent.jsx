@@ -1,8 +1,8 @@
 /* eslint-disable no-use-before-define */
 import _ from 'lodash';
 import moment from 'moment';
+import { replaceExpressionBracket } from './index';
 import { sizeFormatter } from '@/utils'
-
 const fmt = 'YYYY-MM-DD HH:mm:ss';
 
 export default function getTooltipsContent(activeTooltipData) {
@@ -28,6 +28,7 @@ export default function getTooltipsContent(activeTooltipData) {
 }
 
 function renderPointContent(isSingle, pointData = {}, serie = {}, formatUnit, precision) {
+  const { legendTitleFormat } = serie;
   const { color, filledNull, serieOptions = {}, timestamp } = pointData;
   const value = pointData.value;
   let comparison = '';
@@ -41,8 +42,9 @@ function renderPointContent(isSingle, pointData = {}, serie = {}, formatUnit, pr
 
   const renderMultiSeriesPointContent = () => {
     const labelContents = labelKeys.map((label) => `<span>${label}=${serieMetricLabels[label]}</span>`);
+    const label = legendTitleFormat ? replaceExpressionBracket(legendTitleFormat, serieMetricLabels) : `${metricName} ${comparison} {${labelContents}}`;
     return `<span style="color:${color}">● </span>
-      ${metricName} ${comparison} {${labelContents}}：<strong>${formatValue(value)}${filledNull ? '(空值填补,仅限看图使用)' : ''}</strong>
+      ${label}：<strong>${formatValue(value)}${filledNull ? '(空值填补,仅限看图使用)' : ''}</strong>
       <br/>`;
   };
 
@@ -62,8 +64,9 @@ function renderPointContent(isSingle, pointData = {}, serie = {}, formatUnit, pr
 
   const renderSingleSeriesPointContent = () => {
     const labelContents = labelKeys.map((label) => `<div><strong>${label}</strong>: ${serieMetricLabels[label]}</div>`);
+    const label = legendTitleFormat ? replaceExpressionBracket(legendTitleFormat, serieMetricLabels) : `${metricName} ${comparison}${metricName || comparison ? ': ' : ''}`;
     return `<span style="color:${color}">● </span>
-      ${metricName} ${comparison}${metricName || comparison ? ': ' : ''}<strong>${formatValue(value)}${
+      ${label}<strong>${formatValue(value)}${
       filledNull ? '(空值填补,仅限看图使用)' : ''
     }</strong>
       <div /><br />

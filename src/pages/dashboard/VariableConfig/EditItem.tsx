@@ -72,7 +72,7 @@ export default function EditItem(props: Props) {
                   </Col>
                   <Col span={6}>
                     <Form.Item {...restField} name={[name, 'reg']} fieldKey={[fieldKey, 'reg']}>
-                      <Input />
+                      <Input placeholder='/.*-(?<text>.*)-(?<value>.*)-.*/' />
                     </Form.Item>
                   </Col>
                   <Col span={2}>

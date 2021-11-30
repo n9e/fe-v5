@@ -2,13 +2,26 @@
 import _ from 'lodash';
 import { hexPalette } from '../config';
 
-export default function normalizeSeries(data, treeData) {
-  const series = [];
+export interface SeriesType {
+  id: number | string;
+  name: number | string;
+  tags: number | string;
+  metricLabels: string;
+  data: [Number,Number][];
+  lineWidth: number
+  color: string;
+  oldColor: string;
+  comparison: number;
+  legendTitleFormat?: string;
+}
+
+export default function normalizeSeries(data) {
+  const series:SeriesType[] = [];
   _.each(data, (o, i) => {
     const id = o?.metric?.ident || o?.metric?.__name__;
     const color = getSerieColor(o, i);
 
-    const serie = {
+    const serie: SeriesType = {
       id: i,
       name: id,
       tags: id,
@@ -18,6 +31,7 @@ export default function normalizeSeries(data, treeData) {
       color,
       oldColor: color,
       comparison: o.offset,
+      legendTitleFormat: o.legendTitleFormat
     };
     series.push(serie);
   });
@@ -25,7 +39,7 @@ export default function normalizeSeries(data, treeData) {
   return series;
 }
 
-function getSerieColor(serie, serieIndex, isComparison) {
+function getSerieColor(serie, serieIndex, isComparison = false) {
   const { comparison } = serie;
   let color;
   // 同环比固定曲线颜色

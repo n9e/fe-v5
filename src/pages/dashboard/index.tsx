@@ -206,7 +206,7 @@ export default function Dashboard() {
   };
 
   return (
-    <PageLayout title={t('监控大盘')} icon={<FundViewOutlined />}>
+    <PageLayout title={t('监控大盘')} icon={<FundViewOutlined />} hideCluster={true}>
       <div style={{ display: 'flex' }}>
         <LeftTree busiGroup={{ onChange: (id) => setBusiId(id) }}></LeftTree>
         <div className='dashboard' style={{ flex: 1 }}>

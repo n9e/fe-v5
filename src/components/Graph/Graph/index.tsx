@@ -23,6 +23,7 @@ export interface GraphDataProps {
   selectedHosts?: { ident: string }[];
   metric?: string;
   promqls?: string[] | { current: string }[];
+  legendTitleFormats?: string[];
   ref?: any;
   yAxis?: any;
   chartType?: ChartType;
@@ -35,6 +36,7 @@ export interface ErrorInfoType {
 }
 
 interface GraphProps {
+  cluster?: string;
   height?: number;
   ref?: any;
   data: GraphDataProps;
@@ -155,6 +157,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
   afterFetchChartDataOperations(allResponseData, queryStart, step) {
     const errorSeries: ErrorInfoType[] = [];
     const { offsets, series: previousSeries, legendHighlightedKeys } = this.state;
+    const { legendTitleFormats } = this.props.data;
     const rawSeries = allResponseData.reduce((acc, cur, idx) => {
       if (cur.status === 'error') {
         errorSeries.push(cur);
@@ -165,6 +168,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
       if (offsets) {
         arr.forEach((item) => {
           item.offset = offsets[idx] || '';
+          item.legendTitleFormat = legendTitleFormats && legendTitleFormats[idx];
         });
       }
       acc.push(...arr);
@@ -453,7 +457,6 @@ export default class Graph extends Component<GraphProps, GraphState> {
     const { extraRender, data, showHeader = true } = this.props;
     const { title, metric } = data;
     const graphConfig = this.getGraphConfig(data);
-
     return (
       <div className={this.state.legend ? 'graph-container graph-container-hasLegend' : 'graph-container'}>
         {showHeader && (
