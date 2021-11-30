@@ -6,7 +6,8 @@ import PropTypes from 'prop-types';
 import { Table, Input, Button, Modal, Tooltip } from 'antd';
 import Color from 'color';
 import _ from 'lodash';
-
+import { SeriesType } from '../util/normalizeSeries';
+import { replaceExpressionBracket } from '../util';
 interface LegendProps {
   series: any;
   style: object;
@@ -103,7 +104,7 @@ class Legend extends Component<LegendProps, LegendState> {
   }
 
   render() {
-    const { comparisonOptions, onSelectedChange, rowSelection, renderValue = v => v } = this.props;
+    const { comparisonOptions, onSelectedChange, rowSelection, renderValue = (v) => v } = this.props;
     const { graphConfig } = this.props;
 
     if (!graphConfig) return null;
@@ -117,6 +118,7 @@ class Legend extends Component<LegendProps, LegendState> {
       {
         title: <span> Series({data.length}) </span>,
         dataIndex: 'tags',
+        width: 240,
         filterDropdown: (
           <div className='custom-filter-dropdown'>
             <Input placeholder='Input serie name' value={searchText} onChange={this.handleInputChange} onPressEnter={this.handleSearch} />
@@ -258,9 +260,9 @@ class Legend extends Component<LegendProps, LegendState> {
 
 export default Legend;
 
-export function normalizeLegendData(series = []) {
+export function normalizeLegendData(series: SeriesType[] = []) {
   const tableData = _.map(series, (serie) => {
-    const { id, metric, tags, data, comparison, metricLabels } = serie;
+    const { id, metric, tags, data, comparison, metricLabels, legendTitleFormat } = serie;
     const { last, avg, max, min, sum } = getLegendNums(data);
     return {
       id,
@@ -274,6 +276,7 @@ export function normalizeLegendData(series = []) {
       min: _.isNumber(min) ? min.toFixed(3) : null,
       sum: _.isNumber(sum) ? sum.toFixed(3) : null,
       color: serie.color,
+      legendTitleFormat,
     };
   });
   return _.orderBy(tableData, 'counter');
@@ -346,7 +349,7 @@ function getLegendNums(points) {
  * @return {String}                   [description]
  */
 function getLengendName(serie, comparisonOptions, locale = 'zh') {
-  const { tags, comparison, metricLabels } = serie;
+  const { comparison, legendTitleFormat } = serie;
   let legendName = '',
     titleName;
 
@@ -364,7 +367,11 @@ function getLengendName(serie, comparisonOptions, locale = 'zh') {
   //     comparisonTxt = locale === 'zh' ? `环比${currentComparison.label}` : `(${enText} ago)`;
   //   }
   // }
-  legendName = `${metricName || ''} ${comparison ? `offset ${comparison}` : ''} {${labels}}`;
+  if (legendTitleFormat) {
+    legendName = replaceExpressionBracket(legendTitleFormat, serieMetricLabels);
+  } else {
+    legendName = `${metricName || ''} ${comparison ? `offset ${comparison}` : ''} {${labels}}`;
+  }
   titleName = (
     <div>
       <div>

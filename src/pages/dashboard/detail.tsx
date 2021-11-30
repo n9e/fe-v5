@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import PageLayout from '@/components/pageLayout';
 import DateRangePicker from '@/components/DateRangePicker';
-import { ReloadOutlined, RollbackOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Input, Form, Modal, Divider, message } from 'antd';
+import { useSelector, useDispatch } from 'react-redux';
+import { ReloadOutlined, RollbackOutlined, EditOutlined, PlusOutlined, DownOutlined } from '@ant-design/icons';
+import { Button, Input, Form, Modal, Dropdown, message, Menu } from 'antd';
 import { Range } from '@/components/DateRangePicker';
 import { getSingleDashboard, updateSingleDashboard, createChartGroup, getChartGroup, delChartGroup, removeChart, updateChartGroup } from '@/services/dashboard';
 import { Dashboard, Group } from '@/store/dashboardInterface';
@@ -14,6 +15,9 @@ import VariableConfig, { VariableType } from './VariableConfig';
 import './index.less';
 import { useTranslation } from 'react-i18next';
 import Resolution from '@/components/Resolution';
+import { RootState as CommonRootState } from '@/store/common';
+import { CommonStoreState } from '@/store/commonInterface';
+
 interface URLParam {
   id: string;
   busiId: string;
@@ -34,6 +38,13 @@ export default function DashboardDetail() {
   const [groupForm] = Form.useForm();
   const history = useHistory();
   const variableRef = useRef<any>(null);
+  const { clusters } = useSelector<CommonRootState, CommonStoreState>((state) => state.common);
+  const localCluster = localStorage.getItem('curCluster');
+  const [curCluster, setCurCluster] = useState<string>(localCluster || clusters[0]);
+  if (!localCluster && clusters.length > 0) {
+    setCurCluster(clusters[0]);
+    localStorage.setItem('curCluster', clusters[0]);
+  }
   const [dashboard, setDashboard] = useState<Dashboard>({
     create_by: '',
     favorite: 0,
@@ -180,7 +191,22 @@ export default function DashboardDetail() {
     updateSingleDashboard(busiId, id, { ...dashboard, configs: JSON.stringify(value) });
     setVariableConfig(value);
   };
-
+  const clusterMenu = (
+    <Menu selectedKeys={[curCluster]}>
+      {clusters.map((cluster) => (
+        <Menu.Item
+          key={cluster}
+          onClick={(_) => {
+            setCurCluster(cluster);
+            localStorage.setItem('curCluster', cluster);
+            init();
+          }}
+        >
+          {cluster}
+        </Menu.Item>
+      ))}
+    </Menu>
+  );
   return (
     <PageLayout
       customArea={
@@ -191,6 +217,13 @@ export default function DashboardDetail() {
             <EditOutlined className='edit' onClick={handleEdit} />
           </div>
           <div className='dashboard-detail-header-right'>
+            <div style={{ marginRight: 20, display: 'flex', alignItems: 'center' }}>
+              <Dropdown overlay={clusterMenu}>
+                <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
+                  {curCluster} <DownOutlined />
+                </a>
+              </Dropdown>
+            </div>
             <DateRangePicker onChange={handleDateChange} />
             <Resolution onChange={(v) => setStep(v)} initialValue={step} />
             <RefreshIcon
@@ -210,6 +243,7 @@ export default function DashboardDetail() {
         <div className='charts'>
           {chartGroup.map((item, i) => (
             <ChartGroup
+              cluster={curCluster}
               busiId={busiId}
               key={i}
               step={step}

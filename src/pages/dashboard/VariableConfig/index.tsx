@@ -59,7 +59,7 @@ const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = ({ isOpe
             {editable && <EditOutlined className='icon' onClick={() => setEditing(true)}></EditOutlined>}
           </>
         )}
-        {data?.var.length === 0 && editable && (
+        {(data ? data?.var.length === 0 : true) && editable && (
           <div className='add-variable-tips' onClick={() => setEditing(true)}>
             {t('添加大盘变量')}
           </div>
