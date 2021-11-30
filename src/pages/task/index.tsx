@@ -5,7 +5,7 @@ import { ColumnProps } from 'antd/lib/table';
 import _ from 'lodash';
 import moment from 'moment';
 import { useTranslation } from 'react-i18next';
-import { useAntdTable } from '@umijs/hooks';
+import { useAntdTable } from 'ahooks';
 import request from '@/utils/request';
 import api from '@/utils/api';
 import LeftTree from '@/components/LeftTree';
@@ -19,10 +19,10 @@ interface DataItem {
 function getTableData(options: any, busiId: number | undefined, query: string, mine: boolean, days: number) {
   if (busiId) {
     return request(`${api.tasks(busiId)}?limit=${options.pageSize}&p=${options.current}&query=${query}&mine=${mine ? 1 : 0}&days=${days}`).then((res) => {
-      return { data: res.dat.list, total: res.dat.total };
+      return { list: res.dat.list, total: res.dat.total };
     });
   }
-  return Promise.resolve({ data: [], total: 0 });
+  return Promise.resolve({ list: [], total: 0 });
 }
 
 const index = (_props: any) => {
@@ -31,7 +31,7 @@ const index = (_props: any) => {
   const [mine, setMine] = useState(true);
   const [days, setDays] = useState(7);
   const [busiId, setBusiId] = useState<number>();
-  const { tableProps } = useAntdTable((options) => getTableData(options, busiId, query, mine, days), [query, mine, days, busiId]);
+  const { tableProps } = useAntdTable((options) => getTableData(options, busiId, query, mine, days), {refreshDeps: [query, mine, days, busiId]});
 
   const columns: ColumnProps<DataItem>[] = [
     {

@@ -5,7 +5,7 @@ import { DownOutlined, PlusOutlined } from '@ant-design/icons';
 import { ColumnProps } from 'antd/lib/table';
 import _ from 'lodash';
 import moment from 'moment';
-import { useAntdTable } from '@umijs/hooks';
+import { useAntdTable } from 'ahooks';
 import { useTranslation } from 'react-i18next';
 import request from '@/utils/request';
 import api from '@/utils/api';
@@ -18,10 +18,10 @@ import UnBindTags from './unBindTags';
 function getTableData(options: any, busiGroup: number | undefined, query: string) {
   if (busiGroup) {
     return request(`${api.tasktpls(busiGroup)}?limit=${options.pageSize}&p=${options.current}&query=${query}`).then((res) => {
-      return { data: res.dat.list, total: res.dat.total };
+      return { list: res.dat.list, total: res.dat.total };
     });
   }
-  return Promise.resolve({ data: [], total: 0 });
+  return Promise.resolve({ list: [], total: 0 });
 }
 
 const index = (_props: any) => {
@@ -29,7 +29,7 @@ const index = (_props: any) => {
   const [query, setQuery] = useState('');
   const [busiId, setBusiId] = useState<number>();
   const [selectedIds, setSelectedIds] = useState([] as any[]);
-  const { tableProps, refresh } = useAntdTable<any, any>((options) => getTableData(options, busiId, query), [busiId, query]);
+  const { tableProps, refresh } = useAntdTable<any, any>((options) => getTableData(options, busiId, query), {refreshDeps: [busiId, query]});
 
   function handleTagClick(tag: string) {
     if (!_.includes(query, tag)) {

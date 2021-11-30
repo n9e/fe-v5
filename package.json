@@ -20,7 +20,6 @@
     "@d3-charts/ts-graph": "^0.3.7",
     "@types/echarts": "^4.9.7",
     "@types/node": "^15.0.1",
-    "@umijs/hooks": "^1.9.3",
     "@y0c/react-datepicker": "^1.0.4",
     "ahooks": "^2.10.2",
     "antd": "4.15.3",
