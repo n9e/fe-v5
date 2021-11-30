@@ -37,9 +37,12 @@ export default (props) => {
     <div className='host-add-on'>
       <div className='title'>监控对象</div>
       <div className="select-before">
-        <Select value={busiGroups.find(bg => bg.id === curBusiItemInHostSelect.id) ? curBusiItemInHostSelect.id : ''} style={{ width: '100%', textAlign: 'left' }} onChange={(busiItemId) => {
-          let data = busiGroups.find(bg => bg.id === busiItemId)
-          if (busiItemId !== 0) {
+        <Select placeholder='按业务组筛选' value={busiGroups.concat([
+          { id: 0, name: '未归组对象' } as BusiGroupItem
+        ]).find(bg => bg.id === curBusiItemInHostSelect.id) ? String(curBusiItemInHostSelect.id) : undefined} style={{ width: '100%', textAlign: 'left' }} onChange={(busiItemId) => {
+          let busiItemIdNum = Number(busiItemId)
+          let data = busiGroups.find(bg => bg.id === busiItemIdNum)
+          if (busiItemIdNum !== 0) {
             dispatch({
               type: 'common/saveData',
               prop: 'curBusiItem',
@@ -54,8 +57,8 @@ export default (props) => {
           changeBusiGroup && changeBusiGroup(data)
           setCurBusiItemInHostSelect(data as BusiGroupItem)
         }}>
-          <Option key={0} value={0}>未归组对象</Option>
-          {busiGroups.map(bg => <Option key={bg.id} value={bg.id}>{bg.name}</Option>)}
+          <Option key={0} value={'0'}>未归组对象</Option>
+          {busiGroups.map(bg => <Option key={bg.id} value={String(bg.id)}>{bg.name}</Option>)}
         </Select>
       </div>
       <SearchOutlined style={{position: 'absolute',left: 190, zIndex: 2, top: 9}} />
@@ -63,8 +66,8 @@ export default (props) => {
   )
   return <div className='host-select'>
     <div className='top-bar'>
-      <Input placeholder='搜索，空格分隔多个关键字' addonBefore={selectBefore} className='host-input' onChange={e => {
-        const { value } = e.target;
+      <Input placeholder='搜索，空格分隔多个关键字' addonBefore={selectBefore} className='host-input' onPressEnter={e => {
+        const { value } = e.target as HTMLInputElement;
         onSearchHostName && onSearchHostName(value)
       }} />
     </div>
