@@ -294,7 +294,7 @@ export default function ChartConfigModal(props: Props) {
                 const promqls = QL.filter((item) => item && item.PromQL).map((item) =>
                   innerVariableConfig ? replaceExpressionVars(item.PromQL, innerVariableConfig, innerVariableConfig.var.length) : item.PromQL,
                 );
-                const legendTitleFormats = QL.map((item) => item.Legend);
+                const legendTitleFormats = QL.map((item) => item && item.Legend);
                 return (
                   <Graph
                     showHeader={false}
