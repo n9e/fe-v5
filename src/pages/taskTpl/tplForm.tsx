@@ -56,6 +56,7 @@ const TplForm = (props) => {
             >
               <Select
                 mode="tags"
+                open={false}
                 style={{ width: '100%' }}
               />
             </FormItem> : null
