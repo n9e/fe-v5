@@ -1,11 +1,11 @@
 /* eslint-disable no-use-before-define */
 import _ from 'lodash';
 import moment from 'moment';
-
 const fmt = 'YYYY-MM-DD HH:mm:ss';
+import { ChartType } from '@/components/D3Charts/src/interface';
 
 export default function getTooltipsContent(activeTooltipData) {
-  const { points, series, formatUnit, precision } = activeTooltipData;
+  const { points, series, formatUnit, precision, chartType } = activeTooltipData;
   const tooltipWidth = window.innerWidth / 1.5;
   // const sortedPoints = _.orderBy(points, (point) => {
   //   const { series = {} } = point;
@@ -20,15 +20,16 @@ export default function getTooltipsContent(activeTooltipData) {
   tooltipContent += getHeaderStr(activeTooltipData);
   const isSinglePoint = points.length === 1;
   _.each(points, (point, index) => {
-    tooltipContent += renderPointContent(isSinglePoint, point, series[index], formatUnit, precision);
+    tooltipContent += renderPointContent(isSinglePoint, point, series[index], formatUnit, precision, chartType);
   });
 
   return `<div style="table-layout: fixed;max-width: ${tooltipWidth}px;word-wrap: break-word;white-space: normal;">${tooltipContent}</div>`;
 }
 
-function renderPointContent(isSingle, pointData = {}, serie = {}, formatUnit, precision) {
+function renderPointContent(isSingle, pointData = {}, serie = {}, formatUnit, precision, chartType) {
   const { color, filledNull, serieOptions = {}, timestamp } = pointData;
-  const value = pointData.value;
+  // StackArea 类型的原始值被存储在 y0key (值为 2) + 1 的位置，所以取了下标为 3 的值，后期可完善
+  const value = chartType === ChartType.Line ? pointData.value : pointData[3];
   let comparison = '';
   if (serieOptions.comparison) {
     comparison += ` offset ${serieOptions.comparison}`;
