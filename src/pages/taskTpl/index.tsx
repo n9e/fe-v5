@@ -14,7 +14,6 @@ import PageLayout from '@/components/pageLayout';
 import { Tpl } from './interface';
 import BindTags from './bindTags';
 import UnBindTags from './unBindTags';
-// import ModifyNode from './modifyNode';
 
 function getTableData(options: any, busiGroup: number | undefined, query: string) {
   if (busiGroup) {
@@ -81,18 +80,6 @@ const index = (_props: any) => {
       });
     }
   }
-
-  // function handleBatchModifyNode() {
-  //   if (!_.isEmpty(selectedIds)) {
-  //     ModifyNode({
-  //       language: i18n.language,
-  //       selectedIds,
-  //       onOk: () => {
-  //         refresh();
-  //       },
-  //     });
-  //   }
-  // }
 
   const columns: ColumnProps<Tpl>[] = [
     {
@@ -182,9 +169,6 @@ const index = (_props: any) => {
                     <Menu.Item>
                       <Button type="link" disabled={selectedIds.length === 0} onClick={() => { handleBatchUnBindTags(); }}>{t('tpl.tag.unbind')}</Button>
                     </Menu.Item>
-                    {/* <Menu.Item>
-                      <Button type="link" disabled={selectedIds.length === 0} onClick={() => { handleBatchModifyNode(); }}>{t('tpl.node.modify')}</Button>
-                    </Menu.Item> */}
                   </Menu>
                 }
               >

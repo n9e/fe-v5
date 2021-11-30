@@ -49,10 +49,10 @@ const index = (props: any) => {
   tableProps.pagination.total = tableDataSource.length;
 
   const handleHostAction = (host: string, action: string) => {
-    request(`${api.task(curBusiItem.id)}/${taskId}/host`, {
+    request(`${api.task(curBusiItem.id)}/${taskId}/host/${host}/action`, {
       method: 'PUT',
       body: JSON.stringify({
-        host, action,
+        action,
       }),
     }).then(() => {
       refresh();
