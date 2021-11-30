@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useHistory } from 'react-router-dom';
 import { Table, Divider, Tag, Row, Col, Button, Card } from 'antd';
+import { RollbackOutlined } from '@ant-design/icons';
 import { ColumnProps } from 'antd/lib/table';
 import _ from 'lodash';
-import queryString from 'query-string';
 import { useTranslation } from 'react-i18next';
 import PageLayout from '@/components/pageLayout';
-import { useAntdTable } from 'ahooks';
 import FieldCopy from './FieldCopy';
 import request from '@/utils/request';
 import api from '@/utils/api';
@@ -21,32 +20,36 @@ interface HostItem {
 
 const index = (props: any) => {
   const taskResultCls = 'job-task-result';
-  const query = queryString.parse(_.get(props, 'location.search'));
+  const history = useHistory();
   const { curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const { params } = props.match;
   const taskId = params.id;
-  const { t } = useTranslation();
-  const [activeStatus, setActiveStatus] = useState('total');
+  const { t, i18n } = useTranslation();
+  const [activeStatus, setActiveStatus] = useState<string[]>();
   const [data, setData] = useState({} as any);
+  const [hosts, setHosts] = useState<HostItem[]>([]);
+  const [loading, setLoading] = useState(false);
   const getTableData = () => {
+    setLoading(true)
     return request(`${api.task(curBusiItem.id)}/${params.id}`).then((data) => {
       setData({
         ...data.dat.meta,
         action: data.dat.action,
       });
-      return {
-        list: data.dat.hosts,
-      };
+      setHosts(data.dat.hosts);
+    }).finally(() => {
+      setLoading(false);
     });
   };
-  const { tableProps, refresh } = useAntdTable(() => getTableData(), {});
-  let tableDataSource = tableProps.dataSource;
-  if (activeStatus !== 'total') {
-    tableDataSource = _.filter(tableDataSource, (item: any) => {
-      return item.status === activeStatus;
+  useEffect(() => {
+    getTableData();
+  }, []);
+  let filteredHosts = _.cloneDeep(hosts);
+  if (activeStatus) {
+    filteredHosts = _.filter(filteredHosts, (item: any) => {
+      return _.includes(activeStatus, item.status);
     });
   }
-  tableProps.pagination.total = tableDataSource.length;
 
   const handleHostAction = (host: string, action: string) => {
     request(`${api.task(curBusiItem.id)}/${taskId}/host/${host}/action`, {
@@ -55,7 +58,7 @@ const index = (props: any) => {
         action,
       }),
     }).then(() => {
-      refresh();
+      getTableData();
     });
   };
 
@@ -66,13 +69,12 @@ const index = (props: any) => {
         action,
       }),
     }).then(() => {
-      refresh();
+      getTableData();
     });
   };
 
   const renderHostStatusFilter = () => {
-    const groupedHosts = _.groupBy(tableProps.dataSource, 'status');
-
+    const groupedHosts = _.groupBy(hosts, 'status');
     return _.map(groupedHosts, (chosts, status) => {
       return {
         text: `${status} (${chosts.length})`,
@@ -87,7 +89,7 @@ const index = (props: any) => {
         <FieldCopy
           dataIndex="host"
           hasSelected={false}
-          data={tableDataSource}
+          data={filteredHosts}
         />
       ),
       dataIndex: 'host',
@@ -95,7 +97,9 @@ const index = (props: any) => {
       title: t('task.status'),
       dataIndex: 'status',
       filters: renderHostStatusFilter(),
-      onFilter: (value, record) => record.status === value,
+      onFilter: (value: string, record) => {
+        return record.status === value;
+      },
       render: (text) => {
         if (text === 'success') {
           return <Tag color="#87d068">{text}</Tag>;
@@ -147,11 +151,16 @@ const index = (props: any) => {
   }
   
   return (
-    <PageLayout title={<Link to={{ pathname: '/job-tasks' }}>{'<'} 执行历史</Link>}>
-      <div style={{ padding: 20 }} className={taskResultCls}>
+    <PageLayout hideCluster title={
+      <>
+        <RollbackOutlined className='back' onClick={() => history.push('/job-tasks')} />
+        执行历史
+      </>
+    }>
+      <div style={{ padding: 10 }} className={taskResultCls}>
       <Card
         title={data.title}
-        extra={<a onClick={() => { refresh(); }}>{t('task.refresh')}</a>}
+        extra={<a onClick={() => { getTableData(); }}>{t('task.refresh')}</a>}
       >
         <Row style={{ marginBottom: 20 }}>
           <Col span={18}>
@@ -183,13 +192,20 @@ const index = (props: any) => {
         <Table
           rowKey="host"
           columns={columns as any}
-          {...tableProps as any}
-          dataSource={tableDataSource as any}
+          dataSource={hosts}
+          loading={loading}
           pagination={{
-            ...tableProps.pagination,
             showSizeChanger: true,
             pageSizeOptions: ['10', '50', '100', '500', '1000'],
+            showTotal: (total) => {
+              return i18n.language == 'en' ?
+              `Total ${total} items` :
+              `共 ${total} 条`
+            },
           } as any}
+          onChange={(pagination, filters, sorter, extra) => {
+            setActiveStatus(filters.status as string[]);
+          }}
         />
       </Card>
       </div>

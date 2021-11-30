@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Spin, Row, Col, Card, Alert, message } from 'antd';
-import { Link } from 'react-router-dom';
+import { RollbackOutlined } from '@ant-design/icons';
+import { useHistory } from 'react-router-dom';
 import _ from 'lodash';
 import queryString from 'query-string';
 import { useTranslation } from 'react-i18next';
@@ -13,6 +14,7 @@ import { CommonStoreState } from '@/store/commonInterface';
 import TplForm from '../taskTpl/tplForm';
 
 const Add = (props: any) => {
+  const history = useHistory();
   const query = queryString.parse(_.get(props, 'location.search'));
   const { curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const { t } = useTranslation();
@@ -62,18 +64,32 @@ const Add = (props: any) => {
         }).finally(() => {
           setLoading(false);
         });
+      } else {
+        setData({} as any);
       }
     }
   }, []);
 
   return (
-    <PageLayout title={<Link to={{ pathname: '/job-tasks' }}>{'<'} 执行历史</Link>}>
-      <div style={{ padding: 20 }}>
+    <PageLayout hideCluster title={
+      query.tpl ?
+      <>
+        <RollbackOutlined className='back' onClick={() => history.push('/job-tpls')} />
+        自愈脚本
+      </> :
+      <>
+        <RollbackOutlined className='back' onClick={() => history.push('/job-tasks')} />
+        执行历史
+      </>
+    }>
+      <div style={{ padding: 10 }}>
         <div style={{ background: 'none' }}>
         <Row gutter={20}>
           <Col span={18}>
             <Card
-              title="创建任务"
+              title={
+                query.tpl ? '创建任务' : query.task ? '克隆任务' : '创建临时任务'
+              }
             >
               <Spin spinning={loading}>
                 {

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Table, Divider, Checkbox, Row, Col, Input, Select } from 'antd';
+import { Link, useHistory } from 'react-router-dom';
+import { Table, Divider, Checkbox, Row, Col, Input, Select, Button } from 'antd';
+import { SearchOutlined, CodeOutlined } from '@ant-design/icons';
 import { ColumnProps } from 'antd/lib/table';
 import _ from 'lodash';
 import moment from 'moment';
@@ -26,7 +27,8 @@ function getTableData(options: any, busiId: number | undefined, query: string, m
 }
 
 const index = (_props: any) => {
-  const { t } = useTranslation();
+  const history = useHistory();
+  const { t, i18n } = useTranslation();
   const [query, setQuery] = useState('');
   const [mine, setMine] = useState(true);
   const [days, setDays] = useState(7);
@@ -71,15 +73,24 @@ const index = (_props: any) => {
     },
   ];
   return (
-    <PageLayout title={t('执行历史')}>
+    <PageLayout hideCluster title={
+      <>
+        <CodeOutlined />
+        {t('执行历史')}
+      </>
+    }>
       <div style={{ display: 'flex' }}>
         <LeftTree busiGroup={{ onChange: (id) => setBusiId(id) }}></LeftTree>
-        <div style={{ flex: 1, padding: 20 }}>
+        <div style={{ flex: 1, padding: 10 }}>
           <Row>
             <Col span={16} className="mb10">
-              <Input.Search
+              <Input
                 style={{ width: 200, marginRight: 10 }}
-                onChange={(e) => setQuery(e.target.value)}
+                prefix={<SearchOutlined />}
+                defaultValue={query}
+                onPressEnter={(e) => {
+                  setQuery(e.currentTarget.value);
+                }}
                 placeholder="搜索标题"
               />
               <Select
@@ -101,11 +112,24 @@ const index = (_props: any) => {
                 {t('task.only.mine')}
               </Checkbox>
             </Col>
+            <Col span={8} style={{ textAlign: 'right' }}>
+              <Button onClick={() => { history.push('/job-tasks/add') }}>{t('task.temporary.create')}</Button>
+            </Col>
           </Row>
           <Table
             rowKey="id"
             columns={columns as any}
             {...tableProps as any}
+            pagination={{
+              ...tableProps.pagination,
+              showSizeChanger: true,
+              pageSizeOptions: ['10', '50', '100', '500', '1000'],
+              showTotal: (total) => {
+                return i18n.language == 'en' ?
+                `Total ${total} items` :
+                `共 ${total} 条`
+              },
+            } as any}
           />
         </div>
       </div>

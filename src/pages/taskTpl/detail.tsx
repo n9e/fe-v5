@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { Button, Spin, Divider, Card, Breadcrumb } from 'antd';
+import { RollbackOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import moment from 'moment';
 import Highlight from 'react-highlight';
@@ -15,6 +16,7 @@ import { CommonStoreState } from '@/store/commonInterface';
 import { Tpl } from './interface';
 
 const Detail = (props: any) => {
+  const history = useHistory();
   const id = _.get(props, 'match.params.id');
   const { curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const { t } = useTranslation();
@@ -38,20 +40,17 @@ const Detail = (props: any) => {
   }, [id, curBusiItem.id]);
 
   return (
-    <PageLayout title={<Link to={{ pathname: '/job-tpls' }}>{'<'} 自愈脚本</Link>}>
-      <div style={{ padding: 20 }}>
+    <PageLayout hideCluster title={
+      <>
+        <RollbackOutlined className='back' onClick={() => history.push('/job-tpls')} />
+        自愈脚本
+      </>
+    }>
+      <div style={{ padding: 10 }}>
         <Card
           title="任务模板详情"
         >
         <Spin spinning={loading}>
-          <Breadcrumb style={{ paddingBottom: 20, marginBottom: 20, borderBottom: '1px solid #efefef' }}>
-            <Breadcrumb.Item>
-              <Link to={`/job-tpls`}>{t('breadcrumb.tpls')}</Link>
-            </Breadcrumb.Item>
-            <Breadcrumb.Item>
-              {t('breadcrumb.tpl')}
-            </Breadcrumb.Item>
-          </Breadcrumb>
           <div className="job-task-table">
             <div className="ant-table ant-table-default ant-table-bordered">
               <div className="ant-table-content">

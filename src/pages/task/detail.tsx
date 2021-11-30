@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { Spin, Divider, Button, Card } from 'antd';
+import { RollbackOutlined } from '@ant-design/icons';
 import Highlight from 'react-highlight';
 import 'highlight.js/styles/vs2015.css';
 import moment from 'moment';
@@ -16,6 +17,7 @@ import './style.less';
 
 
 const Detail = (props: any) => {
+  const history = useHistory();
   const { curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const { t } = useTranslation();
   const taskId = _.get(props, 'match.params.id');
@@ -39,8 +41,13 @@ const Detail = (props: any) => {
   }, [taskId]);
 
   return (
-    <PageLayout title={<Link to={{ pathname: '/job-tasks' }}>{'<'} 执行历史</Link>}>
-      <div style={{ padding: 20 }}>
+    <PageLayout hideCluster title={
+      <>
+        <RollbackOutlined className='back' onClick={() => history.push('/job-tasks')} />
+        执行历史
+      </>
+    }>
+      <div style={{ padding: 10 }}>
         <Card
           title={data.title}
         >

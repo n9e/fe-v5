@@ -84,6 +84,7 @@
   "task.pause": "暂停点",
   "task.host.list": "机器列表",
   "task.clone.new": "克隆一个新任务",
+  "task.temporary.create": "创建临时任务",
 
   "groups.instGroups": "即时任务",
   "groups.crontabGroups": "定时任务",

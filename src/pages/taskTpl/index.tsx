@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Table, Divider, Popconfirm, Tag, Row, Col, Input, Button, Dropdown, Menu, message } from 'antd';
-import { DownOutlined, PlusOutlined } from '@ant-design/icons';
+import { DownOutlined, PlusOutlined, SearchOutlined, CodeOutlined } from '@ant-design/icons';
 import { ColumnProps } from 'antd/lib/table';
 import _ from 'lodash';
 import moment from 'moment';
@@ -26,6 +26,7 @@ function getTableData(options: any, busiGroup: number | undefined, query: string
 
 const index = (_props: any) => {
   const { t, i18n } = useTranslation();
+  const searchRef = useRef<Input>(null);
   const [query, setQuery] = useState('');
   const [busiId, setBusiId] = useState<number>();
   const [selectedIds, setSelectedIds] = useState([] as any[]);
@@ -35,6 +36,7 @@ const index = (_props: any) => {
     if (!_.includes(query, tag)) {
       const newQuery = query ? `${query} ${tag}` : tag;
       setQuery(newQuery);
+      searchRef.current?.setValue(newQuery);
     }
   }
 
@@ -66,7 +68,7 @@ const index = (_props: any) => {
     if (!_.isEmpty(selectedIds)) {
       let uniqueTags = [] as any[];
       _.each(tableProps.dataSource, (item) => {
-        const tags = item.tags ? _.split(item.tags, ',') : [];
+        const tags = item.tags;
         uniqueTags = _.union(uniqueTags, tags);
       });
       UnBindTags({
@@ -95,8 +97,7 @@ const index = (_props: any) => {
       title: t('tpl.tags'),
       dataIndex: 'tags',
       render: (text) => {
-        const tags = text ? _.split(text, ',') : [];
-        return _.map(tags, item => <Tag color="blue" key={item} onClick={() => handleTagClick(item)}>{item}</Tag>);
+        return _.map(text, item => <Tag color="blue" key={item} onClick={() => handleTagClick(item)}>{item}</Tag>);
       },
     }, {
       title: t('tpl.creator'),
@@ -136,17 +137,24 @@ const index = (_props: any) => {
     },
   ];
   return (
-    <PageLayout title={t('自愈脚本')}>
+    <PageLayout hideCluster title={
+      <>
+        <CodeOutlined />
+        {t('自愈脚本')}
+      </>
+    }>
       <div style={{ display: 'flex' }}>
         <LeftTree busiGroup={{ onChange: (id) => setBusiId(id) }}></LeftTree>
         <div style={{ flex: 1, padding: 20 }}>
           <Row>
             <Col span={14} className="mb10">
-              <Input.Search
+              <Input
                 style={{ width: 200 }}
-                value={query}
-                onChange={(e) => {
-                  setQuery(e.target.value);
+                ref={searchRef}
+                prefix={<SearchOutlined />}
+                defaultValue={query}
+                onPressEnter={(e) => {
+                  setQuery(e.currentTarget.value);
                 }}
                 placeholder="搜索标题、标签"
               />
@@ -186,6 +194,16 @@ const index = (_props: any) => {
                 setSelectedIds(selectedRowKeys);
               }
             }}
+            pagination={{
+              ...tableProps.pagination,
+              showSizeChanger: true,
+              pageSizeOptions: ['10', '50', '100', '500', '1000'],
+              showTotal: (total) => {
+                return i18n.language == 'en' ?
+                `Total ${total} items` :
+                `共 ${total} 条`
+              },
+            } as any}
           />
         </div>
       </div>

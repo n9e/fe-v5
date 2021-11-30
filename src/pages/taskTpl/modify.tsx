@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { Button, Spin, Card, message } from 'antd';
+import { RollbackOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { useTranslation } from 'react-i18next';
 import PageLayout from '@/components/pageLayout';
@@ -12,6 +13,7 @@ import { CommonStoreState } from '@/store/commonInterface';
 import TplForm from './tplForm';
 
 const Modify = (props: any) => {
+  const history = useHistory();
   const id = _.get(props, 'match.params.id');
   const { curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const { t } = useTranslation();
@@ -46,8 +48,13 @@ const Modify = (props: any) => {
   }, [id, curBusiItem.id]);
 
   return (
-    <PageLayout title={<Link to={{ pathname: '/job-tpls' }}>{'<'} 自愈脚本</Link>}>
-      <div style={{ padding: 20 }}>
+    <PageLayout hideCluster title={
+      <>
+        <RollbackOutlined className='back' onClick={() => history.push('/job-tpls')} />
+        自愈脚本
+      </>
+    }>
+      <div style={{ padding: 10 }}>
         <Card
           title="修改任务模板"
         >

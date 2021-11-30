@@ -576,6 +576,7 @@
   "task.pause": "Pause",
   "task.host.list": "Host list",
   "task.clone.new": "Clone a new task",
+  "task.temporary.create": "Create temporary task",
 
   "groups.instGroups": "Instant groups",
   "groups.crontabGroups": "Crontab groups",

@@ -1,12 +1,11 @@
 import React, { FC, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { MenuClickEventHandler } from 'rc-menu/lib/interface';
 import { Menu, Button } from 'antd';
-import { MenuUnfoldOutlined, MenuFoldOutlined, LineChartOutlined, DatabaseOutlined, AlertOutlined, UserOutlined, BankOutlined, SettingOutlined } from '@ant-design/icons';
+import { MenuUnfoldOutlined, MenuFoldOutlined, LineChartOutlined, DatabaseOutlined, UserOutlined, CodeOutlined, SettingOutlined } from '@ant-design/icons';
 import './menu.less';
 import { RootState, accountStoreState } from '@/store/accountInterface';
-import { Logout } from '@/services/login';
 import { useTranslation } from 'react-i18next';
 const { SubMenu } = Menu;
 
@@ -74,7 +73,7 @@ const SideMenu: FC = () => {
           <Menu.Item key='/event'>{t('活跃告警')}</Menu.Item>
           <Menu.Item key='/history-events'>{t('历史告警')}</Menu.Item>
         </SubMenu>
-        <SubMenu icon={<AlertOutlined />} title={t('告警自愈')}>
+        <SubMenu icon={<CodeOutlined />} title={t('告警自愈')}>
           <Menu.Item key='/job-tpls'>{t('自愈脚本')}</Menu.Item>
           <Menu.Item key='/job-tasks'>{t('执行历史')}</Menu.Item>
         </SubMenu>
