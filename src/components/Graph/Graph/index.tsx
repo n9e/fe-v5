@@ -112,6 +112,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
   }
 
   componentDidMount() {
+    console.log('componentDidMount')
     this.updateAllGraphs(this.state.aggrFunc, this.state.aggrGroups, this.state.offsets);
   }
 
