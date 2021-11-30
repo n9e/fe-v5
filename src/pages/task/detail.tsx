@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Spin, Divider, Button } from 'antd';
+import { Spin, Divider, Button, Card } from 'antd';
 import Highlight from 'react-highlight';
 import 'highlight.js/styles/vs2015.css';
 import moment from 'moment';
@@ -39,9 +39,11 @@ const Detail = (props: any) => {
   }, [taskId]);
 
   return (
-    <PageLayout title={data.title}>
+    <PageLayout title={<Link to={{ pathname: '/job-tasks' }}>{'<'} 执行历史</Link>}>
       <div style={{ padding: 20 }}>
-        <div style={{ padding: 20 }}>
+        <Card
+          title={data.title}
+        >
         <Spin spinning={loading}>
           <div className="job-task-table">
             <div className="ant-table ant-table-default ant-table-bordered">
@@ -114,7 +116,7 @@ const Detail = (props: any) => {
             </Link>
           </div>
         </Spin>
-        </div>
+      </Card>
       </div>
     </PageLayout>
   );

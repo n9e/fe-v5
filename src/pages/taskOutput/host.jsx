@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Spin } from 'antd';
 import _ from 'lodash';
-import request from '@pkgs/request';
-import api from '@common/api';
+import request from '@/utils/request';
+import api from '@/utils/api';
 
 export default class index extends Component {
   constructor(props) {
@@ -26,14 +26,15 @@ export default class index extends Component {
   }
 
   fetchData() {
+    const busiId = _.get(this.props, 'match.params.busiId');
     const taskId = _.get(this.props, 'match.params.taskId');
     const host = _.get(this.props, 'match.params.host');
     const outputType = _.get(this.props, 'match.params.outputType');
 
     if (taskId !== undefined && host !== undefined) {
       this.setState({ loading: true });
-      request(`${api.task}/${taskId}/host/${host}/${outputType}`).then((data) => {
-        this.setState({ data });
+      request(`${api.task(busiId)}/${taskId}/host/${host}/${outputType}`).then((data) => {
+        this.setState({ data: data.dat });
       }).finally(() => {
         this.setState({ loading: false });
       });

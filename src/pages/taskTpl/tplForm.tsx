@@ -28,8 +28,6 @@ const TplForm = (props) => {
 
   const { initialValues, type } = props;
 
-  console.log('initialValues', initialValues);
-
   return (
     <div className="job-tpl-form">
       <Form onFinish={handleSubmit} form={form} layout="vertical">
@@ -127,7 +125,7 @@ const TplForm = (props) => {
         >
           <Input />
         </FormItem>
-        {
+        {/* {
           type !== 'tpl' ?
             <>
               <FormItem
@@ -137,7 +135,7 @@ const TplForm = (props) => {
                   </span>
                 }
               >
-                {/* <TreeSelect
+                <TreeSelect
                   showSearch
                   allowClear
                   treeNodeFilterProp="path"
@@ -152,10 +150,10 @@ const TplForm = (props) => {
                   }}
                 >
                   {renderTreeNodes(this.state.treeData, 'treeSelect')}
-                </TreeSelect> */}
+                </TreeSelect>
               </FormItem>
             </> : null
-        }
+        } */}
         <FormItem
           label={
             <>

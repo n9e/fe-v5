@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Table, Divider, Tag, Row, Col, Button } from 'antd';
+import { Table, Divider, Tag, Row, Col, Button, Card } from 'antd';
 import { ColumnProps } from 'antd/lib/table';
 import _ from 'lodash';
 import queryString from 'query-string';
@@ -49,7 +49,7 @@ const index = (props: any) => {
   tableProps.pagination.total = tableDataSource.length;
 
   const handleHostAction = (host: string, action: string) => {
-    request(`${api.task}/${taskId}/host`, {
+    request(`${api.task(curBusiItem.id)}/${taskId}/host`, {
       method: 'PUT',
       body: JSON.stringify({
         host, action,
@@ -60,7 +60,7 @@ const index = (props: any) => {
   };
 
   const handleTaskAction = (action: string) => {
-    request(`${api.task}/${taskId}/action`, {
+    request(`${api.task(curBusiItem.id)}/${taskId}/action`, {
       method: 'PUT',
       body: JSON.stringify({
         action,
@@ -69,6 +69,17 @@ const index = (props: any) => {
       refresh();
     });
   };
+
+  const renderHostStatusFilter = () => {
+    const groupedHosts = _.groupBy(tableProps.dataSource, 'status');
+
+    return _.map(groupedHosts, (chosts, status) => {
+      return {
+        text: `${status} (${chosts.length})`,
+        value: status
+      }
+    });
+  }
 
   const columns: ColumnProps<HostItem>[] = [
     {
@@ -83,6 +94,8 @@ const index = (props: any) => {
     }, {
       title: t('task.status'),
       dataIndex: 'status',
+      filters: renderHostStatusFilter(),
+      onFilter: (value, record) => record.status === value,
       render: (text) => {
         if (text === 'success') {
           return <Tag color="#87d068">{text}</Tag>;
@@ -98,15 +111,15 @@ const index = (props: any) => {
       render: (_text, record) => {
         return (
           <span>
-            <a
-              href={`/task-output/${params.id}/${record.host}/stdout`}
+            <Link
+              to={`/job-task/${curBusiItem.id}/output/${params.id}/${record.host}/stdout`}
               target="_blank"
             >
               stdout
-            </a>
+            </Link>
             <Divider type="vertical" />
             <a
-              href={`/task-output/${params.id}/${record.host}/stderr`}
+              href={`/job-task/${curBusiItem.id}/output/${params.id}/${record.host}/stderr`}
               target="_blank"
             >
               stderr
@@ -132,76 +145,53 @@ const index = (props: any) => {
       },
     });
   }
-  const renderHostStatusFilter = () => {
-    const groupedHosts = _.groupBy(tableProps.dataSource, 'status');
-
-    return _.map(groupedHosts, (chosts, status) => {
-      return (
-        <span key={status}>
-          <a
-            className={activeStatus === status ? 'active' : ''}
-            onClick={() => {
-              setActiveStatus(status);
-            }}
-          >
-            {status} ({chosts.length})
-          </a>
-          <Divider type="vertical" />
-        </span>
-      );
-    });
-  }
+  
   return (
-    <PageLayout title={data.title}>
-      <div style={{ padding: 20 }}>
-      <Row style={{ marginBottom: 20, padding: 20  }}>
-        <Col span={18}>
-          <div className={taskResultCls}>
-            <Link to={{ pathname: '/job-tasks' }}>{'<'}返回列表</Link>
-            <Divider type="vertical" />
-            {t('task.done')}: {_.toString(data.done)}
-            <Divider type="vertical" />
-            <a href={`/task-output/${taskId}/stdout`} target="_blank">stdouts</a>
-            <Divider type="vertical" />
-            <a href={`/task-output/${taskId}/stderr`} target="_blank">stderrs</a>
-            <Divider type="vertical" />
-            <a className={activeStatus === 'total' ? 'active' : ''} onClick={() => setActiveStatus('total')}>total ({tableProps.dataSource.length})</a>
-            <Divider type="vertical" />
-            {renderHostStatusFilter()}
-            <Link to={{ pathname: `/job-tasks/${taskId}/detail` }}>{t('task.meta')}</Link>
-            <Divider type="vertical" />
-            <Link to={{ pathname: '/job-tasks/add', search: `task=${taskId}` }}>{t('task.clone')}</Link>
-            <Divider type="vertical" />
-            <a onClick={() => { refresh(); }}>{t('task.refresh')}</a>
-          </div>
-        </Col>
-        <Col span={6} className="textAlignRight">
-          {
-            !data.done ?
-              <span>
-                {
-                  data.action === 'start' ?
-                    <Button className="success-btn" onClick={() => handleTaskAction('pause')}>Pause</Button> :
-                    <Button className="success-btn" onClick={() => handleTaskAction('start')}>Start</Button>
-                }
-                <Button className="ml10 warning-btn" onClick={() => handleTaskAction('cancel')}>Cancel</Button>
-                <Button className="ml10 danger-btn" onClick={() => handleTaskAction('kill')}>Kill</Button>
-              </span> : null
-          }
-        </Col>
-      </Row>
-      <Table
-        style={{ padding: 20 }}
-        rowKey="host"
-        columns={columns as any}
-        {...tableProps as any}
-        dataSource={tableDataSource as any}
-        pagination={{
-          ...tableProps.pagination,
-          showSizeChanger: true,
-          pageSizeOptions: ['10', '50', '100', '500', '1000'],
-        } as any}
-      />
+    <PageLayout title={<Link to={{ pathname: '/job-tasks' }}>{'<'} 执行历史</Link>}>
+      <div style={{ padding: 20 }} className={taskResultCls}>
+      <Card
+        title={data.title}
+        extra={<a onClick={() => { refresh(); }}>{t('task.refresh')}</a>}
+      >
+        <Row style={{ marginBottom: 20 }}>
+          <Col span={18}>
+            <div>
+              <a href={`/job-task/${curBusiItem.id}/output/${taskId}/stdout`} target="_blank">stdouts</a>
+              <Divider type="vertical" />
+              <a href={`/job-task/${curBusiItem.id}/output/${taskId}/stderr`} target="_blank">stderrs</a>
+              <Divider type="vertical" />
+              <Link to={{ pathname: `/job-tasks/${taskId}/detail` }}>{t('task.meta')}</Link>
+              <Divider type="vertical" />
+              <Link to={{ pathname: '/job-tasks/add', search: `task=${taskId}` }}>{t('task.clone')}</Link>
+            </div>
+          </Col>
+          <Col span={6} className="textAlignRight">
+            {
+              !data.done ?
+                <span>
+                  {
+                    data.action === 'start' ?
+                      <Button className="success-btn" onClick={() => handleTaskAction('pause')}>Pause</Button> :
+                      <Button className="success-btn" onClick={() => handleTaskAction('start')}>Start</Button>
+                  }
+                  <Button className="ml10 warning-btn" onClick={() => handleTaskAction('cancel')}>Cancel</Button>
+                  <Button className="ml10 danger-btn" onClick={() => handleTaskAction('kill')}>Kill</Button>
+                </span> : null
+            }
+          </Col>
+        </Row>
+        <Table
+          rowKey="host"
+          columns={columns as any}
+          {...tableProps as any}
+          dataSource={tableDataSource as any}
+          pagination={{
+            ...tableProps.pagination,
+            showSizeChanger: true,
+            pageSizeOptions: ['10', '50', '100', '500', '1000'],
+          } as any}
+        />
+      </Card>
       </div>
     </PageLayout>
   )

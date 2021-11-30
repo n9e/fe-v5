@@ -31,7 +31,7 @@ const index = (_props: any) => {
   const [mine, setMine] = useState(true);
   const [days, setDays] = useState(7);
   const [busiId, setBusiId] = useState<number>();
-  const { tableProps } = useAntdTable((options) => getTableData(options, busiId, query, mine, days), [query, mine, days]);
+  const { tableProps } = useAntdTable((options) => getTableData(options, busiId, query, mine, days), [query, mine, days, busiId]);
 
   const columns: ColumnProps<DataItem>[] = [
     {
@@ -58,13 +58,6 @@ const index = (_props: any) => {
         );
       },
     }, {
-      title: t('task.done'),
-      dataIndex: 'done',
-      width: 100,
-      render: (text) => {
-        return _.toString(text);
-      },
-    }, {
       title: t('task.creator'),
       dataIndex: 'create_by',
       width: 100,
@@ -78,19 +71,18 @@ const index = (_props: any) => {
     },
   ];
   return (
-    <PageLayout title={t('监控大盘')}>
+    <PageLayout title={t('执行历史')}>
       <div style={{ display: 'flex' }}>
         <LeftTree busiGroup={{ onChange: (id) => setBusiId(id) }}></LeftTree>
         <div style={{ flex: 1, padding: 20 }}>
           <Row>
             <Col span={16} className="mb10">
               <Input.Search
-                style={{ width: 200, marginLeft: 8 }}
-                className="mr10"
-                onSearch={(val) => setQuery(val)}
+                style={{ width: 200, marginRight: 10 }}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="搜索标题"
               />
               <Select
-                className="mr10"
                 style={{ marginRight: 10 }}
                 value={days}
                 onChange={(val: number) => {

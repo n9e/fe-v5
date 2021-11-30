@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Spin, message } from 'antd';
+import { Button, Spin, Row, Col, Card, Alert, message } from 'antd';
+import { Link } from 'react-router-dom';
 import _ from 'lodash';
 import queryString from 'query-string';
 import { useTranslation } from 'react-i18next';
@@ -66,38 +67,54 @@ const Add = (props: any) => {
   }, []);
 
   return (
-    <PageLayout title={t('创建任务')}>
+    <PageLayout title={<Link to={{ pathname: '/job-tasks' }}>{'<'} 执行历史</Link>}>
       <div style={{ padding: 20 }}>
-      <div style={{ padding: 20 }}>
-        <Spin spinning={loading}>
-          {
-            data ?
-            <TplForm
-              type="task"
-              initialValues={data}
-              onSubmit={handleSubmit}
-              footer={
-                <div>
-                  <Button type="primary" htmlType="submit" style={{ marginRight: 10 }}
-                    onClick={() => {
-                      setAction('pause');
-                    }}
-                  >
-                    保存暂不执行
-                  </Button>
-                  <Button type="primary" htmlType="submit"
-                    onClick={() => {
-                      setAction('start');
-                    }}
-                  >
-                    保存立刻执行
-                  </Button>
-                </div>
-              }
-            /> : null
-          }
-        </Spin>
-      </div>
+        <div style={{ background: 'none' }}>
+        <Row gutter={20}>
+          <Col span={18}>
+            <Card
+              title="创建任务"
+            >
+              <Spin spinning={loading}>
+                {
+                  data ?
+                  <TplForm
+                    type="task"
+                    initialValues={data}
+                    onSubmit={handleSubmit}
+                    footer={
+                      <div>
+                        <Button type="primary" htmlType="submit" style={{ marginRight: 10 }}
+                          onClick={() => {
+                            setAction('pause');
+                          }}
+                        >
+                          保存暂不执行
+                        </Button>
+                        <Button type="primary" htmlType="submit"
+                          onClick={() => {
+                            setAction('start');
+                          }}
+                        >
+                          保存立刻执行
+                        </Button>
+                      </div>
+                    }
+                  /> : null
+                }
+              </Spin>
+            </Card>
+          </Col>
+          <Col span={6}>
+            <Alert
+              showIcon
+              message="提示信息"
+              description="如果你的角色是管理员，则可以在任意机器执行脚本；否则，只能对有管理权限的业务组下的机器执行脚本"
+              type="warning"
+            />
+          </Col>
+        </Row>
+        </div>
       </div>
     </PageLayout>
   );

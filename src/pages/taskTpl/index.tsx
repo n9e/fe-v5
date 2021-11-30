@@ -102,7 +102,7 @@ const index = (_props: any) => {
       title: t('tpl.title'),
       dataIndex: 'title',
       render: (text, record) => {
-        return <Link to={{ pathname: `/job-tpls/${record.id}/detail`, search: `nid=${busiId}` }}>{text}</Link>;
+        return <Link to={{ pathname: `/job-tpls/${record.id}/detail` }}>{text}</Link>;
       },
     }, {
       title: t('tpl.tags'),
@@ -114,7 +114,7 @@ const index = (_props: any) => {
     }, {
       title: t('tpl.creator'),
       dataIndex: 'create_by',
-      width: 150,
+      width: 100,
     }, {
       title: t('tpl.last_updated'),
       dataIndex: 'update_at',
@@ -128,16 +128,20 @@ const index = (_props: any) => {
       render: (_text, record) => {
         return (
           <span>
-            <Link to={{ pathname: `/job-tasks/add`, search: `tpl=${record.id}&nid=${busiId}` }}>
+            <Link to={{ pathname: `/job-tasks/add`, search: `tpl=${record.id}` }}>
               {t('task.create')}
             </Link>
             <Divider type="vertical" />
-            <Link to={{ pathname: `/job-tpls/${record.id}/modify`, search: `nid=${busiId}` }}>
+            <Link to={{ pathname: `/job-tpls/${record.id}/modify` }}>
               {t('table.modify')}
             </Link>
             <Divider type="vertical" />
+            <Link to={{ pathname: `/job-tpls/${record.id}/clone` }}>
+              {t('table.clone')}
+            </Link>
+            <Divider type="vertical" />
             <Popconfirm title={t('table.delete.sure')} onConfirm={() => { handleDelBtnClick(record.id); }}>
-              <a>{t('table.delete')}</a>
+              <a style={{ color: 'red' }}>{t('table.delete')}</a>
             </Popconfirm>
           </span>
         );
@@ -145,7 +149,7 @@ const index = (_props: any) => {
     },
   ];
   return (
-    <PageLayout title={t('监控大盘')}>
+    <PageLayout title={t('自愈脚本')}>
       <div style={{ display: 'flex' }}>
         <LeftTree busiGroup={{ onChange: (id) => setBusiId(id) }}></LeftTree>
         <div style={{ flex: 1, padding: 20 }}>
@@ -157,10 +161,11 @@ const index = (_props: any) => {
                 onChange={(e) => {
                   setQuery(e.target.value);
                 }}
+                placeholder="搜索标题、标签"
               />
             </Col>
             <Col span={10} className="textAlignRight">
-              <Link to={{ pathname: `/job-tpls/add`, search: `nid=${busiId}` }}>
+              <Link to={{ pathname: `/job-tpls/add` }}>
                 <Button
                   icon={<PlusOutlined />}
                   style={{ marginRight: 10 }}

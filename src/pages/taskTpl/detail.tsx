@@ -1,28 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Spin, Divider, Breadcrumb } from 'antd';
+import { Button, Spin, Divider, Card, Breadcrumb } from 'antd';
 import _ from 'lodash';
 import moment from 'moment';
 import Highlight from 'react-highlight';
 import 'highlight.js/styles/vs2015.css';
-import queryString from 'query-string';
 import { useTranslation } from 'react-i18next';
 import PageLayout from '@/components/pageLayout';
 import request from '@/utils/request';
 import api from '@/utils/api';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/common';
+import { CommonStoreState } from '@/store/commonInterface';
 import { Tpl } from './interface';
 
 const Detail = (props: any) => {
   const id = _.get(props, 'match.params.id');
-  const query = queryString.parse(props.location.search);
+  const { curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState({} as Tpl);
 
   useEffect(() => {
-    if (id && typeof query.nid === 'string') {
+    if (id) {
       setLoading(true);
-      request(`${api.tasktpl(query.nid)}/${id}`).then((data) => {
+      request(`${api.tasktpl(curBusiItem.id)}/${id}`).then((data) => {
         const { dat } = data;
         setData({
           ...dat.tpl,
@@ -33,11 +35,14 @@ const Detail = (props: any) => {
         setLoading(false);
       });
     }
-  }, [id, query.nid]);
+  }, [id, curBusiItem.id]);
 
   return (
-    <PageLayout title={t('任务模板详情')}>
-      <div style={{ padding: 20, background: '#fff' }}>
+    <PageLayout title={<Link to={{ pathname: '/job-tpls' }}>{'<'} 自愈脚本</Link>}>
+      <div style={{ padding: 20 }}>
+        <Card
+          title="任务模板详情"
+        >
         <Spin spinning={loading}>
           <Breadcrumb style={{ paddingBottom: 20, marginBottom: 20, borderBottom: '1px solid #efefef' }}>
             <Breadcrumb.Item>
@@ -122,6 +127,7 @@ const Detail = (props: any) => {
             </Link>
           </div>
         </Spin>
+        </Card>
       </div>
     </PageLayout>
   )

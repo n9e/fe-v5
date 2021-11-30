@@ -1,34 +1,37 @@
 import React from 'react';
-import { Button, message } from 'antd';
+import { Button, Card, message } from 'antd';
 import _ from 'lodash';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import queryString from 'query-string';
 import PageLayout from '@/components/pageLayout';
 import request from '@/utils/request';
 import api from '@/utils/api';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/common';
+import { CommonStoreState } from '@/store/commonInterface';
 import TplForm from './tplForm';
 
 const Add = (props: any) => {
-  const query = queryString.parse(props.location.search);
+  const { curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const { t } = useTranslation();
   const handleSubmit = (values: any) => {
-    if (typeof query.nid === 'string') {
-      request(`${api.tasktpls(query.nid)}`, {
-        method: 'POST',
-        body: JSON.stringify(values),
-      }).then(() => {
-        message.success(t('msg.create.success'));
-        props.history.push({
-          pathname: `/job-tpls`,
-        });
+    request(`${api.tasktpls(curBusiItem.id)}`, {
+      method: 'POST',
+      body: JSON.stringify(values),
+    }).then(() => {
+      message.success(t('msg.create.success'));
+      props.history.push({
+        pathname: `/job-tpls`,
       });
-    }
+    });
   };
 
   return (
-    <PageLayout title={t('创建任务模板')}>
-      <div style={{ padding: 20, background: '#fff' }}>
+    <PageLayout title={<Link to={{ pathname: '/job-tpls' }}>{'<'} 自愈脚本</Link>}>
+      <div style={{ padding: 20 }}>
+        <Card
+          title="创建任务模板"
+        >
         <TplForm
           onSubmit={handleSubmit}
           footer={
@@ -36,12 +39,10 @@ const Add = (props: any) => {
               <Button type="primary" htmlType="submit" style={{ marginRight: 8 }}> 
                 {t('form.submit')}
               </Button>
-              <Button>
-                <Link to={{ pathname: '/job-tpls' }}>返回</Link>
-              </Button>
             </div>
           }
         />
+        </Card>
       </div>
     </PageLayout>
   )
