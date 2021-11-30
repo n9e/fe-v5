@@ -34,6 +34,13 @@ export interface ErrorInfoType {
   errorType: string;
 }
 
+export interface HighLevelConfigType {
+  shared: boolean;
+  sharedSortDirection: 'desc' | 'asc';
+  precision: 'short' | 'origin' | number;
+  formatUnit: 1024 | 1000;
+}
+
 interface GraphProps {
   height?: number;
   ref?: any;
@@ -41,16 +48,12 @@ interface GraphProps {
   graphConfigInnerVisible?: boolean;
   showHeader?: boolean;
   extraRender?: (ReactNode) => ReactNode;
+  isShowRefresh?: boolean;
   isShowShare?: boolean;
   defaultAggrFunc?: string;
   defaultAggrGroups?: string[];
   defaultOffsets?: string[];
-  highLevelConfig?: {
-    shared?: boolean;
-    sharedSortDirection?: 'desc' | 'asc';
-    precision?: 'short' | 'origin' | number;
-    formatUnit?: 1024 | 1000;
-  };
+  highLevelConfig?: Partial<HighLevelConfigType>;
   onErrorOccured?: (errorArr: ErrorInfoType[]) => void;
   onRequestCompleted?: (requestInfo: QueryStats) => void;
 }
@@ -469,11 +472,13 @@ export default class Graph extends Component<GraphProps, GraphState> {
                   </Button>
                 </Popover>
               </span>
-              <span className='graph-operationbar-item' key='sync'>
-                <Button type='link' size='small' onClick={(e) => e.preventDefault()}>
-                  <SyncOutlined onClick={this.refresh} />
-                </Button>
-              </span>
+              {this.props.isShowRefresh === false ? null : (
+                <span className='graph-operationbar-item' key='sync'>
+                  <Button type='link' size='small' onClick={(e) => e.preventDefault()}>
+                    <SyncOutlined onClick={this.refresh} />
+                  </Button>
+                </span>
+              )}
               {this.props.isShowShare === false ? null : (
                 <span className='graph-operationbar-item' key='share'>
                   <Button type='link' size='small' onClick={(e) => e.preventDefault()}>
