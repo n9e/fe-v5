@@ -1,7 +1,7 @@
 /* eslint-disable no-use-before-define */
 import _ from 'lodash';
 import moment from 'moment';
-
+import { replaceExpressionBracket } from './index';
 const fmt = 'YYYY-MM-DD HH:mm:ss';
 
 export default function getTooltipsContent(activeTooltipData) {
@@ -27,6 +27,7 @@ export default function getTooltipsContent(activeTooltipData) {
 }
 
 function renderPointContent(isSingle, pointData = {}, serie = {}, formatUnit, precision) {
+  const { legendTitleFormat } = serie;
   const { color, filledNull, serieOptions = {}, timestamp } = pointData;
   const value = pointData.value;
   let comparison = '';
@@ -40,17 +41,17 @@ function renderPointContent(isSingle, pointData = {}, serie = {}, formatUnit, pr
 
   const renderMultiSeriesPointContent = () => {
     const labelContents = labelKeys.map((label) => `<span>${label}=${serieMetricLabels[label]}</span>`);
+    const label = legendTitleFormat ? replaceExpressionBracket(legendTitleFormat, serieMetricLabels) : `${metricName} ${comparison} {${labelContents}}`;
     return `<span style="color:${color}">● </span>
-      ${metricName} ${comparison} {${labelContents}}：<strong>${value > 1000 ? sizeFormatter(value) : value.toFixed(2)}${filledNull ? '(空值填补,仅限看图使用)' : ''}</strong>
+      ${label}：<strong>${value > 1000 ? sizeFormatter(value) : value.toFixed(2)}${filledNull ? '(空值填补,仅限看图使用)' : ''}</strong>
       <br/>`;
   };
 
   const renderSingleSeriesPointContent = () => {
     const labelContents = labelKeys.map((label) => `<div><strong>${label}</strong>: ${serieMetricLabels[label]}</div>`);
+    const label = legendTitleFormat ? replaceExpressionBracket(legendTitleFormat, serieMetricLabels) : `${metricName} ${comparison}${metricName || comparison ? ': ' : ''}`;
     return `<span style="color:${color}">● </span>
-      ${metricName} ${comparison}${metricName || comparison ? ': ' : ''}<strong>${value > 1000 ? sizeFormatter(value) : value.toFixed(2)}${
-      filledNull ? '(空值填补,仅限看图使用)' : ''
-    }</strong>
+      ${label}<strong>${value > 1000 ? sizeFormatter(value) : value.toFixed(2)}${filledNull ? '(空值填补,仅限看图使用)' : ''}</strong>
       <div /><br />
       <div><strong>Series:</strong></div>
       ${metricName ? `<div><strong>${metricName}</strong></div>` : ''}

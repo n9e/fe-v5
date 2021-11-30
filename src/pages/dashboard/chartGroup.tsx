@@ -467,6 +467,7 @@ export default function ChartGroup(props: Props) {
       chartConfigs.map((item, i) => {
         let { QL, name, legend, yplotline1, yplotline2 } = item.configs;
         const promqls = QL.map((item) => replaceExpressionVars(item.PromQL, variableConfig, variableConfig.var.length));
+        const legendTitleFormats = QL.map((item) => item.Legend);
         return (
           <div
             style={{
@@ -493,7 +494,7 @@ export default function ChartGroup(props: Props) {
                 range,
                 title: name,
                 promqls,
-                // promqls: QL.map((item) => item.PromQL),
+                legendTitleFormats,
               }}
               extraRender={(graph) => {
                 return (
@@ -541,60 +542,6 @@ export default function ChartGroup(props: Props) {
                 );
               }}
             />
-            {/* <D3Chart
-              barControl='multiOrSort'
-              title={chartConfigs[i].configs.name}
-              rightBar={
-                <>
-                  <Button
-                    type='link'
-                    size='small'
-                    onClick={(e) => {
-                      e.preventDefault();
-                      window.open(item.configs.link);
-                    }}
-                    disabled={!item.configs.link}
-                  >
-                    <LinkOutlined />
-                  </Button>
-                  <Dropdown
-                    trigger={['click']}
-                    overlay={
-                      <Menu>
-                        <Menu.Item onClick={() => onUpdateChart(groupInfo, item)}>{t('编辑图表')}</Menu.Item>
-
-                        <Menu.Item
-                          danger
-                          onClick={() => {
-                            confirm({
-                              title: `${t('是否删除图表')}：${item.configs.name}`,
-                              onOk: async () => {
-                                onDelChart(groupInfo, item);
-                              },
-
-                              onCancel() {},
-                            });
-                          }}
-                        >
-                          {t('删除图表')}
-                        </Menu.Item>
-                      </Menu>
-                    }
-                  >
-                    <Button type='link' size='small' onClick={(e) => e.preventDefault()}>
-                      <SettingOutlined />
-                    </Button>
-                  </Dropdown>
-                </>
-              }
-              options={{
-                ...item.configs,
-                prome_ql,
-                range,
-                step,
-                limit: 50,
-              }}
-            /> */}
           </div>
         );
       })
