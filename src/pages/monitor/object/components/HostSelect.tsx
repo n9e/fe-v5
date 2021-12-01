@@ -87,6 +87,8 @@ export default (props) => {
       pagination={{simple: true}}></Table>
     <div style={{marginTop: -44}}>
       <Button type='link' style={{ paddingRight: 4 }} onClick={() => {
+        changeSelectedHosts(allHosts)
+        setSelectedHosts(allHosts)
         setSelectedHostsKeys(allHosts.map(h => h.ident))
       }}>全选所有</Button>|<SelectedHosts selectedHosts={selectedHosts} allHosts={allHosts} changeSelectedHosts={(selectedHosts) => {
         changeSelectedHosts(selectedHosts)
