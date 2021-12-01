@@ -17,6 +17,7 @@ import { CommonStoreState } from '@/store/commonInterface';
 import { Tpl } from './interface';
 import BindTags from './bindTags';
 import UnBindTags from './unBindTags';
+import BlankBusinessPlaceholder from '@/components/BlankBusinessPlaceholder';
 
 function getTableData(options: any, busiGroup: number | undefined, query: string) {
   if (busiGroup) {
@@ -34,7 +35,7 @@ const index = (_props: any) => {
   const { curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const busiId = curBusiItem.id;
   const [selectedIds, setSelectedIds] = useState([] as any[]);
-  const { tableProps, refresh } = useAntdTable<any, any>((options) => getTableData(options, busiId, query), {refreshDeps: [busiId, query]});
+  const { tableProps, refresh } = useAntdTable<any, any>((options) => getTableData(options, busiId, query), { refreshDeps: [busiId, query] });
 
   function handleTagClick(tag: string) {
     if (!_.includes(query, tag)) {
@@ -55,7 +56,7 @@ const index = (_props: any) => {
     }
   }
 
-  function handleBatchBindTags () {
+  function handleBatchBindTags() {
     if (!_.isEmpty(selectedIds)) {
       BindTags({
         language: i18n.language,
@@ -91,48 +92,56 @@ const index = (_props: any) => {
     {
       title: 'ID',
       dataIndex: 'id',
-    }, {
+    },
+    {
       title: t('tpl.title'),
       dataIndex: 'title',
       render: (text, record) => {
         return <Link to={{ pathname: `/job-tpls/${record.id}/detail` }}>{text}</Link>;
       },
-    }, {
+    },
+    {
       title: t('tpl.tags'),
       dataIndex: 'tags',
       render: (text) => {
-        return _.map(text, item => <Tag color="blue" key={item} onClick={() => handleTagClick(item)}>{item}</Tag>);
+        return _.map(text, (item) => (
+          <Tag color='blue' key={item} onClick={() => handleTagClick(item)}>
+            {item}
+          </Tag>
+        ));
       },
-    }, {
+    },
+    {
       title: t('tpl.creator'),
       dataIndex: 'create_by',
       width: 100,
-    }, {
+    },
+    {
       title: t('tpl.last_updated'),
       dataIndex: 'update_at',
       width: 160,
       render: (text) => {
         return moment.unix(text).format('YYYY-MM-DD HH:mm:ss');
       },
-    }, {
+    },
+    {
       title: t('table.operations'),
       width: 220,
       render: (_text, record) => {
         return (
           <span>
-            <Link to={{ pathname: `/job-tasks/add`, search: `tpl=${record.id}` }}>
-              {t('task.create')}
-            </Link>
-            <Divider type="vertical" />
-            <Link to={{ pathname: `/job-tpls/${record.id}/modify` }}>
-              {t('table.modify')}
-            </Link>
-            <Divider type="vertical" />
-            <Link to={{ pathname: `/job-tpls/${record.id}/clone` }}>
-              {t('table.clone')}
-            </Link>
-            <Divider type="vertical" />
-            <Popconfirm title={t('table.delete.sure')} onConfirm={() => { handleDelBtnClick(record.id); }}>
+            <Link to={{ pathname: `/job-tasks/add`, search: `tpl=${record.id}` }}>{t('task.create')}</Link>
+            <Divider type='vertical' />
+            <Link to={{ pathname: `/job-tpls/${record.id}/modify` }}>{t('table.modify')}</Link>
+            <Divider type='vertical' />
+            <Link to={{ pathname: `/job-tpls/${record.id}/clone` }}>{t('table.clone')}</Link>
+            <Divider type='vertical' />
+            <Popconfirm
+              title={t('table.delete.sure')}
+              onConfirm={() => {
+                handleDelBtnClick(record.id);
+              }}
+            >
               <a style={{ color: 'red' }}>{t('table.delete')}</a>
             </Popconfirm>
           </span>
@@ -141,78 +150,98 @@ const index = (_props: any) => {
     },
   ];
   return (
-    <PageLayout hideCluster title={
-      <>
-        <CodeOutlined />
-        {t('自愈脚本')}
-      </>
-    }>
+    <PageLayout
+      hideCluster
+      title={
+        <>
+          <CodeOutlined />
+          {t('自愈脚本')}
+        </>
+      }
+    >
       <div style={{ display: 'flex' }}>
         <LeftTree></LeftTree>
-        <div style={{ flex: 1, padding: 20 }}>
-          <Row>
-            <Col span={14} className="mb10">
-              <Input
-                style={{ width: 200 }}
-                ref={searchRef}
-                prefix={<SearchOutlined />}
-                defaultValue={query}
-                onPressEnter={(e) => {
-                  setQuery(e.currentTarget.value);
-                }}
-                placeholder="搜索标题、标签"
-              />
-            </Col>
-            <Col span={10} className="textAlignRight">
-              <Link to={{ pathname: `/job-tpls/add` }}>
-                <Button
-                  icon={<PlusOutlined />}
-                  style={{ marginRight: 10 }}
+        {busiId ? (
+          <div style={{ flex: 1, padding: 20 }}>
+            <Row>
+              <Col span={14} className='mb10'>
+                <Input
+                  style={{ width: 200 }}
+                  ref={searchRef}
+                  prefix={<SearchOutlined />}
+                  defaultValue={query}
+                  onPressEnter={(e) => {
+                    setQuery(e.currentTarget.value);
+                  }}
+                  placeholder='搜索标题、标签'
+                />
+              </Col>
+              <Col span={10} className='textAlignRight'>
+                <Link to={{ pathname: `/job-tpls/add` }}>
+                  <Button icon={<PlusOutlined />} style={{ marginRight: 10 }}>
+                    {t('tpl.create')}
+                  </Button>
+                </Link>
+                <Dropdown
+                  overlay={
+                    <Menu>
+                      <Menu.Item>
+                        <Button
+                          type='link'
+                          disabled={selectedIds.length === 0}
+                          onClick={() => {
+                            handleBatchBindTags();
+                          }}
+                        >
+                          {t('tpl.tag.bind')}
+                        </Button>
+                      </Menu.Item>
+                      <Menu.Item>
+                        <Button
+                          type='link'
+                          disabled={selectedIds.length === 0}
+                          onClick={() => {
+                            handleBatchUnBindTags();
+                          }}
+                        >
+                          {t('tpl.tag.unbind')}
+                        </Button>
+                      </Menu.Item>
+                    </Menu>
+                  }
                 >
-                  {t('tpl.create')}
-                </Button>
-              </Link>
-              <Dropdown
-                overlay={
-                  <Menu>
-                    <Menu.Item>
-                      <Button type="link" disabled={selectedIds.length === 0} onClick={() => { handleBatchBindTags(); }}>{t('tpl.tag.bind')}</Button>
-                    </Menu.Item>
-                    <Menu.Item>
-                      <Button type="link" disabled={selectedIds.length === 0} onClick={() => { handleBatchUnBindTags(); }}>{t('tpl.tag.unbind')}</Button>
-                    </Menu.Item>
-                  </Menu>
-                }
-              >
-                <Button icon={<DownOutlined />}>{t('table.batch.operations')}</Button>
-              </Dropdown>
-            </Col>
-          </Row>
-          <Table
-            rowKey="id"
-            columns={columns}
-            {...tableProps as any}
-            rowSelection={{
-              selectedRowKeys: selectedIds,
-              onChange: (selectedRowKeys) => {
-                setSelectedIds(selectedRowKeys);
+                  <Button icon={<DownOutlined />}>{t('table.batch.operations')}</Button>
+                </Dropdown>
+              </Col>
+            </Row>
+            <Table
+              rowKey='id'
+              columns={columns}
+              {...(tableProps as any)}
+              rowSelection={{
+                selectedRowKeys: selectedIds,
+                onChange: (selectedRowKeys) => {
+                  setSelectedIds(selectedRowKeys);
+                },
+              }}
+              pagination={
+                {
+                  ...tableProps.pagination,
+                  showSizeChanger: true,
+                  pageSizeOptions: ['10', '50', '100', '500', '1000'],
+                  showTotal: (total) => {
+                    return i18n.language == 'en' ? `Total ${total} items` : `共 ${total} 条`;
+                  },
+                } as any
               }
-            }}
-            pagination={{
-              ...tableProps.pagination,
-              showSizeChanger: true,
-              pageSizeOptions: ['10', '50', '100', '500', '1000'],
-              showTotal: (total) => {
-                return i18n.language == 'en' ?
-                `Total ${total} items` :
-                `共 ${total} 条`
-              },
-            } as any}
-          />
-        </div>
+            />
+          </div>
+        ) : (
+          <BlankBusinessPlaceholder text='自愈脚本' />
+        )}
       </div>
     </PageLayout>
-  )
-}
+  );
+};
 
 export default index;

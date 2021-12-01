@@ -209,49 +209,48 @@ export default function Dashboard() {
     <PageLayout title={t('监控大盘')} icon={<FundViewOutlined />} hideCluster={true}>
       <div style={{ display: 'flex' }}>
         <LeftTree busiGroup={{ onChange: (id) => setBusiId(id) }}></LeftTree>
-        <div className='dashboard' style={{ flex: 1 }}>
-          <div className='table-handle'>
-            <div className='table-handle-search'>
-              <Input
-                onPressEnter={onSearchQuery}
-                className={'searchInput'}
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                prefix={<SearchOutlined />}
-                placeholder={t('大盘名称')}
-              />
-            </div>
-            <div className='table-handle-buttons'>
-              <Button type='primary' onClick={showModal}>
-                {t('新建大盘')}
-              </Button>
-              <div className={'table-more-options'}>
-                <Button.Group>
-                  <Button size='middle' type='default' icon={<DownloadOutlined />} onClick={() => setModalType(ModalStatus.Import)}>
-                    {t('导入')}
-                  </Button>
-                  <Button
-                    size='middle'
-                    type='default'
-                    icon={<UploadOutlined />}
-                    onClick={async () => {
-                      if (selectRowKeys.length) {
-                        let exportData = await exportDashboard(busiId as number, selectRowKeys);
-                        setExportData(JSON.stringify(exportData.dat, null, 2));
-                        setModalType(ModalStatus.Export);
-                      } else {
-                        message.warning(t('未选择任何大盘'));
-                      }
-                    }}
-                  >
-                    {t('导出')}
-                  </Button>
-                </Button.Group>
+        {busiId ? (
+          <div className='dashboard' style={{ flex: 1 }}>
+            <div className='table-handle'>
+              <div className='table-handle-search'>
+                <Input
+                  onPressEnter={onSearchQuery}
+                  className={'searchInput'}
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  prefix={<SearchOutlined />}
+                  placeholder={t('大盘名称')}
+                />
+              </div>
+              <div className='table-handle-buttons'>
+                <Button type='primary' onClick={showModal}>
+                  {t('新建大盘')}
+                </Button>
+                <div className={'table-more-options'}>
+                  <Button.Group>
+                    <Button size='middle' type='default' icon={<DownloadOutlined />} onClick={() => setModalType(ModalStatus.Import)}>
+                      {t('导入')}
+                    </Button>
+                    <Button
+                      size='middle'
+                      type='default'
+                      icon={<UploadOutlined />}
+                      onClick={async () => {
+                        if (selectRowKeys.length) {
+                          let exportData = await exportDashboard(busiId as number, selectRowKeys);
+                          setExportData(JSON.stringify(exportData.dat, null, 2));
+                          setModalType(ModalStatus.Export);
+                        } else {
+                          message.warning(t('未选择任何大盘'));
+                        }
+                      }}
+                    >
+                      {t('导出')}
+                    </Button>
+                  </Button.Group>
+                </div>
               </div>
             </div>
-          </div>
-
-          {busiId ? (
             <BaseTable
               ref={ref}
               fetchHandle={() => getDashboard(busiId)}
@@ -268,10 +267,10 @@ export default function Dashboard() {
                 },
               }}
             ></BaseTable>
-          ) : (
-            <BlankBusinessPlaceholder text='监控大盘' />
-          )}
-        </div>
+          </div>
+        ) : (
+          <BlankBusinessPlaceholder text='监控大盘' />
+        )}
       </div>
       <Modal
         title={editing ? t('编辑监控大盘') : t('创建新监控大盘')}

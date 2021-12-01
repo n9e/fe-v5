@@ -456,7 +456,7 @@ const Resource: React.FC = () => {
                     value={searchMemberValue}
                     className={'searchInput'}
                     onChange={(e) => setSearchMemberValue(e.target.value)}
-                    placeholder={t('成员名、邮箱或手机')}
+                    placeholder={t('用户名、显示名、邮箱或手机')}
                     onPressEnter={(e) => handleSearch('member', searchMemberValue)}
                   />
                 </Col>
