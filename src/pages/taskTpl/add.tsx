@@ -37,7 +37,7 @@ const Add = (props: any) => {
     }>
       <div style={{ padding: 10 }}>
         <Card
-          title="创建任务模板"
+          title="创建自愈脚本"
         >
         <TplForm
           onSubmit={handleSubmit}

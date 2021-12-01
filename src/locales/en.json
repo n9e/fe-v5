@@ -519,10 +519,6 @@
   "月": " month",
   "季度": " quarter",
 
-  "breadcrumb.groups": "Groups",
-  "breadcrumb.tpls": "Templates",
-  "breadcrumb.tpl": "Detail",
-
   "tpl.create": "Create",
   "tpl.tag.bind": "Bind tags",
   "tpl.tag.unbind": "Unbind tags",

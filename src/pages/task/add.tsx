@@ -64,8 +64,6 @@ const Add = (props: any) => {
         }).finally(() => {
           setLoading(false);
         });
-      } else {
-        setData({} as any);
       }
     }
   }, []);
@@ -93,7 +91,7 @@ const Add = (props: any) => {
             >
               <Spin spinning={loading}>
                 {
-                  data ?
+                  data || !query.tpl || !query.task ?
                   <TplForm
                     type="task"
                     initialValues={data}

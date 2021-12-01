@@ -11,6 +11,9 @@ import request from '@/utils/request';
 import api from '@/utils/api';
 import LeftTree from '@/components/LeftTree';
 import PageLayout from '@/components/pageLayout';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/common';
+import { CommonStoreState } from '@/store/commonInterface';
 
 interface DataItem {
   id: number,
@@ -32,9 +35,8 @@ const index = (_props: any) => {
   const [query, setQuery] = useState('');
   const [mine, setMine] = useState(true);
   const [days, setDays] = useState(7);
-  const [busiId, setBusiId] = useState<number>();
-  const { tableProps } = useAntdTable((options) => getTableData(options, busiId, query, mine, days), {refreshDeps: [query, mine, days, busiId]});
-
+  const { curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
+  const { tableProps } = useAntdTable((options) => getTableData(options, curBusiItem.id, query, mine, days), {refreshDeps: [curBusiItem.id, query, mine, days]});
   const columns: ColumnProps<DataItem>[] = [
     {
       title: 'ID',
@@ -80,7 +82,7 @@ const index = (_props: any) => {
       </>
     }>
       <div style={{ display: 'flex' }}>
-        <LeftTree busiGroup={{ onChange: (id) => setBusiId(id) }}></LeftTree>
+        <LeftTree></LeftTree>
         <div style={{ flex: 1, padding: 10 }}>
           <Row>
             <Col span={16} className="mb10">

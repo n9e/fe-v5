@@ -27,10 +27,6 @@
   "hour": "小时",
   "hours": "小时",
 
-  "breadcrumb.groups": "分组列表",
-  "breadcrumb.tpls": "模板列表",
-  "breadcrumb.tpl": "模板详情",
-
   "tpl.create": "创建",
   "tpl.tag.bind": "绑定标签",
   "tpl.tag.unbind": "解绑标签",
@@ -44,7 +40,7 @@
   "tpl.node.modify.title": "批量修改节点",
   "tpl.batch.modify.group": "批量修改所属分组",
   "tpl.title": "标题",
-  "tpl.title.tpl.help": "标题，说明这个模板的作用",
+  "tpl.title.tpl.help": "标题，说明这个脚本的作用",
   "tpl.title.task.help": "标题，说明这个任务的作用",
   "tpl.tags": "标签",
   "tpl.tags.help": "标签，用于分类",
@@ -59,7 +55,7 @@
   "tpl.host.help": "要执行的机器列表",
   "tpl.script.help": "要执行的脚本内容",
   "tpl.args.help": "附于脚本之后的参数，多个参数之间用双逗号,,分隔，比如arg1,,arg2,,arg3",
-  "tpl.modify": "编辑模板",
+  "tpl.modify": "编辑脚本",
   "tpl.create.task": "创建任务",
 
   "task.create": "创建任务",

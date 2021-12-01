@@ -8,7 +8,7 @@ export interface Tpl {
   pause: number, // 暂停点，默认值为空,
   script: string, // 脚本内容，默认值参看之前四维的版本,
   args: string, // 脚本参数，默认值为空,
-  tags: string, // 任务模板的标签,
+  tags: string, // 自愈脚本的标签,
   account: string, // 运行账号,
   hosts: string[],
   create_by: string,

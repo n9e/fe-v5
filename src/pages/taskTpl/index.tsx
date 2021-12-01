@@ -11,6 +11,9 @@ import request from '@/utils/request';
 import api from '@/utils/api';
 import LeftTree from '@/components/LeftTree';
 import PageLayout from '@/components/pageLayout';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/common';
+import { CommonStoreState } from '@/store/commonInterface';
 import { Tpl } from './interface';
 import BindTags from './bindTags';
 import UnBindTags from './unBindTags';
@@ -28,7 +31,8 @@ const index = (_props: any) => {
   const { t, i18n } = useTranslation();
   const searchRef = useRef<Input>(null);
   const [query, setQuery] = useState('');
-  const [busiId, setBusiId] = useState<number>();
+  const { curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
+  const busiId = curBusiItem.id;
   const [selectedIds, setSelectedIds] = useState([] as any[]);
   const { tableProps, refresh } = useAntdTable<any, any>((options) => getTableData(options, busiId, query), {refreshDeps: [busiId, query]});
 
@@ -144,7 +148,7 @@ const index = (_props: any) => {
       </>
     }>
       <div style={{ display: 'flex' }}>
-        <LeftTree busiGroup={{ onChange: (id) => setBusiId(id) }}></LeftTree>
+        <LeftTree></LeftTree>
         <div style={{ flex: 1, padding: 20 }}>
           <Row>
             <Col span={14} className="mb10">

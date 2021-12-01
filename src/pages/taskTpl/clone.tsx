@@ -58,7 +58,7 @@ const Add = (props: any) => {
     }>
       <div style={{ padding: 10 }}>
         <Card
-          title="克隆任务模板"
+          title="克隆自愈脚本"
         >
           <Spin spinning={loading}>
             {

@@ -56,7 +56,7 @@ const Modify = (props: any) => {
     }>
       <div style={{ padding: 10 }}>
         <Card
-          title="修改任务模板"
+          title="修改自愈脚本"
         >
         <Spin spinning={loading}>
           {

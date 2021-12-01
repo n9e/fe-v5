@@ -47,7 +47,7 @@ const Detail = (props: any) => {
     }>
       <div style={{ padding: 10 }}>
         <Card
-          title="任务模板详情"
+          title="自愈脚本详情"
         >
         <Spin spinning={loading}>
           <div className="job-task-table">
