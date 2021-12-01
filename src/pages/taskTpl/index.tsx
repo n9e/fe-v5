@@ -130,14 +130,14 @@ const index = (_props: any) => {
       render: (_text, record) => {
         return (
           <span>
-            <Link to={{ pathname: `/job-tasks/add`, search: `tpl=${record.id}` }}>{t('task.create')}</Link>
+            <Link to={{ pathname: `/job-tpls/add/task`, search: `tpl=${record.id}` }}>{t('task.create')}</Link>
             <Divider type='vertical' />
             <Link to={{ pathname: `/job-tpls/${record.id}/modify` }}>{t('table.modify')}</Link>
             <Divider type='vertical' />
             <Link to={{ pathname: `/job-tpls/${record.id}/clone` }}>{t('table.clone')}</Link>
             <Divider type='vertical' />
             <Popconfirm
-              title={t('table.delete.sure')}
+              title={<div style={{ width: 100 }}>{t('table.delete.sure')}</div>}
               onConfirm={() => {
                 handleDelBtnClick(record.id);
               }}
