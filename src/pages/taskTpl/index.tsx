@@ -137,7 +137,7 @@ const index = (_props: any) => {
             <Link to={{ pathname: `/job-tpls/${record.id}/clone` }}>{t('table.clone')}</Link>
             <Divider type='vertical' />
             <Popconfirm
-              title={t('table.delete.sure')}
+              title={<div style={{ width: 100 }}>{t('table.delete.sure')}</div>}
               onConfirm={() => {
                 handleDelBtnClick(record.id);
               }}
