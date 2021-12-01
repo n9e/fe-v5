@@ -143,7 +143,7 @@ const Resource: React.FC = () => {
   const handleClose = (isDeleteOrAdd = false) => {
     setVisible(false);
 
-    getList(isDeleteOrAdd);
+    isDeleteOrAdd === true && getList(isDeleteOrAdd);
 
     if (teamId && !isDeleteOrAdd) {
       getTeamInfoDetail(teamId);

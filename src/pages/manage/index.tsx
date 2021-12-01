@@ -185,7 +185,7 @@ const Resource: React.FC = () => {
   }, [type]); // tab切换触发
 
   useEffect(() => {
-    getList();
+    getList(true);
   }, [activeKey]); //teamId变化触发
 
   useEffect(() => {
@@ -278,10 +278,10 @@ const Resource: React.FC = () => {
     if (searchValue) {
       handleSearch('team', searchValue);
     } else {
-      getList(isDeleteOrAdd);
+      isDeleteOrAdd === true && getList(isDeleteOrAdd);
     }
 
-    if (teamId && !isDeleteOrAdd) {
+    if (teamId) {
       getTeamInfoDetail(teamId);
     }
   };
