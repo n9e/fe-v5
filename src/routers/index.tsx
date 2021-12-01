@@ -106,6 +106,7 @@ export default function Content() {
 
       <Route exact path='/job-tpls' component={TaskTpl as any} />
       <Route exact path='/job-tpls/add' component={TaskTplAdd as any} />
+      <Route exact path='/job-tpls/add/task' component={TaskAdd as any} />
       <Route exact path='/job-tpls/:id/detail' component={TaskTplDetail as any} />
       <Route exact path='/job-tpls/:id/modify' component={TaskTplModify as any} />
       <Route exact path='/job-tpls/:id/clone' component={TaskTplClone as any} />

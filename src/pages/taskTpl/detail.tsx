@@ -118,7 +118,7 @@ const Detail = (props: any) => {
             <Link to={{ pathname: `/job-tpls/${id}/modify` }}>
               <Button type="primary" style={{ marginRight: 10 }}>{t('tpl.modify')}</Button>
             </Link>
-            <Link to={{ pathname: `/job-tasks/add`, search: `tpl=${id}` }}>
+            <Link to={{ pathname: `/job-tpls/add/task`, search: `tpl=${id}` }}>
               <Button type="primary">{t('tpl.create.task')}</Button>
             </Link>
           </div>
