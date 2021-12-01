@@ -91,7 +91,7 @@ const Add = (props: any) => {
             >
               <Spin spinning={loading}>
                 {
-                  data || !query.tpl || !query.task ?
+                  data || (!query.tpl && !query.task) ?
                   <TplForm
                     type="task"
                     initialValues={data}
