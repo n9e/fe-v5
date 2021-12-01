@@ -14,7 +14,7 @@ const AddUser: React.FC<TeamProps> = (props: TeamProps) => {
   const [teamInfo, setTeamInfo] = useState<Team>();
   const [selectedUser, setSelectedUser] = useState<React.Key[]>([]);
   const [selectedUserRows, setSelectedUserRows] = useState<User[]>([]);
-  const [query, setQuery] = useState<string>('');
+  const [query, setQuery] = useState('');
   const userColumn: ColumnsType<User> = [
     {
       title: t('用户名'),
@@ -98,10 +98,10 @@ const AddUser: React.FC<TeamProps> = (props: TeamProps) => {
       <Input
         className={'searchInput'}
         prefix={<SearchOutlined />}
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
         placeholder={t('用户名、邮箱或电话')}
-        onPressEnter={(e) => setQuery(query)}
+        onPressEnter={(e) => {
+          setQuery((e.target as HTMLInputElement).value);
+        }}
       />
       <BaseTable
         fetchHandle={getUserInfoList}

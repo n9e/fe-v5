@@ -87,7 +87,7 @@ export default function Content() {
       <Route path='/manage/business' component={Business} />
       <Route path='/manage/:type' component={Manage} />
       <Route path='/dashboard/:busiId/:id' component={DashboardDetail} />
-      <Route path='/dashboard' component={Dashboard} />
+      <Route path='/dashboard' component={Dashboard} exact />
       <Route path='/chart/:ids' component={Chart} />
       <Route path='/resource/:id?' component={ResourcePage} />
       <Route path='/indicator' component={IndicatorPage} />
@@ -104,21 +104,21 @@ export default function Content() {
       <Route exact path='/event-history/:id' component={EventDetail} />
       <Route exact path='/targets' component={MonObjectManage} />
 
-      <Route exact path="/job-tpls" component={TaskTpl as any} />
-      <Route exact path="/job-tpls/add" component={TaskTplAdd as any} />
-      <Route exact path="/job-tpls/:id/detail" component={TaskTplDetail as any} />
-      <Route exact path="/job-tpls/:id/modify" component={TaskTplModify as any} />
-      <Route exact path="/job-tpls/:id/clone" component={TaskTplClone as any} />
-      <Route exact path="/job-tasks" component={Task as any} />
-      <Route exact path="/job-tasks/add" component={TaskAdd as any} />
-      <Route exact path="/job-tasks/:id/result" component={TaskResult as any} />
-      <Route exact path="/job-tasks/:id/detail" component={TaskDetail as any} />
+      <Route exact path='/job-tpls' component={TaskTpl as any} />
+      <Route exact path='/job-tpls/add' component={TaskTplAdd as any} />
+      <Route exact path='/job-tpls/:id/detail' component={TaskTplDetail as any} />
+      <Route exact path='/job-tpls/:id/modify' component={TaskTplModify as any} />
+      <Route exact path='/job-tpls/:id/clone' component={TaskTplClone as any} />
+      <Route exact path='/job-tasks' component={Task as any} />
+      <Route exact path='/job-tasks/add' component={TaskAdd as any} />
+      <Route exact path='/job-tasks/:id/result' component={TaskResult as any} />
+      <Route exact path='/job-tasks/:id/detail' component={TaskDetail as any} />
       {lazyRoutes.map((route, i) => (
         <RouteWithSubRoutes key={i} {...route} />
       ))}
-      {/* <Route path='/' exact>
-        <Redirect to='/overview' />
-      </Route> */}
+      <Route path='/' exact>
+        <Redirect to='/metric/explorer' />
+      </Route>
     </div>
   );
 }

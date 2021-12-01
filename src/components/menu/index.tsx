@@ -23,10 +23,11 @@ const SideMenu: FC = () => {
   const history = useHistory();
   const location = useLocation(); // console.log(location.pathname);
 
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(localStorage.getItem('menuCollapsed') === '1');
 
   const toggleCollapsed = () => {
     setCollapsed(!collapsed);
+    localStorage.setItem('menuCollapsed', !collapsed ? '1' : '0');
   };
 
   const handleClick: MenuClickEventHandler = ({ key }) => {
