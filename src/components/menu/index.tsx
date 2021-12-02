@@ -87,11 +87,11 @@ const SideMenu: FC = () => {
           title: t('订阅规则'),
         },
         {
-          key: '/event',
+          key: '/alert-cur-events',
           title: t('活跃告警'),
         },
         {
-          key: '/history-events',
+          key: '/alert-his-events',
           title: t('历史告警'),
         },
       ],
