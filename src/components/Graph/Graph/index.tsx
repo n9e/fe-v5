@@ -104,7 +104,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
         shared: this.props.highLevelConfig?.shared === undefined ? true : this.props.highLevelConfig?.shared,
         sharedSortDirection: this.props.highLevelConfig?.sharedSortDirection || 'desc',
         precision: this.props.highLevelConfig?.precision || 'short',
-        formatUnit: this.props.highLevelConfig?.formatUnit || 1024,
+        formatUnit: this.props.highLevelConfig?.formatUnit || 1000,
       },
       onErrorOccured: this.props.onErrorOccured,
       onRequestCompleted: this.props.onRequestCompleted,
@@ -375,8 +375,8 @@ export default class Graph extends Component<GraphProps, GraphState> {
         }}
         selectedKeys={[String(this.state.highLevelConfig.formatUnit)]}
       >
-        <Menu.Item key={'1024'}>Ki, Mi, Gi by 1024</Menu.Item>
         <Menu.Item key={'1000'}>Ki, Mi, Gi by 1000</Menu.Item>
+        <Menu.Item key={'1024'}>Ki, Mi, Gi by 1024</Menu.Item>
         <Menu.Item key={'humantime'}>Human time duration</Menu.Item>
       </Menu>
     );
