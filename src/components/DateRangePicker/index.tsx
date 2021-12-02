@@ -110,8 +110,8 @@ export default function DateRangePicker(props: Props) {
 
   const formatExternalAbsoluteTime = (value: AbsoluteRange) => {
     const { start, end } = value;
-    setStartTime(moment(start));
-    setEndTime(moment(end));
+    setStartTime(moment(unit === 's' ? start * 1000 : start));
+    setEndTime(moment(unit === 's' ? end * 1000 : end));
     setLabel(formatLabel(value, unit));
   };
 
