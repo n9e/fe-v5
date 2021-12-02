@@ -9,14 +9,24 @@ import { panelDefaultOptions, PanelOptions } from './panel';
 import Panel from './panel';
 
 // type PanelMeta = { id: string; options: PanelOptions };
-type PanelMeta = { id: string; };
+type PanelMeta = { id: string; defaultPromQL?: string };
 
 interface PanelListProps {
   metrics: string[];
 }
 
+function getUrlParamsByName(name) {
+  let reg = new RegExp(`(?<=\\b${name}=)[^&]*`),
+    str = location.search || '',
+    target = str.match(reg);
+  if (target) {
+    return target[0];
+  }
+  return '';
+}
+
 const PanelList: React.FC<PanelListProps> = ({ metrics }) => {
-  const [panelList, setPanelList] = useState<PanelMeta[]>([{ id: generateID() }]);
+  const [panelList, setPanelList] = useState<PanelMeta[]>([{ id: generateID(), defaultPromQL: decodeURIComponent(getUrlParamsByName('promql')) }]);
   // 添加一个查询面板
   function addPanel() {
     setPanelList((a) => [
@@ -40,15 +50,16 @@ const PanelList: React.FC<PanelListProps> = ({ metrics }) => {
 
   return (
     <>
-      {panelList.map(({ id }) => 
+      {panelList.map(({ id, defaultPromQL = '' }) => (
         <Panel
           key={id}
           // options={options}
           // onOptionsChanged={(opts) => onOptionsChanged(id, opts)}
           metrics={metrics}
+          defaultPromQL={defaultPromQL}
           removePanel={() => removePanel(id)}
         />
-      )}
+      ))}
       <div className='add-prometheus-panel'>
         <Button size='large' onClick={addPanel}>
           <PlusOutlined />

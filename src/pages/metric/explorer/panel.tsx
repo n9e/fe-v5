@@ -1,5 +1,5 @@
-import { AreaChartOutlined, CloseCircleOutlined, DownOutlined, LineChartOutlined } from '@ant-design/icons';
-import { Tabs, List, DatePicker, Radio, Button, Checkbox, Select, Alert, Dropdown, Menu } from 'antd';
+import { AreaChartOutlined, CloseCircleOutlined, DownOutlined, LineChartOutlined, SettingOutlined } from '@ant-design/icons';
+import { Tabs, List, DatePicker, Radio, Button, Checkbox, Select, Alert, Dropdown, Menu, Popover } from 'antd';
 import moment, { Moment } from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import ExpressionInput from './expressionInput';
@@ -8,12 +8,13 @@ import DateRangePicker, { formatPickerDate } from '@/components/DateRangePicker'
 import Resolution from '@/components/Resolution';
 import { Range, RelativeRange, AbsoluteRange } from '@/components/DateRangePicker';
 import Graph from '@/components/Graph';
-import { ErrorInfoType } from '@/components/Graph/Graph';
+import { ErrorInfoType, HighLevelConfigType } from '@/components/Graph/Graph';
 import { ChartType } from '@/components/D3Charts/src/interface';
 import QueryStatsView, { QueryStats } from './QueryStatsView';
 
 interface PanelProps {
   metrics: string[];
+  defaultPromQL: string;
   removePanel: () => void;
 }
 
@@ -78,9 +79,9 @@ function getListItemContent(metrics) {
   );
 }
 
-const Panel: React.FC<PanelProps> = ({ metrics, removePanel }) => {
+const Panel: React.FC<PanelProps> = ({ metrics, defaultPromQL, removePanel }) => {
   const curPanelTab = useRef<PanelType>(PanelType.Table);
-  const inputValue = useRef('');
+  const inputValue = useRef(defaultPromQL);
   const lastEndTime = useRef<number | null>(null);
   const abortInFlightFetch = useRef<(() => void) | null>(null);
 
@@ -96,6 +97,15 @@ const Panel: React.FC<PanelProps> = ({ metrics, removePanel }) => {
   const [dateRangePickerValue, setDateRangePickerValue] = useState<Range>({ num: 1, unit: 'hour', description: 'hour' });
   const [isMultiSeries, setIsMultiSeries] = useState<boolean>(true);
   const [seriesOrderType, setSeriesOrderType] = useState<'desc' | 'asc'>('desc');
+  const [showLegend, setShowLegend] = useState<boolean>(true);
+  const [precision, setPrecision] = useState<'short' | 'origin'>('short');
+  const [formatUnit, setFormatUnit] = useState<1024 | 1000>(1024);
+  const [highLevelConfig, setHighLevelConfig] = useState<HighLevelConfigType>({
+    shared: true,
+    sharedSortDirection: 'desc',
+    precision: 'short',
+    formatUnit: 1024,
+  });
   const [graphRangeData, setGraphRangeData] = useState({
     start: (getEndTime() - optionsRecord.range) / 1000,
     end: getEndTime() / 1000,
@@ -149,6 +159,55 @@ const Panel: React.FC<PanelProps> = ({ metrics, removePanel }) => {
       end: getEndTime(newOptionsRecord.endTime) / 1000,
     });
   }
+
+  // 渲染图表设置内容
+  // function renderGraphSettingContent() {
+  //   const updateHighLevelConfig = (newState) => setHighLevelConfig((state) => ({ ...state, ...newState }));
+
+  //   const precisionMenu = (
+  //     <Menu onClick={(precision) => updateHighLevelConfig({ formatUnit: Number(precision.key) as 1024 | 1000 })} selectedKeys={[String(highLevelConfig.formatUnit)]}>
+  //       <Menu.Item key={'1024'}>1024</Menu.Item>
+  //       <Menu.Item key={'1000'}>1000</Menu.Item>
+  //     </Menu>
+  //   );
+
+  //   return (
+  //     <div>
+  //       {/* 多选和排序 */}
+  //       <Checkbox checked={highLevelConfig.shared} onChange={(e) => updateHighLevelConfig({ shared: e.target.checked })}>
+  //         Multi Series in Tooltip, order value
+  //       </Checkbox>
+  //       <Dropdown
+  //         overlay={
+  //           <Menu onClick={(sort) => updateHighLevelConfig({ sharedSortDirection: sort.key as 'desc' | 'asc' })} selectedKeys={[highLevelConfig.sharedSortDirection]}>
+  //             <Menu.Item key='desc'>desc</Menu.Item>
+  //             <Menu.Item key='asc'>asc</Menu.Item>
+  //           </Menu>
+  //         }
+  //       >
+  //         <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
+  //           {highLevelConfig.sharedSortDirection} <DownOutlined />
+  //         </a>
+  //       </Dropdown>
+  //       <br />
+  //       {/* 是否展示 legend */}
+  //       <Checkbox checked={showLegend} onChange={(e) => setShowLegend(e.target.checked)}>
+  //         Show Legend
+  //       </Checkbox>
+  //       <br />
+  //       {/* 格式化 */}
+  //       <Checkbox checked={highLevelConfig.precision === 'short'} onChange={(e) => updateHighLevelConfig({ precision: e.target.checked ? 'short' : 'origin' })}>
+  //         Value format with: Ki, Mi, Gi by
+  //       </Checkbox>
+  //       <Dropdown overlay={precisionMenu}>
+  //         <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
+  //           {highLevelConfig.formatUnit} <DownOutlined />
+  //         </a>
+  //       </Dropdown>
+  //       <br />
+  //     </div>
+  //   );
+  // }
 
   // 图表选中时间改变，触发更新
   function handleGraphDateChange(e: Range) {
@@ -313,7 +372,7 @@ const Panel: React.FC<PanelProps> = ({ metrics, removePanel }) => {
           {/* 操作栏 */}
           <div className='graph-operate-box'>
             <div className='left'>
-              <DateRangePicker value={dateRangePickerValue} unit='ms' onChange={handleGraphDateChange} />
+              <DateRangePicker placement='bottomRight' value={dateRangePickerValue} unit='ms' onChange={handleGraphDateChange} />
               <Resolution onChange={(v: number) => setOptions({ resolution: v })} initialValue={optionsRecord.resolution} />
               <Radio.Group
                 options={[
@@ -330,50 +389,28 @@ const Panel: React.FC<PanelProps> = ({ metrics, removePanel }) => {
                 buttonStyle='solid'
               />
             </div>
-            <div className='right'>
-              <Checkbox
-                checked={isMultiSeries}
-                onChange={(e) => {
-                  setIsMultiSeries(e.target.checked);
-                }}
-              >
-                Multi Series in Tooltip, order value
-              </Checkbox>
-              <Dropdown
-                overlay={
-                  <Menu
-                    onClick={(sort) => {
-                      setSeriesOrderType(sort.key as 'desc' | 'asc');
-                    }}
-                    selectedKeys={[seriesOrderType]}
-                  >
-                    <Menu.Item key='desc'>desc</Menu.Item>
-                    <Menu.Item key='asc'>asc</Menu.Item>
-                  </Menu>
-                }
-              >
-                <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
-                  {seriesOrderType} <DownOutlined />
-                </a>
-              </Dropdown>
-            </div>
+            {/* <div className='right'>
+              <Popover placement='left' content={renderGraphSettingContent} trigger='click'>
+                <Button type='link' size='small' onClick={(e) => e.preventDefault()}>
+                  <SettingOutlined />
+                </Button>
+              </Popover>
+            </div> */}
           </div>
           {/* 图 */}
           <div>
             {optionsRecord.type === PanelType.Graph && (
               <Graph
-                showHeader={false}
+                showHeader={true}
+                isShowRefresh={false}
                 data={{
                   step: optionsRecord.resolution,
                   range: graphRangeData,
                   promqls: [inputValue],
                   chartType: chartType,
-                  legend: true,
+                  // legend: showLegend,
                 }}
-                highLevelConfig={{
-                  shared: isMultiSeries,
-                  sharedSortDirection: seriesOrderType,
-                }}
+                // highLevelConfig={highLevelConfig}
                 onErrorOccured={onErrorOccured}
                 onRequestCompleted={onGraphRequestCompleted}
               />
