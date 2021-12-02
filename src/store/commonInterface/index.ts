@@ -10,6 +10,7 @@ export interface BusiGroupItem {
 
 export interface CommonStoreState {
   clusters: string[];
+  curClusterItems: string[];
   busiGroups: BusiGroupItem[];
   curBusiItem: BusiGroupItem;
 }
