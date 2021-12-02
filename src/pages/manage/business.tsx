@@ -152,7 +152,7 @@ const Resource: React.FC = () => {
   };
 
   return (
-    <PageLayout title={t('业务组管理')} icon={<UserOutlined />}>
+    <PageLayout title={t('业务组管理')} icon={<UserOutlined />} hideCluster>
       <div className='user-manage-content'>
         <div style={{ display: 'flex', height: '100%' }}>
           <div className='left-tree-area'>

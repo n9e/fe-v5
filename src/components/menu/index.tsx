@@ -117,15 +117,15 @@ const SideMenu: FC = () => {
       title: t('人员组织'),
       children: [
         {
-          key: '/manage/user',
+          key: '/users',
           title: t('用户管理'),
         },
         {
-          key: '/manage/group',
+          key: '/user-groups',
           title: t('团队管理'),
         },
         {
-          key: '/manage/business',
+          key: '/busi-groups',
           title: t('业务组管理'),
         },
       ],

@@ -12,6 +12,8 @@ import Dashboard from '@/pages/dashboard';
 import Chart from '@/pages/chart';
 import DashboardDetail from '@/pages/dashboard/detail';
 import Manage from '@/pages/manage';
+import Groups from '@/pages/manage/groups';
+import Users from '@/pages/manage/users';
 import Business from '@/pages/manage/business';
 import Explore from '@/pages/metric/explorer';
 import ObjectExplore from '@/pages/monitor/object';
@@ -84,8 +86,9 @@ export default function Content() {
       <Route path='/metric/explorer' component={Explore} exact />
       <Route path='/object/explorer' component={ObjectExplore} exact />
       <Route path='/account/profile/:tab' component={Profile} />
-      <Route path='/manage/business' component={Business} />
-      <Route path='/manage/:type' component={Manage} />
+      <Route path='/busi-groups' component={Business} />
+      <Route path='/users' component={Users} />
+      <Route path='/user-groups' component={Groups} />
       <Route path='/dashboard/:busiId/:id' component={DashboardDetail} />
       <Route path='/dashboard' component={Dashboard} exact />
       <Route path='/chart/:ids' component={Chart} />
