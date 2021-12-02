@@ -1,12 +1,6 @@
 import request from '@/utils/request';
 import { RequestMethod, IBasePagingParams } from '@/store/common';
-import type {
-  MetricListRes,
-  strategyGroup,
-  strategyStatus,
-  TagKeysRes,
-  TagValuesRes,
-} from '@/store/warningInterface';
+import type { MetricListRes, strategyGroup, strategyStatus, TagKeysRes, TagValuesRes } from '@/store/warningInterface';
 import { PAGE_SIZE } from '@/utils/constant';
 import React from 'react';
 
@@ -45,9 +39,7 @@ export const deleteStrategyGroup = function (id: number) {
 };
 
 // 更新策略分组
-export const updateStrategyGroup = function (
-  data: Partial<strategyGroup> & { id: number },
-) {
+export const updateStrategyGroup = function (data: Partial<strategyGroup> & { id: number }) {
   return request(`/api/n9e/alert-rule-group/${data.id}`, {
     method: RequestMethod.Put,
     data,
@@ -55,15 +47,10 @@ export const updateStrategyGroup = function (
 };
 
 //// 获取策略列表
-export const getStrategyGroupSubList = function (
-  params: { id: number },
-) {
-  return request(
-    `/api/n9e/busi-group/${params.id}/alert-rules`,
-    {
-      method: RequestMethod.Get,
-    },
-  );
+export const getStrategyGroupSubList = function (params: { id: number }) {
+  return request(`/api/n9e/busi-group/${params.id}/alert-rules`, {
+    method: RequestMethod.Get,
+  });
 };
 
 // 获取收藏分组
@@ -149,10 +136,10 @@ export const EditStrategy = function (data: any[], busiId: number, strategyId: n
   });
 };
 
-export const deleteStrategy = function (ids: number[],  strategyId: number) {
+export const deleteStrategy = function (ids: number[], strategyId: number) {
   return request(`/api/n9e/busi-group/${strategyId}/alert-rules`, {
     method: RequestMethod.Delete,
-    data: { ids }
+    data: { ids },
   });
 };
 
@@ -173,12 +160,12 @@ export const prometheusQuery = function (data): Promise<any> {
 /**
  * 批量更新规则
  */
- export const updateAlertRules = function (
+export const updateAlertRules = function (
   data: {
-    ids: React.Key[],
-    fields: any
+    ids: React.Key[];
+    fields: any;
   },
-  busiId: number
+  busiId: number,
 ) {
   return request(`/api/n9e/busi-group/${busiId}/alert-rules/fields`, {
     method: RequestMethod.Put,
@@ -189,6 +176,13 @@ export const prometheusQuery = function (data): Promise<any> {
 /**
  * 获取未恢复告警列表
  */
+export function getBusiGroupsCurAlerts(ids: number[]) {
+  return request(`/api/n9e/busi-groups/alertings`, {
+    method: RequestMethod.Get,
+    params: { ids: ids.join(',') },
+  });
+}
+
 export const getAlertEvents = function (data) {
   return request(`/api/n9e/alert-events`, {
     method: RequestMethod.Get,
@@ -206,23 +200,23 @@ export const getHistoryEvents = function (data) {
     params: data,
   });
 };
-
-export const getAlertEventsById = function (id) {
-  return request(`/api/n9e/alert-event/${id}`, {
+// 获取告警详情
+export function getAlertEventsById(busiId, eventId) {
+  return request(`/api/n9e/busi-group/${busiId}/alert-cur-event/${eventId}`, {
     method: RequestMethod.Get,
   });
-};
+}
 
-export const getHistoryEventsById = function (id) {
-  return request(`/api/n9e/history-alert-event/${id}`, {
+export function getHistoryEventsById(busiId, eventId) {
+  return request(`/api/n9e/busi-group/${busiId}/alert-his-event/${eventId}`, {
     method: RequestMethod.Get,
   });
-};
+}
 /**
  * 批量删除(忽略)告警历史
  */
-export const deleteAlertEvents = function (ids: Array<number>) {
-  return request(`/api/n9e/alert-events`, {
+export const deleteAlertEvents = function (busiId, ids: Array<number | string>) {
+  return request(`/api/n9e/busi-group/${busiId}/alert-cur-events`, {
     method: RequestMethod.Delete,
     data: {
       ids,
@@ -230,14 +224,10 @@ export const deleteAlertEvents = function (ids: Array<number>) {
   });
 };
 
-
 /**
  * 批量更新告警策略状态
  */
-export const updateAlertEventsStatus = function (
-  ids: Array<number>,
-  status: strategyStatus,
-) {
+export const updateAlertEventsStatus = function (ids: Array<number>, status: strategyStatus) {
   return request(`/api/n9e/alert-rules/status`, {
     method: RequestMethod.Put,
     data: {
@@ -249,11 +239,7 @@ export const updateAlertEventsStatus = function (
 /**
  * 批量更新告警通知接收组+接收人
  */
-export const updateAlertEventsNotifyGroups = function (
-  ids: Array<number>,
-  notify_groups: string,
-  notify_users: string,
-) {
+export const updateAlertEventsNotifyGroups = function (ids: Array<number>, notify_groups: string, notify_users: string) {
   return request(`/api/n9e/alert-rules/notify-groups`, {
     method: RequestMethod.Put,
     data: {
@@ -266,10 +252,7 @@ export const updateAlertEventsNotifyGroups = function (
 /**
  * 批量更新告警通知接收人
  */
-export const updateAlertEventsNotifyUsers = function (
-  ids: Array<number>,
-  notify_users: string,
-) {
+export const updateAlertEventsNotifyUsers = function (ids: Array<number>, notify_users: string) {
   return request(`/api/n9e/alert-rules/notify-users`, {
     method: RequestMethod.Put,
     data: {
@@ -281,10 +264,7 @@ export const updateAlertEventsNotifyUsers = function (
 /**
  * 批量更新告警通知媒介
  */
-export const updateAlertEventsNotifyChannels = function (
-  ids: Array<number>,
-  notify_channels: string,
-) {
+export const updateAlertEventsNotifyChannels = function (ids: Array<number>, notify_channels: string) {
   return request(`/api/n9e/alert-rules/notify-channels`, {
     method: RequestMethod.Put,
     data: {
@@ -296,10 +276,7 @@ export const updateAlertEventsNotifyChannels = function (
 /**
  * 批量更新告警附加标签
  */
-export const updateAlertEventsAppendTags = function (
-  ids: Array<number>,
-  append_tags: string,
-) {
+export const updateAlertEventsAppendTags = function (ids: Array<number>, append_tags: string) {
   return request(`/api/n9e/alert-rules/append-tags`, {
     method: RequestMethod.Put,
     data: {

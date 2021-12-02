@@ -83,7 +83,6 @@ export default function Content() {
         <Route path='/chart/:ids' component={Chart} />
         <Route path='/resource/:id?' component={ResourcePage} />
         <Route path='/indicator' component={IndicatorPage} />
-        <Route path='/history-events' component={historyEvents} />
 
         <Route exact path='/alert-rules/add/:group_id' component={StrategyAdd} />
         <Route exact path='/alert-rules/edit/:id' component={StrategyEdit} />
@@ -91,9 +90,10 @@ export default function Content() {
         <Route exact path='/shield' component={Shield} />
         <Route exact path='/shield/add/:from?' component={AddShield} />
         <Route exact path='/shield/detail/:id' component={ShieldDetail} />
-        <Route exact path='/event' component={Event} />
-        <Route exact path='/event/:id' component={EventDetail} />
-        <Route exact path='/event-history/:id' component={EventDetail} />
+        <Route exact path='/alert-cur-events' component={Event} />
+        <Route exact path='/alert-his-events' component={historyEvents} />
+        <Route exact path='/alert-cur-events/:busiId/:eventId' component={EventDetail} />
+        <Route exact path='/alert-his-events/:busiId/:eventId' component={EventDetail} />
         <Route exact path='/targets' component={MonObjectManage} />
         {lazyRoutes.map((route, i) => (
           <RouteWithSubRoutes key={i} {...route} />
