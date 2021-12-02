@@ -150,9 +150,9 @@ const SideMenu: FC = () => {
   const history = useHistory();
   const location = useLocation();
   const { pathname } = location;
-  const [selectedKeys, setSelectedKeys] = useState<string[]>([defaultSelectedKey(menus, pathname)]);
-  const [openKeys, setOpenKeys] = useState<string[]>([getDefaultOpenKey(menus, pathname)]);
   const [collapsed, setCollapsed] = useState(localStorage.getItem('menuCollapsed') === '1');
+  const [selectedKeys, setSelectedKeys] = useState<string[]>([defaultSelectedKey(menus, pathname)]);
+  const [openKeys, setOpenKeys] = useState<string[]>(collapsed ? [] : [getDefaultOpenKey(menus, pathname)]);
   const toggleCollapsed = () => {
     setCollapsed(!collapsed);
     localStorage.setItem('menuCollapsed', !collapsed ? '1' : '0');
@@ -174,8 +174,10 @@ const SideMenu: FC = () => {
 
   useEffect(() => {
     setSelectedKeys([defaultSelectedKey(menus, pathname)]);
-    setOpenKeys(_.union([...openKeys, getDefaultOpenKey(menus, pathname)]));
-  }, [pathname]);
+    if (!collapsed) {
+      setOpenKeys(_.union([...openKeys, getDefaultOpenKey(menus, pathname)]));
+    }
+  }, [pathname, collapsed]);
 
   return hideSideMenu() ? null : (
     <div
