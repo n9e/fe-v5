@@ -1,6 +1,7 @@
 import { message } from 'antd';
 import React, { ReactNode, Component } from 'react';
 import { IStore } from '@/store/common';
+import { useLocation } from 'react-router-dom';
 export const isPromise = (obj) => {
   return !!obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function';
 };
@@ -144,4 +145,9 @@ export const sizeFormatter = (
   withUnit && (result = `${result}${unit}`);
   withByte && (result = `${result}B`);
   return result;
+}
+
+export function useQuery() {
+  const { search } = useLocation();
+  return React.useMemo(() => new URLSearchParams(search), [search]);
 }

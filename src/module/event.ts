@@ -1,8 +1,19 @@
 import { IStore } from '@/store/common';
 import { eventStoreState } from '@/store/eventInterface';
+import { getBusiGroupsCurAlerts } from '@/services/warning';
 
 const defaultData: eventStoreState = {
   currentEdit: null,
+  // 活跃告警状态
+  alertings: {},
+  severity: undefined,
+  hourRange: { num: 6, unit: 'hours', description: 'hours' },
+  queryContent: '',
+  // 历史告警状态
+  hisSeverity: undefined,
+  hisEventType: undefined,
+  hisHourRange: { num: 6, unit: 'hours', description: 'hours' },
+  hisQueryContent: '',
 };
 
 const eventStore: IStore<eventStoreState> = {
@@ -25,6 +36,14 @@ const eventStore: IStore<eventStoreState> = {
           });
         }
       }
+    },
+    *refreshAlertings({ ids }, { put, call }) {
+      const { dat: data } = yield call(getBusiGroupsCurAlerts, ids);
+      yield put({
+        type: 'saveData',
+        prop: 'alertings',
+        data,
+      });
     },
   },
 };

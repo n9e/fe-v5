@@ -1,308 +1,262 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import PageLayout from '@/components/pageLayout';
-import {
-  warningEventItem,
-  warningPriority,
-  warningStatus,
-  IsRecovery,
-} from '@/store/eventInterface';
-import SearchInput from '@/components/BaseSearchInput';
-import { getHistoryEvents } from '@/services/warning';
-import ColorTag from '@/components/ColorTag';
-import { Tag, Select, Row, Col, Pagination, Spin, Empty, Divider } from 'antd';
-import { useHistory } from 'react-router-dom';
-import dayjs from 'dayjs';
-import { priorityColor } from '@/utils/constant';
-import { useDispatch } from 'react-redux';
-import RefreshIcon from '@/components/RefreshIcon';
-import { AlertOutlined } from '@ant-design/icons';
+import { AlertOutlined, SearchOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-const { Option } = Select;
+import LeftTree from '@/components/LeftTree';
+import DataTable from '@/components/Dantd/components/data-table';
+import moment from 'moment';
+import { Button, Input, Modal, Tag, Tooltip } from 'antd';
+import DateRangePicker, { RelativeRange } from '@/components/DateRangePicker';
+import { priorityColor } from '@/utils/constant';
+import { useHistory } from 'react-router';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/store/common';
+import { eventStoreState } from '@/store/eventInterface';
+import { CommonStoreState } from '@/store/commonInterface';
+import BlankBusinessPlaceholder from '@/components/BlankBusinessPlaceholder';
+// import './index.less';
 
 const Event: React.FC = () => {
+  const history = useHistory();
   const { t } = useTranslation();
   const dispatch = useDispatch();
-  const history = useHistory();
-  const [query, setQuery] = useState<string>('');
-  const [priority, setPriority] = useState<warningPriority | undefined>();
-  const [status, setStatus] = useState<warningStatus | undefined>();
-  const [tablelist, setTablelist] = useState<warningEventItem[]>([]);
-  const [currennt, setcurrennt] = useState<number>(1);
-  const [pageSize, setpageSize] = useState<number>(15);
-  const [total, setTotal] = useState<number>(0);
-  const [spinning, setSpinning] = useState<boolean>(false);
-  const [refresh, setRefresh] = useState<boolean>(false);
-  const [isRecovery, setIsRecovery] = useState<IsRecovery | undefined>();
-  useEffect(() => {
-    setSpinning(true);
-    getHistoryEvents({
-      query,
-      p: currennt,
-      limit: pageSize,
-      priority,
-      is_recovery: isRecovery,
-      status,
-    }).then((res) => {
-      setTablelist(res.dat.list);
-      setTotal(res.dat.total);
-      setSpinning(false);
-    });
-  }, [pageSize, query, refresh, isRecovery, currennt, status, priority]);
+  const tableRef = useRef({
+    handleReload() {},
+  });
+  const { curClusterItems } = useSelector<RootState, CommonStoreState>((state) => state.common);
+  const { hisSeverity, hisEventType, hisHourRange, hisQueryContent } = useSelector<RootState, eventStoreState>((state) => state.event);
+  const isAddTagToQueryInput = useRef(false);
+  const [curBusiId, setCurBusiId] = useState<number>(-1);
+  const DateRangeItems: RelativeRange[] = useMemo(
+    () => [
+      { num: 6, unit: 'hours', description: t('hours') },
+      { num: 12, unit: 'hours', description: t('hours') },
+      { num: 1, unit: 'day', description: t('天') },
+      { num: 2, unit: 'days', description: t('天') },
+      { num: 3, unit: 'days', description: t('天') },
+      { num: 7, unit: 'days', description: t('天') },
+      { num: 14, unit: 'days', description: t('天') },
+      { num: 30, unit: 'days', description: t('天') },
+      { num: 60, unit: 'days', description: t('天') },
+      { num: 90, unit: 'days', description: t('天') },
+    ],
+    [],
+  );
 
-  const onPageCurrentSizeChange = function (currennt, size) {
-    setcurrennt(currennt);
-    setpageSize(size);
-  };
+  const columns = [
+    {
+      title: t('集群'),
+      dataIndex: 'cluster',
+      width: 120,
+    },
+    {
+      title: t('级别'),
+      dataIndex: 'severity',
+      width: 70,
+      render: (severity) => {
+        return <Tag color={priorityColor[severity - 1]}>S{severity}</Tag>;
+      },
+    },
+    {
+      title: t('类别'),
+      dataIndex: 'is_recovered',
+      width: 110,
+      render(isRecovered) {
+        return <Tag color={isRecovered ? 'green' : 'red'}>{isRecovered ? 'Recovered' : 'Triggered'}</Tag>;
+      },
+    },
+    {
+      title: t('规则标题'),
+      dataIndex: 'rule_name',
+      render(title, { id }) {
+        return (
+          <Button size='small' type='link' style={{ padding: 0 }} onClick={() => history.push(`/alert-his-events/${curBusiId}/${id}`)}>
+            {title}
+          </Button>
+        );
+      },
+    },
+    {
+      title: t('事件标签'),
+      dataIndex: 'tags',
+      ellipsis: {
+        showTitle: false,
+      },
+      render(tagArr) {
+        const content =
+          tagArr &&
+          tagArr
+            .sort((a, b) => a.length - b.length)
+            .map((item) => (
+              <Tag
+                color='blue'
+                key={item}
+                onClick={(e) => {
+                  if (!hisQueryContent.includes(item)) {
+                    isAddTagToQueryInput.current = true;
+                    saveData('hisQueryContent', hisQueryContent ? `${hisQueryContent.trim()} ${item}` : item);
+                  }
+                }}
+              >
+                {item}
+              </Tag>
+            ));
+        return (
+          tagArr && (
+            <Tooltip title={content} placement='topLeft' getPopupContainer={() => document.body} overlayClassName='mon-manage-table-tooltip'>
+              <span className='event-tags'>{content}</span>
+            </Tooltip>
+          )
+        );
+      },
+    },
+    {
+      title: t('告警接收组'),
+      dataIndex: 'notify_groups_obj',
+      ellipsis: {
+        showTitle: false,
+      },
+      render(tagArr) {
+        const content =
+          tagArr &&
+          tagArr
+            .sort((a, b) => a.name.length - b.name.length)
+            .map((item) => (
+              <Tag color='blue' key={item.id}>
+                {item.name}
+              </Tag>
+            ));
+        return (
+          tagArr && (
+            <Tooltip title={content} placement='topLeft' getPopupContainer={() => document.body}>
+              {content}
+            </Tooltip>
+          )
+        );
+      },
+    },
+    {
+      title: t('触发时间'),
+      dataIndex: 'trigger_time',
+      width: 140,
+      render(value) {
+        return moment(value * 1000).format('YYYY-MM-DD HH:mm:ss');
+      },
+    },
+  ];
+
+  function renderLeftHeader() {
+    return (
+      <div className='table-operate-box'>
+        <div className='left'>
+          <DateRangePicker
+            showRight={false}
+            leftList={DateRangeItems}
+            value={hisHourRange}
+            onChange={(range: RelativeRange) => {
+              if (range.num !== hisHourRange.num || range.unit !== hisHourRange.unit) {
+                saveData('hisHourRange', range);
+              }
+            }}
+          />
+          <Input
+            className='search-input'
+            prefix={<SearchOutlined />}
+            placeholder='模糊搜索规则和标签(多个关键词请用空格分隔)'
+            value={hisQueryContent}
+            onChange={(e) => saveData('hisQueryContent', e.target.value)}
+            onPressEnter={(e) => tableRef.current.handleReload()}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  function saveData(prop, data) {
+    dispatch({
+      type: 'event/saveData',
+      prop,
+      data,
+    });
+  }
+
+  useEffect(() => {
+    if (isAddTagToQueryInput.current) {
+      tableRef.current.handleReload();
+      isAddTagToQueryInput.current = false;
+    }
+  }, [hisQueryContent]);
+
+  useEffect(() => {
+    tableRef.current.handleReload();
+  }, [curClusterItems, hisSeverity, hisHourRange, hisEventType]);
 
   return (
-    <PageLayout icon={<AlertOutlined />} title={t('全量告警历史')}>
+    <PageLayout icon={<AlertOutlined />} title={t('历史告警')}>
       <div className='event-content'>
-        <div className='event-table-search'>
-          <div className='event-table-search-left'>
-            <RefreshIcon
-              className='event-table-search-left-refresh'
-              onClick={() => {
-                setRefresh(!refresh);
+        <LeftTree
+          clusterGroup={{
+            isShow: true,
+          }}
+          busiGroup={{
+            onChange(value) {
+              setCurBusiId(typeof value === 'number' ? value : -1);
+            },
+          }}
+          eventLevelGroup={{
+            isShow: true,
+            defaultSelect: hisSeverity,
+            onChange(v: number | undefined) {
+              saveData('hisSeverity', v);
+            },
+          }}
+          eventTypeGroup={{
+            isShow: true,
+            defaultSelect: hisEventType,
+            onChange(v: 0 | 1 | undefined) {
+              saveData('hisEventType', v);
+            },
+          }}
+        />
+        <div className='table-area'>
+          {curBusiId !== -1 ? (
+            <DataTable
+              ref={tableRef}
+              antProps={{
+                rowKey: 'id',
+                scroll: { x: 800, y: 'calc(100vh - 252px)' },
               }}
+              url={`/api/n9e/busi-group/${curBusiId}/alert-his-events`}
+              customQueryCallback={(data) =>
+                Object.assign(
+                  data,
+                  { hours: hisHourRange.unit !== 'hours' ? hisHourRange.num * 24 : hisHourRange.num },
+                  curClusterItems.length ? { clusters: curClusterItems.join(',') } : {},
+                  hisSeverity !== undefined ? { severity: hisSeverity } : {},
+                  hisQueryContent ? { query: hisQueryContent } : {},
+                  hisEventType !== undefined ? { is_recovered: hisEventType } : {},
+                )
+              }
+              pageParams={{
+                curPageName: 'p',
+                pageSizeName: 'limit',
+                pageSize: 30,
+                pageSizeOptions: ['30', '100', '200', '500'],
+              }}
+              apiCallback={({ dat: { list: data, total } }) => ({
+                data,
+                total,
+              })}
+              columns={columns}
+              reloadBtnType='btn'
+              reloadBtnPos='left'
+              filterType='flex'
+              leftHeader={renderLeftHeader()}
             />
-            <SearchInput
-              placeholder={t('策略名称、标签、资源分组')}
-              onSearch={setQuery}
-              className={'searchInput'}
-              style={{
-                marginRight: 8,
-              }}
-            ></SearchInput>
-            <Select
-              placeholder={t('告警级别')}
-              allowClear
-              style={{
-                width: 90,
-              }}
-              onChange={(value) => {
-                if (typeof value !== 'undefined') {
-                  setPriority(Number(value));
-                } else {
-                  setPriority(undefined);
-                }
-              }}
-            >
-              <Option value={warningPriority.First}>
-                P{warningPriority.First}
-              </Option>
-              <Option value={warningPriority.Second}>
-                P{warningPriority.Second}
-              </Option>
-              <Option value={warningPriority.Third}>
-                P{warningPriority.Third}
-              </Option>
-            </Select>
-            <Select
-              placeholder={t('告警状态')}
-              allowClear
-              style={{
-                width: 100,
-              }}
-              onChange={(value) => {
-                if (typeof value !== 'undefined') {
-                  setStatus(Number(value));
-                } else {
-                  setStatus(undefined);
-                }
-              }}
-            >
-              <Option value={warningStatus.Enable}>{t('已触发')}</Option>
-              <Option value={warningStatus.UnEnable}>{t('已屏蔽')}</Option>
-            </Select>
-            <Select
-              placeholder={t('通知类型')}
-              allowClear
-              style={{
-                width: 100,
-              }}
-              onChange={(value) => {
-                if (typeof value !== 'undefined') {
-                  setIsRecovery(Number(value));
-                } else {
-                  setIsRecovery(undefined);
-                }
-              }}
-            >
-              <Option value={IsRecovery.Alert}>{t('告警')}</Option>
-              <Option value={IsRecovery.Recovery}>{t('恢复')}</Option>
-            </Select>
-          </div>
+          ) : (
+            <BlankBusinessPlaceholder text='历史告警' />
+          )}
         </div>
-        <Spin spinning={spinning}>
-          <div className={'evenTable'} style={{ marginTop: 0, paddingTop: 10 }}>
-            {tablelist.length > 0 ? (
-              tablelist.map((ele: warningEventItem, index) => {
-                return (
-                  <div
-                    className='table-item'
-                    key={ele.id}
-                    style={{ marginTop: 0 }}
-                  >
-                    <Row className={'main_info'}>
-                      <Col span={21}>
-                        <Tag color={priorityColor[ele.priority - 1]}>
-                          P{ele.priority}
-                        </Tag>
-                        <Divider type='vertical' />
-
-                        <span>
-                          {dayjs(ele.trigger_time * 1000).format(
-                            'YYYY-MM-DD HH:mm:ss',
-                          )}
-                        </span>
-                        <Divider type='vertical' />
-
-                        <span>
-                          {ele.status === warningStatus.Enable
-                            ? t('已触发')
-                            : t('已屏蔽')}
-                        </span>
-                        <Divider type='vertical' />
-                        <span>
-                          {ele.is_recovery === IsRecovery.Alert ? (
-                            <a style={{ color: '#ff4d4f' }}>{t('告警')}</a>
-                          ) : (
-                            <a style={{ color: '#52c41a' }}>{t('恢复')}</a>
-                          )}
-                        </span>
-                        <Divider type='vertical' />
-
-                        <a
-                          className={'name'}
-                          onClick={() => {
-                            dispatch({
-                              type: `event/editItem`,
-                              data: ele,
-                            });
-                            history.push('/event-history/' + ele.id);
-                          }}
-                          key={index}
-                        >
-                          {ele.rule_name}
-                        </a>
-
-                        {
-                          <>
-                            {ele.notify_user_objs
-                              ? ele.notify_user_objs.map((tag, index) => {
-                                  return tag ? (
-                                    <span key={index}>
-                                      <Divider type='vertical' />
-                                      <ColorTag text={tag.nickname}></ColorTag>
-                                    </span>
-                                  ) : null;
-                                })
-                              : ''}
-                          </>
-                        }
-                      </Col>
-                      <Col
-                        span={3}
-                        className={'non-border'}
-                        style={{ textAlign: 'right', paddingRight: 10 }}
-                      >
-                        <a
-                          style={{
-                            cursor: 'pointer',
-                            width: 35,
-                            display: 'inline-block',
-                          }}
-                          onClick={() => {
-                            dispatch({
-                              type: `event/editItem`,
-                              data: ele,
-                            });
-                            history.push('/shield/add/event');
-                          }}
-                        >
-                          {t('屏蔽')}
-                        </a>
-                      </Col>
-                    </Row>
-                    <Row className={'table-item-scoure'}>
-                      <Col span={24}>
-                        <Row className={'item-Row'}>
-                          <Col span={1}>{t('标签')} :</Col>
-                          <Col span={22}>
-                            <div className={'table-item-content'}>
-                              {
-                                <>
-                                  {ele.tags
-                                    ? ele.tags
-                                        .trim()
-                                        .split(' ')
-                                        .map((tag, index) => {
-                                          return tag ? (
-                                            <ColorTag
-                                              text={tag}
-                                              key={index}
-                                            ></ColorTag>
-                                          ) : null;
-                                        })
-                                    : ''}
-                                </>
-                              }
-                              <div className={'table-item-title'}>
-                                {ele.res_classpaths ? (
-                                  <span>{t('资源分组')}:</span>
-                                ) : (
-                                  ''
-                                )}
-                              </div>
-                              <div className={'table-item-content'}>
-                                {
-                                  <>
-                                    {ele.res_classpaths
-                                      ? ele.res_classpaths
-                                          .split(' ')
-                                          .map((tag, index) => {
-                                            return tag ? (
-                                              <ColorTag
-                                                text={tag}
-                                                key={index}
-                                              ></ColorTag>
-                                            ) : null;
-                                          })
-                                      : ''}
-                                  </>
-                                }
-                              </div>
-                            </div>
-                          </Col>
-                        </Row>
-                      </Col>
-                    </Row>
-                  </div>
-                );
-              })
-            ) : (
-              <Empty
-                image={Empty.PRESENTED_IMAGE_SIMPLE}
-                style={{
-                  height: 135,
-                  border: '1px solid #dbdee3',
-                  padding: 30,
-                }}
-              />
-            )}
-          </div>
-        </Spin>
-        {tablelist.length > 0 ? (
-          <div className={'event-Pagination'}>
-            <Pagination
-              total={total}
-              showTotal={(total) => `Total ${total} items`}
-              defaultPageSize={pageSize}
-              current={currennt}
-              onChange={onPageCurrentSizeChange}
-            />
-          </div>
-        ) : null}
       </div>
     </PageLayout>
   );

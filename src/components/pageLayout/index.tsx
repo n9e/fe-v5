@@ -17,19 +17,20 @@ interface IPageLayoutProps {
   rightArea?: ReactNode;
   customArea?: ReactNode;
   showBack?: Boolean;
+  hideCluster?: Boolean;
   onChangeCluster?: (string) => void;
 }
 
-const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, children, customArea, showBack, onChangeCluster }) => {
+const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, children, customArea, showBack, onChangeCluster, hideCluster = false }) => {
   const { t, i18n } = useTranslation();
   const history = useHistory();
   let { profile } = useSelector<AccountRootState, accountStoreState>((state) => state.account);
   const { clusters } = useSelector<CommonRootState, CommonStoreState>((state) => state.common);
-  const localCluster = localStorage.getItem('curCluster')
+  const localCluster = localStorage.getItem('curCluster');
   const [curCluster, setCurCluster] = useState<string>(localCluster || clusters[0]);
   if (!localCluster && clusters.length > 0) {
-    setCurCluster(clusters[0])
-    localStorage.setItem('curCluster', clusters[0])
+    setCurCluster(clusters[0]);
+    localStorage.setItem('curCluster', clusters[0]);
   }
 
   const menu = (
@@ -57,13 +58,20 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, childr
 
   const clusterMenu = (
     <Menu selectedKeys={[curCluster]}>
-      {clusters.map(cluster => <Menu.Item key={cluster} onClick={_ => {
-        setCurCluster(cluster)
-        onChangeCluster && onChangeCluster(cluster)
-        localStorage.setItem('curCluster', cluster)
-      }}>{cluster}</Menu.Item>)}
+      {clusters.map((cluster) => (
+        <Menu.Item
+          key={cluster}
+          onClick={(_) => {
+            setCurCluster(cluster);
+            onChangeCluster && onChangeCluster(cluster);
+            localStorage.setItem('curCluster', cluster);
+          }}
+        >
+          {cluster}
+        </Menu.Item>
+      ))}
     </Menu>
-  )
+  );
 
   return (
     <div className={'page-wrapper'}>
@@ -75,7 +83,7 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, childr
             <div className={'page-header-title'}>
               {showBack && (
                 <RollbackOutlined
-                  onClick={() => window.history.back()}
+                  onClick={() => history.goBack()}
                   style={{
                     marginRight: '5px',
                   }}
@@ -86,16 +94,17 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, childr
             </div>
             {/* <div className={'page-header-right-area'}>{rightArea}</div> */}
             <div className={'page-header-right-area'}>
-              <div style={{ marginRight: 20 }}>
-                <Dropdown
-                  overlay={clusterMenu}
-                >
-                  <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
-                    {curCluster} <DownOutlined />
-                  </a>
-                </Dropdown>
-              </div>
-              <span
+              {!hideCluster && (
+                <div style={{ marginRight: 20 }}>
+                  <Dropdown overlay={clusterMenu}>
+                    <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
+                      {curCluster} <DownOutlined />
+                    </a>
+                  </Dropdown>
+                </div>
+              )}
+              {/* 文案完善了再打开 */}
+              {/* <span
                 className='language'
                 onClick={() => {
                   let language = i18n.language == 'en' ? 'zh' : 'en';
@@ -104,7 +113,7 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, childr
                 }}
               >
                 {i18n.language == 'zh' ? 'En' : '中'}
-              </span>
+              </span> */}
               <Dropdown overlay={menu} trigger={['click']}>
                 <span className='avator'>
                   <img src={profile.portrait || '/image/avatar1.png'} alt='' />

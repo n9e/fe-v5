@@ -10,11 +10,12 @@ interface Props {
   className?: string;
   value?: string;
   xCluster: string;
+  editable?: boolean;
   onChange?: (expr: string) => void;
 }
 
 export default function PromqlEditor(props: Props) {
-  const { onChange, value, className, style = {}, xCluster } = props;
+  const { onChange, value, className, style = {}, editable = true, xCluster } = props;
   const [view, setView] = useState<EditorView>();
   const containerRef = useRef<HTMLDivElement>(null);
   const url = '/api/n9e/prometheus';
@@ -43,6 +44,7 @@ export default function PromqlEditor(props: Props) {
           EditorView.updateListener.of((update: ViewUpdate): void => {
             onChange?.(update.state.doc.toString());
           }),
+          EditorView.editable.of(editable),
         ],
       }),
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

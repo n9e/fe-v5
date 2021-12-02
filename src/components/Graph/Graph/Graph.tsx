@@ -75,6 +75,7 @@ export default class Graph extends Component<GraphProps> {
           series: this.props.series,
           points,
           chartWidth: this.graphWrapEle.offsetWidth - 40,
+          chartType: nextProps.graphConfig.chartType
         });
       },
     }

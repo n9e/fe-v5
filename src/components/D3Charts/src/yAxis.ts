@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { Options, YScales } from './interface';
+import { ChartType, Options, YScales } from './interface';
 
 interface RealData {
   [index: string]: any;
@@ -101,6 +101,8 @@ export default class YAxis {
         ymax = plotLinesMaxAbs;
       }
     }
+    // StackArea 类型图表 y 轴下标总为 0
+    if (this.options.chartType === ChartType.StackArea) ymin = 0;
 
     yScales.domain([ymin, ymax]);
     yScales.nice(realTickLength);

@@ -1,29 +1,36 @@
 import PageLayout from '@/components/pageLayout';
-import { CloseCircleOutlined, LineChartOutlined, PlusOutlined, SearchOutlined, SettingFilled } from '@ant-design/icons';
-import { Button, Input, Modal, Tabs } from 'antd';
+import { LineChartOutlined, PlusOutlined } from '@ant-design/icons';
+import { Button } from 'antd';
 import React, { useEffect, useState } from 'react';
 import './index.less';
 import { generateID } from '@/utils';
 import { getMetrics } from '@/services/warning';
-import { panelDefaultOptions, PanelOptions } from './panel';
 import Panel from './panel';
 
-// type PanelMeta = { id: string; options: PanelOptions };
-type PanelMeta = { id: string; };
+type PanelMeta = { id: string; defaultPromQL?: string };
 
 interface PanelListProps {
   metrics: string[];
 }
 
+function getUrlParamsByName(name) {
+  let reg = new RegExp(`(?<=\\b${name}=)[^&]*`),
+    str = location.search || '',
+    target = str.match(reg);
+  if (target) {
+    return target[0];
+  }
+  return '';
+}
+
 const PanelList: React.FC<PanelListProps> = ({ metrics }) => {
-  const [panelList, setPanelList] = useState<PanelMeta[]>([{ id: generateID() }]);
+  const [panelList, setPanelList] = useState<PanelMeta[]>([{ id: generateID(), defaultPromQL: decodeURIComponent(getUrlParamsByName('promql')) }]);
   // 添加一个查询面板
   function addPanel() {
     setPanelList((a) => [
       ...panelList,
       {
         id: generateID(),
-        // options: {...panelDefaultOptions},
       },
     ]);
   }
@@ -33,22 +40,11 @@ const PanelList: React.FC<PanelListProps> = ({ metrics }) => {
     setPanelList(panelList.reduce<PanelMeta[]>((acc, panel) => (panel.id !== id ? [...acc, { ...panel }] : acc), []));
   }
 
-  // 内容变更
-  // function onOptionsChanged (id, opts) {
-  //   setPanelList(panelList.map((p) => (id === p.id ? { ...p, options: opts } : p)));
-  // }
-
   return (
     <>
-      {panelList.map(({ id }) => 
-        <Panel
-          key={id}
-          // options={options}
-          // onOptionsChanged={(opts) => onOptionsChanged(id, opts)}
-          metrics={metrics}
-          removePanel={() => removePanel(id)}
-        />
-      )}
+      {panelList.map(({ id, defaultPromQL = '' }) => (
+        <Panel key={id} metrics={metrics} defaultPromQL={defaultPromQL} removePanel={() => removePanel(id)} />
+      ))}
       <div className='add-prometheus-panel'>
         <Button size='large' onClick={addPanel}>
           <PlusOutlined />

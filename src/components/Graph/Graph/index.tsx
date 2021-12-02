@@ -23,6 +23,7 @@ export interface GraphDataProps {
   selectedHosts?: { ident: string }[];
   metric?: string;
   promqls?: string[] | { current: string }[];
+  legendTitleFormats?: string[];
   ref?: any;
   yAxis?: any;
   chartType?: ChartType;
@@ -34,6 +35,13 @@ export interface ErrorInfoType {
   errorType: string;
 }
 
+export interface HighLevelConfigType {
+  shared?: boolean;
+  sharedSortDirection?: 'desc' | 'asc';
+  precision?: 'short' | 'origin' | number;
+  formatUnit?: 1024 | 1000 | 'humantime';
+}
+
 interface GraphProps {
   height?: number;
   ref?: any;
@@ -41,16 +49,12 @@ interface GraphProps {
   graphConfigInnerVisible?: boolean;
   showHeader?: boolean;
   extraRender?: (ReactNode) => ReactNode;
+  isShowRefresh?: boolean;
   isShowShare?: boolean;
   defaultAggrFunc?: string;
   defaultAggrGroups?: string[];
   defaultOffsets?: string[];
-  highLevelConfig?: {
-    shared?: boolean;
-    sharedSortDirection?: 'desc' | 'asc';
-    precision?: 'short' | 'origin' | number;
-    formatUnit?: 1024 | 1000 | 'humantime';
-  };
+  highLevelConfig?: Partial<HighLevelConfigType>;
   onErrorOccured?: (errorArr: ErrorInfoType[]) => void;
   onRequestCompleted?: (requestInfo: QueryStats) => void;
 }
@@ -61,7 +65,6 @@ interface GraphState {
   series: any[];
   chartShowSeries: any[];
   legendHighlightedKeys: number[];
-  forceRender: boolean;
   offsets: string[];
   aggrFunc: string;
   aggrGroups: string[];
@@ -79,8 +82,8 @@ interface GraphState {
 const formatUnitInfoMap = {
   1024: 'Ki, Mi, Gi by 1024',
   1000: 'Ki, Mi, Gi by 1000',
-  humantime: 'Human time duration'
-}
+  humantime: 'Human time duration',
+};
 
 const { Option } = Select;
 export default class Graph extends Component<GraphProps, GraphState> {
@@ -95,7 +98,6 @@ export default class Graph extends Component<GraphProps, GraphState> {
       series: [],
       chartShowSeries: [],
       legendHighlightedKeys: [],
-      forceRender: false,
       // 刷新、切换hosts时，需要按照用户已经选择的环比、聚合条件重新刷新图表，所以需要将其记录到state中
       offsets: this.props.defaultOffsets || [],
       aggrFunc: this.props.defaultAggrFunc || 'avg',
@@ -105,7 +107,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
         shared: this.props.highLevelConfig?.shared === undefined ? true : this.props.highLevelConfig?.shared,
         sharedSortDirection: this.props.highLevelConfig?.sharedSortDirection || 'desc',
         precision: this.props.highLevelConfig?.precision || 'short',
-        formatUnit: this.props.highLevelConfig?.formatUnit || 1024,
+        formatUnit: this.props.highLevelConfig?.formatUnit || 1000,
       },
       onErrorOccured: this.props.onErrorOccured,
       onRequestCompleted: this.props.onRequestCompleted,
@@ -113,6 +115,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
   }
 
   componentDidMount() {
+    console.log('componentDidMount');
     this.updateAllGraphs(this.state.aggrFunc, this.state.aggrGroups, this.state.offsets);
   }
 
@@ -155,6 +158,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
   afterFetchChartDataOperations(allResponseData, queryStart, step) {
     const errorSeries: ErrorInfoType[] = [];
     const { offsets, series: previousSeries, legendHighlightedKeys } = this.state;
+    const { legendTitleFormats } = this.props.data;
     const rawSeries = allResponseData.reduce((acc, cur, idx) => {
       if (cur.status === 'error') {
         errorSeries.push(cur);
@@ -165,6 +169,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
       if (offsets) {
         arr.forEach((item) => {
           item.offset = offsets[idx] || '';
+          item.legendTitleFormat = legendTitleFormats && legendTitleFormats[idx];
         });
       }
       acc.push(...arr);
@@ -361,17 +366,20 @@ export default class Graph extends Component<GraphProps, GraphState> {
       </Menu>
     );
     const precisionMenu = (
-      <Menu onClick={(precision) => {
-        const precisionKey = isNaN(Number(precision.key)) ? precision.key : Number(precision.key)
-        this.setState({
-          highLevelConfig: {
-            ...this.state.highLevelConfig,
-            formatUnit: precisionKey as 1024 | 1000 | 'humantime'
-          }
-        })
-      }} selectedKeys={[String(this.state.highLevelConfig.formatUnit)]}>
-        <Menu.Item key={'1024'}>Ki, Mi, Gi by 1024</Menu.Item>
+      <Menu
+        onClick={(precision) => {
+          const precisionKey = isNaN(Number(precision.key)) ? precision.key : Number(precision.key);
+          this.setState({
+            highLevelConfig: {
+              ...this.state.highLevelConfig,
+              formatUnit: precisionKey as 1024 | 1000 | 'humantime',
+            },
+          });
+        }}
+        selectedKeys={[String(this.state.highLevelConfig.formatUnit)]}
+      >
         <Menu.Item key={'1000'}>Ki, Mi, Gi by 1000</Menu.Item>
+        <Menu.Item key={'1024'}>Ki, Mi, Gi by 1024</Menu.Item>
         <Menu.Item key={'humantime'}>Human time duration</Menu.Item>
       </Menu>
     );
@@ -424,10 +432,13 @@ export default class Graph extends Component<GraphProps, GraphState> {
             this.setState({
               highLevelConfig: {
                 ...this.state.highLevelConfig,
-                precision: e.target.checked ? 'short' : 'origin'
-              }
+                precision: e.target.checked ? 'short' : 'origin',
+              },
             });
-          }}>Value format with: </Checkbox>
+          }}
+        >
+          Value format with:{' '}
+        </Checkbox>
         {/* <Select value={this.state.highLevelConfig.formatUnit} onChange={(v: 1024 | 1000) => {
           this.setState({
             highLevelConfig: {
@@ -440,8 +451,8 @@ export default class Graph extends Component<GraphProps, GraphState> {
           <Option value={1000}>1000</Option>
         </Select> */}
         <Dropdown overlay={precisionMenu}>
-          <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
-          {formatUnitInfoMap[this.state.highLevelConfig.formatUnit]} <DownOutlined />
+          <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
+            {formatUnitInfoMap[this.state.highLevelConfig.formatUnit]} <DownOutlined />
           </a>
         </Dropdown>
       </div>
@@ -453,7 +464,6 @@ export default class Graph extends Component<GraphProps, GraphState> {
     const { extraRender, data, showHeader = true } = this.props;
     const { title, metric } = data;
     const graphConfig = this.getGraphConfig(data);
-
     return (
       <div className={this.state.legend ? 'graph-container graph-container-hasLegend' : 'graph-container'}>
         {showHeader && (
@@ -466,17 +476,19 @@ export default class Graph extends Component<GraphProps, GraphState> {
           >
             <div className='graph-extra'>
               <span className='graph-operationbar-item' key='info'>
-                <Popover placement='left' content={this.getContent()} trigger='click'>
+                <Popover placement='left' content={this.getContent()} trigger='click' autoAdjustOverflow={false} getPopupContainer={() => document.body}>
                   <Button className='' type='link' size='small' onClick={(e) => e.preventDefault()}>
                     <SettingOutlined />
                   </Button>
                 </Popover>
               </span>
-              <span className='graph-operationbar-item' key='sync'>
-                <Button type='link' size='small' onClick={(e) => e.preventDefault()}>
-                  <SyncOutlined onClick={this.refresh} />
-                </Button>
-              </span>
+              {this.props.isShowRefresh === false ? null : (
+                <span className='graph-operationbar-item' key='sync'>
+                  <Button type='link' size='small' onClick={(e) => e.preventDefault()}>
+                    <SyncOutlined onClick={this.refresh} />
+                  </Button>
+                </span>
+              )}
               {this.props.isShowShare === false ? null : (
                 <span className='graph-operationbar-item' key='share'>
                   <Button type='link' size='small' onClick={(e) => e.preventDefault()}>

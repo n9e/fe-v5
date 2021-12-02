@@ -1,15 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Popover, Button, DatePicker } from 'antd';
 import { CaretDownOutlined } from '@ant-design/icons';
 import moment, { unitOfTime, Moment } from 'moment';
 import './index.less';
 import { useTranslation } from 'react-i18next';
+import { TooltipPlacement } from 'antd/es/tooltip';
 
 type TimeUnit = 's' | 'ms';
 interface Props {
+  placement?: TooltipPlacement;
   leftList?: RelativeRange[];
   unit?: TimeUnit;
   value?: Range;
+  showRight?: boolean;
   onChange: (value: Range) => void;
 }
 
@@ -70,24 +73,26 @@ export default function DateRangePicker(props: Props) {
     { num: 1, unit: 'month', description: t('月') },
     { num: 1, unit: 'quarter', description: t('季度') },
   ];
-  const { onChange, value, unit = 's', leftList = LeftItems } = props;
+  const { onChange, value, unit = 's', showRight = true, placement = 'bottom', leftList = LeftItems } = props;
   const [visible, setVisible] = useState(false);
   const [startTime, setStartTime] = useState<Moment>(moment());
   const [endTime, setEndTime] = useState<Moment>(moment());
   const [leftSelect, setLeftSelect] = useState<number>(-1);
   const [label, setLabel] = useState<string>();
+  const isDatePickerOpen = useRef(false);
 
   useEffect(() => {
     if (!value) {
-      setLeftSelect(0);
-      emitValue(leftList[0]);
+      const defaultSelect = 3;
+      setLeftSelect(defaultSelect);
+      emitValue(leftList[defaultSelect]);
       return;
     }
     // 如果外部被赋值，只需要改label和组件展示值，不需要向外抛
     if (isAbsoluteRange(value)) {
       value.start > 0 && value.end > 0 && formatExternalAbsoluteTime(value);
     } else {
-      const i = LeftItems.findIndex(({ num, unit }) => num === value.num && unit === value.unit);
+      const i = leftList.findIndex(({ num, unit }) => num === value.num && unit === value.unit);
       setLeftSelect(i === -1 ? 0 : i);
       emitValue(leftList[i]);
     }
@@ -105,8 +110,8 @@ export default function DateRangePicker(props: Props) {
 
   const formatExternalAbsoluteTime = (value: AbsoluteRange) => {
     const { start, end } = value;
-    setStartTime(moment(start));
-    setEndTime(moment(end));
+    setStartTime(moment(unit === 's' ? start * 1000 : start));
+    setEndTime(moment(unit === 's' ? end * 1000 : end));
     setLabel(formatLabel(value, unit));
   };
 
@@ -166,24 +171,50 @@ export default function DateRangePicker(props: Props) {
         ))}
       </div>
 
-      <div className='time-range-picker-right'>
-        <p className='title'>{t('自定义开始时间')}</p>
-        <DatePicker showTime onChange={handleStartTimeChange} value={startTime} disabledDate={startDisabledDate} />
-        <p className='title'>{t('自定义结束时间')}</p>
-        <DatePicker showTime onChange={handleEndTimeChange} value={endTime} disabledDate={endDisabledDate} />
-        <div className='footer'>
-          <Button onClick={() => setVisible(false)}>{t('取消')}</Button>
-          <Button type='primary' onClick={handleRightOk} disabled={startTime.endOf('seconds') >= endTime.endOf('seconds')}>
-            {t('确定')}
-          </Button>
+      {showRight && (
+        <div className='time-range-picker-right'>
+          <p className='title'>{t('自定义开始时间')}</p>
+          <DatePicker
+            showTime
+            onChange={handleStartTimeChange}
+            value={startTime}
+            disabledDate={startDisabledDate}
+            onOpenChange={(open) => {
+              isDatePickerOpen.current = open;
+            }}
+          />
+          <p className='title'>{t('自定义结束时间')}</p>
+          <DatePicker
+            showTime
+            onChange={handleEndTimeChange}
+            value={endTime}
+            disabledDate={endDisabledDate}
+            onOpenChange={(open) => {
+              isDatePickerOpen.current = open;
+            }}
+          />
+          <div className='footer'>
+            <Button onClick={() => setVisible(false)}>{t('取消')}</Button>
+            <Button type='primary' onClick={handleRightOk} disabled={startTime.endOf('seconds') >= endTime.endOf('seconds')}>
+              {t('确定')}
+            </Button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 
   return (
-    <Popover content={content} overlayClassName='time-range-picker' visible={visible}>
-      <Button onClick={() => setVisible(true)}>
+    <Popover
+      trigger='click'
+      placement={placement}
+      content={content}
+      overlayClassName='time-range-picker'
+      visible={visible}
+      getPopupContainer={() => document.body}
+      onVisibleChange={(visible) => (visible || !isDatePickerOpen.current) && setVisible(visible)}
+    >
+      <Button>
         {label} <CaretDownOutlined />
       </Button>
     </Popover>

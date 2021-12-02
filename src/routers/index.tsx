@@ -12,6 +12,8 @@ import Dashboard from '@/pages/dashboard';
 import Chart from '@/pages/chart';
 import DashboardDetail from '@/pages/dashboard/detail';
 import Manage from '@/pages/manage';
+import Groups from '@/pages/manage/groups';
+import Users from '@/pages/manage/users';
 import Business from '@/pages/manage/business';
 import Explore from '@/pages/metric/explorer';
 import ObjectExplore from '@/pages/monitor/object';
@@ -26,10 +28,20 @@ import SubscribeAdd from '@/pages/warning/subscribe/add';
 import SubscribeEdit from '@/pages/warning/subscribe/edit';
 import Event from '@/pages/event';
 import EventDetail from '@/pages/event/detail';
-import Overview from '@/pages/overview';
 import historyEvents from '@/pages/historyEvents';
 import MonObjectManage from '@/pages/monObjectManage';
 import Demo from '@/pages/demo';
+import TaskTpl from '@/pages/taskTpl';
+import TaskTplAdd from '@/pages/taskTpl/add';
+import TaskTplDetail from '@/pages/taskTpl/detail';
+import TaskTplModify from '@/pages/taskTpl/modify';
+import TaskTplClone from '@/pages/taskTpl/clone';
+import Task from '@/pages/task';
+import TaskAdd from '@/pages/task/add';
+import TaskResult from '@/pages/task/result';
+import TaskDetail from '@/pages/task/detail';
+import Version from '@/pages/help/version';
+import Contact from '@/pages/help/contact';
 
 import { dynamicPackages, Entry } from '@/utils';
 
@@ -75,18 +87,18 @@ export default function Content() {
       <Switch>
         <Route path='/demo' component={Demo} />
         <Route path='/login' component={Login} exact />
-        <Route exact path='/overview' component={Overview} />
         <Route path='/metric/explorer' component={Explore} exact />
         <Route path='/object/explorer' component={ObjectExplore} exact />
+        <Route path='/busi-groups' component={Business} />
+        <Route path='/users' component={Users} />
+        <Route path='/user-groups' component={Groups} />
         <Route path='/account/profile/:tab' component={Profile} />
-        <Route path='/manage/business' component={Business} />
-        <Route path='/manage/:type' component={Manage} />
+
         <Route path='/dashboard/:busiId/:id' component={DashboardDetail} />
         <Route path='/dashboard' component={Dashboard} />
         <Route path='/chart/:ids' component={Chart} />
         <Route path='/resource/:id?' component={ResourcePage} />
         <Route path='/indicator' component={IndicatorPage} />
-        <Route path='/history-events' component={historyEvents} />
 
         <Route exact path='/alert-rules/add/:group_id' component={StrategyAdd} />
         <Route exact path='/alert-rules/edit/:id' component={StrategyEdit} />
@@ -97,10 +109,27 @@ export default function Content() {
         <Route exact path='/alert-subscribes' component={Subscribe} />
         <Route exact path='/alert-subscribes/add' component={SubscribeAdd} />
         <Route exact path='/alert-subscribes/edit/:id' component={SubscribeEdit} />
-        <Route exact path='/event' component={Event} />
-        <Route exact path='/event/:id' component={EventDetail} />
-        <Route exact path='/event-history/:id' component={EventDetail} />
+
+        <Route exact path='/alert-cur-events' component={Event} />
+        <Route exact path='/alert-his-events' component={historyEvents} />
+        <Route exact path='/alert-cur-events/:busiId/:eventId' component={EventDetail} />
+        <Route exact path='/alert-his-events/:busiId/:eventId' component={EventDetail} />
         <Route exact path='/targets' component={MonObjectManage} />
+
+        <Route exact path='/job-tpls' component={TaskTpl} />
+        <Route exact path='/job-tpls/add' component={TaskTplAdd} />
+        <Route exact path='/job-tpls/add/task' component={TaskAdd} />
+        <Route exact path='/job-tpls/:id/detail' component={TaskTplDetail} />
+        <Route exact path='/job-tpls/:id/modify' component={TaskTplModify} />
+        <Route exact path='/job-tpls/:id/clone' component={TaskTplClone} />
+        <Route exact path='/job-tasks' component={Task} />
+        <Route exact path='/job-tasks/add' component={TaskAdd} />
+        <Route exact path='/job-tasks/:id/result' component={TaskResult} />
+        <Route exact path='/job-tasks/:id/detail' component={TaskDetail} />
+
+        <Route exact path='/help/version' component={Version} />
+        <Route exact path='/help/contact' component={Contact} />
+
         {lazyRoutes.map((route, i) => (
           <RouteWithSubRoutes key={i} {...route} />
         ))}
