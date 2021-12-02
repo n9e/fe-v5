@@ -36,7 +36,7 @@ const btimeDefault = new Date().getTime();
 const etimeDefault = new Date().getTime() + 1 * 60 * 60 * 1000; // 默认时长1h
 interface Props {
   detail?: shieldItem;
-  type?: number;
+  type?: number; // 1:编辑; 2:克隆
 }
 
 const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
@@ -75,7 +75,6 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
       const h = moment.duration(etime - btime).hours();
       const m = moment.duration(etime - btime).minutes();
       const s = moment.duration(etime - btime).seconds();
-      console.log(d, h, m, s)
     }
     return () => {
 
@@ -158,6 +157,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
         ...detail,
         btime: detail?.btime ? moment(detail.btime) : moment(btimeDefault),
         etime: detail?.etime ? moment(detail.etime) : moment(etimeDefault),
+        cluster: clusterList[0] || 'Default'
       }}
     >
       <Card>
@@ -226,7 +226,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
               title={t(
                 `运算符如果选择in，value的输入框中自动出现placeholder：
                     可以输入多个值，用回车分隔
-                    运算符如果选择~=，value的输入框中自动出现placeholder：
+                    运算符如果选择=～，value的输入框中自动出现placeholder：
                     请输入正则表达式匹配标签value
                     运算符如果选择==，value的输入框中清空placeholder`,
               )}
@@ -282,19 +282,11 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
         </Form.Item>
         <Form.Item {...tailLayout}>
           <Row gutter={[10, 10]} >
-            {i18n.language == 'en' ? (
-              <Col span={1} offset={1}>
+          <Col span={1}>
                 <Button type='primary' htmlType='submit'>
-                  {t('创建')}
+                  {type === 2 ? t('克隆') : t('创建')}
                 </Button>
               </Col>
-            ) : (
-              <Col span={1}>
-                <Button type='primary' htmlType='submit'>
-                  {t('创建')}
-                </Button>
-              </Col>
-            )}
 
             <Col
               span={1}
