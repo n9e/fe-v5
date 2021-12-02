@@ -1,6 +1,8 @@
 /* eslint-disable no-use-before-define */
 import _ from 'lodash';
 import moment from 'moment';
+import { replaceExpressionBracket } from './index';
+import { sizeFormatter } from '@/utils'
 const fmt = 'YYYY-MM-DD HH:mm:ss';
 import { ChartType } from '@/components/D3Charts/src/interface';
 
@@ -27,6 +29,7 @@ export default function getTooltipsContent(activeTooltipData) {
 }
 
 function renderPointContent(isSingle, pointData = {}, serie = {}, formatUnit, precision, chartType) {
+  const { legendTitleFormat } = serie;
   const { color, filledNull, serieOptions = {}, timestamp } = pointData;
   // StackArea 类型的原始值被存储在 y0key (值为 2) + 1 的位置，所以取了下标为 3 的值，后期可完善
   const value = chartType === ChartType.Line ? pointData.value : pointData[3];
@@ -41,15 +44,31 @@ function renderPointContent(isSingle, pointData = {}, serie = {}, formatUnit, pr
 
   const renderMultiSeriesPointContent = () => {
     const labelContents = labelKeys.map((label) => `<span>${label}=${serieMetricLabels[label]}</span>`);
+    const label = legendTitleFormat ? replaceExpressionBracket(legendTitleFormat, serieMetricLabels) : `${metricName} ${comparison} {${labelContents}}`;
     return `<span style="color:${color}">● </span>
-      ${metricName} ${comparison} {${labelContents}}：<strong>${value > 1000 ? sizeFormatter(value) : value.toFixed(2)}${filledNull ? '(空值填补,仅限看图使用)' : ''}</strong>
+      ${label}：<strong>${formatValue(value)}${filledNull ? '(空值填补,仅限看图使用)' : ''}</strong>
       <br/>`;
   };
 
+  const formatValue = value => {
+    if (precision === 'short') {
+      if (formatUnit === 1024 || formatUnit === 1000) {
+        return value > 1000 ? sizeFormatter(value, 2, { convertNum: formatUnit }) : value.toFixed(2)
+      } else if (formatUnit === 'humantime') {
+        return moment.duration(value, 'seconds').humanize()
+      } else {
+        return ''
+      }
+    } else {
+      return value
+    }
+  }
+
   const renderSingleSeriesPointContent = () => {
     const labelContents = labelKeys.map((label) => `<div><strong>${label}</strong>: ${serieMetricLabels[label]}</div>`);
+    const label = legendTitleFormat ? replaceExpressionBracket(legendTitleFormat, serieMetricLabels) : `${metricName} ${comparison}${metricName || comparison ? ': ' : ''}`;
     return `<span style="color:${color}">● </span>
-      ${metricName} ${comparison}${metricName || comparison ? ': ' : ''}<strong>${value > 1000 ? sizeFormatter(value) : value.toFixed(2)}${
+      ${label}<strong>${formatValue(value)}${
       filledNull ? '(空值填补,仅限看图使用)' : ''
     }</strong>
       <div /><br />
@@ -66,41 +85,4 @@ function getHeaderStr(activeTooltipData) {
   const dateStr = moment(points[0].timestamp).format(fmt);
   const headerStr = `<span style="color: #666">${dateStr}</span><br/>`;
   return headerStr;
-}
-
-function sizeFormatter(
-  val,
-  fixedCount = 2,
-  { withUnit = true, withByte = true, trimZero = false } = {
-    withUnit: true,
-    withByte: true,
-    trimZero: false,
-  },
-) {
-  const size = val ? Number(val) : 0;
-  let result;
-  let unit = '';
-
-  if (size < 0) {
-    result = 0;
-  } else if (size < 1024) {
-    result = size.toFixed(fixedCount);
-  } else if (size < 1024 * 1024) {
-    result = (size / 1024).toFixed(fixedCount);
-    unit = 'K';
-  } else if (size < 1024 * 1024 * 1024) {
-    result = (size / 1024 / 1024).toFixed(fixedCount);
-    unit = 'M';
-  } else if (size < 1024 * 1024 * 1024 * 1024) {
-    result = (size / 1024 / 1024 / 1024).toFixed(fixedCount);
-    unit = 'G';
-  } else if (size < 1024 * 1024 * 1024 * 1024 * 1024) {
-    result = (size / 1024 / 1024 / 1024 / 1024).toFixed(fixedCount);
-    unit = 'T';
-  }
-
-  trimZero && (result = parseFloat(result));
-  withUnit && (result = `${result}${unit}`);
-  withByte && (result = `${result}B`);
-  return result;
 }

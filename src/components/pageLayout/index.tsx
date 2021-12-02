@@ -17,10 +17,11 @@ interface IPageLayoutProps {
   rightArea?: ReactNode;
   customArea?: ReactNode;
   showBack?: Boolean;
+  hideCluster?: Boolean;
   onChangeCluster?: (string) => void;
 }
 
-const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, children, customArea, showBack, onChangeCluster }) => {
+const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, children, customArea, showBack, onChangeCluster, hideCluster = false }) => {
   const { t, i18n } = useTranslation();
   const history = useHistory();
   let { profile } = useSelector<AccountRootState, accountStoreState>((state) => state.account);
@@ -93,14 +94,17 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, childr
             </div>
             {/* <div className={'page-header-right-area'}>{rightArea}</div> */}
             <div className={'page-header-right-area'}>
-              <div style={{ marginRight: 20 }}>
-                <Dropdown overlay={clusterMenu}>
-                  <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
-                    {curCluster} <DownOutlined />
-                  </a>
-                </Dropdown>
-              </div>
-              <span
+              {!hideCluster && (
+                <div style={{ marginRight: 20 }}>
+                  <Dropdown overlay={clusterMenu}>
+                    <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
+                      {curCluster} <DownOutlined />
+                    </a>
+                  </Dropdown>
+                </div>
+              )}
+              {/* 文案完善了再打开 */}
+              {/* <span
                 className='language'
                 onClick={() => {
                   let language = i18n.language == 'en' ? 'zh' : 'en';
@@ -109,7 +113,7 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, childr
                 }}
               >
                 {i18n.language == 'zh' ? 'En' : '中'}
-              </span>
+              </span> */}
               <Dropdown overlay={menu} trigger={['click']}>
                 <span className='avator'>
                   <img src={profile.portrait || '/image/avatar1.png'} alt='' />

@@ -2,19 +2,22 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import PageLayout from '@/components/pageLayout';
 import DateRangePicker from '@/components/DateRangePicker';
-import { ReloadOutlined, RollbackOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Input, Form, Modal, Divider, message } from 'antd';
+import { useSelector, useDispatch } from 'react-redux';
+import { ReloadOutlined, RollbackOutlined, EditOutlined, PlusOutlined, DownOutlined } from '@ant-design/icons';
+import { Button, Input, Form, Modal, Dropdown, message, Menu } from 'antd';
 import { Range } from '@/components/DateRangePicker';
 import { getSingleDashboard, updateSingleDashboard, createChartGroup, getChartGroup, delChartGroup, removeChart, updateChartGroup } from '@/services/dashboard';
 import { Dashboard, Group } from '@/store/dashboardInterface';
 import ChartGroup, { Chart } from './chartGroup';
 import ChartConfigModal from './chartConfigModal';
 import RefreshIcon from '@/components/RefreshIcon';
-import VariableConfig from './VariableConfig';
-import { TagFilterResponse } from './VariableConfig/definition';
+import VariableConfig, { VariableType } from './VariableConfig';
 import './index.less';
 import { useTranslation } from 'react-i18next';
 import Resolution from '@/components/Resolution';
+import { RootState as CommonRootState } from '@/store/common';
+import { CommonStoreState } from '@/store/commonInterface';
+
 interface URLParam {
   id: string;
   busiId: string;
@@ -35,6 +38,13 @@ export default function DashboardDetail() {
   const [groupForm] = Form.useForm();
   const history = useHistory();
   const variableRef = useRef<any>(null);
+  const { clusters } = useSelector<CommonRootState, CommonStoreState>((state) => state.common);
+  const localCluster = localStorage.getItem('curCluster');
+  const [curCluster, setCurCluster] = useState<string>(localCluster || clusters[0]);
+  if (!localCluster && clusters.length > 0) {
+    setCurCluster(clusters[0]);
+    localStorage.setItem('curCluster', clusters[0]);
+  }
   const [dashboard, setDashboard] = useState<Dashboard>({
     create_by: '',
     favorite: 0,
@@ -47,7 +57,7 @@ export default function DashboardDetail() {
   const [step, setStep] = useState<number | null>(null);
   const [titleEditing, setTitleEditing] = useState(false);
   const [chartGroup, setChartGroup] = useState<Group[]>([]);
-  const [variableConfig, setVariableConfig] = useState<TagFilterResponse | null>(null);
+  const [variableConfig, setVariableConfig] = useState<VariableType>();
   const [groupModalVisible, setGroupModalVisible] = useState(false);
   const [chartModalVisible, setChartModalVisible] = useState(false);
   const [chartModalInitValue, setChartModalInitValue] = useState<Chart | null>();
@@ -62,11 +72,10 @@ export default function DashboardDetail() {
   const init = () => {
     getSingleDashboard(busiId, id).then((res) => {
       setDashboard(res.dat);
-
-      // if (res.dat.configs) {
-      //   setVariableConfig(JSON.parse(res.dat.configs));
-      //   variableRef.current && variableRef.current.setInitData(res.dat.configs);
-      // }
+      if (res.dat.configs) {
+        const configs = JSON.parse(res.dat.configs);
+        setVariableConfig(configs);
+      }
     });
     getChartGroup(busiId, id).then((res) => {
       let arr = res.dat || [];
@@ -158,7 +167,7 @@ export default function DashboardDetail() {
   };
 
   const handleDelChartGroup = async (id: number) => {
-    await delChartGroup(id);
+    await delChartGroup(busiId, id);
     message.success(t('删除分组成功'));
     init();
     setGroupModalVisible(false);
@@ -179,10 +188,25 @@ export default function DashboardDetail() {
   };
 
   const handleVariableChange = (value) => {
-    // updateSingleDashboard(id, { ...dashboard, configs: JSON.stringify(value) });
+    updateSingleDashboard(busiId, id, { ...dashboard, configs: JSON.stringify(value) });
     setVariableConfig(value);
   };
-
+  const clusterMenu = (
+    <Menu selectedKeys={[curCluster]}>
+      {clusters.map((cluster) => (
+        <Menu.Item
+          key={cluster}
+          onClick={(_) => {
+            setCurCluster(cluster);
+            localStorage.setItem('curCluster', cluster);
+            init();
+          }}
+        >
+          {cluster}
+        </Menu.Item>
+      ))}
+    </Menu>
+  );
   return (
     <PageLayout
       customArea={
@@ -193,6 +217,13 @@ export default function DashboardDetail() {
             <EditOutlined className='edit' onClick={handleEdit} />
           </div>
           <div className='dashboard-detail-header-right'>
+            <div style={{ marginRight: 20, display: 'flex', alignItems: 'center' }}>
+              <Dropdown overlay={clusterMenu}>
+                <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
+                  {curCluster} <DownOutlined />
+                </a>
+              </Dropdown>
+            </div>
             <DateRangePicker onChange={handleDateChange} />
             <Resolution onChange={(v) => setStep(v)} initialValue={step} />
             <RefreshIcon
@@ -206,12 +237,13 @@ export default function DashboardDetail() {
     >
       <div className='dashboard-detail-content'>
         <div className='variable-area'>
-          <VariableConfig ref={variableRef} onChange={handleVariableChange} />
+          <VariableConfig onChange={handleVariableChange} value={variableConfig} />
         </div>
 
         <div className='charts'>
           {chartGroup.map((item, i) => (
             <ChartGroup
+              cluster={curCluster}
               busiId={busiId}
               key={i}
               step={step}
@@ -224,7 +256,7 @@ export default function DashboardDetail() {
               onDelChart={handleDelChart}
               onDelChartGroup={handleDelChartGroup}
               range={range}
-              variableConfig={variableConfig}
+              variableConfig={variableConfig!}
               moveUpEnable={i > 0}
               moveDownEnable={i < chartGroup.length - 1}
             />
@@ -266,7 +298,14 @@ export default function DashboardDetail() {
       </Modal>
 
       {chartModalVisible && (
-        <ChartConfigModal busiId={busiId} initialValue={chartModalInitValue} groupId={groupId} show={chartModalVisible} onVisibleChange={handleChartConfigVisibleChange} />
+        <ChartConfigModal
+          busiId={busiId}
+          initialValue={chartModalInitValue}
+          groupId={groupId}
+          show={chartModalVisible}
+          onVisibleChange={handleChartConfigVisibleChange}
+          variableConfig={variableConfig}
+        />
       )}
     </PageLayout>
   );

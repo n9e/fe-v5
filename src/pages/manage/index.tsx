@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import PageLayout from '@/components/pageLayout';
 import { Button, Table, Input, Switch, message, List, Row, Col, Pagination, Modal } from 'antd';
-import { DeleteTwoTone, EditOutlined, DeleteOutlined, SearchOutlined, UserOutlined, SmallDashOutlined } from '@ant-design/icons';
+import { DeleteTwoTone, EditOutlined, DeleteOutlined, SearchOutlined, UserOutlined, SmallDashOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import BaseTable, { IBaseTableProps } from '@/components/BaseTable';
 import UserInfoModal from './component/createModal';
 import DelPopover from './component/delPopover';
@@ -185,7 +185,7 @@ const Resource: React.FC = () => {
   }, [type]); // tab切换触发
 
   useEffect(() => {
-    getList();
+    getList(true);
   }, [activeKey]); //teamId变化触发
 
   useEffect(() => {
@@ -278,10 +278,10 @@ const Resource: React.FC = () => {
     if (searchValue) {
       handleSearch('team', searchValue);
     } else {
-      getList(isDeleteOrAdd);
+      isDeleteOrAdd === true && getList(isDeleteOrAdd);
     }
 
-    if (teamId && !isDeleteOrAdd) {
+    if (teamId) {
       getTeamInfoDetail(teamId);
     }
   };
@@ -401,77 +401,89 @@ const Resource: React.FC = () => {
                 />
               ) : null}
             </div>
-            <div className='resource-table-content'>
-              <Row className='team-info'>
-                <Col
-                  span='24'
-                  style={{
-                    color: '#000',
-                    fontSize: '14px',
-                    fontWeight: 'bold',
-                    display: 'inline',
-                  }}
-                >
-                  {teamInfo && teamInfo.name}
-                  <EditOutlined
-                    title={t('刷新')}
+            {teamList.length > 0 ? (
+              <div className='resource-table-content'>
+                <Row className='team-info'>
+                  <Col
+                    span='24'
                     style={{
-                      marginLeft: '8px',
+                      color: '#000',
                       fontSize: '14px',
+                      fontWeight: 'bold',
+                      display: 'inline',
                     }}
-                    onClick={() => handleClick(ActionType.EditTeam, teamId)}
-                  ></EditOutlined>
-                  <DeleteOutlined
+                  >
+                    {teamInfo && teamInfo.name}
+                    <EditOutlined
+                      title={t('刷新')}
+                      style={{
+                        marginLeft: '8px',
+                        fontSize: '14px',
+                      }}
+                      onClick={() => handleClick(ActionType.EditTeam, teamId)}
+                    ></EditOutlined>
+                    <DeleteOutlined
+                      style={{
+                        marginLeft: '8px',
+                        fontSize: '14px',
+                      }}
+                      onClick={() => {
+                        confirm({
+                          title: t('是否删除该团队'),
+                          onOk: () => {
+                            deleteTeam(teamId).then((_) => {
+                              message.success(t('团队删除成功'));
+                              handleClose(true);
+                            });
+                          },
+                          onCancel: () => {},
+                        });
+                      }}
+                    />
+                  </Col>
+                  <Col
                     style={{
-                      marginLeft: '8px',
-                      fontSize: '14px',
+                      marginTop: '8px',
+                      color: '#666',
                     }}
+                  >
+                    {t('备注')}：{teamInfo && teamInfo.note ? teamInfo.note : '-'}
+                  </Col>
+                </Row>
+                <Row justify='space-between' align='middle'>
+                  <Col span='12'>
+                    <Input
+                      prefix={<SearchOutlined />}
+                      value={searchMemberValue}
+                      className={'searchInput'}
+                      onChange={(e) => setSearchMemberValue(e.target.value)}
+                      placeholder={t('用户名、显示名、邮箱或手机')}
+                      onPressEnter={(e) => handleSearch('member', searchMemberValue)}
+                    />
+                  </Col>
+                  <Button
+                    type='primary'
                     onClick={() => {
-                      confirm({
-                        title: t('是否删除该团队'),
-                        onOk: () => {
-                          deleteTeam(teamId).then((_) => {
-                            message.success(t('团队删除成功'));
-                            handleClose(true);
-                          });
-                        },
-                        onCancel: () => {},
-                      });
+                      handleClick(ActionType.AddUser, teamId);
                     }}
-                  />
-                </Col>
-                <Col
-                  style={{
-                    marginTop: '8px',
-                    color: '#666',
-                  }}
-                >
-                  {t('备注')}：{teamInfo && teamInfo.note ? teamInfo.note : '-'}
-                </Col>
-              </Row>
-              <Row justify='space-between' align='middle'>
-                <Col span='12'>
-                  <Input
-                    prefix={<SearchOutlined />}
-                    value={searchMemberValue}
-                    className={'searchInput'}
-                    onChange={(e) => setSearchMemberValue(e.target.value)}
-                    placeholder={t('成员名、邮箱或手机')}
-                    onPressEnter={(e) => handleSearch('member', searchMemberValue)}
-                  />
-                </Col>
-                <Button
-                  type='primary'
-                  onClick={() => {
-                    handleClick(ActionType.AddUser, teamId);
-                  }}
-                >
-                  {t('添加成员')}
-                </Button>
-              </Row>
+                  >
+                    {t('添加成员')}
+                  </Button>
+                </Row>
 
-              <Table rowKey='id' columns={teamMemberColumns} dataSource={memberList} loading={memberLoading} />
-            </div>
+                <Table rowKey='id' columns={teamMemberColumns} dataSource={memberList} loading={memberLoading} />
+              </div>
+            ) : (
+              <div className='blank-busi-holder'>
+                <p style={{ textAlign: 'left', fontWeight: 'bold' }}>
+                  <InfoCircleOutlined style={{ color: '#1473ff' }} /> {t('提示信息')}
+                </p>
+                <p>
+                  没有与您相关的团队，请先
+                  <a onClick={() => handleClick(ActionType.CreateTeam)}>创建团队</a>
+                </p>
+              </div>
+            )}
           </div>
         )}
         <UserInfoModal

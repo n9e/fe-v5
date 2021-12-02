@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { useParams, Link } from 'react-router-dom';
 import PageLayout from '@/components/pageLayout';
 import { Button, Table, Input, Switch, message, List, Row, Col, Pagination, Modal } from 'antd';
-import { DeleteTwoTone, EditOutlined, DeleteOutlined, SearchOutlined, UserOutlined, SmallDashOutlined } from '@ant-design/icons';
+import { DeleteTwoTone, EditOutlined, DeleteOutlined, SearchOutlined, UserOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import UserInfoModal from './component/createModal';
 import { RootState, accountStoreState } from '@/store/accountInterface';
 import { changeStatus, deleteBusinessTeamMember, getBusinessTeamList, getBusinessTeamInfo, deleteBusinessTeam } from '@/services/manage';
@@ -143,7 +143,7 @@ const Resource: React.FC = () => {
   const handleClose = (isDeleteOrAdd = false) => {
     setVisible(false);
 
-    getList(isDeleteOrAdd);
+    isDeleteOrAdd === true && getList(isDeleteOrAdd);
 
     if (teamId && !isDeleteOrAdd) {
       getTeamInfoDetail(teamId);
@@ -274,8 +274,13 @@ const Resource: React.FC = () => {
             </div>
           ) : (
             <div className='blank-busi-holder'>
-              业务组（监控大盘，告警规则，屏蔽规则，监控对象都要归属某个业务组）为空，请先
-              <a onClick={() => handleClick(ActionType.CreateBusiness)}>创建业务组</a>
+              <p style={{ textAlign: 'left', fontWeight: 'bold' }}>
+                <InfoCircleOutlined style={{ color: '#1473ff' }} /> {t('提示信息')}
+              </p>
+              <p>
+                业务组（监控对象、监控大盘、告警规则、自愈脚本都要归属某个业务组）为空，请先
+                <a onClick={() => handleClick(ActionType.CreateBusiness)}>创建业务组</a>
+              </p>
             </div>
           )}
         </div>

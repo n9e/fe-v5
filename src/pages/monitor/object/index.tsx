@@ -29,12 +29,10 @@ export default () => {
   const [step, setStep] = useState<number | null>(null);
   const [queryHost, setQueryHost] = useState('');
   const [curCluster, setCurCluster] = useState('');
-  const [range, setRange] = useState<Range>({
-    start: 0,
-    end: 0,
-  });
+  const [range, setRange] = useState<Range>({ num: 1, unit: 'hour', description: 'hour' });
+  const [getHostsTimes, setGetHostsTimes] = useState(0);
   const getHostsRequest = () => {
-    const cluster = localStorage.getItem('curCluster')
+    const cluster = localStorage.getItem('curCluster') || ''
     let transportData = {
       bgid: busiGroup.id,
       query: queryHost,
@@ -49,25 +47,24 @@ export default () => {
 
   useEffect(() => {
     getHostsRequest().then(allHosts => {
+      if (getHostsTimes > 0) return
+      setGetHostsTimes(getHostsTimes + 1)
       getMetricsAndDesc(allHosts.slice(0, 10));
     })
-  }, [])
-
-  useEffect(() => {
-    getHostsRequest()
   }, [busiGroup, queryHost, curCluster]);
   const getMetricsAndDesc = (hosts) => {
     const showHosts = hosts || selectedHosts
-    const hostsMatchParams = `ident=~"${showHosts.map((h: any) => h.ident).join('|')}"`
+    if (showHosts.length === 0) return
+    const hostsMatchParams = `{ident=~"${showHosts.map((h: any) => h.ident).join('|')}"}`
     getMetrics({
       match: [hostsMatchParams]
     }).then((res) => {
       setMetrics(res.data);
-      const newGraphs = graphs.map((graph) => ({
-        ...graph,
-        showHosts,
-      }));
-      setGraphs(newGraphs);
+      // const newGraphs = graphs.map((graph) => ({
+      //   ...graph,
+      //   showHosts,
+      // }));
+      // setGraphs(newGraphs);
       getMetricsDesc(res.data).then(res => {
         setMetricDescs(res.dat)
       })
@@ -76,10 +73,11 @@ export default () => {
   const handleRemoveGraphs = () => {
     setGraphs([]);
   };
+  // 不需要输入的时候就触发，所以不需要防抖了
   const debouncedChangeHostName = useCallback(
     _.debounce((v) => {
       setQueryHost(v)
-    }, 1000),
+    }, 0),
     [],
   );
 
@@ -134,8 +132,8 @@ export default () => {
           <Row style={{ padding: '10px 0' }}>
             <Col span={8}>
             <div style={{display: 'flex'}}>
-              <DateRangePicker onChange={(e) => {
-                setRange(e);
+              <DateRangePicker value={range} onChange={(e) => {
+                // setRange(e);
                 let newGraphs = [...graphs];
                 newGraphs.forEach(graph => {
                   graph.range = e
@@ -151,7 +149,7 @@ export default () => {
                 setGraphs(newGraphs);
               }} initialValue={step} />
               <Button
-                style={{ marginLeft: 8 }}
+                style={{ padding: '4px 8px' }}
                 onClick={() => {
                   graphs.forEach(graph => {
                     const graphInstance = graph.ref?.current
@@ -173,10 +171,10 @@ export default () => {
         </Row>
         <div>
           {_.map(graphs, (o, i) => {
-            return <div style={{ marginBottom: 10 }} key={i + o.metric}>
+            return <div style={{ marginBottom: 10 }} key={o.metric}>
               <Graph ref={o.ref} data={{...o}} graphConfigInnerVisible={true} extraRender={graph => {
                 return [
-                  <Button type='link' size='small' onClick={(e) => e.preventDefault()}>
+                  <Button type='link' danger size='small' onClick={(e) => e.preventDefault()}>
                     <CloseCircleOutlined onClick={_ => {
                       console.log('graphs', graphs)
                       const newGraphs = [...graphs]

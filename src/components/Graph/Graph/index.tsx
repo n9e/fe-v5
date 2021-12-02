@@ -23,6 +23,7 @@ export interface GraphDataProps {
   selectedHosts?: { ident: string }[];
   metric?: string;
   promqls?: string[] | { current: string }[];
+  legendTitleFormats?: string[];
   ref?: any;
   yAxis?: any;
   chartType?: ChartType;
@@ -35,10 +36,10 @@ export interface ErrorInfoType {
 }
 
 export interface HighLevelConfigType {
-  shared: boolean;
-  sharedSortDirection: 'desc' | 'asc';
-  precision: 'short' | 'origin' | number;
-  formatUnit: 1024 | 1000;
+  shared?: boolean;
+  sharedSortDirection?: 'desc' | 'asc';
+  precision?: 'short' | 'origin' | number;
+  formatUnit?: 1024 | 1000 | 'humantime';
 }
 
 interface GraphProps {
@@ -64,7 +65,6 @@ interface GraphState {
   series: any[];
   chartShowSeries: any[];
   legendHighlightedKeys: number[];
-  forceRender: boolean;
   offsets: string[];
   aggrFunc: string;
   aggrGroups: string[];
@@ -73,11 +73,17 @@ interface GraphState {
     shared: boolean;
     sharedSortDirection: 'desc' | 'asc';
     precision: 'short' | 'origin' | number;
-    formatUnit: 1024 | 1000;
+    formatUnit: 1024 | 1000 | 'humantime';
   };
   onErrorOccured?: (errorArr: ErrorInfoType[]) => void;
   onRequestCompleted?: (requestInfo: QueryStats) => void;
 }
+
+const formatUnitInfoMap = {
+  1024: 'Ki, Mi, Gi by 1024',
+  1000: 'Ki, Mi, Gi by 1000',
+  humantime: 'Human time duration',
+};
 
 const { Option } = Select;
 export default class Graph extends Component<GraphProps, GraphState> {
@@ -92,7 +98,6 @@ export default class Graph extends Component<GraphProps, GraphState> {
       series: [],
       chartShowSeries: [],
       legendHighlightedKeys: [],
-      forceRender: false,
       // 刷新、切换hosts时，需要按照用户已经选择的环比、聚合条件重新刷新图表，所以需要将其记录到state中
       offsets: this.props.defaultOffsets || [],
       aggrFunc: this.props.defaultAggrFunc || 'avg',
@@ -110,10 +115,14 @@ export default class Graph extends Component<GraphProps, GraphState> {
   }
 
   componentDidMount() {
+    console.log('componentDidMount');
     this.updateAllGraphs(this.state.aggrFunc, this.state.aggrGroups, this.state.offsets);
   }
 
   componentWillReceiveProps(nextProps) {
+    if (this.props.data.legend !== undefined && this.props.data.legend !== nextProps.data.legend) {
+      this.setState({ legend: nextProps.data.legend });
+    }
     // 兼容及时查询页面操作图标属性
     // 接受外部format，legend，multi等属性并更新视图
     if (typeof nextProps.highLevelConfig === 'object') {
@@ -134,9 +143,6 @@ export default class Graph extends Component<GraphProps, GraphState> {
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.data.legend !== undefined && this.props.data.legend !== this.state.legend) {
-      this.setState({ legend: this.props.data.legend });
-    }
     const oldHosts = (prevProps.data.selectedHosts || []).map((h) => h.ident);
     const newHosts = (this.props.data.selectedHosts || []).map((h) => h.ident);
     const isHostsChanged = !_.isEqual(oldHosts, newHosts);
@@ -152,6 +158,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
   afterFetchChartDataOperations(allResponseData, queryStart, step) {
     const errorSeries: ErrorInfoType[] = [];
     const { offsets, series: previousSeries, legendHighlightedKeys } = this.state;
+    const { legendTitleFormats } = this.props.data;
     const rawSeries = allResponseData.reduce((acc, cur, idx) => {
       if (cur.status === 'error') {
         errorSeries.push(cur);
@@ -162,6 +169,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
       if (offsets) {
         arr.forEach((item) => {
           item.offset = offsets[idx] || '';
+          item.legendTitleFormat = legendTitleFormats && legendTitleFormats[idx];
         });
       }
       acc.push(...arr);
@@ -296,6 +304,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
     const aggrGroups = changeObj?.aggrGroups;
     const offsets = changeObj?.comparison;
     this.setState({ aggrFunc, aggrGroups, offsets });
+    if (changeObj.changeType === 'aggrFuncChange' && aggrGroups.length === 0) return;
     this.updateAllGraphs(aggrFunc, aggrGroups, offsets);
   }
 
@@ -359,17 +368,19 @@ export default class Graph extends Component<GraphProps, GraphState> {
     const precisionMenu = (
       <Menu
         onClick={(precision) => {
+          const precisionKey = isNaN(Number(precision.key)) ? precision.key : Number(precision.key);
           this.setState({
             highLevelConfig: {
               ...this.state.highLevelConfig,
-              formatUnit: Number(precision.key) as 1024 | 1000,
+              formatUnit: precisionKey as 1024 | 1000 | 'humantime',
             },
           });
         }}
         selectedKeys={[String(this.state.highLevelConfig.formatUnit)]}
       >
-        <Menu.Item key={'1024'}>1024</Menu.Item>
-        <Menu.Item key={'1000'}>1000</Menu.Item>
+        <Menu.Item key={'1024'}>Ki, Mi, Gi by 1024</Menu.Item>
+        <Menu.Item key={'1000'}>Ki, Mi, Gi by 1000</Menu.Item>
+        <Menu.Item key={'humantime'}>Human time duration</Menu.Item>
       </Menu>
     );
     return (
@@ -426,7 +437,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
             });
           }}
         >
-          Value format with: Ki, Mi, Gi by
+          Value format with:{' '}
         </Checkbox>
         {/* <Select value={this.state.highLevelConfig.formatUnit} onChange={(v: 1024 | 1000) => {
           this.setState({
@@ -441,7 +452,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
         </Select> */}
         <Dropdown overlay={precisionMenu}>
           <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
-            {this.state.highLevelConfig.formatUnit} <DownOutlined />
+            {formatUnitInfoMap[this.state.highLevelConfig.formatUnit]} <DownOutlined />
           </a>
         </Dropdown>
       </div>
@@ -453,7 +464,6 @@ export default class Graph extends Component<GraphProps, GraphState> {
     const { extraRender, data, showHeader = true } = this.props;
     const { title, metric } = data;
     const graphConfig = this.getGraphConfig(data);
-
     return (
       <div className={this.state.legend ? 'graph-container graph-container-hasLegend' : 'graph-container'}>
         {showHeader && (
@@ -466,8 +476,8 @@ export default class Graph extends Component<GraphProps, GraphState> {
           >
             <div className='graph-extra'>
               <span className='graph-operationbar-item' key='info'>
-                <Popover placement='left' content={this.getContent()} trigger='click'>
-                  <Button type='link' size='small' onClick={(e) => e.preventDefault()}>
+                <Popover placement='left' content={this.getContent()} trigger='click' autoAdjustOverflow={false} getPopupContainer={() => document.body}>
+                  <Button className='' type='link' size='small' onClick={(e) => e.preventDefault()}>
                     <SettingOutlined />
                   </Button>
                 </Popover>

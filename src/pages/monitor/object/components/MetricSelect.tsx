@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Button, Input, Tabs, Tooltip } from 'antd';
-import { SyncOutlined } from '@ant-design/icons';
+import { SearchOutlined, SyncOutlined } from '@ant-design/icons';
 import { filterMetrics, matchMetrics } from '../utils';
 import _ from 'lodash'
 
@@ -21,7 +21,7 @@ export default (props) => {
   }
   const renderMetricList = (metrics = [], metricTabKey: string) => {
     return (
-      <div className="tabPane" style={{height: 432, overflow: 'auto'}}>
+      <div className="tabPane" style={{height: 240, overflow: 'auto'}}>
         {
           metrics.length ?
             <ul className="metric-list" style={{ border: 'none' }}>
@@ -49,14 +49,14 @@ export default (props) => {
   }
   const renderMetricTabs = () => {
     let filteredMetrics = normalizMetrics(activeKey);
-    _.forEachRight(selectedMetrics, (value) => {
-      const index = filteredMetrics.findIndex(metric => metric === value)
-      const curMetric = filteredMetrics[index]
-      if (curMetric) {
-        filteredMetrics.splice(index,  1)
-        filteredMetrics.unshift(curMetric)
-      }
-    });
+    // _.forEachRight(selectedMetrics, (value) => {
+    //   const index = filteredMetrics.findIndex(metric => metric === value)
+    //   const curMetric = filteredMetrics[index]
+    //   if (curMetric) {
+    //     filteredMetrics.splice(index,  1)
+    //     filteredMetrics.unshift(curMetric)
+    //   }
+    // });
     let newMetrics = filteredMetrics;
     if (searchValue) {
       try {
@@ -86,7 +86,7 @@ export default (props) => {
       </TabPane>,
     );
 
-    return (
+    return metrics.length > 0 ?
       <Tabs
         className='metric-tab'
         tabBarStyle={{marginBottom: 10, height: 40}}
@@ -94,8 +94,12 @@ export default (props) => {
         onChange={handleMetricTabsChange}
       >
         {tabPanes}
-      </Tabs>
-    );
+      </Tabs> :
+      <div className='metric-tab-empty'>
+        请先选择监控对象，然后 <a href="javascript:;" onClick={() => {
+          handleRefreshMetrics && handleRefreshMetrics()
+        }}>点击我刷新</a>
+      </div>
   }
   const handleMetricsSearch = (e: any) => {
     const { value } = e.target;
@@ -103,8 +107,11 @@ export default (props) => {
   }
   return <div className='metric-select'>
     <div className='top-bar'>
-      <Input addonBefore={
-        <div className='search-title'>监控指标</div>
+      <Input placeholder='搜索，空格分隔多个关键字' addonBefore={
+        <>
+          <div className='search-title'>监控指标</div>
+          <SearchOutlined style={{position: 'absolute',left: 78, zIndex: 2, top: 9}} />
+        </>
       } addonAfter={
         <SyncOutlined onClick={() => {
           // 不直接写成onClick={handleRefreshMetrics}是为了避免将事件对象e传给外面，造成不必要的麻烦

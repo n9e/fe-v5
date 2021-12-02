@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useCallback, ReactElement } from 'react';
+import React, { useState, useEffect, useContext, useCallback, ReactElement, RefObject } from 'react';
 import { Button, Collapse, Modal, Menu, Dropdown, Divider, Popover, Checkbox } from 'antd';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
@@ -12,19 +12,22 @@ import { SettingOutlined, LinkOutlined, DownOutlined, EditOutlined, CloseCircleO
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import { Range } from '@/components/DateRangePicker';
-import { TagFilterResponse } from './VariableConfig/definition';
+import { VariableType } from './VariableConfig';
 import { number } from 'echarts';
 import { useTranslation } from 'react-i18next';
 import Graph from '@/components/Graph';
 import moment from 'moment';
+// 它可以和15行合并为一个import
+import { convertExpressionToQuery, replaceExpressionVars } from './VariableConfig/constant';
 
 const { confirm } = Modal;
 interface Props {
+  cluster: string;
   busiId: string;
   groupInfo: Group;
   range: Range;
   step: number | null;
-  variableConfig: TagFilterResponse | null;
+  variableConfig: VariableType;
   onAddChart: (data: number) => void;
   onUpdateChart: (group: Group, data: Chart) => void;
   onDelChart: (group: Group, data: Chart) => void;
@@ -180,6 +183,7 @@ const layouts: Layouts = {
 export default function ChartGroup(props: Props) {
   const { t } = useTranslation();
   const {
+    cluster,
     busiId,
     groupInfo,
     range,
@@ -196,11 +200,20 @@ export default function ChartGroup(props: Props) {
     moveDownEnable,
   } = props;
   const [chartConfigs, setChartConfigs] = useState<Chart[]>([]);
+  const [Refs, setRefs] = useState<RefObject<any>[]>();
   const [layout, setLayout] = useState<Layouts>(layouts); // const [colItem, setColItem] = useState<number>(defColItem);
   const [mounted, setMounted] = useState<boolean>(false);
   useEffect(() => {
     init();
   }, [groupInfo.updateTime]);
+
+  useEffect(() => {
+    Refs &&
+      Refs.forEach((ref) => {
+        const graphInstance = ref.current;
+        graphInstance && graphInstance.refresh();
+      });
+  }, [cluster]);
 
   const init = () => {
     setMounted(false);
@@ -240,6 +253,7 @@ export default function ChartGroup(props: Props) {
       const realLayout: Layouts = { lg: innerLayout, sm: innerLayout, md: innerLayout, xs: innerLayout, xxs: innerLayout };
       setLayout(realLayout);
       setChartConfigs(charts);
+      setRefs(new Array(charts.length).fill(0).map((_) => React.createRef()));
       setMounted(true);
     });
   };
@@ -464,7 +478,10 @@ export default function ChartGroup(props: Props) {
       chartConfigs.length > 0 &&
       chartConfigs.map((item, i) => {
         let { QL, name, legend, yplotline1, yplotline2 } = item.configs;
-
+        const promqls = QL.map((item) =>
+          variableConfig && variableConfig.var && variableConfig.var.length ? replaceExpressionVars(item.PromQL, variableConfig, variableConfig.var.length) : item.PromQL,
+        );
+        const legendTitleFormats = QL.map((item) => item.Legend);
         return (
           <div
             style={{
@@ -473,16 +490,17 @@ export default function ChartGroup(props: Props) {
             key={String(i)}
           >
             <Graph
+              ref={Refs![i]}
               data={{
                 yAxis: {
                   plotLines: [
                     {
                       value: yplotline1,
-                      color: 'red',
+                      color: 'orange',
                     },
                     {
                       value: yplotline2,
-                      color: 'green',
+                      color: 'red',
                     },
                   ],
                 },
@@ -490,7 +508,8 @@ export default function ChartGroup(props: Props) {
                 step,
                 range,
                 title: name,
-                promqls: QL.map((item) => item.PromQL),
+                promqls,
+                legendTitleFormats,
               }}
               extraRender={(graph) => {
                 return (
@@ -538,60 +557,6 @@ export default function ChartGroup(props: Props) {
                 );
               }}
             />
-            {/* <D3Chart
-              barControl='multiOrSort'
-              title={chartConfigs[i].configs.name}
-              rightBar={
-                <>
-                  <Button
-                    type='link'
-                    size='small'
-                    onClick={(e) => {
-                      e.preventDefault();
-                      window.open(item.configs.link);
-                    }}
-                    disabled={!item.configs.link}
-                  >
-                    <LinkOutlined />
-                  </Button>
-                  <Dropdown
-                    trigger={['click']}
-                    overlay={
-                      <Menu>
-                        <Menu.Item onClick={() => onUpdateChart(groupInfo, item)}>{t('编辑图表')}</Menu.Item>
-
-                        <Menu.Item
-                          danger
-                          onClick={() => {
-                            confirm({
-                              title: `${t('是否删除图表')}：${item.configs.name}`,
-                              onOk: async () => {
-                                onDelChart(groupInfo, item);
-                              },
-
-                              onCancel() {},
-                            });
-                          }}
-                        >
-                          {t('删除图表')}
-                        </Menu.Item>
-                      </Menu>
-                    }
-                  >
-                    <Button type='link' size='small' onClick={(e) => e.preventDefault()}>
-                      <SettingOutlined />
-                    </Button>
-                  </Dropdown>
-                </>
-              }
-              options={{
-                ...item.configs,
-                prome_ql,
-                range,
-                step,
-                limit: 50,
-              }}
-            /> */}
           </div>
         );
       })
