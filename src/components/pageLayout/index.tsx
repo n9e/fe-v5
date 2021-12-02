@@ -103,7 +103,8 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, childr
                   </Dropdown>
                 </div>
               )}
-              <span
+              {/* 文案完善了再打开 */}
+              {/* <span
                 className='language'
                 onClick={() => {
                   let language = i18n.language == 'en' ? 'zh' : 'en';
@@ -112,7 +113,7 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, childr
                 }}
               >
                 {i18n.language == 'zh' ? 'En' : '中'}
-              </span>
+              </span> */}
               <Dropdown overlay={menu} trigger={['click']}>
                 <span className='avator'>
                   <img src={profile.portrait || '/image/avatar1.png'} alt='' />

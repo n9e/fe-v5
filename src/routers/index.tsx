@@ -80,7 +80,7 @@ export default function Content() {
     <div className='content'>
       <Route path='/demo' component={Demo} />
       <Route path='/login' component={Login} exact />
-      <Route exact path='/overview' component={Overview} />
+      {/* <Route exact path='/overview' component={Overview} /> */}
       <Route path='/metric/explorer' component={Explore} exact />
       <Route path='/object/explorer' component={ObjectExplore} exact />
       <Route path='/account/profile/:tab' component={Profile} />

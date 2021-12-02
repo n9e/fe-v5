@@ -18,8 +18,8 @@ const getDefaultOpenKey = (menus: any, pathname) => {
   const currentSubMenu = _.find(menus, (subMenus: any) => {
     return _.some(subMenus.children, (menu) => {
       return pathname.indexOf(menu.key) !== -1;
-    })
-  })
+    });
+  });
   if (currentSubMenu) {
     return currentSubMenu.key;
   }
@@ -31,8 +31,8 @@ const defaultSelectedKey = (menus: any, pathname) => {
       if (pathname.indexOf(menu.key) !== -1) {
         key = menu.key;
       }
-    })
-  })
+    });
+  });
   return key;
 };
 
@@ -47,8 +47,8 @@ const SideMenu: FC = () => {
         {
           key: '/targets',
           title: t('对象列表'),
-        }
-      ]
+        },
+      ],
     },
     {
       key: 'monitor',
@@ -66,9 +66,10 @@ const SideMenu: FC = () => {
         {
           key: '/dashboard',
           title: t('监控大盘'),
-        }
-      ]
-    }, {
+        },
+      ],
+    },
+    {
       key: 'alarm',
       icon: <SettingOutlined />,
       title: t('告警管理'),
@@ -76,21 +77,26 @@ const SideMenu: FC = () => {
         {
           key: '/alert-rules',
           title: t('告警规则'),
-        }, {
+        },
+        {
           key: '/shield',
           title: t('屏蔽规则'),
-        }, {
+        },
+        {
           key: '/shield-1',
           title: t('订阅规则'),
-        }, {
+        },
+        {
           key: '/event',
           title: t('活跃告警'),
-        }, {
+        },
+        {
           key: '/history-events',
           title: t('历史告警'),
-        }
-      ]
-    }, {
+        },
+      ],
+    },
+    {
       key: 'job',
       icon: <CodeOutlined />,
       title: t('告警自愈'),
@@ -98,26 +104,32 @@ const SideMenu: FC = () => {
         {
           key: '/job-tpls',
           title: t('自愈脚本'),
-        }, {
+        },
+        {
           key: '/job-tasks',
           title: t('执行历史'),
-        }
-      ]
-    }, {
+        },
+      ],
+    },
+    {
       key: 'manage',
       icon: <UserOutlined />,
       title: t('人员组织'),
-      children: [{
-        key: '/manage/user',
-        title: t('用户管理'),
-      }, {
-        key: '/manage/group',
-        title: t('团队管理'),
-      }, {
-        key: '/manage/business',
-        title: t('业务组管理'),
-      }]
-    }
+      children: [
+        {
+          key: '/manage/user',
+          title: t('用户管理'),
+        },
+        {
+          key: '/manage/group',
+          title: t('团队管理'),
+        },
+        {
+          key: '/manage/business',
+          title: t('业务组管理'),
+        },
+      ],
+    },
   ];
   const history = useHistory();
   const location = useLocation();
@@ -143,7 +155,7 @@ const SideMenu: FC = () => {
     }
   };
   const hideSideMenu = () => location.pathname === '/login' || location.pathname.startsWith('/chart/');
-  
+
   useEffect(() => {
     setSelectedKeys([defaultSelectedKey(menus, pathname)]);
     setOpenKeys(_.union([...openKeys, getDefaultOpenKey(menus, pathname)]));
@@ -157,7 +169,7 @@ const SideMenu: FC = () => {
       }}
     >
       <div className={`home ${collapsed ? 'collapse' : ''}`}>
-        <div className='name' onClick={() => history.push('/overview')} key='overview'>
+        <div className='name' onClick={() => history.push('/metric/explorer')} key='overview'>
           <img src={collapsed ? '/image/logo.svg' : '/image/logo-l.svg'} alt='' className='logo' />
         </div>
       </div>
@@ -168,26 +180,21 @@ const SideMenu: FC = () => {
         inlineCollapsed={collapsed}
         openKeys={openKeys}
         selectedKeys={selectedKeys}
-        onClick={handleClick} mode='inline'
+        onClick={handleClick}
+        mode='inline'
         onOpenChange={(openKeys: string[]) => {
           setOpenKeys(openKeys);
         }}
       >
-        {
-          _.map(menus, (subMenus) => {
-            return (
-              <SubMenu key={subMenus.key} icon={subMenus.icon} title={subMenus.title}>
-                {
-                  _.map(subMenus.children, (menu) => {
-                    return (
-                      <Menu.Item key={menu.key}>{menu.title}</Menu.Item>
-                    )
-                  })
-                }
-              </SubMenu>
-            )
-          })
-        }
+        {_.map(menus, (subMenus) => {
+          return (
+            <SubMenu key={subMenus.key} icon={subMenus.icon} title={subMenus.title}>
+              {_.map(subMenus.children, (menu) => {
+                return <Menu.Item key={menu.key}>{menu.title}</Menu.Item>;
+              })}
+            </SubMenu>
+          );
+        })}
         {/* <SubMenu key='/targets' icon={<DatabaseOutlined />} title={t('监控对象')}>
           <Menu.Item key='/targets'>{t('对象列表')}</Menu.Item>
         </SubMenu>

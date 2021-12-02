@@ -11,8 +11,7 @@ export default function Login() {
   const [form] = Form.useForm();
   const history = useHistory();
   const location = useLocation();
-  const redirect =
-    location.search && new URLSearchParams(location.search).get('redirect');
+  const redirect = location.search && new URLSearchParams(location.search).get('redirect');
   const dispatch = useDispatch();
 
   const handleSubmit = async () => {
@@ -33,7 +32,7 @@ export default function Login() {
     });
 
     if (!err) {
-      history.push(redirect || '/overview');
+      history.push(redirect || '/metric/explorer');
     }
   };
 
@@ -58,10 +57,7 @@ export default function Login() {
                 },
               ]}
             >
-              <Input
-                placeholder={t('请输入用户名')}
-                prefix={<UserOutlined className='site-form-item-icon' />}
-              />
+              <Input placeholder={t('请输入用户名')} prefix={<UserOutlined className='site-form-item-icon' />} />
             </Form.Item>
             <Form.Item
               required
@@ -73,12 +69,7 @@ export default function Login() {
                 },
               ]}
             >
-              <Input
-                type='password'
-                placeholder={t('请输入密码')}
-                onPressEnter={handleSubmit}
-                prefix={<LockOutlined className='site-form-item-icon' />}
-              />
+              <Input type='password' placeholder={t('请输入密码')} onPressEnter={handleSubmit} prefix={<LockOutlined className='site-form-item-icon' />} />
             </Form.Item>
 
             <Form.Item>
