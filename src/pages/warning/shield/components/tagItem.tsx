@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
   Form,
   Input,
-
   Select,
   Col,
   Button,
@@ -10,30 +9,19 @@ import {
   message
 } from 'antd';
 const { Option } = Select;
+const { TextArea } = Input;
 import {
   MinusCircleOutlined,
-  PlusOutlined,
-  PlusCircleOutlined
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import TextArea from '_rc-textarea@0.3.5@rc-textarea';
-
 interface Itag {
   field: any;
   remove: Function;
-  add: Function;
-  fields: any[];
-
-  form: any;
 }
 
 const TagItem: React.FC<Itag> = ({
   field,
   remove,
-  add,
-
-  fields,
-  form,
 }) => {
   const { t } = useTranslation();
   const [valuePlaceholder, setValuePlaceholder] = useState<string>('');

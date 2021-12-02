@@ -245,11 +245,8 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
               {fields.map((field, index) => (
                 <TagItem
                   field={field}
-                  fields={fields}
                   key={index}
                   remove={remove}
-                  add={add}
-                  form={form}
                 />
 
 
