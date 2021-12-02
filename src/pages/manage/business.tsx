@@ -279,7 +279,7 @@ const Resource: React.FC = () => {
                 <InfoCircleOutlined style={{ color: '#1473ff' }} /> {t('提示信息')}
               </p>
               <p>
-                业务组（监控对象、监控大盘、告警规则、自愈脚本都要归属某个业务组）为空，请先
+                业务组（监控对象、监控大盘、告警规则、自愈脚本都要归属某个业务组）为空，请先&nbsp;
                 <a onClick={() => handleClick(ActionType.CreateBusiness)}>创建业务组</a>
               </p>
             </div>
