@@ -2,10 +2,11 @@ import React, { FC, useState, useEffect } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { MenuClickEventHandler } from 'rc-menu/lib/interface';
 import { Menu, Button } from 'antd';
-import { MenuUnfoldOutlined, MenuFoldOutlined, LineChartOutlined, DatabaseOutlined, UserOutlined, CodeOutlined, SettingOutlined } from '@ant-design/icons';
+import Icon, { MenuUnfoldOutlined, MenuFoldOutlined, LineChartOutlined, DatabaseOutlined, UserOutlined, CodeOutlined, SettingOutlined, ContactsOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { dynamicPackages, Entry } from '@/utils';
+import SystemInfoSvg from '../../../public/image/system-info.svg';
 import './menu.less';
 
 const { SubMenu } = Menu;
@@ -130,13 +131,28 @@ const SideMenu: FC = () => {
         },
       ],
     },
+    {
+      key: 'help',
+      icon: <Icon component={SystemInfoSvg as any} />,
+      title: t('系统信息'),
+      children: [
+        {
+          key: '/help/version',
+          title: t('系统版本'),
+        },
+        {
+          key: '/help/contact',
+          title: t('联系我们'),
+        },
+      ],
+    },
   ];
   const history = useHistory();
   const location = useLocation();
   const { pathname } = location;
-  const [selectedKeys, setSelectedKeys] = useState<string[]>([defaultSelectedKey(menus, pathname)]);
-  const [openKeys, setOpenKeys] = useState<string[]>([getDefaultOpenKey(menus, pathname)]);
   const [collapsed, setCollapsed] = useState(localStorage.getItem('menuCollapsed') === '1');
+  const [selectedKeys, setSelectedKeys] = useState<string[]>([defaultSelectedKey(menus, pathname)]);
+  const [openKeys, setOpenKeys] = useState<string[]>(collapsed ? [] : [getDefaultOpenKey(menus, pathname)]);
   const toggleCollapsed = () => {
     setCollapsed(!collapsed);
     localStorage.setItem('menuCollapsed', !collapsed ? '1' : '0');
@@ -158,8 +174,10 @@ const SideMenu: FC = () => {
 
   useEffect(() => {
     setSelectedKeys([defaultSelectedKey(menus, pathname)]);
-    setOpenKeys(_.union([...openKeys, getDefaultOpenKey(menus, pathname)]));
-  }, [pathname]);
+    if (!collapsed) {
+      setOpenKeys(_.union([...openKeys, getDefaultOpenKey(menus, pathname)]));
+    }
+  }, [pathname, collapsed]);
 
   return hideSideMenu() ? null : (
     <div

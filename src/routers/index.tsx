@@ -37,6 +37,8 @@ import Task from '@/pages/task';
 import TaskAdd from '@/pages/task/add';
 import TaskResult from '@/pages/task/result';
 import TaskDetail from '@/pages/task/detail';
+import Version from '@/pages/help/version';
+import Contact from '@/pages/help/contact';
 
 import { dynamicPackages, Entry } from '@/utils';
 
@@ -107,16 +109,19 @@ export default function Content() {
         <Route exact path='/alert-his-events/:busiId/:eventId' component={EventDetail} />
         <Route exact path='/targets' component={MonObjectManage} />
 
-        <Route exact path='/job-tpls' component={TaskTpl as any} />
-        <Route exact path='/job-tpls/add' component={TaskTplAdd as any} />
-        <Route exact path='/job-tpls/add/task' component={TaskAdd as any} />
-        <Route exact path='/job-tpls/:id/detail' component={TaskTplDetail as any} />
-        <Route exact path='/job-tpls/:id/modify' component={TaskTplModify as any} />
-        <Route exact path='/job-tpls/:id/clone' component={TaskTplClone as any} />
-        <Route exact path='/job-tasks' component={Task as any} />
-        <Route exact path='/job-tasks/add' component={TaskAdd as any} />
-        <Route exact path='/job-tasks/:id/result' component={TaskResult as any} />
-        <Route exact path='/job-tasks/:id/detail' component={TaskDetail as any} />
+        <Route exact path='/job-tpls' component={TaskTpl} />
+        <Route exact path='/job-tpls/add' component={TaskTplAdd} />
+        <Route exact path='/job-tpls/add/task' component={TaskAdd} />
+        <Route exact path='/job-tpls/:id/detail' component={TaskTplDetail} />
+        <Route exact path='/job-tpls/:id/modify' component={TaskTplModify} />
+        <Route exact path='/job-tpls/:id/clone' component={TaskTplClone} />
+        <Route exact path='/job-tasks' component={Task} />
+        <Route exact path='/job-tasks/add' component={TaskAdd} />
+        <Route exact path='/job-tasks/:id/result' component={TaskResult} />
+        <Route exact path='/job-tasks/:id/detail' component={TaskDetail} />
+
+        <Route exact path='/help/version' component={Version} />
+        <Route exact path='/help/contact' component={Contact} />
 
         {lazyRoutes.map((route, i) => (
           <RouteWithSubRoutes key={i} {...route} />
