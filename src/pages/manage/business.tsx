@@ -269,7 +269,7 @@ const Resource: React.FC = () => {
               <Table
                 rowKey='id'
                 columns={teamMemberColumns}
-                dataSource={memberList.length > 0 ? memberList.filter((item) => item.user_group.name.indexOf(searchMemberValue) !== -1) : []}
+                dataSource={memberList.length > 0 ? memberList.filter((item) => item.user_group && item.user_group.name.indexOf(searchMemberValue) !== -1) : []}
                 loading={memberLoading}
               />
             </div>

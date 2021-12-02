@@ -64,69 +64,6 @@ const Resource: React.FC = () => {
       render: (text: string, record) => record.phone || '-',
     },
   ];
-  const userColumns: ColumnsType<User> = [
-    ...userColumn,
-    {
-      title: t('角色'),
-      dataIndex: 'roles',
-      render: (text: [], record) => text.join(', '),
-    },
-    // {
-    //   title: t('启用'),
-    //   width: '80px',
-    //   render: (text: string, record) => (
-    //     <Switch
-    //       checked={record.status === 0}
-    //       disabled={!profile.roles.includes('Admin')}
-    //       size='small'
-    //       onChange={() => handleChecked(record.status, record.id)}
-    //     />
-    //   ),
-    // },
-    {
-      title: t('操作'),
-      width: '240px',
-      render: (text: string, record) => (
-        <>
-          <Button className='oper-name' type='link' onClick={() => handleClick(ActionType.EditUser, record.id)}>
-            {t('编辑')}
-          </Button>
-          <Button className='oper-name' type='link' onClick={() => handleClick(ActionType.Reset, record.id)}>
-            {t('重置密码')}
-          </Button>
-          {/* <DelPopover
-         userId={record.id}
-         userType='user'
-         onClose={() => handleClose()}
-        ></DelPopover> */}
-          <a
-            style={{
-              color: 'red',
-              marginLeft: '16px',
-            }}
-            onClick={() => {
-              confirm({
-                title: t('是否删除该用户'),
-                onOk: () => {
-                  deleteUser(record.id).then((_) => {
-                    message.success(t('用户删除成功'));
-                    handleClose();
-                  });
-                },
-                onCancel: () => {},
-              });
-            }}
-          >
-            {t('删除')}
-          </a>
-        </>
-      ),
-    },
-  ];
-
-  if (!profile.roles.includes('Admin')) {
-    userColumns.pop(); //普通用户不展示操作列
-  }
 
   const teamMemberColumns: ColumnsType<User> = [
     ...userColumn,
@@ -155,7 +92,7 @@ const Resource: React.FC = () => {
               onOk: () => {
                 deleteMember(teamId, params).then((_) => {
                   message.success(t('成员删除成功'));
-                  handleClose();
+                  handleClose('update');
                 });
               },
               onCancel: () => {},
@@ -195,7 +132,7 @@ const Resource: React.FC = () => {
       }
       setTotal(data.dat.total);
 
-      if (!teamId || isDelete) {
+      if ((!teamId || isDelete) && data.dat.length > 0) {
         setTeamId(data.dat[0].id);
       }
     });
@@ -252,15 +189,14 @@ const Resource: React.FC = () => {
   };
 
   // 弹窗关闭回调
-  const handleClose = (isDeleteOrAdd = false) => {
+  const handleClose = (isDeleteOrAdd: boolean | string = false) => {
     setVisible(false);
     if (searchValue) {
       handleSearch('team', searchValue);
     } else {
       isDeleteOrAdd === true && getList(isDeleteOrAdd);
     }
-
-    if (teamId) {
+    if (teamId && isDeleteOrAdd === 'update') {
       getTeamInfoDetail(teamId);
     }
   };
@@ -404,7 +340,7 @@ const Resource: React.FC = () => {
                 <InfoCircleOutlined style={{ color: '#1473ff' }} /> {t('提示信息')}
               </p>
               <p>
-                没有与您相关的团队，请先
+                没有与您相关的团队，请先&nbsp;
                 <a onClick={() => handleClick(ActionType.CreateTeam)}>创建团队</a>
               </p>
             </div>
