@@ -83,7 +83,7 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, childr
             <div className={'page-header-title'}>
               {showBack && (
                 <RollbackOutlined
-                  onClick={() => window.history.back()}
+                  onClick={() => history.goBack()}
                   style={{
                     marginRight: '5px',
                   }}
