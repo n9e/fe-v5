@@ -46,7 +46,7 @@ const CreateModal: React.FC<ModalProps> = (props: ModalProps) => {
       if (action === ActionType.CreateUser) {
         createUser(params).then((_) => {
           message.success(t('用户创建成功'));
-          onClose();
+          onClose(true);
         });
       }
 

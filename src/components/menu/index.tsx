@@ -2,10 +2,11 @@ import React, { FC, useState, useEffect } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { MenuClickEventHandler } from 'rc-menu/lib/interface';
 import { Menu, Button } from 'antd';
-import { MenuUnfoldOutlined, MenuFoldOutlined, LineChartOutlined, DatabaseOutlined, UserOutlined, CodeOutlined, SettingOutlined } from '@ant-design/icons';
+import Icon, { MenuUnfoldOutlined, MenuFoldOutlined, LineChartOutlined, DatabaseOutlined, UserOutlined, CodeOutlined, SettingOutlined, ContactsOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { dynamicPackages, Entry } from '@/utils';
+import SystemInfoSvg from '../../../public/image/system-info.svg';
 import './menu.less';
 
 const { SubMenu } = Menu;
@@ -117,16 +118,31 @@ const SideMenu: FC = () => {
       title: t('人员组织'),
       children: [
         {
-          key: '/manage/user',
+          key: '/users',
           title: t('用户管理'),
         },
         {
-          key: '/manage/group',
+          key: '/user-groups',
           title: t('团队管理'),
         },
         {
-          key: '/manage/business',
+          key: '/busi-groups',
           title: t('业务组管理'),
+        },
+      ],
+    },
+    {
+      key: 'help',
+      icon: <Icon component={SystemInfoSvg as any} />,
+      title: t('系统信息'),
+      children: [
+        {
+          key: '/help/version',
+          title: t('系统版本'),
+        },
+        {
+          key: '/help/contact',
+          title: t('联系我们'),
         },
       ],
     },
@@ -134,9 +150,9 @@ const SideMenu: FC = () => {
   const history = useHistory();
   const location = useLocation();
   const { pathname } = location;
-  const [selectedKeys, setSelectedKeys] = useState<string[]>([defaultSelectedKey(menus, pathname)]);
-  const [openKeys, setOpenKeys] = useState<string[]>([getDefaultOpenKey(menus, pathname)]);
   const [collapsed, setCollapsed] = useState(localStorage.getItem('menuCollapsed') === '1');
+  const [selectedKeys, setSelectedKeys] = useState<string[]>([defaultSelectedKey(menus, pathname)]);
+  const [openKeys, setOpenKeys] = useState<string[]>(collapsed ? [] : [getDefaultOpenKey(menus, pathname)]);
   const toggleCollapsed = () => {
     setCollapsed(!collapsed);
     localStorage.setItem('menuCollapsed', !collapsed ? '1' : '0');
@@ -158,8 +174,10 @@ const SideMenu: FC = () => {
 
   useEffect(() => {
     setSelectedKeys([defaultSelectedKey(menus, pathname)]);
-    setOpenKeys(_.union([...openKeys, getDefaultOpenKey(menus, pathname)]));
-  }, [pathname]);
+    if (!collapsed) {
+      setOpenKeys(_.union([...openKeys, getDefaultOpenKey(menus, pathname)]));
+    }
+  }, [pathname, collapsed]);
 
   return hideSideMenu() ? null : (
     <div

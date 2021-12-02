@@ -19,7 +19,8 @@ const commonStore: IStore<CommonStoreState> = {
   },
   effects: {
     *getClusters({}, { put }) {
-      const { dat: data } = yield getCommonClusters();
+      const { dat } = yield getCommonClusters();
+      const data = dat || []
       yield put({
         type: 'saveData',
         prop: 'clusters',
@@ -28,8 +29,8 @@ const commonStore: IStore<CommonStoreState> = {
     },
     *getBusiGroups({ query }, { put, select }) {
       const { curBusiItem } = yield select((state) => state.common);
-      const { dat: data } = yield getBusiGroups(query);
-
+      const { dat } = yield getBusiGroups(query);
+      const data = dat || []
       // 如果业务组列表中不存在当前选中的业务组，则清空
       if (curBusiItem.id && data.every((item) => item.id !== curBusiItem.id)) {
         yield put({
