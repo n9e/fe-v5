@@ -18,7 +18,8 @@ const commonStore: IStore<CommonStoreState> = {
   },
   effects: {
     *getClusters({}, { put }) {
-      const { dat: data } = yield getCommonClusters();
+      const { dat } = yield getCommonClusters();
+      const data = dat || []
       yield put({
         type: 'saveData',
         prop: 'clusters',
@@ -26,7 +27,8 @@ const commonStore: IStore<CommonStoreState> = {
       });
     },
     *getBusiGroups({ query }, { put }) {
-      const { dat: data } = yield getBusiGroups(query);
+      const { dat } = yield getBusiGroups(query);
+      const data = dat || []
       yield put({
         type: 'saveData',
         prop: 'busiGroups',

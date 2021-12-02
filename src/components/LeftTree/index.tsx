@@ -5,7 +5,8 @@ import { RootState } from '@/store/common';
 import { getBusiGroups } from '@/services/common';
 import { CommonStoreState } from '@/store/commonInterface';
 import './index.less';
-import { SearchOutlined } from '@ant-design/icons';
+import { SearchOutlined, SettingOutlined } from '@ant-design/icons';
+import { useHistory } from 'react-router-dom';
 
 const CheckboxGroup = Checkbox.Group;
 const { Search } = Input;
@@ -227,6 +228,7 @@ const busiGroupContent = (busiGroupProps: { showNotGroupItem?: boolean; onChange
 
 // 左侧栏
 const LeftTree: React.FC<LeftTreeProps> = ({ clusterGroup = {}, busiGroup = {}, eventLevelGroup = {}, eventTypeGroup = {} }) => {
+  const history = useHistory();
   const groupItems: IGroupItemProps[] = [
     clustersGroupContent(clusterGroup),
     busiGroupContent(busiGroup),
@@ -270,7 +272,10 @@ const LeftTree: React.FC<LeftTreeProps> = ({ clusterGroup = {}, busiGroup = {}, 
         ({ title, isShow, shrink = false, render }: IGroupItemProps, i) =>
           isShow && (
             <div key={i} className={`left-area-group ${shrink ? 'group-shrink' : ''}`} style={typeof shrink === 'object' ? shrink.style : {}}>
-              <div className='left-area-group-title'>{title}</div>
+              <div className='left-area-group-title'>
+                {title}
+                <SettingOutlined onClick={() => history.push(`/manage/business`)} />
+              </div>
               {render()}
             </div>
           ),

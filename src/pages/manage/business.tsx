@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useSelector } from 'react-redux';
 import { useParams, Link } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 import PageLayout from '@/components/pageLayout';
 import { Button, Table, Input, Switch, message, List, Row, Col, Pagination, Modal } from 'antd';
 import { DeleteTwoTone, EditOutlined, DeleteOutlined, SearchOutlined, UserOutlined, InfoCircleOutlined } from '@ant-design/icons';
@@ -13,18 +13,17 @@ import { ColumnsType } from 'antd/lib/table';
 import '@/components/BlankBusinessPlaceholder/index.less';
 import { useTranslation } from 'react-i18next';
 const { confirm } = Modal;
+import { useQuery } from '@/utils';
 
 export const PAGE_SIZE = 2000;
 
 const Resource: React.FC = () => {
   const { t } = useTranslation();
-  const { type } =
-    useParams<{
-      type: string;
-    }>();
+  const urlQuery = useQuery();
+  const id = urlQuery.get('id');
   const [visible, setVisible] = useState<boolean>(false);
   const [action, setAction] = useState<ActionType>();
-  const [teamId, setTeamId] = useState<string>('');
+  const [teamId, setTeamId] = useState<string>(id || '');
   const [memberId, setMemberId] = useState<string>('');
   const [memberList, setMemberList] = useState<{ user_group: any }[]>([]);
   const [memberTotal, setMemberTotal] = useState<number>(0);
@@ -39,7 +38,7 @@ const Resource: React.FC = () => {
   const [searchMemberValue, setSearchMemberValue] = useState<string>('');
   const userRef = useRef(null as any);
   let { profile } = useSelector<RootState, accountStoreState>((state) => state.account);
-
+  const dispatch = useDispatch();
   const teamMemberColumns: ColumnsType<any> = [
     {
       title: t('团队名称'),
@@ -143,8 +142,10 @@ const Resource: React.FC = () => {
   const handleClose = (isDeleteOrAdd = false) => {
     setVisible(false);
 
-    isDeleteOrAdd === true && getList(isDeleteOrAdd);
-
+    if (isDeleteOrAdd === true) {
+      getList(isDeleteOrAdd);
+      dispatch({ type: 'common/getBusiGroups' });
+    }
     if (teamId && !isDeleteOrAdd) {
       getTeamInfoDetail(teamId);
     }
@@ -190,7 +191,7 @@ const Resource: React.FC = () => {
               dataSource={teamList.filter((i) => i.name.includes(searchValue))}
               size='small'
               renderItem={(item) => (
-                <List.Item key={item.id} className={teamId === item.id ? 'is-active' : ''} onClick={() => setTeamId(item.id)}>
+                <List.Item key={item.id} className={teamId == item.id ? 'is-active' : ''} onClick={() => setTeamId(item.id)}>
                   {item.name}
                 </List.Item>
               )}
