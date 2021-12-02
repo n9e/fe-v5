@@ -126,9 +126,9 @@ export default function Content() {
         {lazyRoutes.map((route, i) => (
           <RouteWithSubRoutes key={i} {...route} />
         ))}
-        {/* <Route path='/' exact>
-          <Redirect to='/overview' />
-        </Route> */}
+        <Route path='/' exact>
+          <Redirect to='/metric/explorer' />
+        </Route>
       </Switch>
     </div>
   );
