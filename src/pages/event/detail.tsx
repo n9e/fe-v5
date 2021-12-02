@@ -26,7 +26,7 @@ const EventDetailPage: React.FC = () => {
           <Button
             size='small'
             type='link'
-            style={{ padding: 0, fontSize: 12, border: 0 }}
+            className='rule-link-btn'
             onClick={() => {
               history.push(`/alert-rules/edit/${rule_id}`);
             }}
@@ -73,18 +73,19 @@ const EventDetailPage: React.FC = () => {
       key: 'prom_ql',
       render(promql) {
         return (
-          <Row>
+          <Row className='promql-row'>
             <Col span={20}>
-              <PromqlEditor xCluster='Default' value={promql} editable={false} style={{ fontSize: 12 }} />
+              <PromqlEditor className='promql-editor' xCluster='Default' value={promql} editable={false} />
             </Col>
             <Col span={4}>
               <Button
+                className='run-btn'
                 type='link'
                 onClick={() => {
                   window.open(`${location.origin}/metric/explorer?promql=${encodeURIComponent(promql)}`);
                 }}
               >
-                <PlayCircleOutlined style={{ fontSize: '14px' }} />
+                <PlayCircleOutlined className='run-con' />
               </Button>
             </Col>
           </Row>
@@ -158,7 +159,7 @@ const EventDetailPage: React.FC = () => {
             className='desc-container'
             title='告警事件详情'
             actions={[
-              <div style={{ display: 'flex', justifyContent: 'flex-start', padding: '0 24px' }}>
+              <div className='action-btns'>
                 <Space>
                   <Button type='primary'>屏蔽</Button>
                   {!isHistory && (

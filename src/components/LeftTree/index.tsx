@@ -325,7 +325,7 @@ const LeftTree: React.FC<LeftTreeProps> = ({ clusterGroup = {}, busiGroup = {}, 
             <div key={i} className={`left-area-group ${shrink ? 'group-shrink' : ''}`} style={typeof shrink === 'object' ? shrink.style : {}}>
               <div className='left-area-group-title'>
                 {title}
-                <SettingOutlined onClick={() => history.push(`/busi-groups`)} />
+                {title === '业务组' && <SettingOutlined onClick={() => history.push(`/busi-groups`)} />}
               </div>
               {render()}
             </div>
