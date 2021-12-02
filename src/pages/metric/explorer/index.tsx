@@ -1,14 +1,12 @@
 import PageLayout from '@/components/pageLayout';
-import { CloseCircleOutlined, LineChartOutlined, PlusOutlined, SearchOutlined, SettingFilled } from '@ant-design/icons';
-import { Button, Input, Modal, Tabs } from 'antd';
+import { LineChartOutlined, PlusOutlined } from '@ant-design/icons';
+import { Button } from 'antd';
 import React, { useEffect, useState } from 'react';
 import './index.less';
 import { generateID } from '@/utils';
 import { getMetrics } from '@/services/warning';
-import { panelDefaultOptions, PanelOptions } from './panel';
 import Panel from './panel';
 
-// type PanelMeta = { id: string; options: PanelOptions };
 type PanelMeta = { id: string; defaultPromQL?: string };
 
 interface PanelListProps {
@@ -33,7 +31,6 @@ const PanelList: React.FC<PanelListProps> = ({ metrics }) => {
       ...panelList,
       {
         id: generateID(),
-        // options: {...panelDefaultOptions},
       },
     ]);
   }
@@ -43,22 +40,10 @@ const PanelList: React.FC<PanelListProps> = ({ metrics }) => {
     setPanelList(panelList.reduce<PanelMeta[]>((acc, panel) => (panel.id !== id ? [...acc, { ...panel }] : acc), []));
   }
 
-  // 内容变更
-  // function onOptionsChanged (id, opts) {
-  //   setPanelList(panelList.map((p) => (id === p.id ? { ...p, options: opts } : p)));
-  // }
-
   return (
     <>
       {panelList.map(({ id, defaultPromQL = '' }) => (
-        <Panel
-          key={id}
-          // options={options}
-          // onOptionsChanged={(opts) => onOptionsChanged(id, opts)}
-          metrics={metrics}
-          defaultPromQL={defaultPromQL}
-          removePanel={() => removePanel(id)}
-        />
+        <Panel key={id} metrics={metrics} defaultPromQL={defaultPromQL} removePanel={() => removePanel(id)} />
       ))}
       <div className='add-prometheus-panel'>
         <Button size='large' onClick={addPanel}>
