@@ -1,3 +1,5 @@
+import { RelativeRange } from '@/components/DateRangePicker';
+
 export enum warningPriority {
   First = 1,
   Second = 2,
@@ -52,4 +54,12 @@ export type warningEventItem = {
 
 export interface eventStoreState {
   currentEdit: warningEventItem | null;
+  alertings: { ['index']?: number };
+  severity: number | undefined;
+  hourRange: RelativeRange;
+  queryContent: string;
+  hisSeverity: number | undefined;
+  hisEventType: 0 | 1 | undefined;
+  hisHourRange: RelativeRange;
+  hisQueryContent: string;
 }
