@@ -107,9 +107,10 @@ export const getChartGroup = function (busiId: string, id: string) {
 };
 
 // 删除分组
-export const delChartGroup = function (id: number) {
-  return request(`/api/n9e/chart-group/${id}`, {
+export const delChartGroup = function (busiId: string, id: number) {
+  return request(`/api/n9e/busi-group/${busiId}/chart-groups`, {
     method: RequestMethod.Delete,
+    data:{ids:[id]}
   });
 };
 

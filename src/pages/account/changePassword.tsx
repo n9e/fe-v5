@@ -60,6 +60,15 @@ export default function ChangePassword() {
             required: true,
             message: t('再次输入新密码'),
           },
+          ({ getFieldValue }) => ({
+            validator(_, value) {
+              if (!value || getFieldValue('newpass') === value) {
+                return Promise.resolve();
+              }
+
+              return Promise.reject(new Error('密码不一致!'));
+            },
+          }),
         ]}
       >
         <Input placeholder={t('再次输入新密码')} type='password' />

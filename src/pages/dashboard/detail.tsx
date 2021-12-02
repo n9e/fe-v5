@@ -167,7 +167,7 @@ export default function DashboardDetail() {
   };
 
   const handleDelChartGroup = async (id: number) => {
-    await delChartGroup(id);
+    await delChartGroup(busiId, id);
     message.success(t('删除分组成功'));
     init();
     setGroupModalVisible(false);

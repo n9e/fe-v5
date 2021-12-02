@@ -14,17 +14,17 @@ const Strategy: React.FC = () => {
 
   const clusterChange = (data) => {
     setClusters(data);
-  }
+  };
   const busiChange = (data) => {
     setBgid(data);
-  }
+  };
   return (
     <PageLayout title={t('告警规则')} icon={<SettingOutlined />}>
       <div className='strategy-content'>
         <LeftTree
           clusterGroup={{
             isShow: true,
-            onChange: clusterChange
+            onChange: clusterChange,
           }}
           busiGroup={{
             // showNotGroupItem: true,
