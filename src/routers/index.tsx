@@ -23,7 +23,6 @@ import AddShield from '@/pages/warning/shield/add';
 import ShieldDetail from '@/pages/warning/shield/detail';
 import Event from '@/pages/event';
 import EventDetail from '@/pages/event/detail';
-import Overview from '@/pages/overview';
 import historyEvents from '@/pages/historyEvents';
 import MonObjectManage from '@/pages/monObjectManage';
 import Demo from '@/pages/demo';
@@ -72,7 +71,6 @@ export default function Content() {
       <Switch>
         <Route path='/demo' component={Demo} />
         <Route path='/login' component={Login} exact />
-        <Route exact path='/overview' component={Overview} />
         <Route path='/metric/explorer' component={Explore} exact />
         <Route path='/object/explorer' component={ObjectExplore} exact />
         <Route path='/account/profile/:tab' component={Profile} />
