@@ -1,16 +1,18 @@
-import { AreaChartOutlined, CloseCircleOutlined, DownOutlined, LineChartOutlined, SettingOutlined } from '@ant-design/icons';
-import { Tabs, List, DatePicker, Radio, Button, Checkbox, Select, Alert, Dropdown, Menu, Popover } from 'antd';
+import { AreaChartOutlined, CloseCircleOutlined, LineChartOutlined } from '@ant-design/icons';
+import { Tabs, List, DatePicker, Radio, Alert } from 'antd';
 import moment, { Moment } from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import ExpressionInput from './expressionInput';
 import { prometheusAPI } from '@/services/metric';
-import DateRangePicker, { formatPickerDate } from '@/components/DateRangePicker';
+import DateRangePicker, { isAbsoluteRange } from '@/components/DateRangePicker';
 import Resolution from '@/components/Resolution';
 import { Range, RelativeRange, AbsoluteRange } from '@/components/DateRangePicker';
 import Graph from '@/components/Graph';
-import { ErrorInfoType, HighLevelConfigType } from '@/components/Graph/Graph';
+import { ErrorInfoType } from '@/components/Graph/Graph';
 import { ChartType } from '@/components/D3Charts/src/interface';
 import QueryStatsView, { QueryStats } from './QueryStatsView';
+import { useTranslation } from 'react-i18next';
+import _ from 'lodash';
 
 interface PanelProps {
   metrics: string[];
@@ -19,9 +21,8 @@ interface PanelProps {
 }
 
 export interface PanelOptions {
-  expr: string;
   type: PanelType;
-  range: number; // 单位为毫秒
+  range: Range; // 单位为毫秒
   endTime: number | null; // 单位为毫秒
   resolution: number | null;
   stacked: boolean;
@@ -47,17 +48,6 @@ interface VectorDataType {
 }
 
 const { TabPane } = Tabs;
-const { Option } = Select;
-
-export const panelDefaultOptions: PanelOptions = {
-  type: PanelType.Table,
-  expr: '',
-  range: 60 * 60 * 1000,
-  endTime: null,
-  resolution: null,
-  stacked: false,
-  showExemplars: false,
-};
 
 // 格式化 Table 列表数据
 function getListItemContent(metrics) {
@@ -80,7 +70,9 @@ function getListItemContent(metrics) {
 }
 
 const Panel: React.FC<PanelProps> = ({ metrics, defaultPromQL, removePanel }) => {
+  const { t } = useTranslation();
   const curPanelTab = useRef<PanelType>(PanelType.Table);
+  const graphRef = useRef(null);
   const inputValue = useRef(defaultPromQL);
   const lastEndTime = useRef<number | null>(null);
   const abortInFlightFetch = useRef<(() => void) | null>(null);
@@ -88,28 +80,18 @@ const Panel: React.FC<PanelProps> = ({ metrics, defaultPromQL, removePanel }) =>
   // 公共状态
   const [queryStats, setQueryStats] = useState<QueryStats | null>(null);
   const [chartType, setChartType] = useState<ChartType>(ChartType.Line);
-  const [optionsRecord, setOptionsRecord] = useState<PanelOptions>(panelDefaultOptions);
+  const [optionsRecord, setOptionsRecord] = useState<PanelOptions>({
+    type: PanelType.Table,
+    range: { num: 1, unit: 'hour', description: t('小时') },
+    endTime: null,
+    resolution: null,
+    stacked: false,
+    showExemplars: false,
+  });
   const [errorContent, setErrorContent] = useState<string>('');
   // Table 相关状态
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [vectorData, setVectorData] = useState<VectorDataType | null>(null);
-  // Graph 相关状态
-  const [dateRangePickerValue, setDateRangePickerValue] = useState<Range>({ num: 1, unit: 'hour', description: 'hour' });
-  const [isMultiSeries, setIsMultiSeries] = useState<boolean>(true);
-  const [seriesOrderType, setSeriesOrderType] = useState<'desc' | 'asc'>('desc');
-  const [showLegend, setShowLegend] = useState<boolean>(true);
-  const [precision, setPrecision] = useState<'short' | 'origin'>('short');
-  const [formatUnit, setFormatUnit] = useState<1024 | 1000>(1024);
-  const [highLevelConfig, setHighLevelConfig] = useState<HighLevelConfigType>({
-    shared: true,
-    sharedSortDirection: 'desc',
-    precision: 'short',
-    formatUnit: 1024,
-  });
-  const [graphRangeData, setGraphRangeData] = useState({
-    start: (getEndTime() - optionsRecord.range) / 1000,
-    end: getEndTime() / 1000,
-  });
 
   // 更新输入框表达式内容
   function handleExpressionChange(value: string) {
@@ -121,11 +103,13 @@ const Panel: React.FC<PanelProps> = ({ metrics, defaultPromQL, removePanel }) =>
       // 同步 Table 页时间戳和 Graph 时间选择组件的时间
       if (type === PanelType.Graph && lastEndTime.current !== optionsRecord.endTime) {
         if (optionsRecord.endTime === null) {
-          setDateRangePickerValue({ num: 1, unit: 'hour', description: 'hour' });
+          setOptions({ range: { num: 1, unit: 'hour', description: 'hour' } });
         } else {
-          setDateRangePickerValue({
-            start: optionsRecord.endTime - 60 * 60 * 1000,
-            end: optionsRecord.endTime,
+          setOptions({
+            range: {
+              start: optionsRecord.endTime - 60 * 60,
+              end: optionsRecord.endTime,
+            },
           });
         }
       } else {
@@ -140,94 +124,28 @@ const Panel: React.FC<PanelProps> = ({ metrics, defaultPromQL, removePanel }) =>
 
   // 获取请求的结束时间戳
   function getEndTime(endTime = optionsRecord.endTime): number {
-    return endTime === null ? moment().valueOf() : endTime;
+    return endTime === null ? moment().unix() : endTime;
   }
 
   // 更新时间戳
   function handleTimestampChange(endTime: Moment | null): void {
-    setOptions({ endTime: endTime ? endTime?.valueOf() : null });
+    setOptions({ endTime: endTime ? endTime?.unix() : null });
   }
 
   function setOptions(opts: Partial<PanelOptions>): void {
-    let newOptionsRecord = { ...optionsRecord, ...opts };
-    setOptionsRecord((optionsRecord) => {
-      newOptionsRecord = { ...optionsRecord, ...opts };
-      return newOptionsRecord;
-    });
-    setGraphRangeData({
-      start: (getEndTime(newOptionsRecord.endTime) - newOptionsRecord.range) / 1000,
-      end: getEndTime(newOptionsRecord.endTime) / 1000,
-    });
+    setOptionsRecord((optionsRecord) => ({ ...optionsRecord, ...opts }));
   }
 
-  // 渲染图表设置内容
-  // function renderGraphSettingContent() {
-  //   const updateHighLevelConfig = (newState) => setHighLevelConfig((state) => ({ ...state, ...newState }));
-
-  //   const precisionMenu = (
-  //     <Menu onClick={(precision) => updateHighLevelConfig({ formatUnit: Number(precision.key) as 1024 | 1000 })} selectedKeys={[String(highLevelConfig.formatUnit)]}>
-  //       <Menu.Item key={'1024'}>1024</Menu.Item>
-  //       <Menu.Item key={'1000'}>1000</Menu.Item>
-  //     </Menu>
-  //   );
-
-  //   return (
-  //     <div>
-  //       {/* 多选和排序 */}
-  //       <Checkbox checked={highLevelConfig.shared} onChange={(e) => updateHighLevelConfig({ shared: e.target.checked })}>
-  //         Multi Series in Tooltip, order value
-  //       </Checkbox>
-  //       <Dropdown
-  //         overlay={
-  //           <Menu onClick={(sort) => updateHighLevelConfig({ sharedSortDirection: sort.key as 'desc' | 'asc' })} selectedKeys={[highLevelConfig.sharedSortDirection]}>
-  //             <Menu.Item key='desc'>desc</Menu.Item>
-  //             <Menu.Item key='asc'>asc</Menu.Item>
-  //           </Menu>
-  //         }
-  //       >
-  //         <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
-  //           {highLevelConfig.sharedSortDirection} <DownOutlined />
-  //         </a>
-  //       </Dropdown>
-  //       <br />
-  //       {/* 是否展示 legend */}
-  //       <Checkbox checked={showLegend} onChange={(e) => setShowLegend(e.target.checked)}>
-  //         Show Legend
-  //       </Checkbox>
-  //       <br />
-  //       {/* 格式化 */}
-  //       <Checkbox checked={highLevelConfig.precision === 'short'} onChange={(e) => updateHighLevelConfig({ precision: e.target.checked ? 'short' : 'origin' })}>
-  //         Value format with: Ki, Mi, Gi by
-  //       </Checkbox>
-  //       <Dropdown overlay={precisionMenu}>
-  //         <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
-  //           {highLevelConfig.formatUnit} <DownOutlined />
-  //         </a>
-  //       </Dropdown>
-  //       <br />
-  //     </div>
-  //   );
-  // }
-
   // 图表选中时间改变，触发更新
-  function handleGraphDateChange(e: Range) {
-    const { start, end } = formatPickerDate(e);
-    const endTime = e.hasOwnProperty('unit') ? null : end;
-    const range = e.hasOwnProperty('unit') ? (end - start) * 1000 : end - start;
-    if (endTime !== optionsRecord.endTime || range !== optionsRecord.range) {
-      executeQuery(true, {
+  function handleGraphDateChange(range: Range) {
+    const prevRange = optionsRecord.range;
+    if (isAbsoluteRange(range) ? !_.isEqual(prevRange, range) : range.num !== (prevRange as RelativeRange).num || range.unit !== (prevRange as RelativeRange).unit) {
+      const endTime = range.hasOwnProperty('unit') ? null : (range as AbsoluteRange).end;
+      setOptions({
         endTime,
         range,
       });
     }
-  }
-
-  // 更新图表请求的范围参数
-  function refreshGraphRangeData() {
-    setGraphRangeData({
-      start: (getEndTime() - optionsRecord.range) / 1000,
-      end: getEndTime() / 1000,
-    });
   }
 
   // 图表请求完成，回填请求信息
@@ -237,15 +155,15 @@ const Panel: React.FC<PanelProps> = ({ metrics, defaultPromQL, removePanel }) =>
     }
   }
 
-  // 该函数传入输入框组件，只被初始化一次，注意产生的 props 和 state 不同步问题
-  function executeQuery(isExecute: boolean = true, grpahExtraData = {}) {
+  // 该函数传入输入框组件，注意产生的 props 和 state 不同步问题
+  function executeQuery(isExecute: boolean = true) {
     const expr = inputValue.current;
     if (!isExecute || expr === '') return;
 
-    // 图标模式下直接调用图表组件的刷新方法
+    // 模式下直接调用图表组件的刷新方法
     if (curPanelTab.current === PanelType.Graph) {
       setQueryStats(null);
-      setOptions(Object.assign({ expr }, grpahExtraData));
+      graphRef.current && (graphRef.current as any).refresh();
       return;
     }
     // 存储查询历史
@@ -269,7 +187,7 @@ const Panel: React.FC<PanelProps> = ({ metrics, defaultPromQL, removePanel }) =>
     const queryStart = Date.now();
 
     // 初始化参数
-    const endTime = getEndTime() / 1000;
+    const endTime = getEndTime();
     const params: URLSearchParams = new URLSearchParams({
       query: expr,
     });
@@ -348,7 +266,7 @@ const Panel: React.FC<PanelProps> = ({ metrics, defaultPromQL, removePanel }) =>
               showTime
               showNow={false}
               disabledDate={(current) => current > moment()}
-              value={optionsRecord.endTime ? moment(optionsRecord.endTime) : null}
+              value={optionsRecord.endTime ? moment(optionsRecord.endTime * 1000) : null}
               onChange={handleTimestampChange}
             />
           </div>
@@ -372,7 +290,7 @@ const Panel: React.FC<PanelProps> = ({ metrics, defaultPromQL, removePanel }) =>
           {/* 操作栏 */}
           <div className='graph-operate-box'>
             <div className='left'>
-              <DateRangePicker placement='bottomRight' value={dateRangePickerValue} unit='ms' onChange={handleGraphDateChange} />
+              <DateRangePicker placement='bottomRight' value={optionsRecord.range} onChange={handleGraphDateChange} />
               <Resolution onChange={(v: number) => setOptions({ resolution: v })} initialValue={optionsRecord.resolution} />
               <Radio.Group
                 options={[
@@ -382,35 +300,26 @@ const Panel: React.FC<PanelProps> = ({ metrics, defaultPromQL, removePanel }) =>
                 onChange={(e) => {
                   e.preventDefault();
                   setChartType(e.target.value);
-                  refreshGraphRangeData();
                 }}
                 value={chartType}
                 optionType='button'
                 buttonStyle='solid'
               />
             </div>
-            {/* <div className='right'>
-              <Popover placement='left' content={renderGraphSettingContent} trigger='click'>
-                <Button type='link' size='small' onClick={(e) => e.preventDefault()}>
-                  <SettingOutlined />
-                </Button>
-              </Popover>
-            </div> */}
           </div>
           {/* 图 */}
           <div>
             {optionsRecord.type === PanelType.Graph && (
               <Graph
+                ref={graphRef}
                 showHeader={true}
                 isShowRefresh={false}
                 data={{
                   step: optionsRecord.resolution,
-                  range: graphRangeData,
+                  range: optionsRecord.range,
                   promqls: [inputValue],
                   chartType: chartType,
-                  // legend: showLegend,
                 }}
-                // highLevelConfig={highLevelConfig}
                 onErrorOccured={onErrorOccured}
                 onRequestCompleted={onGraphRequestCompleted}
               />
