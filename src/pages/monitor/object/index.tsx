@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { Button, InputNumber, Layout, Row, Col, Checkbox, Popover, Select } from 'antd';
 import { LineChartOutlined, SyncOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import PageLayout from '@/components/pageLayout';
@@ -17,10 +17,25 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
 
+export interface Host {
+  id: number;
+  ident: string;
+  tags: string;
+  note: string;
+}
+
+function usePrevious(value) {
+  const ref = useRef();
+  useEffect(() => {
+    ref.current = value;
+  });
+  return ref.current || [];
+}
 export default () => {
   const { t, i18n } = useTranslation();
   const [hosts, setHosts] = useState([]);
   const [selectedHosts, setSelectedHosts] = useState([]);
+  const previousSelectedHosts: Array<Host> = usePrevious(selectedHosts);
   const { busiGroups, curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const [busiGroup, setBusiGroup] = useState(curBusiItem)
   const [metrics, setMetrics] = useState([]);
@@ -38,20 +53,28 @@ export default () => {
       query: queryHost,
       clusters: cluster
     }
-    return getHosts(transportData).then((res) => {
-      const allHosts = res?.dat?.list || [];
-      setHosts(allHosts);
-      return allHosts
-    });
+    return getHosts(transportData);
   }
 
   useEffect(() => {
-    getHostsRequest().then(allHosts => {
+    getHostsRequest().then(res => {
+      const allHosts = res?.dat?.list || [];
+      setHosts(allHosts);
       if (getHostsTimes > 0) return
       setGetHostsTimes(getHostsTimes + 1)
       getMetricsAndDesc(allHosts.slice(0, 10));
     })
   }, [busiGroup, queryHost, curCluster]);
+  useEffect(() => {
+    const isPreviousHaveSelectedHosts = previousSelectedHosts && previousSelectedHosts.length > 0
+    const isPreviousDontHaveSelectedHosts = !previousSelectedHosts || previousSelectedHosts.length === 0
+    // 原来有选中的hosts，后来用户全部取消，右侧的metrics要清空
+    if (isPreviousHaveSelectedHosts && selectedHosts.length === 0) {
+      setMetrics([])
+    } else if (isPreviousDontHaveSelectedHosts && selectedHosts.length > 0) {
+      getMetricsAndDesc(selectedHosts)
+    }
+  }, [selectedHosts])
   const getMetricsAndDesc = (hosts) => {
     const showHosts = hosts || selectedHosts
     if (showHosts.length === 0) return
@@ -176,7 +199,6 @@ export default () => {
                 return [
                   <Button type='link' danger size='small' onClick={(e) => e.preventDefault()}>
                     <CloseCircleOutlined onClick={_ => {
-                      console.log('graphs', graphs)
                       const newGraphs = [...graphs]
                       newGraphs.splice(i, 1)
                       setGraphs(newGraphs)
