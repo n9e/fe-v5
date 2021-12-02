@@ -1,12 +1,35 @@
 @import '@/global.variable.less';
 
 .event-content {
+  display: flex;
   padding: @basePadding;
-  overflow-x: auto;
   box-sizing: border-box;
   width: 100%;
-  .ant-spin-nested-loading {
-    padding: 0 10px 10px;
+  // .ant-spin-nested-loading {
+  //   padding: 0 10px 10px;
+  // }
+  .table-area {
+    width: calc(100% - 276px);
+    padding: 16px;
+    .event-tags {
+      .ant-tag {
+        cursor: pointer;
+      }
+    }
+  }
+  .table-operate-box {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    .left {
+      flex: 1;
+      display: flex;
+      padding-right: 10px;
+      .search-input {
+        max-width: 300px;
+        margin-left: 10px;
+      }
+    }
   }
 }
 

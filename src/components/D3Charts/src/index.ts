@@ -32,7 +32,7 @@ export default class TsGraph {
   transform!: Transform;
   constructor(userOptions: Options) {
     const defaultOptions = {
-      charType: ChartType.Line,
+      chartType: ChartType.Line,
       ratio: window.devicePixelRatio || 1,
       xkey: 0,
       ykey: 1,

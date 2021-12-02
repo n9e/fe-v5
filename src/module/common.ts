@@ -4,6 +4,7 @@ import { getBusiGroups, getCommonClusters } from '@/services/common';
 
 const initData: CommonStoreState = {
   clusters: [],
+  curClusterItems: JSON.parse(localStorage.getItem('curClusterItems') || '[]'),
   busiGroups: [],
   curBusiItem: JSON.parse(localStorage.getItem('curBusiItem') || '{}'),
 };
@@ -25,22 +26,25 @@ const commonStore: IStore<CommonStoreState> = {
         data,
       });
     },
-    *getBusiGroups({ query }, { put }) {
+    *getBusiGroups({ query }, { put, select }) {
+      const { curBusiItem } = yield select((state) => state.common);
       const { dat: data } = yield getBusiGroups(query);
+
+      // 如果业务组列表中不存在当前选中的业务组，则清空
+      if (curBusiItem.id && data.every((item) => item.id !== curBusiItem.id)) {
+        yield put({
+          type: 'saveData',
+          prop: 'curBusiItem',
+          data: {},
+        });
+        localStorage.setItem('curBusiItem', '{}');
+      }
+
       yield put({
         type: 'saveData',
         prop: 'busiGroups',
         data,
       });
-      // 初始化选中第一项业务组
-      if (!localStorage.getItem('curBusiItem') && data.length > 0) {
-        localStorage.setItem('curBusiItem', JSON.stringify(data[0]))
-        yield put({
-          type: 'saveData',
-          prop: 'curBusiItem',
-          data: data[0],
-        });
-      }
     },
   },
 };
