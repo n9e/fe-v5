@@ -16,6 +16,7 @@ import { subscribeItem } from '@/store/warningInterface/subscribe';
 import ColorTag from '@/components/ColorTag';
 import LeftTree from '@/components/LeftTree';
 import RefreshIcon from '@/components/RefreshIcon';
+import BlankBusinessPlaceholder from '@/components/BlankBusinessPlaceholder';
 import { pageSizeOptionsDefault } from '../const';
 import './index.less';
 import { useTranslation } from 'react-i18next';
@@ -224,7 +225,8 @@ const Shield: React.FC = () => {
             onChange: busiChange,
           }}
         ></LeftTree>
-        <div className='shield-index'>
+        {curBusiItem?.id ? (
+          <div className='shield-index'>
 
           <div className='header'>
             <div className='header-left'>
@@ -255,7 +257,6 @@ const Shield: React.FC = () => {
           </div>
           <Table
             rowKey="id"
-            // sticky
             pagination={{
               total: currentShieldData.length,
               showQuickJumper: true,
@@ -268,11 +269,14 @@ const Shield: React.FC = () => {
             }}
             loading={loading}
             dataSource={currentShieldData}
-
             columns={columns}
           />
           
         </div>
+        ) : (
+          <BlankBusinessPlaceholder text='订阅规则'/>
+        )}
+        
       </div>
 
     </PageLayout>

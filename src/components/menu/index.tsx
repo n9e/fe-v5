@@ -80,11 +80,11 @@ const SideMenu: FC = () => {
           title: t('告警规则'),
         },
         {
-          key: '/shield',
+          key: '/alert-mutes',
           title: t('屏蔽规则'),
         },
         {
-          key: '/shield-1',
+          key: '/alert-subscribes',
           title: t('订阅规则'),
         },
         {

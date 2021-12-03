@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import PageLayout from '@/components/pageLayout';
 import LeftTree from '@/components/LeftTree';
+import BlankBusinessPlaceholder from '@/components/BlankBusinessPlaceholder';
 import PageTable from './PageTable';
-
-import '../index.less';
 import { SettingOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
+import '../index.less';
 
 const Strategy: React.FC = () => {
   const { t } = useTranslation();
@@ -27,11 +27,15 @@ const Strategy: React.FC = () => {
             onChange: clusterChange,
           }}
           busiGroup={{
-            // showNotGroupItem: true,
             onChange: busiChange,
           }}
         ></LeftTree>
-        <PageTable bgid={bgid} clusters={clusters}></PageTable>
+        {bgid ? (
+          <PageTable bgid={bgid} clusters={clusters}></PageTable>
+        ) : (
+          <BlankBusinessPlaceholder text='告警规则'/>
+        )}
+        
       </div>
     </PageLayout>
   );

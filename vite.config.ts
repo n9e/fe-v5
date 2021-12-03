@@ -79,6 +79,7 @@ export default defineConfig({
   },
   build: {
     outDir: 'pub',
+    chunkSizeWarningLimit: 3000
   },
   css: {
     preprocessorOptions: {

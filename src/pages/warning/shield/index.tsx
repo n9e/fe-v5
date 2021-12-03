@@ -14,9 +14,9 @@ import { CommonStoreState } from '@/store/commonInterface';
 import { shieldItem } from '@/store/warningInterface';
 import { ColumnsType } from 'antd/lib/table';
 import dayjs from 'dayjs';
-import ColorTag from '@/components/ColorTag';
 import LeftTree from '@/components/LeftTree';
 import RefreshIcon from '@/components/RefreshIcon';
+import BlankBusinessPlaceholder from '@/components/BlankBusinessPlaceholder';
 import { pageSizeOptionsDefault } from '../const';
 import './index.less';
 import { useTranslation } from 'react-i18next';
@@ -232,7 +232,9 @@ const Shield: React.FC = () => {
             onChange: busiChange,
           }}
         ></LeftTree>
-        <div className='shield-index'>
+        {curBusiItem?.id ? 
+        (
+          <div className='shield-index'>
 
           <div className='header'>
             <div className='header-left'>
@@ -280,6 +282,11 @@ const Shield: React.FC = () => {
             columns={columns}
           />
         </div>
+        ) : 
+        (
+          <BlankBusinessPlaceholder text='屏蔽规则'/>
+        )}
+        
       </div>
 
     </PageLayout>
