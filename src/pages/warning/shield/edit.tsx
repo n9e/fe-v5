@@ -39,7 +39,7 @@ const EditShield: React.FC = () => {
   //   setCurShield(dat || {})
   // }
   return (
-    <PageLayout title={t('告警屏蔽')} showBack>
+    <PageLayout title={t('告警屏蔽')} showBack hideCluster>
       <div className='shield-add'>
         {curShieldData.id && <OperateForm  detail={curShieldData} type={!isClone ? 1 : 2}/>}
       </div>

@@ -95,7 +95,7 @@ export default function Content() {
         <Route path='/account/profile/:tab' component={Profile} />
 
         <Route path='/dashboard/:busiId/:id' component={DashboardDetail} />
-        <Route path='/dashboard' component={Dashboard} />
+        <Route path='/dashboards' component={Dashboard} />
         <Route path='/chart/:ids' component={Chart} />
         <Route path='/resource/:id?' component={ResourcePage} />
         <Route path='/indicator' component={IndicatorPage} />

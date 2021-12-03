@@ -19,7 +19,7 @@ const Strategy: React.FC = () => {
     setBgid(data);
   };
   return (
-    <PageLayout title={t('告警规则')} icon={<SettingOutlined />}>
+    <PageLayout title={t('告警规则')} icon={<SettingOutlined />} hideCluster>
       <div className='strategy-content'>
         <LeftTree
           clusterGroup={{

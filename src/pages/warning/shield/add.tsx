@@ -9,9 +9,9 @@ const AddShield: React.FC = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const [tags, setTags] = useState<any>(location.state);
-  
+
   return (
-    <PageLayout title={t('告警屏蔽')} showBack>
+    <PageLayout title={t('告警屏蔽')} showBack hideCluster>
       <div className='shield-add'>
         <OperateForm tagsObj={tags ? tags : undefined}/>
       </div>

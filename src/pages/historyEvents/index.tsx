@@ -192,7 +192,7 @@ const Event: React.FC = () => {
   }, [curClusterItems, hisSeverity, hisHourRange, hisEventType]);
 
   return (
-    <PageLayout icon={<AlertOutlined />} title={t('历史告警')}>
+    <PageLayout icon={<AlertOutlined />} title={t('历史告警')} hideCluster>
       <div className='event-content'>
         <LeftTree
           clusterGroup={{

@@ -267,7 +267,7 @@ const Event: React.FC = () => {
   }, [busiGroups]);
 
   return (
-    <PageLayout icon={<AlertOutlined />} title={t('活跃告警')}>
+    <PageLayout icon={<AlertOutlined />} title={t('活跃告警')} hideCluster>
       <div className='event-content'>
         <LeftTree
           clusterGroup={{
