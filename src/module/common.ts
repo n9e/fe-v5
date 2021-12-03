@@ -18,9 +18,19 @@ const commonStore: IStore<CommonStoreState> = {
     },
   },
   effects: {
-    *getClusters({}, { put }) {
+    *getClusters({}, { put, select }) {
+      const { curClusterItems } = yield select((state) => state.common);
       const { dat } = yield getCommonClusters();
-      const data = dat || []
+      const data = dat || [];
+      // 筛选去除当前选中集群列表中不存在的集群
+      const filteredClusterItems = curClusterItems.filter((item: string) => data.includes(item));
+      yield put({
+        type: 'saveData',
+        prop: 'curClusterItems',
+        data: filteredClusterItems,
+      });
+      localStorage.setItem('curClusterItems', JSON.stringify(filteredClusterItems));
+
       yield put({
         type: 'saveData',
         prop: 'clusters',
@@ -30,7 +40,7 @@ const commonStore: IStore<CommonStoreState> = {
     *getBusiGroups({ query }, { put, select }) {
       const { curBusiItem } = yield select((state) => state.common);
       const { dat } = yield getBusiGroups(query);
-      const data = dat || []
+      const data = dat || [];
       // 如果业务组列表中不存在当前选中的业务组，则清空
       if (curBusiItem.id && data.every((item) => item.id !== curBusiItem.id)) {
         yield put({
@@ -38,7 +48,7 @@ const commonStore: IStore<CommonStoreState> = {
           prop: 'curBusiItem',
           data: {},
         });
-        localStorage.setItem('curBusiItem', '{}');
+        localStorage.removeItem('curBusiItem');
       }
 
       yield put({

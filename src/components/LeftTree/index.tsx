@@ -69,7 +69,7 @@ export const SelectList: React.FC<SelectListProps> = ({ dataSource, fieldNames =
             const key = item[fieldNames.key || 'value'];
             const value = item[fieldNames.value || 'value'];
             return (
-              <Row>
+              <Row key={key}>
                 <Col span={showBadge ? 20 : 24}>
                   <Radio
                     className='radio-list-group-item'
@@ -128,17 +128,14 @@ const clustersGroupContent = (clusterGroup: groupProps): IGroupItemProps => {
     setCheckAll(e.target.checked);
   };
 
-  // 初始化后抛出默认选择项
-  useEffect(() => {
-    if (clusterGroup.onChange) {
-      clusterGroup.onChange(curClusterItems);
-    }
-  }, []);
-
-  // 同步全选状态
+  // 获取到集群列表数据后抛出默认选择项并同步全选状态
   useEffect(() => {
     setCheckAll(clusters.length === curClusterItems.length);
     setIndeterminate(!!curClusterItems.length && curClusterItems.length < clusters.length);
+
+    if (clusters.length && clusterGroup.onChange) {
+      clusterGroup.onChange(curClusterItems);
+    }
   }, [clusters]);
 
   return {
@@ -196,17 +193,13 @@ const busiGroupContent = (busiGroupProps: BusiGroupProps): IGroupItemProps => {
   // 初始化选中项
   const initCurBusiItem = useMemo(() => (curBusiItem.id ? curBusiItem : { id: undefined }), [curBusiItem]);
 
-  // 初始化后抛出默认选择项
-  useEffect(() => {
-    if (busiGroupProps.onChange) {
-      busiGroupProps.onChange(initCurBusiItem.id, initCurBusiItem);
-    }
-  }, [initCurBusiItem]);
-
-  // 初始化展示所有业务组
+  // 初始化展示所有业务组并抛出默认选择项
   useEffect(() => {
     if (!filteredBusiGroups.length) {
       setFilteredBusiGroups(busiGroups);
+    }
+    if (busiGroups.length && busiGroupProps.onChange) {
+      busiGroupProps.onChange(initCurBusiItem.id, initCurBusiItem);
     }
   }, [busiGroups]);
 
