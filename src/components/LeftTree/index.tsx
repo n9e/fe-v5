@@ -181,7 +181,7 @@ const busiGroupContent = (busiGroupProps: BusiGroupProps): IGroupItemProps => {
   const { alertings } = useSelector<RootState, eventStoreState>((state) => state.event);
   const [filteredBusiGroups, setFilteredBusiGroups] = useState(busiGroups);
   const showNotGroupItem = busiGroupProps.showNotGroupItem;
-  // 初始化选中第一条业务组
+  // 初始化，当不展示 [未归组对象] 时，选中第一条业务组
   if (!localStorage.getItem('curBusiItem') && !showNotGroupItem && busiGroups.length > 0) {
     localStorage.setItem('curBusiItem', JSON.stringify(busiGroups[0]));
     dispatch({
@@ -193,15 +193,19 @@ const busiGroupContent = (busiGroupProps: BusiGroupProps): IGroupItemProps => {
   // 初始化选中项
   const initCurBusiItem = useMemo(() => (curBusiItem.id ? curBusiItem : { id: undefined }), [curBusiItem]);
 
-  // 初始化展示所有业务组并抛出默认选择项
+  // 初始化展示所有业务组
   useEffect(() => {
     if (!filteredBusiGroups.length) {
       setFilteredBusiGroups(busiGroups);
     }
-    if (busiGroups.length && busiGroupProps.onChange) {
+  }, [busiGroups]);
+
+  // 初始化抛出默认选择项
+  useEffect(() => {
+    if (busiGroups.length && busiGroupProps.onChange && (showNotGroupItem || (!showNotGroupItem && initCurBusiItem.id))) {
       busiGroupProps.onChange(initCurBusiItem.id, initCurBusiItem);
     }
-  }, [busiGroups]);
+  }, [busiGroups, initCurBusiItem]);
 
   return {
     title: '业务组',
