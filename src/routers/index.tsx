@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Switch, Route, useLocation, Redirect } from 'r
 import Loadable from '@/routers/loadable';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, accountStoreState } from '@/store/accountInterface';
+import NotFound from '@/pages/NotFound';
 import Login from '@/pages/login';
 import ResourcePage from '@/pages/resource';
 import Strategy from '@/pages/warning/strategy';
@@ -138,6 +139,8 @@ export default function Content() {
         <Route path='/' exact>
           <Redirect to='/metric/explorer' />
         </Route>
+        <Route path='/404' component={NotFound} />
+        <Route path='*' component={NotFound} />
       </Switch>
     </div>
   );
