@@ -3,6 +3,7 @@ import CommonStore from '@/module/common'
 import ResourceStore from '@/module/resource';
 import ProfileStore from '@/module/account';
 import WarningStore from '@/module/warning';
+import ShieldStore from '@/module/shield';
 import EventStore from '@/module/event';
 import { dynamicPackages } from '@/utils';
 
@@ -17,6 +18,7 @@ miniDva.addModel(CommonStore);
 miniDva.addModel(ResourceStore);
 miniDva.addModel(ProfileStore);
 miniDva.addModel(WarningStore);
+miniDva.addModel(ShieldStore);
 miniDva.addModel(EventStore);
 miniDva.start();
 

@@ -2,12 +2,15 @@ import React from 'react';
 import PageLayout from '@/components/pageLayout';
 import OperateForm from './components/operateForm';
 import { useTranslation } from 'react-i18next';
+import './index.less';
 
 const AddShield: React.FC = () => {
   const { t } = useTranslation();
   return (
-    <PageLayout title={t('新建告警屏蔽')} showBack>
-      <OperateForm />
+    <PageLayout title={t('告警屏蔽')} showBack hideCluster>
+      <div className='shield-add'>
+        <OperateForm />
+      </div>
     </PageLayout>
   );
 };

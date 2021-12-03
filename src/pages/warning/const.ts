@@ -194,3 +194,51 @@ export const tagFilterConditions = [
 ];
 
 export const pageSizeOptionsDefault = ['30', '50', '100', '300'];
+
+export const timeLensDefault = [
+  {
+    value: '1h'
+  },
+  {
+    value: '2h'
+  },
+  {
+    value: '3h'
+  },
+  {
+    value: '6h'
+  },
+  {
+    value: '12h'
+  },
+  {
+    value: '1d'
+  },
+  {
+    value: '2d'
+  },
+  {
+    value: '3d'
+  },
+  {
+    value: '5d'
+  },
+  {
+    value: '7d'
+  },
+  {
+    value: '14d'
+  },
+  {
+    value: '30d'
+  },
+  {
+    value: '60d'
+  },
+  {
+    value: '90d'
+  },
+  {
+    value: 'forever'
+  }
+]

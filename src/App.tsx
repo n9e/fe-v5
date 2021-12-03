@@ -7,7 +7,7 @@ import { ConfigProvider } from 'antd';
 import HeaderMenu from './components/menu';
 import Content from './routers';
 import store from '@/store';
-import { BrowserRouter as Router, Switch, Route} from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import zhCN from 'antd/lib/locale/zh_CN';
 import en from 'antd/lib/locale/en_US';
 import ErrorComponent from './components/ErrorComponent';
@@ -40,8 +40,8 @@ function App() {
           <Router>
             <ErrorComponent>
               <Switch>
-                <Route exact path="/job-task/:busiId/output/:taskId/:outputType" component={TaskOutput} />
-                <Route exact path="/job-task/:busiId/output/:taskId/:host/:outputType" component={TaskHostOutput} />
+                <Route exact path='/job-task/:busiId/output/:taskId/:outputType' component={TaskOutput} />
+                <Route exact path='/job-task/:busiId/output/:taskId/:host/:outputType' component={TaskHostOutput} />
                 <>
                   <HeaderMenu></HeaderMenu>
                   <DndProvider backend={HTML5Backend}>

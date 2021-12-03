@@ -65,7 +65,7 @@ const SideMenu: FC = () => {
           title: t('对象视角'),
         },
         {
-          key: '/dashboard',
+          key: '/dashboards',
           title: t('监控大盘'),
         },
       ],
@@ -80,11 +80,11 @@ const SideMenu: FC = () => {
           title: t('告警规则'),
         },
         {
-          key: '/shield',
+          key: '/alert-mutes',
           title: t('屏蔽规则'),
         },
         {
-          key: '/shield-1',
+          key: '/alert-subscribes',
           title: t('订阅规则'),
         },
         {
@@ -223,8 +223,8 @@ const SideMenu: FC = () => {
         </SubMenu>
         <SubMenu key='/alert-rules,/shield,/event,/history-events' icon={<SettingOutlined />} title={t('告警管理')}>
           <Menu.Item key='/alert-rules'>{t('告警规则')}</Menu.Item>
-          <Menu.Item key='/shield'>{t('屏蔽规则')}</Menu.Item>
-          <Menu.Item key='/shield'>{t('订阅规则')}</Menu.Item>
+          <Menu.Item key='/alert-mutes'>{t('屏蔽规则')}</Menu.Item>
+          <Menu.Item key='/alert-subscribes'>{t('订阅规则')}</Menu.Item>
           <Menu.Item key='/event'>{t('活跃告警')}</Menu.Item>
           <Menu.Item key='/history-events'>{t('历史告警')}</Menu.Item>
         </SubMenu>

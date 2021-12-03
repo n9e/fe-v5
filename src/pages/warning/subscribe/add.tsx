@@ -2,16 +2,17 @@ import React from 'react';
 import PageLayout from '@/components/pageLayout';
 import OperateForm from './components/operateForm';
 import { useTranslation } from 'react-i18next';
-
 import './index.less';
 
-const StrategyAdd: React.FC = () => {
+const AddSubscribe: React.FC = () => {
   const { t } = useTranslation();
   return (
-    <PageLayout title={t('告警规则')} showBack hideCluster>
-      <OperateForm />
+    <PageLayout title={t('订阅规则')} showBack hideCluster>
+      <div className='shield-add'>
+        <OperateForm />
+      </div>
     </PageLayout>
   );
 };
 
-export default StrategyAdd;
+export default AddSubscribe;

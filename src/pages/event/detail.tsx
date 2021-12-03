@@ -152,7 +152,7 @@ const EventDetailPage: React.FC = () => {
   }, [busiId, eventId]);
 
   return (
-    <PageLayout title='告警详情' showBack>
+    <PageLayout title='告警详情' showBack hideCluster>
       <div className='event-detail-container'>
         <Spin spinning={!eventDetail}>
           <Card
