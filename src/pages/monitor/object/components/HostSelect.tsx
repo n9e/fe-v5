@@ -12,7 +12,7 @@ export default (props) => {
   const [selectedHostsKeys, setSelectedHostsKeys] = useState<string[]>([])
   const [selectedHosts, setSelectedHosts] = useState<any[]>([])
   const { busiGroups, curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
-  const [curBusiItemInHostSelect, setCurBusiItemInHostSelect] = useState(curBusiItem)
+  const [curBusiItemInHostSelect, setCurBusiItemInHostSelect] = useState<BusiGroupItem | undefined>(curBusiItem)
   const dispatch = useDispatch()
   const columns = [
     { title: '对象标识', dataIndex: 'ident', render: (t) => <div style={{ maxWidth: '100px' }}>{t}</div> },
@@ -33,29 +33,35 @@ export default (props) => {
     setSelectedHosts(selectedHosts)
     changeSelectedHosts && changeSelectedHosts(selectedHosts)
   }, [allHosts.map(h => h.id + '').join('')])
+
+  const busiGroupsInHostSelect = busiGroups.concat([
+    { id: 0, name: '未归组对象' } as BusiGroupItem
+  ])
+  let curSelectBusiGroup: string | undefined = undefined
+  if (curBusiItemInHostSelect) {
+    curSelectBusiGroup = busiGroupsInHostSelect.find(bg => bg.id === curBusiItemInHostSelect.id) ? String(curBusiItemInHostSelect.id) : undefined
+  }
   const selectBefore = (
     <div className='host-add-on'>
       <div className='title'>监控对象</div>
       <div className="select-before">
-        <Select placeholder='按业务组筛选' value={busiGroups.concat([
-          { id: 0, name: '未归组对象' } as BusiGroupItem
-        ]).find(bg => bg.id === curBusiItemInHostSelect.id) ? String(curBusiItemInHostSelect.id) : undefined} style={{ width: '100%', textAlign: 'left' }} onChange={(busiItemId) => {
+        <Select allowClear placeholder='按业务组筛选' value={curSelectBusiGroup} style={{ width: '100%', textAlign: 'left' }} onChange={(busiItemId) => {
           let busiItemIdNum = Number(busiItemId)
           let data = busiGroups.find(bg => bg.id === busiItemIdNum)
-          if (busiItemIdNum !== 0) {
+          if (busiItemIdNum === 0) {
+            data = {
+              id: 0,
+              name: '未归组对象'
+            } as BusiGroupItem
+          } else if (busiItemIdNum) {
             dispatch({
               type: 'common/saveData',
               prop: 'curBusiItem',
               data: data as BusiGroupItem,
             })
-          } else {
-            data = {
-              id: 0,
-              name: '未归组对象'
-            } as BusiGroupItem
           }
           changeBusiGroup && changeBusiGroup(data)
-          setCurBusiItemInHostSelect(data as BusiGroupItem)
+          setCurBusiItemInHostSelect(data)
         }}>
           <Option key={0} value={'0'}>未归组对象</Option>
           {busiGroups.map(bg => <Option key={bg.id} value={String(bg.id)}>{bg.name}</Option>)}
