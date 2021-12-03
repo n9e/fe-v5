@@ -173,7 +173,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
             cluster: clusterList[0] || 'Default',
             redefine_severity: detail?.redefine_severity ? true : false,
             redefine_channels: detail?.redefine_channels ? true : false,
-            user_group_ids: detail?.user_group_ids?.split(' '),
+            user_group_ids: detail?.user_group_ids ? detail?.user_group_ids?.split(' ') : [],
             new_channels: detail?.new_channels?.split(' ')
           }}
         >

@@ -7,7 +7,7 @@ import './index.less';
 const AddSubscribe: React.FC = () => {
   const { t } = useTranslation();
   return (
-    <PageLayout title={t('订阅规则')} showBack hideCluster>
+    <PageLayout title={t('订阅规则')} showBack>
       <div className='shield-add'>
         <OperateForm />
       </div>

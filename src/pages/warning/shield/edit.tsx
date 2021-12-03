@@ -7,9 +7,8 @@ import { IshieldState } from '@/store/warningInterface/shield';
 import PageLayout from '@/components/pageLayout';
 import OperateForm from './components/operateForm';
 import { useTranslation } from 'react-i18next';
-import { getShieldList } from '@/services/shield';
 
-import './index.less';
+import './index.less'
 
 function useQuery() {
   const { search } = useLocation();
@@ -19,8 +18,8 @@ function useQuery() {
 const EditShield: React.FC = () => {
   const { t } = useTranslation();
   const history = useHistory();
-  const { curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
-  const { curShieldData } = useSelector<RootState, IshieldState>((state) => state.shield);
+  const { curBusiItem } = useSelector<RootState, CommonStoreState>(state => state.common);
+  const { curShieldData } = useSelector<RootState, IshieldState>(state => state.shield);
   if (!curShieldData.id) {
     history.push(`/alert-mutes`);
   }
@@ -41,7 +40,9 @@ const EditShield: React.FC = () => {
   // }
   return (
     <PageLayout title={t('告警屏蔽')} showBack hideCluster>
-      <div className='shield-add'>{curShieldData.id && <OperateForm detail={curShieldData} type={!isClone ? 1 : 2} />}</div>
+      <div className='shield-add'>
+        {curShieldData.id && <OperateForm  detail={curShieldData} type={!isClone ? 1 : 2}/>}
+      </div>
     </PageLayout>
   );
 };

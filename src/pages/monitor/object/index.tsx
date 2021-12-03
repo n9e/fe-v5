@@ -48,8 +48,11 @@ export default () => {
   const [getHostsTimes, setGetHostsTimes] = useState(0);
   const getHostsRequest = () => {
     const cluster = localStorage.getItem('curCluster') || ''
-    let transportData = {
+    let transportData = busiGroup ? {
       bgid: busiGroup.id,
+      query: queryHost,
+      clusters: cluster
+    } : {
       query: queryHost,
       clusters: cluster
     }

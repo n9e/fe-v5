@@ -25,6 +25,7 @@ const TagItem: React.FC<Itag> = ({
 }) => {
   const { t } = useTranslation();
   const [valuePlaceholder, setValuePlaceholder] = useState<string>('');
+  const [funcCur, setfuncCur] = useState('==');
 
   const funcChange = (val) => {
     let text = '';
@@ -33,6 +34,7 @@ const TagItem: React.FC<Itag> = ({
     } else if (val === '=~') {
       text = '请输入正则表达式匹配标签value';
     }
+    setfuncCur(val);
     setValuePlaceholder(text);
   }
   return (
@@ -70,7 +72,15 @@ const TagItem: React.FC<Itag> = ({
             fieldKey={[field.name, 'value']}
             rules={[{ required: true, message: t('value不能为空') }]}
           >
-            <TextArea className='ant-input' rows={1} placeholder={t(valuePlaceholder)}/>
+            
+            {funcCur == 'in' ? (
+              <Select mode="tags" open={false} style={{ width: '100%' }} placeholder={t(valuePlaceholder)}>
+    
+              </Select>
+            ) : (
+              <TextArea className='ant-input' rows={1} placeholder={t(valuePlaceholder)}/>
+            )}
+            
           </Form.Item>
         </Col>
         <Col>

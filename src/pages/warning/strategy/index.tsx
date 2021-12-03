@@ -30,7 +30,12 @@ const Strategy: React.FC = () => {
             onChange: busiChange,
           }}
         ></LeftTree>
-        {bgid ? <PageTable bgid={bgid} clusters={clusters}></PageTable> : <BlankBusinessPlaceholder text='告警规则' />}
+        {bgid ? (
+          <PageTable bgid={bgid} clusters={clusters}></PageTable>
+        ) : (
+          <BlankBusinessPlaceholder text='告警规则'/>
+        )}
+        
       </div>
     </PageLayout>
   );
