@@ -4,15 +4,15 @@ import OperateForm from './components/operateForm';
 import { useTranslation } from 'react-i18next';
 import './index.less';
 
-const AddShield: React.FC = () => {
+const AddSubscribe: React.FC = () => {
   const { t } = useTranslation();
   return (
-    <PageLayout title={t('告警屏蔽')} showBack>
+    <PageLayout title={t('订阅规则')} showBack>
       <div className='shield-add'>
-      <OperateForm />
+        <OperateForm />
       </div>
     </PageLayout>
   );
 };
 
-export default AddShield;
+export default AddSubscribe;

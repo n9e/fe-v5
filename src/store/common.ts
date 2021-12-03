@@ -2,12 +2,14 @@ import { CommonStoreState } from './commonInterface';
 import { resourceStoreState } from './businessInterface';
 import { eventStoreState } from './eventInterface';
 import { warningStoreState } from './warningInterface';
+import { IshieldState } from '@/store/warningInterface/shield';
 
 export type RootState = {
   common: CommonStoreState;
   resource: resourceStoreState;
   strategy: warningStoreState;
   event: eventStoreState;
+  shield: IshieldState;
 };
 
 export interface IContextPayload<T> {

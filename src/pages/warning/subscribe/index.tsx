@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import PageLayout from '@/components/pageLayout';
-import { Button, Input, Table, Tooltip, Tag, message, Modal } from 'antd';
-import { useSelector, useDispatch } from 'react-redux';
+import { Button, Input, Table, message, Modal } from 'antd';
+import { useSelector } from 'react-redux';
 import { RootState } from '@/store/common';
-import { getShieldList, deleteShields } from '@/services/shield';
+import { CommonStoreState } from '@/store/commonInterface';
+import { getSubscribeList, deleteSubscribes } from '@/services/subscribe';
+import { ColumnsType } from 'antd/lib/table';
 import {
-  CloseCircleOutlined,
+  CopyOutlined,
   ExclamationCircleOutlined,
   SearchOutlined,
 } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
-import { CommonStoreState } from '@/store/commonInterface';
-import { shieldItem } from '@/store/warningInterface';
-import { ColumnsType } from 'antd/lib/table';
-import dayjs from 'dayjs';
+import { subscribeItem } from '@/store/warningInterface/subscribe';
+import ColorTag from '@/components/ColorTag';
 import LeftTree from '@/components/LeftTree';
 import RefreshIcon from '@/components/RefreshIcon';
 import BlankBusinessPlaceholder from '@/components/BlankBusinessPlaceholder';
@@ -25,13 +25,12 @@ const { confirm } = Modal;
 const Shield: React.FC = () => {
   const { t } = useTranslation();
   const history = useHistory();
-  const dispatch = useDispatch();
   const [query, setQuery] = useState<string>('');
   const { curBusiItem } = useSelector<RootState, CommonStoreState>(state => state.common);
   const [bgid, setBgid] = useState(undefined);
   const [clusters, setClusters] = useState<string[]>([]);
-  const [currentShieldDataAll, setCurrentShieldDataAll] = useState<Array<shieldItem>>([]);
-  const [currentShieldData, setCurrentShieldData] = useState<Array<shieldItem>>([]);
+  const [currentShieldDataAll, setCurrentShieldDataAll] = useState<Array<subscribeItem>>([]);
+  const [currentShieldData, setCurrentShieldData] = useState<Array<subscribeItem>>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
   const columns: ColumnsType = [
@@ -43,7 +42,14 @@ const Shield: React.FC = () => {
       },
     },
     {
-      title: t('标签'),
+      title: t('告警规则'),
+      dataIndex: 'rule_name',
+      render: (data) => {
+        return <div>{data}</div>;
+      },
+    },
+    {
+      title: t('订阅标签'),
       dataIndex: 'tags',
       render: (text: any) => {
         return (
@@ -51,8 +57,7 @@ const Shield: React.FC = () => {
             {text
               ? text.map((tag, index) => {
                 return tag ? (
-                  // <ColorTag text={`${tag.key} ${tag.func} ${tag.func === 'in' ? tag.value.split(' ').join(', ') : tag.value}`} key={index}>
-                  // </ColorTag>
+                  
                   <div key={index}>
                     {`${tag.key} ${tag.func} ${tag.func === 'in' ? tag.value.split(' ').join(', ') : tag.value}`}
                   </div>
@@ -64,58 +69,47 @@ const Shield: React.FC = () => {
       },
     },
     {
-      title: t('屏蔽原因'),
-      dataIndex: 'cause',
-      render: (text: string, record: shieldItem) => {
+      title: t('告警接收组'),
+      dataIndex: 'user_groups',
+      render: (text: string, record: subscribeItem) => {
         return (
           <>
-            <Tooltip placement='topLeft' title={text}>
-              <div
-                style={{
-                  whiteSpace: 'nowrap',
-                  textOverflow: 'ellipsis',
-                  overflow: 'hidden',
-                }}
-              >
-                {text}
-              </div>
-            </Tooltip>
-            by {record.create_by}
+          {record.user_groups?.map(item => (
+            <ColorTag text={item.name} key={item.id}>
+            </ColorTag>
+          ))}
+            
           </>
         );
       },
     },
+    
     {
-      title: t('屏蔽时间'),
-      dataIndex: 'btime',
-      render: (text: number, record: shieldItem) => {
-        return (
-          <div className='shield-time'>
-            <div>
-              {t('开始:')}
-              {dayjs(record?.btime * 1000).format('YYYY-MM-DD HH:mm:ss')}
-            </div>
-            <div>
-              {t('结束:')}
-              {dayjs(record?.etime * 1000).format('YYYY-MM-DD HH:mm:ss')}
-            </div>
-          </div>
-        );
-      },
+      title: t('编辑人'),
+      ellipsis: true,
+      dataIndex: 'update_by',
     },
-    // {
-    //   title: t('创建人'),
-    //   ellipsis: true,
-    //   dataIndex: 'create_by',
-    // },
     {
       title: t('操作'),
-      width: '98px',
+      width: '128px',
       dataIndex: 'operation',
-      render: (text: undefined, record: shieldItem) => {
+      render: (text: undefined, record: subscribeItem) => {
         return (
           <>
             <div className='table-operator-area'>
+            <div
+                className='table-operator-area-normal'
+                style={{
+                  cursor: 'pointer',
+                  display: 'inline-block'
+                }}
+                onClick={() => {
+                  curBusiItem?.id &&
+                    history.push(`/alert-subscribes/edit/${record.id}`);
+                }}
+              >
+                {t('编辑')}
+              </div>
               <div
                 className='table-operator-area-normal'
                 style={{
@@ -123,12 +117,8 @@ const Shield: React.FC = () => {
                   display: 'inline-block'
                 }}
                 onClick={() => {
-                  dispatch({
-                    type: 'shield/setCurShieldData',
-                    data: record
-                  });
                   curBusiItem?.id &&
-                    history.push(`/alert-mutes/edit/${record.id}?mode=clone`);
+                    history.push(`/alert-subscribes/edit/${record.id}?mode=clone`);
                 }}
               >
                 {t('克隆')}
@@ -170,7 +160,7 @@ const Shield: React.FC = () => {
   }, [query, clusters, currentShieldDataAll])
 
   const dismiss = (id: number) => {
-    deleteShields({ids: [id]}, curBusiItem.id).then((res) => {
+    deleteSubscribes({ids: [id]}, curBusiItem.id).then((res) => {
       refreshList();
       if (res.err) {
         message.success(res.err);
@@ -183,11 +173,14 @@ const Shield: React.FC = () => {
 
   const filterData = () => {
     const data = JSON.parse(JSON.stringify(currentShieldDataAll));
-    const res = data.filter((item: shieldItem) => {
-      const tagFind = item.tags.find(tag => {
+    const res = data.filter((item: subscribeItem) => {
+      const tagFind = item?.tags?.find(tag => {
         return tag.key.indexOf(query) > -1 || tag.value.indexOf(query) > -1 || tag.func.indexOf(query) > -1
       })
-      return (item.cause.indexOf(query) > -1 || !!tagFind) &&
+      const groupFind = item?.user_groups?.find(item => {
+        return item?.name?.indexOf(query) > -1
+      })
+      return (item?.rule_name?.indexOf(query) > -1 || !!tagFind || !!groupFind) &&
         (clusters && clusters?.indexOf(item.cluster) > -1 || clusters?.length === 0)
     });
     setCurrentShieldData(res || []);
@@ -195,7 +188,7 @@ const Shield: React.FC = () => {
 
   const getList = async () => {
     setLoading(true);
-    const { success, dat } = await getShieldList({ id: curBusiItem.id });
+    const { success, dat } = await getSubscribeList({ id: curBusiItem.id });
     if (success) {
       setCurrentShieldDataAll(dat || []);
       setLoading(false);
@@ -220,7 +213,7 @@ const Shield: React.FC = () => {
   };
 
   return (
-    <PageLayout title={t('屏蔽规则')} icon={<CloseCircleOutlined />}>
+    <PageLayout title={t('订阅规则')} icon={<CopyOutlined />}>
       <div className='shield-content'>
         <LeftTree
           clusterGroup={{
@@ -232,8 +225,7 @@ const Shield: React.FC = () => {
             onChange: busiChange,
           }}
         ></LeftTree>
-        {curBusiItem?.id ? 
-        (
+        {curBusiItem?.id ? (
           <div className='shield-index'>
 
           <div className='header'>
@@ -248,7 +240,7 @@ const Shield: React.FC = () => {
                 onPressEnter={onSearchQuery}
                 className={'searchInput'}
                 prefix={<SearchOutlined />}
-                placeholder={t('搜索标签、屏蔽原因')}
+                placeholder={t('搜索规则、标签、接收组')}
               />
             </div>
             <div className='header-right'>
@@ -256,16 +248,15 @@ const Shield: React.FC = () => {
                 type='primary'
                 className='add'
                 onClick={() => {
-                  history.push('/alert-mutes/add');
+                  history.push('/alert-subscribes/add');
                 }}
               >
-                {t('新增屏蔽规则')}
+                {t('新增订阅规则')}
               </Button>
             </div>
           </div>
           <Table
             rowKey="id"
-            // sticky
             pagination={{
               total: currentShieldData.length,
               showQuickJumper: true,
@@ -278,13 +269,12 @@ const Shield: React.FC = () => {
             }}
             loading={loading}
             dataSource={currentShieldData}
-
             columns={columns}
           />
+          
         </div>
-        ) : 
-        (
-          <BlankBusinessPlaceholder text='屏蔽规则'/>
+        ) : (
+          <BlankBusinessPlaceholder text='订阅规则'/>
         )}
         
       </div>

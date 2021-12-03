@@ -22,7 +22,10 @@ import StrategyAdd from '@/pages/warning/strategy/add';
 import StrategyEdit from '@/pages/warning/strategy/edit';
 import Shield from '@/pages/warning/shield';
 import AddShield from '@/pages/warning/shield/add';
-import ShieldDetail from '@/pages/warning/shield/detail';
+import ShieldEdit from '@/pages/warning/shield/edit';
+import Subscribe from '@/pages/warning/subscribe';
+import SubscribeAdd from '@/pages/warning/subscribe/add';
+import SubscribeEdit from '@/pages/warning/subscribe/edit';
 import Event from '@/pages/event';
 import EventDetail from '@/pages/event/detail';
 import historyEvents from '@/pages/historyEvents';
@@ -100,9 +103,13 @@ export default function Content() {
         <Route exact path='/alert-rules/add/:group_id' component={StrategyAdd} />
         <Route exact path='/alert-rules/edit/:id' component={StrategyEdit} />
         <Route exact path='/alert-rules/:id?' component={Strategy} />
-        <Route exact path='/shield' component={Shield} />
-        <Route exact path='/shield/add/:from?' component={AddShield} />
-        <Route exact path='/shield/detail/:id' component={ShieldDetail} />
+        <Route exact path='/alert-mutes' component={Shield} />
+        <Route exact path='/alert-mutes/add/:from?' component={AddShield} />
+        <Route exact path='/alert-mutes/edit/:id' component={ShieldEdit} />
+        <Route exact path='/alert-subscribes' component={Subscribe} />
+        <Route exact path='/alert-subscribes/add' component={SubscribeAdd} />
+        <Route exact path='/alert-subscribes/edit/:id' component={SubscribeEdit} />
+
         <Route exact path='/alert-cur-events' component={Event} />
         <Route exact path='/alert-his-events' component={historyEvents} />
         <Route exact path='/alert-cur-events/:busiId/:eventId' component={EventDetail} />
