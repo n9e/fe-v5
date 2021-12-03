@@ -3,16 +3,19 @@ import { GetTmpChartData } from '@/services/metric';
 import { useParams } from 'react-router';
 import DateRangePicker, { isAbsoluteRange, RelativeRange } from '@/components/DateRangePicker';
 import { Range } from '@/components/DateRangePicker';
-import { AreaChartOutlined, FieldNumberOutlined, LineChartOutlined } from '@ant-design/icons';
-import ResfeshIcon from '@/components/RefreshIcon';
+import { AreaChartOutlined, DownOutlined, FieldNumberOutlined, LineChartOutlined } from '@ant-design/icons';
 import Resolution from '@/components/Resolution';
 import './index.less';
 import { useTranslation } from 'react-i18next';
 import Graph from '@/components/Graph';
 import { GraphDataProps } from '@/components/Graph/Graph/index';
 import _ from 'lodash';
-import { Radio } from 'antd';
+import { Button, Dropdown, Radio, Menu, Tooltip } from 'antd';
 import { ChartType } from '@/components/D3Charts/src/interface';
+import { HighLevelConfigType } from '@/components/Graph/Graph/index';
+import { useSelector } from 'react-redux';
+import { CommonStoreState } from '@/store/commonInterface';
+import { RootState } from '@/store/common';
 
 export default function Chart() {
   const { t } = useTranslation();
@@ -22,12 +25,9 @@ export default function Chart() {
     }>();
   const [chartData, setChartData] = useState<
     Array<{
+      ref: any;
       dataProps: GraphDataProps;
-      state: {
-        defaultAggrFunc: string;
-        defaultAggrGroups: string[];
-        defaultOffsets: string[];
-      };
+      highLevelConfig: HighLevelConfigType;
     }>
   >([]);
   const [range, setRange] = useState<Range>({
@@ -37,6 +37,8 @@ export default function Chart() {
   });
   const [step, setStep] = useState<number | null>(null);
   const [chartType, setChartType] = useState<ChartType>(ChartType.Line);
+  const { clusters } = useSelector<RootState, CommonStoreState>((state) => state.common);
+  const [curCluster, setCurCluster] = useState<string>('');
 
   useEffect(() => {
     initChart();
@@ -47,14 +49,35 @@ export default function Chart() {
       let data = res.dat
         .filter((item) => !!item)
         .map((item) => {
-          return JSON.parse(item.configs);
+          return { ...JSON.parse(item.configs), ref: React.createRef() };
         });
-      setChartType(data[0].dataProps.chartType);
+      const curCluster = data[0].curCluster;
+      setChartType(data[0].dataProps.chartType || ChartType.Line);
       setStep(data[0].dataProps.step);
       setRange(data[0].dataProps.range);
+      // TODO: 处理当前选中集群不在集群列表的情况
+      setCurCluster(curCluster);
+      localStorage.setItem('curCluster', curCluster);
       setChartData(data);
     });
   };
+
+  const clusterMenu = (
+    <Menu selectedKeys={[curCluster]}>
+      {clusters.map((cluster) => (
+        <Menu.Item
+          key={cluster}
+          onClick={(_) => {
+            setCurCluster(cluster);
+            localStorage.setItem('curCluster', cluster);
+            chartData.forEach((item) => item.ref.current.refresh());
+          }}
+        >
+          {cluster}
+        </Menu.Item>
+      ))}
+    </Menu>
+  );
 
   const handleDateChange = (e) => {
     if (isAbsoluteRange(e) ? !_.isEqual(e, range) : e.num !== (range as RelativeRange).num || e.unit !== (range as RelativeRange).unit) {
@@ -68,25 +91,35 @@ export default function Chart() {
 
   return (
     <div className='chart-container'>
-      {chartData && chartData.length > 0 ? (
+      {chartData && chartData.length > 0 && curCluster ? (
         <>
           <div className='chart-container-header'>
-            <DateRangePicker onChange={handleDateChange} value={chartData[0].dataProps.range} />
-            <Resolution onChange={(v) => setStep(v)} initialValue={step} />
-            <Radio.Group
-              options={[
-                { label: <LineChartOutlined />, value: ChartType.Line },
-                { label: <AreaChartOutlined />, value: ChartType.StackArea },
-              ]}
-              onChange={(e) => {
-                e.preventDefault();
-                setChartType(e.target.value);
-              }}
-              value={chartType}
-              optionType='button'
-              buttonStyle='solid'
-            />
-            {/* <ResfeshIcon onClick={handleRefresh} className='reload-icon' /> */}
+            <div className='left'>
+              <DateRangePicker onChange={handleDateChange} value={chartData[0].dataProps.range} />
+              <Resolution onChange={(v) => setStep(v)} initialValue={step} />
+              <Radio.Group
+                options={[
+                  { label: <LineChartOutlined />, value: ChartType.Line },
+                  { label: <AreaChartOutlined />, value: ChartType.StackArea },
+                ]}
+                onChange={(e) => {
+                  e.preventDefault();
+                  setChartType(e.target.value);
+                }}
+                value={chartType}
+                optionType='button'
+                buttonStyle='solid'
+              />
+            </div>
+            <div className='right'>
+              <span>集群：</span>
+              <Dropdown overlay={clusterMenu}>
+                <Button>
+                  {curCluster} <DownOutlined />
+                </Button>
+              </Dropdown>
+              {/* <ResfeshIcon onClick={handleRefresh} className='reload-icon' /> */}
+            </div>
           </div>
           {chartData.map((item, index) => {
             const newItem = {
@@ -94,18 +127,24 @@ export default function Chart() {
               range,
               step,
               chartType,
+              title: (
+                <Tooltip
+                  placement='bottomLeft'
+                  title={() => (
+                    <div>
+                      {item.dataProps.promqls?.map((promql) => {
+                        return <div>{promql.current ? promql.current : promql}</div>;
+                      })}
+                    </div>
+                  )}
+                >
+                  <Button size='small' type='link'>
+                    promql 语句
+                  </Button>
+                </Tooltip>
+              ),
             };
-            return (
-              <Graph
-                key={index}
-                data={{ ...newItem }}
-                graphConfigInnerVisible={false}
-                isShowShare={false}
-                defaultAggrFunc={item.state.defaultAggrFunc}
-                defaultAggrGroups={item.state.defaultAggrGroups}
-                defaultOffsets={item.state.defaultOffsets}
-              />
-            );
+            return <Graph ref={item.ref} key={index} data={{ ...newItem }} graphConfigInnerVisible={false} isShowShare={false} highLevelConfig={item.highLevelConfig || {}} />;
           })}
         </>
       ) : (
