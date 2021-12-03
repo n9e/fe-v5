@@ -1,28 +1,25 @@
 export interface shieldItem {
-  metric?: string;
-  res_filters?: string;
-  tags_filters?: string;
+  tags: any[];
   cause: string;
-  create_at: number;
-  create_by: string;
+  create_at?: number;
+  create_by?: string;
   etime: number;
   btime: number;
   id: number;
+  group_id?: number;
+  cluster: string;
 }
 
-export enum FormType {
-  'add' = 'add',
-  'edit' = 'edit',
-}
+// export interface shieldDetail {
+//   cause: string;
+//   create_at?: number;
+//   create_by?: string;
+//   etime: number;
+//   id: number;
+//   btime: number;
+//   tags: any[];
+// }
 
-export interface shieldDetail {
-  metric?: string;
-  res_filters?: string[];
-  tags_filters?: string[];
-  cause: string;
-  create_at: number;
-  create_by: string;
-  etime: number;
-  id: number;
-  btime: number;
+export interface IshieldState {
+  curShieldData: shieldItem
 }

@@ -312,7 +312,7 @@ const Resource: React.FC = () => {
   };
 
   return (
-    <PageLayout title={activeKey === UserType.User ? t('用户管理') : t('团队管理')} icon={<UserOutlined />}>
+    <PageLayout title={activeKey === UserType.User ? t('用户管理') : t('团队管理')} icon={<UserOutlined />} hideCluster>
       <div className='user-manage-content'>
         {activeKey === UserType.User && (
           <div className='user-content'>

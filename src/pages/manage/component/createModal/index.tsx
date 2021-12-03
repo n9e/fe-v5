@@ -46,14 +46,14 @@ const CreateModal: React.FC<ModalProps> = (props: ModalProps) => {
       if (action === ActionType.CreateUser) {
         createUser(params).then((_) => {
           message.success(t('用户创建成功'));
-          onClose();
+          onClose(true);
         });
       }
 
       if (action === ActionType.EditUser && userId) {
         changeUserInfo(userId, params).then((_) => {
           message.success(t('用户信息修改成功'));
-          onClose();
+          onClose(true);
         });
       }
     }
@@ -77,7 +77,7 @@ const CreateModal: React.FC<ModalProps> = (props: ModalProps) => {
       if (action === ActionType.EditTeam && teamId) {
         changeTeamInfo(teamId, params).then((_) => {
           message.success(t('团队信息修改成功'));
-          onClose(true);
+          onClose('update');
         });
       }
     }
@@ -98,7 +98,7 @@ const CreateModal: React.FC<ModalProps> = (props: ModalProps) => {
       };
       addTeamUser(teamId, params).then((_) => {
         message.success(t('添加成功'));
-        onClose();
+        onClose('update');
       });
     }
     if (isBusinessForm) {

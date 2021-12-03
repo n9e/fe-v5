@@ -60,7 +60,10 @@ request.interceptors.response.use(
         });
     }
     if (status === 401) {
-      localStorage.getItem('refresh_token')
+      if(response.url.indexOf('/api/n9e/auth/refresh') ){
+        location.href = `/login${location.pathname != '/' ? '?redirect=' + location.pathname : ''}`
+      }else{
+        localStorage.getItem('refresh_token')
         ? UpdateAccessToken().then((res) => {
             console.log('401 err', res);
             if (res.err) {
@@ -72,6 +75,7 @@ request.interceptors.response.use(
             }
           })
         : (location.href = `/login${location.pathname != '/' ? '?redirect=' + location.pathname : ''}`);
+      }
     } else {
       const contentType = response.headers.get('content-type');
       const isPlainText = contentType?.indexOf('text/plain; charset=utf-8') !== -1;

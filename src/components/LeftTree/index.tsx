@@ -1,14 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Checkbox, Empty, Input, Radio, Space } from 'antd';
+import { Badge, Checkbox, Col, Input, Radio, Row, Space } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/common';
 import { getBusiGroups } from '@/services/common';
 import { CommonStoreState } from '@/store/commonInterface';
 import './index.less';
-import { SearchOutlined } from '@ant-design/icons';
+import { SearchOutlined, SettingOutlined } from '@ant-design/icons';
+import { useHistory } from 'react-router-dom';
+import { eventStoreState } from '@/store/eventInterface';
 
 const CheckboxGroup = Checkbox.Group;
-const { Search } = Input;
 type ChangeFunction = (value: any, item?: any) => void;
 
 interface groupProps {
@@ -16,14 +17,17 @@ interface groupProps {
   onChange?: ChangeFunction;
 }
 
+interface BusiGroupProps {
+  showNotGroupItem?: boolean;
+  showAlertings?: boolean;
+  onChange?: ChangeFunction;
+}
+
 interface LeftTreeProps {
   clusterGroup?: groupProps;
-  eventLevelGroup?: groupProps;
-  eventTypeGroup?: groupProps;
-  busiGroup?: {
-    showNotGroupItem?: boolean;
-    onChange?: ChangeFunction;
-  };
+  eventLevelGroup?: groupProps & { defaultSelect?: number | undefined };
+  eventTypeGroup?: groupProps & { defaultSelect?: number | undefined };
+  busiGroup?: BusiGroupProps;
 }
 interface IGroupItemProps {
   title: string | React.ReactNode;
@@ -45,11 +49,13 @@ interface SelectListProps {
   };
   defaultSelect?: object | string | number;
   allowNotSelect?: boolean;
+  showBadge?: boolean;
+  badgeInfo?: { ['index']?: number };
   onChange?: ChangeFunction;
 }
 
 // 内容可选列表
-export const SelectList: React.FC<SelectListProps> = ({ dataSource, fieldNames = {}, allowNotSelect = true, defaultSelect, onChange }) => {
+export const SelectList: React.FC<SelectListProps> = ({ dataSource, fieldNames = {}, allowNotSelect = false, defaultSelect, showBadge = false, badgeInfo = {}, onChange }) => {
   const [curSeletedKey, setCurSelectedKey] = useState<string | number>(
     defaultSelect && typeof defaultSelect === 'object' ? defaultSelect[fieldNames.key || 'value'] : defaultSelect,
   );
@@ -63,23 +69,34 @@ export const SelectList: React.FC<SelectListProps> = ({ dataSource, fieldNames =
             const key = item[fieldNames.key || 'value'];
             const value = item[fieldNames.value || 'value'];
             return (
-              <Radio
-                className='radio-list-group-item'
-                key={key}
-                value={value}
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (curSeletedKey !== value) {
-                    setCurSelectedKey(value);
-                    onChange && onChange(value, item);
-                  } else if (allowNotSelect) {
-                    setCurSelectedKey('');
-                    onChange && onChange('', {});
-                  }
-                }}
-              >
-                {label}
-              </Radio>
+              <Row key={key}>
+                <Col span={showBadge ? 20 : 24}>
+                  <Radio
+                    className='radio-list-group-item'
+                    key={key}
+                    value={value}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (curSeletedKey !== value) {
+                        setCurSelectedKey(value);
+                        onChange && onChange(value, item);
+                      } else if (allowNotSelect) {
+                        setCurSelectedKey('');
+                        onChange && onChange('', {});
+                      }
+                    }}
+                  >
+                    <div style={{ wordBreak: 'break-all' }}>{label}</div>
+                  </Radio>
+                </Col>
+                {showBadge && (
+                  <Col span={4}>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                      <Badge count={badgeInfo[key] || 0} />
+                    </div>
+                  </Col>
+                )}
+              </Row>
             );
           })}
         </Space>
@@ -90,25 +107,44 @@ export const SelectList: React.FC<SelectListProps> = ({ dataSource, fieldNames =
 
 // 集群渲染内容
 const clustersGroupContent = (clusterGroup: groupProps): IGroupItemProps => {
-  const { clusters } = useSelector<RootState, CommonStoreState>((state) => state.common);
-  const [checkedList, setCheckedList] = useState<string[]>([]);
+  const dispatch = useDispatch();
+  const { clusters, curClusterItems } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const [indeterminate, setIndeterminate] = useState<boolean>(false);
   const [checkAll, setCheckAll] = useState<boolean>(false);
+
+  const setClusterItems = (curClusterItems) => {
+    dispatch({
+      type: 'common/saveData',
+      prop: 'curClusterItems',
+      data: curClusterItems,
+    });
+    localStorage.setItem('curClusterItems', JSON.stringify(curClusterItems));
+    clusterGroup.onChange && clusterGroup.onChange(curClusterItems);
+  };
   const onCheckAllChange = (e) => {
     const curCheckedList = e.target.checked ? clusters : [];
-    setCheckedList(curCheckedList);
+    setClusterItems(curCheckedList);
     setIndeterminate(false);
     setCheckAll(e.target.checked);
-    clusterGroup.onChange && clusterGroup.onChange(curCheckedList);
   };
+
+  // 获取到集群列表数据后抛出默认选择项并同步全选状态
+  useEffect(() => {
+    setCheckAll(clusters.length === curClusterItems.length);
+    setIndeterminate(!!curClusterItems.length && curClusterItems.length < clusters.length);
+
+    if (clusters.length && clusterGroup.onChange) {
+      clusterGroup.onChange(curClusterItems);
+    }
+  }, [clusters]);
 
   return {
     title: (
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <span>集群</span>
-        <Checkbox indeterminate={indeterminate} onChange={onCheckAllChange} checked={checkAll}>
+        {/* <Checkbox indeterminate={indeterminate} onChange={onCheckAllChange} checked={checkAll}>
           全选
-        </Checkbox>
+        </Checkbox> */}
       </div>
     ),
     isShow: clusterGroup.isShow,
@@ -122,16 +158,15 @@ const clustersGroupContent = (clusterGroup: groupProps): IGroupItemProps => {
       return (
         <CheckboxGroup
           options={clusters}
-          value={checkedList}
+          value={curClusterItems}
           style={{
             flexShrink: 1,
             overflow: 'auto',
           }}
           onChange={(list: string[]) => {
-            setCheckedList(list);
+            setClusterItems(list);
             setIndeterminate(!!list.length && list.length < clusters.length);
             setCheckAll(list.length === clusters.length);
-            clusterGroup.onChange && clusterGroup.onChange(list);
           }}
         ></CheckboxGroup>
       );
@@ -140,28 +175,31 @@ const clustersGroupContent = (clusterGroup: groupProps): IGroupItemProps => {
 };
 
 // 业务组渲染内容
-const busiGroupContent = (busiGroupProps: { showNotGroupItem?: boolean; onChange?: Function }): IGroupItemProps => {
+const busiGroupContent = (busiGroupProps: BusiGroupProps): IGroupItemProps => {
   const dispatch = useDispatch();
   const { busiGroups, curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
+  const { alertings } = useSelector<RootState, eventStoreState>((state) => state.event);
   const [filteredBusiGroups, setFilteredBusiGroups] = useState(busiGroups);
   const showNotGroupItem = busiGroupProps.showNotGroupItem;
-  // 根据是否有未归组对象选项初始化选中项
-  const initCurBusiItem = useMemo(
-    () => (showNotGroupItem ? JSON.parse(localStorage.getItem('objectCurBusiItem') || '{}') : curBusiItem.id ? curBusiItem : busiGroups.length ? busiGroups[0] : {}),
-    [],
-  );
+  // 初始化选中第一条业务组
+  if (!localStorage.getItem('curBusiItem') && !showNotGroupItem && busiGroups.length > 0) {
+    localStorage.setItem('curBusiItem', JSON.stringify(busiGroups[0]));
+    dispatch({
+      type: 'common/saveData',
+      prop: 'curBusiItem',
+      data: busiGroups[0],
+    });
+  }
+  // 初始化选中项
+  const initCurBusiItem = useMemo(() => (curBusiItem.id ? curBusiItem : { id: undefined }), [curBusiItem]);
 
-  // 初始化后抛出默认选择项
-  useEffect(() => {
-    if (busiGroupProps.onChange) {
-      busiGroupProps.onChange(initCurBusiItem.id, initCurBusiItem);
-    }
-  }, []);
-
-  // 初始化展示所有业务组
+  // 初始化展示所有业务组并抛出默认选择项
   useEffect(() => {
     if (!filteredBusiGroups.length) {
       setFilteredBusiGroups(busiGroups);
+    }
+    if (busiGroups.length && busiGroupProps.onChange) {
+      busiGroupProps.onChange(initCurBusiItem.id, initCurBusiItem);
     }
   }, [busiGroups]);
 
@@ -196,16 +234,16 @@ const busiGroupContent = (busiGroupProps: { showNotGroupItem?: boolean; onChange
             }}
             placeholder={'请输入业务组名称进行筛选'}
           />
-          {busiGroups.length !== 0 || showNotGroupItem ? (
+          {(!showNotGroupItem && curBusiItem.id && filteredBusiGroups.length !== 0) || showNotGroupItem ? (
             <SelectList
               dataSource={showNotGroupItem ? [{ id: 0, name: '未归组对象' }].concat(filteredBusiGroups) : filteredBusiGroups}
               fieldNames={{ key: 'id', label: 'name', value: 'id' }}
               allowNotSelect={showNotGroupItem}
               defaultSelect={initCurBusiItem}
+              showBadge={busiGroupProps.showAlertings}
+              badgeInfo={alertings}
               onChange={(value, item) => {
-                if (showNotGroupItem) {
-                  localStorage.setItem('objectCurBusiItem', JSON.stringify(item));
-                } else {
+                if (value) {
                   dispatch({
                     type: 'common/saveData',
                     prop: 'curBusiItem',
@@ -217,7 +255,10 @@ const busiGroupContent = (busiGroupProps: { showNotGroupItem?: boolean; onChange
               }}
             />
           ) : (
-            <Empty />
+            <div style={{ display: 'flex', alignItems: 'center', flexDirection: 'column', padding: 20, marginLeft: -20 }}>
+              <img src='/image/empty.png' width='64' />
+              <div className='ant-empty-description'>{'暂无数据'}</div>
+            </div>
           )}
         </>
       );
@@ -227,6 +268,7 @@ const busiGroupContent = (busiGroupProps: { showNotGroupItem?: boolean; onChange
 
 // 左侧栏
 const LeftTree: React.FC<LeftTreeProps> = ({ clusterGroup = {}, busiGroup = {}, eventLevelGroup = {}, eventTypeGroup = {} }) => {
+  const history = useHistory();
   const groupItems: IGroupItemProps[] = [
     clustersGroupContent(clusterGroup),
     busiGroupContent(busiGroup),
@@ -237,10 +279,12 @@ const LeftTree: React.FC<LeftTreeProps> = ({ clusterGroup = {}, busiGroup = {}, 
         return (
           <SelectList
             dataSource={[
-              { label: '一级告警', value: '1' },
-              { label: '二级告警', value: '2' },
-              { label: '三级告警', value: '3' },
+              { label: '一级告警', value: 1 },
+              { label: '二级告警', value: 2 },
+              { label: '三级告警', value: 3 },
             ]}
+            defaultSelect={eventLevelGroup.defaultSelect}
+            allowNotSelect={true}
             onChange={eventLevelGroup?.onChange}
           />
         );
@@ -253,9 +297,11 @@ const LeftTree: React.FC<LeftTreeProps> = ({ clusterGroup = {}, busiGroup = {}, 
         return (
           <SelectList
             dataSource={[
-              { label: 'Triggered', value: false },
-              { label: 'Recovered', value: true },
+              { label: 'Triggered', value: 0 },
+              { label: 'Recovered', value: 1 },
             ]}
+            defaultSelect={eventTypeGroup.defaultSelect}
+            allowNotSelect={true}
             onChange={eventTypeGroup?.onChange}
           />
         );
@@ -270,7 +316,10 @@ const LeftTree: React.FC<LeftTreeProps> = ({ clusterGroup = {}, busiGroup = {}, 
         ({ title, isShow, shrink = false, render }: IGroupItemProps, i) =>
           isShow && (
             <div key={i} className={`left-area-group ${shrink ? 'group-shrink' : ''}`} style={typeof shrink === 'object' ? shrink.style : {}}>
-              <div className='left-area-group-title'>{title}</div>
+              <div className='left-area-group-title'>
+                {title}
+                {title === '业务组' && <SettingOutlined onClick={() => history.push(`/busi-groups`)} />}
+              </div>
               {render()}
             </div>
           ),

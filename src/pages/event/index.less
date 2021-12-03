@@ -1,136 +1,31 @@
 @import '@/global.variable.less';
 
 .event-content {
+  display: flex;
   padding: @basePadding;
-  overflow-x: auto;
   box-sizing: border-box;
   width: 100%;
-  .ant-spin-nested-loading {
-    padding: 0 10px 10px;
+  .table-area {
+    width: calc(100% - 276px);
+    padding: 16px;
+    .event-tags {
+      .ant-tag {
+        cursor: pointer;
+      }
+    }
   }
-}
-
-.example {
-  margin: 20px 0;
-  margin-bottom: 20px;
-  padding: 30px 50px;
-  text-align: center;
-  background: rgba(0, 0, 0, 0.05);
-  border-radius: 4px;
-}
-.event-table-search {
-  padding: 10px 10px 0;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  &-left {
+  .table-operate-box {
+    width: 100%;
     display: flex;
-    flex-direction: row;
-    > div {
-      margin-right: 8px;
-    }
-    &-refresh {
-      margin-right: 8px;
-    }
-  }
-  &-right {
-    > span {
-      margin-left: 8px;
-    }
-  }
-}
-.event-Pagination {
-  padding: 0 10px 10px;
-}
-.event-detail-content {
-  padding: 20px;
-  &-main {
-    padding: 10px;
-    font-size: @baseFontSizeTiny;
-    line-height: 30px;
-    // font-weight: bold;
-    color: @fontColorLevel3;
-    &-label {
-      display: inline-block;
-      text-align: right;
-      width: 90px;
-      margin-right: 10px;
-      white-space: nowrap;
-    }
-    &-active {
-      cursor: pointer;
-      color: @fontColorBlue;
-    }
-    .ant-table-wrapper {
-      margin-bottom: 10px;
-    }
-    &-chart-and-table {
-      border: 1px solid #e8e8e8;
-      padding: 20px;
-      margin-bottom: 10px;
-      margin: 15px 15px;
-    }
-  }
-}
-.event-Pagination {
-  padding: 0 10px 10px;
-  display: flex;
-  justify-content: flex-end;
-}
-.evenTable {
-  margin-top: 10px;
-  width: 100%;
-  .ant-descriptions-item-label {
-    width: 101px;
-  }
-  .table-item {
-    margin-top: 10px;
-    min-width: 1150px;
-
-    .main_info {
-      border: 1px solid #e0dee2;
-      background: #fafafa;
-      padding: 8px;
-      .ant-col {
-        height: 100%;
+    justify-content: space-between;
+    .left {
+      flex: 1;
+      display: flex;
+      padding-right: 10px;
+      .search-input {
+        max-width: 300px;
+        margin-left: 10px;
       }
-
-      .non-border {
-        border: none;
-      }
-    }
-
-    &-title {
-      min-width: 70px;
-      height: 100%;
-      padding-right: 5px;
-      box-sizing: border-box;
-      display: flex;
-      align-items: center;
-      justify-self: center;
-    }
-    .tag {
-      width: 54px;
-      display: flex;
-      align-items: center;
-      justify-self: center;
-    }
-    .item-Row {
-      height: 100%;
-    }
-    &-content {
-      display: flex;
-      justify-content: flex-start;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-    &-scoure {
-      padding: 8px 10px;
-
-      border-left: 1px solid #f0f0f0;
-      border-right: 1px solid #f0f0f0;
-      border-bottom: 1px solid #f0f0f0;
-      box-sizing: border-box;
     }
   }
 }

@@ -1,8 +1,29 @@
+.shield-content {
+  display: flex;
+  flex-direction: row;
+  padding: @basePadding;
+  overflow-x: auto;
+  box-sizing: border-box;
+  width: 100%;
+  
+}
+.anticon-question-circle {
+  color: @colorBlue;
+}
+.shield-add {
+  .ant-picker {
+    width: 100%;
+  }
+}
 .shield-index {
+  flex: 1;
   .header {
     display: flex;
     padding: 10px 10px 0;
     justify-content: space-between;
+    .searchInput {
+      margin-left: 10px;
+    }
   }
   .ant-table-wrapper {
     padding: 0px 10px 10px;

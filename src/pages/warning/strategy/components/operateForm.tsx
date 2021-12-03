@@ -350,12 +350,6 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
             <Form.Item
               required
               label={t('执行频率')}
-              rules={[
-                {
-                  required: true,
-                  message: t('执行频率不能为空'),
-                },
-              ]}
             >
               <Space>
                 <Form.Item
@@ -363,6 +357,12 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                   name='prom_eval_interval'
                   initialValue={15}
                   wrapperCol={{ span: 10 }}
+                  rules={[
+                    {
+                      required: true,
+                      message: t('执行频率不能为空'),
+                    },
+                  ]}
                 >
                   <InputNumber
                     min={1}

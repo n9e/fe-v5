@@ -15,8 +15,8 @@ export default function BlankBusinessPlaceholder(props: Props) {
         <InfoCircleOutlined style={{ color: '#1473ff' }} /> {t('提示信息')}
       </p>
       <p>
-        {text}需要归属某个业务组，请先
-        <Link to='/manage/business'>创建业务组</Link>
+        {text}需要归属某个业务组，请先 &nbsp;
+        <Link to='/busi-groups'>创建业务组</Link>
       </p>
     </div>
   );

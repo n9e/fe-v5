@@ -1,445 +1,336 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import PageLayout from '@/components/pageLayout';
-import {
-  warningEventItem,
-  warningPriority,
-  warningStatus,
-  warningLabel,
-} from '@/store/eventInterface';
-import BaseTable from '@/components/BaseTable';
-import SearchInput from '@/components/BaseSearchInput';
-import { getAlertEvents, deleteAlertEvents } from '@/services/warning';
-import { ColumnType } from 'antd/lib/table';
-import ColorTag from '@/components/ColorTag';
-import {
-  Tag,
-  Select,
-  Modal,
-  message,
-  Button,
-  Descriptions,
-  Row,
-  Col,
-  Pagination,
-  Spin,
-  Empty,
-  Checkbox,
-  Divider,
-} from 'antd';
-import { useHistory } from 'react-router-dom';
-import dayjs from 'dayjs';
-import { priorityColor } from '@/utils/constant';
-import { useDispatch } from 'react-redux';
-import RefreshIcon from '@/components/RefreshIcon';
-import './index.less';
-import { AlertOutlined } from '@ant-design/icons';
+import { AlertOutlined, ExclamationCircleOutlined, SearchOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-const { Option } = Select;
+import LeftTree from '@/components/LeftTree';
+import DataTable from '@/components/Dantd/components/data-table';
+import moment from 'moment';
+import { Button, Input, message, Modal, Tag, Tooltip } from 'antd';
+import DateRangePicker, { RelativeRange } from '@/components/DateRangePicker';
+import { priorityColor } from '@/utils/constant';
+import { useHistory } from 'react-router';
+import './index.less';
+import { deleteAlertEvents } from '@/services/warning';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/store/common';
+import { eventStoreState } from '@/store/eventInterface';
+import { CommonStoreState } from '@/store/commonInterface';
+import BlankBusinessPlaceholder from '@/components/BlankBusinessPlaceholder';
+
 const { confirm } = Modal;
 
+export function deleteAlertEventsModal(busiId, ids: number[], onSuccess = () => {}) {
+  confirm({
+    title: '删除告警事件',
+    icon: <ExclamationCircleOutlined />,
+    content: '通常只有在确定监控数据永远不再上报的情况下（比如调整了监控数据标签，或者机器下线）才删除告警事件，因为相关告警事件永远无法自动恢复了，您确定要这么做吗？',
+    okText: '确认删除',
+    maskClosable: true,
+    okButtonProps: { danger: true },
+    onOk() {
+      return deleteAlertEvents(busiId, ids).then((res) => {
+        message.success('删除成功');
+        onSuccess();
+      });
+    },
+    onCancel() {},
+  });
+}
+
 const Event: React.FC = () => {
+  const history = useHistory();
   const { t } = useTranslation();
   const dispatch = useDispatch();
-  const history = useHistory();
-  const [query, setQuery] = useState<string>('');
-  const [priority, setPriority] = useState<warningPriority | undefined>();
-  const [status, setStatus] = useState<warningStatus | undefined>();
-  const tableRef = useRef(null as any);
-  const [tablelist, setTablelist] = useState<warningEventItem[]>([]);
-  // const [defaultPageSize, setdefaultPageSize] = useState<number>(50);
-  const [currennt, setcurrennt] = useState<number>(1);
-  const [pageSize, setpageSize] = useState<number>(15);
-  const [total, setTotal] = useState<number>(0);
-  const [spinning, setSpinning] = useState<boolean>(false);
-  const [refresh, setRefresh] = useState<boolean>(false);
-  const [selectRowKeys, setSelectRowKeys] = useState<React.Key[]>([]); //选中数组用给接口
-  const [CheckboxAll, setCheckboxAll] = useState<boolean>(false); //判断选中所有状态
-  const [indeterminate, setindeterminate] = useState<boolean>(false); //判断选中其中一些状态
-  const [CheckboxItem, setCheckboxItem] = useState<number[]>([]); //选中那些checkbox用给Checkbox.Group
-  const [lastPage, setlastPage] = useState<boolean>(false);
-  useEffect(() => {
-    setSpinning(true);
-    getAlertEvents({
-      query,
-      p: currennt,
-      limit: pageSize,
-      priority,
-      status,
-    }).then((res) => {
-      setTablelist(res.dat.list);
-      setTotal(res.dat.total);
-      setSpinning(false);
+  const { busiGroups, curClusterItems } = useSelector<RootState, CommonStoreState>((state) => state.common);
+  const { severity, hourRange, queryContent } = useSelector<RootState, eventStoreState>((state) => state.event);
+  const DateRangeItems: RelativeRange[] = useMemo(
+    () => [
+      { num: 6, unit: 'hours', description: t('hours') },
+      { num: 12, unit: 'hours', description: t('hours') },
+      { num: 1, unit: 'day', description: t('天') },
+      { num: 2, unit: 'days', description: t('天') },
+      { num: 3, unit: 'days', description: t('天') },
+      { num: 7, unit: 'days', description: t('天') },
+      { num: 14, unit: 'days', description: t('天') },
+      { num: 30, unit: 'days', description: t('天') },
+      { num: 60, unit: 'days', description: t('天') },
+      { num: 90, unit: 'days', description: t('天') },
+    ],
+    [],
+  );
+  const tableRef = useRef({
+    handleReload() {},
+  });
+  const isAddTagToQueryInput = useRef(false);
+  const [curBusiId, setCurBusiId] = useState<number>(-1);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<number[]>([]);
+
+  const columns = [
+    {
+      title: t('集群'),
+      dataIndex: 'cluster',
+      width: 120,
+    },
+    {
+      title: t('级别'),
+      dataIndex: 'severity',
+      width: 70,
+      render: (severity) => {
+        return <Tag color={priorityColor[severity - 1]}>S{severity}</Tag>;
+      },
+    },
+    {
+      title: t('规则标题'),
+      dataIndex: 'rule_name',
+      render(title, { id }) {
+        return (
+          <Button size='small' type='link' style={{ padding: 0 }} onClick={() => history.push(`/alert-cur-events/${curBusiId}/${id}`)}>
+            {title}
+          </Button>
+        );
+      },
+    },
+    {
+      title: t('事件标签'),
+      dataIndex: 'tags',
+      ellipsis: {
+        showTitle: false,
+      },
+      render(tagArr) {
+        const content =
+          tagArr &&
+          tagArr
+            .sort((a, b) => a.length - b.length)
+            .map((item) => (
+              <Tag
+                color='blue'
+                key={item}
+                onClick={(e) => {
+                  if (!queryContent.includes(item)) {
+                    isAddTagToQueryInput.current = true;
+                    saveData('queryContent', queryContent ? `${queryContent.trim()} ${item}` : item);
+                  }
+                }}
+              >
+                {item}
+              </Tag>
+            ));
+        return (
+          tagArr && (
+            <Tooltip title={content} placement='topLeft' getPopupContainer={() => document.body} overlayClassName='mon-manage-table-tooltip'>
+              <span className='event-tags'>{content}</span>
+            </Tooltip>
+          )
+        );
+      },
+    },
+    {
+      title: t('告警接收组'),
+      dataIndex: 'notify_groups_obj',
+      ellipsis: {
+        showTitle: false,
+      },
+      render(tagArr) {
+        const content =
+          tagArr &&
+          tagArr
+            .sort((a, b) => a.name.length - b.name.length)
+            .map((item) => (
+              <Tag color='blue' key={item.id}>
+                {item.name}
+              </Tag>
+            ));
+        return (
+          tagArr && (
+            <Tooltip title={content} placement='topLeft' getPopupContainer={() => document.body}>
+              {content}
+            </Tooltip>
+          )
+        );
+      },
+    },
+    {
+      title: t('触发时间'),
+      dataIndex: 'trigger_time',
+      width: 120,
+      render(value) {
+        return moment(value * 1000).format('YYYY-MM-DD HH:mm:ss');
+      },
+    },
+    {
+      title: t('操作'),
+      dataIndex: 'operate',
+      width: 120,
+      render(value, record) {
+        return (
+          <>
+            <Button size='small' type='link'>
+              屏蔽
+            </Button>
+            <Button
+              size='small'
+              type='link'
+              danger
+              onClick={() =>
+                deleteAlertEventsModal(curBusiId, [record.id], () => {
+                  setSelectedRowKeys(selectedRowKeys.filter((key) => key !== record.id));
+                  tableRef.current.handleReload();
+                  refreashAlertings();
+                })
+              }
+            >
+              删除
+            </Button>
+          </>
+        );
+      },
+    },
+  ];
+
+  function saveData(prop, data) {
+    dispatch({
+      type: 'event/saveData',
+      prop,
+      data,
     });
-  }, [pageSize, query, refresh, currennt, status, priority]);
+  }
+
+  function refreashAlertings() {
+    dispatch({
+      type: 'event/refreshAlertings',
+      ids: busiGroups.map((busiItem) => busiItem.id),
+    });
+  }
+
+  function renderLeftHeader() {
+    return (
+      <div className='table-operate-box'>
+        <div className='left'>
+          <DateRangePicker
+            showRight={false}
+            leftList={DateRangeItems}
+            value={hourRange}
+            onChange={(range: RelativeRange) => {
+              if (range.num !== hourRange.num || range.unit !== hourRange.unit) {
+                saveData('hourRange', range);
+              }
+            }}
+          />
+          <Input
+            className='search-input'
+            prefix={<SearchOutlined />}
+            placeholder='模糊搜索规则和标签(多个关键词请用空格分隔)'
+            value={queryContent}
+            onChange={(e) => saveData('queryContent', e.target.value)}
+            onPressEnter={(e) => tableRef.current.handleReload()}
+          />
+        </div>
+        <div className='right'>
+          <Button
+            danger
+            disabled={selectedRowKeys.length === 0}
+            onClick={() =>
+              deleteAlertEventsModal(curBusiId, selectedRowKeys, () => {
+                setSelectedRowKeys([]);
+                tableRef.current.handleReload();
+                refreashAlertings();
+              })
+            }
+          >
+            批量删除
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   useEffect(() => {
-    CheckboxStatus('none', []); //刷新页面，如果是全选状态翻页，设置为空状态
-  }, [refresh, status, priority, currennt]);
-  const CheckboxStatus = function (
-    type: string,
-    arr: boolean | Array<number> = false,
-  ) {
-    switch (type) {
-      case 'all':
-        setindeterminate(false); //选中全部
-        setCheckboxAll(true);
-        break;
-      case 'indeterminate':
-        console.log('indeterminate');
-        setindeterminate(true); //选中部分
-        setCheckboxAll(false);
-        break;
-      case 'none':
-        setindeterminate(false); //一条都没选中
-        setCheckboxAll(false);
-        break;
+    if (isAddTagToQueryInput.current) {
+      tableRef.current.handleReload();
+      isAddTagToQueryInput.current = false;
     }
-    if (Array.isArray(arr)) {
-      console.log(type, arr);
-      setCheckboxItem(arr);
-      setSelectRowKeys(arr);
-    }
-  };
-  const onPageCurrentSizeChange = function (currennt, size) {
-    if (total <= currennt * size) {
-      // 判断最后一页
-      setlastPage(true);
-    }
-    setCheckboxItem([]);
-    setSelectRowKeys([]);
-    setcurrennt(currennt);
-    setpageSize(size);
-  };
-  const onCheckboxChange = function (val) {
-    let arr = [...val];
-    let len = arr.length,
-      allTableLen = tablelist.length;
-    if (len == 0) {
-      CheckboxStatus('none', arr);
-    } else if (len == allTableLen) {
-      CheckboxStatus('all', arr);
-    } else {
-      CheckboxStatus('indeterminate', arr);
-    }
-  };
-  const selectRowKeyAll = function (val) {
-    if (CheckboxAll) {
-      // 重复点击选中全部
-      CheckboxStatus('none', []);
-    } else {
-      //选中全部
-      let res: number[] = [];
-      tablelist.forEach((ele) => {
-        res.push(ele.id);
+  }, [queryContent]);
+
+  useEffect(() => {
+    tableRef.current.handleReload();
+  }, [curClusterItems, severity, hourRange]);
+
+  // 获取活跃告警数量
+  useEffect(() => {
+    const busiIds = busiGroups.map((busiItem) => busiItem.id);
+    if (busiIds.length) {
+      dispatch({
+        type: 'event/refreshAlertings',
+        ids: busiIds,
       });
-      CheckboxStatus('all', res);
     }
-  };
+  }, [busiGroups]);
 
   return (
-    <PageLayout icon={<AlertOutlined />} title={t('未恢复告警事件')}>
+    <PageLayout icon={<AlertOutlined />} title={t('活跃告警')} hideCluster>
       <div className='event-content'>
-        <div className='event-table-search'>
-          <div className='event-table-search-left'>
-            <RefreshIcon
-              className='event-table-search-left-refresh'
-              onClick={() => {
-                setRefresh(!refresh);
-              }}
-            />
-            <SearchInput
-              placeholder={t('策略名称、标签、资源分组')}
-              onSearch={setQuery}
-              className={'searchInput'}
-              style={{
-                marginRight: 8,
-              }}
-            ></SearchInput>
-            <Select
-              placeholder={t('告警级别')}
-              allowClear
-              style={{
-                width: 90,
-              }}
-              onChange={(value) => {
-                if (typeof value !== 'undefined') {
-                  setPriority(Number(value));
-                } else {
-                  setPriority(undefined);
-                }
-              }}
-            >
-              <Option value={warningPriority.First}>
-                P{warningPriority.First}
-              </Option>
-              <Option value={warningPriority.Second}>
-                P{warningPriority.Second}
-              </Option>
-              <Option value={warningPriority.Third}>
-                P{warningPriority.Third}
-              </Option>
-            </Select>
-            <Select
-              placeholder={t('告警状态')}
-              allowClear
-              style={{
-                width: 100,
-              }}
-              onChange={(value) => {
-                if (typeof value !== 'undefined') {
-                  setStatus(Number(value));
-                } else {
-                  setStatus(undefined);
-                }
-              }}
-            >
-              <Option value={warningStatus.Enable}>{t('已触发')}</Option>
-              <Option value={warningStatus.UnEnable}>{t('已屏蔽')}</Option>
-            </Select>
-          </div>
-          <div className='event-table-search-right'>
-            <Checkbox
-              checked={CheckboxAll}
-              style={{ marginRight: 21 }}
-              onChange={selectRowKeyAll}
-              indeterminate={indeterminate}
-            ></Checkbox>
-
-            <Button
-              type='primary'
-              style={{
-                width: 102,
-                textAlign: 'center',
-                paddingLeft: 5,
-                paddingRight: 5,
-              }}
-              disabled={selectRowKeys.length === 0}
-              onClick={() => {
-                confirm({
-                  title: t('是否批量忽略告警?'),
-                  onOk: () => {
-                    console.log(lastPage);
-                    if (lastPage && selectRowKeys.length == tablelist.length) {
-                      console.log('setcurrennt');
-                      setcurrennt(currennt - 1);
-                    }
-                    deleteAlertEvents(selectRowKeys as number[]).then(() => {
-                      message.success(t('已忽略告警'));
-                      setSelectRowKeys([]);
-                      setRefresh(!refresh);
-                    });
+        <LeftTree
+          clusterGroup={{
+            isShow: true,
+          }}
+          busiGroup={{
+            showAlertings: true,
+            onChange(value) {
+              setCurBusiId(typeof value === 'number' ? value : -1);
+            },
+          }}
+          eventLevelGroup={{
+            isShow: true,
+            defaultSelect: severity,
+            onChange(v: number | undefined) {
+              saveData('severity', v);
+            },
+          }}
+        />
+        <div className='table-area'>
+          {curBusiId !== -1 ? (
+            <DataTable
+              ref={tableRef}
+              antProps={{
+                rowKey: 'id',
+                rowSelection: {
+                  selectedRowKeys: selectedRowKeys,
+                  onChange(selectedRowKeys, selectedRows) {
+                    setSelectedRowKeys(selectedRowKeys.map((key) => Number(key)));
                   },
-
-                  onCancel() {},
-                });
+                },
+                scroll: { x: 800, y: 'calc(100vh - 252px)' },
               }}
-            >
-              {t('批量忽略')}
-            </Button>
-          </div>
-        </div>
-        <Spin spinning={spinning}>
-          <Checkbox.Group
-            style={{ width: '100%' }}
-            value={CheckboxItem}
-            onChange={onCheckboxChange}
-          >
-            <div className={'evenTable'}>
-              {tablelist.length > 0 ? (
-                tablelist.map((ele: warningEventItem, index) => {
-                  return (
-                    <div className='table-item' key={ele.id}>
-                      <Row className={'main_info'}>
-                        <Col span={21}>
-                          <Tag color={priorityColor[ele.priority - 1]}>
-                            P{ele.priority}
-                          </Tag>
-                          <Divider type='vertical' />
-
-                          <span>
-                            {dayjs(ele.trigger_time * 1000).format(
-                              'YYYY-MM-DD HH:mm:ss',
-                            )}
-                          </span>
-                          <Divider type='vertical' />
-
-                          <span>
-                            {ele.status === warningStatus.Enable
-                              ? t('已触发')
-                              : t('已屏蔽')}
-                          </span>
-                          <Divider type='vertical' />
-
-                          <a
-                            className={'name'}
-                            onClick={() => {
-                              dispatch({
-                                type: `event/editItem`,
-                                data: ele,
-                              });
-                              history.push('/event/' + ele.id);
-                            }}
-                            key={index}
-                          >
-                            {ele.rule_name}
-                          </a>
-
-                          {
-                            <>
-                              {ele.notify_user_objs
-                                ? ele.notify_user_objs.map((tag, index) => {
-                                    return tag ? (
-                                      <span key={index}>
-                                        <Divider type='vertical' />
-                                        <ColorTag
-                                          text={tag.nickname}
-                                        ></ColorTag>
-                                      </span>
-                                    ) : null;
-                                  })
-                                : ''}
-                            </>
-                          }
-                        </Col>
-                        <Col
-                          span={3}
-                          className={'non-border'}
-                          style={{ textAlign: 'right', paddingRight: 10 }}
-                        >
-                          <Checkbox
-                            value={ele.id}
-                            className={'Checkbox'}
-                            key={index}
-                          ></Checkbox>
-                          <Divider type='vertical' />
-
-                          <a
-                            style={{
-                              cursor: 'pointer',
-                              width: 35,
-                              display: 'inline-block',
-                            }}
-                            onClick={() => {
-                              dispatch({
-                                type: `event/editItem`,
-                                data: ele,
-                              });
-                              history.push('/shield/add/event');
-                            }}
-                          >
-                            {t('屏蔽')}
-                          </a>
-                          <Divider type='vertical' />
-                          <a
-                            style={{
-                              color: 'red',
-                              cursor: 'pointer',
-                              width: 35,
-                              display: 'inline-block',
-                            }}
-                            onClick={() => {
-                              confirm({
-                                title: t('是否忽略告警?'),
-                                onOk: () => {
-                                  if (lastPage && tablelist.length == 1) {
-                                    console.log('setcurrennt');
-                                    setcurrennt(currennt - 1);
-                                  }
-                                  deleteAlertEvents([ele.id]).then(() => {
-                                    message.success(t('已忽略告警'));
-                                    setRefresh(!refresh);
-                                  });
-                                },
-                                onCancel() {},
-                              });
-                            }}
-                          >
-                            {t('忽略')}
-                          </a>
-                        </Col>
-                      </Row>
-                      <Row className={'table-item-scoure'}>
-                        <Col span={24}>
-                          <Row className={'item-Row'}>
-                            <Col span={1}>{t('标签')} :</Col>
-                            <Col span={22}>
-                              <div className={'table-item-content'}>
-                                {
-                                  <>
-                                    {ele.tags
-                                      ? ele.tags
-                                          .trim()
-                                          .split(' ')
-                                          .map((tag, index) => {
-                                            return tag ? (
-                                              <ColorTag
-                                                text={tag}
-                                                key={index}
-                                              ></ColorTag>
-                                            ) : null;
-                                          })
-                                      : ''}
-                                  </>
-                                }
-                                <div className={'table-item-title'}>
-                                   
-                                  {ele.res_classpaths ? (
-                                    <span>{t('资源分组')}:</span>
-                                  ) : (
-                                    ''
-                                  )}
-                                   
-                                </div>
-                                <div className={'table-item-content'}>
-                                  {
-                                    <>
-                                      {ele.res_classpaths
-                                        ? ele.res_classpaths
-                                            .split(' ')
-                                            .map((tag, index) => {
-                                              return tag ? (
-                                                <ColorTag
-                                                  text={tag}
-                                                  key={index}
-                                                ></ColorTag>
-                                              ) : null;
-                                            })
-                                        : ''}
-                                    </>
-                                  }
-                                </div>
-                              </div>
-                            </Col>
-                          </Row>
-                        </Col>
-                      </Row>
-                    </div>
-                  );
-                })
-              ) : (
-                <Empty
-                  image={Empty.PRESENTED_IMAGE_SIMPLE}
-                  style={{
-                    height: 135,
-                    border: '1px solid #dbdee3',
-                    padding: 30,
-                  }}
-                />
-              )}
-            </div>
-          </Checkbox.Group>
-        </Spin>
-        {tablelist.length > 0 ? (
-          <div className={'event-Pagination'}>
-            <Pagination
-              total={total}
-              showTotal={(total) => `Total ${total} items`}
-              defaultPageSize={pageSize}
-              current={currennt}
-              onChange={onPageCurrentSizeChange}
+              url={`/api/n9e/busi-group/${curBusiId}/alert-cur-events`}
+              customQueryCallback={(data) =>
+                Object.assign(
+                  data,
+                  { hours: hourRange.unit !== 'hours' ? hourRange.num * 24 : hourRange.num },
+                  curClusterItems.length ? { clusters: curClusterItems.join(',') } : {},
+                  severity ? { severity } : {},
+                  queryContent ? { query: queryContent } : {},
+                )
+              }
+              pageParams={{
+                curPageName: 'p',
+                pageSizeName: 'limit',
+                pageSize: 30,
+                pageSizeOptions: ['30', '100', '200', '500'],
+              }}
+              apiCallback={({ dat: { list: data, total } }) => ({
+                data,
+                total,
+              })}
+              columns={columns}
+              reloadBtnType='btn'
+              reloadBtnPos='left'
+              filterType='flex'
+              leftHeader={renderLeftHeader()}
             />
-          </div>
-        ) : null}
+          ) : (
+            <BlankBusinessPlaceholder text='活跃告警' />
+          )}
+        </div>
       </div>
     </PageLayout>
   );

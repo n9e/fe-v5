@@ -4,6 +4,7 @@ import { getBusiGroups, getCommonClusters } from '@/services/common';
 
 const initData: CommonStoreState = {
   clusters: [],
+  curClusterItems: JSON.parse(localStorage.getItem('curClusterItems') || '[]'),
   busiGroups: [],
   curBusiItem: JSON.parse(localStorage.getItem('curBusiItem') || '{}'),
 };
@@ -17,30 +18,44 @@ const commonStore: IStore<CommonStoreState> = {
     },
   },
   effects: {
-    *getClusters({}, { put }) {
-      const { dat: data } = yield getCommonClusters();
+    *getClusters({}, { put, select }) {
+      const { curClusterItems } = yield select((state) => state.common);
+      const { dat } = yield getCommonClusters();
+      const data = dat || [];
+      // 筛选去除当前选中集群列表中不存在的集群
+      const filteredClusterItems = curClusterItems.filter((item: string) => data.includes(item));
+      yield put({
+        type: 'saveData',
+        prop: 'curClusterItems',
+        data: filteredClusterItems,
+      });
+      localStorage.setItem('curClusterItems', JSON.stringify(filteredClusterItems));
+
       yield put({
         type: 'saveData',
         prop: 'clusters',
         data,
       });
     },
-    *getBusiGroups({ query }, { put }) {
-      const { dat: data } = yield getBusiGroups(query);
+    *getBusiGroups({ query }, { put, select }) {
+      const { curBusiItem } = yield select((state) => state.common);
+      const { dat } = yield getBusiGroups(query);
+      const data = dat || [];
+      // 如果业务组列表中不存在当前选中的业务组，则清空
+      if (curBusiItem.id && data.every((item) => item.id !== curBusiItem.id)) {
+        yield put({
+          type: 'saveData',
+          prop: 'curBusiItem',
+          data: {},
+        });
+        localStorage.removeItem('curBusiItem');
+      }
+
       yield put({
         type: 'saveData',
         prop: 'busiGroups',
         data,
       });
-      // 初始化选中第一项业务组
-      if (!localStorage.getItem('curBusiItem') && data.length > 0) {
-        localStorage.setItem('curBusiItem', JSON.stringify(data[0]))
-        yield put({
-          type: 'saveData',
-          prop: 'curBusiItem',
-          data: data[0],
-        });
-      }
     },
   },
 };

@@ -1,0 +1,70 @@
+.event-detail-container {
+  .ant-spin-nested-loading {
+    height: 100%;
+    background: transparent !important;
+  }
+  .ant-spin-container {
+    height: 100%;
+  }
+  .desc-container {
+    display: flex;
+    flex-direction: column;
+    border-radius: 0;
+    font-size: 12px;
+    max-height: 100%;
+    .ant-card-body {
+      box-sizing: border-box;
+      flex: auto;
+      overflow: auto;
+    }
+    .desc-row {
+      display: flex;
+      min-height: 26px;
+      margin-bottom: 8px;
+      &:last-of-type {
+        margin-bottom: 0;
+      }
+      .desc-label {
+        display: flex;
+        justify-content: flex-end;
+        padding-top: 3px;
+        width: 84px;
+        color: @colorGray4;
+      }
+      .desc-content {
+        flex: 1;
+        display: flex;
+        flex-flow: row wrap;
+        align-items: center;
+        color: @colorGray1;
+        .ant-row {
+          flex: 1;
+        }
+      }
+      .rule-link-btn {
+        padding: 0;
+        border: 0;
+      }
+      .promql-row {
+        .promql-editor {
+          font-size: 12px;
+        }
+        .run-btn {
+          padding: 0 10px;
+          height: 28px;
+          .run-icon {
+            font-size: 14px;
+          }
+        }
+      }
+    }
+    .ant-tag {
+      margin: 2px 4px;
+    }
+    .action-btns {
+      display: flex;
+      justify-content: flex-start;
+      padding: 0 24px;
+    }
+  }
+}
