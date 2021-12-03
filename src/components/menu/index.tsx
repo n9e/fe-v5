@@ -65,7 +65,7 @@ const SideMenu: FC = () => {
           title: t('对象视角'),
         },
         {
-          key: '/dashboard',
+          key: '/dashboards',
           title: t('监控大盘'),
         },
       ],

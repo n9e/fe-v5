@@ -4,11 +4,7 @@ import { Button, Input, Table, Tooltip, Tag, message, Modal } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store/common';
 import { getShieldList, deleteShields } from '@/services/shield';
-import {
-  CloseCircleOutlined,
-  ExclamationCircleOutlined,
-  SearchOutlined,
-} from '@ant-design/icons';
+import { CloseCircleOutlined, ExclamationCircleOutlined, SearchOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 import { CommonStoreState } from '@/store/commonInterface';
 import { shieldItem } from '@/store/warningInterface';
@@ -27,7 +23,7 @@ const Shield: React.FC = () => {
   const history = useHistory();
   const dispatch = useDispatch();
   const [query, setQuery] = useState<string>('');
-  const { curBusiItem } = useSelector<RootState, CommonStoreState>(state => state.common);
+  const { curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const [bgid, setBgid] = useState(undefined);
   const [clusters, setClusters] = useState<string[]>([]);
   const [currentShieldDataAll, setCurrentShieldDataAll] = useState<Array<shieldItem>>([]);
@@ -50,14 +46,12 @@ const Shield: React.FC = () => {
           <>
             {text
               ? text.map((tag, index) => {
-                return tag ? (
-                  // <ColorTag text={`${tag.key} ${tag.func} ${tag.func === 'in' ? tag.value.split(' ').join(', ') : tag.value}`} key={index}>
-                  // </ColorTag>
-                  <div key={index}>
-                    {`${tag.key} ${tag.func} ${tag.func === 'in' ? tag.value.split(' ').join(', ') : tag.value}`}
-                  </div>
-                ) : null;
-              })
+                  return tag ? (
+                    // <ColorTag text={`${tag.key} ${tag.func} ${tag.func === 'in' ? tag.value.split(' ').join(', ') : tag.value}`} key={index}>
+                    // </ColorTag>
+                    <div key={index}>{`${tag.key} ${tag.func} ${tag.func === 'in' ? tag.value.split(' ').join(', ') : tag.value}`}</div>
+                  ) : null;
+                })
               : ''}
           </>
         );
@@ -120,15 +114,14 @@ const Shield: React.FC = () => {
                 className='table-operator-area-normal'
                 style={{
                   cursor: 'pointer',
-                  display: 'inline-block'
+                  display: 'inline-block',
                 }}
                 onClick={() => {
                   dispatch({
                     type: 'shield/setCurShieldData',
-                    data: record
+                    data: record,
                   });
-                  curBusiItem?.id &&
-                    history.push(`/alert-mutes/edit/${record.id}?mode=clone`);
+                  curBusiItem?.id && history.push(`/alert-mutes/edit/${record.id}?mode=clone`);
                 }}
               >
                 {t('克隆')}
@@ -137,7 +130,7 @@ const Shield: React.FC = () => {
                 className='table-operator-area-warning'
                 style={{
                   cursor: 'pointer',
-                  display: 'inline-block'
+                  display: 'inline-block',
                 }}
                 onClick={() => {
                   confirm({
@@ -147,14 +140,13 @@ const Shield: React.FC = () => {
                       dismiss(record.id);
                     },
 
-                    onCancel() { },
+                    onCancel() {},
                   });
                 }}
               >
                 {t('删除')}
               </div>
             </div>
-
           </>
         );
       },
@@ -163,32 +155,30 @@ const Shield: React.FC = () => {
 
   useEffect(() => {
     getList();
-  }, [curBusiItem])
+  }, [curBusiItem]);
 
   useEffect(() => {
     filterData();
-  }, [query, clusters, currentShieldDataAll])
+  }, [query, clusters, currentShieldDataAll]);
 
   const dismiss = (id: number) => {
-    deleteShields({ids: [id]}, curBusiItem.id).then((res) => {
+    deleteShields({ ids: [id] }, curBusiItem.id).then((res) => {
       refreshList();
       if (res.err) {
         message.success(res.err);
       } else {
         message.success(t('删除成功'));
       }
-      
     });
   };
 
   const filterData = () => {
     const data = JSON.parse(JSON.stringify(currentShieldDataAll));
     const res = data.filter((item: shieldItem) => {
-      const tagFind = item.tags.find(tag => {
-        return tag.key.indexOf(query) > -1 || tag.value.indexOf(query) > -1 || tag.func.indexOf(query) > -1
-      })
-      return (item.cause.indexOf(query) > -1 || !!tagFind) &&
-        (clusters && clusters?.indexOf(item.cluster) > -1 || clusters?.length === 0)
+      const tagFind = item.tags.find((tag) => {
+        return tag.key.indexOf(query) > -1 || tag.value.indexOf(query) > -1 || tag.func.indexOf(query) > -1;
+      });
+      return (item.cause.indexOf(query) > -1 || !!tagFind) && ((clusters && clusters?.indexOf(item.cluster) > -1) || clusters?.length === 0);
     });
     setCurrentShieldData(res || []);
   };
@@ -220,75 +210,64 @@ const Shield: React.FC = () => {
   };
 
   return (
-    <PageLayout title={t('屏蔽规则')} icon={<CloseCircleOutlined />}>
+    <PageLayout title={t('屏蔽规则')} icon={<CloseCircleOutlined />} hideCluster>
       <div className='shield-content'>
         <LeftTree
           clusterGroup={{
             isShow: true,
-            onChange: clusterChange
+            onChange: clusterChange,
           }}
           busiGroup={{
             // showNotGroupItem: true,
             onChange: busiChange,
           }}
         ></LeftTree>
-        {curBusiItem?.id ? 
-        (
+        {curBusiItem?.id ? (
           <div className='shield-index'>
-
-          <div className='header'>
-            <div className='header-left'>
-              <RefreshIcon
-                className='strategy-table-search-left-refresh'
-                onClick={() => {
-                  refreshList();
-                }}
-              />
-              <Input
-                onPressEnter={onSearchQuery}
-                className={'searchInput'}
-                prefix={<SearchOutlined />}
-                placeholder={t('搜索标签、屏蔽原因')}
-              />
+            <div className='header'>
+              <div className='header-left'>
+                <RefreshIcon
+                  className='strategy-table-search-left-refresh'
+                  onClick={() => {
+                    refreshList();
+                  }}
+                />
+                <Input onPressEnter={onSearchQuery} className={'searchInput'} prefix={<SearchOutlined />} placeholder={t('搜索标签、屏蔽原因')} />
+              </div>
+              <div className='header-right'>
+                <Button
+                  type='primary'
+                  className='add'
+                  onClick={() => {
+                    history.push('/alert-mutes/add');
+                  }}
+                >
+                  {t('新增屏蔽规则')}
+                </Button>
+              </div>
             </div>
-            <div className='header-right'>
-              <Button
-                type='primary'
-                className='add'
-                onClick={() => {
-                  history.push('/alert-mutes/add');
-                }}
-              >
-                {t('新增屏蔽规则')}
-              </Button>
-            </div>
+            <Table
+              rowKey='id'
+              // sticky
+              pagination={{
+                total: currentShieldData.length,
+                showQuickJumper: true,
+                showSizeChanger: true,
+                showTotal: (total) => {
+                  return `共 ${total} 条数据`;
+                },
+                pageSizeOptions: pageSizeOptionsDefault,
+                defaultPageSize: 30,
+              }}
+              loading={loading}
+              dataSource={currentShieldData}
+              columns={columns}
+            />
           </div>
-          <Table
-            rowKey="id"
-            // sticky
-            pagination={{
-              total: currentShieldData.length,
-              showQuickJumper: true,
-              showSizeChanger: true,
-              showTotal: (total) => {
-                return `共 ${total} 条数据`;
-              },
-              pageSizeOptions: pageSizeOptionsDefault,
-              defaultPageSize: 30
-            }}
-            loading={loading}
-            dataSource={currentShieldData}
-
-            columns={columns}
-          />
-        </div>
-        ) : 
-        (
-          <BlankBusinessPlaceholder text='屏蔽规则'/>
+        ) : (
+          <BlankBusinessPlaceholder text='屏蔽规则' />
         )}
-        
       </div>
-
     </PageLayout>
   );
 };

@@ -7,9 +7,9 @@ import './index.less';
 const AddShield: React.FC = () => {
   const { t } = useTranslation();
   return (
-    <PageLayout title={t('告警屏蔽')} showBack>
+    <PageLayout title={t('告警屏蔽')} showBack hideCluster>
       <div className='shield-add'>
-      <OperateForm />
+        <OperateForm />
       </div>
     </PageLayout>
   );

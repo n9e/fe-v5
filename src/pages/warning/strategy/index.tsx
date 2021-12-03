@@ -19,7 +19,7 @@ const Strategy: React.FC = () => {
     setBgid(data);
   };
   return (
-    <PageLayout title={t('告警规则')} icon={<SettingOutlined />}>
+    <PageLayout title={t('告警规则')} icon={<SettingOutlined />} hideCluster>
       <div className='strategy-content'>
         <LeftTree
           clusterGroup={{
@@ -30,12 +30,7 @@ const Strategy: React.FC = () => {
             onChange: busiChange,
           }}
         ></LeftTree>
-        {bgid ? (
-          <PageTable bgid={bgid} clusters={clusters}></PageTable>
-        ) : (
-          <BlankBusinessPlaceholder text='告警规则'/>
-        )}
-        
+        {bgid ? <PageTable bgid={bgid} clusters={clusters}></PageTable> : <BlankBusinessPlaceholder text='告警规则' />}
       </div>
     </PageLayout>
   );
