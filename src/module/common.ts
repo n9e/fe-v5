@@ -31,6 +31,10 @@ const commonStore: IStore<CommonStoreState> = {
       });
       localStorage.setItem('curClusterItems', JSON.stringify(filteredClusterItems));
 
+      if (!data.includes(localStorage.getItem('curCluster'))) {
+        localStorage.removeItem('curCluster');
+      }
+
       yield put({
         type: 'saveData',
         prop: 'clusters',
