@@ -34,12 +34,17 @@ const { TextArea } = Input;
 
 const btimeDefault = new Date().getTime();
 const etimeDefault = new Date().getTime() + 1 * 60 * 60 * 1000; // 默认时长1h
+
+interface ItagsObj {
+  tags: any[]
+}
 interface Props {
   detail?: shieldItem;
+  tagsObj?: ItagsObj;
   type?: number; // 1:编辑; 2:克隆
 }
 
-const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
+const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj= {} }) => {
   const { t, i18n } = useTranslation();
   const { clusters: clusterList } = useSelector<RootState, CommonStoreState>(
     (state) => state.common,
@@ -81,6 +86,12 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
     }
   }, [form])
 
+  useEffect(() => {
+    form.setFieldsValue({
+      tags: tagsObj.tags || []
+    })
+  }, [tagsObj])
+
   const timeChange = () => {
     const btime = form.getFieldValue('btime');
     const etime = form.getFieldValue('etime');
@@ -89,7 +100,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
       const h = Math.floor(moment.duration(etime - btime).hours());
       const m = Math.floor(moment.duration(etime - btime).minutes());
       const s = Math.floor(moment.duration(etime - btime).seconds());
-      const timeLen = `${d}.${h}:${m}:${s}`;
+      const timeLen = `${d ? `${d}d ` : ''}${h ? `${h}h ` : ''}${m ? `${m}m ` : ''}${s ? `${s}s` : ''}`;
       setTimeLen(timeLen);
     }
   }
