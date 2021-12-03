@@ -7,9 +7,6 @@ import { IshieldState } from '@/store/warningInterface/shield';
 import PageLayout from '@/components/pageLayout';
 import OperateForm from './components/operateForm';
 import { useTranslation } from 'react-i18next';
-import {
-  getShieldList,
-} from '@/services/shield';
 
 import './index.less'
 
