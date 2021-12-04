@@ -161,7 +161,23 @@ const EventDetailPage: React.FC = () => {
             actions={[
               <div className='action-btns'>
                 <Space>
-                  <Button type='primary'>屏蔽</Button>
+                  <Button
+                    type='primary'
+                    onClick={() => {
+                      history.push('/alert-mutes/add', {
+                        tags: eventDetail.tags.map((tag) => {
+                          const [key, value] = tag.split('=');
+                          return {
+                            func: '==',
+                            key,
+                            value,
+                          };
+                        }),
+                      });
+                    }}
+                  >
+                    屏蔽
+                  </Button>
                   {!isHistory && (
                     <Button
                       danger

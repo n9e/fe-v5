@@ -24,6 +24,7 @@ interface IPageLayoutProps {
 const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, children, customArea, showBack, onChangeCluster, hideCluster = false }) => {
   const { t, i18n } = useTranslation();
   const history = useHistory();
+  const dispatch = useDispatch();
   let { profile } = useSelector<AccountRootState, accountStoreState>((state) => state.account);
   const { clusters } = useSelector<CommonRootState, CommonStoreState>((state) => state.common);
   const localCluster = localStorage.getItem('curCluster');
@@ -47,6 +48,16 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, childr
           Logout().then((res) => {
             localStorage.removeItem('access_token');
             localStorage.removeItem('refresh_token');
+            dispatch({
+              type: 'common/saveData',
+              prop: 'clusters',
+              data: [],
+            });
+            dispatch({
+              type: 'common/saveData',
+              prop: 'busiGroups',
+              data: [],
+            });
             history.push('/login');
           });
         }}

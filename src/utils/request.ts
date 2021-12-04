@@ -28,7 +28,7 @@ request.interceptors.request.use((url, options) => {
   if (!headers['X-Cluster']) {
     headers['X-Cluster'] = localStorage.getItem('curCluster') || '';
   }
-  headers['X-Language']='zh'
+  headers['X-Language'] = 'zh';
   return {
     url,
     options: { ...options, headers },
@@ -60,22 +60,24 @@ request.interceptors.response.use(
         });
     }
     if (status === 401) {
-      if(response.url.indexOf('/api/n9e/auth/refresh') ){
-        location.href = `/login${location.pathname != '/' ? '?redirect=' + location.pathname : ''}`
-      }else{
+      if (response.url.indexOf('/api/n9e/auth/refresh')) {
+        location.href = `/login${location.pathname != '/' ? '?redirect=' + location.pathname : ''}`;
+      } else {
         localStorage.getItem('refresh_token')
-        ? UpdateAccessToken().then((res) => {
-            console.log('401 err', res);
-            if (res.err) {
-              location.href = `/login${location.pathname != '/' ? '?redirect=' + location.pathname : ''}`;
-            } else {
-              const { access_token, refresh_token } = res.dat;
-              localStorage.setItem('access_token', access_token);
-              localStorage.setItem('refresh_token', refresh_token);
-            }
-          })
-        : (location.href = `/login${location.pathname != '/' ? '?redirect=' + location.pathname : ''}`);
+          ? UpdateAccessToken().then((res) => {
+              console.log('401 err', res);
+              if (res.err) {
+                location.href = `/login${location.pathname != '/' ? '?redirect=' + location.pathname : ''}`;
+              } else {
+                const { access_token, refresh_token } = res.dat;
+                localStorage.setItem('access_token', access_token);
+                localStorage.setItem('refresh_token', refresh_token);
+              }
+            })
+          : (location.href = `/login${location.pathname != '/' ? '?redirect=' + location.pathname : ''}`);
       }
+    } else if (status === 404) {
+      location.href = '/404';
     } else {
       const contentType = response.headers.get('content-type');
       const isPlainText = contentType?.indexOf('text/plain; charset=utf-8') !== -1;

@@ -19,7 +19,7 @@ export interface GraphDataProps {
   step: number | null;
   range: Range;
   legend?: boolean;
-  title?: string;
+  title?: string | ReactNode;
   selectedHosts?: { ident: string }[];
   metric?: string;
   promqls?: string[] | { current: string }[];
@@ -263,15 +263,26 @@ export default class Graph extends Component<GraphProps, GraphState> {
   };
 
   shareChart = () => {
+    const initShareDataProps = { ...this.props.data, legend: this.state.legend };
+    if (!initShareDataProps.promqls) {
+      let queries: string[] = [];
+      const obj = {
+        curAggrFunc: this.state.aggrFunc,
+        curAggrGroup: this.state.aggrGroups,
+      };
+      const baseQuery = this.generateQuery(obj);
+      baseQuery && queries.push(baseQuery);
+      const offsetQuery = this.state.offsets.map((offset) => this.generateQuery({ ...obj, offset })).filter((query) => query);
+      queries = queries.concat(offsetQuery as string[]);
+      initShareDataProps.promqls = queries;
+    }
     let serielData = {
-      dataProps: { ...this.props.data },
-      state: {
-        defaultAggrFunc: this.state.aggrFunc,
-        defaultAggrGroups: this.state.aggrGroups,
-        defaultOffsets: this.state.offsets,
-      },
+      dataProps: initShareDataProps,
+      highLevelConfig: { ...this.state.highLevelConfig },
+      curCluster: localStorage.getItem('curCluster'),
     };
     delete serielData.dataProps.ref;
+
     SetTmpChartData([
       {
         configs: JSON.stringify(serielData),

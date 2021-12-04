@@ -2,7 +2,7 @@
 import _ from 'lodash';
 import moment from 'moment';
 import { replaceExpressionBracket } from './index';
-import { sizeFormatter } from '@/utils'
+import { sizeFormatter } from '@/utils';
 const fmt = 'YYYY-MM-DD HH:mm:ss';
 import { ChartType } from '@/components/D3Charts/src/interface';
 
@@ -32,7 +32,7 @@ function renderPointContent(isSingle, pointData = {}, serie = {}, formatUnit, pr
   const { legendTitleFormat } = serie;
   const { color, filledNull, serieOptions = {}, timestamp } = pointData;
   // StackArea 类型的原始值被存储在 y0key (值为 2) + 1 的位置，所以取了下标为 3 的值，后期可完善
-  const value = chartType === ChartType.Line ? pointData.value : pointData[3];
+  const value = chartType === ChartType.StackArea ? pointData[3] : pointData.value;
   let comparison = '';
   if (serieOptions.comparison) {
     comparison += ` offset ${serieOptions.comparison}`;
@@ -50,27 +50,25 @@ function renderPointContent(isSingle, pointData = {}, serie = {}, formatUnit, pr
       <br/>`;
   };
 
-  const formatValue = value => {
+  const formatValue = (value) => {
     if (precision === 'short') {
       if (formatUnit === 1024 || formatUnit === 1000) {
-        return value > 1000 ? sizeFormatter(value, 2, { convertNum: formatUnit }) : value.toFixed(2)
+        return value > 1000 ? sizeFormatter(value, 2, { convertNum: formatUnit }) : value.toFixed(2);
       } else if (formatUnit === 'humantime') {
-        return moment.duration(value, 'seconds').humanize()
+        return moment.duration(value, 'seconds').humanize();
       } else {
-        return ''
+        return '';
       }
     } else {
-      return value
+      return value;
     }
-  }
+  };
 
   const renderSingleSeriesPointContent = () => {
     const labelContents = labelKeys.map((label) => `<div><strong>${label}</strong>: ${serieMetricLabels[label]}</div>`);
     const label = legendTitleFormat ? replaceExpressionBracket(legendTitleFormat, serieMetricLabels) : `${metricName} ${comparison}${metricName || comparison ? ': ' : ''}`;
     return `<span style="color:${color}">● </span>
-      ${label}<strong>${formatValue(value)}${
-      filledNull ? '(空值填补,仅限看图使用)' : ''
-    }</strong>
+      ${label}<strong>${formatValue(value)}${filledNull ? '(空值填补,仅限看图使用)' : ''}</strong>
       <div /><br />
       <div><strong>Series:</strong></div>
       ${metricName ? `<div><strong>${metricName}</strong></div>` : ''}
