@@ -2,7 +2,7 @@ import React, { FC, useState, useEffect } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { MenuClickEventHandler } from 'rc-menu/lib/interface';
 import { Menu, Button } from 'antd';
-import Icon, { MenuUnfoldOutlined, MenuFoldOutlined, LineChartOutlined, DatabaseOutlined, UserOutlined, CodeOutlined, SettingOutlined, ContactsOutlined } from '@ant-design/icons';
+import Icon, { MenuUnfoldOutlined, MenuFoldOutlined, LineChartOutlined, DatabaseOutlined, UserOutlined, CodeOutlined, AlertOutlined, ContactsOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { dynamicPackages, Entry } from '@/utils';
@@ -72,7 +72,7 @@ const SideMenu: FC = () => {
     },
     {
       key: 'alarm',
-      icon: <SettingOutlined />,
+      icon: <AlertOutlined />,
       title: t('告警管理'),
       children: [
         {
