@@ -290,7 +290,7 @@ export default function ChartConfigModal(props: Props) {
               }
             >
               {({ getFieldsValue }) => {
-                const { QL = [], multi, legend, format, yplotline1, yplotline2 } = getFieldsValue();
+                const { QL = [], multi, legend = false, format, yplotline1, yplotline2 } = getFieldsValue();
                 const promqls = QL.filter((item) => item && item.PromQL).map((item) =>
                   innerVariableConfig ? replaceExpressionVars(item.PromQL, innerVariableConfig, innerVariableConfig.var.length) : item.PromQL,
                 );

@@ -54,5 +54,5 @@ export default function PromqlEditor(props: Props) {
     setView(v);
   }, []);
 
-  return <div ref={containerRef} className={className} style={Object.assign({ fontSize: 16 }, style)}></div>;
+  return <div ref={containerRef} className={className} style={Object.assign({ fontSize: 12 }, style)}></div>;
 }
