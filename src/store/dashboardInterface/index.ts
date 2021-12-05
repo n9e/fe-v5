@@ -30,7 +30,15 @@ type QLItem = {
   Legend: string;
 };
 
+export interface HighLevelConfigType {
+  shared: boolean;
+  sharedSortDirection: 'desc' | 'asc';
+  precision: 'short' | 'origin' | number;
+  formatUnit: 1024 | 1000 | 'humantime';
+}
+
 export interface ChartConfig {
+  highLevelConfig?: HighLevelConfigType;
   layout?: Layout;
   tags: object;
   QL: QLItem[];

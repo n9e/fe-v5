@@ -115,7 +115,6 @@ export default class Graph extends Component<GraphProps, GraphState> {
   }
 
   componentDidMount() {
-    console.log('componentDidMount');
     this.updateAllGraphs(this.state.aggrFunc, this.state.aggrGroups, this.state.offsets);
   }
 
@@ -409,17 +408,6 @@ export default class Graph extends Component<GraphProps, GraphState> {
         >
           Multi Series in Tooltip, order value
         </Checkbox>
-        {/* <Select value={this.state.highLevelConfig.sharedSortDirection} onChange={(v: 'desc' | 'asc') => {
-          this.setState({
-            highLevelConfig: {
-              ...this.state.highLevelConfig,
-              sharedSortDirection: v
-            }
-          })
-        }}>
-          <Option value='desc'>desc</Option>
-          <Option value='asc'>asc</Option>
-        </Select> */}
         <Dropdown overlay={aggrFuncMenu}>
           <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
             {this.state.highLevelConfig.sharedSortDirection} <DownOutlined />
@@ -450,17 +438,6 @@ export default class Graph extends Component<GraphProps, GraphState> {
         >
           Value format with:{' '}
         </Checkbox>
-        {/* <Select value={this.state.highLevelConfig.formatUnit} onChange={(v: 1024 | 1000) => {
-          this.setState({
-            highLevelConfig: {
-              ...this.state.highLevelConfig,
-              formatUnit: v
-            }
-          })
-        }}>
-          <Option value={1024}>1024</Option>
-          <Option value={1000}>1000</Option>
-        </Select> */}
         <Dropdown overlay={precisionMenu}>
           <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
             {formatUnitInfoMap[this.state.highLevelConfig.formatUnit]} <DownOutlined />

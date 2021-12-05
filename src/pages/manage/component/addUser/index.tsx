@@ -113,6 +113,7 @@ const AddUser: React.FC<TeamProps> = (props: TeamProps) => {
           query,
         }}
         rowSelection={{
+          preserveSelectedRowKeys: true,
           selectedRowKeys: selectedUser,
           onChange: onSelectChange,
         }}

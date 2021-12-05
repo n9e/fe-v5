@@ -212,7 +212,7 @@ export default function DashboardDetail() {
       customArea={
         <div className='dashboard-detail-header'>
           <div className='dashboard-detail-header-left'>
-            <RollbackOutlined className='back' onClick={() => history.push('/dashboard')} />
+            <RollbackOutlined className='back' onClick={() => history.push('/dashboards')} />
             {titleEditing ? <Input defaultValue={dashboard.name} onPressEnter={handleModifyTitle} /> : <div className='title'>{dashboard.name}</div>}
             <EditOutlined className='edit' onClick={handleEdit} />
           </div>

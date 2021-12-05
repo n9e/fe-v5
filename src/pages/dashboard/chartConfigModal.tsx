@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Dashboard, Group, ChartConfig } from '@/store/dashboardInterface';
+import { HighLevelConfigType, Group, ChartConfig } from '@/store/dashboardInterface';
 import { debounce } from 'lodash';
-import { Radio, InputNumber, Input, Form, Modal, Select, Checkbox, Row, Col, Space } from 'antd';
+import { Radio, InputNumber, Input, Form, Modal, Select, Checkbox, Row, Col, Space, Menu, Dropdown } from 'antd';
 import { createChart, updateCharts, checkPromql } from '@/services/dashboard';
 import { Chart } from './chartGroup';
-import { MinusCircleOutlined, PlusCircleOutlined, CloseOutlined } from '@ant-design/icons';
+import { MinusCircleOutlined, PlusCircleOutlined, CloseOutlined, DownOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import PromqlEditor from '@/components/PromqlEditor';
 import Resolution from '@/components/Resolution';
@@ -12,6 +12,7 @@ import DateRangePicker, { Range, formatPickerDate } from '@/components/DateRange
 import Graph from '@/components/Graph';
 import VariableConfig, { VariableType } from './VariableConfig';
 import { replaceExpressionVars } from './VariableConfig/constant';
+
 const { Option } = Select;
 const layout = {
   labelCol: {
@@ -37,9 +38,16 @@ export default function ChartConfigModal(props: Props) {
   const [innerVariableConfig, setInnerVariableConfig] = useState<VariableType | undefined>(variableConfig);
   const [chartForm] = Form.useForm();
   const [initialQL, setInitialQL] = useState([{ PromQL: '' }]);
-  const [chartPromQL, setChartPromQl] = useState<string[]>([]);
+  const [legend, setLegend] = useState<boolean>(initialValue?.configs.legend || false);
   const [step, setStep] = useState<number | null>(null);
-  const [chartVisible, setChartVisible] = useState<Boolean>(false);
+  const [highLevelConfig, setHighLevelConfig] = useState<HighLevelConfigType>(
+    initialValue?.configs.highLevelConfig || {
+      shared: true,
+      sharedSortDirection: 'desc',
+      precision: 'short',
+      formatUnit: 1000,
+    },
+  );
   const [range, setRange] = useState<Range>({
     start: 0,
     end: 0,
@@ -53,11 +61,15 @@ export default function ChartConfigModal(props: Props) {
 
   const handleAddChart = async (e) => {
     try {
-      const values = await chartForm.validateFields();
-      let formData: ChartConfig = Object.assign(chartForm.getFieldsValue(), {
-        layout,
-      });
-
+      await chartForm.validateFields();
+      let formData: ChartConfig = Object.assign(
+        chartForm.getFieldsValue(),
+        { legend, highLevelConfig },
+        {
+          version: 1, // Temporarily, hardcode 1
+          layout,
+        },
+      );
       if (initialValue && initialValue.id) {
         await updateCharts(busiId, [
           {
@@ -80,10 +92,6 @@ export default function ChartConfigModal(props: Props) {
       console.log('Failed:', errorInfo);
     }
   };
-
-  useEffect(() => {
-    console.log(`chartForm.getFieldValue('QL')`, chartForm.getFieldValue('QL'));
-  }, [chartForm]);
 
   const PromqlEditorField = ({ onChange = (e: any) => {}, value = '', fields, remove, add, index, name }) => {
     return (
@@ -119,6 +127,38 @@ export default function ChartConfigModal(props: Props) {
 
   const handleVariableChange = (value) => {
     setInnerVariableConfig(value);
+  };
+
+  const aggrFuncMenu = (
+    <Menu
+      onClick={(sort) => {
+        setHighLevelConfig({ ...highLevelConfig, sharedSortDirection: (sort as { key: 'desc' | 'asc' }).key });
+      }}
+      selectedKeys={[highLevelConfig.sharedSortDirection]}
+    >
+      <Menu.Item key='desc'>desc</Menu.Item>
+      <Menu.Item key='asc'>asc</Menu.Item>
+    </Menu>
+  );
+
+  const precisionMenu = (
+    <Menu
+      onClick={(precision) => {
+        const precisionKey = isNaN(Number(precision.key)) ? precision.key : Number(precision.key);
+        setHighLevelConfig({ ...highLevelConfig, formatUnit: precisionKey as 1024 | 1000 | 'humantime' });
+      }}
+      selectedKeys={[String(highLevelConfig.formatUnit)]}
+    >
+      <Menu.Item key={'1000'}>Ki, Mi, Gi by 1000</Menu.Item>
+      <Menu.Item key={'1024'}>Ki, Mi, Gi by 1024</Menu.Item>
+      <Menu.Item key={'humantime'}>Human time duration</Menu.Item>
+    </Menu>
+  );
+
+  const formatUnitInfoMap = {
+    1024: 'Ki, Mi, Gi by 1024',
+    1000: 'Ki, Mi, Gi by 1000',
+    humantime: 'Human time duration',
   };
 
   return (
@@ -249,37 +289,52 @@ export default function ChartConfigModal(props: Props) {
                 </Form.Item>
               </Col>
 
-              <Col span={7}>
-                <Form.Item label={t('Multi')} name='multi' valuePropName='checked' labelCol={{ span: 14 }} wrapperCol={{ span: 10 }} initialValue={true}>
-                  <Checkbox></Checkbox>
+              <Col span={23} offset={1}>
+                <Form.Item>
+                  <Checkbox
+                    checked={highLevelConfig.shared}
+                    onChange={(e) => {
+                      setHighLevelConfig({ ...highLevelConfig, shared: e.target.checked });
+                    }}
+                  >
+                    Multi Series in Tooltip, order value
+                  </Checkbox>
+                  <Dropdown overlay={aggrFuncMenu}>
+                    <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
+                      {highLevelConfig.sharedSortDirection} <DownOutlined />
+                    </a>
+                  </Dropdown>
                 </Form.Item>
               </Col>
-              <Col span={7} offset={1}>
-                <Form.Item label={t('Legend')} valuePropName='checked' name='legend' labelCol={{ span: 20 }} wrapperCol={{ span: 10 }} initialValue={false}>
-                  <Checkbox></Checkbox>
+              <Col span={23} offset={1}>
+                <Form.Item>
+                  <Checkbox
+                    checked={legend}
+                    onChange={(e) => {
+                      setLegend(e.target.checked);
+                    }}
+                  >
+                    Show Legend
+                  </Checkbox>
                 </Form.Item>
               </Col>
-              <Col span={7} offset={1}>
-                <Form.Item label={t('Format')} valuePropName='checked' name='format' labelCol={{ span: 20 }} wrapperCol={{ span: 10 }} initialValue={true}>
-                  <Checkbox></Checkbox>
+              <Col span={23} offset={1}>
+                <Form.Item>
+                  <Checkbox
+                    checked={highLevelConfig.precision === 'short'}
+                    onChange={(e) => {
+                      setHighLevelConfig({ ...highLevelConfig, precision: e.target.checked ? 'short' : 'origin' });
+                    }}
+                  >
+                    Value format with:{' '}
+                  </Checkbox>
+                  <Dropdown overlay={precisionMenu}>
+                    <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
+                      {formatUnitInfoMap[highLevelConfig.formatUnit]} <DownOutlined />
+                    </a>
+                  </Dropdown>
                 </Form.Item>
               </Col>
-              {/* <Col span={5} offset={1}>
-            <Form.Item label={t('排序')} name='order' labelCol={{ span: 7 }} wrapperCol={{ span: 20 }} initialValue={'desc'}>
-              <Select>
-                <Option value='desc'>desc</Option>
-                <Option value='asc'>asc</Option>
-              </Select>
-            </Form.Item>
-          </Col> */}
-              {/* <Col span={5} offset={1}>
-            <Form.Item label={t('Format Unit')} name='format' labelCol={{ span: 10 }} wrapperCol={{ span: 20 }} initialValue={1000}>
-              <Select>
-                <Option value='desc'>1000</Option>
-                <Option value='asc'>1024</Option>
-              </Select>
-            </Form.Item>
-          </Col> */}
             </Row>
           </Col>
           <Col span={12}>
@@ -290,7 +345,7 @@ export default function ChartConfigModal(props: Props) {
               }
             >
               {({ getFieldsValue }) => {
-                const { QL = [], multi, legend = false, format, yplotline1, yplotline2 } = getFieldsValue();
+                const { QL = [], yplotline1, yplotline2 } = getFieldsValue();
                 const promqls = QL.filter((item) => item && item.PromQL).map((item) =>
                   innerVariableConfig ? replaceExpressionVars(item.PromQL, innerVariableConfig, innerVariableConfig.var.length) : item.PromQL,
                 );
@@ -299,7 +354,7 @@ export default function ChartConfigModal(props: Props) {
                   <Graph
                     showHeader={false}
                     graphConfigInnerVisible={false}
-                    highLevelConfig={{ shared: multi, precision: format ? 'short' : 'origin' }}
+                    highLevelConfig={highLevelConfig}
                     data={{
                       yAxis: {
                         plotLines: [

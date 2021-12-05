@@ -477,7 +477,7 @@ export default function ChartGroup(props: Props) {
       chartConfigs &&
       chartConfigs.length > 0 &&
       chartConfigs.map((item, i) => {
-        let { QL, name, legend, yplotline1, yplotline2 } = item.configs;
+        let { QL, name, legend, yplotline1, yplotline2, highLevelConfig } = item.configs;
         const promqls = QL.map((item) =>
           variableConfig && variableConfig.var && variableConfig.var.length ? replaceExpressionVars(item.PromQL, variableConfig, variableConfig.var.length) : item.PromQL,
         );
@@ -491,6 +491,7 @@ export default function ChartGroup(props: Props) {
           >
             <Graph
               ref={Refs![i]}
+              highLevelConfig={highLevelConfig}
               data={{
                 yAxis: {
                   plotLines: [
