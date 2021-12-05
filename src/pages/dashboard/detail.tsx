@@ -37,7 +37,7 @@ export default function DashboardDetail() {
   const { id, busiId } = useParams<URLParam>();
   const [groupForm] = Form.useForm();
   const history = useHistory();
-  const variableRef = useRef<any>(null);
+  const Ref = useRef<any>(null);
   const { clusters } = useSelector<CommonRootState, CommonStoreState>((state) => state.common);
   const localCluster = localStorage.getItem('curCluster');
   const [curCluster, setCurCluster] = useState<string>(localCluster || clusters[0]);
@@ -84,7 +84,6 @@ export default function DashboardDetail() {
           .sort((a, b) => a - b)
           .map((item) => {
             item.updateTime = Date.now(); // 前端拓展一个更新时间字段，用来主动刷新ChartGroup
-
             return item;
           }),
       );
@@ -101,7 +100,8 @@ export default function DashboardDetail() {
 
   const handleModifyTitle = async (e) => {
     await updateSingleDashboard(busiId, id, { ...dashboard, name: e.target.value });
-    await init();
+    // await init();
+    setDashboard({ ...dashboard, name: e.target.value });
     setTitleEditing(false);
   };
 
@@ -213,15 +213,33 @@ export default function DashboardDetail() {
         <div className='dashboard-detail-header'>
           <div className='dashboard-detail-header-left'>
             <RollbackOutlined className='back' onClick={() => history.push('/dashboards')} />
-            {titleEditing ? <Input defaultValue={dashboard.name} onPressEnter={handleModifyTitle} /> : <div className='title'>{dashboard.name}</div>}
-            <EditOutlined className='edit' onClick={handleEdit} />
+            {titleEditing ? <Input ref={Ref} defaultValue={dashboard.name} onPressEnter={handleModifyTitle} /> : <div className='title'>{dashboard.name}</div>}
+            {!titleEditing ? (
+              <EditOutlined className='edit' onClick={handleEdit} />
+            ) : (
+              <>
+                <Button size='small' style={{ marginRight: 5, marginLeft: 5 }} onClick={() => setTitleEditing(false)}>
+                  取消
+                </Button>
+                <Button
+                  size='small'
+                  type='primary'
+                  onClick={() => {
+                    handleModifyTitle({ target: { value: Ref.current.state.value } });
+                  }}
+                >
+                  保存
+                </Button>
+              </>
+            )}
           </div>
           <div className='dashboard-detail-header-right'>
             <div style={{ marginRight: 20, display: 'flex', alignItems: 'center' }}>
+              集群：
               <Dropdown overlay={clusterMenu}>
-                <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
+                <Button>
                   {curCluster} <DownOutlined />
-                </a>
+                </Button>
               </Dropdown>
             </div>
             <DateRangePicker onChange={handleDateChange} />

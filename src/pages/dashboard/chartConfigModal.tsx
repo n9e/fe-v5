@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { HighLevelConfigType, Group, ChartConfig } from '@/store/dashboardInterface';
 import { debounce } from 'lodash';
-import { Radio, InputNumber, Input, Form, Modal, Select, Checkbox, Row, Col, Space, Menu, Dropdown } from 'antd';
+import { Radio, InputNumber, Input, Form, Modal, Select, Checkbox, Row, Col, Popover, Menu, Dropdown, Button } from 'antd';
 import { createChart, updateCharts, checkPromql } from '@/services/dashboard';
 import { Chart } from './chartGroup';
-import { MinusCircleOutlined, PlusCircleOutlined, CloseOutlined, DownOutlined } from '@ant-design/icons';
+import { MinusCircleOutlined, PlusCircleOutlined, CloseOutlined, DownOutlined, SettingOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import PromqlEditor from '@/components/PromqlEditor';
 import Resolution from '@/components/Resolution';
@@ -161,6 +161,73 @@ export default function ChartConfigModal(props: Props) {
     humantime: 'Human time duration',
   };
 
+  const getContent = () => {
+    const aggrFuncMenu = (
+      <Menu
+        onClick={(sort) => {
+          setHighLevelConfig({ ...highLevelConfig, sharedSortDirection: (sort as { key: 'desc' | 'asc' }).key });
+        }}
+        selectedKeys={[highLevelConfig.sharedSortDirection]}
+      >
+        <Menu.Item key='desc'>desc</Menu.Item>
+        <Menu.Item key='asc'>asc</Menu.Item>
+      </Menu>
+    );
+    const precisionMenu = (
+      <Menu
+        onClick={(precision) => {
+          const precisionKey = isNaN(Number(precision.key)) ? precision.key : Number(precision.key);
+          setHighLevelConfig({ ...highLevelConfig, formatUnit: precisionKey as 1024 | 1000 | 'humantime' });
+        }}
+        selectedKeys={[String(highLevelConfig.formatUnit)]}
+      >
+        <Menu.Item key={'1000'}>Ki, Mi, Gi by 1000</Menu.Item>
+        <Menu.Item key={'1024'}>Ki, Mi, Gi by 1024</Menu.Item>
+        <Menu.Item key={'humantime'}>Human time duration</Menu.Item>
+      </Menu>
+    );
+    return (
+      <div>
+        <Checkbox
+          checked={highLevelConfig.shared}
+          onChange={(e) => {
+            setHighLevelConfig({ ...highLevelConfig, shared: e.target.checked });
+          }}
+        >
+          Multi Series in Tooltip, order value
+        </Checkbox>
+        <Dropdown overlay={aggrFuncMenu}>
+          <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
+            {highLevelConfig.sharedSortDirection} <DownOutlined />
+          </a>
+        </Dropdown>
+        <br />
+        <Checkbox
+          checked={legend}
+          onChange={(e) => {
+            setLegend(e.target.checked);
+          }}
+        >
+          Show Legend
+        </Checkbox>
+        <br />
+        <Checkbox
+          checked={highLevelConfig.precision === 'short'}
+          onChange={(e) => {
+            setHighLevelConfig({ ...highLevelConfig, precision: e.target.checked ? 'short' : 'origin' });
+          }}
+        >
+          Value format with:{' '}
+        </Checkbox>
+        <Dropdown overlay={precisionMenu}>
+          <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
+            {formatUnitInfoMap[highLevelConfig.formatUnit]} <DownOutlined />
+          </a>
+        </Dropdown>
+      </div>
+    );
+  };
+
   return (
     <Modal
       title={
@@ -252,6 +319,11 @@ export default function ChartConfigModal(props: Props) {
                               <Form.Item
                                 label='Legend'
                                 name={[name, 'Legend']}
+                                tooltip={{
+                                  getPopupContainer: () => document.body,
+                                  title:
+                                    'Controls the name of the time series, using name or pattern. For example {{hostname}} will be replaced with label value for the label hostname.',
+                                }}
                                 labelCol={{
                                   span: 4,
                                 }}
@@ -289,7 +361,7 @@ export default function ChartConfigModal(props: Props) {
                 </Form.Item>
               </Col>
 
-              <Col span={23} offset={1}>
+              {/* <Col span={23} offset={1}>
                 <Form.Item>
                   <Checkbox
                     checked={highLevelConfig.shared}
@@ -334,7 +406,7 @@ export default function ChartConfigModal(props: Props) {
                     </a>
                   </Dropdown>
                 </Form.Item>
-              </Col>
+              </Col> */}
             </Row>
           </Col>
           <Col span={12}>
@@ -351,30 +423,44 @@ export default function ChartConfigModal(props: Props) {
                 );
                 const legendTitleFormats = QL.map((item) => item && item.Legend);
                 return (
-                  <Graph
-                    showHeader={false}
-                    graphConfigInnerVisible={false}
-                    highLevelConfig={highLevelConfig}
-                    data={{
-                      yAxis: {
-                        plotLines: [
-                          {
-                            value: yplotline1,
-                            color: 'orange',
-                          },
-                          {
-                            value: yplotline2,
-                            color: 'red',
-                          },
-                        ],
-                      },
-                      legend: legend,
-                      step,
-                      range,
-                      promqls,
-                      legendTitleFormats,
-                    }}
-                  />
+                  <div className={legend ? 'graph-container graph-container-hasLegend' : 'graph-container'}>
+                    <div className='graph-header' style={{ height: '35px', lineHeight: '35px', display: 'flex', justifyContent: 'space-between' }}>
+                      <div>预览图表</div>
+                      <div className='graph-extra'>
+                        <span className='graph-operationbar-item' key='info'>
+                          <Popover placement='left' content={getContent()} trigger='click' autoAdjustOverflow={false} getPopupContainer={() => document.body}>
+                            <Button className='' type='link' size='small' onClick={(e) => e.preventDefault()}>
+                              <SettingOutlined />
+                            </Button>
+                          </Popover>
+                        </span>
+                      </div>
+                    </div>
+                    <Graph
+                      showHeader={false}
+                      graphConfigInnerVisible={false}
+                      highLevelConfig={highLevelConfig}
+                      data={{
+                        yAxis: {
+                          plotLines: [
+                            {
+                              value: yplotline1 ? yplotline1 : undefined,
+                              color: 'orange',
+                            },
+                            {
+                              value: yplotline2 ? yplotline2 : undefined,
+                              color: 'red',
+                            },
+                          ],
+                        },
+                        legend: legend,
+                        step,
+                        range,
+                        promqls,
+                        legendTitleFormats,
+                      }}
+                    />
+                  </div>
                 );
                 // ) : null;
               }}

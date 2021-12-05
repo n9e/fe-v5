@@ -219,7 +219,7 @@ export default function Dashboard() {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   prefix={<SearchOutlined />}
-                  placeholder={t('大盘名称')}
+                  placeholder={t('大盘名称、分类标签')}
                 />
               </div>
               <div className='table-handle-buttons'>
@@ -253,10 +253,22 @@ export default function Dashboard() {
             </div>
             <BaseTable
               ref={ref}
-              fetchHandle={() => getDashboard(busiId)}
+              fetchHandle={() =>
+                getDashboard(busiId).then((res) => {
+                  if (searchVal && res.dat) {
+                    const filters = searchVal.split(' ');
+                    console.log(filters);
+                    for (var i = 0; i < filters.length; i++) {
+                      res.dat = res.dat.filter((item) => item.name.includes(filters[i]) || item.tags.includes(filters[i]));
+                    }
+                  }
+                  return res;
+                })
+              }
               fetchParams={{
                 query: searchVal,
               }}
+              // feQuery={searchVal}
               className='dashboard-table'
               columns={dashboardColumn}
               rowKey='id'

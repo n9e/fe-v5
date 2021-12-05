@@ -66,9 +66,9 @@ function renderPointContent(isSingle, pointData = {}, serie = {}, formatUnit, pr
 
   const renderSingleSeriesPointContent = () => {
     const labelContents = labelKeys.map((label) => `<div><strong>${label}</strong>: ${serieMetricLabels[label]}</div>`);
-    const label = legendTitleFormat ? replaceExpressionBracket(legendTitleFormat, serieMetricLabels) : `${metricName} ${comparison}${metricName || comparison ? ': ' : ''}`;
+    const label = legendTitleFormat ? replaceExpressionBracket(legendTitleFormat, serieMetricLabels) : `${metricName} ${comparison}${metricName || comparison ? '' : ''}`;
     return `<span style="color:${color}">● </span>
-      ${label}<strong>${formatValue(value)}${filledNull ? '(空值填补,仅限看图使用)' : ''}</strong>
+      ${label}: <strong>${formatValue(value)}${filledNull ? '(空值填补,仅限看图使用)' : ''}</strong>
       <div /><br />
       <div><strong>Series:</strong></div>
       ${metricName ? `<div><strong>${metricName}</strong></div>` : ''}

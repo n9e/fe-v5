@@ -24,6 +24,7 @@ export default function version() {
           <Icon component={SystemInfoSvg as any} /> 系统版本
         </>
       }
+      hideCluster
     >
       <div style={{ padding: 10 }}>
         <ul style={{ padding: '20px 30px' }}>

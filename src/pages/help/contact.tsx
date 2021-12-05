@@ -14,6 +14,7 @@ export default function version() {
           <Icon component={SystemInfoSvg as any} /> 联系我们
         </>
       }
+      hideCluster
     >
       <div style={{ padding: 10 }}>
         <div style={{ padding: 20 }}>
