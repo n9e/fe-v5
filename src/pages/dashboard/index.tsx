@@ -177,7 +177,7 @@ export default function Dashboard() {
             className='table-operator-area-warning'
             onClick={async () => {
               confirm({
-                title: `${t('是否删除大盘')}${record.name}?`,
+                title: `${t('是否删除大盘')}：${record.name}?`,
                 onOk: async () => {
                   await removeDashboard(busiId as number, record.id);
                   message.success(t('删除大盘成功'));
