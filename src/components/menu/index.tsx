@@ -190,10 +190,9 @@ const SideMenu: FC = () => {
       if (profile.roles.indexOf('Admin') === -1) {
         getMenuPerm().then((res) => {
           const { dat } = res;
-          const perms = dat.map((i) => '/' + i.split('_').slice(1).join('/'));
-          const newMenus = [...menus];
+          const newMenus = [...menuList];
           newMenus.forEach((menu) => {
-            menu.children = menu.children.filter((item) => perms.includes(item.key.replaceAll('-', '/')));
+            menu.children = menu.children.filter((item) => dat.includes(item.key));
           });
           setMenus(newMenus);
         });
