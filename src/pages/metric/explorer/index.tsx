@@ -1,5 +1,8 @@
 import PageLayout from '@/components/pageLayout';
 import { LineChartOutlined, PlusOutlined } from '@ant-design/icons';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState as CommonRootState } from '@/store/common';
+import { CommonStoreState } from '@/store/commonInterface';
 import { Button } from 'antd';
 import React, { useEffect, useState } from 'react';
 import './index.less';
@@ -57,12 +60,15 @@ const PanelList: React.FC<PanelListProps> = ({ metrics }) => {
 
 const MetricExplorerPage: React.FC = () => {
   const [metrics, setMetrics] = useState<string[]>([]);
+  const { clusters } = useSelector<CommonRootState, CommonStoreState>((state) => state.common);
 
   useEffect(() => {
-    getMetrics().then((res) => {
-      setMetrics(res.data || []);
-    });
-  }, []);
+    if (clusters.length) {
+      getMetrics().then((res) => {
+        setMetrics(res.data || []);
+      });
+    }
+  }, [clusters]);
 
   return (
     <PageLayout title='即时查询' icon={<LineChartOutlined />}>
