@@ -61,9 +61,11 @@ const Resource: React.FC = () => {
       render: (text: string, record) => (
         <a
           style={{
-            color: 'red',
+            color: memberList.length > 1 ? 'red' : '#00000040',
           }}
           onClick={() => {
+            if (memberList.length <= 1) return;
+
             let params = [
               {
                 user_group_id: record['user_group'].id,
@@ -141,12 +143,11 @@ const Resource: React.FC = () => {
   // 弹窗关闭回调
   const handleClose = (isDeleteOrAdd = false) => {
     setVisible(false);
-
     if (isDeleteOrAdd === true) {
       getList(isDeleteOrAdd);
       dispatch({ type: 'common/getBusiGroups' });
     }
-    if (teamId && !isDeleteOrAdd) {
+    if (teamId) {
       getTeamInfoDetail(teamId);
     }
   };
@@ -269,7 +270,7 @@ const Resource: React.FC = () => {
               <Table
                 rowKey='id'
                 columns={teamMemberColumns}
-                dataSource={memberList.length > 0 ? memberList.filter((item) => item.user_group && item.user_group.name.indexOf(searchMemberValue) !== -1) : []}
+                dataSource={memberList && memberList.length > 0 ? memberList.filter((item) => item.user_group && item.user_group.name.indexOf(searchMemberValue) !== -1) : []}
                 loading={memberLoading}
               />
             </div>
