@@ -26,3 +26,11 @@ export function getPerm(busiGroup: string, perm: "ro" | "rw") {
     method: RequestMethod.Get,
   });
 }
+
+export function getMenuPerm() {
+  return request(`/api/n9e/self/perms`, {
+    method: RequestMethod.Get,
+  });
+}
+
+
