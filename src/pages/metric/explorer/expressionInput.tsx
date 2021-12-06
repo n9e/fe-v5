@@ -25,7 +25,7 @@ function myHTTPClient(resource: string): Promise<Response> {
   return fetch(resource, {
     method: 'Get',
     headers: new Headers({
-      'X-Cluster': 'Default',
+      'X-Cluster': localStorage.getItem('curCluster') || '',
       Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
     }),
   });

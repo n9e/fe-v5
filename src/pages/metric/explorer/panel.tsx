@@ -2,7 +2,10 @@ import { AreaChartOutlined, CloseCircleOutlined, LineChartOutlined } from '@ant-
 import { Tabs, List, DatePicker, Radio, Alert } from 'antd';
 import moment, { Moment } from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import ExpressionInput from './expressionInput';
+import { RootState as CommonRootState } from '@/store/common';
+import { CommonStoreState } from '@/store/commonInterface';
 import { prometheusAPI } from '@/services/metric';
 import DateRangePicker, { isAbsoluteRange } from '@/components/DateRangePicker';
 import Resolution from '@/components/Resolution';
@@ -71,6 +74,7 @@ function getListItemContent(metrics) {
 
 const Panel: React.FC<PanelProps> = ({ metrics, defaultPromQL, removePanel }) => {
   const { t } = useTranslation();
+  const { clusters } = useSelector<CommonRootState, CommonStoreState>((state) => state.common);
   const curPanelTab = useRef<PanelType>(PanelType.Table);
   const graphRef = useRef(null);
   const inputValue = useRef(defaultPromQL);
@@ -158,7 +162,7 @@ const Panel: React.FC<PanelProps> = ({ metrics, defaultPromQL, removePanel }) =>
   // 该函数传入输入框组件，注意产生的 props 和 state 不同步问题
   function executeQuery(isExecute: boolean = true) {
     const expr = inputValue.current;
-    if (!isExecute || expr === '') return;
+    if (!isExecute || expr === '' || clusters.length === 0) return;
 
     // 模式下直接调用图表组件的刷新方法
     if (curPanelTab.current === PanelType.Graph) {
@@ -237,12 +241,12 @@ const Panel: React.FC<PanelProps> = ({ metrics, defaultPromQL, removePanel }) =>
   // 当时间戳变更时，重新获取数据
   useEffect(() => {
     optionsRecord.type === PanelType.Table && executeQuery();
-  }, [optionsRecord.endTime]);
+  }, [optionsRecord.endTime, clusters]);
 
   // 切换标签到 Table 时获取数据
   useEffect(() => {
     optionsRecord.type === PanelType.Table && executeQuery();
-  }, [optionsRecord.type]);
+  }, [optionsRecord.type, clusters]);
 
   return (
     <div className='panel'>
