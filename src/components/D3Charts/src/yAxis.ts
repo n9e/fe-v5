@@ -57,23 +57,25 @@ export default class YAxis {
     return [];
   }
 
-  getPlotLinesMaxAbs() {
-    const {
-      yAxis: { plotLines },
-    } = this.options;
-    let maxAbs: undefined | number;
+  getPlotLinesMaxMin() {
+    const { yAxis: { plotLines } } = this.options;
+    let max: undefined | number;
+    let min: undefined | number;
     if (Array.isArray(plotLines)) {
       plotLines.forEach((plotLine) => {
-        if (!maxAbs || Math.abs(maxAbs) < Math.abs(plotLine.value)) {
-          maxAbs = plotLine.value;
+        if (!max || plotLine.value > max) {
+          max = plotLine.value;
+        }
+        if (!min || plotLine.value < min) {
+          min = plotLine.value;
         }
       });
     }
-    return maxAbs;
+    return { max, min };
   }
 
   setDomain(yScales: YScales, { ymin, ymax }: { ymin: number; ymax: number }) {
-    const plotLinesMaxAbs = this.getPlotLinesMaxAbs();
+    const { max: plotLineMax, min: plotLineMin } = this.getPlotLinesMaxMin();
     let realTickLength = this.tickLength;
 
     // TODO: Optimize the tick
@@ -92,14 +94,12 @@ export default class YAxis {
       ymax = cachemin;
     }
 
-    if (plotLinesMaxAbs) {
-      if (plotLinesMaxAbs < ymin) {
-        ymin = plotLinesMaxAbs;
-      }
+    if (plotLineMin !== undefined && plotLineMin < ymin) {
+      ymin = plotLineMin;
+    }
 
-      if (plotLinesMaxAbs > ymax) {
-        ymax = plotLinesMaxAbs;
-      }
+    if (plotLineMax !== undefined && plotLineMax > ymax) {
+      ymax = plotLineMax;
     }
     // StackArea 类型图表 y 轴下标总为 0
     if (this.options.chartType === ChartType.StackArea) ymin = 0;
