@@ -22,15 +22,15 @@ const btimeDefault = new Date().getTime();
 const etimeDefault = new Date().getTime() + 1 * 60 * 60 * 1000; // 默认时长1h
 
 interface ItagsObj {
-  tags: any[]
+  tags: any[];
 }
 interface Props {
   detail?: shieldItem;
   tagsObj?: ItagsObj;
-  type?: number; // 1:编辑; 2:克隆
+  type?: number; // 1:创建; 2:克隆
 }
 
-const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj= {} }) => {
+const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }) => {
   const { t, i18n } = useTranslation();
   const { clusters: clusterList } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const layout = {
@@ -69,25 +69,19 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj= {} }) => {
   }, [form]);
 
   useEffect(() => {
-    form.setFieldsValue({
-      tags: tagsObj.tags || [{}],
-    });
-  }, [tagsObj]);
-
-  useEffect(() => {
+    // 只有add 的时候才传入tagsObj
     if (tagsObj?.tags && tagsObj?.tags.length > 0) {
-      const tags = tagsObj?.tags?.map(item => {
+      const tags = tagsObj?.tags?.map((item) => {
         return {
           ...item,
-          value: item.func === 'in' ? item.value.split(' ') : item.value
-        }
+          value: item.func === 'in' ? item.value.split(' ') : item.value,
+        };
       });
       form.setFieldsValue({
-        tags: tags || []
-      })
+        tags: tags || [{}],
+      });
     }
-    
-  }, [tagsObj])
+  }, [tagsObj]);
 
   const timeChange = () => {
     const btime = form.getFieldValue('btime');
@@ -107,9 +101,9 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj= {} }) => {
     const tags = values?.tags?.map((item) => {
       return {
         ...item,
-        value: Array.isArray(item.value) ? item.value.join(' ') : item.value
-      }
-    })
+        value: Array.isArray(item.value) ? item.value.join(' ') : item.value,
+      };
+    });
     const params = {
       ...values,
       btime: moment(values.btime).unix(),
@@ -163,8 +157,8 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj= {} }) => {
       onFinishFailed={onFinishFailed}
       initialValues={{
         ...detail,
-        btime: detail?.btime ? moment(detail.btime) : moment(btimeDefault),
-        etime: detail?.etime ? moment(detail.etime) : moment(etimeDefault),
+        btime: detail?.btime ? moment(detail.btime * 1000) : moment(btimeDefault),
+        etime: detail?.etime ? moment(detail.etime * 1000) : moment(etimeDefault),
         cluster: clusterList[0] || 'Default',
       }}
     >
@@ -238,14 +232,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj= {} }) => {
           {(fields, { add, remove }) => (
             <>
               {fields.map((field, index) => (
-                <TagItem
-                  field={field}
-                  key={index}
-                  remove={remove}
-                  form={form}
-                />
-
-
+                <TagItem field={field} key={index} remove={remove} form={form} />
               ))}
               <Form.Item>
                 <PlusCircleOutlined className='control-icon-normal' onClick={() => add()} />

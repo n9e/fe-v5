@@ -1,30 +1,11 @@
-import React, {
-  useEffect,
-  useState,
-  useMemo,
-} from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import {
-  Tag,
-  Button,
-  Select,
-  Modal,
-  message,
-  Switch,
-  Dropdown,
-  Table
-} from 'antd';
-import {
-  getStrategyGroupSubList,
-  updateAlertRules
-} from '@/services/warning';
+import { Tag, Button, Select, Modal, message, Switch, Dropdown, Table } from 'antd';
+import { getStrategyGroupSubList, updateAlertRules } from '@/services/warning';
 import SearchInput from '@/components/BaseSearchInput';
 import { useHistory } from 'react-router-dom';
 
-import {
-  strategyItem,
-  strategyStatus,
-} from '@/store/warningInterface';
+import { strategyItem, strategyStatus } from '@/store/warningInterface';
 import { CommonStoreState } from '@/store/commonInterface';
 import { addOrEditStrategy, deleteStrategy } from '@/services/warning';
 import { priorityColor } from '@/utils/constant';
@@ -34,49 +15,29 @@ import dayjs from 'dayjs';
 import { RootState } from '@/store/common';
 import RefreshIcon from '@/components/RefreshIcon';
 import ColorTag from '@/components/ColorTag';
-import {
-  DownOutlined,
-} from '@ant-design/icons';
-import ImportAndDownloadModal, {
-  ModalStatus,
-} from '@/components/ImportAndDownloadModal';
+import { DownOutlined } from '@ant-design/icons';
+import ImportAndDownloadModal, { ModalStatus } from '@/components/ImportAndDownloadModal';
 import EditModal from './components/editModal';
 const { Option } = Select;
 const { confirm } = Modal;
 
-const exportIgnoreAttrs = [
-  'cluster',
-  'create_by',
-  'group_id',
-  'id',
-  'notify_groups_obj',
-  'notify_groups',
-  'notify_users',
-  'create_at',
-  'update_at',
-  'update_by',
-];
+const exportIgnoreAttrs = ['cluster', 'create_by', 'group_id', 'id', 'notify_groups_obj', 'notify_groups', 'notify_users', 'create_at', 'update_at', 'update_by'];
 import { useTranslation } from 'react-i18next';
-const exportIgnoreAttrsObj = Object.fromEntries(
-  exportIgnoreAttrs.map((item) => [item, undefined]),
-);
+const exportIgnoreAttrsObj = Object.fromEntries(exportIgnoreAttrs.map((item) => [item, undefined]));
 
 interface Props {
   bgid?: number;
   clusters?: string[];
 }
 
-const PageTable: React.FC<Props> = ({
-  bgid,
-  clusters
-}) => {
+const PageTable: React.FC<Props> = ({ bgid, clusters }) => {
   const { t, i18n } = useTranslation();
   const history = useHistory();
   const [modalType, setModalType] = useState<ModalStatus>(ModalStatus.None);
   const [selectRowKeys, setSelectRowKeys] = useState<React.Key[]>([]);
   const [selectedRows, setSelectedRows] = useState<strategyItem[]>([]);
   const [exportData, setExportData] = useState<string>('');
-  const { curBusiItem } = useSelector<RootState, CommonStoreState>(state => state.common);
+  const { curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
 
   const [query, setQuery] = useState<string>('');
   const [isModalVisible, setisModalVisible] = useState<boolean>(false);
@@ -93,7 +54,7 @@ const PageTable: React.FC<Props> = ({
 
   useEffect(() => {
     filterData();
-  }, [query, clusters, currentStrategyDataAll])
+  }, [query, clusters, currentStrategyDataAll]);
 
   const getAlertRules = async () => {
     if (!bgid) {
@@ -105,31 +66,27 @@ const PageTable: React.FC<Props> = ({
       setCurrentStrategyDataAll(dat || []);
       setLoading(false);
     }
-
-  }
+  };
 
   const filterData = () => {
     const data = JSON.parse(JSON.stringify(currentStrategyDataAll));
-    const res = data.filter(item => {
-      return (item.name.indexOf(query) > -1 || item.append_tags.join(' ').indexOf(query) > -1) &&
-        (clusters && clusters?.indexOf(item.cluster) > -1 || clusters?.length === 0)
+    const res = data.filter((item) => {
+      return (item.name.indexOf(query) > -1 || item.append_tags.join(' ').indexOf(query) > -1) && ((clusters && clusters?.indexOf(item.cluster) > -1) || clusters?.length === 0);
     });
     setCurrentStrategyData(res || []);
-  }
+  };
 
   const goToAddWarningStrategy = () => {
     curBusiItem?.id && history.push(`/alert-rules/add/${curBusiItem.id}`);
   };
 
   const handleClickEdit = (id, isClone = false) => {
-    curBusiItem?.id &&
-      history.push(`/alert-rules/edit/${id}${isClone ? '?mode=clone' : ''}`);
+    curBusiItem?.id && history.push(`/alert-rules/edit/${id}${isClone ? '?mode=clone' : ''}`);
   };
 
   const refreshList = () => {
     getAlertRules();
   };
-
 
   const columns: ColumnType<strategyItem>[] = [
     {
@@ -166,7 +123,6 @@ const PageTable: React.FC<Props> = ({
       title: t('告警接收者'),
       dataIndex: 'notify_groups_obj',
       render: (data, record) => {
-
         return (
           (data.length &&
             data.map(
@@ -177,12 +133,7 @@ const PageTable: React.FC<Props> = ({
                 } & { name: string },
                 index: number,
               ) => {
-                return (
-                  <ColorTag
-                    text={user.nickname || user.username || user.name}
-                    key={index}
-                  ></ColorTag>
-                );
+                return <ColorTag text={user.nickname || user.username || user.name} key={index}></ColorTag>;
               },
             )) || <div></div>
         );
@@ -204,8 +155,7 @@ const PageTable: React.FC<Props> = ({
     {
       title: t('更新时间'),
       dataIndex: 'update_at',
-      render: (text: string) =>
-        dayjs(Number(text) * 1000).format('YYYY-MM-DD HH:mm:ss'),
+      render: (text: string) => dayjs(Number(text) * 1000).format('YYYY-MM-DD HH:mm:ss'),
     },
     {
       title: t('启用'),
@@ -216,12 +166,14 @@ const PageTable: React.FC<Props> = ({
           size='small'
           onChange={() => {
             const { id, disabled } = record;
-            updateAlertRules({
-              ids: [id],
-              fields: {
-                disabled: !disabled ? 1 : 0
-              }
-            }, curBusiItem.id
+            updateAlertRules(
+              {
+                ids: [id],
+                fields: {
+                  disabled: !disabled ? 1 : 0,
+                },
+              },
+              curBusiItem.id,
             ).then(() => {
               refreshList();
             });
@@ -257,7 +209,7 @@ const PageTable: React.FC<Props> = ({
                     });
                   },
 
-                  onCancel() { },
+                  onCancel() {},
                 });
               }}
             >
@@ -289,10 +241,7 @@ const PageTable: React.FC<Props> = ({
   const menu = useMemo(() => {
     return (
       <ul className='ant-dropdown-menu'>
-        <li
-          className='ant-dropdown-menu-item'
-          onClick={() => setModalType(ModalStatus.Import)}
-        >
+        <li className='ant-dropdown-menu-item' onClick={() => setModalType(ModalStatus.Import)}>
           <span>{t('导入告警规则')}</span>
         </li>
         <li
@@ -318,16 +267,13 @@ const PageTable: React.FC<Props> = ({
               confirm({
                 title: t('是否批量删除告警规则?'),
                 onOk: () => {
-                  deleteStrategy(
-                    selectRowKeys as number[],
-                    curBusiItem?.id,
-                  ).then(() => {
+                  deleteStrategy(selectRowKeys as number[], curBusiItem?.id).then(() => {
                     message.success(t('删除成功'));
                     refreshList();
                   });
                 },
 
-                onCancel() { },
+                onCancel() {},
               });
             } else {
               message.warning(t('未选择任何规则'));
@@ -344,7 +290,6 @@ const PageTable: React.FC<Props> = ({
         >
           <span>{t('批量更新规则')}</span>
         </li>
-
       </ul>
     );
   }, [selectRowKeys, t]);
@@ -356,10 +301,13 @@ const PageTable: React.FC<Props> = ({
 
   const editModalFinish = async (isOk, fieldsData?) => {
     if (isOk) {
-      const res = await updateAlertRules({
-        ids: selectRowKeys,
-        fields: fieldsData
-      }, curBusiItem.id)
+      const res = await updateAlertRules(
+        {
+          ids: selectRowKeys,
+          fields: fieldsData,
+        },
+        curBusiItem.id,
+      );
       if (!res.err) {
         message.success('修改成功！');
         refreshList();
@@ -367,15 +315,13 @@ const PageTable: React.FC<Props> = ({
       } else {
         message.error(res.err);
       }
-
     } else {
       setisModalVisible(false);
     }
-  }
+  };
 
   return (
     <div className='strategy-table-content'>
-
       <div className='strategy-table-search table-handle'>
         <div className='strategy-table-search-left'>
           <RefreshIcon
@@ -384,24 +330,13 @@ const PageTable: React.FC<Props> = ({
               refreshList();
             }}
           />
-          <SearchInput
-            className={'searchInput'}
-            placeholder={t('搜索名称或标签')}
-            onSearch={setQuery}
-            allowClear
-          />
+          <SearchInput className={'searchInput'} placeholder={t('搜索名称或标签')} onSearch={setQuery} allowClear />
         </div>
         <div className='strategy-table-search-right'>
-
-          <Button
-            type='primary'
-            onClick={goToAddWarningStrategy}
-            className='strategy-table-search-right-create'
-          >
+          <Button type='primary' onClick={goToAddWarningStrategy} className='strategy-table-search-right-create'>
             {t('新增告警规则')}
           </Button>
           <div className={'table-more-options'}>
-
             <Dropdown overlay={menu} trigger={['click']}>
               <Button onClick={(e) => e.stopPropagation()}>
                 {t('更多操作')}
@@ -417,7 +352,7 @@ const PageTable: React.FC<Props> = ({
       </div>
 
       <Table
-        rowKey="id"
+        rowKey='id'
         // sticky
         pagination={{
           total: currentStrategyData.length,
@@ -427,18 +362,14 @@ const PageTable: React.FC<Props> = ({
             return `共 ${total} 条数据`;
           },
           pageSizeOptions: pageSizeOptionsDefault,
-          defaultPageSize: 30
+          defaultPageSize: 30,
         }}
         loading={loading}
         dataSource={currentStrategyData}
         rowSelection={{
-          selectedRowKeys: selectedRows.map(item => item.id),
-          onChange: (
-            selectedRowKeys: React.Key[],
-            selectedRows: strategyItem[],
-          ) => {
+          selectedRowKeys: selectedRows.map((item) => item.id),
+          onChange: (selectedRowKeys: React.Key[], selectedRows: strategyItem[]) => {
             setSelectRowKeys(selectedRowKeys);
-            console.log(selectedRowKeys, 'selectedRowKeys');
             setSelectedRows(selectedRows);
           },
         }}
@@ -455,7 +386,6 @@ const PageTable: React.FC<Props> = ({
         exportData={exportData}
       />
       {isModalVisible && <EditModal isModalVisible={isModalVisible} editModalFinish={editModalFinish} />}
-
     </div>
   );
 };
