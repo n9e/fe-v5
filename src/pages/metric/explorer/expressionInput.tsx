@@ -85,9 +85,11 @@ export class HistoryCompleteStrategy implements CompleteStrategy {
 const ExpressionInput: FC<CMExpressionInputProps> = ({ value, onExpressionChange, queryHistory, metricNames, isLoading, executeQuery }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
+  const executeQueryCallback = useRef(executeQuery);
   const [showMetricsExplorer, setShowMetricsExplorer] = useState<boolean>(false);
 
   useEffect(() => {
+    executeQueryCallback.current = executeQuery;
     promqlExtension
       .activateCompletion(true)
       .activateLinter(true)
@@ -142,7 +144,7 @@ const ExpressionInput: FC<CMExpressionInputProps> = ({ value, onExpressionChange
               {
                 key: 'Enter',
                 run: (v: EditorView): boolean => {
-                  executeQuery();
+                  executeQueryCallback.current();
                   return true;
                 },
               },
