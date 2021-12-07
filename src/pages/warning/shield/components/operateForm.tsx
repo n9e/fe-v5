@@ -87,9 +87,18 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj= {} }) => {
   }, [form])
 
   useEffect(() => {
-    form.setFieldsValue({
-      tags: tagsObj.tags || []
-    })
+    if (tagsObj?.tags && tagsObj?.tags.length > 0) {
+      const tags = tagsObj?.tags?.map(item => {
+        return {
+          ...item,
+          value: item.func === 'in' ? item.value.split(' ') : item.value
+        }
+      });
+      form.setFieldsValue({
+        tags: tags || []
+      })
+    }
+    
   }, [tagsObj])
 
   const timeChange = () => {
@@ -110,7 +119,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj= {} }) => {
     const tags = values?.tags?.map(item => {
       return {
         ...item,
-        value: item.value.indexOf('\n') > -1 ? item.value.split('\n').join(' ') : item.value
+        value: Array.isArray(item.value) ? item.value.join(' ') : item.value
       }
     })
     const params = {
@@ -258,6 +267,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj= {} }) => {
                   field={field}
                   key={index}
                   remove={remove}
+                  form={form}
                 />
 
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Form,
   Input,
@@ -17,15 +17,23 @@ import { useTranslation } from 'react-i18next';
 interface Itag {
   field: any;
   remove: Function;
+  form: any;
 }
 
 const TagItem: React.FC<Itag> = ({
   field,
   remove,
+  form
 }) => {
   const { t } = useTranslation();
   const [valuePlaceholder, setValuePlaceholder] = useState<string>('');
   const [funcCur, setfuncCur] = useState('==');
+
+  useEffect(() => {
+    console.log(field, 88888)
+    const tags = form.getFieldValue('tags');
+    funcChange(tags[field.name].func);
+  }, [field])
 
   const funcChange = (val) => {
     let text = '';
