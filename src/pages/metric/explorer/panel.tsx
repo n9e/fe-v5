@@ -159,7 +159,7 @@ const Panel: React.FC<PanelProps> = ({ metrics, defaultPromQL, removePanel }) =>
     }
   }
 
-  // 该函数传入输入框组件，注意产生的 props 和 state 不同步问题
+  // 触发语句查询
   function executeQuery(isExecute: boolean = true) {
     const expr = inputValue.current;
     if (!isExecute || expr === '' || clusters.length === 0) return;
