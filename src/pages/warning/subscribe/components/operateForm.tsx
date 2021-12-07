@@ -1,23 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Form,
-  Input,
-  Card,
-  Select,
-  Col,
-  Button,
-  Row,
-  message,
-  Checkbox,
-  Tooltip,
-  Radio,
-  Modal
-} from 'antd';
-import {
-  QuestionCircleFilled,
-  PlusCircleOutlined,
-  EditOutlined
-} from '@ant-design/icons';
+import { Form, Input, Card, Select, Col, Button, Row, message, Checkbox, Tooltip, Radio, Modal } from 'antd';
+import { QuestionCircleFilled, PlusCircleOutlined, EditOutlined } from '@ant-design/icons';
 import RuleModal from './ruleModal';
 import TagItem from './tagItem';
 import { addSubscribe, editSubscribe, deleteSubscribes } from '@/services/subscribe';
@@ -34,7 +17,6 @@ import _ from 'lodash';
 const { Option } = Select;
 const { TextArea } = Input;
 
-
 interface Props {
   detail?: subscribeItem;
   type?: number; // 1:编辑; 2:克隆
@@ -42,36 +24,33 @@ interface Props {
 
 const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
   const { t, i18n } = useTranslation();
-  const { clusters: clusterList } = useSelector<RootState, CommonStoreState>(
-    (state) => state.common,
-  );
+  const { clusters: clusterList } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const layout = {
     labelCol: {
-      span: 24
+      span: 24,
     },
     wrapperCol: {
-      span: 24
+      span: 24,
     },
   };
   const tailLayout = {
     labelCol: {
-      span: 24
+      span: 24,
     },
     wrapperCol: {
-      span: 24
+      span: 24,
     },
   };
 
   const [form] = Form.useForm(null as any);
   const history = useHistory();
-  const { curBusiItem } = useSelector<RootState, CommonStoreState>(state => state.common);
+  const { curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const [btnLoading, setBtnLoading] = useState<boolean>(false);
   const [ruleModalShow, setRuleModalShow] = useState<boolean>(false);
   const [ruleCur, setRuleCur] = useState<any>();
   const [contactList, setInitContactList] = useState([]);
   const [littleAffect, setLittleAffect] = useState(true);
   const [notifyGroups, setNotifyGroups] = useState<any[]>([]);
-
 
   useEffect(() => {
     getNotifyChannel();
@@ -81,8 +60,8 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
   useEffect(() => {
     setRuleCur({
       id: detail.rule_id || 0,
-      name: detail.rule_name
-    })
+      name: detail.rule_name,
+    });
   }, [detail.rule_id]);
 
   const notifyGroupsOptions = notifyGroups.map((ng: any) => (
@@ -105,41 +84,40 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
 
   const onFinish = (values) => {
     setBtnLoading(true);
-    const tags = values?.tags?.map(item => {
+    const tags = values?.tags?.map((item) => {
       return {
         ...item,
-        value: item.value.indexOf('\n') > -1 ? item.value.split('\n').join(' ') : item.value
-      }
-    })
+        value: item.value.indexOf('\n') > -1 ? item.value.split('\n').join(' ') : item.value,
+      };
+    });
     const params = {
       ...values,
       tags,
       redefine_severity: values.redefine_severity ? 1 : 0,
       redefine_channels: values.redefine_channels ? 1 : 0,
       rule_id: ruleCur.id,
-      user_group_ids: values.user_group_ids.join(' '),
-      new_channels: values.new_channels.join(' ')
+      user_group_ids: values.user_group_ids ? values.user_group_ids.join(' ') : '',
+      new_channels: values.new_channels ? values.new_channels.join(' ') : '',
     };
     if (type === 1) {
-      editSubscribe([{...params, id: detail.id}], curBusiItem.id)
-      .then((_) => {
-        message.success(t('新建告警屏蔽成功'));
-        history.push('/alert-subscribes');
-      })
-      .finally(() => {
-        setBtnLoading(false);
-      });
+      editSubscribe([{ ...params, id: detail.id }], curBusiItem.id)
+        .then((_) => {
+          message.success(t('新建告警屏蔽成功'));
+          history.push('/alert-subscribes');
+        })
+        .finally(() => {
+          setBtnLoading(false);
+        });
     } else {
       addSubscribe(params, curBusiItem.id)
-      .then((_) => {
-        message.success(t('新建告警屏蔽成功'));
-        history.push('/alert-subscribes');
-      })
-      .finally(() => {
-        setBtnLoading(false);
-      });
+        .then((_) => {
+          message.success(t('新建告警屏蔽成功'));
+          history.push('/alert-subscribes');
+        })
+        .finally(() => {
+          setBtnLoading(false);
+        });
     }
-    
   };
 
   const onFinishFailed = () => {
@@ -154,8 +132,8 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
     setRuleModalShow(false);
     setRuleCur(val);
     form.setFieldsValue({
-      rile_id: val.id || 0
-    })
+      rile_id: val.id || 0,
+    });
   };
 
   return (
@@ -196,33 +174,32 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
                 ))}
               </Select>
             </Form.Item>
-            <Form.Item
-              label={t('订阅告警规则：')}
-            >
-              {!!ruleCur?.id &&
+            <Form.Item label={t('订阅告警规则：')}>
+              {!!ruleCur?.id && (
                 <Button
-                  type="primary" ghost style={{ marginRight: '8px' }}
+                  type='primary'
+                  ghost
+                  style={{ marginRight: '8px' }}
                   onClick={() => {
-                    ruleCur?.id && history.push(`/alert-rules/edit/${ruleCur?.id}`)
-                  }}>
+                    ruleCur?.id && history.push(`/alert-rules/edit/${ruleCur?.id}`);
+                  }}
+                >
                   {ruleCur?.name}
-                </Button>}
+                </Button>
+              )}
 
               <EditOutlined style={{ cursor: 'pointer', fontSize: '18px' }} onClick={chooseRule} />
-
             </Form.Item>
             <Row gutter={[10, 10]} style={{ marginBottom: '8px' }}>
               <Col span={5}>
-                {t('订阅事件标签Key：')}<Tooltip
-                  title={t(
-                    `这里的标签是指告警事件的标签，通过如下标签匹配规则过滤告警事件`,
-                  )}
-                >
+                {t('订阅事件标签Key：')}
+                <Tooltip title={t(`这里的标签是指告警事件的标签，通过如下标签匹配规则过滤告警事件`)}>
                   <QuestionCircleFilled />
                 </Tooltip>
               </Col>
               <Col span={3}>
-                {t('运算符：')}<Tooltip
+                {t('运算符：')}
+                <Tooltip
                   title={t(
                     `运算符如果选择in，value的输入框中自动出现placeholder：
                     可以输入多个值，用回车分隔
@@ -233,89 +210,64 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
                 >
                   <QuestionCircleFilled />
                 </Tooltip>
-
               </Col>
-              <Col span={16}>
-                {t('标签Value：')}
-              </Col>
+              <Col span={16}>{t('标签Value：')}</Col>
             </Row>
-            <Form.List name="tags" initialValue={[{}]}>
+            <Form.List name='tags' initialValue={[{}]}>
               {(fields, { add, remove }) => (
                 <>
                   {fields.map((field, index) => (
-                    <TagItem
-                      field={field}
-                      fields={fields}
-                      key={index}
-                      remove={remove}
-                      add={add}
-                      form={form}
-                    />
-
-
+                    <TagItem field={field} fields={fields} key={index} remove={remove} add={add} form={form} />
                   ))}
                   <Form.Item>
-                    <PlusCircleOutlined
-                      className='control-icon-normal'
-                      onClick={() => add()}
-                    />
+                    <PlusCircleOutlined className='control-icon-normal' onClick={() => add()} />
                   </Form.Item>
                 </>
               )}
             </Form.List>
-            <Form.Item
-              label={t('告警级别：')}
-              name='redefine_severity'
-              valuePropName="checked"
-            >
+            <Form.Item label={t('告警级别：')} name='redefine_severity' valuePropName='checked'>
               <Checkbox
                 value={1}
                 style={{ lineHeight: '32px' }}
                 onChange={(e) => {
                   form.setFieldsValue({
-                    redefine_severity: e.target.checked ? 1 : 0
-                  })
+                    redefine_severity: e.target.checked ? 1 : 0,
+                  });
                   setLittleAffect(!littleAffect);
-                }}>
+                }}
+              >
                 {t('重新定义')}
               </Checkbox>
-
             </Form.Item>
-            <Form.Item
-              label={t('新的告警级别：')}
-              name='new_severity'
-              initialValue={2}
-              style={{ display: form.getFieldValue('redefine_severity') ? 'block' : 'none' }}
-            >
+            <Form.Item label={t('新的告警级别：')} name='new_severity' initialValue={2} style={{ display: form.getFieldValue('redefine_severity') ? 'block' : 'none' }}>
               <Radio.Group>
-                <Radio key={1} value={1}>{t('一级报警')}</Radio>
-                <Radio key={2} value={2}>{t('二级报警')}</Radio>
-                <Radio key={3} value={3}>{t('三级报警')}</Radio>
+                <Radio key={1} value={1}>
+                  {t('一级报警')}
+                </Radio>
+                <Radio key={2} value={2}>
+                  {t('二级报警')}
+                </Radio>
+                <Radio key={3} value={3}>
+                  {t('三级报警')}
+                </Radio>
               </Radio.Group>
             </Form.Item>
 
-            <Form.Item
-              label={t('通知媒介：')}
-              name='redefine_channels'
-              valuePropName="checked"
-            >
+            <Form.Item label={t('通知媒介：')} name='redefine_channels' valuePropName='checked'>
               <Checkbox
                 value={1}
                 style={{ lineHeight: '32px' }}
                 onChange={(e) => {
                   form.setFieldsValue({
-                    redefine_channels: e.target.checked ? 1 : 0
-                  })
+                    redefine_channels: e.target.checked ? 1 : 0,
+                  });
                   setLittleAffect(!littleAffect);
-                }}>
+                }}
+              >
                 {t('重新定义')}
               </Checkbox>
             </Form.Item>
-            <Form.Item
-              label={t('新的通知媒介：')}
-              name='new_channels'
-              style={{ display: form.getFieldValue('redefine_channels') ? 'block' : 'none' }}
-            >
+            <Form.Item label={t('新的通知媒介：')} name='new_channels' style={{ display: form.getFieldValue('redefine_channels') ? 'block' : 'none' }}>
               <Checkbox.Group>
                 {contactList.map((c: string) => (
                   <Checkbox value={c} key={c}>
@@ -325,15 +277,10 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
               </Checkbox.Group>
             </Form.Item>
 
-
             <Form.Item label={t('订阅告警接收组：')} name='user_group_ids'>
-              <Select
-                mode='multiple'
-                showSearch
-                optionFilterProp="children"
-                filterOption={(input, option) =>
-                  option?.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                }>{notifyGroupsOptions}</Select>
+              <Select mode='multiple' showSearch optionFilterProp='children' filterOption={(input, option) => option?.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0}>
+                {notifyGroupsOptions}
+              </Select>
             </Form.Item>
             <Form.Item {...tailLayout}>
               <Button type='primary' htmlType='submit' style={{ marginRight: '8px' }}>
@@ -347,23 +294,21 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
                     Modal.confirm({
                       title: t('是否删除该告警规则?'),
                       onOk: () => {
-                        detail?.id && deleteSubscribes({ ids: [detail.id] }, curBusiItem.id).then(() => {
-                          message.success(t('删除成功'));
-                          history.push('/alert-subscribes');
-                        });
+                        detail?.id &&
+                          deleteSubscribes({ ids: [detail.id] }, curBusiItem.id).then(() => {
+                            message.success(t('删除成功'));
+                            history.push('/alert-subscribes');
+                          });
                       },
 
-                      onCancel() { },
+                      onCancel() {},
                     });
                   }}
                 >
                   {t('删除')}
                 </Button>
               )}
-              <Button onClick={() => window.history.back()}>
-                {t('取消')}
-              </Button>
-
+              <Button onClick={() => window.history.back()}>{t('取消')}</Button>
             </Form.Item>
           </Card>
         </Form>
@@ -372,9 +317,9 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
           ruleModalClose={() => {
             setRuleModalShow(false);
           }}
-          subscribe={subscribeRule} />
+          subscribe={subscribeRule}
+        />
       </div>
-
     </>
   );
 };

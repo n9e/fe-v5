@@ -21,7 +21,7 @@ export default function Profile() {
   };
 
   return (
-    <PageLayout title={t('个人中心')}>
+    <PageLayout title={t('个人中心')} hideCluster>
       <Tabs activeKey={tab} className='profile' onChange={handleChange}>
         <TabPane tab={t('personalInfo')} key='info'>
           <Info />

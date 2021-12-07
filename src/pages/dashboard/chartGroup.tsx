@@ -7,6 +7,7 @@ import _ from 'lodash';
 import { Group, ChartConfig } from '@/store/dashboardInterface';
 import { Tag } from '@/store/chart';
 import { getCharts, updateCharts } from '@/services/dashboard';
+import { getPerm } from '@/services/common';
 import D3Chart from '@/components/D3Chart';
 import { SettingOutlined, LinkOutlined, DownOutlined, EditOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import 'react-grid-layout/css/styles.css';
@@ -205,15 +206,12 @@ export default function ChartGroup(props: Props) {
   const [mounted, setMounted] = useState<boolean>(false);
   useEffect(() => {
     init();
-  }, [groupInfo.updateTime]);
-
-  useEffect(() => {
     Refs &&
       Refs.forEach((ref) => {
         const graphInstance = ref.current;
         graphInstance && graphInstance.refresh();
       });
-  }, [cluster]);
+  }, [groupInfo.updateTime, cluster]);
 
   const init = () => {
     setMounted(false);
@@ -325,10 +323,11 @@ export default function ChartGroup(props: Props) {
       return item;
     });
     // setLayout({ lg: [...layout] });
-    updateCharts(busiId, currConfigs);
+    const { dat } = await getPerm(busiId, 'rw');
+    dat && updateCharts(busiId, currConfigs);
   };
 
-  const setArrange = (colItem: number, w = cols / colItem, h = unit / 3) => {
+  const setArrange = async (colItem: number, w = cols / colItem, h = unit / 3) => {
     // setMounted(false);
     let countX = 0;
     let countY = 0;
@@ -358,7 +357,8 @@ export default function ChartGroup(props: Props) {
       item.configs.layout = { h, w, x, y, i };
       return item;
     });
-    updateCharts(busiId, currConfigs);
+    const { dat } = await getPerm(busiId, 'rw');
+    dat && updateCharts(busiId, currConfigs);
     setLayout({ lg: [..._lg], sm: [..._lg], md: [..._lg], xs: [..._lg], xxs: [..._lg] });
     setChartConfigs(currConfigs);
     // setMounted(true);
@@ -477,7 +477,7 @@ export default function ChartGroup(props: Props) {
       chartConfigs &&
       chartConfigs.length > 0 &&
       chartConfigs.map((item, i) => {
-        let { QL, name, legend, yplotline1, yplotline2 } = item.configs;
+        let { QL, name, legend, yplotline1, yplotline2, highLevelConfig } = item.configs;
         const promqls = QL.map((item) =>
           variableConfig && variableConfig.var && variableConfig.var.length ? replaceExpressionVars(item.PromQL, variableConfig, variableConfig.var.length) : item.PromQL,
         );
@@ -491,15 +491,16 @@ export default function ChartGroup(props: Props) {
           >
             <Graph
               ref={Refs![i]}
+              highLevelConfig={highLevelConfig}
               data={{
                 yAxis: {
                   plotLines: [
                     {
-                      value: yplotline1,
+                      value: yplotline1 ? yplotline1 : undefined,
                       color: 'orange',
                     },
                     {
-                      value: yplotline2,
+                      value: yplotline2 ? yplotline2 : undefined,
                       color: 'red',
                     },
                   ],

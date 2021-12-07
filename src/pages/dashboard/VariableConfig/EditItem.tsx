@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Modal, Form, Input, Button, Space, Row, Col, Switch } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { DeleteOutlined, PlusOutlined, ArrowUpOutlined, ArrowDownOutlined, CopyOutlined } from '@ant-design/icons';
+import { DeleteOutlined, PlusOutlined, ArrowUpOutlined, ArrowDownOutlined, CopyOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import PromqlEditor from '@/components/PromqlEditor';
 import '../index.less';
 import { Variable } from './definition';
@@ -49,7 +49,13 @@ export default function EditItem(props: Props) {
       <Form name='dynamic_form_nest_item' onFinish={onFinish} autoComplete='off' preserve={false} form={form}>
         <Row gutter={[6, 6]} className='tag-header'>
           <Col span={4}>{t('变量名')}</Col>
-          <Col span={6}>{t('变量定义')}</Col>
+          <Col span={6}>
+            {t('变量定义')}
+            <QuestionCircleOutlined
+              style={{ marginLeft: 5 }}
+              onClick={() => window.open('https://grafana.com/docs/grafana/latest/datasources/prometheus/#query-variable', '_blank')}
+            />
+          </Col>
           <Col span={6}>{t('筛值正则')}</Col>
           <Col span={2}>{t('Multi')}</Col>
           <Col span={2}>{t('All Option')}</Col>

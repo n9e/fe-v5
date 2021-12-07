@@ -42,6 +42,7 @@ export default function ChangePassword() {
         label={<span>{t('新密码')}:</span>}
         required
         name='newpass'
+        hasFeedback
         rules={[
           {
             required: true,
@@ -55,6 +56,7 @@ export default function ChangePassword() {
         label={<span>{t('确认密码')}: </span>}
         required
         name='newpassagain'
+        hasFeedback
         rules={[
           {
             required: true,

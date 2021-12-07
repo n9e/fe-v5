@@ -1,9 +1,12 @@
 import React, { FC, useState, useEffect } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 import { MenuClickEventHandler } from 'rc-menu/lib/interface';
+import { RootState as AccountRootState, accountStoreState } from '@/store/accountInterface';
 import { Menu, Button } from 'antd';
-import Icon, { MenuUnfoldOutlined, MenuFoldOutlined, LineChartOutlined, DatabaseOutlined, UserOutlined, CodeOutlined, SettingOutlined, ContactsOutlined } from '@ant-design/icons';
+import Icon, { MenuUnfoldOutlined, MenuFoldOutlined, LineChartOutlined, DatabaseOutlined, UserOutlined, CodeOutlined, AlertOutlined, ContactsOutlined } from '@ant-design/icons';
 import _ from 'lodash';
+import { getMenuPerm } from '@/services/common';
 import { useTranslation } from 'react-i18next';
 import { dynamicPackages, Entry } from '@/utils';
 import SystemInfoSvg from '../../../public/image/system-info.svg';
@@ -39,7 +42,7 @@ const defaultSelectedKey = (menus: any, pathname) => {
 
 const SideMenu: FC = () => {
   const { t, i18n } = useTranslation();
-  const menus = [
+  const menuList = [
     {
       key: 'targets',
       icon: <DatabaseOutlined />,
@@ -72,7 +75,7 @@ const SideMenu: FC = () => {
     },
     {
       key: 'alarm',
-      icon: <SettingOutlined />,
+      icon: <AlertOutlined />,
       title: t('告警管理'),
       children: [
         {
@@ -147,9 +150,12 @@ const SideMenu: FC = () => {
       ],
     },
   ];
+
+  const [menus, setMenus] = useState(menuList);
   const history = useHistory();
   const location = useLocation();
   const { pathname } = location;
+  let { profile } = useSelector<AccountRootState, accountStoreState>((state) => state.account);
   const [collapsed, setCollapsed] = useState(localStorage.getItem('menuCollapsed') === '1');
   const [selectedKeys, setSelectedKeys] = useState<string[]>([defaultSelectedKey(menus, pathname)]);
   const [openKeys, setOpenKeys] = useState<string[]>(collapsed ? [] : [getDefaultOpenKey(menus, pathname)]);
@@ -179,6 +185,23 @@ const SideMenu: FC = () => {
     }
   }, [pathname, collapsed]);
 
+  useEffect(() => {
+    if (profile.roles.length > 0) {
+      if (profile.roles.indexOf('Admin') === -1) {
+        getMenuPerm().then((res) => {
+          const { dat } = res;
+          const newMenus = [...menuList];
+          newMenus.forEach((menu) => {
+            menu.children = menu.children.filter((item) => dat.includes(item.key));
+          });
+          setMenus(newMenus);
+        });
+      } else {
+        setMenus(menuList);
+      }
+    }
+  }, [profile.roles]);
+
   return hideSideMenu() ? null : (
     <div
       style={{
@@ -206,11 +229,13 @@ const SideMenu: FC = () => {
       >
         {_.map(menus, (subMenus) => {
           return (
-            <SubMenu key={subMenus.key} icon={subMenus.icon} title={subMenus.title}>
-              {_.map(subMenus.children, (menu) => {
-                return <Menu.Item key={menu.key}>{menu.title}</Menu.Item>;
-              })}
-            </SubMenu>
+            subMenus.children.length > 0 && (
+              <SubMenu key={subMenus.key} icon={subMenus.icon} title={subMenus.title}>
+                {_.map(subMenus.children, (menu) => {
+                  return <Menu.Item key={menu.key}>{menu.title}</Menu.Item>;
+                })}
+              </SubMenu>
+            )
           );
         })}
         {/* <SubMenu key='/targets' icon={<DatabaseOutlined />} title={t('监控对象')}>

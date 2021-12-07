@@ -19,7 +19,7 @@ export interface GraphDataProps {
   step: number | null;
   range: Range;
   legend?: boolean;
-  title?: string;
+  title?: string | ReactNode;
   selectedHosts?: { ident: string }[];
   metric?: string;
   promqls?: string[] | { current: string }[];
@@ -115,7 +115,6 @@ export default class Graph extends Component<GraphProps, GraphState> {
   }
 
   componentDidMount() {
-    console.log('componentDidMount');
     this.updateAllGraphs(this.state.aggrFunc, this.state.aggrGroups, this.state.offsets);
   }
 
@@ -263,15 +262,26 @@ export default class Graph extends Component<GraphProps, GraphState> {
   };
 
   shareChart = () => {
+    const initShareDataProps = { ...this.props.data, legend: this.state.legend };
+    if (!initShareDataProps.promqls) {
+      let queries: string[] = [];
+      const obj = {
+        curAggrFunc: this.state.aggrFunc,
+        curAggrGroup: this.state.aggrGroups,
+      };
+      const baseQuery = this.generateQuery(obj);
+      baseQuery && queries.push(baseQuery);
+      const offsetQuery = this.state.offsets.map((offset) => this.generateQuery({ ...obj, offset })).filter((query) => query);
+      queries = queries.concat(offsetQuery as string[]);
+      initShareDataProps.promqls = queries;
+    }
     let serielData = {
-      dataProps: { ...this.props.data },
-      state: {
-        defaultAggrFunc: this.state.aggrFunc,
-        defaultAggrGroups: this.state.aggrGroups,
-        defaultOffsets: this.state.offsets,
-      },
+      dataProps: initShareDataProps,
+      highLevelConfig: { ...this.state.highLevelConfig },
+      curCluster: localStorage.getItem('curCluster'),
     };
     delete serielData.dataProps.ref;
+
     SetTmpChartData([
       {
         configs: JSON.stringify(serielData),
@@ -398,17 +408,6 @@ export default class Graph extends Component<GraphProps, GraphState> {
         >
           Multi Series in Tooltip, order value
         </Checkbox>
-        {/* <Select value={this.state.highLevelConfig.sharedSortDirection} onChange={(v: 'desc' | 'asc') => {
-          this.setState({
-            highLevelConfig: {
-              ...this.state.highLevelConfig,
-              sharedSortDirection: v
-            }
-          })
-        }}>
-          <Option value='desc'>desc</Option>
-          <Option value='asc'>asc</Option>
-        </Select> */}
         <Dropdown overlay={aggrFuncMenu}>
           <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
             {this.state.highLevelConfig.sharedSortDirection} <DownOutlined />
@@ -439,17 +438,6 @@ export default class Graph extends Component<GraphProps, GraphState> {
         >
           Value format with:{' '}
         </Checkbox>
-        {/* <Select value={this.state.highLevelConfig.formatUnit} onChange={(v: 1024 | 1000) => {
-          this.setState({
-            highLevelConfig: {
-              ...this.state.highLevelConfig,
-              formatUnit: v
-            }
-          })
-        }}>
-          <Option value={1024}>1024</Option>
-          <Option value={1000}>1000</Option>
-        </Select> */}
         <Dropdown overlay={precisionMenu}>
           <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
             {formatUnitInfoMap[this.state.highLevelConfig.formatUnit]} <DownOutlined />

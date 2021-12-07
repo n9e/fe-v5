@@ -2,21 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Button, Input, Table, Switch, Tag, Select, Modal } from 'antd';
 const { Option } = Select;
-import {
-  SearchOutlined,
-} from '@ant-design/icons';
+import { SearchOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { ColumnType } from 'antd/lib/table';
-import {
-  strategyItem,
-  strategyStatus,
-} from '@/store/warningInterface';
+import { strategyItem, strategyStatus } from '@/store/warningInterface';
 import { CommonStoreState } from '@/store/commonInterface';
 import { RootState } from '@/store/common';
-import {
-  getStrategyGroupSubList,
-  updateAlertRules
-} from '@/services/warning';
+import { getStrategyGroupSubList, updateAlertRules } from '@/services/warning';
 import { priorityColor } from '@/utils/constant';
 import ColorTag from '@/components/ColorTag';
 import { pageSizeOptionsDefault } from '@/pages/warning/const';
@@ -28,16 +20,10 @@ interface props {
   subscribe: Function;
 }
 
-const ruleModal: React.FC<props> = ({
-  visible,
-  ruleModalClose,
-  subscribe
-}) => {
+const ruleModal: React.FC<props> = ({ visible, ruleModalClose, subscribe }) => {
   const { t } = useTranslation();
-  const { curBusiItem } = useSelector<RootState, CommonStoreState>(state => state.common);
-  const { busiGroups } = useSelector<RootState, CommonStoreState>(
-    (state) => state.common,
-  );
+  const { curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
+  const { busiGroups } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const [currentStrategyDataAll, setCurrentStrategyDataAll] = useState([]);
   const [currentStrategyData, setCurrentStrategyData] = useState([]);
   const [bgid, setBgid] = useState(curBusiItem.id);
@@ -53,27 +39,26 @@ const ruleModal: React.FC<props> = ({
 
   useEffect(() => {
     filterData();
-  }, [query, currentStrategyDataAll])
+  }, [query, currentStrategyDataAll]);
 
   const getAlertRules = async () => {
     const { success, dat } = await getStrategyGroupSubList({ id: bgid });
     if (success) {
       setCurrentStrategyDataAll(dat || []);
     }
-
-  }
+  };
 
   const bgidChange = (val) => {
     setBgid(val);
-  }
+  };
 
   const filterData = () => {
     const data = JSON.parse(JSON.stringify(currentStrategyDataAll));
-    const res = data.filter(item => {
-      return (item.name.indexOf(query) > -1 || item.append_tags.join(' ').indexOf(query) > -1)
+    const res = data.filter((item) => {
+      return item.name.indexOf(query) > -1 || item.append_tags.join(' ').indexOf(query) > -1;
     });
     setCurrentStrategyData(res || []);
-  }
+  };
 
   const onSearchQuery = (e) => {
     let val = e.target.value;
@@ -115,7 +100,6 @@ const ruleModal: React.FC<props> = ({
       title: t('告警接收者'),
       dataIndex: 'notify_groups_obj',
       render: (data, record) => {
-
         return (
           (data.length &&
             data.map(
@@ -126,12 +110,7 @@ const ruleModal: React.FC<props> = ({
                 } & { name: string },
                 index: number,
               ) => {
-                return (
-                  <ColorTag
-                    text={user.nickname || user.username || user.name}
-                    key={index}
-                  ></ColorTag>
-                );
+                return <ColorTag text={user.nickname || user.username || user.name} key={index}></ColorTag>;
               },
             )) || <div></div>
         );
@@ -153,8 +132,7 @@ const ruleModal: React.FC<props> = ({
     {
       title: t('更新时间'),
       dataIndex: 'update_at',
-      render: (text: string) =>
-        dayjs(Number(text) * 1000).format('YYYY-MM-DD HH:mm:ss'),
+      render: (text: string) => dayjs(Number(text) * 1000).format('YYYY-MM-DD HH:mm:ss'),
     },
     {
       title: t('启用'),
@@ -195,7 +173,6 @@ const ruleModal: React.FC<props> = ({
             >
               {t('订阅')}
             </div>
-
           </div>
         );
       },
@@ -204,11 +181,11 @@ const ruleModal: React.FC<props> = ({
 
   const handleSubscribe = (record) => {
     subscribe(record);
-  }
+  };
 
   const modalClose = () => {
     ruleModalClose();
-  }
+  };
 
   return (
     <>
@@ -223,24 +200,16 @@ const ruleModal: React.FC<props> = ({
         width={'80%'}
       >
         <div>
-          <Select 
-            style={{width: '280px'}}
-            value={bgid}
-            onChange={bgidChange}>
-            {busiGroups.map(item => (
+          <Select style={{ width: '280px' }} value={bgid} onChange={bgidChange}>
+            {busiGroups.map((item) => (
               <Option value={item.id}>{item.name}</Option>
             ))}
           </Select>
-          <Input
-            style={{float: 'right', width: '280px'}}
-            onPressEnter={onSearchQuery}
-            prefix={<SearchOutlined />}
-            placeholder={t('搜索标签、屏蔽原因')}
-          />
+          <Input style={{ marginLeft: 10, width: '280px' }} onPressEnter={onSearchQuery} prefix={<SearchOutlined />} placeholder={t('规则名称、附加标签')} />
         </div>
         <div className='rule_modal_table'>
           <Table
-            rowKey="id"
+            rowKey='id'
             pagination={{
               total: currentStrategyData.length,
               showQuickJumper: true,
@@ -249,16 +218,15 @@ const ruleModal: React.FC<props> = ({
                 return `共 ${total} 条数据`;
               },
               pageSizeOptions: pageSizeOptionsDefault,
-              defaultPageSize: 30
+              defaultPageSize: 30,
             }}
             dataSource={currentStrategyData}
             columns={columns}
           />
         </div>
-
       </Modal>
     </>
-  )
-}
+  );
+};
 
 export default ruleModal;

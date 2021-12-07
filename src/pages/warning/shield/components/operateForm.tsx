@@ -1,20 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Form,
-  Input,
-  Card,
-  Select,
-  Col,
-  Button,
-  Row,
-  message,
-  DatePicker,
-  Tooltip
-} from 'antd';
-import {
-  QuestionCircleFilled,
-  PlusCircleOutlined
-} from '@ant-design/icons';
+import { Form, Input, Card, Select, Col, Button, Row, message, DatePicker, Tooltip } from 'antd';
+import { QuestionCircleFilled, PlusCircleOutlined } from '@ant-design/icons';
 import moment from 'moment';
 
 import TagItem from './tagItem';
@@ -46,31 +32,29 @@ interface Props {
 
 const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj= {} }) => {
   const { t, i18n } = useTranslation();
-  const { clusters: clusterList } = useSelector<RootState, CommonStoreState>(
-    (state) => state.common,
-  );
+  const { clusters: clusterList } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const layout = {
     labelCol: {
-      span: 24
+      span: 24,
     },
     wrapperCol: {
-      span: 24
+      span: 24,
     },
   };
   const tailLayout = {
     labelCol: {
-      span: 0
+      span: 0,
     },
     wrapperCol: {
-      span: 24
+      span: 24,
     },
   };
-  
+
   const [form] = Form.useForm(null as any);
   const history = useHistory();
   const [btnLoading, setBtnLoading] = useState<boolean>(false);
   const [timeLen, setTimeLen] = useState('1h');
-  const { curBusiItem } = useSelector<RootState, CommonStoreState>(state => state.common);
+  const { curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
 
   useEffect(() => {
     const btime = form.getFieldValue('btime');
@@ -81,10 +65,14 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj= {} }) => {
       const m = moment.duration(etime - btime).minutes();
       const s = moment.duration(etime - btime).seconds();
     }
-    return () => {
+    return () => {};
+  }, [form]);
 
-    }
-  }, [form])
+  useEffect(() => {
+    form.setFieldsValue({
+      tags: tagsObj.tags || [{}],
+    });
+  }, [tagsObj]);
 
   useEffect(() => {
     if (tagsObj?.tags && tagsObj?.tags.length > 0) {
@@ -112,11 +100,11 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj= {} }) => {
       const timeLen = `${d ? `${d}d ` : ''}${h ? `${h}h ` : ''}${m ? `${m}m ` : ''}${s ? `${s}s` : ''}`;
       setTimeLen(timeLen);
     }
-  }
+  };
 
   const onFinish = (values) => {
     setBtnLoading(true);
-    const tags = values?.tags?.map(item => {
+    const tags = values?.tags?.map((item) => {
       return {
         ...item,
         value: Array.isArray(item.value) ? item.value.join(' ') : item.value
@@ -126,7 +114,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj= {} }) => {
       ...values,
       btime: moment(values.btime).unix(),
       etime: moment(values.etime).unix(),
-      tags
+      tags,
     };
     addShield(params, curBusiItem.id)
       .then((_) => {
@@ -150,9 +138,9 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj= {} }) => {
       form.setFieldsValue({
         btime: moment(time),
         etime: moment(time).add({
-          seconds: longTime
-        })
-      })
+          seconds: longTime,
+        }),
+      });
       return;
     }
     const unit = val.charAt(val.length - 1);
@@ -160,12 +148,12 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj= {} }) => {
     form.setFieldsValue({
       btime: moment(time),
       etime: moment(time).add({
-        [unit]: num
-      })
-    })
-  }
+        [unit]: num,
+      }),
+    });
+  };
 
-  const content =
+  const content = (
     <Form
       form={form}
       {...layout}
@@ -177,7 +165,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj= {} }) => {
         ...detail,
         btime: detail?.btime ? moment(detail.btime) : moment(btimeDefault),
         etime: detail?.etime ? moment(detail.etime) : moment(etimeDefault),
-        cluster: clusterList[0] || 'Default'
+        cluster: clusterList[0] || 'Default',
       }}
     >
       <Card>
@@ -199,7 +187,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj= {} }) => {
             ))}
           </Select>
         </Form.Item>
-        
+
         <Row gutter={10}>
           <Col span={8}>
             <Form.Item label={t('屏蔽开始时间：')} name='btime'>
@@ -208,22 +196,14 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj= {} }) => {
           </Col>
           <Col span={8}>
             <Form.Item label={t('屏蔽时长：')}>
-
-              <Select
-                placeholder={t('请选择屏蔽时长')}
-                onChange={timeLenChange}
-                value={timeLen}
-              >
-                {
-                  timeLensDefault.map((item: any, index: number) => (
-                    <Option key={index} value={item.value}>{item.value}</Option>
-                  ))
-                }
-
-
+              <Select placeholder={t('请选择屏蔽时长')} onChange={timeLenChange} value={timeLen}>
+                {timeLensDefault.map((item: any, index: number) => (
+                  <Option key={index} value={item.value}>
+                    {item.value}
+                  </Option>
+                ))}
               </Select>
             </Form.Item>
-
           </Col>
           <Col span={8}>
             <Form.Item label={t('屏蔽结束时间：')} name='etime'>
@@ -233,16 +213,14 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj= {} }) => {
         </Row>
         <Row gutter={[10, 10]} style={{ marginBottom: '8px' }}>
           <Col span={5}>
-            {t('屏蔽事件标签Key：')}<Tooltip
-              title={t(
-                `这里的标签是指告警事件的标签，通过如下标签匹配规则过滤告警事件`,
-              )}
-            >
+            {t('屏蔽事件标签Key：')}
+            <Tooltip title={t(`这里的标签是指告警事件的标签，通过如下标签匹配规则过滤告警事件`)}>
               <QuestionCircleFilled />
             </Tooltip>
           </Col>
           <Col span={3}>
-            {t('运算符：')}<Tooltip
+            {t('运算符：')}
+            <Tooltip
               title={t(
                 `运算符如果选择in，value的输入框中自动出现placeholder：
                     可以输入多个值，用回车分隔
@@ -253,13 +231,10 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj= {} }) => {
             >
               <QuestionCircleFilled />
             </Tooltip>
-
           </Col>
-          <Col span={16}>
-            {t('标签Value：')}
-          </Col>
+          <Col span={16}>{t('标签Value：')}</Col>
         </Row>
-        <Form.List name="tags" initialValue={[{}]}>
+        <Form.List name='tags' initialValue={[{}]}>
           {(fields, { add, remove }) => (
             <>
               {fields.map((field, index) => (
@@ -273,15 +248,11 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj= {} }) => {
 
               ))}
               <Form.Item>
-                <PlusCircleOutlined
-                  className='control-icon-normal'
-                  onClick={() => add()}
-                />
+                <PlusCircleOutlined className='control-icon-normal' onClick={() => add()} />
               </Form.Item>
             </>
           )}
         </Form.List>
-
 
         {/* <Form.Item label={t('屏蔽时间')} name='time'>
           <RangeDatePicker />
@@ -299,12 +270,12 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj= {} }) => {
           <TextArea rows={3} />
         </Form.Item>
         <Form.Item {...tailLayout}>
-          <Row gutter={[10, 10]} >
-          <Col span={1}>
-                <Button type='primary' htmlType='submit'>
-                  {type === 2 ? t('克隆') : t('创建')}
-                </Button>
-              </Col>
+          <Row gutter={[10, 10]}>
+            <Col span={1}>
+              <Button type='primary' htmlType='submit'>
+                {type === 2 ? t('克隆') : t('创建')}
+              </Button>
+            </Col>
 
             <Col
               span={1}
@@ -312,14 +283,13 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj= {} }) => {
                 marginLeft: 40,
               }}
             >
-              <Button onClick={() => window.history.back()}>
-                {t('取消')}
-              </Button>
+              <Button onClick={() => window.history.back()}>{t('取消')}</Button>
             </Col>
           </Row>
         </Form.Item>
       </Card>
     </Form>
+  );
   return <div className='operate-form-index'>{content}</div>;
 };
 

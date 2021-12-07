@@ -427,7 +427,7 @@ const MonObjectManage: React.FC = () => {
   }, [tableQueryContent]);
 
   return (
-    <PageLayout icon={<DatabaseOutlined />} title={t('对象列表')}>
+    <PageLayout icon={<DatabaseOutlined />} title={t('对象列表')} hideCluster>
       <div className='object-manage-page-content'>
         <LeftTree
           clusterGroup={{

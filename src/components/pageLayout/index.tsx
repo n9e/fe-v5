@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { RootState as AccountRootState, accountStoreState } from '@/store/accountInterface';
 import { RootState as CommonRootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
-import { Menu, Dropdown, Switch } from 'antd';
+import { Menu, Dropdown, Button } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import { Logout } from '@/services/login';
 interface IPageLayoutProps {
@@ -24,6 +24,7 @@ interface IPageLayoutProps {
 const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, children, customArea, showBack, onChangeCluster, hideCluster = false }) => {
   const { t, i18n } = useTranslation();
   const history = useHistory();
+  const dispatch = useDispatch();
   let { profile } = useSelector<AccountRootState, accountStoreState>((state) => state.account);
   const { clusters } = useSelector<CommonRootState, CommonStoreState>((state) => state.common);
   const localCluster = localStorage.getItem('curCluster');
@@ -47,6 +48,16 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, childr
           Logout().then((res) => {
             localStorage.removeItem('access_token');
             localStorage.removeItem('refresh_token');
+            dispatch({
+              type: 'common/saveData',
+              prop: 'clusters',
+              data: [],
+            });
+            dispatch({
+              type: 'common/saveData',
+              prop: 'busiGroups',
+              data: [],
+            });
             history.push('/login');
           });
         }}
@@ -96,10 +107,11 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, childr
             <div className={'page-header-right-area'}>
               {!hideCluster && (
                 <div style={{ marginRight: 20 }}>
+                  集群：
                   <Dropdown overlay={clusterMenu}>
-                    <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
+                    <Button>
                       {curCluster} <DownOutlined />
-                    </a>
+                    </Button>
                   </Dropdown>
                 </div>
               )}

@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Switch, Route, useLocation, Redirect } from 'r
 import Loadable from '@/routers/loadable';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, accountStoreState } from '@/store/accountInterface';
+import NotFound from '@/pages/NotFound';
 import Login from '@/pages/login';
 import ResourcePage from '@/pages/resource';
 import Strategy from '@/pages/warning/strategy';
@@ -66,10 +67,12 @@ export default function Content() {
   let { profile } = useSelector<RootState, accountStoreState>((state) => state.account);
   const location = useLocation();
   const dispatch = useDispatch();
-  if (!profile.id && location.pathname != '/login' && !location.pathname.startsWith('/chart/')) {
-    dispatch({ type: 'account/getProfile' });
+  if (!profile.id && location.pathname != '/login') {
     dispatch({ type: 'common/getClusters' });
-    dispatch({ type: 'common/getBusiGroups' });
+    if (!location.pathname.startsWith('/chart/')) {
+      dispatch({ type: 'account/getProfile' });
+      dispatch({ type: 'common/getBusiGroups' });
+    }
   }
 
   // // this is a workaround for D3Chart, it's destroy function has some problem
@@ -136,6 +139,8 @@ export default function Content() {
         <Route path='/' exact>
           <Redirect to='/metric/explorer' />
         </Route>
+        <Route path='/404' component={NotFound} />
+        <Route path='*' component={NotFound} />
       </Switch>
     </div>
   );

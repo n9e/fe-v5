@@ -164,7 +164,22 @@ const Event: React.FC = () => {
       render(value, record) {
         return (
           <>
-            <Button size='small' type='link'>
+            <Button
+              size='small'
+              type='link'
+              onClick={() => {
+                history.push('/alert-mutes/add', {
+                  tags: record.tags.map((tag) => {
+                    const [key, value] = tag.split('=');
+                    return {
+                      func: '==',
+                      key,
+                      value,
+                    };
+                  }),
+                });
+              }}
+            >
               屏蔽
             </Button>
             <Button

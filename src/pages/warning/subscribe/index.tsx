@@ -131,7 +131,7 @@ const Shield: React.FC = () => {
                 }}
                 onClick={() => {
                   confirm({
-                    title: t('确定删除该告警屏蔽?'),
+                    title: t('确定删除该订阅规则?'),
                     icon: <ExclamationCircleOutlined />,
                     onOk: () => {
                       dismiss(record.id);
