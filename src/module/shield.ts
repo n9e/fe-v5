@@ -23,7 +23,7 @@ const ShieldStore: IStore<IshieldState> = {
       const tags = data.tags.map(item => {
         return {
           ...item,
-          value: item.func === 'in' ? item.value.split(' ').join('\n') : item.value
+          value: item.func === 'in' ? item.value.split(' ') : item.value
         }
       })
       yield put({

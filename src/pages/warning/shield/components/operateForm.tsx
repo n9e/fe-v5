@@ -22,7 +22,7 @@ const btimeDefault = new Date().getTime();
 const etimeDefault = new Date().getTime() + 1 * 60 * 60 * 1000; // 默认时长1h
 
 interface ItagsObj {
-  tags: any[];
+  tags: any[]
 }
 interface Props {
   detail?: shieldItem;
@@ -30,7 +30,7 @@ interface Props {
   type?: number; // 1:编辑; 2:克隆
 }
 
-const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }) => {
+const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj= {} }) => {
   const { t, i18n } = useTranslation();
   const { clusters: clusterList } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const layout = {
@@ -74,6 +74,21 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }) => {
     });
   }, [tagsObj]);
 
+  useEffect(() => {
+    if (tagsObj?.tags && tagsObj?.tags.length > 0) {
+      const tags = tagsObj?.tags?.map(item => {
+        return {
+          ...item,
+          value: item.func === 'in' ? item.value.split(' ') : item.value
+        }
+      });
+      form.setFieldsValue({
+        tags: tags || []
+      })
+    }
+    
+  }, [tagsObj])
+
   const timeChange = () => {
     const btime = form.getFieldValue('btime');
     const etime = form.getFieldValue('etime');
@@ -92,9 +107,9 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }) => {
     const tags = values?.tags?.map((item) => {
       return {
         ...item,
-        value: item.value.indexOf('\n') > -1 ? item.value.split('\n').join(' ') : item.value,
-      };
-    });
+        value: Array.isArray(item.value) ? item.value.join(' ') : item.value
+      }
+    })
     const params = {
       ...values,
       btime: moment(values.btime).unix(),
@@ -223,7 +238,14 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }) => {
           {(fields, { add, remove }) => (
             <>
               {fields.map((field, index) => (
-                <TagItem field={field} key={index} remove={remove} />
+                <TagItem
+                  field={field}
+                  key={index}
+                  remove={remove}
+                  form={form}
+                />
+
+
               ))}
               <Form.Item>
                 <PlusCircleOutlined className='control-icon-normal' onClick={() => add()} />
