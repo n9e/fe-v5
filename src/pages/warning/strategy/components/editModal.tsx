@@ -198,7 +198,6 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
   const modelOk = () => {
     form.validateFields().then(async (values) => {
       const data = { ...values };
-      console.log('data', data);
       switch (values.field) {
         case 'enable_time':
           data.enable_stime = values.enable_time[0].format('HH:mm');

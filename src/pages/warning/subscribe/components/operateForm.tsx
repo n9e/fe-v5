@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Input, Card, Select, Col, Button, Row, message, Checkbox, Tooltip, Radio, Modal } from 'antd';
-import { QuestionCircleFilled, PlusCircleOutlined, EditOutlined } from '@ant-design/icons';
+import { QuestionCircleFilled, PlusCircleOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import RuleModal from './ruleModal';
 import TagItem from './tagItem';
 import { addSubscribe, editSubscribe, deleteSubscribes } from '@/services/subscribe';
@@ -87,7 +87,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
     const tags = values?.tags?.map((item) => {
       return {
         ...item,
-        value: item.value.indexOf('\n') > -1 ? item.value.split('\n').join(' ') : item.value,
+        value: Array.isArray(item.value) ? item.value.join(' ') : item.value,
       };
     });
     const params = {
@@ -102,7 +102,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
     if (type === 1) {
       editSubscribe([{ ...params, id: detail.id }], curBusiItem.id)
         .then((_) => {
-          message.success(t('新建告警屏蔽成功'));
+          message.success(t('编辑订阅规则成功'));
           history.push('/alert-subscribes');
         })
         .finally(() => {
@@ -111,7 +111,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
     } else {
       addSubscribe(params, curBusiItem.id)
         .then((_) => {
-          message.success(t('新建告警屏蔽成功'));
+          message.success(t('新建订阅规则成功'));
           history.push('/alert-subscribes');
         })
         .finally(() => {
@@ -152,7 +152,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
             redefine_severity: detail?.redefine_severity ? true : false,
             redefine_channels: detail?.redefine_channels ? true : false,
             user_group_ids: detail?.user_group_ids ? detail?.user_group_ids?.split(' ') : [],
-            new_channels: detail?.new_channels?.split(' ')
+            new_channels: detail?.new_channels?.split(' '),
           }}
         >
           <Card>
@@ -189,6 +189,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
               )}
 
               <EditOutlined style={{ cursor: 'pointer', fontSize: '18px' }} onClick={chooseRule} />
+              {!!ruleCur?.id && <DeleteOutlined style={{ cursor: 'pointer', fontSize: '18px', marginLeft: 5 }} onClick={() => subscribeRule({})} />}
             </Form.Item>
             <Row gutter={[10, 10]} style={{ marginBottom: '8px' }}>
               <Col span={5}>
@@ -277,7 +278,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
               </Checkbox.Group>
             </Form.Item>
 
-            <Form.Item label={t('订阅告警接收组：')} name='user_group_ids'>
+            <Form.Item label={t('订阅告警接收组：')} name='user_group_ids' rules={[{ required: true, message: t('告警接收组不能为空') }]}>
               <Select mode='multiple' showSearch optionFilterProp='children' filterOption={(input, option) => option?.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0}>
                 {notifyGroupsOptions}
               </Select>

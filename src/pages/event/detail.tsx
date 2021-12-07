@@ -100,7 +100,7 @@ const EventDetailPage: React.FC = () => {
       },
     },
     {
-      label: '执行时长',
+      label: '持续时长',
       key: 'prom_for_duration',
       render(content) {
         return `${content} 秒`;
