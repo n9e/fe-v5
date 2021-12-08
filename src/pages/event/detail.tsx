@@ -69,6 +69,13 @@ const EventDetailPage: React.FC = () => {
     },
     { label: '触发时值', key: 'trigger_value' },
     {
+      label: '恢复时间',
+      key: 'recover_time',
+      render(time) {
+        return moment((time || 0) * 1000).format('YYYY-MM-DD HH:mm:ss');
+      },
+    },
+    {
       label: 'PromQL',
       key: 'prom_ql',
       render(promql) {
@@ -150,17 +157,6 @@ const EventDetailPage: React.FC = () => {
     const requestPromise = isHistory ? getHistoryEventsById(busiId, eventId) : getAlertEventsById(busiId, eventId);
     requestPromise.then((res) => {
       setEventDetail(res.dat);
-      if (res.dat.is_recovered) {
-        const originDescriptionInfo = descriptionInfo;
-        originDescriptionInfo.splice(8, 0, {
-          label: '恢复时间',
-          key: 'recover_time',
-          render(time) {
-            return moment((time || 0) * 1000).format('YYYY-MM-DD HH:mm:ss');
-          },
-        });
-        setDescriptionInfo(originDescriptionInfo);
-      }
     });
   }, [busiId, eventId]);
 
@@ -208,14 +204,16 @@ const EventDetailPage: React.FC = () => {
             ]}
           >
             {eventDetail &&
-              descriptionInfo.map(({ label, key, render }) => {
-                return (
-                  <div className='desc-row'>
-                    <div className='desc-label'>{label}：</div>
-                    <div className='desc-content'>{render ? render(eventDetail[key], eventDetail) : eventDetail[key]}</div>
-                  </div>
-                );
-              })}
+              descriptionInfo
+                .filter((item) => (eventDetail.is_recovered ? true : item.key !== 'recover_time'))
+                .map(({ label, key, render }) => {
+                  return (
+                    <div className='desc-row'>
+                      <div className='desc-label'>{label}：</div>
+                      <div className='desc-content'>{render ? render(eventDetail[key], eventDetail) : eventDetail[key]}</div>
+                    </div>
+                  );
+                })}
           </Card>
         </Spin>
       </div>
