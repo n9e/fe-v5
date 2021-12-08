@@ -8,6 +8,7 @@ import { convertExpressionToQuery, replaceExpressionVars } from './constant';
 const { Option } = Select;
 interface Props {
   expression: Variable;
+  cluster: string;
   index: number;
   data: Variable[];
   onChange: (index: number, value: string | string[]) => void;
@@ -24,7 +25,7 @@ const stringToRegex = (str) => {
   return new RegExp(main, options);
 };
 
-const DisplayItem: React.FC<Props> = ({ expression, index, data, onChange }) => {
+const DisplayItem: React.FC<Props> = ({ expression, index, data, onChange, cluster }) => {
   const { t } = useTranslation();
   const [options, setOptions] = useState<string[]>([]);
   const [exp, setExp] = useState<string>();
@@ -43,6 +44,19 @@ const DisplayItem: React.FC<Props> = ({ expression, index, data, onChange }) => 
       }
     }
   }, [expression, data, index]);
+
+  useEffect(() => {
+    if (expression) {
+      var newExpression = replaceExpressionVars(definition, { var: data }, index);
+      setExp(newExpression);
+      convertExpressionToQuery(newExpression).then((res) => {
+        setOptions(res);
+        if (exp && newExpression && exp !== newExpression) {
+          onChange(index, multi ? [] : '');
+        }
+      });
+    }
+  }, [cluster]);
 
   const handleChange = (v) => {
     if (multi && allOption && v.includes('all')) {

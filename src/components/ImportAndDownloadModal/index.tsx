@@ -21,12 +21,13 @@ interface Props {
   status: ModalStatus;
   exportData: string;
   onClose: () => void;
+  onSuccess?: () => void;
   onSubmit: Function;
 }
 export default function ImportAndDownloadModal(props: Props) {
   const { t } = useTranslation();
   const exportTextRef = useRef(null as any);
-  const { status, title, exportData, description, onClose, onSubmit, crossCluster = true } = props;
+  const { status, title, exportData, description, onClose, onSubmit, crossCluster = true, onSuccess } = props;
   const [form] = Form.useForm();
   const { clusters: clusterList } = useSelector<RootState, CommonStoreState>((state) => state.common);
 
@@ -95,6 +96,7 @@ export default function ImportAndDownloadModal(props: Props) {
                       dataIndex: 'msg',
                     },
                   ];
+                  onClose();
                   Modal.success({
                     title: '导入结果',
                     width: '50%',
@@ -103,7 +105,7 @@ export default function ImportAndDownloadModal(props: Props) {
                     maskClosable: true,
                     content: <Table className='samll_table' dataSource={dataSource} columns={columns} pagination={false} size='small' />,
                     onOk: () => {
-                      !errNum && onClose();
+                      !errNum && onSuccess && onSuccess();
                     },
                   });
                   // 每个业务各自处理onSubmit

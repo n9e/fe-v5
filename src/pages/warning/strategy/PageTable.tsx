@@ -27,10 +27,11 @@ const exportIgnoreAttrsObj = Object.fromEntries(exportIgnoreAttrs.map((item) => 
 
 interface Props {
   bgid?: number;
+  severity: number | undefined;
   clusters?: string[];
 }
 
-const PageTable: React.FC<Props> = ({ bgid, clusters }) => {
+const PageTable: React.FC<Props> = ({ bgid, clusters, severity }) => {
   const { t, i18n } = useTranslation();
   const history = useHistory();
   const [modalType, setModalType] = useState<ModalStatus>(ModalStatus.None);
@@ -50,7 +51,7 @@ const PageTable: React.FC<Props> = ({ bgid, clusters }) => {
     if (bgid) {
       getAlertRules();
     }
-  }, [bgid]);
+  }, [bgid, severity]);
 
   useEffect(() => {
     filterData();
@@ -63,7 +64,7 @@ const PageTable: React.FC<Props> = ({ bgid, clusters }) => {
     setLoading(true);
     const { success, dat } = await getStrategyGroupSubList({ id: bgid });
     if (success) {
-      setCurrentStrategyDataAll(dat || []);
+      setCurrentStrategyDataAll(dat.filter((item) => !severity || item.severity === severity) || []);
       setLoading(false);
     }
   };
@@ -379,6 +380,8 @@ const PageTable: React.FC<Props> = ({ bgid, clusters }) => {
         status={modalType}
         onClose={() => {
           setModalType(ModalStatus.None);
+        }}
+        onSuccess={() => {
           getAlertRules();
         }}
         onSubmit={handleImportStrategy}

@@ -331,9 +331,11 @@ export default function Dashboard() {
       <ImportAndDownloadModal
         crossCluster={false}
         status={modalType}
+        onSuccess={() => {
+          (ref?.current as any)?.refreshList();
+        }}
         onClose={() => {
           setModalType(ModalStatus.None);
-          (ref?.current as any)?.refreshList();
         }}
         onSubmit={handleImportDashboard}
         title={t('大盘')}

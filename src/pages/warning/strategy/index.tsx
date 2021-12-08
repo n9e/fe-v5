@@ -11,7 +11,7 @@ const Strategy: React.FC = () => {
   const { t } = useTranslation();
   const [bgid, setBgid] = useState(undefined);
   const [clusters, setClusters] = useState([]);
-
+  const [severity, setSeverity] = useState<number | undefined>();
   const clusterChange = (data) => {
     setClusters(data);
   };
@@ -29,13 +29,16 @@ const Strategy: React.FC = () => {
           busiGroup={{
             onChange: busiChange,
           }}
+          eventLevelGroup={{
+            isShow: true,
+            defaultSelect: severity,
+            onChange(v: number | undefined) {
+              console.log(v);
+              setSeverity(v);
+            },
+          }}
         ></LeftTree>
-        {bgid ? (
-          <PageTable bgid={bgid} clusters={clusters}></PageTable>
-        ) : (
-          <BlankBusinessPlaceholder text='告警规则'/>
-        )}
-        
+        {bgid ? <PageTable bgid={bgid} clusters={clusters} severity={severity}></PageTable> : <BlankBusinessPlaceholder text='告警规则' />}
       </div>
     </PageLayout>
   );

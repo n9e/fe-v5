@@ -24,6 +24,7 @@ const layout = {
 };
 interface Props {
   busiId: string;
+  cluster: string;
   groupId: number;
   show: boolean;
   onVisibleChange: (data: boolean) => void;
@@ -33,7 +34,7 @@ interface Props {
 
 export default function ChartConfigModal(props: Props) {
   const { t } = useTranslation();
-  const { busiId, groupId, show, onVisibleChange, initialValue, variableConfig } = props;
+  const { busiId, groupId, show, onVisibleChange, initialValue, variableConfig, cluster } = props;
   const layout = initialValue?.configs.layout;
   const [innerVariableConfig, setInnerVariableConfig] = useState<VariableType | undefined>(variableConfig);
   const [chartForm] = Form.useForm();
@@ -257,7 +258,7 @@ export default function ChartConfigModal(props: Props) {
       <Form {...layout} form={chartForm} preserve={false}>
         <Row>
           <Col span={12}>
-            <VariableConfig onChange={handleVariableChange} value={innerVariableConfig} editable={false} />
+            <VariableConfig onChange={handleVariableChange} value={innerVariableConfig} editable={false} cluster={cluster} />
             <br />
             <Form.Item
               label={t('标题')}

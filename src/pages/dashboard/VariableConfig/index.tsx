@@ -14,12 +14,13 @@ export type VariableType = FormType;
 
 interface ITagFilterProps {
   isOpen?: boolean;
+  cluster: string;
   editable?: boolean;
   value?: FormType;
   onChange: (data: FormType) => void;
 }
 
-const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = ({ isOpen = false, value, onChange, editable = true }, ref) => {
+const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = ({ isOpen = false, value, onChange, editable = true, cluster }, ref) => {
   const { t } = useTranslation();
   const [editing, setEditing] = useState<boolean>(isOpen);
   const [data, setData] = useState<FormType>();
@@ -54,7 +55,7 @@ const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = ({ isOpe
         {data?.var && data?.var.length > 0 && (
           <>
             {data.var.map((expression, index) => (
-              <DisplayItem expression={expression} index={index} data={data.var} onChange={handleVariableChange}></DisplayItem>
+              <DisplayItem expression={expression} index={index} data={data.var} onChange={handleVariableChange} cluster={cluster}></DisplayItem>
             ))}
             {editable && <EditOutlined className='icon' onClick={() => setEditing(true)}></EditOutlined>}
           </>

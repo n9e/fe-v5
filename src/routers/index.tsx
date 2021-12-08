@@ -69,7 +69,7 @@ export default function Content() {
   const dispatch = useDispatch();
   if (!profile.id && location.pathname != '/login') {
     dispatch({ type: 'common/getClusters' });
-    if (!location.pathname.startsWith('/chart/')) {
+    if (!location.pathname.startsWith('/chart/') && !location.pathname.startsWith('/alert-cur-events/') && !location.pathname.startsWith('/alert-his-events/')) {
       dispatch({ type: 'account/getProfile' });
       dispatch({ type: 'common/getBusiGroups' });
     }

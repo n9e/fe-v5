@@ -255,7 +255,7 @@ export default function DashboardDetail() {
     >
       <div className='dashboard-detail-content'>
         <div className='variable-area'>
-          <VariableConfig onChange={handleVariableChange} value={variableConfig} />
+          <VariableConfig onChange={handleVariableChange} value={variableConfig} cluster={curCluster} />
         </div>
 
         <div className='charts'>
@@ -317,6 +317,7 @@ export default function DashboardDetail() {
 
       {chartModalVisible && (
         <ChartConfigModal
+          cluster={curCluster}
           busiId={busiId}
           initialValue={chartModalInitValue}
           groupId={groupId}

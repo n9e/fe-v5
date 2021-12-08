@@ -148,7 +148,20 @@ const EventDetailPage: React.FC = () => {
 
   useEffect(() => {
     const requestPromise = isHistory ? getHistoryEventsById(busiId, eventId) : getAlertEventsById(busiId, eventId);
-    requestPromise.then((res) => setEventDetail(res.dat));
+    requestPromise.then((res) => {
+      setEventDetail(res.dat);
+      if (res.dat.is_recovered) {
+        const originDescriptionInfo = descriptionInfo;
+        originDescriptionInfo.splice(8, 0, {
+          label: '恢复时间',
+          key: 'recover_time',
+          render(time) {
+            return moment((time || 0) * 1000).format('YYYY-MM-DD HH:mm:ss');
+          },
+        });
+        setDescriptionInfo(originDescriptionInfo);
+      }
+    });
   }, [busiId, eventId]);
 
   return (
