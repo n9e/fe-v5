@@ -37,6 +37,10 @@ const DisplayItem: React.FC<Props> = ({ expression, index, data, onChange, clust
         setExp(newExpression);
         convertExpressionToQuery(newExpression).then((res) => {
           setOptions(res);
+          // 逻辑上只有导入大盘后初始化那一次 selected会为空
+          if (res.length > 0 && !selected) {
+            onChange(index, multi ? [res[0]] : res[0]);
+          }
           if (exp && newExpression && exp !== newExpression) {
             onChange(index, multi ? [] : '');
           }
@@ -94,23 +98,25 @@ const DisplayItem: React.FC<Props> = ({ expression, index, data, onChange, clust
                 all
               </Option>
             )}
-            {options
-              .filter((i) => !reg || stringToRegex(reg).test(i))
-              .map((value) => (
-                <Option key={value} value={value}>
-                  {value}
-                </Option>
-              ))}
+            {options &&
+              options
+                .filter((i) => !reg || stringToRegex(reg).test(i))
+                .map((value) => (
+                  <Option key={value} value={value}>
+                    {value}
+                  </Option>
+                ))}
           </Select>
         ) : (
           <AutoComplete style={{ width: 180 }} onChange={(v) => onChange(index, v)} placeholder='input here' value={selected as string} dropdownClassName='overflow-586'>
-            {options
-              .filter((i) => !reg || stringToRegex(reg).test(i))
-              .map((value) => (
-                <Option key={value} value={value}>
-                  {value}
-                </Option>
-              ))}
+            {options &&
+              options
+                .filter((i) => !reg || stringToRegex(reg).test(i))
+                .map((value) => (
+                  <Option key={value} value={value}>
+                    {value}
+                  </Option>
+                ))}
           </AutoComplete>
         )}
       </div>

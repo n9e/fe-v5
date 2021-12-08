@@ -115,8 +115,8 @@ export default function Content() {
 
         <Route exact path='/alert-cur-events' component={Event} />
         <Route exact path='/alert-his-events' component={historyEvents} />
-        <Route exact path='/alert-cur-events/:busiId/:eventId' component={EventDetail} />
-        <Route exact path='/alert-his-events/:busiId/:eventId' component={EventDetail} />
+        <Route exact path='/alert-cur-events/:eventId' component={EventDetail} />
+        <Route exact path='/alert-his-events/:eventId' component={EventDetail} />
         <Route exact path='/targets' component={MonObjectManage} />
 
         <Route exact path='/job-tpls' component={TaskTpl} />

@@ -93,7 +93,7 @@ request.interceptors.response.use(
           .clone()
           .json()
           .then((data) => {
-            if (response.url.indexOf('/api/n9e/prometheus/api/v1/query') > -1) {
+            if (response.url.indexOf('/api/n9e/prometheus/api/v1') > -1) {
               return data;
             }
             throw new Error(data.err ? data.err : data);

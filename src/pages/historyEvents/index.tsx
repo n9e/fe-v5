@@ -70,7 +70,7 @@ const Event: React.FC = () => {
       dataIndex: 'rule_name',
       render(title, { id }) {
         return (
-          <Button size='small' type='link' style={{ padding: 0 }} onClick={() => history.push(`/alert-his-events/${curBusiId}/${id}`)}>
+          <Button size='small' type='link' style={{ padding: 0 }} onClick={() => history.push(`/alert-his-events/${id}`)}>
             {title}
           </Button>
         );

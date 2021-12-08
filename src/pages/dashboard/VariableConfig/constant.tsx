@@ -169,11 +169,12 @@ export const replaceExpressionVars = (expression: string, formData: FormType, li
   const vars = newExpression.match(/\$[0-9a-zA-Z]+/g);
   if (vars && vars.length > 0) {
     for (let i = 0; i < limit; i++) {
-      if (vars.includes('$' + formData.var[i].name) && formData.var[i].selected) {
-        if (Array.isArray(formData.var[i].selected)) {
-          newExpression = newExpression.replace('$' + formData.var[i].name, `(${(formData.var[i].selected as string[]).join('|')})`);
-        } else if (typeof formData.var[i].selected === 'string') {
-          newExpression = newExpression.replace('$' + formData.var[i].name, formData.var[i].selected as string);
+      const { selected, name } = formData.var[i];
+      if (vars.includes('$' + name) && selected) {
+        if (Array.isArray(selected)) {
+          newExpression = newExpression.replace('$' + name, `(${(selected as string[]).join('|')})`);
+        } else if (typeof selected === 'string') {
+          newExpression = newExpression.replace('$' + name, selected as string);
         }
       }
     }

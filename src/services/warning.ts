@@ -206,13 +206,13 @@ export const getHistoryEvents = function (data) {
 };
 // 获取告警详情
 export function getAlertEventsById(busiId, eventId) {
-  return request(`/api/n9e/busi-group/${busiId}/alert-cur-event/${eventId}`, {
+  return request(`/api/n9e/alert-cur-event/${eventId}`, {
     method: RequestMethod.Get,
   });
 }
 
 export function getHistoryEventsById(busiId, eventId) {
-  return request(`/api/n9e/busi-group/${busiId}/alert-his-event/${eventId}`, {
+  return request(`/api/n9e/alert-his-event/${eventId}`, {
     method: RequestMethod.Get,
   });
 }
