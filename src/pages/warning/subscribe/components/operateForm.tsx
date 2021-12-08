@@ -64,7 +64,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
     });
   }, [detail.rule_id]);
 
-  const notifyGroupsOptions = notifyGroups.map((ng: any) => (
+  const notifyGroupsOptions = (detail.user_groups ? detail.user_groups.filter((item) => !notifyGroups.find((i) => item.id === i.id)) : []).concat(notifyGroups).map((ng: any) => (
     <Option value={String(ng.id)} key={ng.id}>
       {ng.name}
     </Option>

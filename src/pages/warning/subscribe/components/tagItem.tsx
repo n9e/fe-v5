@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Input, Select, Col, Row } from 'antd';
 const { Option } = Select;
 const { TextArea } = Input;
@@ -14,10 +14,15 @@ interface Itag {
   form: any;
 }
 
-const TagItem: React.FC<Itag> = ({ field, remove }) => {
+const TagItem: React.FC<Itag> = ({ field, remove, form }) => {
   const { t } = useTranslation();
   const [valuePlaceholder, setValuePlaceholder] = useState<string>('');
   const [funcCur, setfuncCur] = useState('==');
+
+  useEffect(() => {
+    const tags = form.getFieldValue('tags');
+    funcChange(tags[field.name].func);
+  }, []);
 
   const funcChange = (val) => {
     let text = '';
@@ -49,7 +54,7 @@ const TagItem: React.FC<Itag> = ({ field, remove }) => {
         <Col span={15}>
           <Form.Item style={{ marginBottom: 0 }} name={[field.name, 'value']} fieldKey={[field.name, 'value']} rules={[{ required: true, message: t('value不能为空') }]}>
             {funcCur == 'in' ? (
-              <Select mode='tags' open={false} style={{ width: '100%' }} placeholder={t(valuePlaceholder)}></Select>
+              <Select mode='tags' open={false} style={{ width: '100%' }} placeholder={t(valuePlaceholder)} tokenSeparators={[' ']}></Select>
             ) : (
               <Input className='ant-input' placeholder={t(valuePlaceholder)} />
             )}
