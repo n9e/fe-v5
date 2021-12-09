@@ -362,8 +362,6 @@ export default function ChartGroup(props: Props) {
     setLayout({ lg: [..._lg], sm: [..._lg], md: [..._lg], xs: [..._lg], xxs: [..._lg] });
     setChartConfigs(currConfigs);
     // setMounted(true);
-
-    groupInfo.updateTime = Date.now();
   };
 
   function handleMenuClick(e) {
@@ -590,7 +588,7 @@ export default function ChartGroup(props: Props) {
         )}
       </div>
     );
-  }, [mounted, groupInfo.updateTime, range, variableConfig, step]);
+  }, [mounted, groupInfo.updateTime, range, variableConfig, step, layout]);
   return (
     <Collapse defaultActiveKey={['0']}>
       <Panel header={<span className='panel-title'>{groupInfo.name}</span>} key='0' extra={generateRightButton()}>

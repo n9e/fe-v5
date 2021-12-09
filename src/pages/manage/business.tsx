@@ -77,7 +77,7 @@ const Resource: React.FC = () => {
               onOk: () => {
                 deleteBusinessTeamMember(teamId, params).then((_) => {
                   message.success(t('团队删除成功'));
-                  handleClose();
+                  handleClose('deleteMember');
                 });
               },
               onCancel: () => {},
@@ -141,13 +141,13 @@ const Resource: React.FC = () => {
   };
 
   // 弹窗关闭回调
-  const handleClose = (isDeleteOrAdd = false) => {
+  const handleClose = (action) => {
     setVisible(false);
-    if (isDeleteOrAdd === true) {
-      getList(isDeleteOrAdd);
+    if (['create', 'delete'].includes(action)) {
+      getList(true);
       dispatch({ type: 'common/getBusiGroups' });
     }
-    if (teamId) {
+    if (teamId && ['update', 'addMember', 'deleteMember'].includes(action)) {
       getTeamInfoDetail(teamId);
     }
   };
@@ -230,7 +230,7 @@ const Resource: React.FC = () => {
                         onOk: () => {
                           deleteBusinessTeam(teamId).then((_) => {
                             message.success(t('业务组删除成功'));
-                            handleClose(true);
+                            handleClose('delete');
                           });
                         },
                         onCancel: () => {},

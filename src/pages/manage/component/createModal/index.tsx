@@ -117,7 +117,7 @@ const CreateModal: React.FC<ModalProps> = (props: ModalProps) => {
       if (action === ActionType.CreateBusiness) {
         createBusinessTeam(params).then((_) => {
           message.success(t('业务组创建成功'));
-          onClose(true);
+          onClose('create');
 
           if (val === 'search') {
             onSearch(params.name);
@@ -128,7 +128,7 @@ const CreateModal: React.FC<ModalProps> = (props: ModalProps) => {
       if (action === ActionType.EditBusiness && teamId) {
         changeBusinessTeam(teamId, params).then((_) => {
           message.success(t('业务组信息修改成功'));
-          onClose(true);
+          onClose('update');
         });
       }
 
@@ -140,7 +140,7 @@ const CreateModal: React.FC<ModalProps> = (props: ModalProps) => {
         }));
         addBusinessMember(teamId, params).then((_) => {
           message.success(t('业务组成员添加成功'));
-          onClose();
+          onClose('addMember');
         });
       }
     }

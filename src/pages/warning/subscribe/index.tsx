@@ -6,11 +6,7 @@ import { RootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
 import { getSubscribeList, deleteSubscribes } from '@/services/subscribe';
 import { ColumnsType } from 'antd/lib/table';
-import {
-  CopyOutlined,
-  ExclamationCircleOutlined,
-  SearchOutlined,
-} from '@ant-design/icons';
+import { CopyOutlined, ExclamationCircleOutlined, SearchOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 import { subscribeItem } from '@/store/warningInterface/subscribe';
 import ColorTag from '@/components/ColorTag';
@@ -26,7 +22,7 @@ const Shield: React.FC = () => {
   const { t } = useTranslation();
   const history = useHistory();
   const [query, setQuery] = useState<string>('');
-  const { curBusiItem } = useSelector<RootState, CommonStoreState>(state => state.common);
+  const { curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const [bgid, setBgid] = useState(undefined);
   const [clusters, setClusters] = useState<string[]>([]);
   const [currentShieldDataAll, setCurrentShieldDataAll] = useState<Array<subscribeItem>>([]);
@@ -56,13 +52,8 @@ const Shield: React.FC = () => {
           <>
             {text
               ? text.map((tag, index) => {
-                return tag ? (
-                  
-                  <div key={index}>
-                    {`${tag.key} ${tag.func} ${tag.func === 'in' ? tag.value.split(' ').join(', ') : tag.value}`}
-                  </div>
-                ) : null;
-              })
+                  return tag ? <div key={index}>{`${tag.key} ${tag.func} ${tag.func === 'in' ? tag.value.split(' ').join(', ') : tag.value}`}</div> : null;
+                })
               : ''}
           </>
         );
@@ -74,16 +65,14 @@ const Shield: React.FC = () => {
       render: (text: string, record: subscribeItem) => {
         return (
           <>
-          {record.user_groups?.map(item => (
-            <ColorTag text={item.name} key={item.id}>
-            </ColorTag>
-          ))}
-            
+            {record.user_groups?.map((item) => (
+              <ColorTag text={item.name} key={item.id}></ColorTag>
+            ))}
           </>
         );
       },
     },
-    
+
     {
       title: t('编辑人'),
       ellipsis: true,
@@ -97,15 +86,14 @@ const Shield: React.FC = () => {
         return (
           <>
             <div className='table-operator-area'>
-            <div
+              <div
                 className='table-operator-area-normal'
                 style={{
                   cursor: 'pointer',
-                  display: 'inline-block'
+                  display: 'inline-block',
                 }}
                 onClick={() => {
-                  curBusiItem?.id &&
-                    history.push(`/alert-subscribes/edit/${record.id}`);
+                  curBusiItem?.id && history.push(`/alert-subscribes/edit/${record.id}`);
                 }}
               >
                 {t('编辑')}
@@ -114,11 +102,10 @@ const Shield: React.FC = () => {
                 className='table-operator-area-normal'
                 style={{
                   cursor: 'pointer',
-                  display: 'inline-block'
+                  display: 'inline-block',
                 }}
                 onClick={() => {
-                  curBusiItem?.id &&
-                    history.push(`/alert-subscribes/edit/${record.id}?mode=clone`);
+                  curBusiItem?.id && history.push(`/alert-subscribes/edit/${record.id}?mode=clone`);
                 }}
               >
                 {t('克隆')}
@@ -127,7 +114,7 @@ const Shield: React.FC = () => {
                 className='table-operator-area-warning'
                 style={{
                   cursor: 'pointer',
-                  display: 'inline-block'
+                  display: 'inline-block',
                 }}
                 onClick={() => {
                   confirm({
@@ -137,7 +124,7 @@ const Shield: React.FC = () => {
                       dismiss(record.id);
                     },
 
-                    onCancel() { },
+                    onCancel() {},
                   });
                 }}
               >
@@ -152,45 +139,45 @@ const Shield: React.FC = () => {
 
   useEffect(() => {
     getList();
-  }, [curBusiItem])
+  }, [curBusiItem]);
 
   useEffect(() => {
     filterData();
-  }, [query, clusters, currentShieldDataAll])
+  }, [query, clusters, currentShieldDataAll]);
 
   const dismiss = (id: number) => {
-    deleteSubscribes({ids: [id]}, curBusiItem.id).then((res) => {
+    deleteSubscribes({ ids: [id] }, curBusiItem.id).then((res) => {
       refreshList();
       if (res.err) {
         message.success(res.err);
       } else {
         message.success(t('删除成功'));
       }
-      
     });
   };
 
   const filterData = () => {
     const data = JSON.parse(JSON.stringify(currentShieldDataAll));
     const res = data.filter((item: subscribeItem) => {
-      const tagFind = item?.tags?.find(tag => {
-        return tag.key.indexOf(query) > -1 || tag.value.indexOf(query) > -1 || tag.func.indexOf(query) > -1
-      })
-      const groupFind = item?.user_groups?.find(item => {
-        return item?.name?.indexOf(query) > -1
-      })
-      return (item?.rule_name?.indexOf(query) > -1 || !!tagFind || !!groupFind) &&
-        (clusters && clusters?.indexOf(item.cluster) > -1 || clusters?.length === 0)
+      const tagFind = item?.tags?.find((tag) => {
+        return tag.key.indexOf(query) > -1 || tag.value.indexOf(query) > -1 || tag.func.indexOf(query) > -1;
+      });
+      const groupFind = item?.user_groups?.find((item) => {
+        return item?.name?.indexOf(query) > -1;
+      });
+      return (item?.rule_name?.indexOf(query) > -1 || !!tagFind || !!groupFind) && ((clusters && clusters?.indexOf(item.cluster) > -1) || clusters?.length === 0);
     });
     setCurrentShieldData(res || []);
   };
 
   const getList = async () => {
-    setLoading(true);
-    const { success, dat } = await getSubscribeList({ id: curBusiItem.id });
-    if (success) {
-      setCurrentShieldDataAll(dat || []);
-      setLoading(false);
+    if (curBusiItem.id) {
+      setLoading(true);
+      const { success, dat } = await getSubscribeList({ id: curBusiItem.id });
+      if (success) {
+        setCurrentShieldDataAll(dat || []);
+        setLoading(false);
+      }
     }
   };
 
@@ -217,7 +204,7 @@ const Shield: React.FC = () => {
         <LeftTree
           clusterGroup={{
             isShow: true,
-            onChange: clusterChange
+            onChange: clusterChange,
           }}
           busiGroup={{
             // showNotGroupItem: true,
@@ -226,58 +213,49 @@ const Shield: React.FC = () => {
         ></LeftTree>
         {curBusiItem?.id ? (
           <div className='shield-index'>
-
-          <div className='header'>
-            <div className='header-left'>
-              <RefreshIcon
-                className='strategy-table-search-left-refresh'
-                onClick={() => {
-                  refreshList();
-                }}
-              />
-              <Input
-                onPressEnter={onSearchQuery}
-                className={'searchInput'}
-                prefix={<SearchOutlined />}
-                placeholder={t('搜索规则、标签、接收组')}
-              />
+            <div className='header'>
+              <div className='header-left'>
+                <RefreshIcon
+                  className='strategy-table-search-left-refresh'
+                  onClick={() => {
+                    refreshList();
+                  }}
+                />
+                <Input onPressEnter={onSearchQuery} className={'searchInput'} prefix={<SearchOutlined />} placeholder={t('搜索规则、标签、接收组')} />
+              </div>
+              <div className='header-right'>
+                <Button
+                  type='primary'
+                  className='add'
+                  onClick={() => {
+                    history.push('/alert-subscribes/add');
+                  }}
+                >
+                  {t('新增订阅规则')}
+                </Button>
+              </div>
             </div>
-            <div className='header-right'>
-              <Button
-                type='primary'
-                className='add'
-                onClick={() => {
-                  history.push('/alert-subscribes/add');
-                }}
-              >
-                {t('新增订阅规则')}
-              </Button>
-            </div>
+            <Table
+              rowKey='id'
+              pagination={{
+                total: currentShieldData.length,
+                showQuickJumper: true,
+                showSizeChanger: true,
+                showTotal: (total) => {
+                  return `共 ${total} 条数据`;
+                },
+                pageSizeOptions: pageSizeOptionsDefault,
+                defaultPageSize: 30,
+              }}
+              loading={loading}
+              dataSource={currentShieldData}
+              columns={columns}
+            />
           </div>
-          <Table
-            rowKey="id"
-            pagination={{
-              total: currentShieldData.length,
-              showQuickJumper: true,
-              showSizeChanger: true,
-              showTotal: (total) => {
-                return `共 ${total} 条数据`;
-              },
-              pageSizeOptions: pageSizeOptionsDefault,
-              defaultPageSize: 30
-            }}
-            loading={loading}
-            dataSource={currentShieldData}
-            columns={columns}
-          />
-          
-        </div>
         ) : (
-          <BlankBusinessPlaceholder text='订阅规则'/>
+          <BlankBusinessPlaceholder text='订阅规则' />
         )}
-        
       </div>
-
     </PageLayout>
   );
 };

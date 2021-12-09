@@ -29,11 +29,12 @@ const DisplayItem: React.FC<Props> = ({ expression, index, data, onChange, clust
   const { t } = useTranslation();
   const [options, setOptions] = useState<string[]>([]);
   const [exp, setExp] = useState<string>();
+  const [curCluster, setCurCluster] = useState(cluster);
   const { definition, multi, allOption, name, reg, selected } = expression;
   useEffect(() => {
     if (expression) {
       var newExpression = replaceExpressionVars(definition, { var: data }, index);
-      if (exp !== newExpression) {
+      if (exp !== newExpression || curCluster !== cluster) {
         setExp(newExpression);
         convertExpressionToQuery(newExpression).then((res) => {
           setOptions(res);
@@ -47,20 +48,7 @@ const DisplayItem: React.FC<Props> = ({ expression, index, data, onChange, clust
         });
       }
     }
-  }, [expression, data, index]);
-
-  useEffect(() => {
-    if (expression) {
-      var newExpression = replaceExpressionVars(definition, { var: data }, index);
-      setExp(newExpression);
-      convertExpressionToQuery(newExpression).then((res) => {
-        setOptions(res);
-        if (exp && newExpression && exp !== newExpression) {
-          onChange(index, multi ? [] : '');
-        }
-      });
-    }
-  }, [cluster]);
+  }, [expression, data, index, cluster]);
 
   const handleChange = (v) => {
     if (multi && allOption && v.includes('all')) {

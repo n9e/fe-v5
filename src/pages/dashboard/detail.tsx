@@ -143,6 +143,7 @@ export default function DashboardDetail() {
   const handleUpdateChartGroup = (group: Group) => {
     groupId = group.id;
     isAddGroup = false;
+    groupForm.setFieldsValue({ name: group.name });
     setGroupModalVisible(true);
   };
 
@@ -285,7 +286,10 @@ export default function DashboardDetail() {
             style={{
               paddingRight: 0,
             }}
-            onClick={() => setGroupModalVisible(true)}
+            onClick={() => {
+              groupForm.setFieldsValue({ name: '' });
+              setGroupModalVisible(true);
+            }}
           >
             {t('新增图表分组')}
           </Button>

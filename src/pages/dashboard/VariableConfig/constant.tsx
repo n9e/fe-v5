@@ -172,9 +172,9 @@ export const replaceExpressionVars = (expression: string, formData: FormType, li
       const { selected, name } = formData.var[i];
       if (vars.includes('$' + name) && selected) {
         if (Array.isArray(selected)) {
-          newExpression = newExpression.replace('$' + name, `(${(selected as string[]).join('|')})`);
+          newExpression = newExpression.replaceAll('$' + name, `(${(selected as string[]).join('|')})`);
         } else if (typeof selected === 'string') {
-          newExpression = newExpression.replace('$' + name, selected as string);
+          newExpression = newExpression.replaceAll('$' + name, selected as string);
         }
       }
     }
