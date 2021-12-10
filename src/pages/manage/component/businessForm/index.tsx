@@ -13,7 +13,7 @@ const TeamForm = React.forwardRef<ReactNode, TeamProps>((props, ref) => {
   const [form] = Form.useForm();
   const [userTeam, setUserTeam] = useState<Team[]>([]);
   const [initialValues, setInitialValues] = useState({
-    members: [{ perm_flag: false }],
+    members: [{ perm_flag: true }],
     name: '',
   });
   const [loading, setLoading] = useState<boolean>(true);

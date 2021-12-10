@@ -316,9 +316,21 @@ export default function ChartGroup(props: Props) {
     return { w, h, x: nextLayoutX, y: nextLayoutY, i: '' + index };
   };
 
-  const onLayoutChange = async (layout: { h: any; w: any; x: any; y: any; i: any }[]) => {
+  const onLayoutChange = async (val: { h: any; w: any; x: any; y: any; i: any }[]) => {
+    if (val.length === 0) return;
+    let needUpdate = false;
+    const { lg: lgLayout } = layout;
+
+    for (var k = 0; k < val.length; k++) {
+      const { h, w, x, y, i } = val[k];
+      const { h: oldh, w: oldw, x: oldx, y: oldy, i: oldi } = lgLayout[k];
+      if (h !== oldh || w !== oldw || x !== oldx || y !== oldy || i !== oldi) {
+        needUpdate = true;
+      }
+    }
+    if (!needUpdate) return;
     let currConfigs = chartConfigs.map((item, index) => {
-      const { h, w, x, y, i } = layout[index];
+      const { h, w, x, y, i } = val[index];
       item.configs.layout = { h, w, x, y, i };
       return item;
     });
