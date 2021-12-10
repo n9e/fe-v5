@@ -322,13 +322,15 @@ export default function ChartGroup(props: Props) {
       item.configs.layout = { h, w, x, y, i };
       return item;
     });
-    // setLayout({ lg: [...layout] });
+
+    // setLayout({ lg: [...layout], sm: [...layout], md: [...layout], xs: [...layout], xxs: [...layout] });
+
     const { dat } = await getPerm(busiId, 'rw');
     dat && updateCharts(busiId, currConfigs);
   };
 
   const setArrange = async (colItem: number, w = cols / colItem, h = unit / 3) => {
-    // setMounted(false);
+    setMounted(false);
     let countX = 0;
     let countY = 0;
     const _lg: Layout[] = [];
@@ -361,7 +363,7 @@ export default function ChartGroup(props: Props) {
     dat && updateCharts(busiId, currConfigs);
     setLayout({ lg: [..._lg], sm: [..._lg], md: [..._lg], xs: [..._lg], xxs: [..._lg] });
     setChartConfigs(currConfigs);
-    // setMounted(true);
+    setMounted(true);
   };
 
   function handleMenuClick(e) {
@@ -588,7 +590,7 @@ export default function ChartGroup(props: Props) {
         )}
       </div>
     );
-  }, [mounted, groupInfo.updateTime, range, variableConfig, step, layout]);
+  }, [mounted, groupInfo.updateTime, range, variableConfig, step]);
   return (
     <Collapse defaultActiveKey={['0']}>
       <Panel header={<span className='panel-title'>{groupInfo.name}</span>} key='0' extra={generateRightButton()}>

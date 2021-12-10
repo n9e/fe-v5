@@ -116,9 +116,9 @@ export default function DashboardDetail() {
     setChartModalVisible(true);
   };
 
-  const handleDelChart = (group: Group, item: Chart) => {
+  const handleDelChart = async (group: Group, item: Chart) => {
     groupId = group.id;
-    removeChart(busiId, item.id);
+    await removeChart(busiId, item.id);
     refreshUpdateTimeByChartGroupId();
   };
 

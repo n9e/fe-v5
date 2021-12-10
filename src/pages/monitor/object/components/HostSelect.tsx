@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Input, Select, Table, Tooltip } from 'antd';
+import { Button, Input, Select, Table, Tooltip, Tag } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import SelectedHosts from './SelectedHosts';
 import { useDispatch, useSelector } from 'react-redux';
@@ -8,6 +8,7 @@ import { BusiGroupItem, CommonStoreState } from '@/store/commonInterface';
 
 export default (props) => {
   const { allHosts, changeSelectedHosts, changeBusiGroup, onSearchHostName } = props;
+  console.log('allHosts', allHosts);
   const { Option } = Select;
   const [selectedHostsKeys, setSelectedHostsKeys] = useState<string[]>([]);
   const [selectedHosts, setSelectedHosts] = useState<any[]>([]);
@@ -20,19 +21,23 @@ export default (props) => {
       dataIndex: 'ident',
       render: (t) => <div style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{t}</div>,
     },
-
-    {
-      title: '备注',
-      dataIndex: 'note',
-      render: (t) => (
-        <div style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }} title={t}>
-          {t}
-        </div>
-      ),
-    },
     {
       title: '标签',
       dataIndex: 'tags',
+      render(tagArr) {
+        return (
+          tagArr &&
+          tagArr.map((item) => (
+            <Tag color='blue' key={item}>
+              {item}
+            </Tag>
+          ))
+        );
+      },
+    },
+    {
+      title: '备注',
+      dataIndex: 'note',
       render: (t) => (
         <div style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }} title={t}>
           {t}

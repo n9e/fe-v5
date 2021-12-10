@@ -22,7 +22,7 @@ export function getBusiGroups(query: string, limit: number = 200) {
 
 
 export function getPerm(busiGroup: string, perm: "ro" | "rw") {
-  return request(`/api/n9e/user-group/${busiGroup}/perm/${perm}`, {
+  return request(`/api/n9e/busi-group/${busiGroup}/perm/${perm}`, {
     method: RequestMethod.Get,
   });
 }
