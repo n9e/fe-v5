@@ -213,22 +213,23 @@ export default function ChartGroup(props: Props) {
       });
   }, [groupInfo.updateTime, cluster]);
 
-  const init = () => {
+  const init = async () => {
     setMounted(false);
-    getCharts(busiId, groupInfo.id).then((res) => {
+    getCharts(busiId, groupInfo.id).then(async (res) => {
       let charts = res.dat
         ? res.dat.map((item: { configs: string; id: any; weight: any; group_id: number }) => {
             let configs = item.configs ? JSON.parse(item.configs) : {};
             return { id: item.id, configs, weight: item.weight, group_id: item.group_id };
           })
         : [];
-
+      let haveNewChart = false;
       const innerLayout = charts.map((item: { configs: { layout: { i: string } } }, index: string | number) => {
         if (item.configs.layout) {
           // 当Chart被删除后 layout中的i会中断，ResponsiveReactGridLayout会有问题
           item.configs.layout.i = '' + index;
           return item.configs.layout;
         } else {
+          haveNewChart = true;
           return getNewItemLayout(
             charts.slice(0, index).map(
               (item: {
@@ -239,15 +240,22 @@ export default function ChartGroup(props: Props) {
             ),
             Number(index),
           );
-          // return {
-          //   x: 0,
-          //   y: 0,
-          //   w: unit,
-          //   h: unit / 2,
-          //   i: '' + index,
-          // };
         }
       });
+
+      if (haveNewChart) {
+        const { dat } = await getPerm(busiId, 'rw');
+        dat &&
+          updateCharts(
+            busiId,
+            charts.map((item, index) => {
+              const { h, w, x, y, i } = innerLayout[index];
+              item.configs.layout = { h, w, x, y, i };
+              return item;
+            }),
+          );
+      }
+
       const realLayout: Layouts = { lg: innerLayout, sm: innerLayout, md: innerLayout, xs: innerLayout, xxs: innerLayout };
       setLayout(realLayout);
       setChartConfigs(charts);
@@ -263,7 +271,6 @@ export default function ChartGroup(props: Props) {
     curentLayouts.forEach((layoutItem) => {
       if (layoutItem) {
         const { w, h, x, y } = layoutItem;
-
         for (let i = 0; i < h; i++) {
           if (typeof layoutArrayLayoutFillArray[i + y] === 'undefined') {
             layoutArrayLayoutFillArray[i + y] = new Array<number>(cols).fill(0);
