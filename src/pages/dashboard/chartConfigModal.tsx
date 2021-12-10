@@ -102,8 +102,8 @@ export default function ChartConfigModal(props: Props) {
           onChange={onChange}
           value={value}
           style={{
-            // width: '340px',
-            flex: 1,
+            width: '330px',
+            // flex: 1,
           }}
         />
         {fields.length > 1 ? (
