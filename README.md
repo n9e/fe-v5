@@ -25,6 +25,9 @@ npm run build
 ## Branch and Version
 
 The **rc version** is on master branch, **ga version** is on v5.1. So if you want to deploy n9e ga web, you should checkout to v5.1 branch.
+```
+git clone -b v5.1 https://github.com.cnpmjs.org/n9e/fe-v5.git
+```
 
 ## Nginx Server
 ```
