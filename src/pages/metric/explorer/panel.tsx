@@ -46,7 +46,8 @@ interface VectorDataType {
       quantile: string;
       __name__: string;
     };
-    value: [number, string];
+    value?: [number, string];
+    values?: [number, string][];
   }[];
 }
 
@@ -280,11 +281,25 @@ const Panel: React.FC<PanelProps> = ({ metrics, defaultPromQL, removePanel }) =>
             bordered
             loading={isLoading}
             dataSource={vectorData ? vectorData.result : []}
-            renderItem={({ metric, value }) => (
+            renderItem={({ metric, value, values }) => (
               <List.Item>
                 <div className='list-item-content'>
                   <div className='left'>{getListItemContent(metric)}</div>
-                  <div className='right'>{value[1] || '-'}</div>
+                  {value && value.length > 1 && <div className='right'>{value[1] || '-'}</div>}
+                  {values && values.length > 0 && (
+                    <div className='right'>
+                      {values.map((value) => {
+                        return (
+                          <>
+                            <span style={{ display: 'inline-block' }}>
+                              {value[1]} @{value[0]}
+                            </span>
+                            <br />
+                          </>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               </List.Item>
             )}
