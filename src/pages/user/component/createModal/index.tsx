@@ -115,13 +115,10 @@ const CreateModal: React.FC<ModalProps> = (props: ModalProps) => {
       };
 
       if (action === ActionType.CreateBusiness) {
-        createBusinessTeam(params).then((_) => {
+        createBusinessTeam(params).then((res) => {
           message.success(t('业务组创建成功'));
           onClose('create');
-
-          if (val === 'search') {
-            onSearch(params.name);
-          }
+          onSearch(res);
         });
       }
 
