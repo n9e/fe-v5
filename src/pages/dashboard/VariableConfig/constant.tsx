@@ -165,14 +165,17 @@ export const convertExpressionToQuery = (expression: string) => {
 
 export const replaceExpressionVars = (expression: string, formData: FormType, limit: number) => {
   var newExpression = expression;
-
   const vars = newExpression.match(/\$[0-9a-zA-Z]+/g);
   if (vars && vars.length > 0) {
     for (let i = 0; i < limit; i++) {
-      const { selected, name } = formData.var[i];
+      const { selected, name, options } = formData.var[i];
       if (vars.includes('$' + name) && selected) {
         if (Array.isArray(selected)) {
-          newExpression = newExpression.replaceAll('$' + name, `(${(selected as string[]).join('|')})`);
+          if (selected.includes('all') && options) {
+            newExpression = newExpression.replaceAll('$' + name, `(${(options as string[]).join('|')})`);
+          } else {
+            newExpression = newExpression.replaceAll('$' + name, `(${(selected as string[]).join('|')})`);
+          }
         } else if (typeof selected === 'string') {
           newExpression = newExpression.replaceAll('$' + name, selected as string);
         }

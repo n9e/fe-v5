@@ -87,8 +87,16 @@ export default function EditItem(props: Props) {
                     </Form.Item>
                   </Col>
                   <Col span={2}>
-                    <Form.Item {...restField} name={[name, 'allOption']} fieldKey={[fieldKey, 'allOption']} valuePropName='checked'>
-                      <Switch />
+                    <Form.Item shouldUpdate style={{ margin: 0 }}>
+                      {() => {
+                        return (
+                          form.getFieldValue(['var', name, 'multi']) && (
+                            <Form.Item {...restField} name={[name, 'allOption']} fieldKey={[fieldKey, 'allOption']} valuePropName='checked'>
+                              <Switch />
+                            </Form.Item>
+                          )
+                        );
+                      }}
                     </Form.Item>
                   </Col>
                   <Form.Item {...restField} name={[name, 'selected']} fieldKey={[fieldKey, 'selected']} hidden>

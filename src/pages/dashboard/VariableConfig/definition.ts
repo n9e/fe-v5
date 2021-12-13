@@ -5,4 +5,5 @@ export interface Variable {
   selected?: string | string[];
   multi: boolean;
   allOption: boolean;
+  options?: string[]
 }

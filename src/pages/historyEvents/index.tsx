@@ -136,11 +136,11 @@ const Event: React.FC = () => {
       },
     },
     {
-      title: t('触发时间'),
-      dataIndex: 'trigger_time',
+      title: t('计算时间'),
+      dataIndex: 'last_eval_time',
       width: 140,
       render(value) {
-        return moment(value * 1000).format('YYYY-MM-DD HH:mm:ss');
+        return moment((value ? value : 0) * 1000).format('YYYY-MM-DD HH:mm:ss');
       },
     },
   ];

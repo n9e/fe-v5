@@ -11,7 +11,7 @@ interface Props {
   cluster: string;
   index: number;
   data: Variable[];
-  onChange: (index: number, value: string | string[]) => void;
+  onChange: (index: number, value: string | string[], options?) => void;
 }
 
 const stringToRegex = (str) => {
@@ -40,10 +40,10 @@ const DisplayItem: React.FC<Props> = ({ expression, index, data, onChange, clust
           setOptions(res);
           // 逻辑上只有导入大盘后初始化那一次 selected会为空
           if (res.length > 0 && !selected) {
-            onChange(index, multi ? [res[0]] : res[0]);
+            onChange(index, multi ? [res[0]] : res[0], res);
           }
           if (exp && newExpression && exp !== newExpression) {
-            onChange(index, multi ? [] : '');
+            onChange(index, multi ? [] : '', res);
           }
         });
       }
@@ -52,15 +52,15 @@ const DisplayItem: React.FC<Props> = ({ expression, index, data, onChange, clust
 
   const handleChange = (v) => {
     if (multi && allOption && v.includes('all')) {
-      onChange(index, ['all']);
+      onChange(index, ['all'], options);
     } else if (multi && !allOption) {
       let allIndex = v.indexOf('all');
       if (allIndex !== -1) {
         v.splice(allIndex, 1);
       }
-      onChange(index, v);
+      onChange(index, v, options);
     } else {
-      onChange(index, v);
+      onChange(index, v, options);
     }
   };
 
