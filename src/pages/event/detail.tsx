@@ -2,7 +2,7 @@ import PageLayout from '@/components/pageLayout';
 import React, { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router';
 import { getAlertEventsById, getHistoryEventsById } from '@/services/warning';
-import { Button, Card, Col, Row, Space, Spin, Tag, Typography } from 'antd';
+import { Button, Card, Col, message, Row, Space, Spin, Tag, Typography } from 'antd';
 import { priorityColor } from '@/utils/constant';
 import './detail.less';
 import moment from 'moment';
@@ -56,7 +56,7 @@ const EventDetailPage: React.FC = () => {
       label: '事件标签',
       key: 'tags',
       render(tags) {
-        return tags.map((tag) => <Tag color='blue'>{tag}</Tag>);
+        return tags ? tags.map((tag) => <Tag color='blue'>{tag}</Tag>) : '';
       },
     },
     { label: '对象备注', key: 'target_note' },
@@ -124,20 +124,22 @@ const EventDetailPage: React.FC = () => {
       label: '告警接收组',
       key: 'notify_groups_obj',
       render(groups) {
-        return groups.map((group) => <Tag color='blue'>{group.name}</Tag>);
+        return groups ? groups.map((group) => <Tag color='blue'>{group.name}</Tag>) : '';
       },
     },
     {
       label: '回调地址',
       key: 'callbacks',
       render(callbacks) {
-        return callbacks.map((callback) => (
-          <Tag>
-            <Paragraph copyable style={{ margin: 0 }}>
-              {callback}
-            </Paragraph>
-          </Tag>
-        ));
+        return callbacks
+          ? callbacks.map((callback) => (
+              <Tag>
+                <Paragraph copyable style={{ margin: 0 }}>
+                  {callback}
+                </Paragraph>
+              </Tag>
+            ))
+          : '';
       },
     },
     {
@@ -174,14 +176,16 @@ const EventDetailPage: React.FC = () => {
                     type='primary'
                     onClick={() => {
                       history.push('/alert-mutes/add', {
-                        tags: eventDetail.tags.map((tag) => {
-                          const [key, value] = tag.split('=');
-                          return {
-                            func: '==',
-                            key,
-                            value,
-                          };
-                        }),
+                        tags: eventDetail.tags
+                          ? eventDetail.tags.map((tag) => {
+                              const [key, value] = tag.split('=');
+                              return {
+                                func: '==',
+                                key,
+                                value,
+                              };
+                            })
+                          : [],
                       });
                     }}
                   >
@@ -190,11 +194,15 @@ const EventDetailPage: React.FC = () => {
                   {!isHistory && (
                     <Button
                       danger
-                      onClick={() =>
-                        deleteAlertEventsModal(busiId, [Number(eventId)], () => {
-                          history.replace('/alert-cur-events');
-                        })
-                      }
+                      onClick={() => {
+                        if (eventDetail.group_id) {
+                          deleteAlertEventsModal(eventDetail.group_id, [Number(eventId)], () => {
+                            history.replace('/alert-cur-events');
+                          });
+                        } else {
+                          message.warn('该告警未返回业务组ID');
+                        }
+                      }}
                     >
                       删除
                     </Button>

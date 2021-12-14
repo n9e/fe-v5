@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useCallback, ReactElement, RefObject } from 'react';
-import { Button, Collapse, Modal, Menu, Dropdown, Divider, Popover, Checkbox } from 'antd';
+import { Button, Collapse, Modal, Menu, Dropdown, Divider, Popover, Checkbox, Tooltip } from 'antd';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 const { Panel } = Collapse;
@@ -527,7 +527,11 @@ export default function ChartGroup(props: Props) {
                 legend: legend,
                 step,
                 range,
-                title: name,
+                title: (
+                  <Tooltip title={name}>
+                    <span>{name}</span>
+                  </Tooltip>
+                ),
                 promqls,
                 legendTitleFormats,
               }}
