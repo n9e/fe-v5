@@ -3,6 +3,7 @@ This is the web project for N9E
 
 ## Usage
 The built pub folder can work in the [n9e](https://github.com/didi/nightingale).
+
 you can deploy the front-end code independently, just replace the pub with the new release.
 
 ## Installation
