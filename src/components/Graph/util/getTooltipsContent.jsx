@@ -22,7 +22,7 @@ export default function getTooltipsContent(activeTooltipData) {
   tooltipContent += getHeaderStr(activeTooltipData);
   const isSinglePoint = points.length === 1;
   _.each(points, (point, index) => {
-    tooltipContent += renderPointContent(isSinglePoint, point, series[index], formatUnit, precision, chartType);
+    tooltipContent += renderPointContent(isSinglePoint, point, point.serieOptions, formatUnit, precision, chartType);
   });
 
   return `<div style="table-layout: fixed;max-width: ${tooltipWidth}px;word-wrap: break-word;white-space: normal;">${tooltipContent}</div>`;
