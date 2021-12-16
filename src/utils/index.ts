@@ -109,14 +109,15 @@ export const generateID = (): string => {
   return `_${Math.random().toString(36).substr(2, 9)}`;
 };
 
+// https://github.com/n9e/fe-v5/issues/72 修改 withByte 默认为 false
 export const sizeFormatter = (
   val,
   fixedCount = 2,
-  { withUnit = true, withByte = true, trimZero = false, convertNum = 1024 } = {
+  { withUnit = true, withByte = false, trimZero = false, convertNum = 1024 } = {
     withUnit: true,
-    withByte: true,
+    withByte: false,
     trimZero: false,
-    convertNum: 1024 | 1000
+    convertNum: 1024 | 1000,
   },
 ) => {
   const size = val ? Number(val) : 0;
@@ -145,7 +146,7 @@ export const sizeFormatter = (
   withUnit && (result = `${result}${unit}`);
   withByte && (result = `${result}B`);
   return result;
-}
+};
 
 export function useQuery() {
   const { search } = useLocation();
