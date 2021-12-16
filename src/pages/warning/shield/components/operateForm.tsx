@@ -18,9 +18,6 @@ import { timeLensDefault } from '../../const';
 const { Option } = Select;
 const { TextArea } = Input;
 
-const btimeDefault = new Date().getTime();
-const etimeDefault = new Date().getTime() + 1 * 60 * 60 * 1000; // 默认时长1h
-
 interface ItagsObj {
   tags: any[];
 }
@@ -31,6 +28,8 @@ interface Props {
 }
 
 const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }) => {
+  const btimeDefault = new Date().getTime();
+  const etimeDefault = new Date().getTime() + 1 * 60 * 60 * 1000; // 默认时长1h
   const { t, i18n } = useTranslation();
   const { clusters: clusterList } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const layout = {
