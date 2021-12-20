@@ -102,7 +102,7 @@ export default function ChartConfigModal(props: Props) {
           onChange={onChange}
           value={value}
           style={{
-            width: '330px',
+            width: '310px',
             // flex: 1,
           }}
         />
