@@ -307,8 +307,8 @@ export function getSerieIndex(serie, highlightedKeys, seriesLength, serieIndex) 
 function getLegendNums(points) {
   let last = 0;
   let avg = 0;
-  let max = 0;
-  let min = 0;
+  let max = -Infinity;
+  let min = Infinity;
   let sum = 0;
   let len = 0;
 
@@ -320,14 +320,13 @@ function getLegendNums(points) {
     const x = _.get(point, '[0]');
     const y = _.get(point, '[1]');
     if (_.isNumber(x) && _.isNumber(y)) {
-      if (sum === null) sum = 0;
       sum += y;
 
-      if (max === null || max < y) {
+      if (max < y) {
         max = y;
       }
 
-      if (min === null || min > y) {
+      if (min > y) {
         min = y;
       }
 
