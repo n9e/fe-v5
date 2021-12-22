@@ -14,16 +14,42 @@ interface Props {
   onChange: (index: number, value: string | string[], options?) => void;
 }
 
-const stringToRegex = (str) => {
-  // Main regex
-  const main = str.match(/\/(.+)\/.*/)[1];
+// const stringToRegex = (str) => {
+//   // Main regex
+//   const main = str.match(/\/(.+)\/.*/)[1];
 
-  // Regex options
-  const options = str.match(/\/.+\/(.*)/)[1];
+//   // Regex options
+//   const options = str.match(/\/.+\/(.*)/)[1];
 
-  // Compiled regex
-  return new RegExp(main, options);
-};
+//   // Compiled regex
+//   return new RegExp(main, options);
+// };
+
+export function stringStartsAsRegEx(str: string): boolean {
+  if (!str) {
+    return false;
+  }
+
+  return str[0] === '/';
+}
+
+export function stringToRegex(str: string): RegExp | false {
+  if (!stringStartsAsRegEx(str)) {
+    return new RegExp(`^${str}$`);
+  }
+
+  const match = str.match(new RegExp('^/(.*?)/(g?i?m?y?)$'));
+
+  // if (!match) {
+  //   throw new Error(`'${str}' is not a valid regular expression.`);
+  // }
+
+  if (match) {
+    return new RegExp(match[1], match[2]);
+  } else {
+    return false;
+  }
+}
 
 const DisplayItem: React.FC<Props> = ({ expression, index, data, onChange, cluster }) => {
   const { t } = useTranslation();
@@ -88,7 +114,7 @@ const DisplayItem: React.FC<Props> = ({ expression, index, data, onChange, clust
             )}
             {options &&
               options
-                .filter((i) => !reg || stringToRegex(reg).test(i))
+                .filter((i) => !reg || !stringToRegex(reg) || (stringToRegex(reg) as RegExp).test(i))
                 .map((value) => (
                   <Option key={value} value={value}>
                     {value}
@@ -99,7 +125,7 @@ const DisplayItem: React.FC<Props> = ({ expression, index, data, onChange, clust
           <AutoComplete style={{ width: 180 }} onChange={(v) => onChange(index, v)} placeholder='input here' value={selected as string} dropdownClassName='overflow-586'>
             {options &&
               options
-                .filter((i) => !reg || stringToRegex(reg).test(i))
+                .filter((i) => !reg || !stringToRegex(reg) || (stringToRegex(reg) as RegExp).test(i))
                 .map((value) => (
                   <Option key={value} value={value}>
                     {value}

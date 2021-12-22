@@ -45,7 +45,7 @@ export default function EditItem(props: Props) {
   };
 
   return (
-    <Modal title={t('大盘变量')} width={900} visible={visible} onOk={handleOk} onCancel={onCancel}>
+    <Modal title={t('大盘变量')} width={950} visible={visible} onOk={handleOk} onCancel={onCancel} wrapClassName='variable-modal'>
       <Form name='dynamic_form_nest_item' onFinish={onFinish} autoComplete='off' preserve={false} form={form}>
         <Row gutter={[6, 6]} className='tag-header'>
           <Col span={4}>{t('变量名')}</Col>
@@ -77,8 +77,8 @@ export default function EditItem(props: Props) {
                     </Form.Item>
                   </Col>
                   <Col span={6}>
-                    <Form.Item {...restField} name={[name, 'reg']} fieldKey={[fieldKey, 'reg']}>
-                      <Input placeholder='/.*-(?<text>.*)-(?<value>.*)-.*/' />
+                    <Form.Item {...restField} name={[name, 'reg']} fieldKey={[fieldKey, 'reg']} rules={[{ pattern: new RegExp('^/(.*?)/(g?i?m?y?)$'), message: t('格式不对') }]}>
+                      <Input placeholder='/*.hna/' />
                     </Form.Item>
                   </Col>
                   <Col span={2}>
