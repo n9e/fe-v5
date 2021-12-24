@@ -105,7 +105,7 @@ export default function ImportAndDownloadModal(props: Props) {
                     maskClosable: true,
                     content: <Table className='samll_table' dataSource={dataSource} columns={columns} pagination={false} size='small' />,
                     onOk: () => {
-                      !errNum && onSuccess && onSuccess();
+                      errNum < dataSource.length && onSuccess && onSuccess();
                     },
                   });
                   // 每个业务各自处理onSubmit

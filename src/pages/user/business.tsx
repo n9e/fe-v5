@@ -123,6 +123,11 @@ const Resource: React.FC = () => {
   const getTeamInfoDetail = (id: string) => {
     setMemberLoading(true);
     getBusinessTeamInfo(id).then((data) => {
+      dispatch({
+        type: 'common/saveData',
+        prop: 'curBusiItem',
+        data: data,
+      });
       setTeamInfo(data);
       setMemberList(data.user_groups);
       setMemberLoading(false);
