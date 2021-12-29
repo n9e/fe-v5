@@ -92,7 +92,7 @@ const Resource: React.FC = () => {
               onOk: () => {
                 deleteMember(teamId, params).then((_) => {
                   message.success(t('成员删除成功'));
-                  handleClose('update');
+                  handleClose('updateMember');
                 });
               },
               onCancel: () => {},
@@ -194,9 +194,12 @@ const Resource: React.FC = () => {
     if (searchValue) {
       handleSearch('team', searchValue);
     } else {
-      getList(true);
+      // 添加、删除成员 不用获取列表
+      if (isDeleteOrAdd !== 'updateMember') {
+        getList(isDeleteOrAdd !== 'updateName'); // 修改名字，不用选中第一个
+      }
     }
-    if (teamId && isDeleteOrAdd === 'update') {
+    if (teamId && (isDeleteOrAdd === 'update' || isDeleteOrAdd === 'updateMember' || isDeleteOrAdd === 'updateName')) {
       getTeamInfoDetail(teamId);
     }
   };

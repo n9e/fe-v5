@@ -77,7 +77,7 @@ const CreateModal: React.FC<ModalProps> = (props: ModalProps) => {
       if (action === ActionType.EditTeam && teamId) {
         changeTeamInfo(teamId, params).then((_) => {
           message.success(t('团队信息修改成功'));
-          onClose('update');
+          onClose('updateName');
         });
       }
     }
@@ -98,7 +98,7 @@ const CreateModal: React.FC<ModalProps> = (props: ModalProps) => {
       };
       addTeamUser(teamId, params).then((_) => {
         message.success(t('添加成功'));
-        onClose('update');
+        onClose('updateMember');
       });
     }
     if (isBusinessForm) {
