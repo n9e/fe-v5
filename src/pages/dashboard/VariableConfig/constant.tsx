@@ -2,6 +2,7 @@ import { resourceGroupItem } from '@/store/businessInterface';
 import { favoriteFrom } from '@/store/common';
 import React, { createContext } from 'react';
 import { getLabelNames, getMetricSeries, getLabelValues, getMetric, getQueryResult } from '@/services/dashboard';
+import { Range, formatPickerDate } from '@/components/DateRangePicker';
 import { FormType } from './EditItem';
 export const CLASS_PATH_VALUE = 'classpath';
 export const CLASS_PATH_PREFIX_VALUE = 'classpath_prefix';
@@ -133,23 +134,30 @@ export const TagFilterReducer = function (state, action) {
 
 // https://grafana.com/docs/grafana/latest/datasources/prometheus/#query-variable 根据文档解析表达式
 // 每一个promtheus接口都接受start和end参数来限制返回值
-export const convertExpressionToQuery = (expression: string) => {
+export const convertExpressionToQuery = (expression: string, range: Range) => {
+  const { start, end } = formatPickerDate(range);
   if (expression === 'label_names()') {
-    return getLabelNames().then((res) => res.data);
+    return getLabelNames({ start, end }).then((res) => res.data);
   } else if (expression.startsWith('label_values(')) {
     if (expression.includes(',')) {
-      const [metric, label] = expression.substring('label_values('.length, expression.length - 1).split(',');
-      return getMetricSeries({ 'match[]': metric.trim() }).then((res) => Array.from(new Set(res.data.map((item) => item[label.trim()]))));
+      let i, metric, label;
+      const res = expression.match(/\((.+), (.+?)\)/);
+      if (res && res.length > 2) {
+        [i, metric, label] = res;
+      } else {
+        [metric, label] = expression.substring('label_values('.length, expression.length - 1).split(',');
+      }
+      return getMetricSeries({ 'match[]': metric.trim(), start, end }).then((res) => Array.from(new Set(res.data.map((item) => item[label.trim()]))));
     } else {
       const label = expression.substring('label_values('.length, expression.length - 1);
-      return getLabelValues(label).then((res) => res.data);
+      return getLabelValues(label, { start, end }).then((res) => res.data);
     }
   } else if (expression.startsWith('metrics(')) {
     const metric = expression.substring('metrics('.length, expression.length - 1);
-    return getMetric().then((res) => res.data.filter((item) => item.includes(metric)));
+    return getMetric({ start, end }).then((res) => res.data.filter((item) => item.includes(metric)));
   } else if (expression.startsWith('query_result(')) {
     const promql = expression.substring('query_result('.length, expression.length - 1);
-    return getQueryResult(promql).then((res) =>
+    return getQueryResult({ query: promql, start, end }).then((res) =>
       res.data.result.map(({ metric, value }) => {
         const metricName = metric['__name__'];
         const labels = Object.keys(metric)

@@ -9,7 +9,7 @@ import classNames from 'classnames';
 import { useEffect } from 'react';
 import './index.less';
 import { useTranslation } from 'react-i18next';
-
+import { Range } from '@/components/DateRangePicker';
 export type VariableType = FormType;
 
 interface ITagFilterProps {
@@ -17,10 +17,11 @@ interface ITagFilterProps {
   cluster: string;
   editable?: boolean;
   value?: FormType;
+  range: Range;
   onChange: (data: FormType) => void;
 }
 
-const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = ({ isOpen = false, value, onChange, editable = true, cluster }, ref) => {
+const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = ({ isOpen = false, value, onChange, editable = true, cluster, range }, ref) => {
   const { t } = useTranslation();
   const [editing, setEditing] = useState<boolean>(isOpen);
   const [data, setData] = useState<FormType>();
@@ -56,7 +57,7 @@ const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = ({ isOpe
         {data?.var && data?.var.length > 0 && (
           <>
             {data.var.map((expression, index) => (
-              <DisplayItem expression={expression} index={index} data={data.var} onChange={handleVariableChange} cluster={cluster}></DisplayItem>
+              <DisplayItem expression={expression} index={index} data={data.var} onChange={handleVariableChange} cluster={cluster} range={range}></DisplayItem>
             ))}
             {editable && <EditOutlined className='icon' onClick={() => setEditing(true)}></EditOutlined>}
           </>
@@ -67,7 +68,7 @@ const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = ({ isOpe
           </div>
         )}
       </div>
-      <EditItem visible={editing} onChange={handleEditClose} value={data} />
+      <EditItem visible={editing} onChange={handleEditClose} value={data} range={range} />
     </div>
   );
 };

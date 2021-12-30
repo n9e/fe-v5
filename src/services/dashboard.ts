@@ -200,15 +200,17 @@ export const getTemplateContent = function (type: 'alert_rule' | 'dashboard', na
   });
 };
 
-export const getLabelNames = function () {
+export const getLabelNames = function (data) {
   return request(`/api/n9e/prometheus/api/v1/labels`, {
     method: RequestMethod.Get,
+    params: { ...data },
   });
 };
 
-export const getLabelValues = function (label) {
+export const getLabelValues = function (label, data) {
   return request(`/api/n9e/prometheus/api/v1/label/${label}/values`, {
     method: RequestMethod.Get,
+    params: { ...data },
   });
 };
 
@@ -229,6 +231,6 @@ export const getMetric = function (data = {}) {
 export const getQueryResult = function (data) {
   return request(`/api/n9e/prometheus/api/v1/query`, {
     method: RequestMethod.Get,
-    params: { query: data },
+    params: { ...data },
   });
 };

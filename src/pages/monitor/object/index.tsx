@@ -5,7 +5,7 @@ import PageLayout from '@/components/pageLayout';
 import { useTranslation } from 'react-i18next';
 import HostSelect from './components/HostSelect';
 import MetricSelect from './components/MetricSelect';
-import DateRangePicker from '@/components/DateRangePicker';
+import DateRangePicker, { formatPickerDate } from '@/components/DateRangePicker';
 import { Range } from '@/components/DateRangePicker';
 import { getHosts } from '@/services';
 import { getMetrics, getMetricsDesc } from '@/services/warning';
@@ -37,7 +37,7 @@ export default () => {
   const [selectedHosts, setSelectedHosts] = useState([]);
   const previousSelectedHosts: Array<Host> = usePrevious(selectedHosts);
   const { busiGroups, curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
-  const [busiGroup, setBusiGroup] = useState(curBusiItem)
+  const [busiGroup, setBusiGroup] = useState(curBusiItem);
   const [metrics, setMetrics] = useState([]);
   const [metricDescs, setMetricDescs] = useState({});
   const [graphs, setGraphs] = useState<Array<any>>([]);
@@ -45,45 +45,49 @@ export default () => {
   const [queryHost, setQueryHost] = useState('');
   const [curCluster, setCurCluster] = useState('');
   const [range, setRange] = useState<Range>({ num: 1, unit: 'hour', description: 'hour' });
+  const [range1, setRange1] = useState<Range>({ num: 1, unit: 'hour', description: 'hour' });
   const [getHostsTimes, setGetHostsTimes] = useState(0);
   const getHostsRequest = () => {
-    const cluster = localStorage.getItem('curCluster') || ''
-    let transportData = busiGroup ? {
-      bgid: busiGroup.id,
-      query: queryHost,
-      clusters: cluster
-    } : {
-      query: queryHost,
-      clusters: cluster
-    }
+    const cluster = localStorage.getItem('curCluster') || '';
+    let transportData = busiGroup
+      ? {
+          bgid: busiGroup.id,
+          query: queryHost,
+          clusters: cluster,
+        }
+      : {
+          query: queryHost,
+          clusters: cluster,
+        };
     return getHosts(transportData);
-  }
+  };
 
   useEffect(() => {
-    getHostsRequest().then(res => {
+    getHostsRequest().then((res) => {
       const allHosts = res?.dat?.list || [];
       setHosts(allHosts);
-      if (getHostsTimes > 0) return
-      setGetHostsTimes(getHostsTimes + 1)
+      if (getHostsTimes > 0) return;
+      setGetHostsTimes(getHostsTimes + 1);
       getMetricsAndDesc(allHosts.slice(0, 10));
-    })
+    });
   }, [busiGroup, queryHost, curCluster]);
   useEffect(() => {
-    const isPreviousHaveSelectedHosts = previousSelectedHosts && previousSelectedHosts.length > 0
-    const isPreviousDontHaveSelectedHosts = !previousSelectedHosts || previousSelectedHosts.length === 0
+    const isPreviousHaveSelectedHosts = previousSelectedHosts && previousSelectedHosts.length > 0;
+    const isPreviousDontHaveSelectedHosts = !previousSelectedHosts || previousSelectedHosts.length === 0;
     // 原来有选中的hosts，后来用户全部取消，右侧的metrics要清空
     if (isPreviousHaveSelectedHosts && selectedHosts.length === 0) {
-      setMetrics([])
+      setMetrics([]);
     } else if (isPreviousDontHaveSelectedHosts && selectedHosts.length > 0) {
-      getMetricsAndDesc(selectedHosts)
+      getMetricsAndDesc(selectedHosts);
     }
-  }, [selectedHosts])
+  }, [selectedHosts]);
   const getMetricsAndDesc = (hosts) => {
-    const showHosts = hosts || selectedHosts
-    if (showHosts.length === 0) return
-    const hostsMatchParams = `{ident=~"${showHosts.map((h: any) => h.ident).join('|')}"}`
+    const showHosts = hosts || selectedHosts;
+    if (showHosts.length === 0) return;
+    const hostsMatchParams = `{ident=~"${showHosts.map((h: any) => h.ident).join('|')}"}`;
     getMetrics({
-      match: [hostsMatchParams]
+      match: [hostsMatchParams],
+      ...formatPickerDate(range1),
     }).then((res) => {
       setMetrics(res.data);
       // const newGraphs = graphs.map((graph) => ({
@@ -91,9 +95,9 @@ export default () => {
       //   showHosts,
       // }));
       // setGraphs(newGraphs);
-      getMetricsDesc(res.data).then(res => {
-        setMetricDescs(res.dat)
-      })
+      getMetricsDesc(res.data).then((res) => {
+        setMetricDescs(res.dat);
+      });
     });
   };
   const handleRemoveGraphs = () => {
@@ -102,15 +106,19 @@ export default () => {
   // 不需要输入的时候就触发，所以不需要防抖了
   const debouncedChangeHostName = useCallback(
     _.debounce((v) => {
-      setQueryHost(v)
+      setQueryHost(v);
     }, 0),
     [],
   );
 
   return (
-    <PageLayout title={t('对象视角')} icon={<LineChartOutlined />} onChangeCluster={cluster => {
-      setCurCluster(cluster)
-    }}>
+    <PageLayout
+      title={t('对象视角')}
+      icon={<LineChartOutlined />}
+      onChangeCluster={(cluster) => {
+        setCurCluster(cluster);
+      }}
+    >
       <div className='object-view'>
         <Layout style={{ padding: 10 }}>
           <Row gutter={10}>
@@ -118,13 +126,13 @@ export default () => {
               <HostSelect
                 allHosts={hosts}
                 changeBusiGroup={(busiGroup) => {
-                  setBusiGroup(busiGroup)
+                  setBusiGroup(busiGroup);
                 }}
                 changeSelectedHosts={(hosts) => {
                   setSelectedHosts(hosts);
                 }}
-                onSearchHostName={value => {
-                  debouncedChangeHostName(value)
+                onSearchHostName={(value) => {
+                  debouncedChangeHostName(value);
                 }}
               />
             </Col>
@@ -132,14 +140,14 @@ export default () => {
               <MetricSelect
                 metrics={metrics}
                 metricDescs={metricDescs}
-                selectedMetrics={graphs.map(g => g.metric)}
+                selectedMetrics={graphs.map((g) => g.metric)}
                 handleMetricClick={(metric) => {
                   let newGraphs = [...graphs];
-                  const alreadyHaveGraphIndex = newGraphs.findIndex(g => g.metric === metric)
-                  const orgGraph = newGraphs[alreadyHaveGraphIndex]
+                  const alreadyHaveGraphIndex = newGraphs.findIndex((g) => g.metric === metric);
+                  const orgGraph = newGraphs[alreadyHaveGraphIndex];
                   if (alreadyHaveGraphIndex !== -1) {
-                    newGraphs.splice(alreadyHaveGraphIndex, 1)
-                    newGraphs.unshift(orgGraph)
+                    newGraphs.splice(alreadyHaveGraphIndex, 1);
+                    newGraphs.unshift(orgGraph);
                   } else {
                     newGraphs.unshift({
                       step,
@@ -157,63 +165,77 @@ export default () => {
           </Row>
           <Row style={{ padding: '10px 0' }}>
             <Col span={8}>
-            <div style={{display: 'flex'}}>
-              <DateRangePicker value={range} onChange={(e) => {
-                // setRange(e);
-                let newGraphs = [...graphs];
-                newGraphs.forEach(graph => {
-                  graph.range = e
-                })
-                setGraphs(newGraphs);
-              }} />
-              <Resolution onChange={(v) => {
-                setStep(v)
-                let newGraphs = [...graphs];
-                newGraphs.forEach(graph => {
-                  graph.step = v
-                })
-                setGraphs(newGraphs);
-              }} initialValue={step} />
-              <Button
-                style={{ padding: '4px 8px' }}
-                onClick={() => {
-                  graphs.forEach(graph => {
-                    const graphInstance = graph.ref?.current
-                    graphInstance && graphInstance.refresh()
-                  })
-                }}
-                icon={<SyncOutlined />}></Button>
-            </div>
-          </Col>
-          <Col span={16} style={{ textAlign: 'right' }}>
-            <Button
-              onClick={handleRemoveGraphs}
-              disabled={!graphs.length}
-              style={{ background: '#fff' }}
-            >
-              清空图表
-            </Button>
-          </Col>
-        </Row>
-        <div>
-          {_.map(graphs, (o, i) => {
-            return <div style={{ marginBottom: 10 }} key={o.metric}>
-              <Graph ref={o.ref} data={{...o}} graphConfigInnerVisible={true} extraRender={graph => {
-                return [
-                  <Button type='link' danger size='small' onClick={(e) => e.preventDefault()}>
-                    <CloseCircleOutlined onClick={_ => {
-                      const newGraphs = [...graphs]
-                      newGraphs.splice(i, 1)
-                      setGraphs(newGraphs)
-                    }} />
-                </Button>
-                ]
-              }}></Graph>
-            </div>
-          })}
-          {graphs.length === 0 && <div className='empty-graph'>请先选中指标生成图表</div>}
-        </div>
-      </Layout>
-    </div>
-  </PageLayout>
-)}
+              <div style={{ display: 'flex' }}>
+                <DateRangePicker
+                  value={range}
+                  onChange={(e) => {
+                    // console.log(e);
+                    setRange1(e);
+                    let newGraphs = [...graphs];
+                    newGraphs.forEach((graph) => {
+                      graph.range = e;
+                    });
+                    setGraphs(newGraphs);
+                  }}
+                />
+                <Resolution
+                  onChange={(v) => {
+                    setStep(v);
+                    let newGraphs = [...graphs];
+                    newGraphs.forEach((graph) => {
+                      graph.step = v;
+                    });
+                    setGraphs(newGraphs);
+                  }}
+                  initialValue={step}
+                />
+                <Button
+                  style={{ padding: '4px 8px' }}
+                  onClick={() => {
+                    graphs.forEach((graph) => {
+                      const graphInstance = graph.ref?.current;
+                      graphInstance && graphInstance.refresh();
+                    });
+                  }}
+                  icon={<SyncOutlined />}
+                ></Button>
+              </div>
+            </Col>
+            <Col span={16} style={{ textAlign: 'right' }}>
+              <Button onClick={handleRemoveGraphs} disabled={!graphs.length} style={{ background: '#fff' }}>
+                清空图表
+              </Button>
+            </Col>
+          </Row>
+          <div>
+            {_.map(graphs, (o, i) => {
+              return (
+                <div style={{ marginBottom: 10 }} key={o.metric}>
+                  <Graph
+                    ref={o.ref}
+                    data={{ ...o }}
+                    graphConfigInnerVisible={true}
+                    extraRender={(graph) => {
+                      return [
+                        <Button type='link' danger size='small' onClick={(e) => e.preventDefault()}>
+                          <CloseCircleOutlined
+                            onClick={(_) => {
+                              const newGraphs = [...graphs];
+                              newGraphs.splice(i, 1);
+                              setGraphs(newGraphs);
+                            }}
+                          />
+                        </Button>,
+                      ];
+                    }}
+                  ></Graph>
+                </div>
+              );
+            })}
+            {graphs.length === 0 && <div className='empty-graph'>请先选中指标生成图表</div>}
+          </div>
+        </Layout>
+      </div>
+    </PageLayout>
+  );
+};

@@ -6,11 +6,13 @@ import { FormType } from './EditItem';
 import { Variable } from './definition';
 import { convertExpressionToQuery, replaceExpressionVars } from './constant';
 const { Option } = Select;
+import { Range } from '@/components/DateRangePicker';
 interface Props {
   expression: Variable;
   cluster: string;
   index: number;
   data: Variable[];
+  range: Range;
   onChange: (index: number, value: string | string[], options?) => void;
 }
 
@@ -51,18 +53,21 @@ export function stringToRegex(str: string): RegExp | false {
   }
 }
 
-const DisplayItem: React.FC<Props> = ({ expression, index, data, onChange, cluster }) => {
+const DisplayItem: React.FC<Props> = ({ expression, index, data, onChange, cluster, range }) => {
   const { t } = useTranslation();
   const [options, setOptions] = useState<string[]>([]);
   const [exp, setExp] = useState<string>();
+  const [_range, setRange] = useState<Range>(range);
   const [curCluster, setCurCluster] = useState(cluster);
   const { definition, multi, allOption, name, reg, selected } = expression;
   useEffect(() => {
     if (expression) {
       var newExpression = replaceExpressionVars(definition, { var: data }, index);
-      if (exp !== newExpression || curCluster !== cluster) {
+      if (exp !== newExpression || curCluster !== cluster || _range !== range) {
         setExp(newExpression);
-        convertExpressionToQuery(newExpression).then((res) => {
+        setRange(range);
+        setCurCluster(cluster);
+        convertExpressionToQuery(newExpression, range).then((res) => {
           setOptions(res);
           // 逻辑上只有导入大盘后初始化那一次 selected会为空
           if (res.length > 0 && !selected) {
@@ -74,7 +79,7 @@ const DisplayItem: React.FC<Props> = ({ expression, index, data, onChange, clust
         });
       }
     }
-  }, [expression, data, index, cluster]);
+  }, [expression, data, index, cluster, range]);
 
   const handleChange = (v) => {
     if (multi && allOption && v.includes('all')) {

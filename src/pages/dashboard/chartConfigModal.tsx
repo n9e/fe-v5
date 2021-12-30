@@ -258,7 +258,7 @@ export default function ChartConfigModal(props: Props) {
       <Form {...layout} form={chartForm} preserve={false}>
         <Row>
           <Col span={12}>
-            <VariableConfig onChange={handleVariableChange} value={innerVariableConfig} editable={false} cluster={cluster} />
+            <VariableConfig onChange={handleVariableChange} value={innerVariableConfig} editable={false} cluster={cluster} range={range} />
             <br />
             <Form.Item
               label={t('标题')}

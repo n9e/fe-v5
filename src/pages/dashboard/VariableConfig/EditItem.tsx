@@ -6,17 +6,18 @@ import PromqlEditor from '@/components/PromqlEditor';
 import '../index.less';
 import { Variable } from './definition';
 import { convertExpressionToQuery, replaceExpressionVars } from './constant';
-
+import { Range } from '@/components/DateRangePicker';
 export interface FormType {
   var: Variable[];
 }
 interface Props {
   visible: boolean;
   value: FormType | undefined;
+  range: Range;
   onChange: (v: FormType | undefined) => void;
 }
 export default function EditItem(props: Props) {
-  const { visible, onChange, value } = props;
+  const { visible, onChange, value, range } = props;
   const { t } = useTranslation();
   const [form] = Form.useForm();
   useEffect(() => {
@@ -39,7 +40,7 @@ export default function EditItem(props: Props) {
     const expression = e.target.value;
     const formData = form.getFieldsValue();
     var newExpression = replaceExpressionVars(expression, formData, index);
-    convertExpressionToQuery(newExpression).then((res) => {
+    convertExpressionToQuery(newExpression, range).then((res) => {
       form.setFields([{ name: ['var', index, 'selected'], value: res[0] }]);
     });
   };

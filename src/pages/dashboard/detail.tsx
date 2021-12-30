@@ -256,7 +256,7 @@ export default function DashboardDetail() {
     >
       <div className='dashboard-detail-content'>
         <div className='variable-area'>
-          <VariableConfig onChange={handleVariableChange} value={variableConfig} cluster={curCluster} />
+          <VariableConfig onChange={handleVariableChange} value={variableConfig} cluster={curCluster} range={range} />
         </div>
 
         <div className='charts'>
