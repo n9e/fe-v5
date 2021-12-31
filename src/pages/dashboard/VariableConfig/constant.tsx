@@ -176,11 +176,14 @@ export const replaceExpressionVars = (expression: string, formData: FormType, li
   const vars = newExpression.match(/\$[0-9a-zA-Z]+/g);
   if (vars && vars.length > 0) {
     for (let i = 0; i < limit; i++) {
-      const { selected, name, options } = formData.var[i];
+      const { selected, name, options, reg } = formData.var[i];
       if (vars.includes('$' + name) && selected) {
         if (Array.isArray(selected)) {
           if (selected.includes('all') && options) {
-            newExpression = newExpression.replaceAll('$' + name, `(${(options as string[]).join('|')})`);
+            newExpression = newExpression.replaceAll(
+              '$' + name,
+              `(${(options as string[]).filter((i) => !reg || !stringToRegex(reg) || (stringToRegex(reg) as RegExp).test(i)).join('|')})`,
+            );
           } else {
             newExpression = newExpression.replaceAll('$' + name, `(${(selected as string[]).join('|')})`);
           }
@@ -192,3 +195,40 @@ export const replaceExpressionVars = (expression: string, formData: FormType, li
   }
   return newExpression;
 };
+
+// const stringToRegex = (str) => {
+//   // Main regex
+//   const main = str.match(/\/(.+)\/.*/)[1];
+
+//   // Regex options
+//   const options = str.match(/\/.+\/(.*)/)[1];
+
+//   // Compiled regex
+//   return new RegExp(main, options);
+// };
+
+export function stringStartsAsRegEx(str: string): boolean {
+  if (!str) {
+    return false;
+  }
+
+  return str[0] === '/';
+}
+
+export function stringToRegex(str: string): RegExp | false {
+  if (!stringStartsAsRegEx(str)) {
+    return new RegExp(`^${str}$`);
+  }
+
+  const match = str.match(new RegExp('^/(.*?)/(g?i?m?y?)$'));
+
+  // if (!match) {
+  //   throw new Error(`'${str}' is not a valid regular expression.`);
+  // }
+
+  if (match) {
+    return new RegExp(match[1], match[2]);
+  } else {
+    return false;
+  }
+}
