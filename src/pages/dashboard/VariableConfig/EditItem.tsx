@@ -5,7 +5,7 @@ import { DeleteOutlined, PlusOutlined, ArrowUpOutlined, ArrowDownOutlined, CopyO
 import PromqlEditor from '@/components/PromqlEditor';
 import '../index.less';
 import { Variable } from './definition';
-import { convertExpressionToQuery, replaceExpressionVars } from './constant';
+import { convertExpressionToQuery, replaceExpressionVars, stringToRegex } from './constant';
 import { Range } from '@/components/DateRangePicker';
 export interface FormType {
   var: Variable[];
@@ -36,13 +36,17 @@ export default function EditItem(props: Props) {
     console.log('Received values of form:', values);
   };
 
-  const handleBlur = (e, index) => {
-    const expression = e.target.value;
-    const formData = form.getFieldsValue();
-    var newExpression = replaceExpressionVars(expression, formData, index);
-    convertExpressionToQuery(newExpression, range).then((res) => {
-      form.setFields([{ name: ['var', index, 'selected'], value: res[0] }]);
-    });
+  const handleBlur = (index) => {
+    const reg = form.getFieldValue(['var', index, 'reg']);
+    const expression = form.getFieldValue(['var', index, 'definition']);
+    if (new RegExp('^/(.*?)/(g?i?m?y?)$').test(reg) && expression) {
+      const formData = form.getFieldsValue();
+      var newExpression = replaceExpressionVars(expression, formData, index);
+      convertExpressionToQuery(newExpression, range).then((res) => {
+        const regFilterRes = res.filter((i) => !reg || !stringToRegex(reg) || (stringToRegex(reg) as RegExp).test(i));
+        form.setFields([{ name: ['var', index, 'selected'], value: regFilterRes[0] }]);
+      });
+    }
   };
 
   return (
@@ -74,12 +78,12 @@ export default function EditItem(props: Props) {
                   </Col>
                   <Col span={6}>
                     <Form.Item {...restField} name={[name, 'definition']} fieldKey={[fieldKey, 'definition']} rules={[{ required: true, message: t('请输入变量定义') }]}>
-                      <Input onBlur={(v) => handleBlur(v, name)} />
+                      <Input onBlur={(v) => handleBlur(name)} />
                     </Form.Item>
                   </Col>
                   <Col span={6}>
                     <Form.Item {...restField} name={[name, 'reg']} fieldKey={[fieldKey, 'reg']} rules={[{ pattern: new RegExp('^/(.*?)/(g?i?m?y?)$'), message: t('格式不对') }]}>
-                      <Input placeholder='/*.hna/' />
+                      <Input placeholder='/*.hna/' onBlur={(v) => handleBlur(name)} />
                     </Form.Item>
                   </Col>
                   <Col span={2}>
