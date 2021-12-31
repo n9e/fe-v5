@@ -11,12 +11,14 @@ import { Dashboard, Group } from '@/store/dashboardInterface';
 import ChartGroup, { Chart } from './chartGroup';
 import ChartConfigModal from './chartConfigModal';
 import RefreshIcon from '@/components/RefreshIcon';
+import TSGraph from '@/components/TSGraph';
 import VariableConfig, { VariableType } from './VariableConfig';
 import './index.less';
 import { useTranslation } from 'react-i18next';
 import Resolution from '@/components/Resolution';
 import { RootState as CommonRootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
+import editPanel from './EditPanel';
 
 interface URLParam {
   id: string;
@@ -113,7 +115,10 @@ export default function DashboardDetail() {
   const handleUpdateChart = (group: Group, item: Chart) => {
     groupId = group.id;
     setChartModalInitValue(item);
-    setChartModalVisible(true);
+    // setChartModalVisible(true);
+    editPanel({
+      visible: true,
+    });
   };
 
   const handleDelChart = async (group: Group, item: Chart) => {
@@ -330,6 +335,7 @@ export default function DashboardDetail() {
           variableConfig={variableConfig}
         />
       )}
+      <TSGraph />
     </PageLayout>
   );
 }

@@ -75,16 +75,16 @@ export default class Graph extends Component<GraphProps> {
           series: this.props.series,
           points,
           chartWidth: this.graphWrapEle.offsetWidth - 40,
-          chartType: nextProps.graphConfig.chartType
+          chartType: nextProps.graphConfig.chartType,
         });
       },
-    }
+    };
     if (isFormatUnit1024) {
       Object.assign(options, {
-        precision: nextProps.graphConfig.precision
-      })
+        precision: nextProps.graphConfig.precision,
+      });
     }
-    return options
+    return options;
   }
 
   render() {
