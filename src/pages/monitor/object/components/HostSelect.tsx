@@ -84,6 +84,7 @@ export default (props) => {
           allowClear
           placeholder='按业务组筛选'
           value={curSelectBusiGroup}
+          dropdownMatchSelectWidth={false}
           style={{ width: '100%', textAlign: 'left' }}
           showSearch={true}
           filterOption={false}
