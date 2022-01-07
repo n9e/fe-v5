@@ -138,7 +138,7 @@ const Event: React.FC = () => {
     {
       title: t('计算时间'),
       dataIndex: 'last_eval_time',
-      width: 140,
+      width: 180,
       render(value) {
         return moment((value ? value : 0) * 1000).format('YYYY-MM-DD HH:mm:ss');
       },
@@ -224,7 +224,7 @@ const Event: React.FC = () => {
               ref={tableRef}
               antProps={{
                 rowKey: 'id',
-                scroll: { x: 800, y: 'calc(100vh - 252px)' },
+                scroll: { x: 'max-content', y: 'calc(100vh - 252px)' },
               }}
               url={`/api/n9e/busi-group/${curBusiId}/alert-his-events`}
               customQueryCallback={(data) =>

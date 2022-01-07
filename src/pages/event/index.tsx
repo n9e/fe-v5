@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import PageLayout from '@/components/pageLayout';
-import { AlertOutlined, ExclamationCircleOutlined, SearchOutlined } from '@ant-design/icons';
+import { AlertOutlined, ExclamationCircleOutlined, SearchOutlined, DownOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import LeftTree from '@/components/LeftTree';
 import DataTable from '@/components/Dantd/components/data-table';
 import moment from 'moment';
-import { Button, Input, message, Modal, Tag, Tooltip } from 'antd';
+import { Button, Input, message, Modal, Tag, Tooltip, Menu, Dropdown, Radio } from 'antd';
 import DateRangePicker, { RelativeRange } from '@/components/DateRangePicker';
 import { priorityColor } from '@/utils/constant';
 import { useHistory } from 'react-router';
@@ -16,8 +16,9 @@ import { RootState } from '@/store/common';
 import { eventStoreState } from '@/store/eventInterface';
 import { CommonStoreState } from '@/store/commonInterface';
 import BlankBusinessPlaceholder from '@/components/BlankBusinessPlaceholder';
-
+import { useInterval } from 'ahooks';
 const { confirm } = Modal;
+import RefreshIcon from '@/components/RefreshIcon';
 
 export function deleteAlertEventsModal(busiId, ids: number[], onSuccess = () => {}) {
   confirm({
@@ -64,6 +65,21 @@ const Event: React.FC = () => {
   const isAddTagToQueryInput = useRef(false);
   const [curBusiId, setCurBusiId] = useState<number>(-1);
   const [selectedRowKeys, setSelectedRowKeys] = useState<number[]>([]);
+  const [interval, setInterval] = useState<number>(0);
+
+  useInterval(
+    () => {
+      tableRef.current.handleReload();
+      const busiIds = busiGroups.map((busiItem) => busiItem.id);
+      if (busiIds.length) {
+        dispatch({
+          type: 'event/refreshAlertings',
+          ids: busiIds,
+        });
+      }
+    },
+    interval > 0 ? interval * 1000 : undefined,
+  );
 
   const columns = [
     {
@@ -152,7 +168,7 @@ const Event: React.FC = () => {
     {
       title: t('触发时间'),
       dataIndex: 'trigger_time',
-      width: 120,
+      width: 180,
       render(value) {
         return moment(value * 1000).format('YYYY-MM-DD HH:mm:ss');
       },
@@ -218,9 +234,35 @@ const Event: React.FC = () => {
   }
 
   function renderLeftHeader() {
+    const intervalItems: RelativeRange[] = [
+      { num: 0, unit: 'second', description: 'off' },
+      { num: 5, unit: 'seconds', description: 's' },
+      { num: 30, unit: 'seconds', description: 's' },
+      { num: 60, unit: 'seconds', description: 's' },
+    ];
+
+    const menu = (
+      <Menu
+        onClick={(e) => {
+          setInterval(e.key as number);
+        }}
+      >
+        {intervalItems.map(({ num, description }) => (
+          <Menu.Item key={num}>
+            {num > 0 && <span className='num'>{num}</span>}
+            {description}
+          </Menu.Item>
+        ))}
+      </Menu>
+    );
     return (
       <div className='table-operate-box'>
         <div className='left'>
+          <Dropdown overlay={menu}>
+            <Button className='interval-btn' icon={<DownOutlined />}>
+              {interval > 0 ? interval + 's' : 'off'}
+            </Button>
+          </Dropdown>
           <DateRangePicker
             showRight={false}
             leftList={DateRangeItems}
@@ -314,7 +356,8 @@ const Event: React.FC = () => {
                     setSelectedRowKeys(selectedRowKeys.map((key) => Number(key)));
                   },
                 },
-                scroll: { x: 800, y: 'calc(100vh - 252px)' },
+                // scroll: { x: 'max-content', y: 'calc(100vh - 252px)' },
+                scroll: { x: 'max-content' },
               }}
               url={`/api/n9e/busi-group/${curBusiId}/alert-cur-events`}
               customQueryCallback={(data) =>
