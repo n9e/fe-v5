@@ -356,8 +356,8 @@ const Event: React.FC = () => {
                     setSelectedRowKeys(selectedRowKeys.map((key) => Number(key)));
                   },
                 },
-                // scroll: { x: 'max-content', y: 'calc(100vh - 252px)' },
-                scroll: { x: 'max-content' },
+                scroll: { x: 'max-content', y: 'calc(100vh - 252px)' },
+                // scroll: { x: 'max-content' },
               }}
               url={`/api/n9e/busi-group/${curBusiId}/alert-cur-events`}
               customQueryCallback={(data) =>

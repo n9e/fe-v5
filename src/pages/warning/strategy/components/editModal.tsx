@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { RootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
 import { getTeamInfoList, getNotifiesList } from '@/services/manage';
-
+import { SwitchWithLabel } from './SwitchWithLabel';
 const layout = {
   labelCol: {
     span: 3,
@@ -54,6 +54,11 @@ const fields = [
     id: 13,
     field: 'enable_time',
     name: '生效时间',
+  },
+  {
+    id: 14,
+    field: 'enable_in_bg',
+    name: '仅在本业务组生效',
   },
   {
     id: 12,
@@ -207,6 +212,9 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
         case 'disabled':
           data.disabled = !values.enable_status ? 1 : 0;
           delete data.enable_status;
+          break;
+        case 'enable_in_bg':
+          data.enable_in_bg = values.enable_in_bg ? 1 : 0;
           break;
         case 'callbacks':
           data.callbacks = values.callbacks.map((item) => item.url);
@@ -369,6 +377,14 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                       valuePropName='checked'
                     >
                       <Switch />
+                    </Form.Item>
+                  </>
+                );
+              case 'enable_in_bg':
+                return (
+                  <>
+                    <Form.Item label={t('改为：')} name='enable_in_bg' valuePropName='checked'>
+                      <SwitchWithLabel label='根据告警事件中的ident归属关系判断' />
                     </Form.Item>
                   </>
                 );

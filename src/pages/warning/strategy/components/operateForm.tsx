@@ -12,7 +12,7 @@ import { CommonStoreState } from '@/store/commonInterface';
 import { getTeamInfoList, getNotifiesList } from '@/services/manage';
 import { addOrEditStrategy, EditStrategy, prometheusQuery, deleteStrategy } from '@/services/warning';
 import PromqlEditor from '@/components/PromqlEditor';
-
+import { SwitchWithLabel } from './SwitchWithLabel';
 const layout = {
   labelCol: {
     span: 3,
@@ -91,7 +91,6 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
   const [notifyGroups, setNotifyGroups] = useState<any[]>([]);
   const [initVal, setInitVal] = useState<any>({});
   const [refresh, setRefresh] = useState(true);
-  console.log('type', type);
   useEffect(() => {
     getNotifyChannel();
     getGroups();
@@ -157,6 +156,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
         enable_etime: values.enable_time[1].format('HH:mm'),
         disabled: !values.enable_status ? 1 : 0,
         notify_recovered: values.notify_recovered ? 1 : 0,
+        enable_in_bg: values.enable_in_bg ? 1 : 0,
         callbacks,
       };
       let reqBody,
@@ -206,6 +206,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
           cluster: clusterList[0] || 'Default', // 生效集群
           enable_days_of_week: ['1', '2', '3', '4', '5', '6', '0'],
           ...detail,
+          enable_in_bg: detail?.enable_in_bg === 1,
           enable_time: detail?.enable_stime ? [moment(detail.enable_stime, 'HH:mm'), moment(detail.enable_etime, 'HH:mm')] : [moment('00:00', 'HH:mm'), moment('23:59', 'HH:mm')],
           enable_status: detail?.disabled === undefined ? true : !detail?.disabled,
           notify_recovered: detail?.notify_recovered === 1 || detail?.notify_recovered === undefined ? true : false, // 1:启用 0:禁用
@@ -399,6 +400,9 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                   });
                 }}
               />
+            </Form.Item>
+            <Form.Item label={t('仅在本业务组生效')} name='enable_in_bg' valuePropName='checked'>
+              <SwitchWithLabel label='根据告警事件中的ident归属关系判断' />
             </Form.Item>
           </Card>
           <Card title={t('通知配置')}>
