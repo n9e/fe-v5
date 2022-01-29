@@ -506,7 +506,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                           />
                         </Form.Item>
                         秒
-                        <Tooltip title={t(`持续${form.getFieldValue('recover_duration')}秒没有再次触发阈值才发送恢复通知`)}>
+                        <Tooltip title={t(`持续${form.getFieldValue('recover_duration') || 0}秒没有再次触发阈值才发送恢复通知`)}>
                           <QuestionCircleFilled />
                         </Tooltip>
                       </Space>
