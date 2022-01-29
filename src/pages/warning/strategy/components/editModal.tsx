@@ -86,6 +86,11 @@ const fields = [
     name: '重复发送频率',
   },
   {
+    id: 15,
+    field: 'recover_duration',
+    name: '留观时长',
+  },
+  {
     id: 11,
     field: 'callbacks',
     name: '回调地址',
@@ -473,6 +478,33 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                   <>
                     <Form.Item label={t('改为：')} name='notify_recovered' valuePropName='checked'>
                       <Switch />
+                    </Form.Item>
+                  </>
+                );
+              case 'recover_duration':
+                return (
+                  <>
+                    <Form.Item label={t('改为：')}>
+                      <Space>
+                        <Form.Item
+                          style={{ marginBottom: 0 }}
+                          name='recover_duration'
+                          initialValue={0}
+                          wrapperCol={{ span: 10 }}
+                          rules={[
+                            {
+                              required: false,
+                              message: t('留观时长不能为空'),
+                            },
+                          ]}
+                        >
+                          <InputNumber min={0} />
+                        </Form.Item>
+                        分钟
+                        <Tooltip title={t(`持续${form.getFieldValue('recover_duration')}秒没有再次触发阈值才发送恢复通知`)}>
+                          <QuestionCircleFilled />
+                        </Tooltip>
+                      </Space>
                     </Form.Item>
                   </>
                 );

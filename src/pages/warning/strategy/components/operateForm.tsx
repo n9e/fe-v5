@@ -210,6 +210,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
           enable_time: detail?.enable_stime ? [moment(detail.enable_stime, 'HH:mm'), moment(detail.enable_etime, 'HH:mm')] : [moment('00:00', 'HH:mm'), moment('23:59', 'HH:mm')],
           enable_status: detail?.disabled === undefined ? true : !detail?.disabled,
           notify_recovered: detail?.notify_recovered === 1 || detail?.notify_recovered === undefined ? true : false, // 1:启用 0:禁用
+          recover_duration: detail?.recover_duration || 0,
           callbacks: !!detail?.callbacks
             ? detail.callbacks.map((item) => ({
                 url: item,
@@ -424,7 +425,17 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                 </Tooltip>
               </Space>
             </Form.Item>
-
+            <Form.Item label={t('留观时长')} required>
+              <Space>
+                <Form.Item style={{ marginBottom: 0 }} name='recover_duration' initialValue={0} wrapperCol={{ span: 10 }}>
+                  <InputNumber min={0} />
+                </Form.Item>
+                分钟
+                <Tooltip title={t(`持续${form.getFieldValue('recover_duration')}秒没有再次触发阈值才发送恢复通知`)}>
+                  <QuestionCircleFilled />
+                </Tooltip>
+              </Space>
+            </Form.Item>
             <Form.Item label={t('重复发送频率')} required>
               <Space>
                 <Form.Item
