@@ -428,9 +428,14 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
             <Form.Item label={t('留观时长')} required>
               <Space>
                 <Form.Item style={{ marginBottom: 0 }} name='recover_duration' initialValue={0} wrapperCol={{ span: 10 }}>
-                  <InputNumber min={0} />
+                  <InputNumber
+                    min={0}
+                    onChange={(val) => {
+                      setRefresh(!refresh);
+                    }}
+                  />
                 </Form.Item>
-                分钟
+                秒
                 <Tooltip title={t(`持续${form.getFieldValue('recover_duration')}秒没有再次触发阈值才发送恢复通知`)}>
                   <QuestionCircleFilled />
                 </Tooltip>
