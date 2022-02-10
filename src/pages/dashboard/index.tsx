@@ -210,7 +210,7 @@ export default function Dashboard() {
       <div style={{ display: 'flex' }}>
         <LeftTree busiGroup={{ onChange: (id) => setBusiId(id) }}></LeftTree>
         {busiId ? (
-          <div className='dashboard' style={{ flex: 1 }}>
+          <div className='dashboard' style={{ flex: 1, overflow: 'auto' }}>
             <div className='table-handle'>
               <div className='table-handle-search'>
                 <Input
