@@ -12,7 +12,6 @@ import Profile from '@/pages/account/profile';
 import Dashboard from '@/pages/dashboard';
 import Chart from '@/pages/chart';
 import DashboardDetail from '@/pages/dashboard/detail';
-import Manage from '@/pages/user';
 import Groups from '@/pages/user/groups';
 import Users from '@/pages/user/users';
 import Business from '@/pages/user/business';

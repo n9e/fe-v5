@@ -9,10 +9,11 @@ export const getUserInfoList = function (params = {}) {
     params,
   });
 };
-export const getTeamInfoList = function (params = {}) {
+export const getTeamInfoList = function (params?: { query: string; limit?: number }) {
+  const data = params ? (params.limit ? params : { ...params, limit: 200 }) : { limit: 200 };
   return request(`/api/n9e/user-groups`, {
     method: RequestMethod.Get,
-    params,
+    params: data,
   });
 };
 export const getBusinessTeamList = function (params = {}) {

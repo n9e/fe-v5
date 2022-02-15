@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory, useParams, useLocation } from 'react-router-dom';
 import moment from 'moment';
@@ -13,6 +13,7 @@ import { getTeamInfoList, getNotifiesList } from '@/services/manage';
 import { addOrEditStrategy, EditStrategy, prometheusQuery, deleteStrategy } from '@/services/warning';
 import PromqlEditor from '@/components/PromqlEditor';
 import { SwitchWithLabel } from './SwitchWithLabel';
+import { debounce } from 'lodash';
 const layout = {
   labelCol: {
     span: 3,
@@ -93,7 +94,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
   const [refresh, setRefresh] = useState(true);
   useEffect(() => {
     getNotifyChannel();
-    getGroups();
+    getGroups('');
 
     return () => {};
   }, []);
@@ -133,8 +134,8 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
     setInitContactList(contactList);
   };
 
-  const getGroups = async () => {
-    const res = await getTeamInfoList();
+  const getGroups = async (str) => {
+    const res = await getTeamInfoList({ query: str });
     const data = res.dat || res;
     const combineData = (detail.notify_groups_obj ? detail.notify_groups_obj.filter((item) => !data.find((i) => item.id === i.id)) : []).concat(data);
     setNotifyGroups(combineData || []);
@@ -190,6 +191,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
     });
   };
 
+  const debounceFetcher = useCallback(debounce(getGroups, 800), []);
   return (
     <div className='operate_con'>
       <Form
@@ -411,7 +413,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
               <Checkbox.Group>{contactListCheckboxes}</Checkbox.Group>
             </Form.Item>
             <Form.Item label={t('告警接收组')} name='notify_groups'>
-              <Select mode='multiple' showSearch optionFilterProp='children' filterOption={(input, option) => option?.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0}>
+              <Select mode='multiple' showSearch optionFilterProp='children' filterOption={false} onSearch={(e) => debounceFetcher(e)} onBlur={() => getGroups('')}>
                 {notifyGroupsOptions}
               </Select>
             </Form.Item>

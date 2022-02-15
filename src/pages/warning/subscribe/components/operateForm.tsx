@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Form, Input, Card, Select, Col, Button, Row, message, Checkbox, Tooltip, Radio, Modal } from 'antd';
 import { QuestionCircleFilled, PlusCircleOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import RuleModal from './ruleModal';
@@ -54,7 +54,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
 
   useEffect(() => {
     getNotifyChannel();
-    getGroups();
+    getGroups('');
   }, []);
 
   useEffect(() => {
@@ -76,11 +76,13 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
     setInitContactList(contactList);
   };
 
-  const getGroups = async () => {
-    const res = await getTeamInfoList();
+  const getGroups = async (str) => {
+    const res = await getTeamInfoList({ query: str });
     const data = res.dat || res;
     setNotifyGroups(data || []);
   };
+
+  const debounceFetcher = useCallback(_.debounce(getGroups, 800), []);
 
   const onFinish = (values) => {
     setBtnLoading(true);
@@ -198,20 +200,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
                   <QuestionCircleFilled />
                 </Tooltip>
               </Col>
-              <Col span={3}>
-                {t('运算符：')}
-                <Tooltip
-                  title={t(
-                    `运算符如果选择in，value的输入框中自动出现placeholder：
-                    可以输入多个值，用回车分隔
-                    运算符如果选择=～，value的输入框中自动出现placeholder：
-                    请输入正则表达式匹配标签value
-                    运算符如果选择==，value的输入框中清空placeholder`,
-                  )}
-                >
-                  <QuestionCircleFilled />
-                </Tooltip>
-              </Col>
+              <Col span={3}>{t('运算符：')}</Col>
               <Col span={16}>{t('标签Value：')}</Col>
             </Row>
             <Form.List name='tags' initialValue={[{}]}>
@@ -279,7 +268,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
             </Form.Item>
 
             <Form.Item label={t('订阅告警接收组：')} name='user_group_ids' rules={[{ required: true, message: t('告警接收组不能为空') }]}>
-              <Select mode='multiple' showSearch optionFilterProp='children' filterOption={(input, option) => option?.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0}>
+              <Select mode='multiple' showSearch optionFilterProp='children' filterOption={false} onSearch={(e) => debounceFetcher(e)} onBlur={() => getGroups('')}>
                 {notifyGroupsOptions}
               </Select>
             </Form.Item>

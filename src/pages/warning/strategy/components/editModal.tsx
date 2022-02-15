@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import moment from 'moment';
 import { Form, Input, InputNumber, Radio, Select, Row, Col, TimePicker, Checkbox, Tag, message, Space, Switch, Tooltip, Modal } from 'antd';
@@ -9,6 +9,7 @@ import { RootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
 import { getTeamInfoList, getNotifiesList } from '@/services/manage';
 import { SwitchWithLabel } from './SwitchWithLabel';
+import { debounce } from 'lodash';
 const layout = {
   labelCol: {
     span: 3,
@@ -172,7 +173,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
 
   useEffect(() => {
     getNotifyChannel();
-    getGroups();
+    getGroups('');
 
     return () => {};
   }, []);
@@ -199,11 +200,13 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
     setInitContactList(contactList);
   };
 
-  const getGroups = async () => {
-    const res = await getTeamInfoList();
+  const getGroups = async (str) => {
+    const res = await getTeamInfoList({ query: str });
     const data = res.dat || res;
     setNotifyGroups(data || []);
   };
+
+  const debounceFetcher = useCallback(debounce(getGroups, 800), []);
 
   const modelOk = () => {
     form.validateFields().then(async (values) => {
@@ -462,12 +465,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                 return (
                   <>
                     <Form.Item label={t('改为：')} name='notify_groups'>
-                      <Select
-                        mode='multiple'
-                        showSearch
-                        optionFilterProp='children'
-                        filterOption={(input, option) => option?.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0}
-                      >
+                      <Select mode='multiple' showSearch optionFilterProp='children' filterOption={false} onSearch={(e) => debounceFetcher(e)} onBlur={() => getGroups('')}>
                         {notifyGroupsOptions}
                       </Select>
                     </Form.Item>

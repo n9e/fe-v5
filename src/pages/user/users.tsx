@@ -130,9 +130,9 @@ const Resource: React.FC = () => {
   };
 
   // 弹窗关闭回调
-  const handleClose = (isDeleteOrAdd = false) => {
+  const handleClose = () => {
     setVisible(false);
-    isDeleteOrAdd === true && getList();
+    getList();
   };
 
   const onSearchQuery = (e) => {

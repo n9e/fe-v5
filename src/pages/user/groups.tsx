@@ -35,8 +35,6 @@ const Resource: React.FC = () => {
   const [teamInfo, setTeamInfo] = useState<Team>();
   const [teamList, setTeamList] = useState<Team[]>([]);
   const [memberLoading, setMemberLoading] = useState<boolean>(false);
-  const [pageNumber, setPageNumber] = useState<number>(1);
-  const [total, setTotal] = useState<number>(0);
   const [searchValue, setSearchValue] = useState<string>('');
   const [searchMemberValue, setSearchMemberValue] = useState<string>('');
   const userRef = useRef(null as any);
@@ -116,22 +114,13 @@ const Resource: React.FC = () => {
   }, [teamId]);
 
   const getList = (isDeleteOrAdd = false) => {
-    if (isDeleteOrAdd) {
-      setPageNumber(1);
-    }
-    getTeamList(undefined, isDeleteOrAdd ? 1 : undefined, undefined, isDeleteOrAdd);
+    getTeamList('', isDeleteOrAdd);
   };
 
   // 获取团队列表
-  const getTeamList = (isAppend = false, p?: number, search?: string, isDelete?: boolean) => {
-    getTeamInfoList().then((data) => {
-      if (isAppend) {
-        setTeamList(teamList.concat(data.dat || []));
-      } else {
-        setTeamList(data.dat || []);
-      }
-      setTotal(data.dat.total);
-
+  const getTeamList = (search?: string, isDelete?: boolean) => {
+    getTeamInfoList({ query: search || '' }).then((data) => {
+      setTeamList(data.dat || []);
       if ((!teamId || isDelete) && data.dat.length > 0) {
         setTeamId(data.dat[0].id);
       }
@@ -151,7 +140,7 @@ const Resource: React.FC = () => {
 
   const handleSearch = (type?: string, val?: string) => {
     if (type === 'team') {
-      getTeamList(false, 1, val);
+      getTeamList(val);
     } else {
       if (!val) {
         getTeamInfoDetail(teamId);
@@ -232,11 +221,14 @@ const Resource: React.FC = () => {
                   setSearchValue(e.target.value);
                 }}
                 placeholder={t('搜索团队名称')}
-                // onPressEnter={(e) => {
-                //   setPageNumber(1);
-                //   // @ts-ignore
-                //   getTeamList(false, 1, e.target.value);
-                // }}
+                onPressEnter={(e) => {
+                  // @ts-ignore
+                  getTeamList(e.target.value);
+                }}
+                onBlur={(e) => {
+                  // @ts-ignore
+                  getTeamList(e.target.value);
+                }}
               />
             </div>
 
@@ -246,7 +238,7 @@ const Resource: React.FC = () => {
                 flex: 1,
                 overflow: 'auto',
               }}
-              dataSource={teamList.filter((i) => i.name.includes(searchValue))}
+              dataSource={teamList}
               size='small'
               renderItem={(item) => (
                 <List.Item key={item.id} className={teamId === item.id ? 'is-active' : ''} onClick={() => setTeamId(item.id)}>
@@ -254,16 +246,6 @@ const Resource: React.FC = () => {
                 </List.Item>
               )}
             />
-
-            {PAGE_SIZE * pageNumber < total ? (
-              <SmallDashOutlined
-                className={'load-more'}
-                onClick={() => {
-                  setPageNumber(pageNumber + 1);
-                  getTeamList(true, pageNumber + 1);
-                }}
-              />
-            ) : null}
           </div>
           {teamList.length > 0 ? (
             <div className='resource-table-content'>

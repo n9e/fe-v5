@@ -1,10 +1,11 @@
-import React, { useEffect, useState, useImperativeHandle, ReactNode } from 'react';
+import React, { useEffect, useState, useImperativeHandle, ReactNode, useCallback } from 'react';
 import { Form, Input, Select, Switch, Row, Col, Space, Button } from 'antd';
 import { layout } from '../../const';
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import { getBusinessTeamInfo, getTeamInfoList } from '@/services/manage';
 import { TeamProps, Team, TeamInfo, ActionType } from '@/store/manageInterface';
 import { useTranslation } from 'react-i18next';
+import { debounce } from 'lodash';
 
 const { Option } = Select;
 const TeamForm = React.forwardRef<ReactNode, TeamProps>((props, ref) => {
@@ -43,10 +44,16 @@ const TeamForm = React.forwardRef<ReactNode, TeamProps>((props, ref) => {
   };
 
   useEffect(() => {
-    getTeamInfoList().then((res) => {
+    getList('');
+  }, []);
+
+  const getList = (str: string) => {
+    getTeamInfoList({ query: str }).then((res) => {
       setUserTeam(res.dat);
     });
-  }, []);
+  };
+
+  const debounceFetcher = useCallback(debounce(getList, 800), []);
 
   return !loading ? (
     <Form {...layout} form={form} initialValues={initialValues} preserve={false}>
@@ -85,7 +92,7 @@ const TeamForm = React.forwardRef<ReactNode, TeamProps>((props, ref) => {
                       fieldKey={[fieldKey, 'user_group_id']}
                       rules={[{ required: true, message: t('业务组团队不能为空！') }]}
                     >
-                      <Select style={{ width: '100%' }}>
+                      <Select style={{ width: '100%' }} filterOption={false} onSearch={(e) => debounceFetcher(e)} showSearch onBlur={() => getList('')}>
                         {userTeam.map((team) => (
                           <Option key={team.id} value={team.id}>
                             {team.name}
