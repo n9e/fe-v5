@@ -195,7 +195,7 @@ export default function DateRangePicker(props: Props) {
           />
           <div className='footer'>
             <Button onClick={() => setVisible(false)}>{t('取消')}</Button>
-            <Button type='primary' onClick={handleRightOk} disabled={startTime.endOf('seconds') >= endTime.endOf('seconds')}>
+            <Button type='primary' onClick={handleRightOk} disabled={!startTime || !endTime || startTime.endOf('seconds') >= endTime.endOf('seconds')}>
               {t('确定')}
             </Button>
           </div>
