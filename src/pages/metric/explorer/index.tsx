@@ -17,11 +17,11 @@ interface PanelListProps {
 }
 
 function getUrlParamsByName(name) {
-  let reg = new RegExp(`(?<=\\b${name}=)[^&]*`),
+  let reg = new RegExp(`.*?${name}=([^&]*)`),
     str = location.search || '',
     target = str.match(reg);
   if (target) {
-    return target[0];
+    return target[1];
   }
   return '';
 }
