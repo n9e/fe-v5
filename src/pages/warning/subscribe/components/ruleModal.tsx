@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { Button, Input, Table, Switch, Tag, Select, Modal } from 'antd';
 const { Option } = Select;
@@ -13,7 +13,9 @@ import { priorityColor } from '@/utils/constant';
 import ColorTag from '@/components/ColorTag';
 import { pageSizeOptionsDefault } from '@/pages/warning/const';
 import dayjs from 'dayjs';
-
+import { getBusinessTeamList } from '@/services/manage';
+import { debounce } from 'lodash';
+import { number } from 'echarts';
 interface props {
   visible: boolean;
   ruleModalClose: Function;
@@ -23,7 +25,8 @@ interface props {
 const ruleModal: React.FC<props> = ({ visible, ruleModalClose, subscribe }) => {
   const { t } = useTranslation();
   const { curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
-  const { busiGroups } = useSelector<RootState, CommonStoreState>((state) => state.common);
+  // const { busiGroups } = useSelector<RootState, CommonStoreState>((state) => state.common);
+  const [busiGroups, setBusiGroups] = useState<{ id: number; name: string }[]>([]);
   const [currentStrategyDataAll, setCurrentStrategyDataAll] = useState([]);
   const [currentStrategyData, setCurrentStrategyData] = useState([]);
   const [bgid, setBgid] = useState(curBusiItem.id);
@@ -38,8 +41,27 @@ const ruleModal: React.FC<props> = ({ visible, ruleModalClose, subscribe }) => {
   }, [bgid]);
 
   useEffect(() => {
+    getTeamList('');
+  }, []);
+
+  useEffect(() => {
     filterData();
   }, [query, currentStrategyDataAll]);
+
+  // 获取业务组列表
+  const getTeamList = (query: string) => {
+    console.log(111);
+    let params = {
+      all: 1,
+      query,
+      limit: 200,
+    };
+    getBusinessTeamList(params).then((data) => {
+      setBusiGroups(data.dat || []);
+    });
+  };
+
+  const debounceFetcher = useCallback(debounce(getTeamList, 400), []);
 
   const getAlertRules = async () => {
     const { success, dat } = await getStrategyGroupSubList({ id: bgid });
@@ -200,9 +222,20 @@ const ruleModal: React.FC<props> = ({ visible, ruleModalClose, subscribe }) => {
         width={'80%'}
       >
         <div>
-          <Select style={{ width: '280px' }} value={bgid} onChange={bgidChange}>
+          <Select
+            style={{ width: '280px' }}
+            value={bgid}
+            onChange={bgidChange}
+            showSearch
+            optionFilterProp='children'
+            filterOption={false}
+            onSearch={(e) => debounceFetcher(e)}
+            onBlur={() => getTeamList('')}
+          >
             {busiGroups.map((item) => (
-              <Option value={item.id}>{item.name}</Option>
+              <Option value={item.id} key={item.id}>
+                {item.name}
+              </Option>
             ))}
           </Select>
           <Input style={{ marginLeft: 10, width: '280px' }} onPressEnter={onSearchQuery} prefix={<SearchOutlined />} placeholder={t('规则名称、附加标签')} />

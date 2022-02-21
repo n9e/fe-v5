@@ -100,18 +100,18 @@ const Event: React.FC = () => {
       dataIndex: 'rule_name',
       render(title, { id }) {
         return (
-          <Button size='small' type='link' style={{ padding: 0 }} onClick={() => history.push(`/alert-cur-events/${id}`)}>
+          <a style={{ padding: 0 }} onClick={() => history.push(`/alert-cur-events/${id}`)}>
             {title}
-          </Button>
+          </a>
         );
       },
     },
     {
       title: t('事件标签'),
       dataIndex: 'tags',
-      ellipsis: {
-        showTitle: false,
-      },
+      // ellipsis: {
+      //   showTitle: false,
+      // },
       render(tagArr) {
         const content =
           tagArr &&
@@ -133,9 +133,9 @@ const Event: React.FC = () => {
             ));
         return (
           tagArr && (
-            <Tooltip title={content} placement='topLeft' getPopupContainer={() => document.body} overlayClassName='mon-manage-table-tooltip'>
-              <span className='event-tags'>{content}</span>
-            </Tooltip>
+            // <Tooltip title={content} placement='topLeft' getPopupContainer={() => document.body} overlayClassName='mon-manage-table-tooltip'>
+            <span className='event-tags'>{content}</span>
+            // </Tooltip>
           )
         );
       },
@@ -168,7 +168,7 @@ const Event: React.FC = () => {
     {
       title: t('触发时间'),
       dataIndex: 'trigger_time',
-      width: 180,
+      width: 120,
       render(value) {
         return moment(value * 1000).format('YYYY-MM-DD HH:mm:ss');
       },
@@ -325,7 +325,7 @@ const Event: React.FC = () => {
 
   return (
     <PageLayout icon={<AlertOutlined />} title={t('活跃告警')} hideCluster>
-      <div className='event-content'>
+      <div className='event-content cur-events'>
         <LeftTree
           clusterGroup={{
             isShow: true,
@@ -356,7 +356,6 @@ const Event: React.FC = () => {
                     setSelectedRowKeys(selectedRowKeys.map((key) => Number(key)));
                   },
                 },
-                scroll: { x: 'max-content', y: 'calc(100vh - 252px)' },
                 // scroll: { x: 'max-content' },
               }}
               url={`/api/n9e/busi-group/${curBusiId}/alert-cur-events`}

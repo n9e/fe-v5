@@ -123,6 +123,7 @@ const PageTable: React.FC<Props> = ({ bgid, clusters, severity }) => {
     {
       title: t('告警接收者'),
       dataIndex: 'notify_groups_obj',
+      width: 100,
       render: (data, record) => {
         return (
           (data.length &&
@@ -156,6 +157,7 @@ const PageTable: React.FC<Props> = ({ bgid, clusters, severity }) => {
     {
       title: t('更新时间'),
       dataIndex: 'update_at',
+      width: 120,
       render: (text: string) => dayjs(Number(text) * 1000).format('YYYY-MM-DD HH:mm:ss'),
     },
     {
@@ -185,7 +187,6 @@ const PageTable: React.FC<Props> = ({ bgid, clusters, severity }) => {
     {
       title: t('操作'),
       dataIndex: 'operator',
-      fixed: 'right',
       width: 100,
       render: (data, record) => {
         return (

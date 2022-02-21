@@ -211,20 +211,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }) => {
               <QuestionCircleFilled />
             </Tooltip>
           </Col>
-          <Col span={3}>
-            {t('运算符：')}
-            <Tooltip
-              title={t(
-                `运算符如果选择in，value的输入框中自动出现placeholder：
-                    可以输入多个值，用回车分隔
-                    运算符如果选择=～，value的输入框中自动出现placeholder：
-                    请输入正则表达式匹配标签value
-                    运算符如果选择==，value的输入框中清空placeholder`,
-              )}
-            >
-              <QuestionCircleFilled />
-            </Tooltip>
-          </Col>
+          <Col span={3}>{t('运算符：')}</Col>
           <Col span={16}>{t('标签Value：')}</Col>
         </Row>
         <Form.List name='tags' initialValue={[{}]}>

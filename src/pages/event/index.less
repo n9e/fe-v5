@@ -5,8 +5,14 @@
   padding: @basePadding;
   box-sizing: border-box;
   width: 100%;
+  &.cur-events {
+    .dantd-data-table-header-loadbtn-left {
+      margin-right: 0px;
+    }
+  }
   .table-area {
     width: calc(100% - 210px);
+    overflow: auto;
     padding: 16px;
     .event-tags {
       .ant-tag {
@@ -14,7 +20,6 @@
       }
     }
     .dantd-data-table-header-loadbtn-left {
-      margin-right: 0px;
       border-bottom-right-radius: 0px;
       border-top-right-radius: 0px;
     }
