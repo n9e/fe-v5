@@ -42,23 +42,23 @@ export default defineConfig({
       //   changeOrigin: true,
       // },
       '/api/n9e': {
-        target: 'http://118.195.188.100:8765',
+        target: 'http://10.206.0.11:8765/',
         changeOrigin: true,
       },
       '/filters': {
-        target: 'http://118.195.188.100:8765',
+        target: 'http://10.206.0.11:8765/',
         changeOrigin: true,
       },
       '/integrations': {
-        target: 'http://118.195.188.100:8765',
+        target: 'http://10.206.0.11:8765/',
         changeOrigin: true,
       },
       '/alerts': {
-        target: 'http://118.195.188.100:8765',
+        target: 'http://10.206.0.11:8765/',
         changeOrigin: true,
       },
       '/changes': {
-        target: 'http://118.195.188.100:8765',
+        target: 'http://10.206.0.11:8765/',
         changeOrigin: true,
       },
       '/dimension/api/v1': {

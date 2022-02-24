@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 import Resolution from '@/components/Resolution';
 import { RootState as CommonRootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
-import editPanel from './EditPanel';
+import editor from './Editor';
 
 interface URLParam {
   id: string;
@@ -116,7 +116,7 @@ export default function DashboardDetail() {
     groupId = group.id;
     setChartModalInitValue(item);
     // setChartModalVisible(true);
-    editPanel({
+    editor({
       visible: true,
     });
   };
