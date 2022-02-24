@@ -463,6 +463,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
               lineHeight: `${this.headerHeight}px`,
             }}
           >
+            <div>{title || metric}</div>
             <div className='graph-extra'>
               <span className='graph-operationbar-item' key='info'>
                 <Popover placement='left' content={this.getContent()} trigger='click' autoAdjustOverflow={false} getPopupContainer={() => document.body}>
@@ -487,7 +488,6 @@ export default class Graph extends Component<GraphProps, GraphState> {
               )}
               {extraRender && _.isFunction(extraRender) ? extraRender(this) : null}
             </div>
-            <div>{title || metric}</div>
           </div>
         )}
         {this.props.graphConfigInnerVisible ? (

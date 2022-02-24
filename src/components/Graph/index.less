@@ -18,7 +18,7 @@
   width: 100%;
 }
 .highcharts-tooltip > span {
-  background: rgba(255,255,255,0.85);
+  background: rgba(255, 255, 255, 0.85);
   border: 1px solid silver;
   border-radius: 3px;
   box-shadow: 1px 1px 2px #888;
@@ -43,10 +43,13 @@
   flex-direction: column;
   // overflow: hidden;
   border: 1px solid #efefef;
-  .ant-table-middle .ant-table-thead > tr > th, .ant-table-middle .ant-table-tbody > tr > td {
+  .ant-table-middle .ant-table-thead > tr > th,
+  .ant-table-middle .ant-table-tbody > tr > td {
     padding: 5px;
   }
-  li { list-style: none; }
+  li {
+    list-style: none;
+  }
 }
 .graph-legend {
   display: none;
@@ -60,14 +63,14 @@
   background-color: #f9f9f9;
   border-bottom: 1px solid #efefef;
   overflow: hidden;
+  display: flex;
+  justify-content: space-between;
 }
 .graph-title {
   margin-right: 150px;
   float: unset;
 }
-.graph-extra {
-  float: right;
-}
+
 .graph-extra-item {
   color: #999;
   display: inline-block;
@@ -85,11 +88,11 @@
   margin-right: 10px;
   vertical-align: middle;
   &.ccp {
-    .ant-input-group-addon{
+    .ant-input-group-addon {
       height: 32px !important;
       line-height: 24px !important;
     }
-    .ant-select-sm .ant-select-selection__rendered{
+    .ant-select-sm .ant-select-selection__rendered {
       line-height: 30px !important;
     }
   }
@@ -163,8 +166,12 @@
 .selectedNs-content {
   border: 1px solid #e7e9ed;
   overflow-y: auto;
-  .ant-tag { height: auto; }
-  .ant-tag-text { word-break: break-all; }
+  .ant-tag {
+    height: auto;
+  }
+  .ant-tag-text {
+    word-break: break-all;
+  }
 }
 
 .graph-config-inner-comparison {
@@ -206,7 +213,7 @@
   padding: 8px;
   border-radius: 6px;
   background: #fff;
-  box-shadow: 0 1px 6px rgba(0,0,0,.2);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.2);
 
   input {
     width: 130px;
@@ -228,11 +235,12 @@
   .ant-table-content {
     position: relative;
   }
-  .ant-table-body, .ant-table-body-inner {
+  .ant-table-body,
+  .ant-table-body-inner {
     // overflow-y: auto!important;
   }
   .ant-table-header {
-    overflow-y: hidden!important;
+    overflow-y: hidden !important;
   }
   .ant-table-body {
     height: calc(100% - 43px);
