@@ -67,7 +67,6 @@ export default function Dashboard() {
 
   const edit = async () => {
     let { name, tags, id } = form.getFieldsValue();
-    console.log(name, tags, id);
     return (
       busiId &&
       updateSingleDashboard(busiId, id, {
@@ -291,8 +290,9 @@ export default function Dashboard() {
         onCancel={() => {
           setIsModalVisible(false);
         }}
+        destroyOnClose
       >
-        <Form {...layout} form={form}>
+        <Form {...layout} form={form} preserve={false}>
           <Form.Item
             label={t('大盘名称')}
             name='name'
