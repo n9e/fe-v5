@@ -21,10 +21,19 @@ import EditModal from './components/editModal';
 const { Option } = Select;
 const { confirm } = Modal;
 
-const exportIgnoreAttrs = ['cluster', 'create_by', 'group_id', 'id', 'notify_groups_obj', 'notify_groups', 'notify_users', 'create_at', 'update_at', 'update_by'];
 import { useTranslation } from 'react-i18next';
-const exportIgnoreAttrsObj = Object.fromEntries(exportIgnoreAttrs.map((item) => [item, undefined]));
-
+const exportIgnoreAttrsObj = {
+  cluster: undefined,
+  create_by: undefined,
+  group_id: undefined,
+  id: undefined,
+  notify_groups_obj: undefined,
+  notify_groups: undefined,
+  notify_users: undefined,
+  create_at: undefined,
+  update_at: undefined,
+  update_by: undefined,
+};
 interface Props {
   bgid?: number;
   severity: number | undefined;
