@@ -259,9 +259,9 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
             </Form.Item>
             <Form.Item label={t('新的通知媒介：')} name='new_channels' style={{ display: form.getFieldValue('redefine_channels') ? 'block' : 'none' }}>
               <Checkbox.Group>
-                {contactList.map((c: string) => (
-                  <Checkbox value={c} key={c}>
-                    {c}
+                {contactList.map((c: { key: string; label: string }) => (
+                  <Checkbox value={c.key} key={c.label}>
+                    {c.label}
                   </Checkbox>
                 ))}
               </Checkbox.Group>

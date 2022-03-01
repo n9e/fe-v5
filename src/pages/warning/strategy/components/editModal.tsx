@@ -182,9 +182,9 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
     return <Option value={String(i)} key={i}>{`${v}`}</Option>;
   });
 
-  const contactListCheckboxes = contactList.map((c: string) => (
-    <Checkbox value={c} key={c}>
-      {c}
+  const contactListCheckboxes = contactList.map((c: { key: string; label: string }) => (
+    <Checkbox value={c.key} key={c.label}>
+      {c.label}
     </Checkbox>
   ));
 
