@@ -105,33 +105,12 @@ function index(props: ModalWrapProps & IProps) {
       <Form layout='vertical' form={chartForm} preserve={false}>
         <Row gutter={20}>
           <Col flex={1}>
-            <Collapse defaultActiveKey={['base', 'config']}>
-              <Panel header='面板配置' key='base'>
-                <div>
-                  <Form.Item
-                    label={'标题'}
-                    name='name'
-                    rules={[
-                      {
-                        required: true,
-                        message: '图表名称',
-                      },
-                    ]}
-                  >
-                    <Input />
-                  </Form.Item>
-                  <Form.Item label={'下钻链接'} name='link'>
-                    <Input />
-                  </Form.Item>
-                </div>
-              </Panel>
-              <Panel header='图表配置' key='config'>
-                <div></div>
-              </Panel>
-            </Collapse>
-          </Col>
-          <Col flex='600px'>
-            <Renderer />
+            <Form.Item noStyle shouldUpdate={(prevValues, curValues) => prevValues.QL !== curValues.QL}>
+              {({ getFieldValue }) => {
+                const QL = getFieldValue('QL');
+                return <Renderer time={range} step={step} query={QL} />;
+              }}
+            </Form.Item>
             <div style={{ marginTop: 20 }}>
               <Form.List name='QL' initialValue={initialQL}>
                 {(fields, { add, remove }, { errors }) => {
@@ -183,6 +162,32 @@ function index(props: ModalWrapProps & IProps) {
                 }}
               </Form.List>
             </div>
+          </Col>
+          <Col flex='600px'>
+            <Collapse defaultActiveKey={['base', 'config']}>
+              <Panel header='面板配置' key='base'>
+                <div>
+                  <Form.Item
+                    label={'标题'}
+                    name='name'
+                    rules={[
+                      {
+                        required: true,
+                        message: '图表名称',
+                      },
+                    ]}
+                  >
+                    <Input />
+                  </Form.Item>
+                  <Form.Item label={'下钻链接'} name='link'>
+                    <Input />
+                  </Form.Item>
+                </div>
+              </Panel>
+              <Panel header='图表配置' key='config'>
+                <div></div>
+              </Panel>
+            </Collapse>
           </Col>
         </Row>
       </Form>
