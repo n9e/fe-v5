@@ -151,3 +151,9 @@ export const getNotifyChannels = function () {
     method: RequestMethod.Get,
   }).then((res) => res && res.dat);
 };
+
+export const getRoles = function () {
+  return request(`/api/n9e/roles`, {
+    method: RequestMethod.Get,
+  }).then((res) => res && res.dat);
+};
