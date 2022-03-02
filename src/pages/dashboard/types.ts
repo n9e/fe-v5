@@ -50,6 +50,7 @@ export interface IOptions {
     util?: string;
     min?: number;
     max?: number;
+    decimals?: number;
   };
   legend?: { // TODO: 目前不支持这么复杂的自定义
     calcs: string[];
@@ -63,7 +64,7 @@ export interface IOptions {
 }
 
 export interface ITimeseriesStyles {
-  style: 'lines' | 'areas' |'bars';
+  drawStyle: 'lines' | 'areas' |'bars';
   lineInterpolation: 'linear' | 'smooth';
   stack: 'off' | 'noraml'; // off 关闭；normal 开启，此结构未后期其他模式预留
 }

@@ -12,8 +12,8 @@ export default function index(props) {
       <div>
         <Form.Item label='模式' name={[...namePrefix, 'mode']}>
           <Radio.Group buttonStyle='solid'>
-            <Radio.Button value='single'>单值</Radio.Button>
-            <Radio.Button value='all'>所有</Radio.Button>
+            <Radio.Button value='single'>single</Radio.Button>
+            <Radio.Button value='all'>all</Radio.Button>
           </Radio.Group>
         </Form.Item>
         <Form.Item noStyle shouldUpdate={(prevValues, curValues) => _.get(prevValues, [...namePrefix, 'mode']) !== _.get(curValues, [...namePrefix, 'mode'])}>
@@ -22,9 +22,9 @@ export default function index(props) {
               return (
                 <Form.Item label='排序' name={[...namePrefix, 'sort']}>
                   <Radio.Group buttonStyle='solid'>
-                    <Radio.Button value='none'>不排序</Radio.Button>
-                    <Radio.Button value='asc'>升序</Radio.Button>
-                    <Radio.Button value='desc'>降序</Radio.Button>
+                    <Radio.Button value='none'>none</Radio.Button>
+                    <Radio.Button value='asc'>asc</Radio.Button>
+                    <Radio.Button value='desc'>desc</Radio.Button>
                   </Radio.Group>
                 </Form.Item>
               );
