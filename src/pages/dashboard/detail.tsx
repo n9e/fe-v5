@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
+import _ from 'lodash';
 import PageLayout from '@/components/pageLayout';
 import DateRangePicker from '@/components/DateRangePicker';
 import { useSelector, useDispatch } from 'react-redux';
@@ -118,6 +119,16 @@ export default function DashboardDetail() {
     // setChartModalVisible(true);
     editor({
       visible: true,
+      initialValues: {
+        name: 'title',
+        link: 'flashcat.cloud',
+        type: 'timeseries',
+        targets: [
+          {
+            expr: 'avg(go_gc_duration_seconds offset 1d)',
+          },
+        ],
+      },
     });
   };
 

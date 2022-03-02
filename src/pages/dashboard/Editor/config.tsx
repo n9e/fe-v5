@@ -1,6 +1,6 @@
 export const visualizations = [
   {
-    type: 'timeSeries',
+    type: 'timeseries',
     name: '时间序列图',
   },
   {
@@ -16,3 +16,17 @@ export const visualizations = [
     name: '饼图',
   },
 ];
+
+export const IRefreshMap = {
+  off: 'off',
+  '5s': 5,
+  '10s': 10,
+  '30s': 30,
+  '1m': 60,
+  '5m': 300,
+  '15m': 900,
+  '30m': 1800,
+  '1h': 3600,
+  '2h': 7200,
+  '1d': 86400,
+};
