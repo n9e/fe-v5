@@ -35,7 +35,7 @@ npm run build
 
 ## Branch and Version
 
-The **rc version** is on v5.0.0-rc branch
+The **rc version** is on master branch ,from 5.1.4 tag
 
 ## Nginx Server
 ```
