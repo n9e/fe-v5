@@ -30,3 +30,23 @@ export const IRefreshMap = {
   '2h': 7200,
   '1d': 86400,
 };
+
+export const defaultValues = {
+  version: '1.0.0',
+  type: 'timeseries',
+  options: {
+    tooltip: {
+      mode: 'all',
+      sort: 'none',
+    },
+    legend: {
+      displayMode: 'hidden',
+    },
+  },
+  custom: {
+    drawStyle: 'lines',
+    lineInterpolation: 'smooth',
+    fillOpacity: 0.5,
+    stack: 'off',
+  },
+};

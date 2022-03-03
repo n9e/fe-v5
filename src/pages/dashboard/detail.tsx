@@ -125,7 +125,7 @@ export default function DashboardDetail() {
         type: 'timeseries',
         targets: [
           {
-            expr: 'avg(go_gc_duration_seconds offset 1d)',
+            expr: 'go_gc_duration_seconds',
           },
         ],
       },

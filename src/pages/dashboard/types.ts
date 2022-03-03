@@ -58,14 +58,15 @@ export interface IOptions {
     placement: 'right' | 'bottom'
   };
   tooltip?: {
-    mode: 'single' | 'multi',
+    mode: 'single' | 'all',
     sort: 'none' | 'asc' | 'desc'
   }
 }
 
 export interface ITimeseriesStyles {
-  drawStyle: 'lines' | 'areas' |'bars';
+  drawStyle: 'lines' |'bars';
   lineInterpolation: 'linear' | 'smooth';
+  fillOpacity: number;
   stack: 'off' | 'noraml'; // off 关闭；normal 开启，此结构未后期其他模式预留
 }
 

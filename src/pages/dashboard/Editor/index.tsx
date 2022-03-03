@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, Form, Input, Row, Col, Select, Space, Collapse } from 'antd';
+import { Modal, Form, Input, Row, Col, Select, Space } from 'antd';
 import { MinusCircleOutlined, PlusCircleOutlined, CloseOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { useTranslation } from 'react-i18next';
@@ -8,17 +8,15 @@ import DateRangePicker, { Range } from '@/components/DateRangePicker';
 import PromqlEditor from '@/components/PromqlEditor';
 import Resolution from '@/components/Resolution';
 import ModalHOC, { ModalWrapProps } from './ModalHOC';
-import { visualizations } from './config';
+import { visualizations, defaultValues } from './config';
 import Renderer from '../Renderer';
 import { Chart } from '../chartGroup';
 import Options from './Options';
-import N9eCollapse, { Panel as N9ePanel } from './Components/Collapse';
+import Collapse, { Panel } from './Components/Collapse';
 
 interface IProps {
   initialValues: Chart | null;
 }
-
-const { Panel } = Collapse;
 
 function index(props: ModalWrapProps & IProps) {
   const { t } = useTranslation();
@@ -55,7 +53,7 @@ function index(props: ModalWrapProps & IProps) {
           <PlusCircleOutlined
             style={{ marginLeft: 10 }}
             onClick={() => {
-              add({ PromQL: '', expaned: true });
+              add({ PromQL: '' });
             }}
           />
         )}
@@ -63,20 +61,7 @@ function index(props: ModalWrapProps & IProps) {
     );
   };
   return (
-    <Form
-      layout='vertical'
-      form={chartForm}
-      preserve={false}
-      initialValues={_.merge(
-        {},
-        {
-          type: 'timeseries',
-          targets: [{ expr: '', expaned: true }],
-        },
-        initialValues,
-      )}
-      id='dashboard-panel-form'
-    >
+    <Form layout='vertical' form={chartForm} preserve={false} initialValues={_.merge({}, defaultValues, initialValues)} id='dashboard-panel-form'>
       <Modal
         width='100%'
         title={
@@ -130,41 +115,22 @@ function index(props: ModalWrapProps & IProps) {
             }}
           >
             <Col flex={1}>
-              <Form.Item noStyle shouldUpdate={(prevValues, curValues) => !_.isEqual(prevValues.targets, curValues.targets)}>
-                {({ getFieldValue }) => {
-                  const targets = getFieldValue('targets');
-                  return <Renderer time={range} step={step} targets={targets} />;
+              <Form.Item noStyle shouldUpdate={(prevValues, curValues) => !_.isEqual(prevValues, curValues)}>
+                {({ getFieldsValue }) => {
+                  const values = getFieldsValue();
+                  return <Renderer time={range} step={step} values={values} />;
                 }}
               </Form.Item>
               <div style={{ marginTop: 20, height: 'calc(100% - 220px)', overflowY: 'auto' }}>
                 <Form.List name='targets'>
                   {(fields, { add, remove }, { errors }) => {
-                    const currentTargets = chartForm.getFieldValue('targets');
-                    const activeKey: string[] = [];
-                    _.forEach(currentTargets, (item, idx) => {
-                      if (item.expaned) {
-                        activeKey.push(_.toString(idx));
-                      }
-                    });
                     return (
                       <>
-                        <Collapse
-                          activeKey={activeKey}
-                          onChange={(keys) => {
-                            chartForm.setFieldsValue({
-                              targets: _.map(chartForm.getFieldValue('targets'), (item, idx) => {
-                                return {
-                                  ...item,
-                                  expaned: _.includes(keys, _.toString(idx)),
-                                };
-                              }),
-                            });
-                          }}
-                        >
+                        <Collapse>
                           {fields.length ? (
                             fields.map(({ key, name, fieldKey, ...restField }, index) => {
                               return (
-                                <Panel header={`Query ${index}`} key={index}>
+                                <Panel header={`Query ${index}`}>
                                   <Form.Item
                                     label='PromQL'
                                     name={[name, 'expr']}
@@ -197,7 +163,6 @@ function index(props: ModalWrapProps & IProps) {
                               onClick={() => {
                                 add({
                                   PromQL: '',
-                                  expaned: true,
                                 });
                               }}
                             />
@@ -211,8 +176,8 @@ function index(props: ModalWrapProps & IProps) {
               </div>
             </Col>
             <Col flex='600px' style={{ overflowY: 'auto' }}>
-              <N9eCollapse>
-                <N9ePanel header='面板配置'>
+              <Collapse>
+                <Panel header='面板配置'>
                   <>
                     <Form.Item
                       label={'标题'}
@@ -230,9 +195,9 @@ function index(props: ModalWrapProps & IProps) {
                       <Input />
                     </Form.Item>
                   </>
-                </N9ePanel>
+                </Panel>
                 <Options />
-              </N9eCollapse>
+              </Collapse>
             </Col>
           </Row>
         </div>
