@@ -31,18 +31,11 @@ export default function GraphStyles() {
             return null;
           }}
         </Form.Item>
-        <Form.Item
-          label='堆叠'
-          name={[...namePrefix, 'stack']}
-          valuePropName='checked'
-          normalize={(value) => {
-            return value === 'noraml';
-          }}
-          getValueFromEvent={(val) => {
-            return !!val ? 'noraml' : 'off';
-          }}
-        >
-          <Switch />
+        <Form.Item label='堆叠' name={[...namePrefix, 'stack']}>
+          <Radio.Group buttonStyle='solid'>
+            <Radio.Button value='noraml'>开启</Radio.Button>
+            <Radio.Button value='off'>关闭</Radio.Button>
+          </Radio.Group>
         </Form.Item>
       </>
     </Panel>

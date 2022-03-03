@@ -75,6 +75,7 @@ function index(props: ModalWrapProps & IProps) {
         },
         initialValues,
       )}
+      id='dashboard-panel-form'
     >
       <Modal
         width='100%'
@@ -114,6 +115,7 @@ function index(props: ModalWrapProps & IProps) {
         bodyStyle={{
           padding: '10px 24px 24px 24px',
         }}
+        getContainer={() => document.getElementById('dashboard-panel-form')!}
       >
         <div
           style={{

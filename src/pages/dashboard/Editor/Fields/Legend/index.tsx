@@ -9,22 +9,16 @@ export default function index() {
   return (
     <Panel header='Legend'>
       <>
-        <Form.Item
-          label='显示'
-          name={[...namePrefix, 'displayMode']}
-          valuePropName='checked'
-          normalize={(value) => {
-            return value === 'list';
-          }}
-          getValueFromEvent={(val) => {
-            return !!val ? 'list' : 'hidden';
-          }}
-        >
-          <Switch />
+        <Form.Item noStyle label='' name={[...namePrefix, 'displayMode']}>
+          <Radio.Group buttonStyle='solid'>
+            <Radio.Button value='table'>开启</Radio.Button>
+            <Radio.Button value='hidden'>关闭</Radio.Button>
+          </Radio.Group>
         </Form.Item>
-        <Form.Item noStyle shouldUpdate={(prevValues, curValues) => _.get(prevValues, [...namePrefix, 'displayMode']) !== _.get(curValues, [...namePrefix, 'displayMode'])}>
+        {/*目前只有 table 形态的 legend，后面支持 list 形态后再打开下面的位置设置*/}
+        {/* <Form.Item noStyle shouldUpdate={(prevValues, curValues) => _.get(prevValues, [...namePrefix, 'displayMode']) !== _.get(curValues, [...namePrefix, 'displayMode'])}>
           {({ getFieldValue }) => {
-            if (getFieldValue([...namePrefix, 'displayMode']) === true) {
+            if (getFieldValue([...namePrefix, 'displayMode']) === 'list') {
               return (
                 <Form.Item label='位置' name={[...namePrefix, 'placement']}>
                   <Radio.Group buttonStyle='solid'>
@@ -36,7 +30,7 @@ export default function index() {
             }
             return null;
           }}
-        </Form.Item>
+        </Form.Item> */}
       </>
     </Panel>
   );

@@ -3,6 +3,7 @@ import Tooltip from '../../Fields/Tooltip';
 import Legend from '../../Fields/Legend';
 import GraphStyles from './GraphStyles';
 import StandardOptions from '../../Fields/StandardOptions';
+import Thresholds from '../../Fields/Thresholds';
 
 export default function Timeseries() {
   return (
@@ -11,6 +12,7 @@ export default function Timeseries() {
       <Legend />
       <GraphStyles />
       <StandardOptions />
+      <Thresholds />
     </>
   );
 }
