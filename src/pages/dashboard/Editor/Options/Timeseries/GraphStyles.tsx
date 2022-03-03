@@ -1,15 +1,14 @@
 import React from 'react';
-import { Collapse, Form, Radio, Switch } from 'antd';
+import { Form, Radio, Switch } from 'antd';
 import _ from 'lodash';
+import { Panel } from '../../Components/Collapse';
 
-const { Panel } = Collapse;
-
-export default function GraphStyles(props) {
+export default function GraphStyles() {
   const namePrefix = ['custom'];
 
   return (
-    <Panel {...props} header='图表样式' key='graphStyles'>
-      <div>
+    <Panel header='图表样式'>
+      <>
         <Form.Item label='绘制模式' name={[...namePrefix, 'drawStyle']}>
           <Radio.Group buttonStyle='solid'>
             <Radio.Button value='lines'>lines</Radio.Button>
@@ -45,7 +44,7 @@ export default function GraphStyles(props) {
         >
           <Switch />
         </Form.Item>
-      </div>
+      </>
     </Panel>
   );
 }

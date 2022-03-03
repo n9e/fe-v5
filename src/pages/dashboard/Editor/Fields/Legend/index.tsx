@@ -1,15 +1,14 @@
 import React from 'react';
-import { Collapse, Form, Radio, Switch } from 'antd';
+import { Form, Radio, Switch } from 'antd';
 import _ from 'lodash';
+import { Panel } from '../../Components/Collapse';
 
-const { Panel } = Collapse;
-
-export default function index(props) {
+export default function index() {
   const namePrefix = ['options', 'legend'];
 
   return (
-    <Panel {...props} header='Legend' key='legend'>
-      <div>
+    <Panel header='Legend'>
+      <>
         <Form.Item
           label='显示'
           name={[...namePrefix, 'displayMode']}
@@ -38,7 +37,7 @@ export default function index(props) {
             return null;
           }}
         </Form.Item>
-      </div>
+      </>
     </Panel>
   );
 }

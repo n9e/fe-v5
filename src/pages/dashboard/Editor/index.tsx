@@ -11,6 +11,7 @@ import { visualizations } from './config';
 import Renderer from '../Renderer';
 import { Chart } from '../chartGroup';
 import Options from './Options';
+import N9eCollapse, { Panel as N9ePanel } from './Components/Collapse';
 
 interface IProps {
   initialValues: Chart | null;
@@ -203,9 +204,9 @@ function index(props: ModalWrapProps & IProps) {
             </div>
           </Col>
           <Col flex='600px'>
-            <Collapse defaultActiveKey={['base', 'config', 'tooltip']}>
-              <Panel header='面板配置' key='base'>
-                <div>
+            <N9eCollapse>
+              <N9ePanel header='面板配置'>
+                <>
                   <Form.Item
                     label={'标题'}
                     name='name'
@@ -221,10 +222,10 @@ function index(props: ModalWrapProps & IProps) {
                   <Form.Item label={'下钻链接'} name='link'>
                     <Input />
                   </Form.Item>
-                </div>
-              </Panel>
+                </>
+              </N9ePanel>
               <Options />
-            </Collapse>
+            </N9eCollapse>
           </Col>
         </Row>
       </Modal>

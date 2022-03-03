@@ -1,16 +1,16 @@
 import React from 'react';
-import { Collapse, Form, Radio, Select, InputNumber } from 'antd';
+import { Form, Select, InputNumber } from 'antd';
 import _ from 'lodash';
+import { Panel } from '../../Components/Collapse';
 
-const { Panel } = Collapse;
 const { Option, OptGroup } = Select;
 
-export default function index(props) {
+export default function index() {
   const namePrefix = ['options', 'standardOptions'];
 
   return (
-    <Panel {...props} header='高级设置' key='standardOptions'>
-      <div>
+    <Panel header='高级设置'>
+      <>
         <Form.Item label='单位' name={[...namePrefix, 'util']}>
           <Select>
             <OptGroup label='基础'>
@@ -37,7 +37,7 @@ export default function index(props) {
         <Form.Item label='小数点' name={[...namePrefix, 'decimals']}>
           <InputNumber />
         </Form.Item>
-      </div>
+      </>
     </Panel>
   );
 }
