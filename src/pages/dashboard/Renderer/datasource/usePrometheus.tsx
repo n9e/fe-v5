@@ -20,11 +20,12 @@ const getSerieName = (metric: Object) => {
 
 export default function usePrometheus(props: IProps) {
   const { time, step, targets } = props;
-  const { start, end } = formatPickerDate(time);
   const [series, setSeries] = useState<any[]>([]);
-  let _step = step;
-  if (!step) _step = Math.max(Math.floor((end - start) / 250), 1);
+
   useEffect(() => {
+    const { start, end } = formatPickerDate(time);
+    let _step = step;
+    if (!step) _step = Math.max(Math.floor((end - start) / 250), 1);
     const _series: any[] = [];
     const promises = _.map(targets, (item: ITarget) => {
       return api
@@ -49,7 +50,7 @@ export default function usePrometheus(props: IProps) {
       });
       setSeries(_series);
     });
-  }, [JSON.stringify(targets), start, end, _step]);
+  }, [JSON.stringify(targets), JSON.stringify(time), step]);
 
   return { series };
 }
