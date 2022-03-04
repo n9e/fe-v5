@@ -10,6 +10,14 @@ interface IProps {
   targets: ITarget[];
 }
 
+const getSerieName = (metric: Object) => {
+  let name = metric['__name__'];
+  _.forEach(_.omit(metric, '__name__'), (value, key) => {
+    name += ` ${key}: ${value}`;
+  });
+  return name;
+};
+
 export default function usePrometheus(props: IProps) {
   const { time, step, targets } = props;
   const { start, end } = formatPickerDate(time);
@@ -34,7 +42,7 @@ export default function usePrometheus(props: IProps) {
       _.forEach(res, (item) => {
         _.forEach(item, (serie) => {
           _series.push({
-            name: serie.metric.instance, // TODO: 临时定义曲线名称，需要结合真实情况处理
+            name: getSerieName(serie.metric),
             data: serie.values,
           });
         });
