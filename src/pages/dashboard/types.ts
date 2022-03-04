@@ -34,7 +34,7 @@ export interface IMapping {
   };
 }
 
-export interface IThreshold {
+export interface IThresholds {
   steps: {
     color: string;
     value: number;
@@ -45,7 +45,7 @@ export interface IThreshold {
 // 一些通用的配置，不同类型的图表可选择性使用配置
 export interface IOptions {
   mappings?: IMapping[];
-  thresholds?: IThreshold[];
+  thresholds?: IThresholds;
   standardOptions?: {
     util?: string;
     min?: number;
@@ -64,6 +64,7 @@ export interface IOptions {
 }
 
 export interface ITimeseriesStyles {
+  version: string; // 时序图组件使用的版本
   drawStyle: 'lines' |'bars';
   lineInterpolation: 'linear' | 'smooth';
   fillOpacity: number;
@@ -71,7 +72,7 @@ export interface ITimeseriesStyles {
 }
 
 export interface IPanel {
-  version: string; // 单个图表面板使用的版本，遵循版本规范 '1.0.0'
+  version: string; // 单个图表面板使用的版本
   id: number;
   title: string;
   link: ILink;

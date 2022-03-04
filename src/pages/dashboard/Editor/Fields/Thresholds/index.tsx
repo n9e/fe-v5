@@ -16,7 +16,9 @@ export default function index() {
             <Button
               style={{ width: '100%', marginBottom: 10 }}
               onClick={() => {
-                add();
+                add({
+                  value: 0,
+                });
               }}
             >
               添加

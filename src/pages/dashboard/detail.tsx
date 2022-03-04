@@ -125,7 +125,7 @@ export default function DashboardDetail() {
         type: 'timeseries',
         targets: [
           {
-            expr: 'go_gc_duration_seconds',
+            expr: 'disk_total',
           },
         ],
       },
