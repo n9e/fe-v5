@@ -3,11 +3,14 @@ import _ from 'lodash';
 import * as api from '@/components/Graph/api';
 import { Range, formatPickerDate } from '@/components/DateRangePicker';
 import { ITarget } from '../../types';
+import { VariableType } from '../../VariableConfig';
+import { replaceExpressionVars } from '../../VariableConfig/constant';
 
 interface IProps {
   time: Range;
   step: number | null;
   targets: ITarget[];
+  variableConfig?: VariableType;
 }
 
 const getSerieName = (metric: Object) => {
@@ -19,7 +22,7 @@ const getSerieName = (metric: Object) => {
 };
 
 export default function usePrometheus(props: IProps) {
-  const { time, step, targets } = props;
+  const { time, step, targets, variableConfig } = props;
   const [series, setSeries] = useState<any[]>([]);
 
   useEffect(() => {
@@ -27,13 +30,15 @@ export default function usePrometheus(props: IProps) {
     let _step = step;
     if (!step) _step = Math.max(Math.floor((end - start) / 250), 1);
     const _series: any[] = [];
-    const promises = _.map(targets, (item: ITarget) => {
+    const exprs = _.map(targets, 'expr');
+    const promises = _.map(exprs, (expr) => {
+      const realExpr = variableConfig ? replaceExpressionVars(expr, variableConfig, variableConfig.var.length) : exprs;
       return api
         .fetchHistory({
           start,
           end,
           step: _step,
-          query: item?.expr,
+          query: realExpr,
         })
         .then((res) => {
           return res?.data?.result;

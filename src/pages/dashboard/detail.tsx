@@ -117,8 +117,11 @@ export default function DashboardDetail() {
     groupId = group.id;
     setChartModalInitValue(item);
     // setChartModalVisible(true);
+    // 此处处理新旧版本的调用
     editor({
       visible: true,
+      variableConfig,
+      cluster: curCluster,
       initialValues: {
         name: 'title',
         link: 'flashcat.cloud',

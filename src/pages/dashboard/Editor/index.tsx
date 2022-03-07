@@ -13,14 +13,17 @@ import Renderer from '../Renderer';
 import { Chart } from '../chartGroup';
 import Options from './Options';
 import Collapse, { Panel } from './Components/Collapse';
+import VariableConfig, { VariableType } from '../VariableConfig';
 
 interface IProps {
   initialValues: Chart | null;
+  variableConfig?: VariableType;
+  cluster: string;
 }
 
 function index(props: ModalWrapProps & IProps) {
   const { t } = useTranslation();
-  const { visible, initialValues } = props;
+  const { visible, initialValues, variableConfig, cluster } = props;
   const size = useSize(document.querySelector('body'));
   const [chartForm] = Form.useForm();
   const [range, setRange] = useState<Range>({
@@ -29,6 +32,7 @@ function index(props: ModalWrapProps & IProps) {
     unit: 'hour',
   });
   const [step, setStep] = useState<number | null>(null);
+  const [innerVariableConfig, setInnerVariableConfig] = useState<VariableType | undefined>(variableConfig);
   const PromqlEditorField = ({ onChange = (e: any) => {}, value = '', fields, remove, add, index, name }) => {
     return (
       <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -118,10 +122,20 @@ function index(props: ModalWrapProps & IProps) {
               <Form.Item noStyle shouldUpdate={(prevValues, curValues) => !_.isEqual(prevValues, curValues)}>
                 {({ getFieldsValue }) => {
                   const values = getFieldsValue();
-                  return <Renderer time={range} step={step} values={values} />;
+                  return <Renderer time={range} step={step} values={values} variableConfig={innerVariableConfig} />;
                 }}
               </Form.Item>
-              <div style={{ marginTop: 20, height: 'calc(100% - 220px)', overflowY: 'auto' }}>
+              <div style={{ height: 'calc(100% - 220px)', overflowY: 'auto' }}>
+                <div style={{ marginTop: 20 }}>
+                  <VariableConfig
+                    onChange={(value) => {
+                      setInnerVariableConfig(value);
+                    }}
+                    value={innerVariableConfig}
+                    editable={false}
+                    cluster={cluster}
+                  />
+                </div>
                 <Form.List name='targets'>
                   {(fields, { add, remove }, { errors }) => {
                     return (

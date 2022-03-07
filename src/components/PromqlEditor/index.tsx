@@ -20,13 +20,14 @@ export default function PromqlEditor(props: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const url = '/api/n9e/prometheus';
 
-  function myHTTPClient(resource: string): Promise<Response> {
+  function myHTTPClient(resource: string, options = {}): Promise<Response> {
     return fetch(resource, {
       method: 'Get',
       headers: new Headers({
         'X-Cluster': xCluster,
         Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
       }),
+      ...options,
     });
   }
   const promQL = new PromQLExtension().setComplete({

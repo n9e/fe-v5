@@ -6,11 +6,13 @@ import { Range } from '@/components/DateRangePicker';
 import usePrometheus from './datasource/usePrometheus';
 import { IPanel } from '../types';
 import * as byteConverter from './utils/byteConverter';
+import { VariableType } from '../VariableConfig';
 
 interface IProps {
   time: Range;
   step: number | null;
   values: IPanel;
+  variableConfig?: VariableType;
 }
 
 export const hexPalette = [
@@ -74,7 +76,7 @@ const valueFormatter = (options, val) => {
 };
 
 export default function index(props: IProps) {
-  const { values, time, step } = props;
+  const { values, time, step, variableConfig } = props;
   const { targets, custom, options } = values;
   const chartEleRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<TsGraph>(null);
@@ -82,6 +84,7 @@ export default function index(props: IProps) {
     time,
     step,
     targets,
+    variableConfig,
   });
 
   useEffect(() => {

@@ -2,11 +2,13 @@ import React from 'react';
 import { Range } from '@/components/DateRangePicker';
 import { IPanel } from '../types';
 import Timeseries from './Timeseries';
+import { VariableType } from '../VariableConfig';
 
 interface IProps {
   time: Range;
   step: number | null;
   values: IPanel;
+  variableConfig?: VariableType;
 }
 
 export default function index(props: IProps) {
