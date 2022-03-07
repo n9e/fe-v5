@@ -49,6 +49,29 @@ const utilValMap = {
     base: 'bytes',
   },
 };
+const valueFormatter = (options, val) => {
+  const utilVal = options.standardOptions?.util;
+  const decimals = options.standardOptions?.decimals || 3;
+  if (utilVal) {
+    const utilValObj = utilValMap[utilVal];
+    if (utilValObj) {
+      const { type, base } = utilValObj;
+      return byteConverter.format(val, {
+        type,
+        base,
+        decimals,
+      });
+    }
+    if (utilVal === 'percent') {
+      return _.round(val, decimals) + '%';
+    }
+    if (utilVal === 'percentUnit') {
+      return _.round(val * 100, decimals) + '%';
+    }
+    return val;
+  }
+  return val;
+};
 
 export default function index(props: IProps) {
   const { values, time, step } = props;
@@ -77,25 +100,6 @@ export default function index(props: IProps) {
           series: [],
           line: {
             width: 1,
-          },
-          area: {
-            opacity: custom.fillOpacity,
-          },
-          stack: {
-            enabled: custom.stack === 'noraml',
-          },
-          curve: {
-            enabled: true,
-            mode: custom.lineInterpolation,
-          },
-          tooltip: {
-            shared: options.tooltip?.mode === 'all',
-            sharedSortDirection: options.tooltip?.sort !== 'none' ? options.tooltip?.sort : undefined,
-          },
-          yAxis: {
-            min: options.standardOptions?.min,
-            max: options.standardOptions?.max,
-            plotLines: options.thresholds?.steps,
           },
         });
       }
@@ -126,15 +130,7 @@ export default function index(props: IProps) {
           shared: options.tooltip?.mode === 'all',
           sharedSortDirection: options.tooltip?.sort !== 'none' ? options.tooltip?.sort : undefined,
           pointValueformatter: (val) => {
-            if (options.standardOptions?.util) {
-              const { type, base } = utilValMap[options.standardOptions.util];
-              return byteConverter.format(val, {
-                type,
-                base,
-                decimals: options.standardOptions?.decimals || 3,
-              });
-            }
-            return val;
+            return valueFormatter(options, val);
           },
         },
         yAxis: {
@@ -143,15 +139,7 @@ export default function index(props: IProps) {
           max: options.standardOptions?.max,
           plotLines: options.thresholds?.steps,
           tickValueFormatter: (val) => {
-            if (options.standardOptions?.util) {
-              const { type, base } = utilValMap[options.standardOptions.util];
-              return byteConverter.format(val, {
-                type,
-                base,
-                decimals: options.standardOptions?.decimals || 3,
-              });
-            }
-            return val;
+            return valueFormatter(options, val);
           },
         },
       });
