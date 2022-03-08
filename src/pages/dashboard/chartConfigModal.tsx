@@ -23,6 +23,7 @@ const layout = {
   },
 };
 interface Props {
+  id: string;
   busiId: string;
   cluster: string;
   groupId: number;
@@ -34,7 +35,7 @@ interface Props {
 
 export default function ChartConfigModal(props: Props) {
   const { t } = useTranslation();
-  const { busiId, groupId, show, onVisibleChange, initialValue, variableConfig, cluster } = props;
+  const { busiId, groupId, show, onVisibleChange, initialValue, variableConfig, cluster, id } = props;
   const layout = initialValue?.configs.layout;
   const [innerVariableConfig, setInnerVariableConfig] = useState<VariableType | undefined>(variableConfig);
   const [chartForm] = Form.useForm();
@@ -258,7 +259,7 @@ export default function ChartConfigModal(props: Props) {
       <Form {...layout} form={chartForm} preserve={false}>
         <Row>
           <Col span={12}>
-            <VariableConfig onChange={handleVariableChange} value={innerVariableConfig} editable={false} cluster={cluster} range={range} />
+            <VariableConfig onChange={handleVariableChange} value={innerVariableConfig} editable={false} cluster={cluster} range={range} id={id} />
             <br />
             <Form.Item
               label={t('标题')}
@@ -420,7 +421,7 @@ export default function ChartConfigModal(props: Props) {
               {({ getFieldsValue }) => {
                 const { QL = [], yplotline1, yplotline2 } = getFieldsValue();
                 const promqls = QL.filter((item) => item && item.PromQL).map((item) =>
-                  innerVariableConfig ? replaceExpressionVars(item.PromQL, innerVariableConfig, innerVariableConfig.var.length) : item.PromQL,
+                  innerVariableConfig ? replaceExpressionVars(item.PromQL, innerVariableConfig, innerVariableConfig.var.length, id) : item.PromQL,
                 );
                 const legendTitleFormats = QL.map((item) => item && item.Legend);
                 return (

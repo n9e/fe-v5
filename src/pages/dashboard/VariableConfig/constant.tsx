@@ -4,6 +4,7 @@ import React, { createContext } from 'react';
 import { getLabelNames, getMetricSeries, getLabelValues, getMetric, getQueryResult } from '@/services/dashboard';
 import { Range, formatPickerDate } from '@/components/DateRangePicker';
 import { FormType } from './EditItem';
+import { getVaraiableSelected } from './index';
 export const CLASS_PATH_VALUE = 'classpath';
 export const CLASS_PATH_PREFIX_VALUE = 'classpath_prefix';
 export const DEFAULT_VALUE = '*';
@@ -171,12 +172,14 @@ export const convertExpressionToQuery = (expression: string, range: Range) => {
   return Promise.resolve(expression.length > 0 ? expression.split(',').map((i) => i.trim()) : '');
 };
 
-export const replaceExpressionVars = (expression: string, formData: FormType, limit: number) => {
+export const replaceExpressionVars = (expression: string, formData: FormType, limit: number, id: string) => {
   var newExpression = expression;
   const vars = newExpression.match(/\$[0-9a-zA-Z\._\-]+/g);
   if (vars && vars.length > 0) {
     for (let i = 0; i < limit; i++) {
-      const { selected, name, options, reg } = formData.var[i];
+      const { name, options, reg } = formData.var[i];
+      const selected = getVaraiableSelected(name, id);
+
       if (vars.includes('$' + name) && selected) {
         if (Array.isArray(selected)) {
           if (selected.includes('all') && options) {
@@ -194,6 +197,12 @@ export const replaceExpressionVars = (expression: string, formData: FormType, li
     }
   }
   return newExpression;
+};
+
+export const extractExpressionVars = (expression: string) => {
+  var newExpression = expression;
+  const vars = newExpression.match(/\$[0-9a-zA-Z\._\-]+/g);
+  return vars;
 };
 
 // const stringToRegex = (str) => {

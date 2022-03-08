@@ -110,7 +110,7 @@ export const getChartGroup = function (busiId: string, id: string) {
 export const delChartGroup = function (busiId: string, id: number) {
   return request(`/api/n9e/busi-group/${busiId}/chart-groups`, {
     method: RequestMethod.Delete,
-    data:{ids:[id]}
+    data: { ids: [id] },
   });
 };
 
@@ -126,7 +126,7 @@ interface Chart {
   configs: string | object;
   weight: number;
   group_id: number;
-  id?: number;
+  id?: number | string;
 }
 
 // 创建Chart
@@ -172,7 +172,7 @@ export const getCharts = function (busiId: string | number, id: number) {
 };
 
 // 删除Chart
-export const removeChart = function (busiId: string | number, id: number) {
+export const removeChart = function (busiId: string | number, id: number | string) {
   return request(`/api/n9e/busi-group/${busiId}/charts`, {
     method: RequestMethod.Delete,
     data: { ids: [id] },

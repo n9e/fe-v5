@@ -13,21 +13,33 @@ import { Range } from '@/components/DateRangePicker';
 export type VariableType = FormType;
 
 interface ITagFilterProps {
+  id: string;
   isOpen?: boolean;
   cluster: string;
   editable?: boolean;
   value?: FormType;
   range: Range;
-  onChange: (data: FormType) => void;
+  onChange: (data: FormType, needSave: boolean) => void;
 }
 
-const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = ({ isOpen = false, value, onChange, editable = true, cluster, range }, ref) => {
+export function setVaraiableSelected(name: string, value: string | string[], id: string) {
+  if (value === undefined) return;
+  localStorage.setItem(`dashboard_${id}_${name}`, JSON.stringify(value));
+}
+
+export function getVaraiableSelected(name: string, id: string) {
+  const v = localStorage.getItem(`dashboard_${id}_${name}`);
+  return v ? JSON.parse(v) : null;
+}
+
+const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = ({ isOpen = false, value, onChange, editable = true, cluster, range, id }, ref) => {
   const { t } = useTranslation();
   const [editing, setEditing] = useState<boolean>(isOpen);
+  const [varsMap, setVarsMap] = useState<{ string?: string | string[] | undefined }>({});
   const [data, setData] = useState<FormType>();
   const handleEditClose = (v: FormType) => {
     if (v) {
-      onChange(v);
+      onChange(v, true);
       setData(v);
     }
     setEditing(false);
@@ -35,29 +47,37 @@ const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = ({ isOpe
 
   useEffect(() => {
     value && setData(value);
+    console.log(value);
   }, [value]);
 
   const handleVariableChange = (index: number, v: string | string[], options) => {
     const newData = data ? { var: [...data.var] } : { var: [] };
-    newData.var[index].selected = v;
-    options && (newData.var[index].options = options);
+    console.log(newData);
+    // newData.var[index].selected = v;
+    setVaraiableSelected(newData.var[index].name, v, id);
+    setVarsMap((varsMap) => ({ ...varsMap, [`$${newData.var[index].name}`]: v }));
+    // options && (newData.var[index].options = options);
     setData(newData);
-    onChange(newData);
+    onChange(newData, false);
   };
 
-  const setInitData = (initData: VariableType) => {
-    setData(initData);
-  };
-  useImperativeHandle(ref, () => ({
-    setInitData,
-  }));
   return (
     <div className='tag-area'>
       <div className={classNames('tag-content', 'tag-content-close')}>
         {data?.var && data?.var.length > 0 && (
           <>
             {data.var.map((expression, index) => (
-              <DisplayItem expression={expression} index={index} data={data.var} onChange={handleVariableChange} cluster={cluster} range={range}></DisplayItem>
+              <DisplayItem
+                expression={expression}
+                index={index}
+                data={data.var}
+                onChange={handleVariableChange}
+                cluster={cluster}
+                range={range}
+                key={index}
+                id={id}
+                varsMap={varsMap}
+              ></DisplayItem>
             ))}
             {editable && <EditOutlined className='icon' onClick={() => setEditing(true)}></EditOutlined>}
           </>
@@ -68,7 +88,7 @@ const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = ({ isOpe
           </div>
         )}
       </div>
-      <EditItem visible={editing} onChange={handleEditClose} value={data} range={range} />
+      <EditItem visible={editing} onChange={handleEditClose} value={data} range={range} id={id} />
     </div>
   );
 };
