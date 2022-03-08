@@ -2,6 +2,7 @@ import React from 'react';
 import { Range } from '@/components/DateRangePicker';
 import { IPanel } from '../types';
 import Timeseries from './Timeseries';
+import Stat from './Stat';
 import { VariableType } from '../VariableConfig';
 
 interface IProps {
@@ -17,6 +18,7 @@ export default function index(props: IProps) {
   } = props;
   const RendererCptMap = {
     timeseries: <Timeseries {...props} />,
+    stat: <Stat {...props} />,
   };
-  return RendererCptMap[type] || <div style={{ height: 200, border: '1px solid #d9d9d9' }}>`无效的图表类型 ${type}`</div>;
+  return <div style={{ border: '1px solid #d9d9d9', height: 200 }}>{RendererCptMap[type] || `无效的图表类型 ${type}`}</div>;
 }

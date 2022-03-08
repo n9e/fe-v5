@@ -118,7 +118,7 @@ function index(props: ModalWrapProps & IProps) {
               height: '100%',
             }}
           >
-            <Col flex={1}>
+            <Col flex={1} style={{ minWidth: 100 }}>
               <Form.Item noStyle shouldUpdate={(prevValues, curValues) => !_.isEqual(prevValues, curValues)}>
                 {({ getFieldsValue }) => {
                   const values = getFieldsValue();

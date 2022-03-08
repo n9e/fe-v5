@@ -5,6 +5,7 @@ import '@fc-plot/ts-graph/dist/index.css';
 import { Range } from '@/components/DateRangePicker';
 import usePrometheus from './datasource/usePrometheus';
 import { IPanel } from '../types';
+import { hexPalette } from '../config';
 import * as byteConverter from './utils/byteConverter';
 import { VariableType } from '../VariableConfig';
 
@@ -14,24 +15,6 @@ interface IProps {
   values: IPanel;
   variableConfig?: VariableType;
 }
-
-export const hexPalette = [
-  '#3399CC',
-  '#CC9933',
-  '#9966CC',
-  '#66CC66',
-  '#CC3333',
-  '#99CCCC',
-  '#CCCC66',
-  '#CC99CC',
-  '#99CC99',
-  '#CC6666',
-  '#336699',
-  '#996633',
-  '#993399',
-  '#339966',
-  '#993333',
-];
 
 const utilValMap = {
   bitsSI: {
@@ -151,9 +134,5 @@ export default function index(props: IProps) {
     }
   }, [JSON.stringify(series), JSON.stringify(custom), JSON.stringify(options)]);
 
-  return (
-    <div style={{ border: '1px solid #d9d9d9', height: 200 }}>
-      <div ref={chartEleRef} />
-    </div>
-  );
+  return <div ref={chartEleRef} />;
 }

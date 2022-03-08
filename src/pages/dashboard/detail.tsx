@@ -12,7 +12,6 @@ import { Dashboard, Group } from '@/store/dashboardInterface';
 import ChartGroup, { Chart } from './chartGroup';
 import ChartConfigModal from './chartConfigModal';
 import RefreshIcon from '@/components/RefreshIcon';
-import TSGraph from '@/components/TSGraph';
 import VariableConfig, { VariableType } from './VariableConfig';
 import './index.less';
 import { useTranslation } from 'react-i18next';
@@ -125,7 +124,7 @@ export default function DashboardDetail() {
       initialValues: {
         name: 'title',
         link: 'flashcat.cloud',
-        type: 'timeseries',
+        type: 'stat',
         targets: [
           {
             expr: 'disk_total',
@@ -349,7 +348,6 @@ export default function DashboardDetail() {
           variableConfig={variableConfig}
         />
       )}
-      <TSGraph />
     </PageLayout>
   );
 }
