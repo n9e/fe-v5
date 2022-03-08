@@ -12,22 +12,23 @@ export default function GraphStyles() {
         <Form.Item label='绘制模式' name={[...namePrefix, 'drawStyle']}>
           <Radio.Group buttonStyle='solid'>
             <Radio.Button value='lines'>lines</Radio.Button>
-            <Radio.Button value='bars' disabled>
-              bars
-            </Radio.Button>
+            <Radio.Button value='bars'>bars</Radio.Button>
           </Radio.Group>
         </Form.Item>
         <Form.Item noStyle shouldUpdate={(prevValues, curValues) => _.get(prevValues, [...namePrefix, 'drawStyle']) !== _.get(curValues, [...namePrefix, 'drawStyle'])}>
           {({ getFieldValue }) => {
-            if (getFieldValue([...namePrefix, 'drawStyle']) === 'lines') {
+            const drawStyle = getFieldValue([...namePrefix, 'drawStyle']);
+            if (drawStyle === 'lines' || drawStyle === 'bars') {
               return (
                 <>
-                  <Form.Item label='线插值' name={[...namePrefix, 'lineInterpolation']}>
-                    <Radio.Group buttonStyle='solid'>
-                      <Radio.Button value='linear'>linear</Radio.Button>
-                      <Radio.Button value='smooth'>smooth</Radio.Button>
-                    </Radio.Group>
-                  </Form.Item>
+                  {drawStyle === 'lines' ? (
+                    <Form.Item label='线插值' name={[...namePrefix, 'lineInterpolation']}>
+                      <Radio.Group buttonStyle='solid'>
+                        <Radio.Button value='linear'>linear</Radio.Button>
+                        <Radio.Button value='smooth'>smooth</Radio.Button>
+                      </Radio.Group>
+                    </Form.Item>
+                  ) : null}
                   <Form.Item label='透明度' name={[...namePrefix, 'fillOpacity']}>
                     <Slider min={0} max={1} step={0.01} />
                   </Form.Item>

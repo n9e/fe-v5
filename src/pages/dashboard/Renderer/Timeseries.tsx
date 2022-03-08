@@ -51,6 +51,7 @@ const utilValMap = {
     base: 'bytes',
   },
 };
+
 const valueFormatter = (options, val) => {
   const utilVal = options.standardOptions?.util;
   const decimals = options.standardOptions?.decimals || 3;
@@ -117,6 +118,7 @@ export default function index(props: IProps) {
   useEffect(() => {
     if (chartRef.current) {
       chartRef.current.update({
+        type: custom.drawStyle === 'lines' ? 'line' : 'bar',
         series,
         area: {
           opacity: custom.fillOpacity,
