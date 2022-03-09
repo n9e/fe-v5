@@ -71,6 +71,12 @@ export interface ITimeseriesStyles {
   stack: 'off' | 'noraml'; // off 关闭；normal 开启，此结构未后期其他模式预留
 }
 
+export interface IStatStyles {
+  version: string; // 时序图组件使用的版本
+  textMode: 'valueAndName' |'value';
+  // colorMode: 'value' | 'background'; // TODO: 后面版本再开放
+}
+
 export interface IPanel {
   version: string; // 单个图表面板使用的版本
   id: number;
@@ -95,4 +101,5 @@ export interface IDashboard {
   refresh: string; // off | 10s ...
   variable: any; // 变量配置
   editable: boolean; // 备用
+  panels: IPanel[];
 }

@@ -43,10 +43,19 @@ export const defaultValues = {
       displayMode: 'hidden',
     },
   },
-  custom: {
+  custom: {},
+};
+
+export const defaultCustomValuesMap = {
+  timeseries: {
     drawStyle: 'lines',
     lineInterpolation: 'smooth',
     fillOpacity: 0.5,
     stack: 'off',
+  },
+  stat: {
+    textMode: 'valueAndName',
+    calc: 'lastNotNull',
+    colSpan: 1,
   },
 };

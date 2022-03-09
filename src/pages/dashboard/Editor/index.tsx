@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Modal, Form, Input, Row, Col, Select, Space } from 'antd';
 import { MinusCircleOutlined, PlusCircleOutlined, CloseOutlined } from '@ant-design/icons';
 import _ from 'lodash';
@@ -8,8 +8,8 @@ import DateRangePicker, { Range } from '@/components/DateRangePicker';
 import PromqlEditor from '@/components/PromqlEditor';
 import Resolution from '@/components/Resolution';
 import ModalHOC, { ModalWrapProps } from './ModalHOC';
-import { visualizations, defaultValues } from './config';
-import Renderer from '../Renderer';
+import { visualizations, defaultValues, defaultCustomValuesMap } from './config';
+import Renderer from '../Renderer/Renderer';
 import { Chart } from '../chartGroup';
 import Options from './Options';
 import Collapse, { Panel } from './Components/Collapse';
@@ -33,6 +33,7 @@ function index(props: ModalWrapProps & IProps) {
   });
   const [step, setStep] = useState<number | null>(null);
   const [innerVariableConfig, setInnerVariableConfig] = useState<VariableType | undefined>(variableConfig);
+  const renderRef = useRef<any>(null);
   const PromqlEditorField = ({ onChange = (e: any) => {}, value = '', fields, remove, add, index, name }) => {
     return (
       <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -64,6 +65,7 @@ function index(props: ModalWrapProps & IProps) {
       </div>
     );
   };
+  defaultValues.custom = defaultCustomValuesMap[_.get(initialValues, 'type') || defaultValues.type];
   return (
     <Form layout='vertical' form={chartForm} preserve={false} initialValues={_.merge({}, defaultValues, initialValues)} id='dashboard-panel-form'>
       <Modal
@@ -72,8 +74,20 @@ function index(props: ModalWrapProps & IProps) {
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <div>{initialValues ? t('编辑图表') : t('新建图表')}</div>
             <Space style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', fontSize: 12, lineHeight: '20px' }}>
+              <Form.Item noStyle shouldUpdate={(prevValues, curValues) => !_.isEqual(prevValues.type, curValues.type)}>
+                {({ getFieldValue, setFieldsValue }) => {
+                  const type = getFieldValue('type');
+                  setFieldsValue({
+                    custom: defaultCustomValuesMap[type],
+                  });
+                  if (renderRef.current) {
+                    renderRef.current.reload();
+                  }
+                  return null;
+                }}
+              </Form.Item>
               <Form.Item name='type' noStyle>
-                <Select>
+                <Select dropdownMatchSelectWidth={false}>
                   {_.map(visualizations, (item) => {
                     return (
                       <Select.Option value={item.type} key={item.type}>
@@ -121,8 +135,7 @@ function index(props: ModalWrapProps & IProps) {
             <Col flex={1} style={{ minWidth: 100 }}>
               <Form.Item noStyle shouldUpdate={(prevValues, curValues) => !_.isEqual(prevValues, curValues)}>
                 {({ getFieldsValue }) => {
-                  const values = getFieldsValue();
-                  return <Renderer time={range} step={step} values={values} variableConfig={innerVariableConfig} />;
+                  return <Renderer ref={renderRef} time={range} step={step} getFieldsValue={getFieldsValue} variableConfig={innerVariableConfig} />;
                 }}
               </Form.Item>
               <div style={{ height: 'calc(100% - 220px)', overflowY: 'auto' }}>
@@ -144,7 +157,7 @@ function index(props: ModalWrapProps & IProps) {
                           {fields.length ? (
                             fields.map(({ key, name, fieldKey, ...restField }, index) => {
                               return (
-                                <Panel header={`Query ${index}`}>
+                                <Panel header={`Query ${index}`} key={index}>
                                   <Form.Item
                                     label='PromQL'
                                     name={[name, 'expr']}

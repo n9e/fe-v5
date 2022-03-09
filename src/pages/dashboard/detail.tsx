@@ -127,7 +127,7 @@ export default function DashboardDetail() {
         type: 'stat',
         targets: [
           {
-            expr: 'disk_total',
+            expr: 'go_gc_duration_seconds',
           },
         ],
       },
