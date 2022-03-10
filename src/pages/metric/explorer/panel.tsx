@@ -59,7 +59,7 @@ function getListItemContent(metrics) {
   const labels = Object.keys(metrics)
     .filter((ml) => ml !== '__name__')
     .map((label, i, labels) => (
-      <span>
+      <span key={i}>
         <span className='bold-text'>{label}</span>="{metrics[label]}"{i === labels.length - 1 ? '' : ', '}
       </span>
     ));
