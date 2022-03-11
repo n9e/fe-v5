@@ -55,7 +55,9 @@ export const defaultCustomValuesMap = {
   },
   stat: {
     textMode: 'valueAndName',
+    colorMode: 'value',
     calc: 'lastNotNull',
     colSpan: 1,
+    textSize: {},
   },
 };

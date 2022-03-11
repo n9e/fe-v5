@@ -74,7 +74,11 @@ export interface ITimeseriesStyles {
 export interface IStatStyles {
   version: string; // 时序图组件使用的版本
   textMode: 'valueAndName' |'value';
-  // colorMode: 'value' | 'background'; // TODO: 后面版本再开放
+  textSize: {
+    title: number;
+    value: number;
+  };
+  colorMode: 'value' | 'background';
 }
 
 export interface IPanel {

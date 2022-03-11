@@ -44,9 +44,9 @@ const getCalculatedValuesBySeries = (series: any[], calc: string, { util, decima
 function StatItem(props) {
   const ele = useRef(null);
   const eleSize = useSize(ele);
-  const { item, idx, colSpan, textMode } = props;
-  const headerFontSize = eleSize?.width! / _.toString(item.name).length || 12;
-  const statFontSize = eleSize?.width! / _.toString(item.stat).length || 12;
+  const { item, idx, colSpan, textMode, colorMode, textSize } = props;
+  const headerFontSize = textSize?.title ? textSize?.title : eleSize?.width! / _.toString(item.name).length || 12;
+  const statFontSize = textSize?.value ? textSize?.value : eleSize?.width! / _.toString(item.stat).length || 12;
   return (
     <div
       key={item.name}
@@ -54,6 +54,8 @@ function StatItem(props) {
       ref={ele}
       style={{
         width: `${100 / colSpan}%`,
+        flexBasis: `${100 / colSpan}%`,
+        backgroundColor: colorMode === 'background' ? hexPalette[idx % hexPalette.length] : 'transparent',
       }}
     >
       <div className='renderer-stat-item-content'>
@@ -70,7 +72,7 @@ function StatItem(props) {
         <div
           className='renderer-stat-value'
           style={{
-            color: hexPalette[idx],
+            color: colorMode === 'value' ? hexPalette[idx % hexPalette.length] : '#fff',
             fontSize: statFontSize > 100 ? 100 : statFontSize,
           }}
         >
@@ -84,7 +86,7 @@ function StatItem(props) {
 export default function Stat(props: IProps) {
   const { values, time, step, variableConfig } = props;
   const { targets, custom, options } = values;
-  const { calc, textMode, colSpan } = custom;
+  const { calc, textMode, colorMode, colSpan, textSize } = custom;
   const { series } = usePrometheus({
     time,
     step,
@@ -100,7 +102,7 @@ export default function Stat(props: IProps) {
     <div className='renderer-stat-container'>
       <div className='renderer-stat-container-box'>
         {_.map(calculatedValues, (item, idx) => {
-          return <StatItem key={item.name} item={item} idx={idx} colSpan={colSpan} textMode={textMode} />;
+          return <StatItem key={item.name} item={item} idx={idx} colSpan={colSpan} textMode={textMode} colorMode={colorMode} textSize={textSize} />;
         })}
       </div>
     </div>

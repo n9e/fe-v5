@@ -3,7 +3,6 @@ import { Modal, Form, Input, Row, Col, Select, Space } from 'antd';
 import { MinusCircleOutlined, PlusCircleOutlined, CloseOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { useTranslation } from 'react-i18next';
-import { useSize } from 'ahooks';
 import DateRangePicker, { Range } from '@/components/DateRangePicker';
 import PromqlEditor from '@/components/PromqlEditor';
 import Resolution from '@/components/Resolution';
@@ -24,7 +23,6 @@ interface IProps {
 function index(props: ModalWrapProps & IProps) {
   const { t } = useTranslation();
   const { visible, initialValues, variableConfig, cluster } = props;
-  const size = useSize(document.querySelector('body'));
   const [chartForm] = Form.useForm();
   const [range, setRange] = useState<Range>({
     description: '小时',
@@ -74,7 +72,12 @@ function index(props: ModalWrapProps & IProps) {
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <div>{initialValues ? t('编辑图表') : t('新建图表')}</div>
             <Space style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', fontSize: 12, lineHeight: '20px' }}>
-              <Form.Item noStyle shouldUpdate={(prevValues, curValues) => !_.isEqual(prevValues.type, curValues.type)}>
+              <Form.Item
+                noStyle
+                shouldUpdate={(prevValues, curValues) => {
+                  return !_.isEqual(prevValues.type, curValues.type);
+                }}
+              >
                 {({ getFieldValue, setFieldsValue }) => {
                   const type = getFieldValue('type');
                   setFieldsValue({
@@ -122,7 +125,7 @@ function index(props: ModalWrapProps & IProps) {
       >
         <div
           style={{
-            height: size.height ? size.height - 120 : 500,
+            height: 'calc(100% - 120px)',
           }}
         >
           <Row
