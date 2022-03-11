@@ -78,7 +78,16 @@ export interface IStatStyles {
     title: number;
     value: number;
   };
+  calc: string;
   colorMode: 'value' | 'background';
+}
+
+export interface ITableStyles {
+  version: string; // 时序图组件使用的版本
+  showHeader: boolean;
+  colorMode: 'value' | 'background';
+  calc: string;
+  groupBy: string; // 多个 series 基于一个 label 去分组
 }
 
 export interface IPanel {

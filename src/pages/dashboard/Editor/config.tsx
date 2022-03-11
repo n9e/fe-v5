@@ -31,6 +31,36 @@ export const IRefreshMap = {
   '1d': 86400,
 };
 
+export const calcsOptions = {
+  lastNotNull: {
+    name: '最后一个非空值',
+  },
+  last: {
+    name: '最后一个值',
+  },
+  firstNotNull: {
+    name: '第一个非空值',
+  },
+  first: {
+    name: '第一个值',
+  },
+  min: {
+    name: '最小值',
+  },
+  max: {
+    name: '最大值',
+  },
+  avg: {
+    name: '平均值',
+  },
+  sum: {
+    name: '总和',
+  },
+  count: {
+    name: '数量',
+  },
+};
+
 export const defaultValues = {
   version: '1.0.0',
   type: 'timeseries',
@@ -59,5 +89,9 @@ export const defaultCustomValuesMap = {
     calc: 'lastNotNull',
     colSpan: 1,
     textSize: {},
+  },
+  table: {
+    showHeader: true,
+    calc: 'lastNotNull',
   },
 };

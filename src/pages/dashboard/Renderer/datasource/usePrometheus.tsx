@@ -49,6 +49,7 @@ export default function usePrometheus(props: IProps) {
         _.forEach(item, (serie) => {
           _series.push({
             name: getSerieName(serie.metric),
+            metric: serie.metric,
             data: serie.values,
           });
         });

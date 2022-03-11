@@ -124,10 +124,13 @@ export default function DashboardDetail() {
       initialValues: {
         name: 'title',
         link: 'flashcat.cloud',
-        type: 'stat',
+        type: 'table',
         targets: [
           {
-            expr: 'go_gc_duration_seconds',
+            expr: 'cpu_usage_idle',
+          },
+          {
+            expr: 'disk_used',
           },
         ],
       },
