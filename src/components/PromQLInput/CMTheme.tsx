@@ -2,6 +2,9 @@ import { HighlightStyle, tags } from '@codemirror/highlight';
 import { EditorView } from '@codemirror/view';
 
 export const baseTheme = EditorView.theme({
+  '.cm-content': {
+    padding: 0,
+  },
   '&.cm-editor.cm-focused': {
     outline: 'unset',
   },

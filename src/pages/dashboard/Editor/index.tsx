@@ -96,7 +96,6 @@ function index(props: ModalWrapProps & IProps) {
         variableConfig={variableConfig}
         cluster={cluster}
         render={(innerVariableConfig) => {
-          console.log('values', values);
           return <Renderer time={range} step={step} type={type} values={values} variableConfig={innerVariableConfig} />;
         }}
       />
