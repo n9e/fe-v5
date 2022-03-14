@@ -32,7 +32,7 @@ export default function usePrometheus(props: IProps) {
     const _series: any[] = [];
     const exprs = _.map(targets, 'expr');
     const promises = _.map(exprs, (expr) => {
-      const realExpr = variableConfig ? replaceExpressionVars(expr, variableConfig, variableConfig.var.length) : exprs;
+      const realExpr = variableConfig ? replaceExpressionVars(expr, variableConfig, variableConfig.var.length) : expr;
       return api
         .fetchHistory({
           start,
