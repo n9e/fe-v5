@@ -53,7 +53,7 @@ export default function GraphStyles() {
               if (getFieldValue([...namePrefix, 'displayMode']) === 'labelValuesToRows') {
                 return (
                   <>
-                    <Col span={6}>
+                    {/* <Col span={6}>
                       <Form.Item
                         label={
                           <span>
@@ -75,9 +75,9 @@ export default function GraphStyles() {
                           })}
                         </Select>
                       </Form.Item>
-                    </Col>
-                    <Col span={6}>
-                      <Form.Item label='聚合维度' name={[...namePrefix, 'aggrDimension']}>
+                    </Col> */}
+                    <Col span={12}>
+                      <Form.Item label='显示维度' name={[...namePrefix, 'aggrDimension']}>
                         <Input />
                       </Form.Item>
                     </Col>

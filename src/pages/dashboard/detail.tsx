@@ -127,10 +127,10 @@ export default function DashboardDetail() {
         type: 'table',
         targets: [
           {
-            expr: 'cpu_usage_idle',
+            expr: 'avg(cpu_usage_idle) by (ident)',
           },
           {
-            expr: 'disk_used',
+            expr: 'avg(disk_used) by (ident)',
           },
         ],
       },

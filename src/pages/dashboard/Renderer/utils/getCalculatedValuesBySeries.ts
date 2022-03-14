@@ -37,15 +37,7 @@ const getCalculatedValuesBySeries = (series: any[], calc: string, { util, decima
         return item.metric.__name__;
       });
       _.forEach(subGrouped, (subVal, subKey) => {
-        const aggrResult = {
-          sum: () => _.sumBy(subVal, 'stat'),
-          avg: () => _.meanBy(subVal, 'stat'),
-          min: () => _.get(_.minBy(subVal, 'stat'), 'stat'),
-          max: () => _.get(_.maxBy(subVal, 'stat'), 'stat'),
-        }
-        if (aggrOperator) {
-          item[subKey] = aggrResult[aggrOperator]();
-        }
+        item[subKey] = _.meanBy(subVal, 'stat');
       });
       item.groupNames = _.keys(subGrouped);
       return item;

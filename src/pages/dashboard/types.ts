@@ -88,7 +88,7 @@ export interface ITableStyles {
   colorMode: 'value' | 'background';
   calc: string;
   displayMode: 'seriesToRows' | 'labelValuesToRows';
-  aggrOperator: string;
+  // aggrOperator: string;
   aggrDimension: string;
 }
 
