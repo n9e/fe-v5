@@ -60,7 +60,7 @@ request.interceptors.response.use(
         });
     }
     if (status === 401) {
-      if (response.url.indexOf('/api/n9e/auth/refresh')) {
+      if (response.url.startsWith('/api/n9e/auth/refresh')) {
         location.href = `/login${location.pathname != '/' ? '?redirect=' + location.pathname : ''}`;
       } else {
         localStorage.getItem('refresh_token')
