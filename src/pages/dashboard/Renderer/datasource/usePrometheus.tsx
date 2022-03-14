@@ -13,8 +13,8 @@ interface IProps {
   variableConfig?: VariableType;
 }
 
-const getSerieName = (metric: Object) => {
-  let name = metric['__name__'];
+const getSerieName = (metric: Object, expr: string) => {
+  let name = metric['__name__'] || expr;
   _.forEach(_.omit(metric, '__name__'), (value, key) => {
     name += ` ${key}: ${value}`;
   });
@@ -41,15 +41,21 @@ export default function usePrometheus(props: IProps) {
           query: realExpr,
         })
         .then((res) => {
-          return res?.data?.result;
+          return {
+            result: res?.data?.result,
+            expr,
+          };
         });
     });
     Promise.all(promises).then((res) => {
       _.forEach(res, (item) => {
-        _.forEach(item, (serie) => {
+        _.forEach(item.result, (serie) => {
           _series.push({
-            name: getSerieName(serie.metric),
-            metric: serie.metric,
+            name: getSerieName(serie.metric, item.expr),
+            metric: {
+              ...serie.metric,
+              __name__: serie.metric.__name__ || item.expr,
+            },
             data: serie.values,
           });
         });

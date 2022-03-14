@@ -11,37 +11,6 @@ import VariableConfig, { VariableType } from '../VariableConfig';
 export default function FormCpt(props) {
   const { chartForm, setChangedFlag, initialValues, type, variableConfig, cluster, render } = props;
   const [innerVariableConfig, setInnerVariableConfig] = useState<VariableType | undefined>(variableConfig);
-  const PromqlEditorField = ({ onChange = (e: any) => {}, value = '', fields, remove, add, index, name }) => {
-    return (
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        <PromQLInput
-          url='/api/n9e/prometheus'
-          headers={{
-            xCluster: 'Default',
-            Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
-          }}
-          onChange={onChange}
-          value={value}
-        />
-        {fields.length > 1 ? (
-          <MinusCircleOutlined
-            style={{ marginLeft: 10 }}
-            onClick={() => {
-              remove(name);
-            }}
-          />
-        ) : null}
-        {index === fields.length - 1 && (
-          <PlusCircleOutlined
-            style={{ marginLeft: 10 }}
-            onClick={() => {
-              add({ PromQL: '' });
-            }}
-          />
-        )}
-      </div>
-    );
-  };
 
   defaultValues.custom = defaultCustomValuesMap[_.get(initialValues, 'type') || defaultValues.type];
 
@@ -83,22 +52,47 @@ export default function FormCpt(props) {
                     <>
                       <Collapse>
                         {fields.length ? (
-                          fields.map(({ key, name, fieldKey, ...restField }, index) => {
+                          fields.map(({ name }, index) => {
                             return (
                               <Panel header={`Query ${index}`} key={index}>
-                                <Form.Item
-                                  label='PromQL'
-                                  name={[name, 'expr']}
-                                  validateTrigger={['onBlur']}
-                                  rules={[
-                                    {
-                                      required: true,
-                                      message: '请输入PromQL',
-                                    },
-                                  ]}
-                                >
-                                  <PromqlEditorField key={name + fieldKey} name={name} fields={fields} index={index} remove={remove} add={add} />
-                                </Form.Item>
+                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                  <Form.Item
+                                    label='PromQL'
+                                    name={[name, 'expr']}
+                                    validateTrigger={['onBlur']}
+                                    rules={[
+                                      {
+                                        required: true,
+                                        message: '请输入PromQL',
+                                      },
+                                    ]}
+                                    style={{ flex: 1 }}
+                                  >
+                                    <PromQLInput
+                                      url='/api/n9e/prometheus'
+                                      headers={{
+                                        xCluster: 'Default',
+                                        Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
+                                      }}
+                                    />
+                                  </Form.Item>
+                                  {fields.length > 1 ? (
+                                    <MinusCircleOutlined
+                                      style={{ marginLeft: 10 }}
+                                      onClick={() => {
+                                        remove(name);
+                                      }}
+                                    />
+                                  ) : null}
+                                  {index === fields.length - 1 && (
+                                    <PlusCircleOutlined
+                                      style={{ marginLeft: 10 }}
+                                      onClick={() => {
+                                        add({ PromQL: '' });
+                                      }}
+                                    />
+                                  )}
+                                </div>
                                 <Form.Item
                                   label='Legend'
                                   name={[name, 'Legend']}

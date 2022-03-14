@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef } from 'react';
+import React, { FC, useEffect, useRef, memo } from 'react';
 
 import { EditorView, highlightSpecialChars, keymap, ViewUpdate, placeholder } from '@codemirror/view';
 import { EditorState, Prec } from '@codemirror/state';
@@ -119,7 +119,7 @@ const ExpressionInput: FC<CMExpressionInputProps> = ({ url, headers, value, onCh
 
       viewRef.current = view;
 
-      // view.focus();
+      view.focus();
     }
   }, [onChange]);
 

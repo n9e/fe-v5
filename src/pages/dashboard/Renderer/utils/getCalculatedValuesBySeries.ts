@@ -5,7 +5,7 @@ const getValueAndToNumber = (value: any[]) => {
   return _.toNumber(_.get(value, 1, NaN));
 };
 
-const getCalculatedValuesBySeries = (series: any[], calc: string, { util, decimals }, groupBy?: string) => {
+const getCalculatedValuesBySeries = (series: any[], calc: string, { util, decimals }, aggrOperator?: string, aggrDimension?: string) => {
   const values = _.map(series, (serie) => {
     const results = {
       lastNotNull: () => getValueAndToNumber(_.last(_.filter(serie.data, (item) => item[1] !== null))),
@@ -25,9 +25,9 @@ const getCalculatedValuesBySeries = (series: any[], calc: string, { util, decima
       stat: valueFormatter({ util, decimals }, stat),
     };
   });
-  if (groupBy) {
+  if (aggrDimension) {
     const grouped = _.groupBy(values, (item) => {
-      return item.metric[groupBy];
+      return item.metric[aggrDimension];
     });
     return _.map(grouped, (val, key) => {
       const item: any = {
@@ -37,7 +37,15 @@ const getCalculatedValuesBySeries = (series: any[], calc: string, { util, decima
         return item.metric.__name__;
       });
       _.forEach(subGrouped, (subVal, subKey) => {
-        item[subKey] = _.meanBy(subVal, 'stat');
+        const aggrResult = {
+          sum: () => _.sumBy(subVal, 'stat'),
+          avg: () => _.meanBy(subVal, 'stat'),
+          min: () => _.get(_.minBy(subVal, 'stat'), 'stat'),
+          max: () => _.get(_.maxBy(subVal, 'stat'), 'stat'),
+        }
+        if (aggrOperator) {
+          item[subKey] = aggrResult[aggrOperator]();
+        }
       });
       item.groupNames = _.keys(subGrouped);
       return item;

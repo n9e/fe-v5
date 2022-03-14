@@ -1,10 +1,11 @@
 import React from 'react';
-import { Form, Radio, Select, Row, Col, InputNumber, Switch, Input } from 'antd';
+import { Form, Select, Row, Col, Switch, Input, Tooltip } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { Panel } from '../../Components/Collapse';
 import { calcsOptions } from '../../config';
 
-const colSpans = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const aggrOperators = ['sum', 'min', 'max', 'avg'];
 
 export default function GraphStyles() {
   const namePrefix = ['custom'];
@@ -27,25 +28,65 @@ export default function GraphStyles() {
             </Form.Item>
           </Col> */}
         </Row>
+        <Form.Item label='取值计算' name={[...namePrefix, 'calc']}>
+          <Select>
+            {_.map(calcsOptions, (item, key) => {
+              return (
+                <Select.Option key={key} value={key}>
+                  {item.name}
+                </Select.Option>
+              );
+            })}
+          </Select>
+        </Form.Item>
         <Row gutter={10}>
           <Col span={12}>
-            <Form.Item label='取值计算' name={[...namePrefix, 'calc']}>
+            <Form.Item label='显示模式' name={[...namePrefix, 'displayMode']}>
               <Select>
-                {_.map(calcsOptions, (item, key) => {
-                  return (
-                    <Select.Option key={key} value={key}>
-                      {item.name}
-                    </Select.Option>
-                  );
-                })}
+                <Select.Option value='seriesToRows'>每行展示 serie 的值</Select.Option>
+                <Select.Option value='labelValuesToRows'>每行展示指定聚合维度的值</Select.Option>
               </Select>
             </Form.Item>
           </Col>
-          <Col span={12}>
-            <Form.Item label='groupBy' name={[...namePrefix, 'groupBy']}>
-              <Input />
-            </Form.Item>
-          </Col>
+          <Form.Item noStyle shouldUpdate={(prevValues, curValues) => _.get(prevValues, [...namePrefix, 'displayMode']) !== _.get(curValues, [...namePrefix, 'displayMode'])}>
+            {({ getFieldValue }) => {
+              if (getFieldValue([...namePrefix, 'displayMode']) === 'labelValuesToRows') {
+                return (
+                  <>
+                    <Col span={6}>
+                      <Form.Item
+                        label={
+                          <span>
+                            聚合函数&nbsp;
+                            <Tooltip title='建议优先通过 promql 的 aggregation operators and by clause 来聚合指定的维度，否则才会生效这里配置的聚合函数和维度'>
+                              <InfoCircleOutlined />
+                            </Tooltip>
+                          </span>
+                        }
+                        name={[...namePrefix, 'aggrOperator']}
+                      >
+                        <Select>
+                          {_.map(aggrOperators, (item) => {
+                            return (
+                              <Select.Option key={item} value={item}>
+                                {item}
+                              </Select.Option>
+                            );
+                          })}
+                        </Select>
+                      </Form.Item>
+                    </Col>
+                    <Col span={6}>
+                      <Form.Item label='聚合维度' name={[...namePrefix, 'aggrDimension']}>
+                        <Input />
+                      </Form.Item>
+                    </Col>
+                  </>
+                );
+              }
+              return null;
+            }}
+          </Form.Item>
         </Row>
       </>
     </Panel>

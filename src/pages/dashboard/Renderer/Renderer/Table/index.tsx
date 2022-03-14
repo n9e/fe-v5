@@ -1,12 +1,10 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import _ from 'lodash';
 import { Table } from 'antd';
-import { useSize } from 'ahooks';
 import { Range } from '@/components/DateRangePicker';
 import usePrometheus from '../../datasource/usePrometheus';
 import { IPanel } from '../../../types';
 import { VariableType } from '../../../VariableConfig';
-import { hexPalette } from '../../../config';
 import getCalculatedValuesBySeries from '../../utils/getCalculatedValuesBySeries';
 import './style.less';
 
@@ -20,7 +18,7 @@ interface IProps {
 export default function Stat(props: IProps) {
   const { values, time, step, variableConfig } = props;
   const { targets, custom, options } = values;
-  const { showHeader, calc, groupBy } = custom;
+  const { showHeader, calc, aggrOperator, aggrDimension } = custom;
   const { series } = usePrometheus({
     time,
     step,
@@ -34,7 +32,8 @@ export default function Stat(props: IProps) {
       util: options?.standardOptions?.util,
       decimals: options?.standardOptions?.decimals,
     },
-    groupBy,
+    aggrOperator,
+    aggrDimension,
   );
   const firstItem = _.first(calculatedValues);
   const columns = [
@@ -46,7 +45,7 @@ export default function Stat(props: IProps) {
     },
   ];
 
-  if (groupBy) {
+  if (aggrDimension) {
     _.map(firstItem?.groupNames, (name) => {
       columns.push({
         title: name,

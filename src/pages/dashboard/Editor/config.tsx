@@ -93,5 +93,6 @@ export const defaultCustomValuesMap = {
   table: {
     showHeader: true,
     calc: 'lastNotNull',
+    displayMode: 'seriesToRows',
   },
 };

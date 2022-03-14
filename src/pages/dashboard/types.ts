@@ -87,7 +87,9 @@ export interface ITableStyles {
   showHeader: boolean;
   colorMode: 'value' | 'background';
   calc: string;
-  groupBy: string; // 多个 series 基于一个 label 去分组
+  displayMode: 'seriesToRows' | 'labelValuesToRows';
+  aggrOperator: string;
+  aggrDimension: string;
 }
 
 export interface IPanel {
