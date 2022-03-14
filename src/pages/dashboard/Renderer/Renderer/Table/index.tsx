@@ -42,6 +42,7 @@ export default function Stat(props: IProps) {
       title: 'name',
       dataIndex: 'name',
       key: 'name',
+      render: (text) => <div className='renderer-table-td-content'>{text}</div>,
     },
   ];
 
@@ -51,6 +52,7 @@ export default function Stat(props: IProps) {
         title: name,
         dataIndex: name,
         key: name,
+        render: (text) => <div className='renderer-table-td-content'>{text}</div>,
       });
     });
   } else {
@@ -58,6 +60,7 @@ export default function Stat(props: IProps) {
       title: 'value',
       dataIndex: 'stat',
       key: 'stat',
+      render: (text) => <div className='renderer-table-td-content'>{text}</div>,
     });
   }
 
