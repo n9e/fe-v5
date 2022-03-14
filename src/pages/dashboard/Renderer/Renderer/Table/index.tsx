@@ -61,13 +61,12 @@ export default function Stat(props: IProps) {
     });
   }
 
-  console.log('calculatedValues', calculatedValues);
   const height = showHeader ? 168 : 198;
 
   return (
     <div className='renderer-table-container'>
       <div className='renderer-table-container-box'>
-        <Table showHeader={showHeader} dataSource={calculatedValues} columns={columns} scroll={{ y: height }} bordered={false} pagination={false} />
+        <Table rowKey='name' showHeader={showHeader} dataSource={calculatedValues} columns={columns} scroll={{ y: height }} bordered={false} pagination={false} />
       </div>
     </div>
   );

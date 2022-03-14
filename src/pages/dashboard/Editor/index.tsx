@@ -1,18 +1,16 @@
-import React, { useState, useRef } from 'react';
-import { Modal, Form, Input, Row, Col, Select, Space } from 'antd';
-import { MinusCircleOutlined, PlusCircleOutlined, CloseOutlined } from '@ant-design/icons';
+import React, { useState, useEffect } from 'react';
+import { Modal, Form, Select, Space } from 'antd';
+import { CloseOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { useTranslation } from 'react-i18next';
 import DateRangePicker, { Range } from '@/components/DateRangePicker';
-import PromqlEditor from '@/components/PromqlEditor';
 import Resolution from '@/components/Resolution';
 import ModalHOC, { ModalWrapProps } from './ModalHOC';
 import { visualizations, defaultValues, defaultCustomValuesMap } from './config';
 import Renderer from '../Renderer/Renderer';
 import { Chart } from '../chartGroup';
-import Options from './Options';
-import Collapse, { Panel } from './Components/Collapse';
-import VariableConfig, { VariableType } from '../VariableConfig';
+import { VariableType } from '../VariableConfig';
+import FormCpt from './Form';
 
 interface IProps {
   initialValues: Chart | null;
@@ -29,210 +27,80 @@ function index(props: ModalWrapProps & IProps) {
     num: 1,
     unit: 'hour',
   });
+  const defaultType = _.get(initialValues, 'type') || defaultValues.type;
+  const [type, setType] = useState<string>(defaultType);
   const [step, setStep] = useState<number | null>(null);
-  const [innerVariableConfig, setInnerVariableConfig] = useState<VariableType | undefined>(variableConfig);
-  const renderRef = useRef<any>(null);
-  const PromqlEditorField = ({ onChange = (e: any) => {}, value = '', fields, remove, add, index, name }) => {
-    return (
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        <PromqlEditor
-          xCluster='Default'
-          onChange={onChange}
-          value={value}
-          style={{
-            width: '310px',
-            // flex: 1,
-          }}
-        />
-        {fields.length > 1 ? (
-          <MinusCircleOutlined
-            style={{ marginLeft: 10 }}
-            onClick={() => {
-              remove(name);
-            }}
-          />
-        ) : null}
-        {index === fields.length - 1 && (
-          <PlusCircleOutlined
-            style={{ marginLeft: 10 }}
-            onClick={() => {
-              add({ PromQL: '' });
-            }}
-          />
-        )}
-      </div>
-    );
-  };
-  defaultValues.custom = defaultCustomValuesMap[_.get(initialValues, 'type') || defaultValues.type];
+  const [changedFlag, setChangedFlag] = useState<string>(_.uniqueId('xxx_'));
+  const [values, setValues] = useState<any>(chartForm.getFieldsValue());
+
+  useEffect(() => {
+    setValues(chartForm.getFieldsValue());
+  }, [changedFlag]);
+
   return (
-    <Form layout='vertical' form={chartForm} preserve={false} initialValues={_.merge({}, defaultValues, initialValues)} id='dashboard-panel-form'>
-      <Modal
-        width='100%'
-        title={
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <div>{initialValues ? t('编辑图表') : t('新建图表')}</div>
-            <Space style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', fontSize: 12, lineHeight: '20px' }}>
-              <Form.Item
-                noStyle
-                shouldUpdate={(prevValues, curValues) => {
-                  return !_.isEqual(prevValues.type, curValues.type);
-                }}
-              >
-                {({ getFieldValue, setFieldsValue }) => {
-                  const type = getFieldValue('type');
-                  setFieldsValue({
-                    custom: defaultCustomValuesMap[type],
-                  });
-                  if (renderRef.current) {
-                    renderRef.current.reload();
-                  }
-                  return null;
-                }}
-              </Form.Item>
-              <Form.Item name='type' noStyle>
-                <Select dropdownMatchSelectWidth={false}>
-                  {_.map(visualizations, (item) => {
-                    return (
-                      <Select.Option value={item.type} key={item.type}>
-                        {item.name}
-                      </Select.Option>
-                    );
-                  })}
-                </Select>
-              </Form.Item>
-              <DateRangePicker onChange={(e) => setRange(e)} />
-              <Resolution onChange={(v) => setStep(v)} initialValue={step} />
-              <CloseOutlined
-                style={{ fontSize: 18 }}
-                onClick={() => {
-                  props.destroy();
-                }}
-              />
-            </Space>
-          </div>
-        }
-        style={{ top: 10, padding: 0 }}
-        visible={visible}
-        closable={false}
-        footer={null}
-        onCancel={() => {
-          props.destroy();
-        }}
-        bodyStyle={{
-          padding: '10px 24px 24px 24px',
-        }}
-        getContainer={() => document.getElementById('dashboard-panel-form')!}
-      >
-        <div
-          style={{
-            height: 'calc(100vh - 120px)',
-          }}
-        >
-          <Row
-            gutter={20}
-            style={{
-              flexWrap: 'nowrap',
-              height: '100%',
-            }}
-          >
-            <Col flex={1} style={{ minWidth: 100 }}>
-              <Form.Item noStyle shouldUpdate={(prevValues, curValues) => !_.isEqual(prevValues, curValues)}>
-                {({ getFieldsValue }) => {
-                  return <Renderer ref={renderRef} time={range} step={step} getFieldsValue={getFieldsValue} variableConfig={innerVariableConfig} />;
-                }}
-              </Form.Item>
-              <div style={{ height: 'calc(100% - 220px)', overflowY: 'auto' }}>
-                <div style={{ marginTop: 20 }}>
-                  <VariableConfig
-                    onChange={(value) => {
-                      setInnerVariableConfig(value);
-                    }}
-                    value={innerVariableConfig}
-                    editable={false}
-                    cluster={cluster}
-                  />
-                </div>
-                <Form.List name='targets'>
-                  {(fields, { add, remove }, { errors }) => {
-                    return (
-                      <>
-                        <Collapse>
-                          {fields.length ? (
-                            fields.map(({ key, name, fieldKey, ...restField }, index) => {
-                              return (
-                                <Panel header={`Query ${index}`} key={index}>
-                                  <Form.Item
-                                    label='PromQL'
-                                    name={[name, 'expr']}
-                                    validateTrigger={['onBlur']}
-                                    rules={[
-                                      {
-                                        required: true,
-                                        message: '请输入PromQL',
-                                      },
-                                    ]}
-                                  >
-                                    <PromqlEditorField key={name + fieldKey} name={name} fields={fields} index={index} remove={remove} add={add} />
-                                  </Form.Item>
-                                  <Form.Item
-                                    label='Legend'
-                                    name={[name, 'Legend']}
-                                    tooltip={{
-                                      getPopupContainer: () => document.body,
-                                      title:
-                                        'Controls the name of the time series, using name or pattern. For example {{hostname}} will be replaced with label value for the label hostname.',
-                                    }}
-                                  >
-                                    <Input />
-                                  </Form.Item>
-                                </Panel>
-                              );
-                            })
-                          ) : (
-                            <PlusCircleOutlined
-                              onClick={() => {
-                                add({
-                                  PromQL: '',
-                                });
-                              }}
-                            />
-                          )}
-                          <Form.ErrorList errors={errors} />
-                        </Collapse>
-                      </>
-                    );
-                  }}
-                </Form.List>
-              </div>
-            </Col>
-            <Col flex='600px' style={{ overflowY: 'auto' }}>
-              <Collapse>
-                <Panel header='面板配置'>
-                  <>
-                    <Form.Item
-                      label={'标题'}
-                      name='name'
-                      rules={[
-                        {
-                          required: true,
-                          message: '图表名称',
-                        },
-                      ]}
-                    >
-                      <Input />
-                    </Form.Item>
-                    <Form.Item label={'下钻链接'} name='link'>
-                      <Input />
-                    </Form.Item>
-                  </>
-                </Panel>
-                <Options />
-              </Collapse>
-            </Col>
-          </Row>
+    <Modal
+      width='100%'
+      title={
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div>{initialValues ? t('编辑图表') : t('新建图表')}</div>
+          <Space style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', fontSize: 12, lineHeight: '20px' }}>
+            <Select
+              dropdownMatchSelectWidth={false}
+              value={type}
+              onChange={(val) => {
+                setType(val);
+                chartForm.setFieldsValue({
+                  custom: defaultCustomValuesMap[val],
+                });
+                // TODO: setFieldsValue 可能是个异步的，无法立刻拿到最新的 values，后面需要翻下 antd.form 组件源码
+                setTimeout(() => {
+                  setChangedFlag(_.uniqueId('xxx_'));
+                }, 100);
+              }}
+            >
+              {_.map(visualizations, (item) => {
+                return (
+                  <Select.Option value={item.type} key={item.type}>
+                    {item.name}
+                  </Select.Option>
+                );
+              })}
+            </Select>
+            <DateRangePicker onChange={(e) => setRange(e)} />
+            <Resolution onChange={(v) => setStep(v)} initialValue={step} />
+            <CloseOutlined
+              style={{ fontSize: 18 }}
+              onClick={() => {
+                props.destroy();
+              }}
+            />
+          </Space>
         </div>
-      </Modal>
-    </Form>
+      }
+      style={{ top: 10, padding: 0 }}
+      visible={visible}
+      closable={false}
+      footer={null}
+      onCancel={() => {
+        props.destroy();
+      }}
+      bodyStyle={{
+        padding: '10px 24px 24px 24px',
+      }}
+    >
+      <FormCpt
+        chartForm={chartForm}
+        setChangedFlag={setChangedFlag}
+        initialValues={initialValues}
+        type={type}
+        variableConfig={variableConfig}
+        cluster={cluster}
+        render={(innerVariableConfig) => {
+          console.log('values', values);
+          return <Renderer time={range} step={step} type={type} values={values} variableConfig={innerVariableConfig} />;
+        }}
+      />
+    </Modal>
   );
 }
 
