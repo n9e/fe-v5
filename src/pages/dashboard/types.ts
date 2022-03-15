@@ -19,19 +19,17 @@ export interface ILink {
 
 export type IType = 'timeseries' | 'stat' | 'table' | 'pie';
 
-export interface IMapping {
-  options: {
-    match: {
-      special?: string | number;
-      from?: number;
-      to?: number
-    };
-    result: {
-      color: string;
-      text: string;
-    };
-    type: 'range' | 'special'
+export interface IValueMapping {
+  match: {
+    special?: string | number;
+    from?: number;
+    to?: number
   };
+  result: {
+    color: string;
+    text: string;
+  };
+  type: 'range' | 'special'
 }
 
 export interface IThresholds {
@@ -44,7 +42,7 @@ export interface IThresholds {
 
 // 一些通用的配置，不同类型的图表可选择性使用配置
 export interface IOptions {
-  mappings?: IMapping[];
+  valueMappings?: IValueMapping[];
   thresholds?: IThresholds;
   standardOptions?: {
     util?: string;
@@ -60,7 +58,7 @@ export interface IOptions {
   tooltip?: {
     mode: 'single' | 'all',
     sort: 'none' | 'asc' | 'desc'
-  }
+  };
 }
 
 export interface ITimeseriesStyles {
