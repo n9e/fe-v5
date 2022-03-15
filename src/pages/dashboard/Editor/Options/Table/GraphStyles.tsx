@@ -1,11 +1,8 @@
 import React from 'react';
-import { Form, Select, Row, Col, Switch, Input, Tooltip } from 'antd';
-import { InfoCircleOutlined } from '@ant-design/icons';
+import { Form, Select, Row, Col, Switch, Input } from 'antd';
 import _ from 'lodash';
 import { Panel } from '../../Components/Collapse';
 import { calcsOptions } from '../../config';
-
-const aggrOperators = ['sum', 'min', 'max', 'avg'];
 
 export default function GraphStyles() {
   const namePrefix = ['custom'];
@@ -19,14 +16,6 @@ export default function GraphStyles() {
               <Switch size='small' />
             </Form.Item>
           </Col>
-          {/* <Col span={12}>
-            <Form.Item label='颜色模式' name={[...namePrefix, 'colorMode']}>
-              <Radio.Group buttonStyle='solid'>
-                <Radio.Button value='value'>值</Radio.Button>
-                <Radio.Button value='background'>背景</Radio.Button>
-              </Radio.Group>
-            </Form.Item>
-          </Col> */}
         </Row>
         <Form.Item label='取值计算' name={[...namePrefix, 'calc']}>
           <Select>
@@ -52,36 +41,11 @@ export default function GraphStyles() {
             {({ getFieldValue }) => {
               if (getFieldValue([...namePrefix, 'displayMode']) === 'labelValuesToRows') {
                 return (
-                  <>
-                    {/* <Col span={6}>
-                      <Form.Item
-                        label={
-                          <span>
-                            聚合函数&nbsp;
-                            <Tooltip title='建议优先通过 promql 的 aggregation operators and by clause 来聚合指定的维度，否则才会生效这里配置的聚合函数和维度'>
-                              <InfoCircleOutlined />
-                            </Tooltip>
-                          </span>
-                        }
-                        name={[...namePrefix, 'aggrOperator']}
-                      >
-                        <Select>
-                          {_.map(aggrOperators, (item) => {
-                            return (
-                              <Select.Option key={item} value={item}>
-                                {item}
-                              </Select.Option>
-                            );
-                          })}
-                        </Select>
-                      </Form.Item>
-                    </Col> */}
-                    <Col span={12}>
-                      <Form.Item label='显示维度' name={[...namePrefix, 'aggrDimension']}>
-                        <Input />
-                      </Form.Item>
-                    </Col>
-                  </>
+                  <Col span={12}>
+                    <Form.Item label='显示维度' name={[...namePrefix, 'aggrDimension']}>
+                      <Input />
+                    </Form.Item>
+                  </Col>
                 );
               }
               return null;
