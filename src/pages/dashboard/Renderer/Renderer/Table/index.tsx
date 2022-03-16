@@ -18,7 +18,7 @@ interface IProps {
 export default function Stat(props: IProps) {
   const { values, time, step, variableConfig } = props;
   const { targets, custom, options } = values;
-  const { showHeader, calc, aggrOperator, aggrDimension } = custom;
+  const { showHeader, calc, aggrDimension } = custom;
   const { series } = usePrometheus({
     time,
     step,
@@ -32,11 +32,11 @@ export default function Stat(props: IProps) {
       util: options?.standardOptions?.util,
       decimals: options?.standardOptions?.decimals,
     },
-    aggrOperator,
+    options.valueMappings,
     aggrDimension,
   );
   const firstItem = _.first(calculatedValues);
-  const columns = [
+  const columns: any[] = [
     {
       title: 'name',
       dataIndex: 'name',
@@ -51,15 +51,27 @@ export default function Stat(props: IProps) {
         title: name,
         dataIndex: name,
         key: name,
-        render: (text) => <div className='renderer-table-td-content'>{text}</div>,
+        render: (text) => {
+          return (
+            <div className='renderer-table-td-content' style={{ color: text?.color }}>
+              {text?.text}
+            </div>
+          );
+        },
       });
     });
   } else {
     columns.push({
       title: 'value',
-      dataIndex: 'stat',
-      key: 'stat',
-      render: (text) => <div className='renderer-table-td-content'>{text}</div>,
+      dataIndex: 'text',
+      key: 'text',
+      render: (text, record) => {
+        return (
+          <div className='renderer-table-td-content' style={{ color: record.color }}>
+            {text}
+          </div>
+        );
+      },
     });
   }
 

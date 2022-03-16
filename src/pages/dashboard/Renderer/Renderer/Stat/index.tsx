@@ -22,6 +22,7 @@ function StatItem(props) {
   const { item, idx, colSpan, textMode, colorMode, textSize } = props;
   const headerFontSize = textSize?.title ? textSize?.title : eleSize?.width! / _.toString(item.name).length || 12;
   const statFontSize = textSize?.value ? textSize?.value : eleSize?.width! / _.toString(item.stat).length || 12;
+  const color = item.color ? item.color : hexPalette[idx % hexPalette.length];
   return (
     <div
       key={item.name}
@@ -30,7 +31,7 @@ function StatItem(props) {
       style={{
         width: `${100 / colSpan}%`,
         flexBasis: `${100 / colSpan}%`,
-        backgroundColor: colorMode === 'background' ? hexPalette[idx % hexPalette.length] : 'transparent',
+        backgroundColor: colorMode === 'background' ? color : 'transparent',
       }}
     >
       <div className='renderer-stat-item-content'>
@@ -47,11 +48,11 @@ function StatItem(props) {
         <div
           className='renderer-stat-value'
           style={{
-            color: colorMode === 'value' ? hexPalette[idx % hexPalette.length] : '#fff',
+            color: colorMode === 'value' ? color : '#fff',
             fontSize: statFontSize > 100 ? 100 : statFontSize,
           }}
         >
-          {item.stat}
+          {item.text}
         </div>
       </div>
     </div>
@@ -68,10 +69,15 @@ export default function Stat(props: IProps) {
     targets,
     variableConfig,
   });
-  const calculatedValues = getCalculatedValuesBySeries(series, calc, {
-    util: options?.standardOptions?.util,
-    decimals: options?.standardOptions?.decimals,
-  });
+  const calculatedValues = getCalculatedValuesBySeries(
+    series,
+    calc,
+    {
+      util: options?.standardOptions?.util,
+      decimals: options?.standardOptions?.decimals,
+    },
+    options?.valueMappings,
+  );
 
   return (
     <div className='renderer-stat-container'>

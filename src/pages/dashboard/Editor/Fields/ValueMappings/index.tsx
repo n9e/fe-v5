@@ -1,6 +1,6 @@
 import React from 'react';
 import { Form, Input, InputNumber, Button, Select, Row, Col, Space } from 'antd';
-import { CloseSquareOutlined } from '@ant-design/icons';
+import { DeleteOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 
 import { Panel } from '../../Components/Collapse';
@@ -23,53 +23,64 @@ export default function index() {
             >
               添加
             </Button>
-            <Row gutter={10}>
-              <Col flex='290px'>条件</Col>
-              <Col flex='100'>显示文字</Col>
-              <Col flex='50'>颜色</Col>
-              <Col flex='50'>操作</Col>
-            </Row>
+            {_.isEmpty(fields) ? null : (
+              <Row gutter={10}>
+                <Col flex='290px'>条件</Col>
+                <Col flex='100'>显示文字</Col>
+                <Col flex='50'>颜色</Col>
+                <Col flex='50'>操作</Col>
+              </Row>
+            )}
+
             {fields.map(({ key, name, ...restField }) => {
               return (
-                <Row gutter={10} style={{ marginBottom: 10 }}>
+                <Row key={key} gutter={10} style={{ marginBottom: 10 }}>
                   <Col flex='290px'>
-                    <Space>
-                      <Form.Item noStyle {...restField} name={[name, 'type']}>
-                        <Select style={{ width: 80 }}>
-                          <Select.Option value='special'>固定值</Select.Option>
-                          <Select.Option value='range'>范围值</Select.Option>
-                        </Select>
-                      </Form.Item>
-                      <Form.Item noStyle {...restField} shouldUpdate={(prevValues, curValues) => _.get(prevValues, [name, 'type']) !== _.get(curValues, [name, 'type'])}>
-                        {({ getFieldValue }) => {
-                          const type = getFieldValue([...namePrefix, name, 'type']);
-                          if (type === 'special') {
-                            return (
-                              <Form.Item noStyle {...restField} name={[name, 'match', 'special']}>
-                                <InputNumber style={{ width: '100%' }} />
-                              </Form.Item>
-                            );
-                          }
-                          if (type === 'range') {
-                            return (
-                              <Space>
-                                <Form.Item noStyle {...restField} name={[name, 'match', 'from']}>
-                                  <InputNumber />
+                    <Row gutter={10}>
+                      <Col flex='80px'>
+                        <Form.Item noStyle {...restField} name={[name, 'type']}>
+                          <Select style={{ width: 80 }}>
+                            <Select.Option value='special'>固定值</Select.Option>
+                            <Select.Option value='range'>范围值</Select.Option>
+                          </Select>
+                        </Form.Item>
+                      </Col>
+                      <Col flex='1'>
+                        <Form.Item noStyle {...restField} shouldUpdate={(prevValues, curValues) => _.get(prevValues, [name, 'type']) !== _.get(curValues, [name, 'type'])}>
+                          {({ getFieldValue }) => {
+                            const type = getFieldValue([...namePrefix, name, 'type']);
+                            if (type === 'special') {
+                              return (
+                                <Form.Item noStyle {...restField} name={[name, 'match', 'special']}>
+                                  <InputNumber style={{ width: '100%' }} />
                                 </Form.Item>
-                                <Form.Item noStyle {...restField} name={[name, 'match', 'to']}>
-                                  <InputNumber />
-                                </Form.Item>
-                              </Space>
-                            );
-                          }
-                          return null;
-                        }}
-                      </Form.Item>
-                    </Space>
+                              );
+                            }
+                            if (type === 'range') {
+                              return (
+                                <Row gutter={10}>
+                                  <Col span={12}>
+                                    <Form.Item noStyle {...restField} name={[name, 'match', 'from']}>
+                                      <InputNumber />
+                                    </Form.Item>
+                                  </Col>
+                                  <Col span={12}>
+                                    <Form.Item noStyle {...restField} name={[name, 'match', 'to']}>
+                                      <InputNumber />
+                                    </Form.Item>
+                                  </Col>
+                                </Row>
+                              );
+                            }
+                            return null;
+                          }}
+                        </Form.Item>
+                      </Col>
+                    </Row>
                   </Col>
                   <Col flex='100'>
                     <Form.Item noStyle {...restField} name={[name, 'result', 'text']}>
-                      <Input />
+                      <Input placeholder='可选' />
                     </Form.Item>
                   </Col>
                   <Col flex='50'>
@@ -78,10 +89,11 @@ export default function index() {
                     </Form.Item>
                   </Col>
                   <Col flex='50'>
-                    <CloseSquareOutlined
+                    <Button
                       onClick={() => {
                         remove(name);
                       }}
+                      icon={<DeleteOutlined />}
                     />
                   </Col>
                 </Row>

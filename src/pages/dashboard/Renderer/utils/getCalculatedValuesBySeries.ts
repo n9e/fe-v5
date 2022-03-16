@@ -1,11 +1,12 @@
 import _ from 'lodash';
 import valueFormatter from './valueFormatter';
+import { IValueMapping } from '../../types';
 
 const getValueAndToNumber = (value: any[]) => {
   return _.toNumber(_.get(value, 1, NaN));
 };
 
-const getCalculatedValuesBySeries = (series: any[], calc: string, { util, decimals }, aggrOperator?: string, aggrDimension?: string) => {
+const getCalculatedValuesBySeries = (series: any[], calc: string, { util, decimals }, valueMappings?: IValueMapping[], aggrDimension?: string) => {
   const values = _.map(series, (serie) => {
     const results = {
       lastNotNull: () => getValueAndToNumber(_.last(_.filter(serie.data, (item) => item[1] !== null))),
@@ -19,10 +20,20 @@ const getCalculatedValuesBySeries = (series: any[], calc: string, { util, decima
       count: () => _.size(serie.data),
     };
     const stat = results[calc] ? results[calc]() : NaN;
+    const matchedValueMapping = _.find(valueMappings, (item) => {
+      const { type, match } = item;
+      if (type === 'special') {
+        return stat === match?.special;
+      } else if (type === 'range') {
+        return stat >= match?.from && stat <= match?.to;
+      }
+    });
     return {
       name: serie.name,
       metric: serie.metric,
-      stat: valueFormatter({ util, decimals }, stat),
+      color: matchedValueMapping?.result?.color,
+      stat,
+      text: matchedValueMapping?.result?.text ? matchedValueMapping?.result?.text : valueFormatter({ util, decimals }, stat),
     };
   });
   if (aggrDimension) {
@@ -37,7 +48,11 @@ const getCalculatedValuesBySeries = (series: any[], calc: string, { util, decima
         return item.metric.__name__;
       });
       _.forEach(subGrouped, (subVal, subKey) => {
-        item[subKey] = _.meanBy(subVal, 'stat');
+        item[subKey] = {
+          stat: subVal[0].stat,
+          color: subVal[0].color,
+          text: subVal[0].text,
+        };
       });
       item.groupNames = _.keys(subGrouped);
       return item;
