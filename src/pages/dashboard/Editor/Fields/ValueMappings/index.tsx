@@ -9,7 +9,7 @@ export default function index() {
   const namePrefix = ['options', 'valueMappings'];
 
   return (
-    <Panel header='阈值'>
+    <Panel header='值映射'>
       <Form.List name={namePrefix}>
         {(fields, { add, remove }) => (
           <>

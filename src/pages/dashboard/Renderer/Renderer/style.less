@@ -1,0 +1,28 @@
+.renderer-header {
+  background-color: #f9f9f9;
+  border-bottom: 1px solid #efefef;
+  height: 35px;
+  line-height: 35px;
+  display: flex;
+}
+.renderer-header-desc {
+  width: 35px;
+  text-align: center;
+  background-color: #efefef;
+  cursor: pointer;
+}
+.renderer-header-content {
+  text-align: center;
+  flex: 1;
+}
+.renderer-header-title {
+  cursor: pointer;
+  .renderer-header-arrow {
+    opacity: 0;
+  }
+  &:hover {
+    .renderer-header-arrow {
+      opacity: 1;
+    }
+  }
+}

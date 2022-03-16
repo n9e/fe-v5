@@ -75,7 +75,8 @@ export default function Stat(props: IProps) {
     });
   }
 
-  const height = showHeader ? 168 : 198;
+  const headerHeight = showHeader ? 30 : 0;
+  const height = 300 - 36 - headerHeight;
 
   return (
     <div className='renderer-table-container'>

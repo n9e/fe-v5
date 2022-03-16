@@ -37,7 +37,7 @@ export default function FormCpt(props) {
         >
           <Col flex={1} style={{ minWidth: 100 }}>
             <div style={{ marginBottom: 20 }}>{render(innerVariableConfig)}</div>
-            <div style={{ height: 'calc(100% - 220px)', overflowY: 'auto' }}>
+            <div style={{ height: 'calc(100% - 320px)', overflowY: 'auto' }}>
               <VariableConfig
                 onChange={(value) => {
                   setInnerVariableConfig(value);
@@ -142,6 +142,9 @@ export default function FormCpt(props) {
                   </Form.Item>
                   <Form.Item label={'下钻链接'} name='link'>
                     <Input />
+                  </Form.Item>
+                  <Form.Item label='备注' name='description'>
+                    <Input.TextArea placeholder='支持 markdown' />
                   </Form.Item>
                 </>
               </Panel>

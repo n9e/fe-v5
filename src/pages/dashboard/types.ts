@@ -95,6 +95,7 @@ export interface IPanel {
   id: number;
   title: string;
   link: ILink;
+  description: string;
   gridPos: IGridPos;
   targets: ITarget[];
   type: IType;

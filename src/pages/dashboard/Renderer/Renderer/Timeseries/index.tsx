@@ -39,7 +39,7 @@ export default function index(props: IProps) {
           ykeyFormatter: (value) => Number(value),
           chart: {
             renderTo: chartEleRef.current,
-            height: 200,
+            height: 300 - 36,
           },
           series: [],
           line: {
