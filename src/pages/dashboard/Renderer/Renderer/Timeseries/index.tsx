@@ -8,6 +8,7 @@ import { IPanel } from '../../../types';
 import { hexPalette } from '../../../config';
 import { VariableType } from '../../../VariableConfig';
 import valueFormatter from '../../utils/valueFormatter';
+import './style.less';
 
 interface IProps {
   time: Range;
@@ -39,7 +40,7 @@ export default function index(props: IProps) {
           ykeyFormatter: (value) => Number(value),
           chart: {
             renderTo: chartEleRef.current,
-            height: 300 - 36,
+            height: chartEleRef.current.clientHeight,
           },
           series: [],
           line: {
@@ -103,5 +104,5 @@ export default function index(props: IProps) {
     }
   }, [JSON.stringify(series), JSON.stringify(custom), JSON.stringify(options)]);
 
-  return <div ref={chartEleRef} />;
+  return <div className='renderer-timeseries-container' ref={chartEleRef} />;
 }

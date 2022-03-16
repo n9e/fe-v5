@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext, useCallback, ReactElement, RefObject } from 'react';
 import { Button, Collapse, Modal, Menu, Dropdown, Divider, Popover, Checkbox, Tooltip } from 'antd';
+import semver from 'semver';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 const { Panel } = Collapse;
@@ -20,6 +21,7 @@ import Graph from '@/components/Graph';
 import moment from 'moment';
 // 它可以和15行合并为一个import
 import { convertExpressionToQuery, replaceExpressionVars } from './VariableConfig/constant';
+import Renderer from './Renderer/Renderer/index';
 
 const { confirm } = Modal;
 interface Props {
@@ -496,7 +498,21 @@ export default function ChartGroup(props: Props) {
       chartConfigs &&
       chartConfigs.length > 0 &&
       chartConfigs.map((item, i) => {
-        let { QL, name, legend, yplotline1, yplotline2, highLevelConfig } = item.configs;
+        let { QL, name, legend, yplotline1, yplotline2, highLevelConfig, version } = item.configs;
+        if (semver.valid(version)) {
+          // 新版图表配置的版本使用语义化版本规范
+          const { type } = item.configs as any;
+          return (
+            <div
+              style={{
+                border: '1px solid #e0dee2',
+              }}
+              key={String(i)}
+            >
+              <Renderer time={range} step={step} type={type} values={item.configs as any} variableConfig={variableConfig} headerVisible={false} />
+            </div>
+          );
+        }
         const promqls = QL.map((item) =>
           variableConfig && variableConfig.var && variableConfig.var.length ? replaceExpressionVars(item.PromQL, variableConfig, variableConfig.var.length) : item.PromQL,
         );

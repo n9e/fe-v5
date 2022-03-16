@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Form, Select, Space } from 'antd';
+import { Modal, Form, Select, Space, Button } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { useTranslation } from 'react-i18next';
@@ -8,19 +8,23 @@ import Resolution from '@/components/Resolution';
 import ModalHOC, { ModalWrapProps } from './ModalHOC';
 import { visualizations, defaultValues, defaultCustomValuesMap } from './config';
 import Renderer from '../Renderer/Renderer';
-import { Chart } from '../chartGroup';
+import { createChart, updateCharts } from '@/services/dashboard';
 import { VariableType } from '../VariableConfig';
 import FormCpt from './Form';
+import { IPanel } from '../types';
 
 interface IProps {
-  initialValues: Chart | null;
+  initialValues: IPanel | null;
   variableConfig?: VariableType;
   cluster: string;
+  busiId: string;
+  groupId: number;
+  onOK: () => void;
 }
 
 function index(props: ModalWrapProps & IProps) {
   const { t } = useTranslation();
-  const { visible, initialValues, variableConfig, cluster } = props;
+  const { visible, initialValues, variableConfig, cluster, busiId, groupId } = props;
   const [chartForm] = Form.useForm();
   const [range, setRange] = useState<Range>({
     description: '小时',
@@ -32,6 +36,36 @@ function index(props: ModalWrapProps & IProps) {
   const [step, setStep] = useState<number | null>(null);
   const [changedFlag, setChangedFlag] = useState<string>(_.uniqueId('xxx_'));
   const [values, setValues] = useState<any>(chartForm.getFieldsValue());
+
+  const handleAddChart = async () => {
+    try {
+      await chartForm.validateFields();
+      let formData = Object.assign(chartForm.getFieldsValue(), {
+        version: '2.0.0', // Temporarily, hardcode 1
+        type,
+        layout: initialValues?.layout,
+      });
+      if (initialValues && initialValues.id) {
+        await updateCharts(busiId, [
+          {
+            configs: formData,
+            weight: 0,
+            group_id: groupId,
+            id: initialValues.id,
+          },
+        ]);
+      } else {
+        await createChart(busiId, {
+          configs: JSON.stringify(formData),
+          weight: 0,
+          group_id: groupId,
+        });
+      }
+      // onVisibleChange(true);
+    } catch (errorInfo) {
+      console.log('Failed:', errorInfo);
+    }
+  };
 
   useEffect(() => {
     setValues(chartForm.getFieldsValue());
@@ -80,7 +114,28 @@ function index(props: ModalWrapProps & IProps) {
       style={{ top: 10, padding: 0 }}
       visible={visible}
       closable={false}
-      footer={null}
+      footer={[
+        <Button
+          key='cancel'
+          onClick={() => {
+            props.destroy();
+          }}
+        >
+          取消
+        </Button>,
+        <Button
+          key='ok'
+          type='primary'
+          onClick={() => {
+            handleAddChart().then(() => {
+              props.onOK();
+              props.destroy();
+            });
+          }}
+        >
+          确认
+        </Button>,
+      ]}
       onCancel={() => {
         props.destroy();
       }}
@@ -96,7 +151,11 @@ function index(props: ModalWrapProps & IProps) {
         variableConfig={variableConfig}
         cluster={cluster}
         render={(innerVariableConfig) => {
-          return <Renderer time={range} step={step} type={type} values={values} variableConfig={innerVariableConfig} />;
+          return (
+            <div style={{ height: 300, border: '1px solid #d9d9d9' }}>
+              <Renderer time={range} step={step} type={type} values={values} variableConfig={innerVariableConfig} />
+            </div>
+          );
         }}
       />
     </Modal>

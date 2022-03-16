@@ -93,10 +93,10 @@ export interface ITableStyles {
 export interface IPanel {
   version: string; // 单个图表面板使用的版本
   id: number;
-  title: string;
+  name: string;
   link: ILink;
   description: string;
-  gridPos: IGridPos;
+  layout: IGridPos;
   targets: ITarget[];
   type: IType;
   options: IOptions;

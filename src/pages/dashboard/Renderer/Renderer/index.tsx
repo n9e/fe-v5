@@ -8,18 +8,22 @@ import Stat from './Stat';
 import Table from './Table';
 import { VariableType } from '../../VariableConfig';
 import Markdown from '../../Editor/Components/Markdown';
+import { IPanel } from '../../types';
 import './style.less';
 
 interface IProps {
   time: Range;
   step: number | null;
   type: string;
-  values: any;
+  values: IPanel;
   variableConfig?: VariableType;
+  headerVisible?: boolean;
 }
 
 function index(props: IProps) {
-  const { time, step, type, variableConfig, values } = props;
+  console.log(222);
+  const { time, step, type, variableConfig, values, headerVisible = true } = props;
+  console.log('values', values);
   const subProps = {
     time,
     step,
@@ -33,7 +37,7 @@ function index(props: IProps) {
     table: <Table {...subProps} />,
   };
   return (
-    <div className='renderer-container' style={{ border: '1px solid #d9d9d9', height: 300 }}>
+    <div className='renderer-container'>
       <div className='renderer-header'>
         {values.description ? (
           <Tooltip placement='rightTop' title={<Markdown content={values.description} />}>
@@ -65,7 +69,7 @@ function index(props: IProps) {
           </Dropdown>
         </div>
       </div>
-      {RendererCptMap[type] || `无效的图表类型 ${type}`}
+      <div style={{ height: `calc(100% - 36px)` }}>{RendererCptMap[type] || `无效的图表类型 ${type}`}</div>
     </div>
   );
 }

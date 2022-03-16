@@ -48,4 +48,5 @@ export interface ChartConfig {
   legend?: boolean;
   yplotline1?: number;
   yplotline2?: number;
+  version?: number;
 }

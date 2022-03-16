@@ -25,7 +25,7 @@ export default function FormCpt(props) {
     >
       <div
         style={{
-          height: 'calc(100vh - 120px)',
+          height: 'calc(100vh - 173px)',
         }}
       >
         <Row
@@ -71,7 +71,7 @@ export default function FormCpt(props) {
                                     <PromQLInput
                                       url='/api/n9e/prometheus'
                                       headers={{
-                                        xCluster: 'Default',
+                                        'X-Cluster': 'Default',
                                         Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
                                       }}
                                     />

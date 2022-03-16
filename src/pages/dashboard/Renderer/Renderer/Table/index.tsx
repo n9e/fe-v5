@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import _ from 'lodash';
 import { Table } from 'antd';
 import { Range } from '@/components/DateRangePicker';
@@ -16,6 +16,7 @@ interface IProps {
 }
 
 export default function Stat(props: IProps) {
+  const eleRef = useRef<HTMLDivElement>(null);
   const { values, time, step, variableConfig } = props;
   const { targets, custom, options } = values;
   const { showHeader, calc, aggrDimension } = custom;
@@ -76,10 +77,10 @@ export default function Stat(props: IProps) {
   }
 
   const headerHeight = showHeader ? 30 : 0;
-  const height = 300 - 36 - headerHeight;
+  const height = eleRef?.current?.clientHeight! - headerHeight;
 
   return (
-    <div className='renderer-table-container'>
+    <div className='renderer-table-container' ref={eleRef}>
       <div className='renderer-table-container-box'>
         <Table rowKey='name' showHeader={showHeader} dataSource={calculatedValues} columns={columns} scroll={{ y: height }} bordered={false} pagination={false} />
       </div>

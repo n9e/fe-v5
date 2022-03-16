@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import _ from 'lodash';
+import semver from 'semver';
 import PageLayout from '@/components/pageLayout';
 import DateRangePicker from '@/components/DateRangePicker';
 import { useSelector, useDispatch } from 'react-redux';
@@ -109,32 +110,46 @@ export default function DashboardDetail() {
 
   const handleAddChart = (id: number) => {
     groupId = id;
-    setChartModalVisible(true);
+    editor({
+      visible: true,
+      variableConfig,
+      cluster: curCluster,
+      busiId,
+      groupId,
+      initialValues: {
+        type: 'timeseries',
+        targets: [
+          {
+            expr: '',
+          },
+        ],
+      },
+      onOK: () => {
+        handleChartConfigVisibleChange(true);
+      },
+    });
+    // setChartModalVisible(true);
   }; //group是为了让detail组件知道当前需要刷新的是哪个chartGroup，item是为了获取待编辑的信息
 
   const handleUpdateChart = (group: Group, item: Chart) => {
     groupId = group.id;
     setChartModalInitValue(item);
-    // setChartModalVisible(true);
-    // 此处处理新旧版本的调用
-    editor({
-      visible: true,
-      variableConfig,
-      cluster: curCluster,
-      initialValues: {
-        name: 'title',
-        link: 'flashcat.cloud',
-        type: 'table',
-        targets: [
-          {
-            expr: 'avg(cpu_usage_idle) by (ident)',
-          },
-          {
-            expr: 'avg(disk_used) by (ident)',
-          },
-        ],
-      },
-    });
+
+    if (semver.valid(item.configs.version)) {
+      editor({
+        visible: true,
+        variableConfig,
+        cluster: curCluster,
+        busiId,
+        groupId,
+        initialValues: item.configs,
+        onOK: () => {
+          handleChartConfigVisibleChange(true);
+        },
+      });
+    } else {
+      setChartModalVisible(true);
+    }
   };
 
   const handleDelChart = async (group: Group, item: Chart) => {
