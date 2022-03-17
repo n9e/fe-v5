@@ -26,8 +26,8 @@ export default function index() {
               <Option value='percentUnit'>百分比(0.0-1.0)</Option>
             </OptGroup>
             <OptGroup label='Human time duration'>
-              <Option value='humantimeSeconds'>Seconds</Option>
-              <Option value='humantimeMilliseconds'>Milliseconds</Option>
+              <Option value='humantimeSeconds'>Humanize(seconds)</Option>
+              <Option value='humantimeMilliseconds'>Humanize(milliseconds)</Option>
             </OptGroup>
           </Select>
         </Form.Item>
