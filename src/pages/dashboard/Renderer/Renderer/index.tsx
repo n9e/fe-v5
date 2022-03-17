@@ -91,7 +91,9 @@ function index(props: IProps) {
           </Dropdown>
         </div>
       </div>
-      <div style={{ height: `calc(100% - 36px)` }}>{RendererCptMap[type] || `无效的图表类型 ${type}`}</div>
+      <div className='renderer-body' style={{ height: `calc(100% - 36px)` }}>
+        {RendererCptMap[type] || `无效的图表类型 ${type}`}
+      </div>
     </div>
   );
 }
