@@ -40,7 +40,7 @@ function index(props: IProps) {
   };
   return (
     <div className='renderer-container'>
-      <div className='renderer-header'>
+      <div className='renderer-header graph-header'>
         {values.description ? (
           <Tooltip placement='rightTop' title={<Markdown content={values.description} />}>
             <div className='renderer-header-desc'>
