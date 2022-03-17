@@ -21,8 +21,13 @@ function StatItem(props) {
   const eleSize = useSize(ele);
   const { item, idx, colSpan, textMode, colorMode, textSize } = props;
   const headerFontSize = textSize?.title ? textSize?.title : eleSize?.width! / _.toString(item.name).length || 12;
-  const statFontSize = textSize?.value ? textSize?.value : eleSize?.width! / _.toString(item.stat).length || 12;
+  let statFontSize = textSize?.value ? textSize?.value : eleSize?.width! / _.toString(item.text).length || 12;
   const color = item.color ? item.color : hexPalette[idx % hexPalette.length];
+
+  if (statFontSize > eleSize?.height! - 20) {
+    statFontSize = eleSize?.height! - 20;
+  }
+
   return (
     <div
       key={item.name}
