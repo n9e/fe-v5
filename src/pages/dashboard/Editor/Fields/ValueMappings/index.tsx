@@ -1,6 +1,6 @@
 import React from 'react';
-import { Form, Input, InputNumber, Button, Select, Row, Col, Space } from 'antd';
-import { DeleteOutlined } from '@ant-design/icons';
+import { Form, Input, InputNumber, Button, Select, Row, Col, Tooltip } from 'antd';
+import { DeleteOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 
 import { Panel } from '../../Components/Collapse';
@@ -25,7 +25,21 @@ export default function index() {
             </Button>
             {_.isEmpty(fields) ? null : (
               <Row gutter={10}>
-                <Col flex='290px'>条件</Col>
+                <Col flex='290px'>
+                  <Tooltip
+                    overlayInnerStyle={{
+                      width: 300,
+                    }}
+                    title={
+                      <div>
+                        <div>范围值说明: from &gt;= value &lt;= to</div>
+                        <div>范围值默认值: from=-Infinity; to=Infinity </div>
+                      </div>
+                    }
+                  >
+                    条件 <InfoCircleOutlined />
+                  </Tooltip>
+                </Col>
                 <Col flex='100'>显示文字</Col>
                 <Col flex='50'>颜色</Col>
                 <Col flex='50'>操作</Col>
@@ -61,12 +75,12 @@ export default function index() {
                                 <Row gutter={10}>
                                   <Col span={12}>
                                     <Form.Item noStyle {...restField} name={[name, 'match', 'from']}>
-                                      <InputNumber />
+                                      <InputNumber placeholder='from' />
                                     </Form.Item>
                                   </Col>
                                   <Col span={12}>
                                     <Form.Item noStyle {...restField} name={[name, 'match', 'to']}>
-                                      <InputNumber />
+                                      <InputNumber placeholder='to' />
                                     </Form.Item>
                                   </Col>
                                 </Row>

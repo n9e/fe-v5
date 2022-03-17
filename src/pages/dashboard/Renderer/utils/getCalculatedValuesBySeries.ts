@@ -25,7 +25,14 @@ const getCalculatedValuesBySeries = (series: any[], calc: string, { util, decima
       if (type === 'special') {
         return stat === match?.special;
       } else if (type === 'range') {
-        return stat >= match?.from && stat <= match?.to;
+        if (match?.from && match?.to) {
+          return stat >= match?.from && stat <= match?.to;
+        } else if (match?.from) {
+          return stat >= match?.from;
+        } else if (match?.to) {
+          return stat <= match?.to;
+        }
+        return true;
       }
     });
     return {
