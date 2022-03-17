@@ -94,7 +94,7 @@ export interface IPanel {
   version: string; // 单个图表面板使用的版本
   id: number;
   name: string;
-  link: ILink;
+  link: string;
   description: string;
   layout: IGridPos;
   targets: ITarget[];

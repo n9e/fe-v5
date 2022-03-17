@@ -1,7 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 import { Dropdown, Menu, Tooltip } from 'antd';
-import { InfoOutlined, DownOutlined, ShareAltOutlined } from '@ant-design/icons';
+import { InfoOutlined, DownOutlined, LinkOutlined, SettingOutlined, ShareAltOutlined, DeleteOutlined } from '@ant-design/icons';
 import { Range } from '@/components/DateRangePicker';
 import Timeseries from './Timeseries';
 import Stat from './Stat';
@@ -17,13 +17,13 @@ interface IProps {
   type: string;
   values: IPanel;
   variableConfig?: VariableType;
-  headerVisible?: boolean;
+  isPreview?: boolean; // 是否是预览，预览中不显示编辑和分享
+  onEditClick?: () => void;
+  onDeleteClick?: () => void;
 }
 
 function index(props: IProps) {
-  console.log(222);
-  const { time, step, type, variableConfig, values, headerVisible = true } = props;
-  console.log('values', values);
+  const { time, step, type, variableConfig, values, isPreview, onEditClick, onDeleteClick } = props;
   const subProps = {
     time,
     step,
@@ -55,10 +55,30 @@ function index(props: IProps) {
             }}
             overlay={
               <Menu>
-                <Menu.Item>
-                  <ShareAltOutlined />
-                  分享
-                </Menu.Item>
+                {values.link ? (
+                  <Menu.Item>
+                    <a href={values.link} target='_blank'>
+                      <LinkOutlined />
+                      下钻链接
+                    </a>
+                  </Menu.Item>
+                ) : null}
+                {!isPreview ? (
+                  <>
+                    <Menu.Item onClick={onEditClick}>
+                      <SettingOutlined />
+                      编辑
+                    </Menu.Item>
+                    <Menu.Item disabled>
+                      <ShareAltOutlined />
+                      分享
+                    </Menu.Item>
+                    <Menu.Item onClick={onDeleteClick}>
+                      <DeleteOutlined />
+                      删除
+                    </Menu.Item>
+                  </>
+                ) : null}
               </Menu>
             }
           >

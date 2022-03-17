@@ -88,7 +88,7 @@ export default function FormCpt(props) {
                                     <PlusCircleOutlined
                                       style={{ marginLeft: 10 }}
                                       onClick={() => {
-                                        add({ PromQL: '' });
+                                        add({ expr: '' });
                                       }}
                                     />
                                   )}

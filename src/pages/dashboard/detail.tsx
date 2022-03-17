@@ -142,7 +142,10 @@ export default function DashboardDetail() {
         cluster: curCluster,
         busiId,
         groupId,
-        initialValues: item.configs,
+        initialValues: {
+          ...item.configs,
+          id: item.id,
+        },
         onOK: () => {
           handleChartConfigVisibleChange(true);
         },

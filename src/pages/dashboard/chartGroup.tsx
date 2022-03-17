@@ -509,7 +509,24 @@ export default function ChartGroup(props: Props) {
               }}
               key={String(i)}
             >
-              <Renderer time={range} step={step} type={type} values={item.configs as any} variableConfig={variableConfig} headerVisible={false} />
+              <Renderer
+                time={range}
+                step={step}
+                type={type}
+                values={item.configs as any}
+                variableConfig={variableConfig}
+                onEditClick={() => {
+                  onUpdateChart(groupInfo, item);
+                }}
+                onDeleteClick={() => {
+                  confirm({
+                    title: `${t('是否删除图表')}：${item.configs.name}`,
+                    onOk: async () => {
+                      onDelChart(groupInfo, item);
+                    },
+                  });
+                }}
+              />
             </div>
           );
         }
