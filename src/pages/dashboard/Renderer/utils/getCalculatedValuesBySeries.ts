@@ -45,7 +45,7 @@ const getCalculatedValuesBySeries = (series: any[], calc: string, { util, decima
         name: key,
       };
       const subGrouped = _.groupBy(val, (item) => {
-        return item.metric.__name__;
+        return item.name || item.metric.__name__;
       });
       _.forEach(subGrouped, (subVal, subKey) => {
         item[subKey] = {

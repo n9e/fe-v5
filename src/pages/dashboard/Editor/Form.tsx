@@ -95,7 +95,7 @@ export default function FormCpt(props) {
                                 </div>
                                 <Form.Item
                                   label='Legend'
-                                  name={[name, 'Legend']}
+                                  name={[name, 'legend']}
                                   tooltip={{
                                     getPopupContainer: () => document.body,
                                     title:

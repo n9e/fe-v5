@@ -5,6 +5,7 @@ import { Range, formatPickerDate } from '@/components/DateRangePicker';
 import { ITarget } from '../../types';
 import { VariableType } from '../../VariableConfig';
 import { replaceExpressionVars } from '../../VariableConfig/constant';
+import replaceExpressionBracket from '../utils/replaceExpressionBracket';
 
 interface IProps {
   time: Range;
@@ -30,9 +31,8 @@ export default function usePrometheus(props: IProps) {
     let _step = step;
     if (!step) _step = Math.max(Math.floor((end - start) / 250), 1);
     const _series: any[] = [];
-    const exprs = _.map(targets, 'expr');
-    const promises = _.map(exprs, (expr) => {
-      const realExpr = variableConfig ? replaceExpressionVars(expr, variableConfig, variableConfig.var.length) : expr;
+    const promises = _.map(targets, (target) => {
+      const realExpr = variableConfig ? replaceExpressionVars(target.expr, variableConfig, variableConfig.var.length) : target.expr;
       return api
         .fetchHistory({
           start,
@@ -43,15 +43,16 @@ export default function usePrometheus(props: IProps) {
         .then((res) => {
           return {
             result: res?.data?.result,
-            expr,
+            expr: target.expr,
           };
         });
     });
     Promise.all(promises).then((res) => {
       _.forEach(res, (item) => {
+        const target = _.find(targets, (t) => t.expr === item.expr);
         _.forEach(item.result, (serie) => {
           _series.push({
-            name: getSerieName(serie.metric, item.expr),
+            name: target?.legend ? replaceExpressionBracket(target?.legend, serie.metric) : getSerieName(serie.metric, item.expr),
             metric: {
               ...serie.metric,
               __name__: serie.metric.__name__ || item.expr,
