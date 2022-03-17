@@ -3,7 +3,7 @@ import { utilValMap } from '../config';
 import * as byteConverter from './byteConverter';
 
 const valueFormatter = ({util, decimals = 3}, val) => {
-    if (util) {
+  if (util) {
     const utilValObj = utilValMap[util];
     if (utilValObj) {
       const { type, base } = utilValObj;
@@ -21,6 +21,6 @@ const valueFormatter = ({util, decimals = 3}, val) => {
     }
     return val;
   }
-  return val;
+  return _.round(val, decimals);
 };
 export default valueFormatter;
