@@ -648,10 +648,12 @@ export default function ChartGroup(props: Props) {
     );
   }, [mounted, groupInfo.updateTime, range, variableConfig, step]);
   return (
-    <Collapse defaultActiveKey={['0']}>
-      <Panel header={<span className='panel-title'>{groupInfo.name}</span>} key='0' extra={generateRightButton()}>
-        {renderCharts()}
-      </Panel>
-    </Collapse>
+    <div className='n9e-dashboard-group'>
+      <Collapse defaultActiveKey={['0']}>
+        <Panel header={<span className='panel-title'>{groupInfo.name}</span>} key='0' extra={generateRightButton()}>
+          {renderCharts()}
+        </Panel>
+      </Collapse>
+    </div>
   );
 }
