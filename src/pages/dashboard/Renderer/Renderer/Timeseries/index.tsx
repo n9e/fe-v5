@@ -19,7 +19,7 @@ interface IProps {
 
 export default function index(props: IProps) {
   const { values, time, step, variableConfig } = props;
-  const { targets, custom, options } = values;
+  const { targets, custom, options = {} } = values;
   const chartEleRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<TsGraph>(null);
   const { series } = usePrometheus({

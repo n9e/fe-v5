@@ -6,6 +6,7 @@ import { Range } from '@/components/DateRangePicker';
 import Timeseries from './Timeseries';
 import Stat from './Stat';
 import Table from './Table';
+import Pie from './Pie';
 import { VariableType } from '../../VariableConfig';
 import Markdown from '../../Editor/Components/Markdown';
 import { IPanel } from '../../types';
@@ -35,6 +36,7 @@ function index(props: IProps) {
     timeseries: <Timeseries {...subProps} />,
     stat: <Stat {...subProps} />,
     table: <Table {...subProps} />,
+    pie: <Pie {...subProps} />,
   };
   return (
     <div className='renderer-container'>

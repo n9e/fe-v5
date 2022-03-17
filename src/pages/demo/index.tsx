@@ -18,7 +18,36 @@ export default function Demo() {
         <Panel header='G2PieChart' key='2'>
           <Row>
             <Col span={12}>
-              <G2PieChart />
+              <G2PieChart
+                hidden={false}
+                positon='left'
+                data={[
+                  {
+                    name: '分类一',
+                    value: 27,
+                  },
+                  {
+                    name: '分类二',
+                    value: 25,
+                  },
+                  {
+                    name: '分类三',
+                    value: 18,
+                  },
+                  {
+                    name: '分类四',
+                    value: 15,
+                  },
+                  {
+                    name: '分类五',
+                    value: 10,
+                  },
+                  {
+                    name: '其他',
+                    value: 5,
+                  },
+                ]}
+              />
             </Col>
           </Row>
         </Panel>

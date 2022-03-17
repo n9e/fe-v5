@@ -90,9 +90,18 @@ export const defaultCustomValuesMap = {
     colSpan: 1,
     textSize: {},
   },
+  pie: {
+    textMode: 'valueAndName',
+    colorMode: 'value',
+    calc: 'lastNotNull',
+    textSize: {},
+    legengPosition: 'right',
+  },
   table: {
     showHeader: true,
     calc: 'lastNotNull',
     displayMode: 'seriesToRows',
   },
 };
+
+export const legendPostion = ['hidden', 'top', 'left', 'right', 'bottom'];

@@ -1,63 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { Pie, PieConfig } from '@ant-design/plots';
-console.log(Pie);
+import { Pie, PieConfig, Options } from '@ant-design/plots';
 
 type Marker = {
   symbol?: string;
   spacing?: number;
 };
 
-type ListItem = {
-  /**
-   * 名称 {string}
-   */
-  name: string;
-  /**
-   * 值 {any}
-   */
-  value: any;
-  /**
-   * 图形标记 {object|string}
-   */
+interface ListItem extends DataType {
   marker?: Marker | string;
-};
+}
 
-const DemoPie = () => {
-  const data = [
-    {
-      type: '分类一',
-      value: 27,
-      num: 123,
-    },
-    {
-      type: '分类二',
-      value: 25,
-      num: 234,
-    },
-    {
-      type: '分类三',
-      value: 18,
-    },
-    {
-      type: '分类四',
-      value: 15,
-    },
-    {
-      type: '分类五',
-      value: 10,
-    },
-    {
-      type: '其他',
-      value: 5,
-    },
-  ];
+type DataType = {
+  name: string;
+  value: number;
+};
+interface Props {
+  data: DataType[];
+  positon: 'top' | 'left' | 'right' | 'bottom';
+  hidden: boolean;
+}
+
+const DemoPie = (props: Props) => {
+  const { data, positon, hidden } = props;
+
   const config: PieConfig = {
     padding: [16, 8, 16, 8],
     appendPadding: 10,
     data,
+    // autoFit: true,
     angleField: 'value',
-    colorField: 'type',
+    colorField: 'name',
     radius: 0.9,
     label: {
       type: 'spider',
@@ -74,24 +47,27 @@ const DemoPie = () => {
       },
     ],
     tooltip: {
-      fields: ['num', 'type', 'value'],
+      fields: ['name', 'value'],
       formatter: (datum) => {
         // console.log(datum);
-        return { name: datum.type, value: datum.num + '%' };
+        return { name: datum.name, value: `${datum.value.toFixed(3)}` };
       },
-      customContent: (title, data) => {
-        // console.log(title, data);
-        return `<div style="color: green">${title}</div>`;
-      },
+      // customContent: (title, data) => {
+      //   console.log(title, data);
+      //   return `<div style="color: green">${title}</div>`;
+      // },
     },
-    legend: {
-      itemName: {
-        formatter(text: string, item: ListItem, index: number) {
-          console.log(text, item, index);
-          return text + 123;
+    legend: hidden
+      ? false
+      : {
+          position: positon,
+          // itemName: {
+          //   formatter(text: string, item: ListItem, index: number) {
+          //     // console.log(text, item, index);
+          //     return text;
+          //   },
+          // },
         },
-      },
-    },
   };
   return <Pie {...config} />;
 };
