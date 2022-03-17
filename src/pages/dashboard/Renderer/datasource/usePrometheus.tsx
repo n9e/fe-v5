@@ -57,13 +57,25 @@ export default function usePrometheus(props: IProps) {
               ...serie.metric,
               __name__: serie.metric.__name__ || item.expr,
             },
+            expr: item.expr,
             data: serie.values,
           });
         });
       });
       setSeries(_series);
     });
-  }, [JSON.stringify(targets), JSON.stringify(time), step]);
+  }, [JSON.stringify(_.map(targets, 'expr')), JSON.stringify(time), step]);
+
+  useEffect(() => {
+    const _series = _.map(series, (item) => {
+      const target = _.find(targets, (t) => t.expr === item.expr);
+      return {
+        ...item,
+        name: target?.legend ? replaceExpressionBracket(target?.legend, item.metric) : item.name,
+      };
+    });
+    setSeries(_series);
+  }, [JSON.stringify(_.map(targets, 'legend'))]);
 
   return { series };
 }
