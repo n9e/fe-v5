@@ -42,8 +42,15 @@ function index(props: IProps) {
     <div className='renderer-container'>
       <div className='renderer-header graph-header'>
         {values.description ? (
-          <Tooltip placement='rightTop' title={<Markdown content={values.description} />}>
+          <Tooltip
+            placement='rightTop'
+            overlayInnerStyle={{
+              width: 300,
+            }}
+            title={<Markdown content={values.description} />}
+          >
             <div className='renderer-header-desc'>
+              <span className='renderer-header-info-corner-inner' />
               <InfoOutlined />
             </div>
           </Tooltip>
