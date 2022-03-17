@@ -8,6 +8,8 @@ import Options from './Options';
 import Collapse, { Panel } from './Components/Collapse';
 import VariableConfig, { VariableType } from '../VariableConfig';
 
+const alphabet = 'ABCDEFGHIGKLMNOPQRSTUVWXYZ'.split('');
+
 export default function FormCpt(props) {
   const { chartForm, setChangedFlag, initialValues, type, variableConfig, cluster, render } = props;
   const [innerVariableConfig, setInnerVariableConfig] = useState<VariableType | undefined>(variableConfig);
@@ -54,7 +56,7 @@ export default function FormCpt(props) {
                         {fields.length ? (
                           fields.map(({ name }, index) => {
                             return (
-                              <Panel header={`Query ${index}`} key={index}>
+                              <Panel header={`Query ${alphabet[index]}`} key={index}>
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
                                   <Form.Item
                                     label='PromQL'
