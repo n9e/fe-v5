@@ -140,7 +140,13 @@ const ExpressionInput: FC<CMExpressionInputProps> = ({ url, headers, value, onCh
   }, [value]);
 
   return (
-    <div className='ant-input'>
+    <div
+      className='ant-input'
+      style={{
+        minHeight: 32,
+        height: 'unset',
+      }}
+    >
       <div className='input-content' ref={containerRef} />
     </div>
   );
