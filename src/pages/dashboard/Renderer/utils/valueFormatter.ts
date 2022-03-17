@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import moment from 'moment';
 import { utilValMap } from '../config';
 import * as byteConverter from './byteConverter';
 
@@ -18,6 +19,12 @@ const valueFormatter = ({util, decimals = 3}, val) => {
     }
     if (util === 'percentUnit') {
       return _.round(val * 100, decimals) + '%';
+    }
+    if (util === 'humantimeSeconds') {
+      return moment.duration(val, 'seconds').humanize();
+    }
+    if (util === 'humantimeMilliseconds') {
+      return moment.duration(val, 'milliseconds').humanize();
     }
     return val;
   }

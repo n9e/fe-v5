@@ -25,6 +25,10 @@ export default function index() {
               <Option value='percent'>百分比(0-100)</Option>
               <Option value='percentUnit'>百分比(0.0-1.0)</Option>
             </OptGroup>
+            <OptGroup label='Human time duration'>
+              <Option value='humantimeSeconds'>Seconds</Option>
+              <Option value='humantimeMilliseconds'>Milliseconds</Option>
+            </OptGroup>
           </Select>
         </Form.Item>
         <Row gutter={10}>
