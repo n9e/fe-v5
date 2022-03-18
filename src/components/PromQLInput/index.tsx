@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef, memo } from 'react';
+import React, { FC, useEffect, useRef } from 'react';
 
 import { EditorView, highlightSpecialChars, keymap, ViewUpdate, placeholder } from '@codemirror/view';
 import { EditorState, Prec } from '@codemirror/state';
@@ -20,7 +20,7 @@ interface CMExpressionInputProps {
   url: string;
   headers?: { [index: string]: string };
   value?: string;
-  onChange?: (expr: string) => void;
+  onChange?: (expr?: string) => void;
   executeQuery?: () => void;
 }
 
@@ -88,6 +88,7 @@ const ExpressionInput: FC<CMExpressionInputProps> = ({ url, headers, value, onCh
               {
                 key: 'Enter',
                 run: (v: EditorView): boolean => {
+                  console.log('enter');
                   if (typeof executeQueryCallback.current === 'function') {
                     executeQueryCallback.current();
                   }
@@ -101,12 +102,9 @@ const ExpressionInput: FC<CMExpressionInputProps> = ({ url, headers, value, onCh
             ]),
           ),
           EditorView.updateListener.of((update: ViewUpdate): void => {
-            if (typeof onChange === 'function') {
-              const val = update.state.doc.toString();
-              if (val !== realValue.current) {
-                realValue.current = val;
-                onChange(val);
-              }
+            const val = update.state.doc.toString();
+            if (val !== realValue.current) {
+              realValue.current = val;
             }
           }),
         ],
@@ -145,6 +143,11 @@ const ExpressionInput: FC<CMExpressionInputProps> = ({ url, headers, value, onCh
       style={{
         minHeight: 32,
         height: 'unset',
+      }}
+      onBlur={() => {
+        if (typeof onChange === 'function') {
+          onChange(realValue.current);
+        }
       }}
     >
       <div className='input-content' ref={containerRef} />
