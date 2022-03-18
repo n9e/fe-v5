@@ -21,7 +21,7 @@ export default function FormCpt(props) {
       layout='vertical'
       form={chartForm}
       initialValues={_.merge({}, defaultValues, initialValues)}
-      onValuesChange={(aa) => {
+      onValuesChange={() => {
         setChangedFlag(_.uniqueId('xxx_'));
       }}
     >

@@ -20,12 +20,13 @@ interface IProps {
   variableConfig?: VariableType;
   isPreview?: boolean; // 是否是预览，预览中不显示编辑和分享
   onCloneClick?: () => void;
+  onShareClick?: () => void;
   onEditClick?: () => void;
   onDeleteClick?: () => void;
 }
 
 function index(props: IProps) {
-  const { time, step, type, variableConfig, values, isPreview, onCloneClick, onEditClick, onDeleteClick } = props;
+  const { time, step, type, variableConfig, values, isPreview, onCloneClick, onShareClick, onEditClick, onDeleteClick } = props;
   const subProps = {
     time,
     step,
@@ -65,14 +66,12 @@ function index(props: IProps) {
             }}
             overlay={
               <Menu>
-                {values.link ? (
-                  <Menu.Item>
-                    <a href={values.link} target='_blank'>
-                      <LinkOutlined />
-                      下钻链接
-                    </a>
-                  </Menu.Item>
-                ) : null}
+                <Menu.Item disabled={!values.link}>
+                  <a href={values.link} target='_blank'>
+                    <LinkOutlined />
+                    下钻链接
+                  </a>
+                </Menu.Item>
                 {!isPreview ? (
                   <>
                     <Menu.Item onClick={onEditClick}>
@@ -83,7 +82,7 @@ function index(props: IProps) {
                       <CopyOutlined />
                       克隆
                     </Menu.Item>
-                    <Menu.Item disabled>
+                    <Menu.Item onClick={onShareClick}>
                       <ShareAltOutlined />
                       分享
                     </Menu.Item>

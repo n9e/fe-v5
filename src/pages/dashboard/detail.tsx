@@ -10,6 +10,7 @@ import { ReloadOutlined, RollbackOutlined, EditOutlined, PlusOutlined, DownOutli
 import { Button, Input, Form, Modal, Dropdown, message, Menu, Space } from 'antd';
 import { Range } from '@/components/DateRangePicker';
 import { getSingleDashboard, updateSingleDashboard, createChartGroup, getChartGroup, delChartGroup, removeChart, updateChartGroup, createChart } from '@/services/dashboard';
+import { SetTmpChartData } from '@/services/metric';
 import { Dashboard, Group } from '@/store/dashboardInterface';
 import ChartGroup, { Chart } from './chartGroup';
 import ChartConfigModal from './chartConfigModal';
@@ -171,6 +172,25 @@ export default function DashboardDetail() {
       group_id: groupId,
     });
     refreshUpdateTimeByChartGroupId();
+  };
+
+  const handleShareChart = async (group: Group, item: Chart) => {
+    const serielData = {
+      dataProps: {
+        ...item.configs,
+        step,
+        range,
+      },
+      curCluster: localStorage.getItem('curCluster'),
+    };
+    SetTmpChartData([
+      {
+        configs: JSON.stringify(serielData),
+      },
+    ]).then((res) => {
+      const ids = res.dat;
+      window.open('/chart/' + ids);
+    });
   };
 
   const handleAddOrUpdateChartGroup = async () => {
@@ -337,6 +357,7 @@ export default function DashboardDetail() {
               onAddChart={handleAddChart}
               onUpdateChart={handleUpdateChart}
               onCloneChart={handleCloneChart}
+              onShareChart={handleShareChart}
               onUpdateChartGroup={handleUpdateChartGroup}
               onMoveUpChartGroup={handleMoveUpChartGroup}
               onMoveDownChartGroup={handleMoveDownChartGroup}

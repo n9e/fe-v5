@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import semver from 'semver';
 import { GetTmpChartData } from '@/services/metric';
 import { useParams } from 'react-router';
 import DateRangePicker, { isAbsoluteRange, RelativeRange } from '@/components/DateRangePicker';
@@ -16,6 +17,7 @@ import { HighLevelConfigType } from '@/components/Graph/Graph/index';
 import { useSelector } from 'react-redux';
 import { CommonStoreState } from '@/store/commonInterface';
 import { RootState } from '@/store/common';
+import Renderer from '../dashboard/Renderer/Renderer';
 
 export default function Chart() {
   const { t } = useTranslation();
@@ -26,7 +28,7 @@ export default function Chart() {
   const [chartData, setChartData] = useState<
     Array<{
       ref: any;
-      dataProps: GraphDataProps;
+      dataProps: any;
       highLevelConfig: HighLevelConfigType;
     }>
   >([]);
@@ -97,19 +99,21 @@ export default function Chart() {
             <div className='left'>
               <DateRangePicker onChange={handleDateChange} value={chartData[0].dataProps.range} />
               <Resolution onChange={(v) => setStep(v)} initialValue={step} />
-              <Radio.Group
-                options={[
-                  { label: <LineChartOutlined />, value: ChartType.Line },
-                  { label: <AreaChartOutlined />, value: ChartType.StackArea },
-                ]}
-                onChange={(e) => {
-                  e.preventDefault();
-                  setChartType(e.target.value);
-                }}
-                value={chartType}
-                optionType='button'
-                buttonStyle='solid'
-              />
+              {!semver.valid(chartData[0].dataProps?.version) && (
+                <Radio.Group
+                  options={[
+                    { label: <LineChartOutlined />, value: ChartType.Line },
+                    { label: <AreaChartOutlined />, value: ChartType.StackArea },
+                  ]}
+                  onChange={(e) => {
+                    e.preventDefault();
+                    setChartType(e.target.value);
+                  }}
+                  value={chartType}
+                  optionType='button'
+                  buttonStyle='solid'
+                />
+              )}
             </div>
             <div className='right'>
               <span>集群：</span>
@@ -121,7 +125,14 @@ export default function Chart() {
               {/* <ResfeshIcon onClick={handleRefresh} className='reload-icon' /> */}
             </div>
           </div>
-          {chartData.map((item, index) => {
+          {chartData.map((item: any, index) => {
+            if (semver.valid(item.dataProps?.version)) {
+              return (
+                <div style={{ height: 400, border: '1px solid #efefef' }}>
+                  <Renderer key={index} time={range} step={step} type={item.dataProps?.type} values={item.dataProps as any} isPreview />
+                </div>
+              );
+            }
             const newItem = {
               ...item.dataProps,
               range,
