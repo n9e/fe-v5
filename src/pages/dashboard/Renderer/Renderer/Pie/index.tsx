@@ -21,7 +21,6 @@ export default function Pie(props: IProps) {
   const { values, time, step, variableConfig } = props;
   const { targets, custom, options } = values;
   const { calc, legengPosition, max } = custom;
-  console.log(max);
   const { series } = usePrometheus({
     time,
     step,

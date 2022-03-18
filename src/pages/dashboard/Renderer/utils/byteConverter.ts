@@ -51,8 +51,14 @@ export const config = [
 ];
 
 export function format(value: number, options = defaultOptions) {
-  const baseNum = options.type === 'iec' ? 2 : 10;
   const baseUtil = baseUtilMap[options.base];
+  if (
+    (options.type === 'si' && value < 1000) || (options.type === 'iec' && value < 1024)
+  ) {
+    return _.round(value, options.decimals) + baseUtil;
+  }
+
+  const baseNum = options.type === 'iec' ? 2 : 10;
   const autoDetectRegex = /(\d.*\+)(\d{1,2})/;
   const autoDetect = value.toExponential();
   const expArray = autoDetect.match(autoDetectRegex);
