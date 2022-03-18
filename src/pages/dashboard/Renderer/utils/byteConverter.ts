@@ -3,7 +3,7 @@ import _ from 'lodash';
 
 interface IOptions {
   type: 'si' | 'iec';
-  base: 'bits' | 'bytes';
+  base?: 'bits' | 'bytes';
   decimals: number;
 }
 
@@ -51,7 +51,7 @@ export const config = [
 ];
 
 export function format(value: number, options = defaultOptions) {
-  const baseUtil = baseUtilMap[options.base];
+  const baseUtil = options.base ? baseUtilMap[options.base] : ''; // 支持
   if (
     (options.type === 'si' && value < 1000) || (options.type === 'iec' && value < 1024)
   ) {

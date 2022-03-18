@@ -26,8 +26,12 @@ const valueFormatter = ({util, decimals = 3}, val) => {
     if (util === 'humantimeMilliseconds') {
       return moment.duration(val, 'milliseconds').humanize();
     }
-    return val;
+    return _.round(val, decimals);
   }
-  return _.round(val, decimals);
+  // 默认返回 SI 不带基础单位
+  return byteConverter.format(val, {
+    type: 'si',
+    decimals,
+  });
 };
 export default valueFormatter;
