@@ -1,5 +1,6 @@
 import React from 'react';
-import { Form, Select, InputNumber, Row, Col } from 'antd';
+import { Form, Select, InputNumber, Row, Col, Tooltip } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { Panel } from '../../Components/Collapse';
 
@@ -11,7 +12,29 @@ export default function index() {
   return (
     <Panel header='高级设置'>
       <>
-        <Form.Item label='单位' name={[...namePrefix, 'util']}>
+        <Form.Item
+          label={
+            <div>
+              单位{' '}
+              <Tooltip
+                overlayInnerStyle={{
+                  width: 500,
+                }}
+                title={
+                  <div>
+                    <div>SI: 基数为 1000, 单位为 B、kB、MB、GB、TB、PB、EB、ZB、YB</div>
+                    <div>IEC: 基数为 1024, 单位为 B、KiB、MiB、GiB、TiB、PiB、EiB、ZiB、YiB</div>
+                    <div>bits: b</div>
+                    <div>bytes: B</div>
+                  </div>
+                }
+              >
+                <InfoCircleOutlined />
+              </Tooltip>
+            </div>
+          }
+          name={[...namePrefix, 'util']}
+        >
           <Select placeholder='none' allowClear>
             <OptGroup label='Data(SI)'>
               <Option value='bitsSI'>bits(SI)</Option>
