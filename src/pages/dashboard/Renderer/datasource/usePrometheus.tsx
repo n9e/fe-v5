@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import _ from 'lodash';
 import * as api from '@/components/Graph/api';
 import { Range, formatPickerDate } from '@/components/DateRangePicker';
@@ -34,21 +34,26 @@ export default function usePrometheus(props: IProps) {
     let _step = step;
     if (!step) _step = Math.max(Math.floor((end - start) / 250), 1);
     const _series: any[] = [];
-    const promises = _.map(targets, (target) => {
+    const promises: Promise<any>[] = [];
+    _.forEach(targets, (target) => {
       const realExpr = variableConfig ? replaceExpressionVars(target.expr, variableConfig, variableConfig.var.length) : target.expr;
-      return api
-        .fetchHistory({
-          start,
-          end,
-          step: _step,
-          query: realExpr,
-        })
-        .then((res) => {
-          return {
-            result: res?.data?.result,
-            expr: target.expr,
-          };
-        });
+      if (realExpr) {
+        promises.push(
+          api
+            .fetchHistory({
+              start,
+              end,
+              step: _step,
+              query: realExpr,
+            })
+            .then((res) => {
+              return {
+                result: res?.data?.result,
+                expr: target.expr,
+              };
+            }),
+        );
+      }
     });
     Promise.all(promises).then((res) => {
       _.forEach(res, (item) => {
