@@ -6,6 +6,7 @@ interface IProps {
   isActive?: boolean;
   header: string;
   children: React.ReactNode;
+  extra?: React.ReactNode;
 }
 
 export default function Panel(props: IProps) {
@@ -25,6 +26,15 @@ export default function Panel(props: IProps) {
       >
         {isActive ? <DownOutlined className='n9e-collapse-arrow' /> : <RightOutlined className='n9e-collapse-arrow' />}
         {props.header}
+        <div
+          className='n9e-collapse-extra'
+          onClick={(e) => {
+            e.stopPropagation();
+            e.nativeEvent.stopImmediatePropagation();
+          }}
+        >
+          {props.extra}
+        </div>
       </div>
       <div
         className={classnames({

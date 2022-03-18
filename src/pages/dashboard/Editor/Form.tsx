@@ -56,7 +56,30 @@ export default function FormCpt(props) {
                         {fields.length ? (
                           fields.map(({ name }, index) => {
                             return (
-                              <Panel header={`Query ${alphabet[index]}`} key={index}>
+                              <Panel
+                                header={`Query ${alphabet[index]}`}
+                                key={index}
+                                extra={
+                                  <div>
+                                    {fields.length > 1 ? (
+                                      <MinusCircleOutlined
+                                        style={{ marginLeft: 10 }}
+                                        onClick={() => {
+                                          remove(name);
+                                        }}
+                                      />
+                                    ) : null}
+                                    {index === fields.length - 1 && (
+                                      <PlusCircleOutlined
+                                        style={{ marginLeft: 10 }}
+                                        onClick={() => {
+                                          add({ expr: '' });
+                                        }}
+                                      />
+                                    )}
+                                  </div>
+                                }
+                              >
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
                                   <Form.Item
                                     label='PromQL'
@@ -78,22 +101,6 @@ export default function FormCpt(props) {
                                       }}
                                     />
                                   </Form.Item>
-                                  {fields.length > 1 ? (
-                                    <MinusCircleOutlined
-                                      style={{ marginLeft: 10 }}
-                                      onClick={() => {
-                                        remove(name);
-                                      }}
-                                    />
-                                  ) : null}
-                                  {index === fields.length - 1 && (
-                                    <PlusCircleOutlined
-                                      style={{ marginLeft: 10 }}
-                                      onClick={() => {
-                                        add({ expr: '' });
-                                      }}
-                                    />
-                                  )}
                                 </div>
                                 <Form.Item
                                   label='Legend'
