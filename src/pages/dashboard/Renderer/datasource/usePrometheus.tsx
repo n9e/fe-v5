@@ -73,7 +73,7 @@ export default function usePrometheus(props: IProps) {
       });
       setSeries(_series);
     });
-  }, [JSON.stringify(_.map(targets, 'expr')), JSON.stringify(time), step]);
+  }, [JSON.stringify(_.map(targets, 'expr')), JSON.stringify(time), step, JSON.stringify(variableConfig)]);
 
   useEffect(() => {
     const _series = _.map(series, (item) => {

@@ -75,13 +75,13 @@ function index(props: IProps) {
                 ) : null}
                 {!isPreview ? (
                   <>
-                    <Menu.Item onClick={onCloneClick}>
-                      <CopyOutlined />
-                      克隆
-                    </Menu.Item>
                     <Menu.Item onClick={onEditClick}>
                       <SettingOutlined />
                       编辑
+                    </Menu.Item>
+                    <Menu.Item onClick={onCloneClick}>
+                      <CopyOutlined />
+                      克隆
                     </Menu.Item>
                     <Menu.Item disabled>
                       <ShareAltOutlined />
