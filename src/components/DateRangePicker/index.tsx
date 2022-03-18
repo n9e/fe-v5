@@ -22,6 +22,7 @@ export interface RelativeRange {
   num: number;
   unit: unitOfTime.DurationConstructor;
   description: string;
+  refreshFlag?: string; // 用于刷新的标识
 }
 
 export interface AbsoluteRange {

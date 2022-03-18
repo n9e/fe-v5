@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import _ from 'lodash';
+import moment from 'moment';
 import semver from 'semver';
 import PageLayout from '@/components/pageLayout';
 import DateRangePicker from '@/components/DateRangePicker';
 import { useSelector, useDispatch } from 'react-redux';
 import { ReloadOutlined, RollbackOutlined, EditOutlined, PlusOutlined, DownOutlined } from '@ant-design/icons';
-import { Button, Input, Form, Modal, Dropdown, message, Menu } from 'antd';
+import { Button, Input, Form, Modal, Dropdown, message, Menu, Space } from 'antd';
 import { Range } from '@/components/DateRangePicker';
 import { getSingleDashboard, updateSingleDashboard, createChartGroup, getChartGroup, delChartGroup, removeChart, updateChartGroup } from '@/services/dashboard';
 import { Dashboard, Group } from '@/store/dashboardInterface';
@@ -20,6 +21,7 @@ import Resolution from '@/components/Resolution';
 import { RootState as CommonRootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
 import editor from './Editor';
+import Refresh from './Components/Refresh';
 
 interface URLParam {
   id: string;
@@ -274,21 +276,37 @@ export default function DashboardDetail() {
             )}
           </div>
           <div className='dashboard-detail-header-right'>
-            <div style={{ marginRight: 20, display: 'flex', alignItems: 'center' }}>
-              集群：
-              <Dropdown overlay={clusterMenu}>
-                <Button>
-                  {curCluster} <DownOutlined />
-                </Button>
-              </Dropdown>
-            </div>
-            <DateRangePicker onChange={handleDateChange} />
-            <Resolution onChange={(v) => setStep(v)} initialValue={step} />
-            <RefreshIcon
-              onClick={() => {
-                init();
-              }}
-            />
+            <Space>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                集群：
+                <Dropdown overlay={clusterMenu}>
+                  <Button>
+                    {curCluster} <DownOutlined />
+                  </Button>
+                </Dropdown>
+              </div>
+              <DateRangePicker onChange={handleDateChange} />
+              <Resolution onChange={(v) => setStep(v)} initialValue={step} />
+              <Refresh
+                onRefresh={() => {
+                  const currentRange = range as any;
+                  if (currentRange.start && currentRange.end) {
+                    const diff = currentRange.end - currentRange.start;
+                    const now = moment().unix();
+                    setRange({
+                      end: now,
+                      start: now - diff,
+                    });
+                  } else if (currentRange.unit) {
+                    setRange({
+                      ...currentRange,
+                      refreshFlag: _.uniqueId('refreshFlag_'),
+                    });
+                  }
+                  init();
+                }}
+              />
+            </Space>
           </div>
         </div>
       }
