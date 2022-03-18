@@ -33,7 +33,7 @@ export default function Stat(props: IProps) {
       util: options?.standardOptions?.util,
       decimals: options?.standardOptions?.decimals,
     },
-    options.valueMappings,
+    options?.valueMappings,
     aggrDimension,
   );
   const firstItem = _.first(calculatedValues);
