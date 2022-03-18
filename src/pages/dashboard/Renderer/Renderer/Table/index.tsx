@@ -82,17 +82,7 @@ export default function Stat(props: IProps) {
   return (
     <div className='renderer-table-container' ref={eleRef}>
       <div className='renderer-table-container-box'>
-        <Table
-          rowKey={(record, i) => {
-            return record.name + i;
-          }}
-          showHeader={showHeader}
-          dataSource={calculatedValues}
-          columns={columns}
-          scroll={{ y: height }}
-          bordered={false}
-          pagination={false}
-        />
+        <Table rowKey='id' showHeader={showHeader} dataSource={calculatedValues} columns={columns} scroll={{ y: height }} bordered={false} pagination={false} />
       </div>
     </div>
   );

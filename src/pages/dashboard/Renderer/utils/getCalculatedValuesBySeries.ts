@@ -36,6 +36,7 @@ const getCalculatedValuesBySeries = (series: any[], calc: string, { util, decima
       }
     });
     return {
+      id: serie.id,
       name: serie.name,
       metric: serie.metric,
       color: matchedValueMapping?.result?.color,
@@ -56,6 +57,7 @@ const getCalculatedValuesBySeries = (series: any[], calc: string, { util, decima
       });
       _.forEach(subGrouped, (subVal, subKey) => {
         item[subKey] = {
+          id: subVal[0].id,
           stat: subVal[0].stat,
           color: subVal[0].color,
           text: subVal[0].text,

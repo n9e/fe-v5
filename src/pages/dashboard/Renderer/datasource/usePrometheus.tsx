@@ -55,6 +55,7 @@ export default function usePrometheus(props: IProps) {
         const target = _.find(targets, (t) => t.expr === item.expr);
         _.forEach(item.result, (serie) => {
           _series.push({
+            id: _.uniqueId('series_'),
             name: target?.legend ? replaceExpressionBracket(target?.legend, serie.metric) : getSerieName(serie.metric, item.expr),
             metric: {
               ...serie.metric,
