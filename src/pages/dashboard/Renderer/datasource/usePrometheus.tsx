@@ -15,7 +15,7 @@ interface IProps {
 }
 
 const getSerieName = (metric: Object, expr: string) => {
-  let name = metric['__name__'];
+  let name = metric['__name__'] || '';
   if (_.keys(metric).length === 0) {
     name = expr;
   }
