@@ -38,33 +38,33 @@ function index(props: ModalWrapProps & IProps) {
   const [values, setValues] = useState<any>(chartForm.getFieldsValue());
 
   const handleAddChart = async () => {
-    try {
-      await chartForm.validateFields();
-      let formData = Object.assign(chartForm.getFieldsValue(), {
-        version: '2.0.0', // Temporarily, hardcode 1
-        type,
-        layout: initialValues?.layout,
-      });
-      if (initialValues && initialValues.id) {
-        await updateCharts(busiId, [
-          {
-            configs: formData,
+    return chartForm.validateFields().then(async (values) => {
+      try {
+        let formData = Object.assign(values, {
+          version: '2.0.0',
+          type,
+          layout: initialValues?.layout,
+        });
+        if (initialValues && initialValues.id) {
+          await updateCharts(busiId, [
+            {
+              configs: formData,
+              weight: 0,
+              group_id: groupId,
+              id: initialValues.id,
+            },
+          ]);
+        } else {
+          await createChart(busiId, {
+            configs: JSON.stringify(formData),
             weight: 0,
             group_id: groupId,
-            id: initialValues.id,
-          },
-        ]);
-      } else {
-        await createChart(busiId, {
-          configs: JSON.stringify(formData),
-          weight: 0,
-          group_id: groupId,
-        });
+          });
+        }
+      } catch (errorInfo) {
+        console.log('Failed:', errorInfo);
       }
-      // onVisibleChange(true);
-    } catch (errorInfo) {
-      console.log('Failed:', errorInfo);
-    }
+    });
   };
 
   useEffect(() => {
