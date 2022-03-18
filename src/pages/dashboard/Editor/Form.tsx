@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Form, Input, Row, Col } from 'antd';
-import { MinusCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import { Form, Input, Row, Col, Button } from 'antd';
+import { DeleteOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import PromQLInput from '@/components/PromQLInput';
 import { defaultValues, defaultCustomValuesMap } from './config';
@@ -53,80 +53,71 @@ export default function FormCpt(props) {
                   return (
                     <>
                       <Collapse>
-                        {fields.length ? (
-                          fields.map(({ name }, index) => {
-                            return (
-                              <Panel
-                                header={`Query ${alphabet[index]}`}
-                                key={index}
-                                extra={
-                                  <div>
-                                    {fields.length > 1 ? (
-                                      <MinusCircleOutlined
-                                        style={{ marginLeft: 10 }}
-                                        onClick={() => {
-                                          remove(name);
-                                        }}
-                                      />
-                                    ) : null}
-                                    {index === fields.length - 1 && (
-                                      <PlusCircleOutlined
-                                        style={{ marginLeft: 10 }}
-                                        onClick={() => {
-                                          add({ expr: '' });
-                                        }}
-                                      />
-                                    )}
-                                  </div>
-                                }
-                              >
-                                <div style={{ display: 'flex', alignItems: 'center' }}>
-                                  <Form.Item
-                                    label='PromQL'
-                                    name={[name, 'expr']}
-                                    validateTrigger={['onBlur']}
-                                    rules={[
-                                      {
-                                        required: true,
-                                        message: '请输入PromQL',
-                                      },
-                                    ]}
-                                    style={{ flex: 1 }}
-                                  >
-                                    <PromQLInput
-                                      url='/api/n9e/prometheus'
-                                      headers={{
-                                        'X-Cluster': 'Default',
-                                        Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
+                        {_.map(fields, ({ name }, index) => {
+                          return (
+                            <Panel
+                              header={`Query ${alphabet[index]}`}
+                              key={index}
+                              extra={
+                                <div>
+                                  {fields.length > 1 ? (
+                                    <DeleteOutlined
+                                      style={{ marginLeft: 10 }}
+                                      onClick={() => {
+                                        remove(name);
                                       }}
                                     />
-                                  </Form.Item>
+                                  ) : null}
                                 </div>
+                              }
+                            >
+                              <div style={{ display: 'flex', alignItems: 'center' }}>
                                 <Form.Item
-                                  label='Legend'
-                                  name={[name, 'legend']}
-                                  tooltip={{
-                                    getPopupContainer: () => document.body,
-                                    title:
-                                      'Controls the name of the time series, using name or pattern. For example {{hostname}} will be replaced with label value for the label hostname.',
-                                  }}
+                                  label='PromQL'
+                                  name={[name, 'expr']}
+                                  validateTrigger={['onBlur']}
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: '请输入PromQL',
+                                    },
+                                  ]}
+                                  style={{ flex: 1 }}
                                 >
-                                  <Input />
+                                  <PromQLInput
+                                    url='/api/n9e/prometheus'
+                                    headers={{
+                                      'X-Cluster': 'Default',
+                                      Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
+                                    }}
+                                  />
                                 </Form.Item>
-                              </Panel>
-                            );
-                          })
-                        ) : (
-                          <PlusCircleOutlined
-                            onClick={() => {
-                              add({
-                                PromQL: '',
-                              });
-                            }}
-                          />
-                        )}
+                              </div>
+                              <Form.Item
+                                label='Legend'
+                                name={[name, 'legend']}
+                                tooltip={{
+                                  getPopupContainer: () => document.body,
+                                  title:
+                                    'Controls the name of the time series, using name or pattern. For example {{hostname}} will be replaced with label value for the label hostname.',
+                                }}
+                              >
+                                <Input />
+                              </Form.Item>
+                            </Panel>
+                          );
+                        })}
+
                         <Form.ErrorList errors={errors} />
                       </Collapse>
+                      <Button
+                        style={{ width: '100%', marginTop: 10 }}
+                        onClick={() => {
+                          add({ expr: '' });
+                        }}
+                      >
+                        + add query
+                      </Button>
                     </>
                   );
                 }}
