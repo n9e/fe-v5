@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import _ from 'lodash';
 import { Table } from 'antd';
 import { Range } from '@/components/DateRangePicker';

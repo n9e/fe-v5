@@ -9,7 +9,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { ReloadOutlined, RollbackOutlined, EditOutlined, PlusOutlined, DownOutlined } from '@ant-design/icons';
 import { Button, Input, Form, Modal, Dropdown, message, Menu, Space } from 'antd';
 import { Range } from '@/components/DateRangePicker';
-import { getSingleDashboard, updateSingleDashboard, createChartGroup, getChartGroup, delChartGroup, removeChart, updateChartGroup } from '@/services/dashboard';
+import { getSingleDashboard, updateSingleDashboard, createChartGroup, getChartGroup, delChartGroup, removeChart, updateChartGroup, createChart } from '@/services/dashboard';
 import { Dashboard, Group } from '@/store/dashboardInterface';
 import ChartGroup, { Chart } from './chartGroup';
 import ChartConfigModal from './chartConfigModal';
@@ -160,6 +160,16 @@ export default function DashboardDetail() {
   const handleDelChart = async (group: Group, item: Chart) => {
     groupId = group.id;
     await removeChart(busiId, item.id);
+    refreshUpdateTimeByChartGroupId();
+  };
+
+  const handleCloneChart = async (group: Group, item: Chart) => {
+    groupId = group.id;
+    await createChart(busiId, {
+      configs: JSON.stringify(_.omit(item.configs, 'layout')),
+      weight: 0,
+      group_id: groupId,
+    });
     refreshUpdateTimeByChartGroupId();
   };
 
@@ -326,6 +336,7 @@ export default function DashboardDetail() {
               groupInfo={item}
               onAddChart={handleAddChart}
               onUpdateChart={handleUpdateChart}
+              onCloneChart={handleCloneChart}
               onUpdateChartGroup={handleUpdateChartGroup}
               onMoveUpChartGroup={handleMoveUpChartGroup}
               onMoveDownChartGroup={handleMoveDownChartGroup}

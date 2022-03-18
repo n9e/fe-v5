@@ -33,6 +33,7 @@ interface Props {
   variableConfig: VariableType;
   onAddChart: (data: number) => void;
   onUpdateChart: (group: Group, data: Chart) => void;
+  onCloneChart: (group: Group, data: Chart) => void;
   onDelChart: (group: Group, data: Chart) => void;
   onDelChartGroup: (id: number) => void;
   onUpdateChartGroup: (group: Group) => void;
@@ -194,6 +195,7 @@ export default function ChartGroup(props: Props) {
     variableConfig,
     onAddChart,
     onUpdateChart,
+    onCloneChart,
     onDelChartGroup,
     onDelChart,
     onUpdateChartGroup,
@@ -515,6 +517,9 @@ export default function ChartGroup(props: Props) {
                 type={type}
                 values={item.configs as any}
                 variableConfig={variableConfig}
+                onCloneClick={() => {
+                  onCloneChart(groupInfo, item);
+                }}
                 onEditClick={() => {
                   onUpdateChart(groupInfo, item);
                 }}

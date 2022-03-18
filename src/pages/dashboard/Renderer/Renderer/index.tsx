@@ -1,7 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 import { Dropdown, Menu, Tooltip } from 'antd';
-import { InfoOutlined, DownOutlined, LinkOutlined, SettingOutlined, ShareAltOutlined, DeleteOutlined } from '@ant-design/icons';
+import { InfoOutlined, DownOutlined, LinkOutlined, SettingOutlined, ShareAltOutlined, DeleteOutlined, CopyOutlined } from '@ant-design/icons';
 import { Range } from '@/components/DateRangePicker';
 import Timeseries from './Timeseries';
 import Stat from './Stat';
@@ -19,12 +19,13 @@ interface IProps {
   values: IPanel;
   variableConfig?: VariableType;
   isPreview?: boolean; // 是否是预览，预览中不显示编辑和分享
+  onCloneClick?: () => void;
   onEditClick?: () => void;
   onDeleteClick?: () => void;
 }
 
 function index(props: IProps) {
-  const { time, step, type, variableConfig, values, isPreview, onEditClick, onDeleteClick } = props;
+  const { time, step, type, variableConfig, values, isPreview, onCloneClick, onEditClick, onDeleteClick } = props;
   const subProps = {
     time,
     step,
@@ -74,6 +75,10 @@ function index(props: IProps) {
                 ) : null}
                 {!isPreview ? (
                   <>
+                    <Menu.Item onClick={onCloneClick}>
+                      <CopyOutlined />
+                      克隆
+                    </Menu.Item>
                     <Menu.Item onClick={onEditClick}>
                       <SettingOutlined />
                       编辑
