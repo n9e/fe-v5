@@ -50,7 +50,7 @@ export default function Info() {
         return;
       }
 
-      fetch(customAvatar)
+      fetch(customAvatar, { mode: 'no-cors' })
         .then((res) => {
           setIsModalVisible(false);
           handleSubmit();

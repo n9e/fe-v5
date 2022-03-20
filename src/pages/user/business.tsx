@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next';
 const { confirm } = Modal;
 import { useQuery } from '@/utils';
 
-export const PAGE_SIZE = 2000;
+export const PAGE_SIZE = 200;
 
 const Resource: React.FC = () => {
   const { t } = useTranslation();
@@ -32,8 +32,6 @@ const Resource: React.FC = () => {
   const [teamList, setTeamList] = useState<Team[]>([]);
   const [query, setQuery] = useState<string>('');
   const [memberLoading, setMemberLoading] = useState<boolean>(false);
-  const [pageNumber, setPageNumber] = useState<number>(1);
-  const [total, setTotal] = useState<number>(0);
   const [searchValue, setSearchValue] = useState<string>('');
   const [searchMemberValue, setSearchMemberValue] = useState<string>('');
   const userRef = useRef(null as any);
@@ -99,9 +97,6 @@ const Resource: React.FC = () => {
   }, []);
 
   const getList = (action) => {
-    if (action === 'delete') {
-      setPageNumber(1);
-    }
     getTeamList(undefined, action === 'delete');
   };
 
@@ -123,6 +118,11 @@ const Resource: React.FC = () => {
   const getTeamInfoDetail = (id: string) => {
     setMemberLoading(true);
     getBusinessTeamInfo(id).then((data) => {
+      dispatch({
+        type: 'common/saveData',
+        prop: 'curBusiItem',
+        data: data,
+      });
       setTeamInfo(data);
       setMemberList(data.user_groups);
       setMemberLoading(false);
@@ -175,11 +175,15 @@ const Resource: React.FC = () => {
             <div style={{ display: 'flex', margin: '5px 0px 12px' }}>
               <Input
                 prefix={<SearchOutlined />}
-                value={searchValue}
-                onChange={(e) => {
-                  setSearchValue(e.target.value);
-                }}
                 placeholder={t('搜索业务组名称')}
+                onPressEnter={(e) => {
+                  // @ts-ignore
+                  getTeamList(e.target.value);
+                }}
+                onBlur={(e) => {
+                  // @ts-ignore
+                  getTeamList(e.target.value);
+                }}
               />
             </div>
 
@@ -189,7 +193,7 @@ const Resource: React.FC = () => {
                 flex: 1,
                 overflow: 'auto',
               }}
-              dataSource={teamList.filter((i) => i.name.includes(searchValue))}
+              dataSource={teamList}
               size='small'
               renderItem={(item) => (
                 <List.Item key={item.id} className={teamId == item.id ? 'is-active' : ''} onClick={() => setTeamId(item.id)}>

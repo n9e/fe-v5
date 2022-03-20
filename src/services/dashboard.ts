@@ -110,7 +110,7 @@ export const getChartGroup = function (busiId: string, id: string) {
 export const delChartGroup = function (busiId: string, id: number) {
   return request(`/api/n9e/busi-group/${busiId}/chart-groups`, {
     method: RequestMethod.Delete,
-    data:{ids:[id]}
+    data: { ids: [id] },
   });
 };
 
@@ -126,7 +126,7 @@ interface Chart {
   configs: string | object;
   weight: number;
   group_id: number;
-  id?: number;
+  id?: number | string;
 }
 
 // 创建Chart
@@ -172,7 +172,7 @@ export const getCharts = function (busiId: string | number, id: number) {
 };
 
 // 删除Chart
-export const removeChart = function (busiId: string | number, id: number) {
+export const removeChart = function (busiId: string | number, id: number | string) {
   return request(`/api/n9e/busi-group/${busiId}/charts`, {
     method: RequestMethod.Delete,
     data: { ids: [id] },
@@ -200,15 +200,17 @@ export const getTemplateContent = function (type: 'alert_rule' | 'dashboard', na
   });
 };
 
-export const getLabelNames = function () {
+export const getLabelNames = function (data) {
   return request(`/api/n9e/prometheus/api/v1/labels`, {
     method: RequestMethod.Get,
+    params: { ...data },
   });
 };
 
-export const getLabelValues = function (label) {
+export const getLabelValues = function (label, data) {
   return request(`/api/n9e/prometheus/api/v1/label/${label}/values`, {
     method: RequestMethod.Get,
+    params: { ...data },
   });
 };
 
@@ -229,6 +231,6 @@ export const getMetric = function (data = {}) {
 export const getQueryResult = function (data) {
   return request(`/api/n9e/prometheus/api/v1/query`, {
     method: RequestMethod.Get,
-    params: { query: data },
+    params: { ...data },
   });
 };

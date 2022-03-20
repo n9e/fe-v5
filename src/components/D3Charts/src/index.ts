@@ -443,8 +443,20 @@ export default class TsGraph {
                 item[ykey] = item[y0key + 1];
               }
             } else {
-              // 找到上一条 serie 该点的上标作为当前 serie 点的下标
-              const previousYValue = clonedSeriesData[i - 1][dataIdx][ykey];
+              // while一直往上找到相同时间戳的点  该点的上标作为当前 serie 点的下标
+              let previousYValue = 0;
+              let previousI = i;
+              while (previousI > 0) {
+                if (clonedSeriesData[previousI - 1]) {
+                  const sameTimePoint = clonedSeriesData[previousI - 1].find((i) => i[xkey] === item[0]);
+                  if (sameTimePoint) {
+                    previousYValue = sameTimePoint[ykey];
+                    break;
+                  }
+                }
+                previousI--;
+              }
+
               item[y0key] = previousYValue;
 
               // 将默认的上标值（未叠加）保存，用于之后判断上标值是否进行叠加

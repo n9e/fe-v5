@@ -39,8 +39,8 @@ export default function version() {
             <Card style={{ width: 250, marginRight: 10 }} cover={<Image style={{ border: '1px solid #efefef', height: 305 }} preview={false} src={'/image/dingtalk.png'} />}>
               <Meta title={<div style={{ textAlign: 'center' }}>钉钉交流群</div>} />
             </Card>
-            <Card style={{ width: 250 }} cover={<Image style={{ border: '1px solid #efefef', height: 305 }} preview={false} src={'/image/zsxq.jpeg'} />}>
-              <Meta title={<div style={{ textAlign: 'center' }}>知识星球（论坛）</div>} />
+            <Card style={{ width: 250 }} cover={<Image style={{ border: '1px solid #efefef', height: 305 }} preview={false} src={'/image/zhihu.png'} />}>
+              <Meta title={<div style={{ textAlign: 'center' }}>知乎话题</div>} />
             </Card>
           </div>
         </div>

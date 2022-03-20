@@ -59,7 +59,7 @@ function getListItemContent(metrics) {
   const labels = Object.keys(metrics)
     .filter((ml) => ml !== '__name__')
     .map((label, i, labels) => (
-      <span>
+      <span key={i}>
         <span className='bold-text'>{label}</span>="{metrics[label]}"{i === labels.length - 1 ? '' : ', '}
       </span>
     ));
@@ -213,12 +213,36 @@ const Panel: React.FC<PanelProps> = ({ metrics, defaultPromQL, removePanel }) =>
           return;
         }
         if (res.hasOwnProperty('status') && res.status === 'success') {
-          setVectorData(res.data);
+          var tooLong = false;
+          var LENGTH = 10000;
+          var maxLength = 0;
+          let { resultType, result } = res.data;
+          if (result) {
+            if (result.length > LENGTH) {
+              tooLong = true;
+              maxLength = result.length;
+              result = result.slice(LENGTH);
+            }
+            result.forEach((item) => {
+              if (item.values && item.values.length > LENGTH) {
+                tooLong = true;
+                if (item.values.length > maxLength) {
+                  maxLength = item.values.length;
+                }
+                item.values = item.values.slice(LENGTH);
+              }
+            });
+          }
+          if (tooLong) {
+            setErrorContent(`Warning：Fetched ${maxLength} metrics, only displaying first ${LENGTH}`);
+          } else {
+            setErrorContent('');
+          }
+          setVectorData({ resultType, result });
           setQueryStats({
             loadTime: Date.now() - queryStart,
             resultSeries: res.data.result.length,
           });
-          setErrorContent('');
         } else {
           setVectorData(null);
           setErrorContent(res?.error || '');
@@ -291,9 +315,11 @@ const Panel: React.FC<PanelProps> = ({ metrics, defaultPromQL, removePanel }) =>
                       {values.map((value) => {
                         return (
                           <>
-                            <span style={{ display: 'inline-block' }}>
-                              {value[1]} @{value[0]}
-                            </span>
+                            {value && value.length > 1 && (
+                              <span style={{ display: 'inline-block' }}>
+                                {value[1]} @{value[0]}
+                              </span>
+                            )}
                             <br />
                           </>
                         );

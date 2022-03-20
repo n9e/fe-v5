@@ -5,18 +5,21 @@ import { DeleteOutlined, PlusOutlined, ArrowUpOutlined, ArrowDownOutlined, CopyO
 import PromqlEditor from '@/components/PromqlEditor';
 import '../index.less';
 import { Variable } from './definition';
-import { convertExpressionToQuery, replaceExpressionVars } from './constant';
-
+import { convertExpressionToQuery, replaceExpressionVars, stringToRegex } from './constant';
+import { Range } from '@/components/DateRangePicker';
+import { setVaraiableSelected } from './index';
 export interface FormType {
   var: Variable[];
 }
 interface Props {
+  id: string;
   visible: boolean;
   value: FormType | undefined;
+  range: Range;
   onChange: (v: FormType | undefined) => void;
 }
 export default function EditItem(props: Props) {
-  const { visible, onChange, value } = props;
+  const { visible, onChange, value, range, id } = props;
   const { t } = useTranslation();
   const [form] = Form.useForm();
   useEffect(() => {
@@ -35,13 +38,20 @@ export default function EditItem(props: Props) {
     console.log('Received values of form:', values);
   };
 
-  const handleBlur = (e, index) => {
-    const expression = e.target.value;
-    const formData = form.getFieldsValue();
-    var newExpression = replaceExpressionVars(expression, formData, index);
-    convertExpressionToQuery(newExpression).then((res) => {
-      form.setFields([{ name: ['var', index, 'selected'], value: res[0] }]);
-    });
+  const handleBlur = (index) => {
+    const reg = form.getFieldValue(['var', index, 'reg']);
+    const expression = form.getFieldValue(['var', index, 'definition']);
+    if ((!reg || new RegExp('^/(.*?)/(g?i?m?y?)$').test(reg)) && expression) {
+      const formData = form.getFieldsValue();
+      var newExpression = replaceExpressionVars(expression, formData, index, id);
+      convertExpressionToQuery(newExpression, range).then((res) => {
+        const regFilterRes = res.filter((i) => !reg || !stringToRegex(reg) || (stringToRegex(reg) as RegExp).test(i));
+        if (regFilterRes.length > 0) {
+          setVaraiableSelected(formData.var[index].name, regFilterRes[0], id);
+        }
+        // form.setFields([{ name: ['var', index, 'selected'], value: regFilterRes[0] }]);
+      });
+    }
   };
 
   return (
@@ -72,13 +82,28 @@ export default function EditItem(props: Props) {
                     </Form.Item>
                   </Col>
                   <Col span={6}>
-                    <Form.Item {...restField} name={[name, 'definition']} fieldKey={[fieldKey, 'definition']} rules={[{ required: true, message: t('请输入变量定义') }]}>
-                      <Input onBlur={(v) => handleBlur(v, name)} />
+                    <Form.Item
+                      {...restField}
+                      name={[name, 'definition']}
+                      fieldKey={[fieldKey, 'definition']}
+                      rules={[
+                        { required: true, message: t('请输入变量定义') },
+                        {
+                          validator(_, value) {
+                            if (/^\s*label_values.+,\s*\$.+/.test(value)) {
+                              return Promise.reject(new Error('label_values表达式的label不允许使用变量'));
+                            }
+                            return Promise.resolve();
+                          },
+                        },
+                      ]}
+                    >
+                      <Input onBlur={(v) => handleBlur(name)} />
                     </Form.Item>
                   </Col>
                   <Col span={6}>
                     <Form.Item {...restField} name={[name, 'reg']} fieldKey={[fieldKey, 'reg']} rules={[{ pattern: new RegExp('^/(.*?)/(g?i?m?y?)$'), message: t('格式不对') }]}>
-                      <Input placeholder='/*.hna/' />
+                      <Input placeholder='/*.hna/' onBlur={(v) => handleBlur(name)} />
                     </Form.Item>
                   </Col>
                   <Col span={2}>
@@ -99,9 +124,9 @@ export default function EditItem(props: Props) {
                       }}
                     </Form.Item>
                   </Col>
-                  <Form.Item {...restField} name={[name, 'selected']} fieldKey={[fieldKey, 'selected']} hidden>
+                  {/* <Form.Item {...restField} name={[name, 'selected']} fieldKey={[fieldKey, 'selected']} hidden>
                     <Input />
-                  </Form.Item>
+                  </Form.Item> */}
                   <Col span={4}>
                     <Button type='link' size='small' onClick={() => move(name, name + 1)} disabled={name === fields.length - 1}>
                       <ArrowDownOutlined />

@@ -70,18 +70,18 @@ const Event: React.FC = () => {
       dataIndex: 'rule_name',
       render(title, { id }) {
         return (
-          <Button size='small' type='link' style={{ padding: 0 }} onClick={() => history.push(`/alert-his-events/${id}`)}>
+          <a style={{ padding: 0 }} onClick={() => history.push(`/alert-his-events/${id}`)}>
             {title}
-          </Button>
+          </a>
         );
       },
     },
     {
       title: t('事件标签'),
       dataIndex: 'tags',
-      ellipsis: {
-        showTitle: false,
-      },
+      // ellipsis: {
+      //   showTitle: false,
+      // },
       render(tagArr) {
         const content =
           tagArr &&
@@ -103,9 +103,9 @@ const Event: React.FC = () => {
             ));
         return (
           tagArr && (
-            <Tooltip title={content} placement='topLeft' getPopupContainer={() => document.body} overlayClassName='mon-manage-table-tooltip'>
-              <span className='event-tags'>{content}</span>
-            </Tooltip>
+            // <Tooltip title={content} placement='topLeft' getPopupContainer={() => document.body} overlayClassName='mon-manage-table-tooltip'>
+            <span className='event-tags'>{content}</span>
+            // </Tooltip>
           )
         );
       },
@@ -138,7 +138,7 @@ const Event: React.FC = () => {
     {
       title: t('计算时间'),
       dataIndex: 'last_eval_time',
-      width: 140,
+      width: 120,
       render(value) {
         return moment((value ? value : 0) * 1000).format('YYYY-MM-DD HH:mm:ss');
       },
@@ -224,7 +224,7 @@ const Event: React.FC = () => {
               ref={tableRef}
               antProps={{
                 rowKey: 'id',
-                scroll: { x: 800, y: 'calc(100vh - 252px)' },
+                // scroll: { x: 'max-content' },
               }}
               url={`/api/n9e/busi-group/${curBusiId}/alert-his-events`}
               customQueryCallback={(data) =>

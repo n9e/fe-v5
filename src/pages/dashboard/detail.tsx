@@ -259,8 +259,8 @@ export default function DashboardDetail() {
     b && refreshUpdateTimeByChartGroupId();
   };
 
-  const handleVariableChange = (value) => {
-    updateSingleDashboard(busiId, id, { ...dashboard, configs: JSON.stringify(value) });
+  const handleVariableChange = (value, b) => {
+    b && updateSingleDashboard(busiId, id, { ...dashboard, configs: JSON.stringify(value) });
     setVariableConfig(value);
   };
   const clusterMenu = (
@@ -343,12 +343,13 @@ export default function DashboardDetail() {
     >
       <div className='dashboard-detail-content'>
         <div className='variable-area'>
-          <VariableConfig onChange={handleVariableChange} value={variableConfig} cluster={curCluster} />
+          <VariableConfig onChange={handleVariableChange} value={variableConfig} cluster={curCluster} range={range} id={id} />
         </div>
 
         <div className='charts'>
           {chartGroup.map((item, i) => (
             <ChartGroup
+              id={id}
               cluster={curCluster}
               busiId={busiId}
               key={i}
@@ -410,6 +411,7 @@ export default function DashboardDetail() {
 
       {chartModalVisible && (
         <ChartConfigModal
+          id={id}
           cluster={curCluster}
           busiId={busiId}
           initialValue={chartModalInitValue}

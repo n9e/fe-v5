@@ -68,6 +68,7 @@ interface GraphState {
   offsets: string[];
   aggrFunc: string;
   aggrGroups: string[];
+  calcFunc: string;
   legend: boolean;
   highLevelConfig: {
     shared: boolean;
@@ -102,6 +103,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
       offsets: this.props.defaultOffsets || [],
       aggrFunc: this.props.defaultAggrFunc || 'avg',
       aggrGroups: this.props.defaultAggrGroups || ['ident'],
+      calcFunc: '',
       legend: props.data.legend !== undefined ? props.data.legend : true,
       highLevelConfig: {
         shared: this.props.highLevelConfig?.shared === undefined ? true : this.props.highLevelConfig?.shared,
@@ -115,7 +117,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
   }
 
   componentDidMount() {
-    this.updateAllGraphs(this.state.aggrFunc, this.state.aggrGroups, this.state.offsets);
+    this.updateAllGraphs(this.state.aggrFunc, this.state.aggrGroups, this.state.offsets, this.state.calcFunc);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -146,7 +148,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
     const newHosts = (this.props.data.selectedHosts || []).map((h) => h.ident);
     const isHostsChanged = !_.isEqual(oldHosts, newHosts);
     if (isHostsChanged || !_.isEqualWith(prevProps.data, this.props.data)) {
-      this.updateAllGraphs(this.state.aggrFunc, this.state.aggrGroups, this.state.offsets);
+      this.updateAllGraphs(this.state.aggrFunc, this.state.aggrGroups, this.state.offsets, this.state.calcFunc);
     }
   }
 
@@ -207,12 +209,13 @@ export default class Graph extends Component<GraphProps, GraphState> {
   }
 
   generateQuery(obj) {
-    const { offset, curAggrFunc, curAggrGroup } = obj;
+    const { offset, curAggrFunc, curAggrGroup, calcFunc } = obj;
+    const [calcMethod, calcPeriod] = calcFunc.split('_');
     const { metric, selectedHosts } = this.props.data;
     if (metric && selectedHosts) {
       const idents = selectedHosts.map((h) => h.ident);
       const offsetSubQuery = offset ? ' offset ' + offset : '';
-      let query = `${metric}{ident=~"${idents.join('|')}"}${offsetSubQuery}`;
+      let query = `${calcFunc ? calcMethod + '(' : ''}${metric}{ident=~"${idents.join('|')}"}${calcFunc ? '[' + calcPeriod + ']' : ''}${offsetSubQuery}${calcFunc ? ')' : ''}`;
       if (curAggrFunc && curAggrGroup && curAggrGroup.length > 0) {
         query = `${curAggrFunc}(${query}) by (${curAggrGroup.join(', ')})`;
       }
@@ -258,7 +261,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
   };
 
   refresh = () => {
-    this.updateAllGraphs(this.state.aggrFunc, this.state.aggrGroups, this.state.offsets);
+    this.updateAllGraphs(this.state.aggrFunc, this.state.aggrGroups, this.state.offsets, this.state.calcFunc);
   };
 
   shareChart = () => {
@@ -310,22 +313,20 @@ export default class Graph extends Component<GraphProps, GraphState> {
   }
 
   updateGraphConfig(changeObj) {
-    const aggrFunc = changeObj?.aggrFunc;
-    const aggrGroups = changeObj?.aggrGroups;
-    const offsets = changeObj?.comparison;
-    this.setState({ aggrFunc, aggrGroups, offsets });
+    const { aggrFunc, aggrGroups, comparison: offsets, calcFunc } = changeObj;
+    this.setState({ aggrFunc, aggrGroups, offsets, calcFunc });
     if (changeObj.changeType === 'aggrFuncChange' && aggrGroups.length === 0) return;
-    this.updateAllGraphs(aggrFunc, aggrGroups, offsets);
+    this.updateAllGraphs(aggrFunc, aggrGroups, offsets, calcFunc);
   }
 
-  updateAllGraphs(aggrFunc, aggrGroups, offsets) {
+  updateAllGraphs(aggrFunc, aggrGroups, offsets, calcFunc) {
     const queryStart = Date.now();
     let { promqls, range, step } = this.props.data;
     const { start, end } = formatPickerDate(range);
     // 如果没有 step(resolution)，计算一个默认的 step 值
     if (!step) step = Math.max(Math.floor((end - start) / 250), 1);
 
-    let obj: { curAggrFunc?: string; curAggrGroup?: string[]; offset?: string[] } = {};
+    let obj: { curAggrFunc?: string; curAggrGroup?: string[]; offset?: string[]; calcFunc: string } = { calcFunc };
     if (aggrFunc) obj.curAggrFunc = aggrFunc;
     if (aggrGroups && aggrGroups.length > 0) obj.curAggrGroup = aggrGroups;
 
@@ -462,6 +463,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
               lineHeight: `${this.headerHeight}px`,
             }}
           >
+            <div>{title || metric}</div>
             <div className='graph-extra'>
               <span className='graph-operationbar-item' key='info'>
                 <Popover placement='left' content={this.getContent()} trigger='click' autoAdjustOverflow={false} getPopupContainer={() => document.body}>
@@ -486,7 +488,6 @@ export default class Graph extends Component<GraphProps, GraphState> {
               )}
               {extraRender && _.isFunction(extraRender) ? extraRender(this) : null}
             </div>
-            <div>{title || metric}</div>
           </div>
         )}
         {this.props.graphConfigInnerVisible ? (

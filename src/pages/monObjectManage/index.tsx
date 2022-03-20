@@ -458,7 +458,7 @@ const MonObjectManage: React.FC = () => {
                     setSelectedIdents(selectedRows ? selectedRows.map(({ ident }) => ident) : []);
                   },
                 },
-                scroll: { x: 800, y: 'calc(100vh - 252px)' },
+                // scroll: { x: 800, y: 'calc(100vh - 252px)' },
               }}
               url='/api/n9e/targets'
               customQueryCallback={(data) =>

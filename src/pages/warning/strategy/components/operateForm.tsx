@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory, useParams, useLocation } from 'react-router-dom';
 import moment from 'moment';
@@ -12,7 +12,8 @@ import { CommonStoreState } from '@/store/commonInterface';
 import { getTeamInfoList, getNotifiesList } from '@/services/manage';
 import { addOrEditStrategy, EditStrategy, prometheusQuery, deleteStrategy } from '@/services/warning';
 import PromqlEditor from '@/components/PromqlEditor';
-
+import { SwitchWithLabel } from './SwitchWithLabel';
+import { debounce } from 'lodash';
 const layout = {
   labelCol: {
     span: 3,
@@ -91,10 +92,9 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
   const [notifyGroups, setNotifyGroups] = useState<any[]>([]);
   const [initVal, setInitVal] = useState<any>({});
   const [refresh, setRefresh] = useState(true);
-  console.log('type', type);
   useEffect(() => {
     getNotifyChannel();
-    getGroups();
+    getGroups('');
 
     return () => {};
   }, []);
@@ -116,9 +116,9 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
     return <Option value={String(i)} key={i}>{`${v}`}</Option>;
   });
 
-  const contactListCheckboxes = contactList.map((c: string) => (
-    <Checkbox value={c} key={c}>
-      {c}
+  const contactListCheckboxes = contactList.map((c: { key: string; label: string }) => (
+    <Checkbox value={c.key} key={c.label}>
+      {c.label}
     </Checkbox>
   ));
 
@@ -134,8 +134,8 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
     setInitContactList(contactList);
   };
 
-  const getGroups = async () => {
-    const res = await getTeamInfoList();
+  const getGroups = async (str) => {
+    const res = await getTeamInfoList({ query: str });
     const data = res.dat || res;
     const combineData = (detail.notify_groups_obj ? detail.notify_groups_obj.filter((item) => !data.find((i) => item.id === i.id)) : []).concat(data);
     setNotifyGroups(combineData || []);
@@ -157,6 +157,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
         enable_etime: values.enable_time[1].format('HH:mm'),
         disabled: !values.enable_status ? 1 : 0,
         notify_recovered: values.notify_recovered ? 1 : 0,
+        enable_in_bg: values.enable_in_bg ? 1 : 0,
         callbacks,
       };
       let reqBody,
@@ -190,6 +191,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
     });
   };
 
+  const debounceFetcher = useCallback(debounce(getGroups, 800), []);
   return (
     <div className='operate_con'>
       <Form
@@ -206,9 +208,11 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
           cluster: clusterList[0] || 'Default', // 生效集群
           enable_days_of_week: ['1', '2', '3', '4', '5', '6', '0'],
           ...detail,
+          enable_in_bg: detail?.enable_in_bg === 1,
           enable_time: detail?.enable_stime ? [moment(detail.enable_stime, 'HH:mm'), moment(detail.enable_etime, 'HH:mm')] : [moment('00:00', 'HH:mm'), moment('23:59', 'HH:mm')],
           enable_status: detail?.disabled === undefined ? true : !detail?.disabled,
           notify_recovered: detail?.notify_recovered === 1 || detail?.notify_recovered === undefined ? true : false, // 1:启用 0:禁用
+          recover_duration: detail?.recover_duration || 0,
           callbacks: !!detail?.callbacks
             ? detail.callbacks.map((item) => ({
                 url: item,
@@ -400,13 +404,16 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                 }}
               />
             </Form.Item>
+            <Form.Item label={t('仅在本业务组生效')} name='enable_in_bg' valuePropName='checked'>
+              <SwitchWithLabel label='根据告警事件中的ident归属关系判断' />
+            </Form.Item>
           </Card>
           <Card title={t('通知配置')}>
             <Form.Item label={t('通知媒介')} name='notify_channels'>
               <Checkbox.Group>{contactListCheckboxes}</Checkbox.Group>
             </Form.Item>
             <Form.Item label={t('告警接收组')} name='notify_groups'>
-              <Select mode='multiple' showSearch optionFilterProp='children' filterOption={(input, option) => option?.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0}>
+              <Select mode='multiple' showSearch optionFilterProp='children' filterOption={false} onSearch={(e) => debounceFetcher(e)} onBlur={() => getGroups('')}>
                 {notifyGroupsOptions}
               </Select>
             </Form.Item>
@@ -420,7 +427,22 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                 </Tooltip>
               </Space>
             </Form.Item>
-
+            <Form.Item label={t('留观时长')} required>
+              <Space>
+                <Form.Item style={{ marginBottom: 0 }} name='recover_duration' initialValue={0} wrapperCol={{ span: 10 }}>
+                  <InputNumber
+                    min={0}
+                    onChange={(val) => {
+                      setRefresh(!refresh);
+                    }}
+                  />
+                </Form.Item>
+                秒
+                <Tooltip title={t(`持续${form.getFieldValue('recover_duration')}秒没有再次触发阈值才发送恢复通知`)}>
+                  <QuestionCircleFilled />
+                </Tooltip>
+              </Space>
+            </Form.Item>
             <Form.Item label={t('重复发送频率')} required>
               <Space>
                 <Form.Item

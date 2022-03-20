@@ -5,13 +5,23 @@
   padding: @basePadding;
   box-sizing: border-box;
   width: 100%;
+  &.cur-events {
+    .dantd-data-table-header-loadbtn-left {
+      margin-right: 0px;
+    }
+  }
   .table-area {
     width: calc(100% - 210px);
+    overflow: auto;
     padding: 16px;
     .event-tags {
       .ant-tag {
         cursor: pointer;
       }
+    }
+    .dantd-data-table-header-loadbtn-left {
+      border-bottom-right-radius: 0px;
+      border-top-right-radius: 0px;
     }
   }
   .table-operate-box {
@@ -25,6 +35,16 @@
       .search-input {
         max-width: 300px;
         margin-left: 10px;
+      }
+    }
+    .interval-btn {
+      border-bottom-left-radius: 0px;
+      border-top-left-radius: 0px;
+      margin-right: 10px;
+      border-left: 0px;
+      border-color: #d9d9d9;
+      &:hover {
+        border-color: #d9d9d9;
       }
     }
   }

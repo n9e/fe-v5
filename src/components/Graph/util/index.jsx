@@ -5,7 +5,7 @@ import isEqualBy from './isEqualBy';
 import getYAxis from './getYAxis';
 
 function extractBracketValue(str) {
-  let reg = /{{([0-9a-zA-Z]+?)}}/g;
+  let reg = /{{([0-9a-zA-Z\._\-]+?)}}/g;
   let matchAll = Array.from(str.matchAll(reg));
   // https://javascript.info/regexp-methods#str-matchall-regexp
   return matchAll.map((item) => (item.length > 0 ? item[1] : item[0]));

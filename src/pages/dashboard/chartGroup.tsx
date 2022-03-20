@@ -25,6 +25,7 @@ import Renderer from './Renderer/Renderer/index';
 
 const { confirm } = Modal;
 interface Props {
+  id: string;
   cluster: string;
   busiId: string;
   groupInfo: Group;
@@ -62,7 +63,7 @@ const cols = 24;
 const defColItem = 4; //一键规整列数
 
 export interface Chart {
-  id: number;
+  id: string;
   configs: ChartConfig;
   group_id: number;
   weight: number;
@@ -188,6 +189,7 @@ const layouts: Layouts = {
 export default function ChartGroup(props: Props) {
   const { t } = useTranslation();
   const {
+    id,
     cluster,
     busiId,
     groupInfo,
@@ -541,7 +543,7 @@ export default function ChartGroup(props: Props) {
           );
         }
         const promqls = QL.map((item) =>
-          variableConfig && variableConfig.var && variableConfig.var.length ? replaceExpressionVars(item.PromQL, variableConfig, variableConfig.var.length) : item.PromQL,
+          variableConfig && variableConfig.var && variableConfig.var.length ? replaceExpressionVars(item.PromQL, variableConfig, variableConfig.var.length, id) : item.PromQL,
         );
         const legendTitleFormats = QL.map((item) => item.Legend);
         return (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import moment from 'moment';
 import { Form, Input, InputNumber, Radio, Select, Row, Col, TimePicker, Checkbox, Tag, message, Space, Switch, Tooltip, Modal } from 'antd';
@@ -8,7 +8,8 @@ import { useTranslation } from 'react-i18next';
 import { RootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
 import { getTeamInfoList, getNotifiesList } from '@/services/manage';
-
+import { SwitchWithLabel } from './SwitchWithLabel';
+import { debounce } from 'lodash';
 const layout = {
   labelCol: {
     span: 3,
@@ -56,6 +57,11 @@ const fields = [
     name: '生效时间',
   },
   {
+    id: 14,
+    field: 'enable_in_bg',
+    name: '仅在本业务组生效',
+  },
+  {
     id: 12,
     field: 'append_tags',
     name: '附加标签',
@@ -79,6 +85,11 @@ const fields = [
     id: 10,
     field: 'notify_repeat_step',
     name: '重复发送频率',
+  },
+  {
+    id: 15,
+    field: 'recover_duration',
+    name: '留观时长',
   },
   {
     id: 11,
@@ -162,7 +173,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
 
   useEffect(() => {
     getNotifyChannel();
-    getGroups();
+    getGroups('');
 
     return () => {};
   }, []);
@@ -171,9 +182,9 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
     return <Option value={String(i)} key={i}>{`${v}`}</Option>;
   });
 
-  const contactListCheckboxes = contactList.map((c: string) => (
-    <Checkbox value={c} key={c}>
-      {c}
+  const contactListCheckboxes = contactList.map((c: { key: string; label: string }) => (
+    <Checkbox value={c.key} key={c.label}>
+      {c.label}
     </Checkbox>
   ));
 
@@ -189,11 +200,13 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
     setInitContactList(contactList);
   };
 
-  const getGroups = async () => {
-    const res = await getTeamInfoList();
+  const getGroups = async (str) => {
+    const res = await getTeamInfoList({ query: str });
     const data = res.dat || res;
     setNotifyGroups(data || []);
   };
+
+  const debounceFetcher = useCallback(debounce(getGroups, 800), []);
 
   const modelOk = () => {
     form.validateFields().then(async (values) => {
@@ -207,6 +220,9 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
         case 'disabled':
           data.disabled = !values.enable_status ? 1 : 0;
           delete data.enable_status;
+          break;
+        case 'enable_in_bg':
+          data.enable_in_bg = values.enable_in_bg ? 1 : 0;
           break;
         case 'callbacks':
           data.callbacks = values.callbacks.map((item) => item.url);
@@ -372,6 +388,14 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                     </Form.Item>
                   </>
                 );
+              case 'enable_in_bg':
+                return (
+                  <>
+                    <Form.Item label={t('改为：')} name='enable_in_bg' valuePropName='checked'>
+                      <SwitchWithLabel label='根据告警事件中的ident归属关系判断' />
+                    </Form.Item>
+                  </>
+                );
               case 'prom_eval_interval':
                 return (
                   <>
@@ -441,12 +465,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                 return (
                   <>
                     <Form.Item label={t('改为：')} name='notify_groups'>
-                      <Select
-                        mode='multiple'
-                        showSearch
-                        optionFilterProp='children'
-                        filterOption={(input, option) => option?.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0}
-                      >
+                      <Select mode='multiple' showSearch optionFilterProp='children' filterOption={false} onSearch={(e) => debounceFetcher(e)} onBlur={() => getGroups('')}>
                         {notifyGroupsOptions}
                       </Select>
                     </Form.Item>
@@ -457,6 +476,38 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                   <>
                     <Form.Item label={t('改为：')} name='notify_recovered' valuePropName='checked'>
                       <Switch />
+                    </Form.Item>
+                  </>
+                );
+              case 'recover_duration':
+                return (
+                  <>
+                    <Form.Item label={t('改为：')}>
+                      <Space>
+                        <Form.Item
+                          style={{ marginBottom: 0 }}
+                          name='recover_duration'
+                          initialValue={0}
+                          wrapperCol={{ span: 10 }}
+                          rules={[
+                            {
+                              required: false,
+                              message: t('留观时长不能为空'),
+                            },
+                          ]}
+                        >
+                          <InputNumber
+                            min={0}
+                            onChange={(val) => {
+                              setRefresh(!refresh);
+                            }}
+                          />
+                        </Form.Item>
+                        秒
+                        <Tooltip title={t(`持续${form.getFieldValue('recover_duration') || 0}秒没有再次触发阈值才发送恢复通知`)}>
+                          <QuestionCircleFilled />
+                        </Tooltip>
+                      </Space>
                     </Form.Item>
                   </>
                 );

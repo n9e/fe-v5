@@ -9,10 +9,11 @@ export const getUserInfoList = function (params = {}) {
     params,
   });
 };
-export const getTeamInfoList = function (params = {}) {
+export const getTeamInfoList = function (params?: { query: string; limit?: number }) {
+  const data = params ? (params.limit ? params : { ...params, limit: 200 }) : { limit: 200 };
   return request(`/api/n9e/user-groups`, {
     method: RequestMethod.Get,
-    params,
+    params: data,
   });
 };
 export const getBusinessTeamList = function (params = {}) {
@@ -147,6 +148,12 @@ export const getContactsList = function () {
 
 export const getNotifyChannels = function () {
   return request(`/api/n9e/contact-keys`, {
+    method: RequestMethod.Get,
+  }).then((res) => res && res.dat);
+};
+
+export const getRoles = function () {
+  return request(`/api/n9e/roles`, {
     method: RequestMethod.Get,
   }).then((res) => res && res.dat);
 };

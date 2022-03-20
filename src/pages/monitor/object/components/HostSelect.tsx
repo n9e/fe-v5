@@ -1,19 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Button, Input, Select, Table, Tooltip, Tag } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import SelectedHosts from './SelectedHosts';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/common';
 import { BusiGroupItem, CommonStoreState } from '@/store/commonInterface';
+import { getBusiGroups } from '@/services/common';
+import { debounce } from 'lodash';
 
 export default (props) => {
   const { allHosts, changeSelectedHosts, changeBusiGroup, onSearchHostName } = props;
-  console.log('allHosts', allHosts);
   const { Option } = Select;
   const [selectedHostsKeys, setSelectedHostsKeys] = useState<string[]>([]);
   const [selectedHosts, setSelectedHosts] = useState<any[]>([]);
   const { busiGroups, curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const [curBusiItemInHostSelect, setCurBusiItemInHostSelect] = useState<BusiGroupItem | undefined>(curBusiItem);
+  const [filteredBusiGroups, setFilteredBusiGroups] = useState(busiGroups);
   const dispatch = useDispatch();
   const columns = [
     {
@@ -45,6 +47,14 @@ export default (props) => {
       ),
     },
   ];
+
+  // 初始化展示所有业务组
+  useEffect(() => {
+    if (!filteredBusiGroups.length) {
+      setFilteredBusiGroups(busiGroups);
+    }
+  }, [busiGroups]);
+
   useEffect(() => {
     const selectedHosts = allHosts.slice(0, 10);
     setSelectedHostsKeys(selectedHosts.map((h) => h.ident));
@@ -56,7 +66,16 @@ export default (props) => {
   let curSelectBusiGroup: string | undefined = undefined;
   if (curBusiItemInHostSelect) {
     curSelectBusiGroup = busiGroupsInHostSelect.find((bg) => bg.id === curBusiItemInHostSelect.id) ? String(curBusiItemInHostSelect.id) : undefined;
+  } else {
+    curSelectBusiGroup = undefined;
   }
+
+  const fetchBusiGroup = (e) => {
+    getBusiGroups(e).then((res) => {
+      setFilteredBusiGroups(res.dat || []);
+    });
+  };
+  const handleSearch = useCallback(debounce(fetchBusiGroup, 800), []);
   const selectBefore = (
     <div className='host-add-on'>
       <div className='title'>监控对象</div>
@@ -65,10 +84,19 @@ export default (props) => {
           allowClear
           placeholder='按业务组筛选'
           value={curSelectBusiGroup}
+          dropdownMatchSelectWidth={false}
           style={{ width: '100%', textAlign: 'left' }}
+          showSearch={true}
+          filterOption={false}
+          onSearch={handleSearch}
+          onClear={() => {
+            getBusiGroups('').then((res) => {
+              setFilteredBusiGroups(res.dat || []);
+            });
+          }}
           onChange={(busiItemId) => {
             let busiItemIdNum = Number(busiItemId);
-            let data = busiGroups.find((bg) => bg.id === busiItemIdNum);
+            let data = filteredBusiGroups.find((bg) => bg.id === busiItemIdNum);
             if (busiItemIdNum === 0) {
               data = {
                 id: 0,
@@ -88,7 +116,7 @@ export default (props) => {
           <Option key={0} value={'0'}>
             未归组对象
           </Option>
-          {busiGroups.map((bg) => (
+          {filteredBusiGroups.map((bg) => (
             <Option key={bg.id} value={String(bg.id)}>
               {bg.name}
             </Option>
