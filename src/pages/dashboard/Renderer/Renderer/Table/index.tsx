@@ -9,6 +9,7 @@ import getCalculatedValuesBySeries from '../../utils/getCalculatedValuesBySeries
 import './style.less';
 
 interface IProps {
+  id: string;
   time: Range;
   step: number | null;
   values: IPanel;
@@ -17,10 +18,11 @@ interface IProps {
 
 export default function Stat(props: IProps) {
   const eleRef = useRef<HTMLDivElement>(null);
-  const { values, time, step, variableConfig } = props;
+  const { id, values, time, step, variableConfig } = props;
   const { targets, custom, options } = values;
   const { showHeader, calc, aggrDimension } = custom;
   const { series } = usePrometheus({
+    id,
     time,
     step,
     targets,

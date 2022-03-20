@@ -11,7 +11,7 @@ import VariableConfig, { VariableType } from '../VariableConfig';
 const alphabet = 'ABCDEFGHIGKLMNOPQRSTUVWXYZ'.split('');
 
 export default function FormCpt(props) {
-  const { chartForm, setChangedFlag, initialValues, type, variableConfig, cluster, render } = props;
+  const { chartForm, setChangedFlag, initialValues, type, variableConfig, cluster, render, range, id } = props;
   const [innerVariableConfig, setInnerVariableConfig] = useState<VariableType | undefined>(variableConfig);
 
   defaultValues.custom = defaultCustomValuesMap[_.get(initialValues, 'type') || defaultValues.type];
@@ -47,6 +47,8 @@ export default function FormCpt(props) {
                 value={innerVariableConfig}
                 editable={false}
                 cluster={cluster}
+                range={range}
+                id={id}
               />
               <Form.List name='targets'>
                 {(fields, { add, remove }, { errors }) => {

@@ -8,6 +8,7 @@ import { replaceExpressionVars } from '../../VariableConfig/constant';
 import replaceExpressionBracket from '../utils/replaceExpressionBracket';
 
 interface IProps {
+  id: string;
   time: Range;
   step: number | null;
   targets: ITarget[];
@@ -26,7 +27,7 @@ const getSerieName = (metric: Object, expr: string) => {
 };
 
 export default function usePrometheus(props: IProps) {
-  const { time, step, targets, variableConfig } = props;
+  const { id, time, step, targets, variableConfig } = props;
   const [series, setSeries] = useState<any[]>([]);
 
   useEffect(() => {
@@ -36,7 +37,7 @@ export default function usePrometheus(props: IProps) {
     const _series: any[] = [];
     const promises: Promise<any>[] = [];
     _.forEach(targets, (target) => {
-      const realExpr = variableConfig ? replaceExpressionVars(target.expr, variableConfig, variableConfig.var.length) : target.expr;
+      const realExpr = variableConfig ? replaceExpressionVars(target.expr, variableConfig, variableConfig.var.length, id) : target.expr;
       if (realExpr) {
         promises.push(
           api

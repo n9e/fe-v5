@@ -13,6 +13,7 @@ import { IPanel } from '../../types';
 import './style.less';
 
 interface IProps {
+  id: string;
   time: Range;
   step: number | null;
   type: string;
@@ -26,8 +27,9 @@ interface IProps {
 }
 
 function index(props: IProps) {
-  const { time, step, type, variableConfig, values, isPreview, onCloneClick, onShareClick, onEditClick, onDeleteClick } = props;
+  const { id, time, step, type, variableConfig, values, isPreview, onCloneClick, onShareClick, onEditClick, onDeleteClick } = props;
   const subProps = {
+    id,
     time,
     step,
     variableConfig,

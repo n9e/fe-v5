@@ -119,6 +119,7 @@ export default function DashboardDetail() {
       cluster: curCluster,
       busiId,
       groupId,
+      id,
       initialValues: {
         type: 'timeseries',
         targets: [
@@ -145,6 +146,7 @@ export default function DashboardDetail() {
         cluster: curCluster,
         busiId,
         groupId,
+        id,
         initialValues: {
           ...item.configs,
           id: item.id,
@@ -160,7 +162,7 @@ export default function DashboardDetail() {
 
   const handleDelChart = async (group: Group, item: Chart) => {
     groupId = group.id;
-    await removeChart(busiId, item.id);
+    await removeChart(busiId, item.id as any);
     refreshUpdateTimeByChartGroupId();
   };
 

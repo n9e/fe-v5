@@ -11,6 +11,7 @@ import './style.less';
 import G2PieChart from '@/components/G2PieChart';
 
 interface IProps {
+  id: string;
   time: Range;
   step: number | null;
   values: IPanel;
@@ -18,10 +19,11 @@ interface IProps {
 }
 
 export default function Pie(props: IProps) {
-  const { values, time, step, variableConfig } = props;
+  const { id, values, time, step, variableConfig } = props;
   const { targets, custom, options } = values;
   const { calc, legengPosition, max } = custom;
   const { series } = usePrometheus({
+    id,
     time,
     step,
     targets,

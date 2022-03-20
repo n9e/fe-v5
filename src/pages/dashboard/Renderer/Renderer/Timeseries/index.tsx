@@ -11,6 +11,7 @@ import valueFormatter from '../../utils/valueFormatter';
 import './style.less';
 
 interface IProps {
+  id: string;
   time: Range;
   step: number | null;
   values: IPanel;
@@ -18,11 +19,12 @@ interface IProps {
 }
 
 export default function index(props: IProps) {
-  const { values, time, step, variableConfig } = props;
+  const { id, values, time, step, variableConfig } = props;
   const { targets, custom, options = {} } = values;
   const chartEleRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<TsGraph>(null);
   const { series } = usePrometheus({
+    id,
     time,
     step,
     targets,

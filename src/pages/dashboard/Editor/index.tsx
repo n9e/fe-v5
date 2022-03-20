@@ -19,12 +19,13 @@ interface IProps {
   cluster: string;
   busiId: string;
   groupId: number;
+  id: string;
   onOK: () => void;
 }
 
 function index(props: ModalWrapProps & IProps) {
   const { t } = useTranslation();
-  const { visible, initialValues, variableConfig, cluster, busiId, groupId } = props;
+  const { visible, initialValues, variableConfig, cluster, busiId, groupId, id } = props;
   const [chartForm] = Form.useForm();
   const [range, setRange] = useState<Range>({
     description: '小时',
@@ -150,10 +151,12 @@ function index(props: ModalWrapProps & IProps) {
         type={type}
         variableConfig={variableConfig}
         cluster={cluster}
+        range={range}
+        id={id}
         render={(innerVariableConfig) => {
           return (
             <div style={{ height: 300, border: '1px solid #d9d9d9' }}>
-              <Renderer time={range} step={step} type={type} values={values} variableConfig={innerVariableConfig} isPreview />
+              <Renderer id={id} time={range} step={step} type={type} values={values} variableConfig={innerVariableConfig} isPreview />
             </div>
           );
         }}

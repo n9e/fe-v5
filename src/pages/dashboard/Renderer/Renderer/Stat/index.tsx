@@ -10,6 +10,7 @@ import getCalculatedValuesBySeries from '../../utils/getCalculatedValuesBySeries
 import './style.less';
 
 interface IProps {
+  id: string;
   time: Range;
   step: number | null;
   values: IPanel;
@@ -65,10 +66,11 @@ function StatItem(props) {
 }
 
 export default function Stat(props: IProps) {
-  const { values, time, step, variableConfig } = props;
+  const { id, values, time, step, variableConfig } = props;
   const { targets, custom, options } = values;
   const { calc, textMode, colorMode, colSpan, textSize } = custom;
   const { series } = usePrometheus({
+    id,
     time,
     step,
     targets,

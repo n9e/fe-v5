@@ -516,6 +516,7 @@ export default function ChartGroup(props: Props) {
               key={String(i)}
             >
               <Renderer
+                id={id}
                 time={range}
                 step={step}
                 type={type}
