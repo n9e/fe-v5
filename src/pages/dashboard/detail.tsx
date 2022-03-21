@@ -321,15 +321,15 @@ export default function DashboardDetail() {
               <Resolution onChange={(v) => setStep(v)} initialValue={step} />
               <Refresh
                 onRefresh={() => {
-                  const currentRange = range as any;
-                  if (currentRange.start && currentRange.end) {
+                  const currentRange = range;
+                  if ('start' in currentRange && currentRange.start && currentRange.end) {
                     const diff = currentRange.end - currentRange.start;
                     const now = moment().unix();
                     setRange({
                       end: now,
                       start: now - diff,
                     });
-                  } else if (currentRange.unit) {
+                  } else if ('unit' in currentRange && currentRange.unit) {
                     setRange({
                       ...currentRange,
                       refreshFlag: _.uniqueId('refreshFlag_'),

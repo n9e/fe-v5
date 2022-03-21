@@ -6,6 +6,7 @@ import { ITarget } from '../../types';
 import { VariableType } from '../../VariableConfig';
 import { replaceExpressionVars } from '../../VariableConfig/constant';
 import replaceExpressionBracket from '../utils/replaceExpressionBracket';
+import { getVaraiableSelected } from '../../VariableConfig';
 
 interface IProps {
   id: string;
@@ -29,6 +30,9 @@ const getSerieName = (metric: Object, expr: string) => {
 export default function usePrometheus(props: IProps) {
   const { id, time, step, targets, variableConfig } = props;
   const [series, setSeries] = useState<any[]>([]);
+  const cachedVariableValues = _.map(variableConfig?.var, (item) => {
+    return getVaraiableSelected(item.name, id);
+  });
 
   useEffect(() => {
     const { start, end } = formatPickerDate(time);
@@ -74,7 +78,7 @@ export default function usePrometheus(props: IProps) {
       });
       setSeries(_series);
     });
-  }, [JSON.stringify(_.map(targets, 'expr')), JSON.stringify(time), step, JSON.stringify(variableConfig)]);
+  }, [JSON.stringify(_.map(targets, 'expr')), JSON.stringify(time), step, JSON.stringify(variableConfig), JSON.stringify(cachedVariableValues)]);
 
   useEffect(() => {
     const _series = _.map(series, (item) => {
