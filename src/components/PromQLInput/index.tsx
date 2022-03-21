@@ -128,10 +128,9 @@ const ExpressionInput: FC<CMExpressionInputProps> = ({ url, headers, value, onCh
       if (view === null) {
         return;
       }
-      const { from, to } = view.state.selection.ranges[0];
       view.dispatch(
         view.state.update({
-          changes: { from, to, insert: value },
+          changes: { from: 0, to: view.state.doc.length, insert: value },
         }),
       );
     }
