@@ -47,12 +47,10 @@ const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = ({ isOpe
 
   useEffect(() => {
     value && setData(value);
-    console.log(value);
   }, [value]);
 
   const handleVariableChange = (index: number, v: string | string[], options) => {
     const newData = data ? { var: [...data.var] } : { var: [] };
-    console.log(newData);
     // newData.var[index].selected = v;
     setVaraiableSelected(newData.var[index].name, v, id);
     setVarsMap((varsMap) => ({ ...varsMap, [`$${newData.var[index].name}`]: v }));

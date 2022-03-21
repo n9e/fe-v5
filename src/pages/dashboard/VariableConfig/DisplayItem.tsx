@@ -29,6 +29,7 @@ const DisplayItem: React.FC<Props> = ({ expression, index, data, onChange, clust
   const { definition, multi, allOption, name, reg } = expression;
   const selected = getVaraiableSelected(name, id);
   const vars = extractExpressionVars(definition);
+  const [search, setSearch] = useState<string>();
 
   useEffect(() => {
     // console.log(vars, varsMap, !vars || vars.every((key) => varsMap[key]));
@@ -108,9 +109,19 @@ const DisplayItem: React.FC<Props> = ({ expression, index, data, onChange, clust
                 ))}
           </Select>
         ) : (
-          <AutoComplete style={{ width: 180 }} onChange={(v) => onChange(index, v)} placeholder='input here' value={selected as string} dropdownClassName='overflow-586'>
+          <AutoComplete
+            style={{ width: 180 }}
+            onChange={(v) => onChange(index, v)}
+            placeholder='input here'
+            onSearch={setSearch}
+            showSearch
+            value={selected as string}
+            dropdownClassName='overflow-586'
+            onFocus={() => setSearch(undefined)}
+          >
             {options &&
               options
+                .filter((i) => !search || i.includes(search))
                 // .filter((i) => !reg || !stringToRegex(reg) || (stringToRegex(reg) as RegExp).test(i))
                 .map((value) => (
                   <Option key={value} value={value}>
