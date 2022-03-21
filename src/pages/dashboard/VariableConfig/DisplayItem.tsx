@@ -30,6 +30,7 @@ const DisplayItem: React.FC<Props> = ({ expression, index, data, onChange, clust
   const selected = getVaraiableSelected(name, id);
   const vars = extractExpressionVars(definition);
   const [search, setSearch] = useState<string>();
+  const [v, setV] = useState(selected);
 
   useEffect(() => {
     // console.log(vars, varsMap, !vars || vars.every((key) => varsMap[key]));
@@ -111,11 +112,18 @@ const DisplayItem: React.FC<Props> = ({ expression, index, data, onChange, clust
         ) : (
           <AutoComplete
             style={{ width: 180 }}
-            onChange={(v) => onChange(index, v)}
+            // onChange={(v) => onChange(index, v)}
+            onChange={setV}
+            onInputKeyDown={(e) => {
+              if (e.code === 'Enter') {
+                onChange(index, (e.target as HTMLInputElement).value);
+              }
+            }}
+            onSelect={(v) => onChange(index, v)}
             placeholder='input here'
             onSearch={setSearch}
             showSearch
-            value={selected as string}
+            value={v}
             dropdownClassName='overflow-586'
             onFocus={() => setSearch(undefined)}
           >
