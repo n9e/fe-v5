@@ -81,7 +81,11 @@ const PageTable: React.FC<Props> = ({ bgid, clusters, severity }) => {
   const filterData = () => {
     const data = JSON.parse(JSON.stringify(currentStrategyDataAll));
     const res = data.filter((item) => {
-      return (item.name.indexOf(query) > -1 || item.append_tags.join(' ').indexOf(query) > -1) && ((clusters && clusters?.indexOf(item.cluster) > -1) || clusters?.length === 0);
+      const lowerCaseQuery = query.toLowerCase();
+      return (
+        (item.name.toLowerCase().indexOf(lowerCaseQuery) > -1 || item.append_tags.join(' ').toLowerCase().indexOf(lowerCaseQuery) > -1) &&
+        ((clusters && clusters?.indexOf(item.cluster) > -1) || clusters?.length === 0)
+      );
     });
     setCurrentStrategyData(res || []);
   };
