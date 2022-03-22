@@ -39,7 +39,7 @@ function index(props: IProps) {
     step,
     targets: values.targets,
     variableConfig,
-    inViewPort,
+    inViewPort: isPreview || inViewPort,
   });
   const subProps = {
     id,
@@ -49,6 +49,7 @@ function index(props: IProps) {
     values,
     series,
   };
+  if (_.isEmpty(values)) return null;
   const RendererCptMap = {
     timeseries: () => <Timeseries {...subProps} />,
     stat: () => <Stat {...subProps} />,
@@ -56,9 +57,6 @@ function index(props: IProps) {
     pie: () => <Pie {...subProps} />,
   };
 
-  if (values.name === 'CPU空闲率') {
-    console.log('inViewport', inViewPort, values.name);
-  }
   return (
     <div className='renderer-container' ref={ref}>
       <div className='renderer-header graph-header'>

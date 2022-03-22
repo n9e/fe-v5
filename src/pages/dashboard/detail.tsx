@@ -22,6 +22,7 @@ import Resolution from '@/components/Resolution';
 import { RootState as CommonRootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
 import editor from './Editor';
+import { replaceExpressionVars } from './VariableConfig/constant';
 import Refresh from './Components/Refresh';
 
 interface URLParam {
@@ -176,10 +177,17 @@ export default function DashboardDetail() {
     refreshUpdateTimeByChartGroupId();
   };
 
-  const handleShareChart = async (group: Group, item: Chart) => {
+  const handleShareChart = async (group: Group, item: any) => {
     const serielData = {
       dataProps: {
         ...item.configs,
+        targets: _.map(item.configs.targets, (target) => {
+          const realExpr = variableConfig ? replaceExpressionVars(target.expr, variableConfig, variableConfig.var.length, id) : target.expr;
+          return {
+            ...target,
+            expr: realExpr,
+          };
+        }),
         step,
         range,
       },
