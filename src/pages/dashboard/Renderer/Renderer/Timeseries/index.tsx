@@ -3,7 +3,6 @@ import _ from 'lodash';
 import TsGraph from '@fc-plot/ts-graph';
 import '@fc-plot/ts-graph/dist/index.css';
 import { Range } from '@/components/DateRangePicker';
-import usePrometheus from '../../datasource/usePrometheus';
 import { IPanel } from '../../../types';
 import { hexPalette } from '../../../config';
 import { VariableType } from '../../../VariableConfig';
@@ -15,21 +14,15 @@ interface IProps {
   time: Range;
   step: number | null;
   values: IPanel;
+  series: any[];
   variableConfig?: VariableType;
 }
 
 export default function index(props: IProps) {
-  const { id, values, time, step, variableConfig } = props;
-  const { targets, custom, options = {} } = values;
+  const { values, series } = props;
+  const { custom, options = {} } = values;
   const chartEleRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<TsGraph>(null);
-  const { series } = usePrometheus({
-    id,
-    time,
-    step,
-    targets,
-    variableConfig,
-  });
 
   useEffect(() => {
     if (chartEleRef.current) {

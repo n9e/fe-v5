@@ -2,7 +2,6 @@ import React, { useRef } from 'react';
 import _ from 'lodash';
 import { useSize } from 'ahooks';
 import { Range } from '@/components/DateRangePicker';
-import usePrometheus from '../../datasource/usePrometheus';
 import { IPanel } from '../../../types';
 import { VariableType } from '../../../VariableConfig';
 import { hexPalette } from '../../../config';
@@ -14,6 +13,7 @@ interface IProps {
   time: Range;
   step: number | null;
   values: IPanel;
+  series: any[];
   variableConfig?: VariableType;
 }
 
@@ -66,16 +66,9 @@ function StatItem(props) {
 }
 
 export default function Stat(props: IProps) {
-  const { id, values, time, step, variableConfig } = props;
-  const { targets, custom, options } = values;
+  const { values, series } = props;
+  const { custom, options } = values;
   const { calc, textMode, colorMode, colSpan, textSize } = custom;
-  const { series } = usePrometheus({
-    id,
-    time,
-    step,
-    targets,
-    variableConfig,
-  });
   const calculatedValues = getCalculatedValuesBySeries(
     series,
     calc,

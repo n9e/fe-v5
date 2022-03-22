@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import _ from 'lodash';
 import * as api from '@/components/Graph/api';
 import { Range, formatPickerDate } from '@/components/DateRangePicker';
@@ -14,6 +14,7 @@ interface IProps {
   step: number | null;
   targets: ITarget[];
   variableConfig?: VariableType;
+  inViewPort?: boolean;
 }
 
 const getSerieName = (metric: Object, expr: string) => {
@@ -28,13 +29,13 @@ const getSerieName = (metric: Object, expr: string) => {
 };
 
 export default function usePrometheus(props: IProps) {
-  const { id, time, step, targets, variableConfig } = props;
+  const { id, time, step, targets, variableConfig, inViewPort } = props;
   const [series, setSeries] = useState<any[]>([]);
   const cachedVariableValues = _.map(variableConfig?.var, (item) => {
     return getVaraiableSelected(item.name, id);
   });
-
-  useEffect(() => {
+  const flag = useRef(false);
+  const fetchData = () => {
     const { start, end } = formatPickerDate(time);
     let _step = step;
     if (!step) _step = Math.max(Math.floor((end - start) / 250), 1);
@@ -78,7 +79,22 @@ export default function usePrometheus(props: IProps) {
       });
       setSeries(_series);
     });
+  };
+
+  useEffect(() => {
+    if (inViewPort) {
+      fetchData();
+    } else {
+      flag.current = false;
+    }
   }, [JSON.stringify(_.map(targets, 'expr')), JSON.stringify(time), step, JSON.stringify(variableConfig), JSON.stringify(cachedVariableValues)]);
+
+  useEffect(() => {
+    if (inViewPort && !flag.current) {
+      flag.current = true;
+      fetchData();
+    }
+  }, [inViewPort]);
 
   useEffect(() => {
     const _series = _.map(series, (item) => {

@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import _ from 'lodash';
+import { useInViewport } from 'ahooks';
 import { Dropdown, Menu, Tooltip } from 'antd';
 import { InfoOutlined, DownOutlined, LinkOutlined, SettingOutlined, ShareAltOutlined, DeleteOutlined, CopyOutlined } from '@ant-design/icons';
 import { Range } from '@/components/DateRangePicker';
@@ -9,6 +10,7 @@ import Table from './Table';
 import Pie from './Pie';
 import { VariableType } from '../../VariableConfig';
 import Markdown from '../../Editor/Components/Markdown';
+import usePrometheus from '../datasource/usePrometheus';
 import { IPanel } from '../../types';
 import './style.less';
 
@@ -28,22 +30,37 @@ interface IProps {
 
 function index(props: IProps) {
   const { id, time, step, type, variableConfig, values, isPreview, onCloneClick, onShareClick, onEditClick, onDeleteClick } = props;
+
+  const ref = useRef<HTMLDivElement>(null);
+  const inViewPort = useInViewport(ref);
+  const { series } = usePrometheus({
+    id,
+    time,
+    step,
+    targets: values.targets,
+    variableConfig,
+    inViewPort,
+  });
   const subProps = {
     id,
     time,
     step,
     variableConfig,
     values,
+    series,
   };
-  if (_.isEmpty(values)) return null;
   const RendererCptMap = {
-    timeseries: <Timeseries {...subProps} />,
-    stat: <Stat {...subProps} />,
-    table: <Table {...subProps} />,
-    pie: <Pie {...subProps} />,
+    timeseries: () => <Timeseries {...subProps} />,
+    stat: () => <Stat {...subProps} />,
+    table: () => <Table {...subProps} />,
+    pie: () => <Pie {...subProps} />,
   };
+
+  if (values.name === 'CPU空闲率') {
+    console.log('inViewport', inViewPort, values.name);
+  }
   return (
-    <div className='renderer-container'>
+    <div className='renderer-container' ref={ref}>
       <div className='renderer-header graph-header'>
         {values.description ? (
           <Tooltip
@@ -105,10 +122,10 @@ function index(props: IProps) {
         </div>
       </div>
       <div className='renderer-body' style={{ height: `calc(100% - 36px)` }}>
-        {RendererCptMap[type] || `无效的图表类型 ${type}`}
+        {RendererCptMap[type] ? RendererCptMap[type]() : `无效的图表类型 ${type}`}
       </div>
     </div>
   );
 }
 
-export default index;
+export default React.memo(index);

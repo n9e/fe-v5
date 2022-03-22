@@ -1,11 +1,8 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import _ from 'lodash';
-import { useSize } from 'ahooks';
 import { Range } from '@/components/DateRangePicker';
-import usePrometheus from '../../datasource/usePrometheus';
 import { IPanel } from '../../../types';
 import { VariableType } from '../../../VariableConfig';
-import { hexPalette } from '../../../config';
 import getCalculatedValuesBySeries from '../../utils/getCalculatedValuesBySeries';
 import './style.less';
 import G2PieChart from '@/components/G2PieChart';
@@ -15,20 +12,14 @@ interface IProps {
   time: Range;
   step: number | null;
   values: IPanel;
+  series: any[];
   variableConfig?: VariableType;
 }
 
 export default function Pie(props: IProps) {
-  const { id, values, time, step, variableConfig } = props;
-  const { targets, custom, options } = values;
+  const { values, series } = props;
+  const { custom, options } = values;
   const { calc, legengPosition, max } = custom;
-  const { series } = usePrometheus({
-    id,
-    time,
-    step,
-    targets,
-    variableConfig,
-  });
   const calculatedValues = getCalculatedValuesBySeries(
     series,
     calc,
