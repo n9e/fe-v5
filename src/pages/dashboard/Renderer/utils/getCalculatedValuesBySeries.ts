@@ -6,6 +6,29 @@ const getValueAndToNumber = (value: any[]) => {
   return _.toNumber(_.get(value, 1, NaN));
 };
 
+export const getSerieTextObj = (value: number, standardOptions?: any, valueMappings?: IValueMapping[]) => {
+  const { util, decimals } = standardOptions || {};
+  const matchedValueMapping = _.find(valueMappings, (item) => {
+    const { type, match } = item;
+    if (type === 'special') {
+      return value === match?.special;
+    } else if (type === 'range') {
+      if (match?.from && match?.to) {
+        return value >= match?.from && value <= match?.to;
+      } else if (match?.from) {
+        return value >= match?.from;
+      } else if (match?.to) {
+        return value <= match?.to;
+      }
+      return true;
+    }
+  });
+  return {
+    text: matchedValueMapping?.result?.text ? matchedValueMapping?.result?.text : valueFormatter({ util, decimals }, value),
+    color: matchedValueMapping?.result?.color,
+  };
+}
+
 const getCalculatedValuesBySeries = (series: any[], calc: string, { util, decimals }, valueMappings?: IValueMapping[], aggrDimension?: string) => {
   const values = _.map(series, (serie) => {
     const results = {
@@ -20,40 +43,24 @@ const getCalculatedValuesBySeries = (series: any[], calc: string, { util, decima
       count: () => _.size(serie.data),
     };
     const stat = results[calc] ? results[calc]() : NaN;
-    const matchedValueMapping = _.find(valueMappings, (item) => {
-      const { type, match } = item;
-      if (type === 'special') {
-        return stat === match?.special;
-      } else if (type === 'range') {
-        if (match?.from && match?.to) {
-          return stat >= match?.from && stat <= match?.to;
-        } else if (match?.from) {
-          return stat >= match?.from;
-        } else if (match?.to) {
-          return stat <= match?.to;
-        }
-        return true;
-      }
-    });
     return {
       id: serie.id,
       name: serie.name,
       metric: serie.metric,
-      color: matchedValueMapping?.result?.color,
       stat,
-      text: matchedValueMapping?.result?.text ? matchedValueMapping?.result?.text : valueFormatter({ util, decimals }, stat),
+      ...getSerieTextObj(stat, { util, decimals }, valueMappings),
     };
   });
   if (aggrDimension) {
     const grouped = _.groupBy(values, (item) => {
       return item.metric[aggrDimension];
     });
-    return _.map(grouped, (val, key) => {
+    const newValues = _.map(grouped, (val, key) => {
       const item: any = {
         name: key,
       };
       const subGrouped = _.groupBy(val, (item) => {
-        return item.name || item.metric.__name__;
+        return item.name;
       });
       _.forEach(subGrouped, (subVal, subKey) => {
         item[subKey] = {
@@ -66,6 +73,7 @@ const getCalculatedValuesBySeries = (series: any[], calc: string, { util, decima
       item.groupNames = _.keys(subGrouped);
       return item;
     });
+    return newValues;
   }
   return values;
 };

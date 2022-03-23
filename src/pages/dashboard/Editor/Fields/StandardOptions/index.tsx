@@ -4,10 +4,15 @@ import { InfoCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { Panel } from '../../Components/Collapse';
 
+interface IProps {
+  preNamePrefix?: (string | number)[];
+  namePrefix?: (string | number)[];
+}
+
 const { Option, OptGroup } = Select;
 
-export default function index() {
-  const namePrefix = ['options', 'standardOptions'];
+export default function index(props: IProps) {
+  const { preNamePrefix = [], namePrefix = ['options', 'standardOptions'] } = props;
 
   return (
     <Panel header='高级设置'>

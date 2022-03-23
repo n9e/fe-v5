@@ -26,7 +26,7 @@ const getSerieName = (metric: Object, expr: string) => {
   _.forEach(_.omit(metric, '__name__'), (value, key) => {
     name += ` ${key}: ${value}`;
   });
-  return name;
+  return _.trim(name);
 };
 
 export default function usePrometheus(props: IProps) {
@@ -76,10 +76,7 @@ export default function usePrometheus(props: IProps) {
             _series.push({
               id: _.uniqueId('series_'),
               name: target?.legend ? replaceExpressionBracket(target?.legend, serie.metric) : getSerieName(serie.metric, item.expr),
-              metric: {
-                ...serie.metric,
-                __name__: serie.metric.__name__ || item.expr,
-              },
+              metric: serie.metric,
               expr: item.expr,
               data: serie.values,
             });
@@ -112,7 +109,7 @@ export default function usePrometheus(props: IProps) {
       const target = _.find(targets, (t) => t.expr === item.expr);
       return {
         ...item,
-        name: target?.legend ? replaceExpressionBracket(target?.legend, item.metric) : item.name,
+        name: target?.legend ? replaceExpressionBracket(target?.legend, item.metric) : getSerieName(item.metric, item.expr),
       };
     });
     setSeries(_series);

@@ -2,7 +2,8 @@ import React, { useRef } from 'react';
 import _ from 'lodash';
 import { Table } from 'antd';
 import { IPanel } from '../../../types';
-import getCalculatedValuesBySeries from '../../utils/getCalculatedValuesBySeries';
+import getCalculatedValuesBySeries, { getSerieTextObj } from '../../utils/getCalculatedValuesBySeries';
+import getOverridePropertiesByName from '../../utils/getOverridePropertiesByName';
 import './style.less';
 
 interface IProps {
@@ -13,7 +14,7 @@ interface IProps {
 export default function Stat(props: IProps) {
   const eleRef = useRef<HTMLDivElement>(null);
   const { values, series } = props;
-  const { custom, options } = values;
+  const { custom, options, overrides } = values;
   const { showHeader, calc, aggrDimension } = custom;
   const calculatedValues = getCalculatedValuesBySeries(
     series,
@@ -42,9 +43,11 @@ export default function Stat(props: IProps) {
         dataIndex: name,
         key: name,
         render: (text) => {
+          const overrideProps = getOverridePropertiesByName(overrides, name);
+          const obj = getSerieTextObj(text?.stat, overrideProps?.standardOptions, overrideProps?.valueMappings);
           return (
-            <div className='renderer-table-td-content' style={{ color: text?.color }}>
-              {text?.text}
+            <div className='renderer-table-td-content' style={{ color: obj?.color }}>
+              {obj?.text}
             </div>
           );
         },

@@ -61,6 +61,16 @@ export interface IOptions {
   };
 }
 
+export interface IOverride {
+  matcher: {
+    type: 'byName'; // 目前只支持 byName
+    value: string;
+  },
+  properties: {
+    [key: string]: any; // standardOptions | valueMappings
+  }
+}
+
 export interface ITimeseriesStyles {
   version: string; // 时序图组件使用的版本
   drawStyle: 'lines' |'bars';
@@ -101,6 +111,7 @@ export interface IPanel {
   type: IType;
   options: IOptions;
   custom: any; // 图表
+  overrides: IOverride[];
 }
 
 export interface IDashboard {

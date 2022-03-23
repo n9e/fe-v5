@@ -5,8 +5,13 @@ import _ from 'lodash';
 
 import { Panel } from '../../Components/Collapse';
 
-export default function index() {
-  const namePrefix = ['options', 'valueMappings'];
+interface IProps {
+  preNamePrefix?: (string | number)[];
+  namePrefix?: (string | number)[];
+}
+
+export default function index(props: IProps) {
+  const { preNamePrefix = [], namePrefix = ['options', 'valueMappings'] } = props;
 
   return (
     <Panel header='值映射'>
@@ -62,7 +67,7 @@ export default function index() {
                       <Col flex='1'>
                         <Form.Item noStyle {...restField} shouldUpdate={(prevValues, curValues) => _.get(prevValues, [name, 'type']) !== _.get(curValues, [name, 'type'])}>
                           {({ getFieldValue }) => {
-                            const type = getFieldValue([...namePrefix, name, 'type']);
+                            const type = getFieldValue([...preNamePrefix, ...namePrefix, name, 'type']);
                             if (type === 'special') {
                               return (
                                 <Form.Item noStyle {...restField} name={[name, 'match', 'special']}>

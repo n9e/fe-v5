@@ -74,6 +74,7 @@ export const defaultValues = {
     },
   },
   custom: {},
+  overrides: [{}],
 };
 
 export const defaultCustomValuesMap = {
