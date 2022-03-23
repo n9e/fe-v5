@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import _ from 'lodash';
 import { useInViewport } from 'ahooks';
 import { Dropdown, Menu, Tooltip } from 'antd';
-import { InfoOutlined, DownOutlined, LinkOutlined, SettingOutlined, ShareAltOutlined, DeleteOutlined, CopyOutlined } from '@ant-design/icons';
+import { InfoOutlined, DownOutlined, LinkOutlined, SettingOutlined, ShareAltOutlined, DeleteOutlined, CopyOutlined, SyncOutlined } from '@ant-design/icons';
 import { Range } from '@/components/DateRangePicker';
 import Timeseries from './Timeseries';
 import Stat from './Stat';
@@ -33,7 +33,7 @@ function index(props: IProps) {
 
   const ref = useRef<HTMLDivElement>(null);
   const inViewPort = useInViewport(ref);
-  const { series } = usePrometheus({
+  const { series, loading } = usePrometheus({
     id,
     time,
     step,
@@ -117,6 +117,14 @@ function index(props: IProps) {
               <DownOutlined className='renderer-header-arrow' />
             </div>
           </Dropdown>
+        </div>
+        <div className='renderer-header-loading'>
+          <SyncOutlined
+            spin
+            style={{
+              opacity: loading ? 1 : 0,
+            }}
+          />
         </div>
       </div>
       <div className='renderer-body' style={{ height: `calc(100% - 36px)` }}>

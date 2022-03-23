@@ -31,6 +31,7 @@ const getSerieName = (metric: Object, expr: string) => {
 export default function usePrometheus(props: IProps) {
   const { id, time, step, targets, variableConfig, inViewPort } = props;
   const [series, setSeries] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
   const cachedVariableValues = _.map(variableConfig?.var, (item) => {
     return getVaraiableSelected(item.name, id);
   });
@@ -61,24 +62,29 @@ export default function usePrometheus(props: IProps) {
         );
       }
     });
-    Promise.all(promises).then((res) => {
-      _.forEach(res, (item) => {
-        const target = _.find(targets, (t) => t.expr === item.expr);
-        _.forEach(item.result, (serie) => {
-          _series.push({
-            id: _.uniqueId('series_'),
-            name: target?.legend ? replaceExpressionBracket(target?.legend, serie.metric) : getSerieName(serie.metric, item.expr),
-            metric: {
-              ...serie.metric,
-              __name__: serie.metric.__name__ || item.expr,
-            },
-            expr: item.expr,
-            data: serie.values,
+    setLoading(true);
+    Promise.all(promises)
+      .then((res) => {
+        _.forEach(res, (item) => {
+          const target = _.find(targets, (t) => t.expr === item.expr);
+          _.forEach(item.result, (serie) => {
+            _series.push({
+              id: _.uniqueId('series_'),
+              name: target?.legend ? replaceExpressionBracket(target?.legend, serie.metric) : getSerieName(serie.metric, item.expr),
+              metric: {
+                ...serie.metric,
+                __name__: serie.metric.__name__ || item.expr,
+              },
+              expr: item.expr,
+              data: serie.values,
+            });
           });
         });
+        setSeries(_series);
+      })
+      .finally(() => {
+        setLoading(false);
       });
-      setSeries(_series);
-    });
   };
 
   useEffect(() => {
@@ -107,5 +113,5 @@ export default function usePrometheus(props: IProps) {
     setSeries(_series);
   }, [JSON.stringify(_.map(targets, 'legend'))]);
 
-  return { series };
+  return { series, loading };
 }
