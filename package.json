@@ -19,7 +19,7 @@
     "@codemirror/state": "^0.18.2",
     "@codemirror/view": "^0.18.1",
     "@d3-charts/ts-graph": "^0.3.7",
-    "@fc-plot/ts-graph": "^0.13.6",
+    "@fc-plot/ts-graph": "^0.13.7",
     "@types/echarts": "^4.9.7",
     "@y0c/react-datepicker": "^1.0.4",
     "ahooks": "^2.10.2",
