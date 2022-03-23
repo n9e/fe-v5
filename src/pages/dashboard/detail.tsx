@@ -133,8 +133,8 @@ export default function DashboardDetail() {
     setTitleEditing(false);
   };
 
-  const handleAddChart = (id: number) => {
-    groupId = id;
+  const handleAddChart = (gid: number) => {
+    groupId = gid;
     editor({
       visible: true,
       variableConfig,
