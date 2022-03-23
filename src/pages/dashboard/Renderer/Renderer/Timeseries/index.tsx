@@ -2,20 +2,14 @@ import React, { useRef, useEffect } from 'react';
 import _ from 'lodash';
 import TsGraph from '@fc-plot/ts-graph';
 import '@fc-plot/ts-graph/dist/index.css';
-import { Range } from '@/components/DateRangePicker';
 import { IPanel } from '../../../types';
 import { hexPalette } from '../../../config';
-import { VariableType } from '../../../VariableConfig';
 import valueFormatter from '../../utils/valueFormatter';
 import './style.less';
 
 interface IProps {
-  id: string;
-  time: Range;
-  step: number | null;
   values: IPanel;
   series: any[];
-  variableConfig?: VariableType;
 }
 
 export default function index(props: IProps) {

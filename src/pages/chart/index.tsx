@@ -132,7 +132,7 @@ export default function Chart() {
             if (semver.valid(item.dataProps?.version)) {
               return (
                 <div style={{ height: 400, border: '1px solid #efefef' }}>
-                  <Renderer id={item.id} key={index} time={range} step={step} type={item.dataProps?.type} values={item.dataProps as any} isPreview />
+                  <Renderer dashboardId={item.id} key={index} time={range} step={step} type={item.dataProps?.type} values={item.dataProps as any} isPreview />
                 </div>
               );
             }

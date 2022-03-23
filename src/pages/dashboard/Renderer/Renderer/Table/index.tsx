@@ -1,19 +1,13 @@
 import React, { useRef } from 'react';
 import _ from 'lodash';
 import { Table } from 'antd';
-import { Range } from '@/components/DateRangePicker';
 import { IPanel } from '../../../types';
-import { VariableType } from '../../../VariableConfig';
 import getCalculatedValuesBySeries from '../../utils/getCalculatedValuesBySeries';
 import './style.less';
 
 interface IProps {
-  id: string;
-  time: Range;
-  step: number | null;
   values: IPanel;
   series: any[];
-  variableConfig?: VariableType;
 }
 
 export default function Stat(props: IProps) {

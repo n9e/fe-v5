@@ -15,7 +15,8 @@ import { IPanel } from '../../types';
 import './style.less';
 
 interface IProps {
-  id: string;
+  dashboardId: string;
+  id?: string;
   time: Range;
   step: number | null;
   type: string;
@@ -29,12 +30,12 @@ interface IProps {
 }
 
 function index(props: IProps) {
-  const { id, time, step, type, variableConfig, values, isPreview, onCloneClick, onShareClick, onEditClick, onDeleteClick } = props;
-
+  const { dashboardId, id, time, step, type, variableConfig, values, isPreview, onCloneClick, onShareClick, onEditClick, onDeleteClick } = props;
   const ref = useRef<HTMLDivElement>(null);
   const inViewPort = useInViewport(ref);
   const { series, loading } = usePrometheus({
     id,
+    dashboardId,
     time,
     step,
     targets: values.targets,
@@ -42,10 +43,6 @@ function index(props: IProps) {
     inViewPort: isPreview || inViewPort,
   });
   const subProps = {
-    id,
-    time,
-    step,
-    variableConfig,
     values,
     series,
   };
@@ -118,14 +115,7 @@ function index(props: IProps) {
             </div>
           </Dropdown>
         </div>
-        <div className='renderer-header-loading'>
-          <SyncOutlined
-            spin
-            style={{
-              opacity: loading ? 1 : 0,
-            }}
-          />
-        </div>
+        <div className='renderer-header-loading'>{loading && <SyncOutlined spin />}</div>
       </div>
       <div className='renderer-body' style={{ height: `calc(100% - 36px)` }}>
         {RendererCptMap[type] ? RendererCptMap[type]() : `无效的图表类型 ${type}`}

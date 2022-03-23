@@ -1,20 +1,14 @@
 import React, { useRef } from 'react';
 import _ from 'lodash';
 import { useSize } from 'ahooks';
-import { Range } from '@/components/DateRangePicker';
 import { IPanel } from '../../../types';
-import { VariableType } from '../../../VariableConfig';
 import { hexPalette } from '../../../config';
 import getCalculatedValuesBySeries from '../../utils/getCalculatedValuesBySeries';
 import './style.less';
 
 interface IProps {
-  id: string;
-  time: Range;
-  step: number | null;
   values: IPanel;
   series: any[];
-  variableConfig?: VariableType;
 }
 
 function StatItem(props) {

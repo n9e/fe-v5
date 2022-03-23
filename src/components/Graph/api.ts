@@ -2,10 +2,21 @@ import request from '@/utils/request';
 import { RequestMethod } from '@/store/common';
 import queryString from 'query-string';
 
-export const fetchHistory = (params?) => {
+const signals = {};
+
+export const fetchHistory = (params?, signalKey?) => {
+  const controller = new AbortController();
+  const { signal } = controller;
+  if (signals[signalKey] && signals[signalKey].abort) {
+    signals[signalKey].abort();
+  }
+  signals[signalKey] = controller;
   return request(`/api/n9e/prometheus/api/v1/query_range`, {
     method: RequestMethod.Get,
-    params
+    params,
+    signal,
+  }).finally(() => {
+    delete signals[signalKey];
   });
 }
 

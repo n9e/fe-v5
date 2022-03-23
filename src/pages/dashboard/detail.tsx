@@ -3,6 +3,7 @@ import { useParams, useHistory } from 'react-router-dom';
 import _ from 'lodash';
 import moment from 'moment';
 import semver from 'semver';
+import { useThrottleFn } from 'ahooks';
 import PageLayout from '@/components/pageLayout';
 import DateRangePicker from '@/components/DateRangePicker';
 import { useSelector, useDispatch } from 'react-redux';
@@ -72,6 +73,26 @@ export default function DashboardDetail() {
     start: 0,
     end: 0,
   });
+  const { run } = useThrottleFn(
+    () => {
+      if ('start' in range && range.start && range.end) {
+        const diff = range.end - range.start;
+        const now = moment().unix();
+        setRange({
+          end: now,
+          start: now - diff,
+        });
+      } else if ('unit' in range && range.unit) {
+        setRange({
+          ...range,
+          refreshFlag: _.uniqueId('refreshFlag_'),
+        });
+      }
+      init();
+    },
+    { wait: 1000 },
+  );
+
   useEffect(() => {
     init();
   }, []);
@@ -327,25 +348,7 @@ export default function DashboardDetail() {
               </div>
               <DateRangePicker onChange={handleDateChange} />
               <Resolution onChange={(v) => setStep(v)} initialValue={step} />
-              <Refresh
-                onRefresh={() => {
-                  const currentRange = range;
-                  if ('start' in currentRange && currentRange.start && currentRange.end) {
-                    const diff = currentRange.end - currentRange.start;
-                    const now = moment().unix();
-                    setRange({
-                      end: now,
-                      start: now - diff,
-                    });
-                  } else if ('unit' in currentRange && currentRange.unit) {
-                    setRange({
-                      ...currentRange,
-                      refreshFlag: _.uniqueId('refreshFlag_'),
-                    });
-                  }
-                  init();
-                }}
-              />
+              <Refresh onRefresh={run} />
             </Space>
           </div>
         </div>

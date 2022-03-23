@@ -9,7 +9,8 @@ import replaceExpressionBracket from '../utils/replaceExpressionBracket';
 import { getVaraiableSelected } from '../../VariableConfig';
 
 interface IProps {
-  id: string;
+  id?: string;
+  dashboardId: string;
   time: Range;
   step: number | null;
   targets: ITarget[];
@@ -29,11 +30,11 @@ const getSerieName = (metric: Object, expr: string) => {
 };
 
 export default function usePrometheus(props: IProps) {
-  const { id, time, step, targets, variableConfig, inViewPort } = props;
+  const { id = 0, dashboardId, time, step, targets, variableConfig, inViewPort } = props;
   const [series, setSeries] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const cachedVariableValues = _.map(variableConfig?.var, (item) => {
-    return getVaraiableSelected(item.name, id);
+    return getVaraiableSelected(item.name, dashboardId);
   });
   const flag = useRef(false);
   const fetchData = () => {
@@ -42,17 +43,21 @@ export default function usePrometheus(props: IProps) {
     if (!step) _step = Math.max(Math.floor((end - start) / 250), 1);
     const _series: any[] = [];
     const promises: Promise<any>[] = [];
-    _.forEach(targets, (target) => {
-      const realExpr = variableConfig ? replaceExpressionVars(target.expr, variableConfig, variableConfig.var.length, id) : target.expr;
+    _.forEach(targets, (target, idx) => {
+      const realExpr = variableConfig ? replaceExpressionVars(target.expr, variableConfig, variableConfig.var.length, dashboardId) : target.expr;
+      const signalKey = `${id}-${idx}`;
       if (realExpr) {
         promises.push(
           api
-            .fetchHistory({
-              start,
-              end,
-              step: _step,
-              query: realExpr,
-            })
+            .fetchHistory(
+              {
+                start,
+                end,
+                step: _step,
+                query: realExpr,
+              },
+              signalKey,
+            )
             .then((res) => {
               return {
                 result: res?.data?.result,

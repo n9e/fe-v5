@@ -1,19 +1,13 @@
 import React from 'react';
 import _ from 'lodash';
-import { Range } from '@/components/DateRangePicker';
 import { IPanel } from '../../../types';
-import { VariableType } from '../../../VariableConfig';
 import getCalculatedValuesBySeries from '../../utils/getCalculatedValuesBySeries';
 import './style.less';
 import G2PieChart from '@/components/G2PieChart';
 
 interface IProps {
-  id: string;
-  time: Range;
-  step: number | null;
   values: IPanel;
   series: any[];
-  variableConfig?: VariableType;
 }
 
 export default function Pie(props: IProps) {
