@@ -4,7 +4,7 @@ import classnames from 'classnames';
 
 interface IProps {
   isActive?: boolean;
-  header: string;
+  header: React.ReactNode;
   children: React.ReactNode;
   extra?: React.ReactNode;
 }

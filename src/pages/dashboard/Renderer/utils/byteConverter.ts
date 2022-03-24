@@ -51,6 +51,7 @@ export const config = [
 ];
 
 export function format(value: number, options = defaultOptions) {
+  if (value === null || value === undefined) return;
   const baseUtil = options.base ? baseUtilMap[options.base] : ''; // 支持
   if (
     (options.type === 'si' && value < 1000) || (options.type === 'iec' && value < 1024)

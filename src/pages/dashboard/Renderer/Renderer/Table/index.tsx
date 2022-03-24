@@ -4,6 +4,7 @@ import { Table } from 'antd';
 import { IPanel } from '../../../types';
 import getCalculatedValuesBySeries, { getSerieTextObj } from '../../utils/getCalculatedValuesBySeries';
 import getOverridePropertiesByName from '../../utils/getOverridePropertiesByName';
+import formatToTable from '../../utils/formatToTable';
 import './style.less';
 
 interface IProps {
@@ -24,9 +25,9 @@ export default function Stat(props: IProps) {
       decimals: options?.standardOptions?.decimals,
     },
     options?.valueMappings,
-    aggrDimension,
   );
-  const firstItem = _.first(calculatedValues);
+  const tableDataSource = formatToTable(calculatedValues, aggrDimension, 'refId');
+  const firstItem = _.first(tableDataSource);
   const columns: any[] = [
     {
       title: 'name',
@@ -39,7 +40,7 @@ export default function Stat(props: IProps) {
   if (aggrDimension) {
     _.map(firstItem?.groupNames, (name) => {
       columns.push({
-        title: name,
+        title: firstItem[name].name,
         dataIndex: name,
         key: name,
         render: (text) => {
@@ -74,7 +75,7 @@ export default function Stat(props: IProps) {
   return (
     <div className='renderer-table-container' ref={eleRef}>
       <div className='renderer-table-container-box'>
-        <Table rowKey='id' showHeader={showHeader} dataSource={calculatedValues} columns={columns} scroll={{ y: height }} bordered={false} pagination={false} />
+        <Table rowKey='id' showHeader={showHeader} dataSource={tableDataSource} columns={columns} scroll={{ y: height }} bordered={false} pagination={false} />
       </div>
     </div>
   );

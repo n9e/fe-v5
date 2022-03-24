@@ -7,6 +7,7 @@ export interface IGridPos {
 
 // query interface 
 export interface ITarget {
+  refId: string;
   expr: string; // promQL
   legendFormat: string;
   // format: string; // table | timeSeries 暂定，可能需要添加一个 format 来处理 table 形态

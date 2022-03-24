@@ -7,6 +7,7 @@ import { defaultValues, defaultCustomValuesMap } from './config';
 import Options from './Options';
 import Collapse, { Panel } from './Components/Collapse';
 import VariableConfig, { VariableType } from '../VariableConfig';
+import getFirstUnusedLetter from '../Renderer/utils/getFirstUnusedLetter';
 
 const alphabet = 'ABCDEFGHIGKLMNOPQRSTUVWXYZ'.split('');
 
@@ -58,7 +59,13 @@ export default function FormCpt(props) {
                         {_.map(fields, ({ name }, index) => {
                           return (
                             <Panel
-                              header={`Query ${alphabet[index]}`}
+                              header={
+                                <Form.Item noStyle shouldUpdate>
+                                  {({ getFieldValue }) => {
+                                    return getFieldValue(['targets', name, 'refId']) || alphabet[index];
+                                  }}
+                                </Form.Item>
+                              }
                               key={index}
                               extra={
                                 <div>
@@ -73,6 +80,7 @@ export default function FormCpt(props) {
                                 </div>
                               }
                             >
+                              <Form.Item noStyle name={[name, 'refId']} />
                               <div style={{ display: 'flex', alignItems: 'center' }}>
                                 <Form.Item
                                   label='PromQL'
@@ -115,7 +123,7 @@ export default function FormCpt(props) {
                       <Button
                         style={{ width: '100%', marginTop: 10 }}
                         onClick={() => {
-                          add({ expr: '' });
+                          add({ expr: '', refId: getFirstUnusedLetter(_.map(chartForm.getFieldValue('targets'), 'refId')) });
                         }}
                       >
                         + add query

@@ -29,7 +29,7 @@ export const getSerieTextObj = (value: number, standardOptions?: any, valueMappi
   };
 }
 
-const getCalculatedValuesBySeries = (series: any[], calc: string, { util, decimals }, valueMappings?: IValueMapping[], aggrDimension?: string) => {
+const getCalculatedValuesBySeries = (series: any[], calc: string, { util, decimals }, valueMappings?: IValueMapping[]) => {
   const values = _.map(series, (serie) => {
     const results = {
       lastNotNull: () => getValueAndToNumber(_.last(_.filter(serie.data, (item) => item[1] !== null))),
@@ -47,34 +47,15 @@ const getCalculatedValuesBySeries = (series: any[], calc: string, { util, decima
       id: serie.id,
       name: serie.name,
       metric: serie.metric,
+      fields: {
+        ...serie.metric,
+        refId: serie.refId,
+      },
       stat,
       ...getSerieTextObj(stat, { util, decimals }, valueMappings),
     };
   });
-  if (aggrDimension) {
-    const grouped = _.groupBy(values, (item) => {
-      return item.metric[aggrDimension];
-    });
-    const newValues = _.map(grouped, (val, key) => {
-      const item: any = {
-        name: key,
-      };
-      const subGrouped = _.groupBy(val, (item) => {
-        return item.name;
-      });
-      _.forEach(subGrouped, (subVal, subKey) => {
-        item[subKey] = {
-          id: subVal[0].id,
-          stat: subVal[0].stat,
-          color: subVal[0].color,
-          text: subVal[0].text,
-        };
-      });
-      item.groupNames = _.keys(subGrouped);
-      return item;
-    });
-    return newValues;
-  }
+  console.log('values', values);
   return values;
 };
 

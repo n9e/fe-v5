@@ -62,6 +62,7 @@ export default function usePrometheus(props: IProps) {
               return {
                 result: res?.data?.result,
                 expr: target.expr,
+                refId: target.refId,
               };
             }),
         );
@@ -75,6 +76,7 @@ export default function usePrometheus(props: IProps) {
           _.forEach(item.result, (serie) => {
             _series.push({
               id: _.uniqueId('series_'),
+              refId: item.refId,
               name: target?.legend ? replaceExpressionBracket(target?.legend, serie.metric) : getSerieName(serie.metric, item.expr),
               metric: serie.metric,
               expr: item.expr,

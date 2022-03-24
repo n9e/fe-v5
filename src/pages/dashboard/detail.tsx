@@ -146,6 +146,7 @@ export default function DashboardDetail() {
         type: 'timeseries',
         targets: [
           {
+            refId: 'A',
             expr: '',
           },
         ],
