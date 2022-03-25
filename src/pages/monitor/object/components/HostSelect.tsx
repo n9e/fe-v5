@@ -89,6 +89,11 @@ export default (props) => {
           showSearch={true}
           filterOption={false}
           onSearch={handleSearch}
+          onFocus={() => {
+            getBusiGroups('').then((res) => {
+              setFilteredBusiGroups(res.dat || []);
+            });
+          }}
           onClear={() => {
             getBusiGroups('').then((res) => {
               setFilteredBusiGroups(res.dat || []);
