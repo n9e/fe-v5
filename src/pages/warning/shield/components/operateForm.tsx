@@ -20,6 +20,7 @@ const { TextArea } = Input;
 
 interface ItagsObj {
   tags: any[];
+  cluster: string;
 }
 interface Props {
   detail?: shieldItem;
@@ -78,6 +79,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }) => {
       });
       form.setFieldsValue({
         tags: tags || [{}],
+        cluster: tagsObj.cluster,
       });
     }
   }, [tagsObj]);

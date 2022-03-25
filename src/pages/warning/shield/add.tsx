@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import PageLayout from '@/components/pageLayout';
 import OperateForm from './components/operateForm';
@@ -13,7 +13,7 @@ const AddShield: React.FC = () => {
   return (
     <PageLayout title={t('告警屏蔽')} showBack hideCluster>
       <div className='shield-add'>
-        <OperateForm tagsObj={tags ? tags : undefined}/>
+        <OperateForm tagsObj={tags ? tags : undefined} />
       </div>
     </PageLayout>
   );
