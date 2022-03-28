@@ -6,7 +6,7 @@ const formatToTable = (series: any[], rowBy: string, colBy: string) => {
   });
   const newSeries = _.map(rows, (val, key) => {
     const item: any = {
-      name: key,
+      [rowBy]: key,
     };
     const subGrouped = _.groupBy(val, (item) => {
       return item.fields[colBy];

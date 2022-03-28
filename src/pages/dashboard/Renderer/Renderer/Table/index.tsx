@@ -26,18 +26,39 @@ export default function Stat(props: IProps) {
     },
     options?.valueMappings,
   );
-  const tableDataSource = formatToTable(calculatedValues, aggrDimension, 'refId');
-  const firstItem = _.first(tableDataSource);
-  const columns: any[] = [
+  let tableDataSource = calculatedValues;
+  let columns: any[] = [
     {
       title: 'name',
       dataIndex: 'name',
       key: 'name',
       render: (text) => <div className='renderer-table-td-content'>{text}</div>,
     },
+    {
+      title: 'value',
+      dataIndex: 'text',
+      key: 'text',
+      render: (text, record) => {
+        return (
+          <div className='renderer-table-td-content' style={{ color: record.color }}>
+            {text}
+          </div>
+        );
+      },
+    },
   ];
 
   if (aggrDimension) {
+    tableDataSource = formatToTable(calculatedValues, aggrDimension, 'refId');
+    const firstItem = _.first(tableDataSource);
+    columns = [
+      {
+        title: aggrDimension,
+        dataIndex: aggrDimension,
+        key: aggrDimension,
+        render: (text) => <div className='renderer-table-td-content'>{text}</div>,
+      },
+    ];
     _.map(firstItem?.groupNames, (name) => {
       columns.push({
         title: firstItem[name].name,
@@ -53,19 +74,6 @@ export default function Stat(props: IProps) {
           );
         },
       });
-    });
-  } else {
-    columns.push({
-      title: 'value',
-      dataIndex: 'text',
-      key: 'text',
-      render: (text, record) => {
-        return (
-          <div className='renderer-table-td-content' style={{ color: record.color }}>
-            {text}
-          </div>
-        );
-      },
     });
   }
 
