@@ -39,9 +39,17 @@ export default function Stat(props: IProps) {
       dataIndex: 'text',
       key: 'text',
       render: (text, record) => {
+        let textObj = {
+          text,
+          color: record.color,
+        };
+        const overrideProps = getOverridePropertiesByName(overrides, record.fields.refId);
+        if (!_.isEmpty(overrideProps)) {
+          textObj = getSerieTextObj(record?.stat, overrideProps?.standardOptions, overrideProps?.valueMappings);
+        }
         return (
-          <div className='renderer-table-td-content' style={{ color: record.color }}>
-            {text}
+          <div className='renderer-table-td-content' style={{ color: textObj.color }}>
+            {textObj.text}
           </div>
         );
       },
@@ -65,11 +73,17 @@ export default function Stat(props: IProps) {
         dataIndex: name,
         key: name,
         render: (text) => {
+          let textObj = {
+            text: text.text,
+            color: text.color,
+          };
           const overrideProps = getOverridePropertiesByName(overrides, name);
-          const obj = getSerieTextObj(text?.stat, overrideProps?.standardOptions, overrideProps?.valueMappings);
+          if (!_.isEmpty(overrideProps)) {
+            textObj = getSerieTextObj(text?.stat, overrideProps?.standardOptions, overrideProps?.valueMappings);
+          }
           return (
-            <div className='renderer-table-td-content' style={{ color: obj?.color }}>
-              {obj?.text}
+            <div className='renderer-table-td-content' style={{ color: textObj?.color }}>
+              {textObj?.text}
             </div>
           );
         },

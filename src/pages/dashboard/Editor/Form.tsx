@@ -158,7 +158,11 @@ export default function FormCpt(props) {
                   </Form.Item>
                 </>
               </Panel>
-              <Options type={type} />
+              <Form.Item shouldUpdate={(prevValues, curValues) => !_.isEqual(prevValues.targets, curValues.targets)}>
+                {({ getFieldValue }) => {
+                  return <Options type={type} targets={getFieldValue('targets')} />;
+                }}
+              </Form.Item>
             </Collapse>
           </Col>
         </Row>

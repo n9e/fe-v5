@@ -4,13 +4,13 @@ import StandardOptions from '../../Fields/StandardOptions';
 import ValueMappings from '../../Fields/ValueMappings';
 import Overrides from '../../Fields/Overrides';
 
-export default function Timeseries() {
+export default function Timeseries({ targets }) {
   return (
     <>
       <GraphStyles />
       <ValueMappings />
       <StandardOptions />
-      <Overrides />
+      <Overrides targets={targets} />
     </>
   );
 }

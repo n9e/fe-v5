@@ -6,7 +6,7 @@ import { Panel } from '../../Components/Collapse';
 import ValueMappings from '../ValueMappings';
 import StandardOptions from '../StandardOptions';
 
-export default function index() {
+export default function index({ targets }) {
   const namePrefix = ['overrides'];
 
   return (
@@ -16,6 +16,7 @@ export default function index() {
           {fields.map(({ key, name, ...restField }) => {
             return (
               <Panel
+                isInner
                 header='override'
                 extra={
                   <Space>
@@ -36,8 +37,16 @@ export default function index() {
                   </Space>
                 }
               >
-                <Form.Item label='指标名称' {...restField} name={[name, 'matcher', 'value']}>
-                  <Input />
+                <Form.Item label='查询条件名称' {...restField} name={[name, 'matcher', 'value']}>
+                  <Select allowClear>
+                    {_.map(targets, (target) => {
+                      return (
+                        <Select.Option key={target.refId} value={target.refId}>
+                          {target.refId}
+                        </Select.Option>
+                      );
+                    })}
+                  </Select>
                 </Form.Item>
                 <ValueMappings preNamePrefix={namePrefix} namePrefix={[name, 'properties', 'valueMappings']} />
                 <StandardOptions preNamePrefix={namePrefix} namePrefix={[name, 'properties', 'standardOptions']} />

@@ -7,6 +7,7 @@ interface IProps {
   header: React.ReactNode;
   children: React.ReactNode;
   extra?: React.ReactNode;
+  isInner?: boolean;
 }
 
 export default function Panel(props: IProps) {
@@ -16,6 +17,7 @@ export default function Panel(props: IProps) {
       className={classnames({
         'n9e-collapse-item': true,
         'n9e-collapse-item-active': isActive,
+        'n9e-collapse-item-inner': props.isInner,
       })}
     >
       <div
