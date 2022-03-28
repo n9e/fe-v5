@@ -176,7 +176,7 @@ const SideMenu: FC = () => {
       history.push(key as string);
     }
   };
-  const hideSideMenu = () => location.pathname === '/login' || location.pathname.startsWith('/chart/');
+  const hideSideMenu = () => location.pathname === '/login' || location.pathname.startsWith('/chart/') || location.pathname === '/callback';
 
   useEffect(() => {
     setSelectedKeys([defaultSelectedKey(menus, pathname)]);

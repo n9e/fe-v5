@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState, accountStoreState } from '@/store/accountInterface';
 import NotFound from '@/pages/NotFound';
 import Login from '@/pages/login';
+import LoginCallback from '@/pages/loginCallback';
 import ResourcePage from '@/pages/resource';
 import Strategy from '@/pages/warning/strategy';
 import Profile from '@/pages/account/profile';
@@ -89,6 +90,7 @@ export default function Content() {
       <Switch>
         <Route path='/demo' component={Demo} />
         <Route path='/login' component={Login} exact />
+        <Route path='/callback' component={LoginCallback} exact />
         <Route path='/metric/explorer' component={Explore} exact />
         <Route path='/object/explorer' component={ObjectExplore} exact />
         <Route path='/busi-groups' component={Business} />

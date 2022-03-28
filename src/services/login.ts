@@ -40,3 +40,16 @@ export const Logout = function () {
     method: RequestMethod.Post,
   });
 };
+
+export const getRedirectURL = function () {
+  return request('/api/n9e/auth/redirect', {
+    method: RequestMethod.Get,
+  });
+};
+
+export const authCallback = function (params) {
+  return request('/api/n9e/auth/callback', {
+    method: RequestMethod.Get,
+    params,
+  });
+};
