@@ -55,8 +55,29 @@ const getCalculatedValuesBySeries = (series: any[], calc: string, { util, decima
       ...getSerieTextObj(stat, { util, decimals }, valueMappings),
     };
   });
-  console.log('values', values);
   return values;
 };
+
+export const getLegendValues = (series: any[]) => {
+  const values = _.map(series, (serie) => {
+    const results = {
+      max: getValueAndToNumber(_.maxBy(serie.data, (item) => _.toNumber(item[1]))),
+      min: getValueAndToNumber(_.minBy(serie.data, (item) => _.toNumber(item[1]))),
+      avg: _.meanBy(serie.data, (item) => _.toNumber(item[1])),
+      sum: _.sumBy(serie.data, (item) => _.toNumber(item[1])),
+      last: getValueAndToNumber(_.last(serie.data)),
+    };
+    return {
+      id: serie.id,
+      name: serie.name,
+      max: _.round(results.max, 3),
+      min: _.round(results.min, 3),
+      avg: _.round(results.avg, 3),
+      sum: _.round(results.sum, 3),
+      last: _.round(results.last, 3),
+    };
+  });
+  return values;
+}
 
 export default getCalculatedValuesBySeries;
