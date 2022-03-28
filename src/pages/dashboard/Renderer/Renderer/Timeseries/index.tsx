@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import _ from 'lodash';
-import { Table } from 'antd';
+import { Table, Tooltip } from 'antd';
 import { useSize } from 'ahooks';
 import TsGraph from '@fc-plot/ts-graph';
 import '@fc-plot/ts-graph/dist/index.css';
@@ -47,7 +47,12 @@ export default function index(props: IProps) {
       });
     }
     if (hasLegend) {
-      setLegendData(getLegendValues(series));
+      setLegendData(
+        getLegendValues(series, {
+          util: options?.standardOptions?.util,
+          decimals: options?.standardOptions?.decimals,
+        }),
+      );
     } else {
       setLegendData([]);
     }
@@ -105,7 +110,12 @@ export default function index(props: IProps) {
       });
     }
     if (hasLegend) {
-      setLegendData(getLegendValues(series));
+      setLegendData(
+        getLegendValues(series, {
+          util: options?.standardOptions?.util,
+          decimals: options?.standardOptions?.decimals,
+        }),
+      );
     } else {
       setLegendData([]);
     }
@@ -124,7 +134,14 @@ export default function index(props: IProps) {
               title: `Series (${series.length})`,
               dataIndex: 'name',
               width: 150,
-              ellipsis: true,
+              ellipsis: {
+                showTitle: false,
+              },
+              render: (text) => (
+                <Tooltip placement='topLeft' title={text} getTooltipContainer={() => document.body}>
+                  {text}
+                </Tooltip>
+              ),
             },
             {
               title: 'Max',

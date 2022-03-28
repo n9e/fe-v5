@@ -58,7 +58,7 @@ const getCalculatedValuesBySeries = (series: any[], calc: string, { util, decima
   return values;
 };
 
-export const getLegendValues = (series: any[]) => {
+export const getLegendValues = (series: any[], { util, decimals }) => {
   const values = _.map(series, (serie) => {
     const results = {
       max: getValueAndToNumber(_.maxBy(serie.data, (item) => _.toNumber(item[1]))),
@@ -70,11 +70,11 @@ export const getLegendValues = (series: any[]) => {
     return {
       id: serie.id,
       name: serie.name,
-      max: _.round(results.max, 3),
-      min: _.round(results.min, 3),
-      avg: _.round(results.avg, 3),
-      sum: _.round(results.sum, 3),
-      last: _.round(results.last, 3),
+      max: valueFormatter({ util, decimals }, results.max),
+      min: valueFormatter({ util, decimals }, results.min),
+      avg: valueFormatter({ util, decimals }, results.avg),
+      sum: valueFormatter({ util, decimals }, results.sum),
+      last: valueFormatter({ util, decimals }, results.last),
     };
   });
   return values;
