@@ -38,7 +38,7 @@ export enum PanelType {
 }
 
 interface VectorDataType {
-  resultType: 'vector' | 'scalar';
+  resultType: 'matrix' | 'vector' | 'scalar' | 'string';
   result: {
     metric: {
       instance: string;
@@ -54,7 +54,9 @@ interface VectorDataType {
 const { TabPane } = Tabs;
 
 // 格式化 Table 列表数据
-function getListItemContent(metrics) {
+function getListItemContent(resultType, metrics) {
+  if (resultType === 'scalar') return 'scalar';
+  if (resultType === 'string') return 'string';
   const metricName = metrics?.__name__;
   const labels = _.keys(metrics)
     .filter((ml) => ml !== '__name__')
@@ -238,7 +240,7 @@ const Panel: React.FC<PanelProps> = ({ metrics, defaultPromQL, removePanel }) =>
           } else {
             setErrorContent('');
           }
-          if (resultType === 'scalar') {
+          if (resultType === 'scalar' || resultType === 'string') {
             setVectorData({ resultType, result: [result] });
           } else {
             setVectorData({ resultType, result });
@@ -314,8 +316,8 @@ const Panel: React.FC<PanelProps> = ({ metrics, defaultPromQL, removePanel }) =>
               return (
                 <List.Item>
                   <div className='list-item-content'>
-                    <div className='left'>{vectorData?.resultType === 'scalar' ? 'scalar' : getListItemContent(metric)}</div>
-                    {vectorData?.resultType === 'scalar' ? (
+                    <div className='left'>{getListItemContent(vectorData?.resultType, metric)}</div>
+                    {vectorData?.resultType === 'scalar' || vectorData?.resultType === 'string' ? (
                       item[1]
                     ) : (
                       <div>
