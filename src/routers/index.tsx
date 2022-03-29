@@ -67,9 +67,14 @@ export default function Content() {
   let { profile } = useSelector<RootState, accountStoreState>((state) => state.account);
   const location = useLocation();
   const dispatch = useDispatch();
-  if (!profile.id && location.pathname != '/login') {
+  if (!profile.id && location.pathname != '/login' && !location.pathname.startsWith('/callback')) {
     dispatch({ type: 'common/getClusters' });
-    if (!location.pathname.startsWith('/chart/') && !location.pathname.startsWith('/alert-cur-events/') && !location.pathname.startsWith('/alert-his-events/')) {
+    if (
+      !location.pathname.startsWith('/chart/') &&
+      !location.pathname.startsWith('/alert-cur-events/') &&
+      !location.pathname.startsWith('/alert-his-events/') &&
+      !location.pathname.startsWith('/callback')
+    ) {
       dispatch({ type: 'account/getProfile' });
       dispatch({ type: 'common/getBusiGroups' });
     }
