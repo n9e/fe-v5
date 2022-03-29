@@ -21,7 +21,6 @@ interface Props {
 }
 
 const DisplayItem: React.FC<Props> = ({ expression, index, data, onChange, cluster, range, id, varsMap }) => {
-  const { t } = useTranslation();
   const [options, setOptions] = useState<string[]>([]);
   const [exp, setExp] = useState<string>();
   const [_range, setRange] = useState<Range>(range);
@@ -29,8 +28,6 @@ const DisplayItem: React.FC<Props> = ({ expression, index, data, onChange, clust
   const { definition, multi, allOption, name, reg } = expression;
   const selected = getVaraiableSelected(name, id);
   const vars = extractExpressionVars(definition);
-  const [search, setSearch] = useState<string>();
-  const [v, setV] = useState(selected);
 
   useEffect(() => {
     // console.log(vars, varsMap, !vars || vars.every((key) => varsMap[key]));
@@ -82,62 +79,31 @@ const DisplayItem: React.FC<Props> = ({ expression, index, data, onChange, clust
     <div>
       <div className='tag-content-close-item'>
         <div className='tag-content-close-item-tagName'>{name}</div>
-
-        {multi ? (
-          <Select
-            mode='tags'
-            style={{
-              width: '180px',
-            }}
-            onChange={handleChange}
-            defaultActiveFirstOption={false}
-            showSearch
-            value={selected}
-            dropdownClassName='overflow-586'
-          >
-            {allOption && (
-              <Option key={'all'} value={'all'}>
-                all
-              </Option>
-            )}
-            {options &&
-              options
-                // .filter((i) => !reg || !stringToRegex(reg) || (stringToRegex(reg) as RegExp).test(i))
-                .map((value) => (
-                  <Option key={value} value={value}>
-                    {value}
-                  </Option>
-                ))}
-          </Select>
-        ) : (
-          <AutoComplete
-            style={{ width: 180 }}
-            // onChange={(v) => onChange(index, v)}
-            onChange={setV}
-            onInputKeyDown={(e) => {
-              if (e.code === 'Enter') {
-                onChange(index, (e.target as HTMLInputElement).value);
-              }
-            }}
-            onSelect={(v) => onChange(index, v)}
-            placeholder='input here'
-            onSearch={setSearch}
-            showSearch
-            value={v}
-            dropdownClassName='overflow-586'
-            onFocus={() => setSearch(undefined)}
-          >
-            {options &&
-              options
-                .filter((i) => !search || i.includes(search))
-                // .filter((i) => !reg || !stringToRegex(reg) || (stringToRegex(reg) as RegExp).test(i))
-                .map((value) => (
-                  <Option key={value} value={value}>
-                    {value}
-                  </Option>
-                ))}
-          </AutoComplete>
-        )}
+        <Select
+          mode={multi ? 'tags' : undefined}
+          style={{
+            width: '180px',
+          }}
+          onChange={handleChange}
+          defaultActiveFirstOption={false}
+          showSearch
+          value={selected}
+          dropdownClassName='overflow-586'
+        >
+          {allOption && (
+            <Option key={'all'} value={'all'}>
+              all
+            </Option>
+          )}
+          {options &&
+            options
+              // .filter((i) => !reg || !stringToRegex(reg) || (stringToRegex(reg) as RegExp).test(i))
+              .map((value) => (
+                <Option key={value} value={value}>
+                  {value}
+                </Option>
+              ))}
+        </Select>
       </div>
     </div>
   );

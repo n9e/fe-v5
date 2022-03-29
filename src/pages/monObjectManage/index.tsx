@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import PageLayout from '@/components/pageLayout';
 import LeftTree from '@/components/LeftTree';
 import { DatabaseOutlined, DownOutlined, SearchOutlined } from '@ant-design/icons';
@@ -10,6 +10,8 @@ import DataTable from '@/components/Dantd/components/data-table';
 import { Button, Dropdown, Menu, Modal, Tag, Form, Input, Alert, Select, Tooltip, message } from 'antd';
 import { BusiGroupItem, CommonStoreState } from '@/store/commonInterface';
 import { useSelector } from 'react-redux';
+import { getBusiGroups } from '@/services/common';
+import { debounce } from 'lodash';
 
 enum OperateType {
   BindTag = 'bindTag',
@@ -117,31 +119,6 @@ const unbindTagDetail = (tagsList) => {
   };
 };
 
-// 修改业务组弹窗内容
-const updateBusiDetail = (busiGroups) => {
-  return {
-    operateTitle: '修改业务组',
-    requestFunc: moveTargetBusi,
-    isFormItem: true,
-    render() {
-      return (
-        <Form.Item label='归属业务组' name='bgid' rules={[{ required: true, message: '请选择归属业务组！' }]}>
-          <Select
-            showSearch
-            style={{ width: '100%' }}
-            placeholder='请选择归属业务组'
-            options={busiGroups.map(({ id, name }) => ({
-              label: name,
-              value: id,
-            }))}
-            optionFilterProp='label'
-          />
-        </Form.Item>
-      );
-    },
-  };
-};
-
 // 移出业务组弹窗内容
 const removeBusiDetail = () => {
   return {
@@ -182,23 +159,6 @@ const deleteDetail = () => {
   };
 };
 
-const operateDetail = {
-  bindTagDetail,
-  unbindTagDetail,
-  updateBusiDetail,
-  removeBusiDetail,
-  updateNoteDetail,
-  deleteDetail,
-  noneDetail: () => ({
-    operateTitle: '',
-    requestFunc() {
-      return Promise.resolve();
-    },
-    isFormItem: false,
-    render() {},
-  }),
-};
-
 const OperationModal: React.FC<OperateionModalProps> = ({ operateType, setOperateType, idents, reloadList }) => {
   const { busiGroups } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const [form] = Form.useForm();
@@ -206,8 +166,62 @@ const OperationModal: React.FC<OperateionModalProps> = ({ operateType, setOperat
   const [identList, setIdentList] = useState<string[]>(idents);
   const [tagsList, setTagsList] = useState<string[]>([]);
   const detailProp = operateType === OperateType.UnbindTag ? tagsList : busiGroups;
-  const { operateTitle, requestFunc, isFormItem, render } = operateDetail[`${operateType}Detail`](detailProp);
 
+  // 修改业务组弹窗内容
+  const updateBusiDetail = (busiGroups) => {
+    return {
+      operateTitle: '修改业务组',
+      requestFunc: moveTargetBusi,
+      isFormItem: true,
+      render() {
+        return (
+          <Form.Item label='归属业务组' name='bgid' rules={[{ required: true, message: '请选择归属业务组！' }]}>
+            <Select
+              showSearch
+              style={{ width: '100%' }}
+              placeholder='请选择归属业务组'
+              options={filteredBusiGroups.map(({ id, name }) => ({
+                label: name,
+                value: id,
+              }))}
+              optionFilterProp='label'
+              filterOption={false}
+              onSearch={handleSearch}
+              onFocus={() => {
+                getBusiGroups('').then((res) => {
+                  setFilteredBusiGroups(res.dat || []);
+                });
+              }}
+              onClear={() => {
+                getBusiGroups('').then((res) => {
+                  setFilteredBusiGroups(res.dat || []);
+                });
+              }}
+            />
+          </Form.Item>
+        );
+      },
+    };
+  };
+
+  const operateDetail = {
+    bindTagDetail,
+    unbindTagDetail,
+    updateBusiDetail,
+    removeBusiDetail,
+    updateNoteDetail,
+    deleteDetail,
+    noneDetail: () => ({
+      operateTitle: '',
+      requestFunc() {
+        return Promise.resolve();
+      },
+      isFormItem: false,
+      render() {},
+    }),
+  };
+  const { operateTitle, requestFunc, isFormItem, render } = operateDetail[`${operateType}Detail`](detailProp);
+  const [filteredBusiGroups, setFilteredBusiGroups] = useState(busiGroups);
   function formatValue() {
     const inputValue = form.getFieldValue('idents');
     const formattedIdents = inputValue.split(/[ ,\n]+/).filter((value) => value);
@@ -240,6 +254,20 @@ const OperationModal: React.FC<OperateionModalProps> = ({ operateType, setOperat
         .catch(() => setConfirmLoading(false));
     });
   }
+
+  // 初始化展示所有业务组
+  useEffect(() => {
+    if (!filteredBusiGroups.length) {
+      setFilteredBusiGroups(busiGroups);
+    }
+  }, [busiGroups]);
+
+  const fetchBusiGroup = (e) => {
+    getBusiGroups(e).then((res) => {
+      setFilteredBusiGroups(res.dat || []);
+    });
+  };
+  const handleSearch = useCallback(debounce(fetchBusiGroup, 800), []);
 
   // 点击批量操作时，初始化默认监控对象列表
   useEffect(() => {

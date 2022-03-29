@@ -11,7 +11,7 @@ const errorHandler = (error: Error): Response => {
       message: error.message,
     });
   }
-  throw new Error();
+  throw new Error(error.message);
 };
 
 /** 配置request请求时的默认参数 */

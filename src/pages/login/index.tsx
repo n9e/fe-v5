@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Input, Button, Radio } from 'antd';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import './login.less'; // import { Login, GenCsrfToken } from '@/services/login';
+import { getRedirectURL } from '@/services/login';
+import './login.less';
 
 import { useTranslation } from 'react-i18next';
 export default function Login() {
@@ -35,6 +36,14 @@ export default function Login() {
       history.push(redirect || '/metric/explorer');
     }
   };
+
+  useEffect(() => {
+    getRedirectURL().then((res) => {
+      if (res.dat) {
+        window.location.href = res.dat;
+      }
+    });
+  }, []);
 
   return (
     <div className='login-warp'>

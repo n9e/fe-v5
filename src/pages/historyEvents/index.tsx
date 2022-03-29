@@ -85,22 +85,20 @@ const Event: React.FC = () => {
       render(tagArr) {
         const content =
           tagArr &&
-          tagArr
-            .sort((a, b) => a.length - b.length)
-            .map((item) => (
-              <Tag
-                color='blue'
-                key={item}
-                onClick={(e) => {
-                  if (!hisQueryContent.includes(item)) {
-                    isAddTagToQueryInput.current = true;
-                    saveData('hisQueryContent', hisQueryContent ? `${hisQueryContent.trim()} ${item}` : item);
-                  }
-                }}
-              >
-                {item}
-              </Tag>
-            ));
+          tagArr.map((item) => (
+            <Tag
+              color='blue'
+              key={item}
+              onClick={(e) => {
+                if (!hisQueryContent.includes(item)) {
+                  isAddTagToQueryInput.current = true;
+                  saveData('hisQueryContent', hisQueryContent ? `${hisQueryContent.trim()} ${item}` : item);
+                }
+              }}
+            >
+              {item}
+            </Tag>
+          ));
         return (
           tagArr && (
             // <Tooltip title={content} placement='topLeft' getPopupContainer={() => document.body} overlayClassName='mon-manage-table-tooltip'>
