@@ -6,7 +6,7 @@ import { authCallback } from '@/services/login';
 export default function index() {
   const location = useLocation();
   const query = queryString.parse(location.search);
-  const [err, setErr] = useState('');
+  const [err, setErr] = useState();
 
   useEffect(() => {
     authCallback({
@@ -27,6 +27,7 @@ export default function index() {
         setErr(res.message);
       });
   }, []);
+  if (err === undefined) return null;
   return (
     <div
       style={{
