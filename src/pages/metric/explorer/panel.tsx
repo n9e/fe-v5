@@ -38,7 +38,7 @@ export enum PanelType {
 }
 
 interface VectorDataType {
-  resultType: 'vector';
+  resultType: 'vector' | 'scalar';
   result: {
     metric: {
       instance: string;
@@ -55,8 +55,8 @@ const { TabPane } = Tabs;
 
 // 格式化 Table 列表数据
 function getListItemContent(metrics) {
-  const metricName = metrics.__name__;
-  const labels = Object.keys(metrics)
+  const metricName = metrics?.__name__;
+  const labels = _.keys(metrics)
     .filter((ml) => ml !== '__name__')
     .map((label, i, labels) => (
       <span key={i}>
@@ -238,7 +238,11 @@ const Panel: React.FC<PanelProps> = ({ metrics, defaultPromQL, removePanel }) =>
           } else {
             setErrorContent('');
           }
-          setVectorData({ resultType, result });
+          if (resultType === 'scalar') {
+            setVectorData({ resultType, result: [result] });
+          } else {
+            setVectorData({ resultType, result });
+          }
           setQueryStats({
             loadTime: Date.now() - queryStart,
             resultSeries: res.data.result.length,
@@ -305,30 +309,39 @@ const Panel: React.FC<PanelProps> = ({ metrics, defaultPromQL, removePanel }) =>
             bordered
             loading={isLoading}
             dataSource={vectorData ? vectorData.result : []}
-            renderItem={({ metric, value, values }) => (
-              <List.Item>
-                <div className='list-item-content'>
-                  <div className='left'>{getListItemContent(metric)}</div>
-                  {value && value.length > 1 && <div className='right'>{value[1] || '-'}</div>}
-                  {values && values.length > 0 && (
-                    <div className='right'>
-                      {values.map((value) => {
-                        return (
-                          <>
-                            {value && value.length > 1 && (
-                              <span style={{ display: 'inline-block' }}>
-                                {value[1]} @{value[0]}
-                              </span>
-                            )}
-                            <br />
-                          </>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              </List.Item>
-            )}
+            renderItem={(item) => {
+              const { metric, value, values } = item;
+              return (
+                <List.Item>
+                  <div className='list-item-content'>
+                    <div className='left'>{vectorData?.resultType === 'scalar' ? 'scalar' : getListItemContent(metric)}</div>
+                    {vectorData?.resultType === 'scalar' ? (
+                      item[1]
+                    ) : (
+                      <div>
+                        {value && value.length > 1 && <div className='right'>{value[1] || '-'}</div>}
+                        {values && values.length > 0 && (
+                          <div className='right'>
+                            {values.map((value) => {
+                              return (
+                                <>
+                                  {value && value.length > 1 && (
+                                    <span style={{ display: 'inline-block' }}>
+                                      {value[1]} @{value[0]}
+                                    </span>
+                                  )}
+                                  <br />
+                                </>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </List.Item>
+              );
+            }}
           />
         </TabPane>
         <TabPane tab='Graph' key='graph'>
