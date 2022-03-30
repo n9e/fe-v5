@@ -1,4 +1,12 @@
 .left-area {
+  &.collapse {
+    width: 0px;
+    padding: 0px;
+    margin: 0px;
+    .collapse-btn {
+      right: -12px;
+    }
+  }
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -60,5 +68,18 @@
       display: flex;
       margin-bottom: 6px;
     }
+  }
+  .collapse-btn {
+    cursor: pointer;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    top: 50%;
+    margin-top: -29px;
+    right: 0px;
+    height: 58px;
+    width: 12px;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.1);
   }
 }

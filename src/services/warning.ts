@@ -86,7 +86,7 @@ export const getMetrics = function (params = {}) {
     method: RequestMethod.Get,
     params,
     paramsSerializer: function (params) {
-      return queryString.stringify(params, {arrayFormat: 'bracket'})
+      return queryString.stringify(params, { arrayFormat: 'bracket' });
     },
   });
 };
@@ -220,7 +220,7 @@ export function getHistoryEventsById(busiId, eventId) {
  * 批量删除(忽略)告警历史
  */
 export const deleteAlertEvents = function (busiId, ids: Array<number | string>) {
-  return request(`/api/n9e/busi-group/${busiId}/alert-cur-events`, {
+  return request(`/api/n9e/alert-cur-events`, {
     method: RequestMethod.Delete,
     data: {
       ids,

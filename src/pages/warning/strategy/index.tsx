@@ -22,23 +22,11 @@ const Strategy: React.FC = () => {
     <PageLayout title={t('告警规则')} icon={<SettingOutlined />} hideCluster>
       <div className='strategy-content'>
         <LeftTree
-          clusterGroup={{
-            isShow: true,
-            onChange: clusterChange,
-          }}
           busiGroup={{
             onChange: busiChange,
           }}
-          eventLevelGroup={{
-            isShow: true,
-            defaultSelect: severity,
-            onChange(v: number | undefined) {
-              console.log(v);
-              setSeverity(v);
-            },
-          }}
         ></LeftTree>
-        {bgid ? <PageTable bgid={bgid} clusters={clusters} severity={severity}></PageTable> : <BlankBusinessPlaceholder text='告警规则' />}
+        {bgid ? <PageTable bgid={bgid}></PageTable> : <BlankBusinessPlaceholder text='告警规则' />}
       </div>
     </PageLayout>
   );

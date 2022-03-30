@@ -14,6 +14,7 @@ import { RootState } from '@/store/common';
 import { eventStoreState } from '@/store/eventInterface';
 import { CommonStoreState } from '@/store/commonInterface';
 import BlankBusinessPlaceholder from '@/components/BlankBusinessPlaceholder';
+import ColumnSelect from '@/components/ColumnSelect';
 // import './index.less';
 
 const Event: React.FC = () => {
@@ -23,8 +24,10 @@ const Event: React.FC = () => {
   const tableRef = useRef({
     handleReload() {},
   });
-  const { curClusterItems } = useSelector<RootState, CommonStoreState>((state) => state.common);
-  const { hisSeverity, hisEventType, hisHourRange, hisQueryContent } = useSelector<RootState, eventStoreState>((state) => state.event);
+  const { hisHourRange, hisQueryContent } = useSelector<RootState, eventStoreState>((state) => state.event);
+  const [hisSeverity, setHisSeverity] = useState<number>();
+  const [hisEventType, setHisEventType] = useState<number>();
+  const [curClusterItems, setCurClusterItems] = useState<string[]>([]);
   const isAddTagToQueryInput = useRef(false);
   const [curBusiId, setCurBusiId] = useState<number>(-1);
   const DateRangeItems: RelativeRange[] = useMemo(
@@ -157,6 +160,12 @@ const Event: React.FC = () => {
               }
             }}
           />
+          <ColumnSelect
+            onSeverityChange={(e) => setHisSeverity(e)}
+            onEventTypeChange={(e) => setHisEventType(e)}
+            onBusiGroupChange={(e) => setCurBusiId(typeof e === 'number' ? e : -1)}
+            onClusterChange={(e) => setCurClusterItems(e)}
+          />
           <Input
             className='search-input'
             prefix={<SearchOutlined />}
@@ -187,73 +196,46 @@ const Event: React.FC = () => {
 
   useEffect(() => {
     tableRef.current.handleReload();
-  }, [curClusterItems, hisSeverity, hisHourRange, hisEventType]);
+  }, [curClusterItems, hisSeverity, hisHourRange, hisEventType, curBusiId]);
 
   return (
     <PageLayout icon={<AlertOutlined />} title={t('历史告警')} hideCluster>
       <div className='event-content'>
-        <LeftTree
-          clusterGroup={{
-            isShow: true,
-          }}
-          busiGroup={{
-            onChange(value) {
-              setCurBusiId(typeof value === 'number' ? value : -1);
-            },
-          }}
-          eventLevelGroup={{
-            isShow: true,
-            defaultSelect: hisSeverity,
-            onChange(v: number | undefined) {
-              saveData('hisSeverity', v);
-            },
-          }}
-          eventTypeGroup={{
-            isShow: true,
-            defaultSelect: hisEventType,
-            onChange(v: 0 | 1 | undefined) {
-              saveData('hisEventType', v);
-            },
-          }}
-        />
         <div className='table-area'>
-          {curBusiId !== -1 ? (
-            <DataTable
-              ref={tableRef}
-              antProps={{
-                rowKey: 'id',
-                // scroll: { x: 'max-content' },
-              }}
-              url={`/api/n9e/busi-group/${curBusiId}/alert-his-events`}
-              customQueryCallback={(data) =>
-                Object.assign(
-                  data,
-                  { hours: hisHourRange.unit !== 'hours' ? hisHourRange.num * 24 : hisHourRange.num },
-                  curClusterItems.length ? { clusters: curClusterItems.join(',') } : {},
-                  hisSeverity !== undefined ? { severity: hisSeverity } : {},
-                  hisQueryContent ? { query: hisQueryContent } : {},
-                  hisEventType !== undefined ? { is_recovered: hisEventType } : {},
-                )
-              }
-              pageParams={{
-                curPageName: 'p',
-                pageSizeName: 'limit',
-                pageSize: 30,
-                pageSizeOptions: ['30', '100', '200', '500'],
-              }}
-              apiCallback={({ dat: { list: data, total } }) => ({
+          <DataTable
+            ref={tableRef}
+            antProps={{
+              rowKey: 'id',
+              // scroll: { x: 'max-content' },
+            }}
+            url={`/api/n9e/alert-his-events/list`}
+            customQueryCallback={(data) =>
+              Object.assign(
                 data,
-                total,
-              })}
-              columns={columns}
-              reloadBtnType='btn'
-              reloadBtnPos='left'
-              filterType='flex'
-              leftHeader={renderLeftHeader()}
-            />
-          ) : (
-            <BlankBusinessPlaceholder text='历史告警' />
-          )}
+                { hours: hisHourRange.unit !== 'hours' ? hisHourRange.num * 24 : hisHourRange.num },
+                curClusterItems.length ? { clusters: curClusterItems.join(',') } : {},
+                hisSeverity !== undefined ? { severity: hisSeverity } : {},
+                hisQueryContent ? { query: hisQueryContent } : {},
+                hisEventType !== undefined ? { is_recovered: hisEventType } : {},
+                { bgid: curBusiId },
+              )
+            }
+            pageParams={{
+              curPageName: 'p',
+              pageSizeName: 'limit',
+              pageSize: 30,
+              pageSizeOptions: ['30', '100', '200', '500'],
+            }}
+            apiCallback={({ dat: { list: data, total } }) => ({
+              data,
+              total,
+            })}
+            columns={columns}
+            reloadBtnType='btn'
+            reloadBtnPos='left'
+            filterType='flex'
+            leftHeader={renderLeftHeader()}
+          />
         </div>
       </div>
     </PageLayout>

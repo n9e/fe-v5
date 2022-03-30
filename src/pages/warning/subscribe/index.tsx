@@ -17,7 +17,7 @@ import { pageSizeOptionsDefault } from '../const';
 import './index.less';
 import { useTranslation } from 'react-i18next';
 const { confirm } = Modal;
-
+import ColumnSelect from '@/components/ColumnSelect';
 const Shield: React.FC = () => {
   const { t } = useTranslation();
   const history = useHistory();
@@ -202,10 +202,6 @@ const Shield: React.FC = () => {
     <PageLayout title={t('订阅规则')} icon={<CopyOutlined />}>
       <div className='shield-content'>
         <LeftTree
-          clusterGroup={{
-            isShow: true,
-            onChange: clusterChange,
-          }}
           busiGroup={{
             // showNotGroupItem: true,
             onChange: busiChange,
@@ -221,6 +217,7 @@ const Shield: React.FC = () => {
                     refreshList();
                   }}
                 />
+                <ColumnSelect onClusterChange={(e) => setClusters(e)} />
                 <Input onPressEnter={onSearchQuery} className={'searchInput'} prefix={<SearchOutlined />} placeholder={t('搜索规则、标签、接收组')} />
               </div>
               <div className='header-right'>

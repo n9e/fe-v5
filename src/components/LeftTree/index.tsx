@@ -5,7 +5,7 @@ import { RootState } from '@/store/common';
 import { getBusiGroups } from '@/services/common';
 import { CommonStoreState } from '@/store/commonInterface';
 import './index.less';
-import { SearchOutlined, SettingOutlined } from '@ant-design/icons';
+import { SearchOutlined, SettingOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 import { eventStoreState } from '@/store/eventInterface';
 
@@ -273,6 +273,7 @@ const busiGroupContent = (busiGroupProps: BusiGroupProps): IGroupItemProps => {
 // 左侧栏
 const LeftTree: React.FC<LeftTreeProps> = ({ clusterGroup = {}, busiGroup = {}, eventLevelGroup = {}, eventTypeGroup = {} }) => {
   const history = useHistory();
+  const [collapse, setCollapse] = useState(localStorage.getItem('leftlist') === '1');
   const groupItems: IGroupItemProps[] = [
     clustersGroupContent(clusterGroup),
     busiGroupContent(busiGroup),
@@ -314,7 +315,16 @@ const LeftTree: React.FC<LeftTreeProps> = ({ clusterGroup = {}, busiGroup = {}, 
   ];
 
   return (
-    <div className='left-area'>
+    <div className={collapse ? 'left-area collapse' : 'left-area'}>
+      <div
+        className='collapse-btn'
+        onClick={() => {
+          localStorage.setItem('leftlist', !collapse ? '1' : '0');
+          setCollapse(!collapse);
+        }}
+      >
+        {!collapse ? <LeftOutlined /> : <RightOutlined />}
+      </div>
       {/* 遍历渲染左侧栏内容 */}
       {groupItems.map(
         ({ title, isShow, shrink = false, render }: IGroupItemProps, i) =>

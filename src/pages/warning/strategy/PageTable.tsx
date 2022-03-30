@@ -18,6 +18,7 @@ import ColorTag from '@/components/ColorTag';
 import { DownOutlined } from '@ant-design/icons';
 import ImportAndDownloadModal, { ModalStatus } from '@/components/ImportAndDownloadModal';
 import EditModal from './components/editModal';
+import ColumnSelect from '@/components/ColumnSelect';
 const { Option } = Select;
 const { confirm } = Modal;
 
@@ -36,11 +37,11 @@ const exportIgnoreAttrsObj = {
 };
 interface Props {
   bgid?: number;
-  severity: number | undefined;
-  clusters?: string[];
 }
 
-const PageTable: React.FC<Props> = ({ bgid, clusters, severity }) => {
+const PageTable: React.FC<Props> = ({ bgid }) => {
+  const [severity, setSeverity] = useState<number>();
+  const [clusters, setClusters] = useState<string[]>([]);
   const { t, i18n } = useTranslation();
   const history = useHistory();
   const [modalType, setModalType] = useState<ModalStatus>(ModalStatus.None);
@@ -345,6 +346,7 @@ const PageTable: React.FC<Props> = ({ bgid, clusters, severity }) => {
               refreshList();
             }}
           />
+          <ColumnSelect noLeftPadding noRightPadding={false} onSeverityChange={(e) => setSeverity(e)} onClusterChange={(e) => setClusters(e)} />
           <SearchInput className={'searchInput'} placeholder={t('搜索名称或标签')} onSearch={setQuery} allowClear />
         </div>
         <div className='strategy-table-search-right'>

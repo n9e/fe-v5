@@ -18,6 +18,7 @@ import { CommonStoreState } from '@/store/commonInterface';
 import BlankBusinessPlaceholder from '@/components/BlankBusinessPlaceholder';
 import { useInterval } from 'ahooks';
 const { confirm } = Modal;
+import ColumnSelect from '@/components/ColumnSelect';
 import RefreshIcon from '@/components/RefreshIcon';
 
 export function deleteAlertEventsModal(busiId, ids: number[], onSuccess = () => {}) {
@@ -42,8 +43,9 @@ const Event: React.FC = () => {
   const history = useHistory();
   const { t } = useTranslation();
   const dispatch = useDispatch();
-  const { busiGroups, curClusterItems } = useSelector<RootState, CommonStoreState>((state) => state.common);
-  const { severity, hourRange, queryContent } = useSelector<RootState, eventStoreState>((state) => state.event);
+  const [severity, setSeverity] = useState<number>();
+  const [curClusterItems, setCurClusterItems] = useState<string[]>([]);
+  const { hourRange, queryContent } = useSelector<RootState, eventStoreState>((state) => state.event);
   const DateRangeItems: RelativeRange[] = useMemo(
     () => [
       { num: 6, unit: 'hours', description: t('hours') },
@@ -70,13 +72,6 @@ const Event: React.FC = () => {
   useInterval(
     () => {
       tableRef.current.handleReload();
-      const busiIds = busiGroups.map((busiItem) => busiItem.id);
-      if (busiIds.length) {
-        dispatch({
-          type: 'event/refreshAlertings',
-          ids: busiIds,
-        });
-      }
     },
     interval > 0 ? interval * 1000 : undefined,
   );
@@ -204,7 +199,6 @@ const Event: React.FC = () => {
                 deleteAlertEventsModal(curBusiId, [record.id], () => {
                   setSelectedRowKeys(selectedRowKeys.filter((key) => key !== record.id));
                   tableRef.current.handleReload();
-                  refreashAlertings();
                 })
               }
             >
@@ -221,13 +215,6 @@ const Event: React.FC = () => {
       type: 'event/saveData',
       prop,
       data,
-    });
-  }
-
-  function refreashAlertings() {
-    dispatch({
-      type: 'event/refreshAlertings',
-      ids: busiGroups.map((busiItem) => busiItem.id),
     });
   }
 
@@ -271,6 +258,11 @@ const Event: React.FC = () => {
               }
             }}
           />
+          <ColumnSelect
+            onSeverityChange={(e) => setSeverity(e)}
+            onBusiGroupChange={(e) => setCurBusiId(typeof e === 'number' ? e : -1)}
+            onClusterChange={(e) => setCurClusterItems(e)}
+          />
           <Input
             className='search-input'
             prefix={<SearchOutlined />}
@@ -288,7 +280,6 @@ const Event: React.FC = () => {
               deleteAlertEventsModal(curBusiId, selectedRowKeys, () => {
                 setSelectedRowKeys([]);
                 tableRef.current.handleReload();
-                refreashAlertings();
               })
             }
           >
@@ -308,83 +299,51 @@ const Event: React.FC = () => {
 
   useEffect(() => {
     tableRef.current.handleReload();
-  }, [curClusterItems, severity, hourRange]);
-
-  // 获取活跃告警数量
-  useEffect(() => {
-    const busiIds = busiGroups.map((busiItem) => busiItem.id);
-    if (busiIds.length) {
-      dispatch({
-        type: 'event/refreshAlertings',
-        ids: busiIds,
-      });
-    }
-  }, [busiGroups]);
+  }, [curClusterItems, severity, hourRange, curBusiId]);
 
   return (
     <PageLayout icon={<AlertOutlined />} title={t('活跃告警')} hideCluster>
       <div className='event-content cur-events'>
-        <LeftTree
-          clusterGroup={{
-            isShow: true,
-          }}
-          busiGroup={{
-            showAlertings: true,
-            onChange(value) {
-              setCurBusiId(typeof value === 'number' ? value : -1);
-            },
-          }}
-          eventLevelGroup={{
-            isShow: true,
-            defaultSelect: severity,
-            onChange(v: number | undefined) {
-              saveData('severity', v);
-            },
-          }}
-        />
         <div className='table-area'>
-          {curBusiId !== -1 ? (
-            <DataTable
-              ref={tableRef}
-              antProps={{
-                rowKey: 'id',
-                rowSelection: {
-                  selectedRowKeys: selectedRowKeys,
-                  onChange(selectedRowKeys, selectedRows) {
-                    setSelectedRowKeys(selectedRowKeys.map((key) => Number(key)));
-                  },
+          <DataTable
+            ref={tableRef}
+            antProps={{
+              rowKey: 'id',
+              rowSelection: {
+                selectedRowKeys: selectedRowKeys,
+                onChange(selectedRowKeys, selectedRows) {
+                  setSelectedRowKeys(selectedRowKeys.map((key) => Number(key)));
                 },
-                // scroll: { x: 'max-content' },
-              }}
-              url={`/api/n9e/busi-group/${curBusiId}/alert-cur-events`}
-              customQueryCallback={(data) =>
-                Object.assign(
-                  data,
-                  { hours: hourRange.unit !== 'hours' ? hourRange.num * 24 : hourRange.num },
-                  curClusterItems.length ? { clusters: curClusterItems.join(',') } : {},
-                  severity ? { severity } : {},
-                  queryContent ? { query: queryContent } : {},
-                )
-              }
-              pageParams={{
-                curPageName: 'p',
-                pageSizeName: 'limit',
-                pageSize: 30,
-                pageSizeOptions: ['30', '100', '200', '500'],
-              }}
-              apiCallback={({ dat: { list: data, total } }) => ({
+              },
+              // scroll: { x: 'max-content' },
+            }}
+            url={`/api/n9e/alert-cur-events/list`}
+            customQueryCallback={(data) =>
+              Object.assign(
                 data,
-                total,
-              })}
-              columns={columns}
-              reloadBtnType='btn'
-              reloadBtnPos='left'
-              filterType='flex'
-              leftHeader={renderLeftHeader()}
-            />
-          ) : (
-            <BlankBusinessPlaceholder text='活跃告警' />
-          )}
+                { hours: hourRange.unit !== 'hours' ? hourRange.num * 24 : hourRange.num },
+                curClusterItems.length ? { clusters: curClusterItems.join(',') } : {},
+                severity ? { severity } : {},
+                queryContent ? { query: queryContent } : {},
+                { bgid: curBusiId },
+              )
+            }
+            pageParams={{
+              curPageName: 'p',
+              pageSizeName: 'limit',
+              pageSize: 30,
+              pageSizeOptions: ['30', '100', '200', '500'],
+            }}
+            apiCallback={({ dat: { list: data, total } }) => ({
+              data,
+              total,
+            })}
+            columns={columns}
+            reloadBtnType='btn'
+            reloadBtnPos='left'
+            filterType='flex'
+            leftHeader={renderLeftHeader()}
+          />
         </div>
       </div>
     </PageLayout>

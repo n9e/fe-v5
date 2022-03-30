@@ -7,11 +7,12 @@ import './index.less';
 import { bindTags, unbindTags, moveTargetBusi, updateTargetNote, deleteTargets, getTargetTags } from '@/services/monObjectManage';
 import { RootState } from '@/store/common';
 import DataTable from '@/components/Dantd/components/data-table';
-import { Button, Dropdown, Menu, Modal, Tag, Form, Input, Alert, Select, Tooltip, message } from 'antd';
+import { Button, Dropdown, Menu, Modal, Tag, Form, Input, Alert, Select, Tooltip, message, Space } from 'antd';
 import { BusiGroupItem, CommonStoreState } from '@/store/commonInterface';
 import { useSelector } from 'react-redux';
 import { getBusiGroups } from '@/services/common';
 import { debounce } from 'lodash';
+import ColumnSelect from '@/components/ColumnSelect';
 
 enum OperateType {
   BindTag = 'bindTag',
@@ -294,7 +295,6 @@ const OperationModal: React.FC<OperateionModalProps> = ({ operateType, setOperat
     }
   }, [operateType, identList]);
 
-  console.log('end----');
   return (
     <Modal
       visible={operateType !== 'none'}
@@ -406,14 +406,17 @@ const MonObjectManage: React.FC = () => {
   function renderLeftHeader() {
     return (
       <div className='table-operate-box'>
-        <Input
-          className='search-input'
-          prefix={<SearchOutlined />}
-          placeholder='模糊搜索表格内容(多个关键词请用空格分隔)'
-          value={tableQueryContent}
-          onChange={(e) => setTableQueryContent(e.target.value)}
-          onPressEnter={(e) => tableRef.current.handleReload()}
-        />
+        <Space>
+          <ColumnSelect noLeftPadding onClusterChange={(e) => setCurClusters(e)} />
+          <Input
+            className='search-input'
+            prefix={<SearchOutlined />}
+            placeholder='模糊搜索表格内容(多个关键词请用空格分隔)'
+            value={tableQueryContent}
+            onChange={(e) => setTableQueryContent(e.target.value)}
+            onPressEnter={(e) => tableRef.current.handleReload()}
+          />
+        </Space>
         <Dropdown
           trigger={['click']}
           overlay={
@@ -458,12 +461,6 @@ const MonObjectManage: React.FC = () => {
     <PageLayout icon={<DatabaseOutlined />} title={t('对象列表')} hideCluster>
       <div className='object-manage-page-content'>
         <LeftTree
-          clusterGroup={{
-            isShow: true,
-            onChange(value) {
-              setCurClusters(value ? value : []);
-            },
-          }}
           busiGroup={{
             showNotGroupItem: true,
             onChange(value) {
