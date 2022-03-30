@@ -210,7 +210,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
 
   generateQuery(obj) {
     const { offset, curAggrFunc, curAggrGroup, calcFunc } = obj;
-    const [calcMethod, calcPeriod] = calcFunc.split('_');
+    const [calcMethod, calcPeriod] = _.split('_');
     const { metric, selectedHosts } = this.props.data;
     if (metric && selectedHosts) {
       const idents = selectedHosts.map((h) => h.ident);
