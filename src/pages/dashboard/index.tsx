@@ -246,6 +246,33 @@ export default function Dashboard() {
                     >
                       {t('导出')}
                     </Button>
+                    <Button
+                      onClick={() => {
+                        if (selectRowKeys.length) {
+                          confirm({
+                            title: '是否批量删除大盘?',
+                            onOk: async () => {
+                              const reuqests = selectRowKeys.map((id) => {
+                                console.log(id);
+                                return removeDashboard(busiId as number, id);
+                              });
+                              Promise.all(reuqests).then(() => {
+                                message.success(t('批量删除大盘成功'));
+                              });
+                              // TODO: 删除完后立马刷新数据有时候不是实时的，这里暂时间隔0.5s后再刷新列表
+                              setTimeout(() => {
+                                (ref?.current as any)?.refreshList();
+                              }, 500);
+                            },
+                            onCancel() {},
+                          });
+                        } else {
+                          message.warning(t('未选择任何大盘'));
+                        }
+                      }}
+                    >
+                      批量删除
+                    </Button>
                   </Button.Group>
                 </div>
               </div>
