@@ -82,3 +82,21 @@
     }
   }
 }
+
+// 现在大盘里面边框线太多了，尝试去掉 collapse 的所有边框线
+.n9e-dashboard-group {
+  .ant-collapse,
+  .ant-collapse-item,
+  .ant-collapse-content {
+    border: 0 none;
+    background-color: #f9f9f9;
+  }
+  .ant-collapse-extra {
+    display: none;
+  }
+  .ant-collapse-header:hover {
+    .ant-collapse-extra {
+      display: block;
+    }
+  }
+}

@@ -7,8 +7,8 @@ export interface SeriesType {
   name: number | string;
   tags: number | string;
   metricLabels: string;
-  data: [Number,Number][];
-  lineWidth: number
+  data: [Number, Number][];
+  lineWidth: number;
   color: string;
   oldColor: string;
   comparison: number;
@@ -16,7 +16,7 @@ export interface SeriesType {
 }
 
 export default function normalizeSeries(data) {
-  const series:SeriesType[] = [];
+  const series: SeriesType[] = [];
   _.each(data, (o, i) => {
     const id = o?.metric?.ident || o?.metric?.__name__;
     const color = getSerieColor(o, i);
@@ -31,7 +31,7 @@ export default function normalizeSeries(data) {
       color,
       oldColor: color,
       comparison: o.offset,
-      legendTitleFormat: o.legendTitleFormat
+      legendTitleFormat: o.legendTitleFormat,
     };
     series.push(serie);
   });

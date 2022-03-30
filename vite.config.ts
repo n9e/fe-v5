@@ -71,24 +71,24 @@ export default defineConfig({
       //   changeOrigin: true,
       // },
       '/api/n9e': {
-        // target: 'http://116.85.46.86:18000',
-        target: 'http://10.206.0.17:8001/',
+        // target: 'http://10.206.0.11:8765/',
+        target: 'http://10.206.0.16:18000/',
         changeOrigin: true,
       },
       '/filters': {
-        target: 'http://10.85.128.137',
+        target: 'http://10.206.0.11:8765/',
         changeOrigin: true,
       },
       '/integrations': {
-        target: 'http://10.85.128.137',
+        target: 'http://10.206.0.11:8765/',
         changeOrigin: true,
       },
       '/alerts': {
-        target: 'http://10.85.128.137',
+        target: 'http://10.206.0.11:8765/',
         changeOrigin: true,
       },
       '/changes': {
-        target: 'http://10.85.128.137',
+        target: 'http://10.206.0.11:8765/',
         changeOrigin: true,
       },
       '/dimension/api/v1': {

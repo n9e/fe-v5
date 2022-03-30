@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext, useCallback, ReactElement, RefObject } from 'react';
 import { Button, Collapse, Modal, Menu, Dropdown, Divider, Popover, Checkbox, Tooltip } from 'antd';
+import semver from 'semver';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 const { Panel } = Collapse;
@@ -20,6 +21,7 @@ import Graph from '@/components/Graph';
 import moment from 'moment';
 // 它可以和15行合并为一个import
 import { convertExpressionToQuery, replaceExpressionVars } from './VariableConfig/constant';
+import Renderer from './Renderer/Renderer/index';
 
 const { confirm } = Modal;
 interface Props {
@@ -32,6 +34,8 @@ interface Props {
   variableConfig: VariableType;
   onAddChart: (data: number) => void;
   onUpdateChart: (group: Group, data: Chart) => void;
+  onCloneChart: (group: Group, data: Chart) => void;
+  onShareChart: (group: Group, data: Chart) => void;
   onDelChart: (group: Group, data: Chart) => void;
   onDelChartGroup: (id: number) => void;
   onUpdateChartGroup: (group: Group) => void;
@@ -194,6 +198,8 @@ export default function ChartGroup(props: Props) {
     variableConfig,
     onAddChart,
     onUpdateChart,
+    onCloneChart,
+    onShareChart,
     onDelChartGroup,
     onDelChart,
     onUpdateChartGroup,
@@ -498,7 +504,46 @@ export default function ChartGroup(props: Props) {
       chartConfigs &&
       chartConfigs.length > 0 &&
       chartConfigs.map((item, i) => {
-        let { QL, name, legend, yplotline1, yplotline2, highLevelConfig } = item.configs;
+        let { QL, name, legend, yplotline1, yplotline2, highLevelConfig, version } = item.configs;
+        if (semver.valid(version)) {
+          // 新版图表配置的版本使用语义化版本规范
+          const { type } = item.configs as any;
+          return (
+            <div
+              style={{
+                border: '1px solid #e0dee2',
+              }}
+              key={String(i)}
+            >
+              <Renderer
+                dashboardId={id}
+                id={item.id}
+                time={range}
+                step={step}
+                type={type}
+                values={item.configs as any}
+                variableConfig={variableConfig}
+                onCloneClick={() => {
+                  onCloneChart(groupInfo, item);
+                }}
+                onShareClick={() => {
+                  onShareChart(groupInfo, item);
+                }}
+                onEditClick={() => {
+                  onUpdateChart(groupInfo, item);
+                }}
+                onDeleteClick={() => {
+                  confirm({
+                    title: `${t('是否删除图表')}：${item.configs.name}`,
+                    onOk: async () => {
+                      onDelChart(groupInfo, item);
+                    },
+                  });
+                }}
+              />
+            </div>
+          );
+        }
         const promqls = QL.map((item) =>
           variableConfig && variableConfig.var && variableConfig.var.length ? replaceExpressionVars(item.PromQL, variableConfig, variableConfig.var.length, id) : item.PromQL,
         );
@@ -617,10 +662,12 @@ export default function ChartGroup(props: Props) {
     );
   }, [mounted, groupInfo.updateTime, range, variableConfig, step]);
   return (
-    <Collapse defaultActiveKey={['0']}>
-      <Panel header={<span className='panel-title'>{groupInfo.name}</span>} key='0' extra={generateRightButton()}>
-        {renderCharts()}
-      </Panel>
-    </Collapse>
+    <div className='n9e-dashboard-group'>
+      <Collapse defaultActiveKey={['0']}>
+        <Panel header={<span className='panel-title'>{groupInfo.name}</span>} key='0' extra={generateRightButton()}>
+          {renderCharts()}
+        </Panel>
+      </Collapse>
+    </div>
   );
 }

@@ -1,12 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
+import _ from 'lodash';
+import moment from 'moment';
+import semver from 'semver';
+import { useThrottleFn } from 'ahooks';
 import PageLayout from '@/components/pageLayout';
 import DateRangePicker from '@/components/DateRangePicker';
 import { useSelector, useDispatch } from 'react-redux';
 import { ReloadOutlined, RollbackOutlined, EditOutlined, PlusOutlined, DownOutlined } from '@ant-design/icons';
-import { Button, Input, Form, Modal, Dropdown, message, Menu } from 'antd';
+import { Button, Input, Form, Modal, Dropdown, message, Menu, Space } from 'antd';
 import { Range } from '@/components/DateRangePicker';
-import { getSingleDashboard, updateSingleDashboard, createChartGroup, getChartGroup, delChartGroup, removeChart, updateChartGroup } from '@/services/dashboard';
+import { getSingleDashboard, updateSingleDashboard, createChartGroup, getChartGroup, delChartGroup, removeChart, updateChartGroup, createChart } from '@/services/dashboard';
+import { SetTmpChartData } from '@/services/metric';
 import { Dashboard, Group } from '@/store/dashboardInterface';
 import ChartGroup, { Chart } from './chartGroup';
 import ChartConfigModal from './chartConfigModal';
@@ -17,6 +22,9 @@ import { useTranslation } from 'react-i18next';
 import Resolution from '@/components/Resolution';
 import { RootState as CommonRootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
+import editor from './Editor';
+import { replaceExpressionVars } from './VariableConfig/constant';
+import Refresh from './Components/Refresh';
 
 interface URLParam {
   id: string;
@@ -65,6 +73,26 @@ export default function DashboardDetail() {
     start: 0,
     end: 0,
   });
+  const { run } = useThrottleFn(
+    () => {
+      if ('start' in range && range.start && range.end) {
+        const diff = range.end - range.start;
+        const now = moment().unix();
+        setRange({
+          end: now,
+          start: now - diff,
+        });
+      } else if ('unit' in range && range.unit) {
+        setRange({
+          ...range,
+          refreshFlag: _.uniqueId('refreshFlag_'),
+        });
+      }
+      init();
+    },
+    { wait: 1000 },
+  );
+
   useEffect(() => {
     init();
   }, []);
@@ -105,21 +133,96 @@ export default function DashboardDetail() {
     setTitleEditing(false);
   };
 
-  const handleAddChart = (id: number) => {
-    groupId = id;
-    setChartModalVisible(true);
+  const handleAddChart = (gid: number) => {
+    groupId = gid;
+    editor({
+      visible: true,
+      variableConfig,
+      cluster: curCluster,
+      busiId,
+      groupId,
+      id,
+      initialValues: {
+        type: 'timeseries',
+        targets: [
+          {
+            refId: 'A',
+            expr: '',
+          },
+        ],
+      },
+      onOK: () => {
+        handleChartConfigVisibleChange(true);
+      },
+    });
+    // setChartModalVisible(true);
   }; //group是为了让detail组件知道当前需要刷新的是哪个chartGroup，item是为了获取待编辑的信息
 
   const handleUpdateChart = (group: Group, item: Chart) => {
     groupId = group.id;
     setChartModalInitValue(item);
-    setChartModalVisible(true);
+
+    if (semver.valid(item.configs.version)) {
+      editor({
+        visible: true,
+        variableConfig,
+        cluster: curCluster,
+        busiId,
+        groupId,
+        id,
+        initialValues: {
+          ...item.configs,
+          id: item.id,
+        },
+        onOK: () => {
+          handleChartConfigVisibleChange(true);
+        },
+      });
+    } else {
+      setChartModalVisible(true);
+    }
   };
 
   const handleDelChart = async (group: Group, item: Chart) => {
     groupId = group.id;
-    await removeChart(busiId, item.id);
+    await removeChart(busiId, item.id as any);
     refreshUpdateTimeByChartGroupId();
+  };
+
+  const handleCloneChart = async (group: Group, item: Chart) => {
+    groupId = group.id;
+    await createChart(busiId, {
+      configs: JSON.stringify(_.omit(item.configs, 'layout')),
+      weight: 0,
+      group_id: groupId,
+    });
+    refreshUpdateTimeByChartGroupId();
+  };
+
+  const handleShareChart = async (group: Group, item: any) => {
+    const serielData = {
+      dataProps: {
+        ...item.configs,
+        targets: _.map(item.configs.targets, (target) => {
+          const realExpr = variableConfig ? replaceExpressionVars(target.expr, variableConfig, variableConfig.var.length, id) : target.expr;
+          return {
+            ...target,
+            expr: realExpr,
+          };
+        }),
+        step,
+        range,
+      },
+      curCluster: localStorage.getItem('curCluster'),
+    };
+    SetTmpChartData([
+      {
+        configs: JSON.stringify(serielData),
+      },
+    ]).then((res) => {
+      const ids = res.dat;
+      window.open('/chart/' + ids);
+    });
   };
 
   const handleAddOrUpdateChartGroup = async () => {
@@ -235,21 +338,19 @@ export default function DashboardDetail() {
             )}
           </div>
           <div className='dashboard-detail-header-right'>
-            <div style={{ marginRight: 20, display: 'flex', alignItems: 'center' }}>
-              集群：
-              <Dropdown overlay={clusterMenu}>
-                <Button>
-                  {curCluster} <DownOutlined />
-                </Button>
-              </Dropdown>
-            </div>
-            <DateRangePicker onChange={handleDateChange} />
-            <Resolution onChange={(v) => setStep(v)} initialValue={step} />
-            <RefreshIcon
-              onClick={() => {
-                init();
-              }}
-            />
+            <Space>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                集群：
+                <Dropdown overlay={clusterMenu}>
+                  <Button>
+                    {curCluster} <DownOutlined />
+                  </Button>
+                </Dropdown>
+              </div>
+              <DateRangePicker onChange={handleDateChange} />
+              <Resolution onChange={(v) => setStep(v)} initialValue={step} />
+              <Refresh onRefresh={run} />
+            </Space>
           </div>
         </div>
       }
@@ -270,6 +371,8 @@ export default function DashboardDetail() {
               groupInfo={item}
               onAddChart={handleAddChart}
               onUpdateChart={handleUpdateChart}
+              onCloneChart={handleCloneChart}
+              onShareChart={handleShareChart}
               onUpdateChartGroup={handleUpdateChartGroup}
               onMoveUpChartGroup={handleMoveUpChartGroup}
               onMoveDownChartGroup={handleMoveDownChartGroup}
