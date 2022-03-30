@@ -7,7 +7,7 @@ const signals = {};
 export const fetchHistory = (params?, signalKey?) => {
   const controller = new AbortController();
   const { signal } = controller;
-  if (signals[signalKey] && signals[signalKey].abort) {
+  if (signalKey && signals[signalKey] && signals[signalKey].abort) {
     signals[signalKey].abort();
   }
   signals[signalKey] = controller;
