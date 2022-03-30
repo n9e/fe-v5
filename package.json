@@ -1,6 +1,6 @@
 {
   "name": "n9e-fe",
-  "version": "5.1.6",
+  "version": "5.1.7",
   "scripts": {
     "dev": "vite --port 8765 --host",
     "preinstall": "sh beforeinstall.sh",
