@@ -14,6 +14,9 @@ const valueFormatter = ({util, decimals = 3}, val) => {
         decimals,
       });
     }
+    if (util === 'none') {
+      return _.round(val, decimals);
+    }
     if (util === 'percent') {
       return _.round(val, decimals) + '%';
     }
