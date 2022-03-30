@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, Radio } from 'antd';
+import { Form, Input, Button, Radio, message } from 'antd';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
@@ -36,14 +36,6 @@ export default function Login() {
       history.push(redirect || '/metric/explorer');
     }
   };
-
-  useEffect(() => {
-    getRedirectURL().then((res) => {
-      if (res.dat) {
-        window.location.href = res.dat;
-      }
-    });
-  }, []);
 
   return (
     <div className='login-warp'>
@@ -86,6 +78,22 @@ export default function Login() {
                 {t('登录')}
               </Button>
             </Form.Item>
+            <div className='login-other'>
+              <strong>其他登录方式：</strong>
+              <a
+                onClick={() => {
+                  getRedirectURL().then((res) => {
+                    if (res.dat) {
+                      window.location.href = res.dat;
+                    } else {
+                      message.warning('没有配置 OIDC 登录地址！');
+                    }
+                  });
+                }}
+              >
+                OIDC
+              </a>
+            </div>
           </Form>
         </div>
       </div>
