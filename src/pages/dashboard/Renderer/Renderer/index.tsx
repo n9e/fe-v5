@@ -46,6 +46,7 @@ function index(props: IProps) {
     values,
     series,
   };
+  const tipsVisible = values.description || !_.isEmpty(values.links);
   if (_.isEmpty(values)) return null;
   const RendererCptMap = {
     timeseries: () => <Timeseries {...subProps} />,
@@ -57,17 +58,32 @@ function index(props: IProps) {
   return (
     <div className='renderer-container' ref={ref}>
       <div className='renderer-header graph-header'>
-        {values.description ? (
+        {tipsVisible ? (
           <Tooltip
             placement='rightTop'
             overlayInnerStyle={{
               width: 300,
             }}
-            title={<Markdown content={values.description} />}
+            title={
+              <div>
+                <Markdown content={values.description} />
+                <div>
+                  {_.map(values.links, (link) => {
+                    return (
+                      <div style={{ marginTop: 8 }}>
+                        <a href={link.url} target={link.targetBlank ? '_blank' : '_self'}>
+                          {link.title}
+                        </a>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            }
           >
             <div className='renderer-header-desc'>
               <span className='renderer-header-info-corner-inner' />
-              <InfoOutlined />
+              {values.description ? <InfoOutlined /> : <LinkOutlined />}
             </div>
           </Tooltip>
         ) : null}
@@ -80,12 +96,6 @@ function index(props: IProps) {
             }}
             overlay={
               <Menu>
-                <Menu.Item disabled={!values.link}>
-                  <a href={values.link} target='_blank'>
-                    <LinkOutlined />
-                    下钻链接
-                  </a>
-                </Menu.Item>
                 {!isPreview ? (
                   <>
                     <Menu.Item onClick={onEditClick}>

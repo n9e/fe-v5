@@ -72,6 +72,12 @@ export interface IOverride {
   }
 }
 
+export interface Link {
+  title: string;
+  url: string;
+  targetBlank: boolean;
+}
+
 export interface ITimeseriesStyles {
   version: string; // 时序图组件使用的版本
   drawStyle: 'lines' |'bars';
@@ -105,7 +111,7 @@ export interface IPanel {
   version: string; // 单个图表面板使用的版本
   id: number;
   name: string;
-  link: string;
+  links?: Link[];
   description: string;
   layout: IGridPos;
   targets: ITarget[];

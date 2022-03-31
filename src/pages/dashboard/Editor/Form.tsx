@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, Input, Row, Col, Button } from 'antd';
+import { Form, Input, Row, Col, Button, Space, Switch, Tooltip } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import PromQLInput from '@/components/PromQLInput';
@@ -150,11 +150,51 @@ export default function FormCpt(props) {
                   >
                     <Input />
                   </Form.Item>
-                  <Form.Item label={'下钻链接'} name='link'>
-                    <Input />
-                  </Form.Item>
-                  <Form.Item label='备注' name='description'>
-                    <Input.TextArea placeholder='支持 markdown' />
+                  <Form.Item label={'下钻链接'}>
+                    <Form.List name={'links'}>
+                      {(fields, { add, remove }) => (
+                        <>
+                          <Button
+                            style={{ width: '100%', marginBottom: 10 }}
+                            onClick={() => {
+                              add({});
+                            }}
+                          >
+                            添加
+                          </Button>
+                          {fields.map(({ key, name, ...restField }) => {
+                            return (
+                              <Space
+                                style={{
+                                  alignItems: 'flex-start',
+                                }}
+                              >
+                                <Form.Item {...restField} name={[name, 'title']}>
+                                  <Input placeholder='链接名称' />
+                                </Form.Item>
+                                <Form.Item {...restField} name={[name, 'url']}>
+                                  <Input style={{ width: 260 }} placeholder='链接地址' />
+                                </Form.Item>
+                                <Tooltip title='是否新窗口打开'>
+                                  <Form.Item {...restField} name={[name, 'targetBlank']} valuePropName='checked'>
+                                    <Switch />
+                                  </Form.Item>
+                                </Tooltip>
+                                <Button
+                                  icon={<DeleteOutlined />}
+                                  onClick={() => {
+                                    remove(name);
+                                  }}
+                                />
+                              </Space>
+                            );
+                          })}
+                        </>
+                      )}
+                    </Form.List>
+                    <Form.Item label='备注' name='description'>
+                      <Input.TextArea placeholder='支持 markdown' />
+                    </Form.Item>
                   </Form.Item>
                 </>
               </Panel>
