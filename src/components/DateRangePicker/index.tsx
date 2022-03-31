@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Popover, Button, DatePicker } from 'antd';
-import { CaretDownOutlined } from '@ant-design/icons';
+import { CaretDownOutlined, CloseCircleFilled } from '@ant-design/icons';
 import moment, { unitOfTime, Moment } from 'moment';
+import classNames from 'classnames';
 import './index.less';
 import { useTranslation } from 'react-i18next';
 import { TooltipPlacement } from 'antd/es/tooltip';
@@ -14,7 +15,7 @@ interface Props {
   value?: Range;
   showRight?: boolean;
   nullable?: boolean;
-  onChange?: (value: Range) => void;
+  onChange?: (value?: Range) => void;
 }
 
 export type Range = RelativeRange | AbsoluteRange;
@@ -158,9 +159,13 @@ export default function DateRangePicker(props: Props) {
     setVisible(false);
   };
 
-  const emitValue = (value: Range) => {
+  const emitValue = (value?: Range) => {
     onChange && onChange(value);
-    setLabel(formatLabel(value, unit));
+    if (value) {
+      setLabel(formatLabel(value, unit));
+    } else {
+      setLabel('选择时间');
+    }
   };
 
   const content = (
@@ -218,8 +223,21 @@ export default function DateRangePicker(props: Props) {
       getPopupContainer={() => document.body}
       onVisibleChange={(visible) => (visible || !isDatePickerOpen.current) && setVisible(visible)}
     >
-      <Button style={{ width: '100%' }}>
+      <Button
+        className={classNames({
+          'time-range-picker-target-nullable': nullable,
+        })}
+      >
         {label} <CaretDownOutlined />
+        {nullable && (
+          <CloseCircleFilled
+            onClick={(e) => {
+              e.stopPropagation();
+              e.nativeEvent.stopImmediatePropagation();
+              emitValue(undefined);
+            }}
+          />
+        )}
       </Button>
     </Popover>
   );
