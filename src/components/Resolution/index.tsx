@@ -49,7 +49,6 @@ export default function Resolution(props: Props) {
 
   return (
     <div className='resolution'>
-      <span className='label'>Step</span>
       <AutoComplete
         options={options}
         value={inputContent}
