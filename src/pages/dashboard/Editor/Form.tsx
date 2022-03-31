@@ -169,10 +169,28 @@ export default function FormCpt(props) {
                                   alignItems: 'flex-start',
                                 }}
                               >
-                                <Form.Item {...restField} name={[name, 'title']}>
+                                <Form.Item
+                                  {...restField}
+                                  name={[name, 'title']}
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: '链接名称',
+                                    },
+                                  ]}
+                                >
                                   <Input placeholder='链接名称' />
                                 </Form.Item>
-                                <Form.Item {...restField} name={[name, 'url']}>
+                                <Form.Item
+                                  {...restField}
+                                  name={[name, 'url']}
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: '链接地址',
+                                    },
+                                  ]}
+                                >
                                   <Input style={{ width: 260 }} placeholder='链接地址' />
                                 </Form.Item>
                                 <Tooltip title='是否新窗口打开'>
