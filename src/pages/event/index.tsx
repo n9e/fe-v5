@@ -21,6 +21,8 @@ const { confirm } = Modal;
 import ColumnSelect from '@/components/ColumnSelect';
 import RefreshIcon from '@/components/RefreshIcon';
 
+export const SeverityColor = ['red', 'yellow', 'green'];
+
 export function deleteAlertEventsModal(busiId, ids: number[], onSuccess = () => {}) {
   confirm({
     title: '删除告警事件',
@@ -83,34 +85,12 @@ const Event: React.FC = () => {
       width: 120,
     },
     {
-      title: t('级别'),
-      dataIndex: 'severity',
-      width: 70,
-      render: (severity) => {
-        return <Tag color={priorityColor[severity - 1]}>S{severity}</Tag>;
-      },
-    },
-    {
-      title: t('规则标题'),
+      title: t('规则标题&事件标签'),
       dataIndex: 'rule_name',
-      render(title, { id }) {
-        return (
-          <a style={{ padding: 0 }} onClick={() => history.push(`/alert-cur-events/${id}`)}>
-            {title}
-          </a>
-        );
-      },
-    },
-    {
-      title: t('事件标签'),
-      dataIndex: 'tags',
-      // ellipsis: {
-      //   showTitle: false,
-      // },
-      render(tagArr) {
+      render(title, { id, tags }) {
         const content =
-          tagArr &&
-          tagArr.map((item) => (
+          tags &&
+          tags.map((item) => (
             <Tag
               color='blue'
               key={item}
@@ -125,36 +105,16 @@ const Event: React.FC = () => {
             </Tag>
           ));
         return (
-          tagArr && (
-            // <Tooltip title={content} placement='topLeft' getPopupContainer={() => document.body} overlayClassName='mon-manage-table-tooltip'>
-            <span className='event-tags'>{content}</span>
-            // </Tooltip>
-          )
-        );
-      },
-    },
-    {
-      title: t('告警接收组'),
-      dataIndex: 'notify_groups_obj',
-      ellipsis: {
-        showTitle: false,
-      },
-      render(tagArr) {
-        const content =
-          tagArr &&
-          tagArr
-            .sort((a, b) => a.name.length - b.name.length)
-            .map((item) => (
-              <Tag color='blue' key={item.id}>
-                {item.name}
-              </Tag>
-            ));
-        return (
-          tagArr && (
-            <Tooltip title={content} placement='topLeft' getPopupContainer={() => document.body}>
-              {content}
-            </Tooltip>
-          )
+          <>
+            <div>
+              <a style={{ padding: 0 }} onClick={() => history.push(`/alert-cur-events/${id}`)}>
+                {title}
+              </a>
+            </div>
+            <div>
+              <span className='event-tags'>{content}</span>
+            </div>
+          </>
         );
       },
     },
@@ -309,6 +269,9 @@ const Event: React.FC = () => {
             ref={tableRef}
             antProps={{
               rowKey: 'id',
+              rowClassName: (record: { severity: number }, index) => {
+                return SeverityColor[record.severity - 1];
+              },
               rowSelection: {
                 selectedRowKeys: selectedRowKeys,
                 onChange(selectedRowKeys, selectedRows) {

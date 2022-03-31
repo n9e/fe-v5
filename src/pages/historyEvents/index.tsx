@@ -15,7 +15,8 @@ import { eventStoreState } from '@/store/eventInterface';
 import { CommonStoreState } from '@/store/commonInterface';
 import BlankBusinessPlaceholder from '@/components/BlankBusinessPlaceholder';
 import ColumnSelect from '@/components/ColumnSelect';
-// import './index.less';
+import '../event/index.less';
+import { SeverityColor } from '../event';
 
 const Event: React.FC = () => {
   const history = useHistory();
@@ -52,14 +53,14 @@ const Event: React.FC = () => {
       dataIndex: 'cluster',
       width: 120,
     },
-    {
-      title: t('级别'),
-      dataIndex: 'severity',
-      width: 70,
-      render: (severity) => {
-        return <Tag color={priorityColor[severity - 1]}>S{severity}</Tag>;
-      },
-    },
+    // {
+    //   title: t('级别'),
+    //   dataIndex: 'severity',
+    //   width: 70,
+    //   render: (severity) => {
+    //     return <Tag color={priorityColor[severity - 1]}>S{severity}</Tag>;
+    //   },
+    // },
     {
       title: t('类别'),
       dataIndex: 'is_recovered',
@@ -69,26 +70,12 @@ const Event: React.FC = () => {
       },
     },
     {
-      title: t('规则标题'),
+      title: t('规则标题&事件标签'),
       dataIndex: 'rule_name',
-      render(title, { id }) {
-        return (
-          <a style={{ padding: 0 }} onClick={() => history.push(`/alert-his-events/${id}`)}>
-            {title}
-          </a>
-        );
-      },
-    },
-    {
-      title: t('事件标签'),
-      dataIndex: 'tags',
-      // ellipsis: {
-      //   showTitle: false,
-      // },
-      render(tagArr) {
+      render(title, { id, tags }) {
         const content =
-          tagArr &&
-          tagArr.map((item) => (
+          tags &&
+          tags.map((item) => (
             <Tag
               color='blue'
               key={item}
@@ -103,39 +90,20 @@ const Event: React.FC = () => {
             </Tag>
           ));
         return (
-          tagArr && (
-            // <Tooltip title={content} placement='topLeft' getPopupContainer={() => document.body} overlayClassName='mon-manage-table-tooltip'>
-            <span className='event-tags'>{content}</span>
-            // </Tooltip>
-          )
+          <>
+            <div>
+              <a style={{ padding: 0 }} onClick={() => history.push(`/alert-his-events/${id}`)}>
+                {title}
+              </a>
+            </div>
+            <div>
+              <span className='event-tags'>{content}</span>
+            </div>
+          </>
         );
       },
     },
-    {
-      title: t('告警接收组'),
-      dataIndex: 'notify_groups_obj',
-      ellipsis: {
-        showTitle: false,
-      },
-      render(tagArr) {
-        const content =
-          tagArr &&
-          tagArr
-            .sort((a, b) => a.name.length - b.name.length)
-            .map((item) => (
-              <Tag color='blue' key={item.id}>
-                {item.name}
-              </Tag>
-            ));
-        return (
-          tagArr && (
-            <Tooltip title={content} placement='topLeft' getPopupContainer={() => document.body}>
-              {content}
-            </Tooltip>
-          )
-        );
-      },
-    },
+
     {
       title: t('计算时间'),
       dataIndex: 'last_eval_time',
@@ -206,6 +174,9 @@ const Event: React.FC = () => {
             ref={tableRef}
             antProps={{
               rowKey: 'id',
+              rowClassName: (record: { severity: number }, index) => {
+                return SeverityColor[record.severity - 1];
+              },
               // scroll: { x: 'max-content' },
             }}
             url={`/api/n9e/alert-his-events/list`}

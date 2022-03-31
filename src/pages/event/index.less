@@ -13,6 +13,13 @@
   .table-area {
     overflow: auto;
     padding: 16px;
+    width: 100%;
+    table {
+      border-collapse: collapse;
+      thead {
+        border-left: 10px solid #fafafa;
+      }
+    }
     .event-tags {
       .ant-tag {
         cursor: pointer;
@@ -46,5 +53,18 @@
         border-color: #d9d9d9;
       }
     }
+  }
+  .ant-table-row {
+    position: relative;
+  }
+
+  .yellow {
+    border-left: 10px solid #fec10b;
+  }
+  .red {
+    border-left: 10px solid #e71408;
+  }
+  .green {
+    border-left: 10px solid #52c41a;
   }
 }

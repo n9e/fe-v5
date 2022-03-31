@@ -50,7 +50,7 @@ const Shield: React.FC = () => {
                   return tag ? (
                     // <ColorTag text={`${tag.key} ${tag.func} ${tag.func === 'in' ? tag.value.split(' ').join(', ') : tag.value}`} key={index}>
                     // </ColorTag>
-                    <div key={index}>{`${tag.key} ${tag.func} ${tag.func === 'in' ? tag.value.split(' ').join(', ') : tag.value}`}</div>
+                    <div key={index} style={{ lineHeight: '16px' }}>{`${tag.key} ${tag.func} ${tag.func === 'in' ? tag.value.split(' ').join(', ') : tag.value}`}</div>
                   ) : null;
                 })
               : ''}
@@ -70,6 +70,7 @@ const Shield: React.FC = () => {
                   whiteSpace: 'nowrap',
                   textOverflow: 'ellipsis',
                   overflow: 'hidden',
+                  lineHeight: '16px',
                 }}
               >
                 {text}
