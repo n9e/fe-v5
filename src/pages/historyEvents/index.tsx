@@ -174,8 +174,8 @@ const Event: React.FC = () => {
             ref={tableRef}
             antProps={{
               rowKey: 'id',
-              rowClassName: (record: { severity: number }, index) => {
-                return SeverityColor[record.severity - 1];
+              rowClassName: (record: { severity: number; is_recovered: number }, index) => {
+                return SeverityColor[record.is_recovered ? 2 : record.severity - 1];
               },
               // scroll: { x: 'max-content' },
             }}
