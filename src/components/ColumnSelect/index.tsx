@@ -41,7 +41,8 @@ export default function ColumnSelect(props: Props) {
           allowClear
           showSearch
           style={{ minWidth: 120 }}
-          placeholder='业务线'
+          placeholder='业务组'
+          dropdownClassName='overflow-586'
           filterOption={false}
           onSearch={handleSearch}
           onFocus={() => {

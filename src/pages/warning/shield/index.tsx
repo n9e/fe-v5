@@ -213,7 +213,7 @@ const Shield: React.FC = () => {
   };
 
   return (
-    <PageLayout title={t('屏蔽规则')} icon={<CloseCircleOutlined />}>
+    <PageLayout title={t('屏蔽规则')} icon={<CloseCircleOutlined />} hideCluster>
       <div className='shield-content'>
         <LeftTree
           busiGroup={{
