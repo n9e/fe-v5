@@ -1,7 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 import { Button, Space, Dropdown, Menu } from 'antd';
-import { LinkOutlined, DownOutlined, EditOutlined } from '@ant-design/icons';
+import { DownOutlined, EditOutlined } from '@ant-design/icons';
 import Edit from './Edit';
 import { ILink } from '../types';
 
@@ -18,15 +18,19 @@ export default function index(props: IProps) {
       <Dropdown
         overlay={
           <Menu>
-            {_.map(value, (item, idx) => {
-              return (
-                <Menu.Item key={idx}>
-                  <a href={item.url} target={item.targetBlank ? '_blank' : '_self'}>
-                    {item.title}
-                  </a>
-                </Menu.Item>
-              );
-            })}
+            {_.isEmpty(value) ? (
+              <div style={{ textAlign: 'center' }}>暂无数据</div>
+            ) : (
+              _.map(value, (item, idx) => {
+                return (
+                  <Menu.Item key={idx}>
+                    <a href={item.url} target={item.targetBlank ? '_blank' : '_self'}>
+                      {item.title}
+                    </a>
+                  </Menu.Item>
+                );
+              })
+            )}
           </Menu>
         }
       >
