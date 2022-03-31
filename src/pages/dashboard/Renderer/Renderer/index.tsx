@@ -88,42 +88,46 @@ function index(props: IProps) {
           </Tooltip>
         ) : null}
         <div className='renderer-header-content'>
-          <Dropdown
-            trigger={['click']}
-            placement='bottomCenter'
-            overlayStyle={{
-              minWidth: '100px',
-            }}
-            overlay={
-              <Menu>
-                {!isPreview ? (
-                  <>
-                    <Menu.Item onClick={onEditClick}>
-                      <SettingOutlined />
-                      编辑
-                    </Menu.Item>
-                    <Menu.Item onClick={onCloneClick}>
-                      <CopyOutlined />
-                      克隆
-                    </Menu.Item>
-                    <Menu.Item onClick={onShareClick}>
-                      <ShareAltOutlined />
-                      分享
-                    </Menu.Item>
-                    <Menu.Item onClick={onDeleteClick}>
-                      <DeleteOutlined />
-                      删除
-                    </Menu.Item>
-                  </>
-                ) : null}
-              </Menu>
-            }
-          >
-            <div className='renderer-header-title'>
-              {values.name}
-              <DownOutlined className='renderer-header-arrow' />
-            </div>
-          </Dropdown>
+          {!isPreview ? (
+            <Dropdown
+              trigger={['click']}
+              placement='bottomCenter'
+              overlayStyle={{
+                minWidth: '100px',
+              }}
+              overlay={
+                <Menu>
+                  {!isPreview ? (
+                    <>
+                      <Menu.Item onClick={onEditClick}>
+                        <SettingOutlined />
+                        编辑
+                      </Menu.Item>
+                      <Menu.Item onClick={onCloneClick}>
+                        <CopyOutlined />
+                        克隆
+                      </Menu.Item>
+                      <Menu.Item onClick={onShareClick}>
+                        <ShareAltOutlined />
+                        分享
+                      </Menu.Item>
+                      <Menu.Item onClick={onDeleteClick}>
+                        <DeleteOutlined />
+                        删除
+                      </Menu.Item>
+                    </>
+                  ) : null}
+                </Menu>
+              }
+            >
+              <div className='renderer-header-title'>
+                {values.name}
+                <DownOutlined className='renderer-header-arrow' />
+              </div>
+            </Dropdown>
+          ) : (
+            <div className='renderer-header-title'>{values.name}</div>
+          )}
         </div>
         <div className='renderer-header-loading'>{loading && <SyncOutlined spin />}</div>
       </div>
