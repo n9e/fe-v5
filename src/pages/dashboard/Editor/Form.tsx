@@ -82,7 +82,9 @@ export default function FormCpt(props) {
                                 </div>
                               }
                             >
-                              <Form.Item noStyle name={[name, 'refId']} />
+                              <Form.Item noStyle name={[name, 'refId']}>
+                                <div />
+                              </Form.Item>
                               <div style={{ display: 'flex', alignItems: 'center' }}>
                                 <Form.Item
                                   label='PromQL'
