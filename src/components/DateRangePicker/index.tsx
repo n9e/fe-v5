@@ -13,7 +13,7 @@ interface Props {
   unit?: TimeUnit;
   value?: Range;
   showRight?: boolean;
-  onChange: (value: Range) => void;
+  onChange?: (value: Range) => void;
 }
 
 export type Range = RelativeRange | AbsoluteRange;
@@ -97,7 +97,7 @@ export default function DateRangePicker(props: Props) {
       setLeftSelect(i === -1 ? 0 : i);
       emitValue(leftList[i]);
     }
-  }, [value]);
+  }, [JSON.stringify(value)]);
 
   const formatLabel = (r: Range, unit: TimeUnit): string => {
     if (isAbsoluteRange(r)) {
@@ -156,7 +156,7 @@ export default function DateRangePicker(props: Props) {
   };
 
   const emitValue = (value: Range) => {
-    onChange(value);
+    onChange && onChange(value);
     setLabel(formatLabel(value, unit));
   };
 

@@ -1,3 +1,4 @@
+import { Range } from '@/components/DateRangePicker';
 export interface IGridPos {
   h: number;
   w: number;
@@ -10,7 +11,8 @@ export interface ITarget {
   refId: string;
   expr: string; // promQL
   legendFormat: string;
-  // format: string; // table | timeSeries 暂定，可能需要添加一个 format 来处理 table 形态
+  time?: Range; // 固定时间范围
+  step?: number; // 固定时间间隔
 }
 
 export interface ILink {

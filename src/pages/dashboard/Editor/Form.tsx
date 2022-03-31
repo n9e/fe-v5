@@ -3,6 +3,8 @@ import { Form, Input, Row, Col, Button, Space, Switch, Tooltip } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import PromQLInput from '@/components/PromQLInput';
+import DateRangePicker from '@/components/DateRangePicker';
+import Resolution from '@/components/Resolution';
 import { defaultValues, defaultCustomValuesMap } from './config';
 import Options from './Options';
 import Collapse, { Panel } from './Components/Collapse';
@@ -103,17 +105,45 @@ export default function FormCpt(props) {
                                   />
                                 </Form.Item>
                               </div>
-                              <Form.Item
-                                label='Legend'
-                                name={[name, 'legend']}
-                                tooltip={{
-                                  getPopupContainer: () => document.body,
-                                  title:
-                                    'Controls the name of the time series, using name or pattern. For example {{hostname}} will be replaced with label value for the label hostname.',
-                                }}
-                              >
-                                <Input />
-                              </Form.Item>
+                              <Row gutter={10}>
+                                <Col flex='auto'>
+                                  <Form.Item
+                                    label='Legend'
+                                    name={[name, 'legend']}
+                                    tooltip={{
+                                      getPopupContainer: () => document.body,
+                                      title:
+                                        'Controls the name of the time series, using name or pattern. For example {{hostname}} will be replaced with label value for the label hostname.',
+                                    }}
+                                  >
+                                    <Input />
+                                  </Form.Item>
+                                </Col>
+                                <Col flex='116px'>
+                                  <Form.Item
+                                    label='时间选择'
+                                    name={[name, 'time']}
+                                    tooltip={{
+                                      getPopupContainer: () => document.body,
+                                      title: '可指定时间范围，默认为大盘全局时间范围',
+                                    }}
+                                  >
+                                    <DateRangePicker />
+                                  </Form.Item>
+                                </Col>
+                                <Col flex='72px'>
+                                  <Form.Item
+                                    label='Step'
+                                    name={[name, 'step']}
+                                    tooltip={{
+                                      getPopupContainer: () => document.body,
+                                      title: '可指定 step，默认为大盘全局 step',
+                                    }}
+                                  >
+                                    <Resolution />
+                                  </Form.Item>
+                                </Col>
+                              </Row>
                             </Panel>
                           );
                         })}

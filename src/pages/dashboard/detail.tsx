@@ -73,6 +73,7 @@ export default function DashboardDetail() {
     start: 0,
     end: 0,
   });
+  const [refreshFlag, setRefreshFlag] = useState(_.uniqueId('refreshFlag_'));
   const { run } = useThrottleFn(
     () => {
       if ('start' in range && range.start && range.end) {
@@ -83,10 +84,12 @@ export default function DashboardDetail() {
           start: now - diff,
         });
       } else if ('unit' in range && range.unit) {
+        const newRefreshFlag = _.uniqueId('refreshFlag_');
         setRange({
           ...range,
-          refreshFlag: _.uniqueId('refreshFlag_'),
+          refreshFlag: newRefreshFlag,
         });
+        setRefreshFlag(newRefreshFlag);
       }
       init();
     },
@@ -379,6 +382,7 @@ export default function DashboardDetail() {
               onDelChart={handleDelChart}
               onDelChartGroup={handleDelChartGroup}
               range={range}
+              refreshFlag={refreshFlag}
               variableConfig={variableConfig!}
               moveUpEnable={i > 0}
               moveDownEnable={i < chartGroup.length - 1}
