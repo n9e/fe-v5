@@ -53,22 +53,6 @@ const Event: React.FC = () => {
       dataIndex: 'cluster',
       width: 120,
     },
-    // {
-    //   title: t('级别'),
-    //   dataIndex: 'severity',
-    //   width: 70,
-    //   render: (severity) => {
-    //     return <Tag color={priorityColor[severity - 1]}>S{severity}</Tag>;
-    //   },
-    // },
-    {
-      title: t('类别'),
-      dataIndex: 'is_recovered',
-      width: 110,
-      render(isRecovered) {
-        return <Tag color={isRecovered ? 'green' : 'red'}>{isRecovered ? 'Recovered' : 'Triggered'}</Tag>;
-      },
-    },
     {
       title: t('规则标题&事件标签'),
       dataIndex: 'rule_name',
@@ -175,7 +159,7 @@ const Event: React.FC = () => {
             antProps={{
               rowKey: 'id',
               rowClassName: (record: { severity: number; is_recovered: number }, index) => {
-                return SeverityColor[record.is_recovered ? 2 : record.severity - 1];
+                return SeverityColor[record.is_recovered ? 3 : record.severity - 1];
               },
               // scroll: { x: 'max-content' },
             }}

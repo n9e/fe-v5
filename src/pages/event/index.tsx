@@ -21,7 +21,7 @@ const { confirm } = Modal;
 import ColumnSelect from '@/components/ColumnSelect';
 import RefreshIcon from '@/components/RefreshIcon';
 
-export const SeverityColor = ['red', 'yellow', 'green'];
+export const SeverityColor = ['red', 'orange', 'yellow', 'green'];
 
 export function deleteAlertEventsModal(busiId, ids: number[], onSuccess = () => {}) {
   confirm({
