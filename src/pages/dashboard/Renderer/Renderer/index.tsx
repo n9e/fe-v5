@@ -18,6 +18,7 @@ interface IProps {
   dashboardId: string;
   id?: string;
   time: Range;
+  refreshFlag: string;
   step: number | null;
   type: string;
   values: IPanel;
@@ -30,13 +31,14 @@ interface IProps {
 }
 
 function index(props: IProps) {
-  const { dashboardId, id, time, step, type, variableConfig, values, isPreview, onCloneClick, onShareClick, onEditClick, onDeleteClick } = props;
+  const { dashboardId, id, time, refreshFlag, step, type, variableConfig, values, isPreview, onCloneClick, onShareClick, onEditClick, onDeleteClick } = props;
   const ref = useRef<HTMLDivElement>(null);
   const inViewPort = useInViewport(ref);
   const { series, loading } = usePrometheus({
     id,
     dashboardId,
     time,
+    refreshFlag,
     step,
     targets: values.targets,
     variableConfig,

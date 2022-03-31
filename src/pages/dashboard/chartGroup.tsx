@@ -30,6 +30,7 @@ interface Props {
   busiId: string;
   groupInfo: Group;
   range: Range;
+  refreshFlag: string;
   step: number | null;
   variableConfig: VariableType;
   onAddChart: (data: number) => void;
@@ -519,6 +520,7 @@ export default function ChartGroup(props: Props) {
                 dashboardId={id}
                 id={item.id}
                 time={range}
+                refreshFlag={props.refreshFlag}
                 step={step}
                 type={type}
                 values={item.configs as any}

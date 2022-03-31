@@ -12,6 +12,7 @@ interface IProps {
   id?: string;
   dashboardId: string;
   time: Range;
+  refreshFlag: string;
   step: number | null;
   targets: ITarget[];
   variableConfig?: VariableType;
@@ -30,7 +31,7 @@ const getSerieName = (metric: Object, expr: string) => {
 };
 
 export default function usePrometheus(props: IProps) {
-  const { id = 0, dashboardId, time, step, targets, variableConfig, inViewPort } = props;
+  const { id = 0, dashboardId, time, refreshFlag, step, targets, variableConfig, inViewPort } = props;
   const [series, setSeries] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const cachedVariableValues = _.map(variableConfig?.var, (item) => {
@@ -38,12 +39,20 @@ export default function usePrometheus(props: IProps) {
   });
   const flag = useRef(false);
   const fetchData = () => {
-    const { start, end } = formatPickerDate(time);
+    let { start, end } = formatPickerDate(time);
     let _step = step;
     if (!step) _step = Math.max(Math.floor((end - start) / 250), 1);
     const _series: any[] = [];
     const promises: Promise<any>[] = [];
     _.forEach(targets, (target, idx) => {
+      if (target.time) {
+        const { start: _start, end: _end } = formatPickerDate(target.time);
+        start = _start;
+        end = _end;
+      }
+      if (target.step) {
+        _step = target.step;
+      }
       const realExpr = variableConfig ? replaceExpressionVars(target.expr, variableConfig, variableConfig.var.length, dashboardId) : target.expr;
       const signalKey = `${id}-${idx}`;
       if (realExpr) {
@@ -97,7 +106,7 @@ export default function usePrometheus(props: IProps) {
     } else {
       flag.current = false;
     }
-  }, [JSON.stringify(_.map(targets, 'expr')), JSON.stringify(time), step, JSON.stringify(variableConfig), JSON.stringify(cachedVariableValues)]);
+  }, [JSON.stringify(_.map(targets, 'expr')), JSON.stringify(time), refreshFlag, step, JSON.stringify(variableConfig), JSON.stringify(cachedVariableValues)]);
 
   useEffect(() => {
     if (inViewPort && !flag.current) {
