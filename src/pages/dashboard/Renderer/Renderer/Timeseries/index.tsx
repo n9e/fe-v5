@@ -128,7 +128,7 @@ export default function index(props: IProps) {
         <Table
           rowKey='id'
           size='small'
-          scroll={{ x: 650, y: legendEleSize.height! - 46 }}
+          scroll={{ x: 650, y: legendEleSize.height || 100 - 46 }}
           columns={[
             {
               title: `Series (${series.length})`,

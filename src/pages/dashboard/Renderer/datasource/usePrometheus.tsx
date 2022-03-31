@@ -12,7 +12,7 @@ interface IProps {
   id?: string;
   dashboardId: string;
   time: Range;
-  refreshFlag: string;
+  refreshFlag?: string;
   step: number | null;
   targets: ITarget[];
   variableConfig?: VariableType;

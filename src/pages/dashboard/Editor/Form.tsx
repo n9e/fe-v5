@@ -82,7 +82,9 @@ export default function FormCpt(props) {
                                 </div>
                               }
                             >
-                              <Form.Item noStyle name={[name, 'refId']} />
+                              <Form.Item noStyle name={[name, 'refId']}>
+                                <div />
+                              </Form.Item>
                               <div style={{ display: 'flex', alignItems: 'center' }}>
                                 <Form.Item
                                   label='PromQL'
@@ -128,7 +130,7 @@ export default function FormCpt(props) {
                                       title: '可指定时间范围，默认为大盘全局时间范围',
                                     }}
                                   >
-                                    <DateRangePicker />
+                                    <DateRangePicker nullable />
                                   </Form.Item>
                                 </Col>
                                 <Col flex='72px'>

@@ -18,7 +18,7 @@ interface IProps {
   dashboardId: string;
   id?: string;
   time: Range;
-  refreshFlag: string;
+  refreshFlag?: string;
   step: number | null;
   type: string;
   values: IPanel;
