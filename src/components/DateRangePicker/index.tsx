@@ -15,7 +15,7 @@ interface Props {
   value?: Range;
   showRight?: boolean;
   nullable?: boolean;
-  onChange?: (value?: Range) => void;
+  onChange?: (value: Range) => void;
 }
 
 export type Range = RelativeRange | AbsoluteRange;
@@ -159,7 +159,7 @@ export default function DateRangePicker(props: Props) {
     setVisible(false);
   };
 
-  const emitValue = (value?: Range) => {
+  const emitValue = (value: Range) => {
     onChange && onChange(value);
     if (value) {
       setLabel(formatLabel(value, unit));
@@ -234,7 +234,7 @@ export default function DateRangePicker(props: Props) {
             onClick={(e) => {
               e.stopPropagation();
               e.nativeEvent.stopImmediatePropagation();
-              emitValue(undefined);
+              emitValue(undefined as any);
             }}
           />
         )}
