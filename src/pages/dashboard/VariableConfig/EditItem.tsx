@@ -75,7 +75,7 @@ export default function EditItem(props: Props) {
           {(fields, { add, remove, move }) => (
             <>
               {fields.map(({ key, name, fieldKey, ...restField }) => (
-                <Row gutter={[6, 6]} className='tag-content-item'>
+                <Row gutter={[6, 6]} className='tag-content-item' key={key}>
                   <Col span={4}>
                     <Form.Item {...restField} name={[name, 'name']} fieldKey={[fieldKey, 'name']} rules={[{ required: true, message: t('请输入变量名') }]}>
                       <Input />
