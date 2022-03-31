@@ -128,7 +128,7 @@ export default function FormCpt(props) {
                                       title: '可指定时间范围，默认为大盘全局时间范围',
                                     }}
                                   >
-                                    <DateRangePicker />
+                                    <DateRangePicker nullable />
                                   </Form.Item>
                                 </Col>
                                 <Col flex='72px'>

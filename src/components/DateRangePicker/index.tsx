@@ -13,6 +13,7 @@ interface Props {
   unit?: TimeUnit;
   value?: Range;
   showRight?: boolean;
+  nullable?: boolean;
   onChange?: (value: Range) => void;
 }
 
@@ -74,26 +75,28 @@ export default function DateRangePicker(props: Props) {
     { num: 1, unit: 'month', description: t('月') },
     { num: 1, unit: 'quarter', description: t('季度') },
   ];
-  const { onChange, value, unit = 's', showRight = true, placement = 'bottom', leftList = LeftItems } = props;
+  const { onChange, value, unit = 's', showRight = true, placement = 'bottom', leftList = LeftItems, nullable = false } = props;
   const [visible, setVisible] = useState(false);
   const [startTime, setStartTime] = useState<Moment>(moment());
   const [endTime, setEndTime] = useState<Moment>(moment());
   const [leftSelect, setLeftSelect] = useState<number>(-1);
-  const [label, setLabel] = useState<string>();
+  const [label, setLabel] = useState<string>('选择时间');
   const isDatePickerOpen = useRef(false);
 
   useEffect(() => {
     if (!value) {
-      const defaultSelect = 3;
-      setLeftSelect(defaultSelect);
-      emitValue(leftList[defaultSelect]);
+      if (!nullable) {
+        const defaultSelect = 3;
+        setLeftSelect(defaultSelect);
+        emitValue(leftList[defaultSelect]);
+      }
       return;
     }
     // 如果外部被赋值，只需要改label和组件展示值，不需要向外抛
     if (isAbsoluteRange(value)) {
       value.start > 0 && value.end > 0 && formatExternalAbsoluteTime(value);
     } else {
-      const i = leftList.findIndex(({ num, unit }) => num === value.num && unit === value.unit);
+      const i = leftList.findIndex(({ num, unit }) => num === value?.num && unit === value.unit);
       setLeftSelect(i === -1 ? 0 : i);
       emitValue(leftList[i]);
     }
@@ -215,7 +218,7 @@ export default function DateRangePicker(props: Props) {
       getPopupContainer={() => document.body}
       onVisibleChange={(visible) => (visible || !isDatePickerOpen.current) && setVisible(visible)}
     >
-      <Button>
+      <Button style={{ width: '100%' }}>
         {label} <CaretDownOutlined />
       </Button>
     </Popover>
