@@ -27,8 +27,9 @@ export default function index(props: IProps) {
                 }}
                 title={
                   <div>
-                    <div>SI: 基数为 1000, 单位为 B、kB、MB、GB、TB、PB、EB、ZB、YB</div>
-                    <div>IEC: 基数为 1024, 单位为 B、KiB、MiB、GiB、TiB、PiB、EiB、ZiB、YiB</div>
+                    <div>默认会做 SI Prefixes 处理，如不想默认的处理可选择 none 关闭</div>
+                    <div>Data(SI): 基数为 1000, 单位为 B、kB、MB、GB、TB、PB、EB、ZB、YB</div>
+                    <div>Data(IEC): 基数为 1024, 单位为 B、KiB、MiB、GiB、TiB、PiB、EiB、ZiB、YiB</div>
                     <div>bits: b</div>
                     <div>bytes: B</div>
                   </div>
@@ -40,7 +41,8 @@ export default function index(props: IProps) {
           }
           name={[...namePrefix, 'util']}
         >
-          <Select placeholder='none' allowClear>
+          <Select placeholder='auto' allowClear>
+            <Option value='none'>none</Option>
             <OptGroup label='Data(SI)'>
               <Option value='bitsSI'>bits(SI)</Option>
               <Option value='bytesSI'>bytes(SI)</Option>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { Button, InputNumber, Layout, Row, Col, Checkbox, Popover, Select } from 'antd';
+import { Button, InputNumber, Layout, Row, Col, Space, Checkbox, Popover, Select } from 'antd';
 import { LineChartOutlined, SyncOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import PageLayout from '@/components/pageLayout';
 import { useTranslation } from 'react-i18next';
@@ -165,7 +165,7 @@ export default () => {
           </Row>
           <Row style={{ padding: '10px 0' }}>
             <Col span={8}>
-              <div style={{ display: 'flex' }}>
+              <Space>
                 <DateRangePicker
                   value={range}
                   onChange={(e) => {
@@ -199,7 +199,7 @@ export default () => {
                   }}
                   icon={<SyncOutlined />}
                 ></Button>
-              </div>
+              </Space>
             </Col>
             <Col span={16} style={{ textAlign: 'right' }}>
               <Button onClick={handleRemoveGraphs} disabled={!graphs.length} style={{ background: '#fff' }}>
