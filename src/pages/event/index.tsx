@@ -189,7 +189,7 @@ const Event: React.FC = () => {
     const menu = (
       <Menu
         onClick={(e) => {
-          setInterval(e.key as number);
+          setInterval(e.key as any);
         }}
       >
         {intervalItems.map(({ num, description }) => (
