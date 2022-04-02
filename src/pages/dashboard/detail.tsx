@@ -294,9 +294,9 @@ export default function DashboardDetail() {
     b && refreshUpdateTimeByChartGroupId();
   };
 
-  const handleVariableChange = (value, b) => {
+  const handleVariableChange = (value, b, valueWithOptions) => {
     b && updateSingleDashboard(busiId, id, { ...dashboard, configs: JSON.stringify(value) });
-    setVariableConfig(value);
+    setVariableConfig(valueWithOptions);
   };
   const clusterMenu = (
     <Menu selectedKeys={[curCluster]}>

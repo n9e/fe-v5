@@ -24,30 +24,51 @@ const DisplayItem: React.FC<Props> = ({ expression, index, data, onChange, clust
   const [options, setOptions] = useState<string[]>([]);
   const [exp, setExp] = useState<string>();
   const [_range, setRange] = useState<Range>(range);
+  const [_select, setSelect] = useState<string | string[]>();
   const [curCluster, setCurCluster] = useState(cluster);
   const { definition, multi, allOption, name, reg } = expression;
+  const [_allOption, setAllOption] = useState(allOption);
+  const [_multi, setMulti] = useState(multi);
   const selected = getVaraiableSelected(name, id);
   const vars = extractExpressionVars(definition);
-
   useEffect(() => {
-    // console.log(vars, varsMap, !vars || vars.every((key) => varsMap[key]));
     if (expression && (!vars || vars.every((key) => varsMap[key]))) {
       var newExpression = replaceExpressionVars(definition, { var: data }, index, id);
-      if (exp !== newExpression || curCluster !== cluster || _range !== range) {
+      if (
+        exp !== newExpression ||
+        curCluster !== cluster ||
+        _range !== range ||
+        JSON.stringify(_select) !== JSON.stringify(selected) ||
+        _multi !== multi ||
+        _allOption !== allOption
+      ) {
         setExp(newExpression);
         setRange(range);
         setCurCluster(cluster);
+        setSelect(selected);
+        setAllOption(allOption);
+        setMulti(multi);
         convertExpressionToQuery(newExpression, range).then((res) => {
           // 逻辑上只有导入大盘后初始化那一次 selected会为空
           const regFilterRes = res.filter((i) => !!i && (!reg || !stringToRegex(reg) || (stringToRegex(reg) as RegExp).test(i)));
+          console.log('regFilterRes', regFilterRes);
           setOptions(regFilterRes);
           if (res.length > 0) {
             if (selected) {
               if (multi && selected.length > 0) {
-                const inOptionSelected = selected.filter((i) => regFilterRes.includes(i));
-                onChange(index, inOptionSelected.length > 0 ? inOptionSelected : [regFilterRes[0]], regFilterRes);
+                let inOptionSelected;
+                if (Array.isArray(selected)) {
+                  inOptionSelected = selected.length === 1 && selected[0] === 'all' ? selected : selected.filter((i) => regFilterRes.includes(i));
+                  onChange(index, inOptionSelected.length > 0 ? inOptionSelected : [regFilterRes[0]], regFilterRes);
+                } else {
+                  onChange(index, regFilterRes.includes(selected) ? [selected] : [regFilterRes[0]], regFilterRes);
+                }
               } else {
-                onChange(index, regFilterRes.includes(selected) ? selected : regFilterRes[0], regFilterRes);
+                if (Array.isArray(selected)) {
+                  onChange(index, regFilterRes.includes(selected[0]) ? selected[0] : regFilterRes[0], regFilterRes);
+                } else {
+                  onChange(index, regFilterRes.includes(selected) ? selected : regFilterRes[0], regFilterRes);
+                }
               }
             } else {
               onChange(index, multi ? [regFilterRes[0]] : regFilterRes[0], regFilterRes);
@@ -59,7 +80,7 @@ const DisplayItem: React.FC<Props> = ({ expression, index, data, onChange, clust
         });
       }
     }
-  }, [expression, data, index, cluster, range]);
+  }, [expression, data, index, cluster, range, selected, multi, allOption]);
 
   const handleChange = (v) => {
     if (multi && allOption && v.includes('all')) {

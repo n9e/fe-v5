@@ -10,6 +10,7 @@ import { useEffect } from 'react';
 import './index.less';
 import { useTranslation } from 'react-i18next';
 import { Range } from '@/components/DateRangePicker';
+import _ from 'lodash';
 export type VariableType = FormType;
 
 interface ITagFilterProps {
@@ -19,7 +20,7 @@ interface ITagFilterProps {
   editable?: boolean;
   value?: FormType;
   range: Range;
-  onChange: (data: FormType, needSave: boolean) => void;
+  onChange: (data: FormType, needSave: boolean, options?: FormType) => void;
 }
 
 export function setVaraiableSelected(name: string, value: string | string[], id: string) {
@@ -50,13 +51,14 @@ const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = ({ isOpe
   }, [value]);
 
   const handleVariableChange = (index: number, v: string | string[], options) => {
-    const newData = data ? { var: [...data.var] } : { var: [] };
+    const newData = data ? { var: _.cloneDeep(data.var) } : { var: [] };
+    const newDataWithOptions = data ? { var: _.cloneDeep(data.var) } : { var: [] };
     // newData.var[index].selected = v;
     setVaraiableSelected(newData.var[index].name, v, id);
     setVarsMap((varsMap) => ({ ...varsMap, [`$${newData.var[index].name}`]: v }));
-    // options && (newData.var[index].options = options);
+    options && (newDataWithOptions.var[index].options = options);
     setData(newData);
-    onChange(newData, false);
+    onChange(newData, false, newDataWithOptions);
   };
 
   return (

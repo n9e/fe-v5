@@ -71,8 +71,8 @@ export default defineConfig({
       //   changeOrigin: true,
       // },
       '/api/n9e': {
-        target: 'http://10.206.0.11:8765/',
-        // target: 'http://10.206.0.16:18000/',
+        // target: 'http://10.206.0.11:8765/',
+        target: 'http://10.206.0.16:18000/',
         changeOrigin: true,
       },
       '/filters': {
