@@ -223,11 +223,11 @@ export default function ImportAndDownloadModal(props: Props) {
                     </Select>
                   </Form.Item>
                 </Form>
-                <Table className='samll_table' dataSource={buildinList} columns={builtinColumn} pagination={false} size='small' />
+                <Table className='samll_table' dataSource={buildinList} columns={builtinColumn} pagination={buildinList.length < 5 ? false : { pageSize: 5 }} size='small' />
                 {importResult && (
                   <>
                     <Divider />
-                    <Table className='samll_table' dataSource={importResult} columns={columns} pagination={false} size='small' />
+                    <Table className='samll_table' dataSource={importResult} columns={columns} size='small' pagination={importResult.length < 5 ? false : { pageSize: 5 }} />
                   </>
                 )}
               </>

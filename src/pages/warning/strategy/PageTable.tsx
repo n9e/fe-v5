@@ -405,14 +405,14 @@ const PageTable: React.FC<Props> = ({ bgid }) => {
           getAlertRules();
         }}
         onSubmit={handleImportStrategy}
-        label='告警策略'
+        label='告警规则'
         title={
           ModalStatus.Export === modalType ? (
-            '告警策略'
+            '告警规则'
           ) : (
             <Tabs defaultActiveKey={ModalStatus.BuiltIn} onChange={(e: ModalStatus) => setModalType(e)} className='custom-import-alert-title'>
-              <TabPane tab=' 导入内置告警策略' key={ModalStatus.BuiltIn}></TabPane>
-              <TabPane tab='导入告警策略JSON' key={ModalStatus.Import}></TabPane>
+              <TabPane tab=' 导入内置告警规则' key={ModalStatus.BuiltIn}></TabPane>
+              <TabPane tab='导入告警规则JSON' key={ModalStatus.Import}></TabPane>
             </Tabs>
           )
         }
