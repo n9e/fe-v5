@@ -3,6 +3,51 @@ import moment from 'moment';
 import { utilValMap } from '../config';
 import * as byteConverter from './byteConverter';
 
+function timeFormatter(val, type: 'seconds' | 'milliseconds', decimals) {
+  if (typeof val !== 'number') return val;
+  const timeMap = [{
+    unit: 'year',
+    value: 31104000,
+  }, {
+    unit: 'month',
+    value: 2592000,
+  }, {
+    unit: 'week',
+    value: 604800,
+  }, {
+    unit: 'day',
+    value: 86400,
+  }, {
+    unit: 'hour',
+    value: 3600,
+  }, {
+    unit: 'min',
+    value: 60,
+  }]
+  const shortTypeMap = {
+    seconds: 's',
+    milliseconds: 'ms',
+  }
+  let newVal = val;
+  let unit = shortTypeMap[type];
+  _.forEach(timeMap, (item) => {
+    const _val = val / item.value / (type === 'milliseconds' ? 1000 : 1);
+    if (_val >= 1) {
+      newVal = _val;
+      unit = item.unit;
+      return false;
+    }
+  });
+  if (type === 'milliseconds' && unit === 'ms') {
+    const _val = newVal / 1000;
+    if (_val >= 1) {
+      newVal = _val;
+      unit = 's';
+    }
+  }
+  return _.round(newVal, decimals) + unit;
+}
+
 const valueFormatter = ({util, decimals = 3}, val) => {
   if (util) {
     const utilValObj = utilValMap[util];
@@ -28,6 +73,12 @@ const valueFormatter = ({util, decimals = 3}, val) => {
     }
     if (util === 'humantimeMilliseconds') {
       return moment.duration(val, 'milliseconds').humanize();
+    }
+    if (util === 'seconds') {
+      return timeFormatter(val, util, decimals);
+    }
+    if (util === 'milliseconds') {
+      return timeFormatter(val, util, decimals);
     }
     return _.round(val, decimals);
   }

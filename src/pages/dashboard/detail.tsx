@@ -25,6 +25,8 @@ import { CommonStoreState } from '@/store/commonInterface';
 import editor from './Editor';
 import { replaceExpressionVars } from './VariableConfig/constant';
 import Refresh from './Components/Refresh';
+import DashboardLinks from './DashboardLinks';
+import { ILink } from './types';
 
 interface URLParam {
   id: string;
@@ -66,6 +68,7 @@ export default function DashboardDetail() {
   const [titleEditing, setTitleEditing] = useState(false);
   const [chartGroup, setChartGroup] = useState<Group[]>([]);
   const [variableConfig, setVariableConfig] = useState<VariableType>();
+  const [dashboardLinks, setDashboardLinks] = useState<ILink[]>();
   const [groupModalVisible, setGroupModalVisible] = useState(false);
   const [chartModalVisible, setChartModalVisible] = useState(false);
   const [chartModalInitValue, setChartModalInitValue] = useState<Chart | null>();
@@ -106,6 +109,7 @@ export default function DashboardDetail() {
       if (res.dat.configs) {
         const configs = JSON.parse(res.dat.configs);
         setVariableConfig(configs);
+        setDashboardLinks(configs.links);
       }
     });
     getChartGroup(busiId, id).then((res) => {
@@ -295,7 +299,16 @@ export default function DashboardDetail() {
   };
 
   const handleVariableChange = (value, b, valueWithOptions) => {
-    b && updateSingleDashboard(busiId, id, { ...dashboard, configs: JSON.stringify(value) });
+    let dashboardConfigs: any = {};
+    try {
+      if (dashboard.configs) {
+        dashboardConfigs = JSON.parse(dashboard.configs);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    dashboardConfigs.var = value.var;
+    b && updateSingleDashboard(busiId, id, { ...dashboard, configs: JSON.stringify(dashboardConfigs) });
     setVariableConfig(valueWithOptions);
   };
   const clusterMenu = (
@@ -359,8 +372,29 @@ export default function DashboardDetail() {
       }
     >
       <div className='dashboard-detail-content'>
-        <div className='variable-area'>
-          <VariableConfig onChange={handleVariableChange} value={variableConfig} cluster={curCluster} range={range} id={id} />
+        <div className='dashboard-detail-content-header'>
+          <div className='variable-area'>
+            <VariableConfig onChange={handleVariableChange} value={variableConfig} cluster={curCluster} range={range} id={id} />
+          </div>
+          <DashboardLinks
+            value={dashboardLinks}
+            onChange={(v) => {
+              let dashboardConfigs: any = {};
+              try {
+                if (dashboard.configs) {
+                  dashboardConfigs = JSON.parse(dashboard.configs);
+                }
+              } catch (e) {
+                console.error(e);
+              }
+              dashboardConfigs.links = v;
+              updateSingleDashboard(busiId, id, {
+                ...dashboard,
+                configs: JSON.stringify(dashboardConfigs),
+              });
+              setDashboardLinks(v);
+            }}
+          />
         </div>
 
         <div className='charts'>

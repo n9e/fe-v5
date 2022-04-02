@@ -5,7 +5,7 @@ import _ from 'lodash';
 import { useTranslation } from 'react-i18next';
 import DateRangePicker, { Range } from '@/components/DateRangePicker';
 import Resolution from '@/components/Resolution';
-import ModalHOC, { ModalWrapProps } from './ModalHOC';
+import ModalHOC, { ModalWrapProps } from '../Components/ModalHOC';
 import { visualizations, defaultValues, defaultCustomValuesMap } from './config';
 import Renderer from '../Renderer/Renderer';
 import { createChart, updateCharts } from '@/services/dashboard';

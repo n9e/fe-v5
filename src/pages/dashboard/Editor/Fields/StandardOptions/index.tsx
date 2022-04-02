@@ -55,9 +55,11 @@ export default function index(props: IProps) {
               <Option value='percent'>百分比(0-100)</Option>
               <Option value='percentUnit'>百分比(0.0-1.0)</Option>
             </OptGroup>
-            <OptGroup label='Human time duration'>
-              <Option value='humantimeSeconds'>Humanize(seconds)</Option>
-              <Option value='humantimeMilliseconds'>Humanize(milliseconds)</Option>
+            <OptGroup label='时间'>
+              <Option value='humantimeSeconds'>humanize(seconds)</Option>
+              <Option value='humantimeMilliseconds'>humanize(milliseconds)</Option>
+              <Option value='seconds'>seconds</Option>
+              <Option value='milliseconds'>milliseconds</Option>
             </OptGroup>
           </Select>
         </Form.Item>

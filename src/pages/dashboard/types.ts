@@ -15,11 +15,6 @@ export interface ITarget {
   step?: number; // 固定时间间隔
 }
 
-export interface ILink {
-  title: string;
-  url: string;
-}
-
 export type IType = 'timeseries' | 'stat' | 'table' | 'pie';
 
 export interface IValueMapping {
@@ -74,10 +69,10 @@ export interface IOverride {
   }
 }
 
-export interface Link {
+export interface ILink {
   title: string;
   url: string;
-  targetBlank: boolean;
+  targetBlank?: boolean;
 }
 
 export interface ITimeseriesStyles {
@@ -113,7 +108,7 @@ export interface IPanel {
   version: string; // 单个图表面板使用的版本
   id: number;
   name: string;
-  links?: Link[];
+  links?: ILink[];
   description: string;
   layout: IGridPos;
   targets: ITarget[];

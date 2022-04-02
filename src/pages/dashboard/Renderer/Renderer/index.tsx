@@ -101,20 +101,20 @@ function index(props: IProps) {
                 <Menu>
                   {!isPreview ? (
                     <>
-                      <Menu.Item onClick={onEditClick}>
-                        <SettingOutlined />
+                      <Menu.Item onClick={onEditClick} key='0'>
+                        <SettingOutlined style={{ marginRight: 8 }} />
                         编辑
                       </Menu.Item>
-                      <Menu.Item onClick={onCloneClick}>
-                        <CopyOutlined />
+                      <Menu.Item onClick={onCloneClick} key='1'>
+                        <CopyOutlined style={{ marginRight: 8 }} />
                         克隆
                       </Menu.Item>
-                      <Menu.Item onClick={onShareClick}>
-                        <ShareAltOutlined />
+                      <Menu.Item onClick={onShareClick} key='2'>
+                        <ShareAltOutlined style={{ marginRight: 8 }} />
                         分享
                       </Menu.Item>
-                      <Menu.Item onClick={onDeleteClick}>
-                        <DeleteOutlined />
+                      <Menu.Item onClick={onDeleteClick} key='3'>
+                        <DeleteOutlined style={{ marginRight: 8 }} />
                         删除
                       </Menu.Item>
                     </>

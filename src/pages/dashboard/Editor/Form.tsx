@@ -197,6 +197,7 @@ export default function FormCpt(props) {
                           {fields.map(({ key, name, ...restField }) => {
                             return (
                               <Space
+                                key={key}
                                 style={{
                                   alignItems: 'flex-start',
                                 }}
