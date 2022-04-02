@@ -289,3 +289,17 @@ export const updateAlertEventsAppendTags = function (ids: Array<number>, append_
     },
   });
 };
+
+export const getBuiltinAlerts = function () {
+  return request('/api/n9e/alert-rules/builtin/list', {
+    method: RequestMethod.Get,
+  });
+  // return Promise.resolve({ dat: [{ name: '123', id: 123 }] });
+};
+
+export const createBuiltinAlerts = function (name: string, cluster: string, id: number) {
+  return request(`/api/n9e/busi-group/${id}/alert-rules/builtin`, {
+    method: RequestMethod.Post,
+    data: { name, cluster },
+  });
+};

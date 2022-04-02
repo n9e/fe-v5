@@ -1,13 +1,13 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { Tag, Button, Select, Modal, message, Switch, Dropdown, Table } from 'antd';
+import { Tag, Button, Select, Modal, message, Switch, Dropdown, Table, Tabs } from 'antd';
 import { getStrategyGroupSubList, updateAlertRules } from '@/services/warning';
 import SearchInput from '@/components/BaseSearchInput';
 import { useHistory } from 'react-router-dom';
 
 import { strategyItem, strategyStatus } from '@/store/warningInterface';
 import { CommonStoreState } from '@/store/commonInterface';
-import { addOrEditStrategy, deleteStrategy } from '@/services/warning';
+import { addOrEditStrategy, deleteStrategy, getBuiltinAlerts, createBuiltinAlerts } from '@/services/warning';
 import { priorityColor } from '@/utils/constant';
 import { ColumnType } from 'antd/lib/table';
 import { pageSizeOptionsDefault } from '../const';
@@ -21,6 +21,7 @@ import EditModal from './components/editModal';
 import ColumnSelect from '@/components/ColumnSelect';
 const { Option } = Select;
 const { confirm } = Modal;
+const { TabPane } = Tabs;
 
 import { useTranslation } from 'react-i18next';
 const exportIgnoreAttrsObj = {
@@ -257,7 +258,7 @@ const PageTable: React.FC<Props> = ({ bgid }) => {
   const menu = useMemo(() => {
     return (
       <ul className='ant-dropdown-menu'>
-        <li className='ant-dropdown-menu-item' onClick={() => setModalType(ModalStatus.Import)}>
+        <li className='ant-dropdown-menu-item' onClick={() => setModalType(ModalStatus.BuiltIn)}>
           <span>{t('导入告警规则')}</span>
         </li>
         <li
@@ -393,7 +394,10 @@ const PageTable: React.FC<Props> = ({ bgid }) => {
         columns={columns}
       />
       <ImportAndDownloadModal
+        bgid={bgid}
         status={modalType}
+        fetchBuiltinFunc={getBuiltinAlerts}
+        submitBuiltinFunc={createBuiltinAlerts}
         onClose={() => {
           setModalType(ModalStatus.None);
         }}
@@ -401,7 +405,17 @@ const PageTable: React.FC<Props> = ({ bgid }) => {
           getAlertRules();
         }}
         onSubmit={handleImportStrategy}
-        title={t('告警规则')}
+        label='告警策略'
+        title={
+          ModalStatus.Export === modalType ? (
+            '告警策略'
+          ) : (
+            <Tabs defaultActiveKey={ModalStatus.BuiltIn} onChange={(e: ModalStatus) => setModalType(e)} className='custom-import-alert-title'>
+              <TabPane tab=' 导入内置告警策略' key={ModalStatus.BuiltIn}></TabPane>
+              <TabPane tab='导入告警策略JSON' key={ModalStatus.Import}></TabPane>
+            </Tabs>
+          )
+        }
         exportData={exportData}
       />
       {isModalVisible && <EditModal isModalVisible={isModalVisible} editModalFinish={editModalFinish} />}
