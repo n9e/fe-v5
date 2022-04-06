@@ -234,3 +234,16 @@ export const getQueryResult = function (data) {
     params: { ...data },
   });
 };
+
+export const getBuiltinDashboards = function () {
+  return request('/api/n9e/dashboards/builtin/list', {
+    method: RequestMethod.Get,
+  });
+};
+
+export const createBuiltinDashboards = function (name: string, cluster: string, id: number) {
+  return request(`/api/n9e/busi-group/${id}/dashboards/builtin`, {
+    method: RequestMethod.Post,
+    data: { name, cluster },
+  });
+};

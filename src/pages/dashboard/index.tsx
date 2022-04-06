@@ -3,9 +3,19 @@ import { useHistory, Link } from 'react-router-dom';
 import PageLayout from '@/components/pageLayout';
 import BaseTable, { IBaseTableProps } from '@/components/BaseTable';
 import { ColumnsType } from 'antd/lib/table';
-import { getDashboard, createDashboard, cloneDashboard, removeDashboard, exportDashboard, importDashboard, updateSingleDashboard } from '@/services/dashboard';
+import {
+  getDashboard,
+  createDashboard,
+  cloneDashboard,
+  removeDashboard,
+  exportDashboard,
+  importDashboard,
+  updateSingleDashboard,
+  getBuiltinDashboards,
+  createBuiltinDashboards,
+} from '@/services/dashboard';
 import { SearchOutlined, DownOutlined, FundOutlined, FundViewOutlined, DownloadOutlined, UploadOutlined } from '@ant-design/icons';
-import { Button, Modal, Form, Input, Tag, message, Dropdown, notification, Select } from 'antd';
+import { Button, Modal, Form, Input, Tag, message, Dropdown, notification, Select, Tabs } from 'antd';
 import dayjs from 'dayjs';
 import { Dashboard as DashboardType } from '@/store/dashboardInterface';
 import ImportAndDownloadModal, { ModalStatus } from '@/components/ImportAndDownloadModal';
@@ -14,6 +24,7 @@ import BlankBusinessPlaceholder from '@/components/BlankBusinessPlaceholder';
 import './index.less';
 import { useTranslation } from 'react-i18next';
 const { confirm } = Modal;
+const { TabPane } = Tabs;
 const type = 'dashboard';
 export default function Dashboard() {
   const { t } = useTranslation();
@@ -227,7 +238,7 @@ export default function Dashboard() {
                 </Button>
                 <div className={'table-more-options'}>
                   <Button.Group>
-                    <Button size='middle' type='default' icon={<DownloadOutlined />} onClick={() => setModalType(ModalStatus.Import)}>
+                    <Button size='middle' type='default' icon={<DownloadOutlined />} onClick={() => setModalType(ModalStatus.BuiltIn)}>
                       {t('导入')}
                     </Button>
                     <Button
@@ -356,16 +367,28 @@ export default function Dashboard() {
         </Form>
       </Modal>
       <ImportAndDownloadModal
-        crossCluster={false}
+        bgid={busiId}
         status={modalType}
-        onSuccess={() => {
-          (ref?.current as any)?.refreshList();
-        }}
+        fetchBuiltinFunc={getBuiltinDashboards}
+        submitBuiltinFunc={createBuiltinDashboards}
         onClose={() => {
           setModalType(ModalStatus.None);
         }}
+        onSuccess={() => {
+          (ref?.current as any)?.refreshList();
+        }}
         onSubmit={handleImportDashboard}
-        title={t('大盘')}
+        label='大盘'
+        title={
+          ModalStatus.Export === modalType ? (
+            '大盘'
+          ) : (
+            <Tabs defaultActiveKey={ModalStatus.BuiltIn} onChange={(e: ModalStatus) => setModalType(e)} className='custom-import-alert-title'>
+              <TabPane tab=' 导入内置大盘模块' key={ModalStatus.BuiltIn}></TabPane>
+              <TabPane tab='导入大盘JSON' key={ModalStatus.Import}></TabPane>
+            </Tabs>
+          )
+        }
         exportData={exportData}
       />
     </PageLayout>
