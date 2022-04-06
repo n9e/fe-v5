@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { Card, Space, Dropdown, Menu, Tag, Popover } from 'antd';
 import { ShareAltOutlined, SyncOutlined, CloseCircleOutlined, DownOutlined, PlusCircleOutlined, SettingOutlined } from '@ant-design/icons';
 import { Range } from '@/components/DateRangePicker';
-import { getLabels, getQueryRange } from '@/services/metricViews';
+import { getLabels, getQueryRange, getExprs, setTmpChartData } from '@/services/metricViews';
 import { getMatchStr } from './utils';
 import { IMatch } from '../types';
 import Timeseries from '../../../dashboard/Renderer/Renderer/Timeseries';
@@ -32,6 +32,26 @@ export default function Graph(props: IProps) {
     legend: true,
     util: 'none',
   });
+  const graphProps = {
+    custom: {
+      drawStyle: 'lines',
+      fillOpacity: 0,
+      stack: 'hidden',
+      lineInterpolation: 'smooth',
+    },
+    options: {
+      legend: {
+        displayMode: highLevelConfig.legend ? 'list' : 'hidden',
+      },
+      tooltip: {
+        mode: highLevelConfig.shared ? 'all' : 'single',
+        sort: highLevelConfig.sharedSortDirection,
+      },
+      standardOptions: {
+        util: highLevelConfig.util,
+      },
+    },
+  };
 
   useEffect(() => {
     getLabels(getMatchStr(match), range).then((res) => {
@@ -80,7 +100,45 @@ export default function Graph(props: IProps) {
             />
           </a>
           <a>
-            <ShareAltOutlined />
+            <ShareAltOutlined
+              onClick={() => {
+                const curCluster = localStorage.getItem('curCluster');
+                const dataProps = {
+                  type: 'timeseries',
+                  version: '2.0.0',
+                  name: metric,
+                  step,
+                  range,
+                  ...graphProps,
+                  targets: _.map(
+                    getExprs({
+                      metric,
+                      match: getMatchStr(match),
+                      aggrFunc,
+                      aggrGroups,
+                      calcFunc,
+                      comparison,
+                    }),
+                    (expr) => {
+                      return {
+                        expr,
+                      };
+                    },
+                  ),
+                };
+                setTmpChartData([
+                  {
+                    configs: JSON.stringify({
+                      curCluster,
+                      dataProps,
+                    }),
+                  },
+                ]).then((res) => {
+                  const ids = res.dat;
+                  window.open('/chart/' + ids);
+                });
+              }}
+            />
           </a>
           <a>
             <CloseCircleOutlined onClick={onClose} />
@@ -207,32 +265,7 @@ export default function Graph(props: IProps) {
         </Space>
       </div>
       <div>
-        <Timeseries
-          inDashboard={false}
-          values={
-            {
-              custom: {
-                drawStyle: 'lines',
-                fillOpacity: 0,
-                stack: 'hidden',
-                lineInterpolation: 'smooth',
-              },
-              options: {
-                legend: {
-                  displayMode: highLevelConfig.legend ? 'list' : 'hidden',
-                },
-                tooltip: {
-                  mode: highLevelConfig.shared ? 'all' : 'single',
-                  sort: highLevelConfig.sharedSortDirection,
-                },
-                standardOptions: {
-                  util: highLevelConfig.util,
-                },
-              },
-            } as any
-          }
-          series={series}
-        />
+        <Timeseries inDashboard={false} values={graphProps as any} series={series} />
       </div>
     </Card>
   );

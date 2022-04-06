@@ -60,6 +60,35 @@ const getSerieName = (metric: Object) => {
   return _.trim(name);
 };
 
+export const getExprs = (params) => {
+  const { metric, match, calcFunc, comparison, aggrFunc, aggrGroups } = params;
+  const calcArr = _.split(calcFunc, '_');
+  const isAggr = aggrGroups.length > 0;
+  const exprs = [
+    getQuery({
+      isAggr,
+      aggrFunc,
+      calcArr,
+      metric,
+      match,
+      offset: '',
+      aggrGroups,
+    }),
+    ..._.map(comparison, (item) => {
+      return getQuery({
+        isAggr,
+        aggrFunc,
+        calcArr,
+        metric,
+        match,
+        offset: item,
+        aggrGroups,
+      });
+    })
+  ];
+  return exprs;
+}
+
 export const getQueryRange = function (params: {
   metric: string;
   match: string;
@@ -76,47 +105,24 @@ export const getQueryRange = function (params: {
   if (!step) _step = Math.max(Math.floor((end - start) / 250), 1);
   const calcArr = _.split(calcFunc, '_');
   const isAggr = aggrGroups.length > 0;
-  const requests = [
-    request('/api/n9e/prometheus/api/v1/query_range', {
-      method: RequestMethod.Get,
-      params: {
-        start,
-        end,
-        step: _step,
-        query: getQuery({
-          isAggr,
-          aggrFunc,
-          calcArr,
-          metric,
-          match,
-          offset: '',
-          aggrGroups,
-        }),
-      }
-    })
-  ];
-  const comparisonRequests = _.map(comparison, (item) => {
+  const exprs = getExprs({
+    metric,
+    match,
+    calcFunc,
+    comparison, aggrFunc, aggrGroups,
+  });
+  const requests = _.map(exprs, (expr) => {
     return request('/api/n9e/prometheus/api/v1/query_range', {
       method: RequestMethod.Get,
       params: {
         start,
         end,
         step: _step,
-        query: getQuery({
-          isAggr,
-          aggrFunc,
-          calcArr,
-          metric,
-          match,
-          offset: item,
-          aggrGroups,
-        }),
+        query: expr,
       }
-    }).then((res) => {
-      return res?.data;
     });
   });
-  return Promise.all([...requests, ...comparisonRequests]).then((res) => {
+  return Promise.all(requests).then((res) => {
     const series: any[] = [];
     _.forEach(['current', ...comparison], (item, idx) => {
       const dat = res[idx]?.data ? res[idx]?.data : res[idx]; // 处理环比的情况返回结构不一致
@@ -130,7 +136,7 @@ export const getQueryRange = function (params: {
       });
     });
     return series;
-  })
+  });
 };
 
 export const getList = function (range: Range) {
@@ -166,5 +172,12 @@ export const deleteMetricView = function (data) {
     data,
   }).then((res) => {
     return res?.dat;
+  });
+};
+
+export const setTmpChartData = function (data: { configs: string }[]) {
+  return request(`/api/n9e/share-charts`, {
+    method: RequestMethod.Post,
+    data,
   });
 };
