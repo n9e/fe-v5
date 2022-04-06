@@ -308,7 +308,6 @@ export default function DashboardDetail() {
       console.error(e);
     }
     dashboardConfigs.var = value.var;
-    console.log(dashboardConfigs);
     b && updateSingleDashboard(busiId, id, { ...dashboard, configs: JSON.stringify(dashboardConfigs) });
     setVariableConfig(value);
   };

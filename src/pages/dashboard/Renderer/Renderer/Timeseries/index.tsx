@@ -11,12 +11,15 @@ import { getLegendValues } from '../../utils/getCalculatedValuesBySeries';
 import './style.less';
 
 interface IProps {
+  inDashboard?: boolean;
+  chartHeight?: string;
+  tableHeight?: string;
   values: IPanel;
   series: any[];
 }
 
 export default function index(props: IProps) {
-  const { values, series } = props;
+  const { values, series, inDashboard = true, chartHeight = '200px', tableHeight = '200px' } = props;
   const { custom, options = {} } = values;
   const chartEleRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<TsGraph>(null);
@@ -24,6 +27,13 @@ export default function index(props: IProps) {
   const legendEleSize = useSize(legendEleRef);
   const hasLegend = options.legend?.displayMode !== 'hidden';
   const [legendData, setLegendData] = useState([]);
+  let _chartHeight = hasLegend ? '70%' : '100%';
+  let _tableHeight = hasLegend ? '30%' : '0px';
+
+  if (!inDashboard) {
+    _chartHeight = chartHeight;
+    _tableHeight = tableHeight;
+  }
 
   useEffect(() => {
     if (chartEleRef.current) {
@@ -94,9 +104,9 @@ export default function index(props: IProps) {
         },
         yAxis: {
           ...chartRef.current.options.yAxis,
-          min: options.standardOptions?.min,
-          max: options.standardOptions?.max,
-          plotLines: options.thresholds?.steps,
+          min: options?.standardOptions?.min,
+          max: options?.standardOptions?.max,
+          plotLines: options?.thresholds?.steps,
           tickValueFormatter: (val) => {
             return valueFormatter(
               {
@@ -123,8 +133,8 @@ export default function index(props: IProps) {
 
   return (
     <div className='renderer-timeseries-container'>
-      <div ref={chartEleRef} style={{ height: hasLegend ? '70%' : '100%' }} />
-      <div className='renderer-timeseries-legend' style={{ height: hasLegend ? '30%' : 0, overflow: 'hidden' }} ref={legendEleRef}>
+      <div ref={chartEleRef} style={{ height: _chartHeight }} />
+      <div className='renderer-timeseries-legend' style={{ [inDashboard ? 'height' : 'maxHeight']: _tableHeight, overflow: 'hidden' }} ref={legendEleRef}>
         <Table
           rowKey='id'
           size='small'

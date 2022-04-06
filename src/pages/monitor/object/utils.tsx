@@ -48,7 +48,7 @@ export function matchMetrics(matches, alls) {
     return [];
   }
 
-  return _.filter(matches, o => _.indexOf(alls, o) > -1);
+  return _.filter(matches, (o) => _.indexOf(alls, o) > -1);
 }
 
 export function getClusterNs(allNsData, query) {
