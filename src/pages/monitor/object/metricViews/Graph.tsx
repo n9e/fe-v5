@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import _ from 'lodash';
-import { Card, Space, Dropdown, Menu, Tag } from 'antd';
-import { ShareAltOutlined, SyncOutlined, CloseCircleOutlined, DownOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import { Card, Space, Dropdown, Menu, Tag, Popover } from 'antd';
+import { ShareAltOutlined, SyncOutlined, CloseCircleOutlined, DownOutlined, PlusCircleOutlined, SettingOutlined } from '@ant-design/icons';
 import { Range } from '@/components/DateRangePicker';
 import { getLabels, getQueryRange } from '@/services/metricViews';
 import { getMatchStr } from './utils';
 import { IMatch } from '../types';
 import Timeseries from '../../../dashboard/Renderer/Renderer/Timeseries';
+import GraphStandardOptions from './GraphStandardOptions';
 
 interface IProps {
   metric: string;
@@ -25,6 +26,12 @@ export default function Graph(props: IProps) {
   const [aggrGroups, setAggrGroups] = useState<string[]>([match.dimensionLabel.label]);
   const [labels, setLabels] = useState<string[]>([]);
   const [series, setSeries] = useState<any[]>([]);
+  const [highLevelConfig, setHighLevelConfig] = useState({
+    shared: true,
+    sharedSortDirection: 'desc',
+    legend: true,
+    util: 'none',
+  });
 
   useEffect(() => {
     getLabels(getMatchStr(match), range).then((res) => {
@@ -54,6 +61,17 @@ export default function Graph(props: IProps) {
       title={metric}
       extra={
         <Space>
+          <Popover
+            placement='left'
+            content={<GraphStandardOptions highLevelConfig={highLevelConfig} setHighLevelConfig={setHighLevelConfig} />}
+            trigger='click'
+            autoAdjustOverflow={false}
+            getPopupContainer={() => document.body}
+          >
+            <a>
+              <SettingOutlined />
+            </a>
+          </Popover>
           <a>
             <SyncOutlined
               onClick={() => {
@@ -201,11 +219,14 @@ export default function Graph(props: IProps) {
               },
               options: {
                 legend: {
-                  displayMode: 'list',
+                  displayMode: highLevelConfig.legend ? 'list' : 'hidden',
                 },
                 tooltip: {
-                  mode: 'all',
-                  sort: 'none',
+                  mode: highLevelConfig.shared ? 'all' : 'single',
+                  sort: highLevelConfig.sharedSortDirection,
+                },
+                standardOptions: {
+                  util: highLevelConfig.util,
                 },
               },
             } as any
