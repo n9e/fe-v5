@@ -21,6 +21,7 @@ import { PlusCircleOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import ModalHOC, { ModalWrapProps } from '@/components/ModalHOC';
 import { getLabels, getLabelValues, addMetricView, updateMetricView } from '@/services/metricViews';
 import { Range } from '@/components/DateRangePicker';
+import { getFiltersStr } from './utils';
 
 interface IProps {
   action: 'add' | 'edit';
@@ -37,11 +38,12 @@ function FormCpt(props: ModalWrapProps & IProps) {
   const { action, visible, initialValues, destroy, range, onOk } = props;
   const [form] = Form.useForm();
   const [labels, setLabels] = useState<string[]>([]);
+  const [filteredLabels, setFilteredLabels] = useState<string[]>([]);
   const [previewVisible, setPreviewVisible] = useState(false);
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewData, setPreviewData] = useState([]);
-  const getLablesOptions = () => {
-    return _.map(labels, (label) => {
+  const getLablesOptions = (_labels) => {
+    return _.map(_labels, (label) => {
       return (
         <Select.Option key={label} value={label}>
           {label}
@@ -95,7 +97,19 @@ function FormCpt(props: ModalWrapProps & IProps) {
         });
       }}
     >
-      <Form layout='vertical' initialValues={initialValues} form={form}>
+      <Form
+        layout='vertical'
+        initialValues={initialValues}
+        form={form}
+        onValuesChange={(changedValues, allValues) => {
+          if (changedValues.filters) {
+            const filtersStr = getFiltersStr(allValues.filters);
+            getLabels(`${filtersStr ? `{${filtersStr}}` : ''}`, range).then((res) => {
+              setFilteredLabels(res);
+            });
+          }
+        }}
+      >
         <Form.Item label='视图名称' name='name' rules={[{ required: true }]}>
           <Input />
         </Form.Item>
@@ -117,7 +131,7 @@ function FormCpt(props: ModalWrapProps & IProps) {
                   <Space key={key}>
                     <Form.Item name={[name, 'label']} rules={[{ required: true }]}>
                       <Select allowClear showSearch style={{ width: 170 }}>
-                        {getLablesOptions()}
+                        {getLablesOptions(labels)}
                       </Select>
                     </Form.Item>
                     <Form.Item name={[name, 'oper']} rules={[{ required: true }]}>
@@ -146,12 +160,12 @@ function FormCpt(props: ModalWrapProps & IProps) {
         </Form.List>
         <Form.Item label='动态过滤标签' name='dynamicLabels'>
           <Select allowClear showSearch mode='multiple'>
-            {getLablesOptions()}
+            {getLablesOptions(filteredLabels)}
           </Select>
         </Form.Item>
         <Form.Item label='展开维度标签' name={['dimensionLabel', 'label']} rules={[{ required: true }]}>
           <Select allowClear showSearch>
-            {getLablesOptions()}
+            {getLablesOptions(filteredLabels)}
           </Select>
         </Form.Item>
         <div style={{ textAlign: 'right', marginBottom: 10 }}>

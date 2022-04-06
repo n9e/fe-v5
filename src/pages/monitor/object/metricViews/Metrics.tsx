@@ -99,6 +99,10 @@ export default function Metrics(props: IProps) {
     }
   }, [refreshFlag, matchStr]);
 
+  useEffect(() => {
+    setSelectedMetrics([]);
+  }, [matchStr]);
+
   return (
     <div className='n9e-metric-views-metrics'>
       <div>

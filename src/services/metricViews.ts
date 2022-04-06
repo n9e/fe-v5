@@ -19,10 +19,16 @@ import request from '@/utils/request';
 import { RequestMethod } from '@/store/common';
 import { Range, formatPickerDate } from '@/components/DateRangePicker';
 
-export const getLabelValues = function (label: string, range: Range) {
+export const getLabelValues = function (label: string, range: Range, match?: string) {
+  const params = {
+    ...formatPickerDate(range),
+  };
+  if (match) {
+    params['match[]'] = match;
+  }
   return request(`/api/n9e/prometheus/api/v1/label/${label}/values`, {
     method: RequestMethod.Get,
-    params: formatPickerDate(range),
+    params,
   }).then((res) => {
     return res?.data;
   });
@@ -155,10 +161,9 @@ export const getQueryRange = function (params: {
   });
 };
 
-export const getList = function (range: Range) {
+export const getList = function () {
   return request('/api/n9e/metric-views', {
     method: RequestMethod.Get,
-    params: formatPickerDate(range),
   }).then((res) => {
     return res?.dat;
   });

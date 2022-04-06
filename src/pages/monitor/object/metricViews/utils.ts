@@ -17,19 +17,28 @@
 import _ from 'lodash';
 import { IMatch } from '../types';
 
+
 export function getFiltersStr(filters: IMatch['filters']) {
-  return _.join(_.map(filters, (item) => `${item.label}${item.oper}"${item.value}"`), ',');
+  const arr = _.compact(_.map(filters, (item) => {
+    if (item.label && item.value) {
+      return `${item.label}${item.oper}"${item.value}"`;
+    }
+    return '';
+  }));
+  return _.join(_.compact(arr), ',');
 }
 
-export function getMatchStr(match: IMatch) {
-  const filtersStr = _.map(match.filters, (item) => `${item.label}${item.oper}"${item.value}"`);
-  const dynamicLabelsStr = _.map(match.dynamicLabels, (item) => {
+export function getDynamicLabelsStr(dynamicLabels: IMatch['dynamicLabels']) {
+  const arr= _.map(dynamicLabels, (item) => {
     if (item.value) {
       return `${item.label}=~"${item.value}"`;
     }
     return '';
   });
+  return _.join(_.compact(arr), ',');
+}
+
+export function getMatchStr(match: IMatch) {
   const dimensionLabelStr = match.dimensionLabel.label && !_.isEmpty(match.dimensionLabel.value) ? [`${match.dimensionLabel.label}=~"${_.join(match.dimensionLabel.value, '|')}"`] : '';
-  const matchArr = _.join(_.compact(_.concat(filtersStr, dynamicLabelsStr, dimensionLabelStr)), ',');
-  return matchArr ? `{${matchArr}}` : '';
+  return dimensionLabelStr ? `{${dimensionLabelStr}}` : '';
 }

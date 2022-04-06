@@ -1,7 +1,8 @@
+@margin-base: 10px;
 .page-title {
   &::before {
     width: 4px;
-    height: 16px;
+    height: 14px;
     background-color: @primary-color;
     border-radius: 2px;
     margin-right: 8px;
@@ -9,7 +10,8 @@
     content: ' ';
     display: inline-block;
   }
-  font-size: 16px;
+  font-size: 14px;
+  font-weight: 700;
   display: flex;
   align-items: center;
 }
@@ -19,30 +21,29 @@
   display: flex;
   gap: 10px;
   .mt16 {
-    margin-top: 16px;
+    margin-top: @margin-base;
   }
   .mb16 {
-    margin-bottom: 16px;
+    margin-bottom: @margin-base;
   }
 }
 .n9e-metric-views-list {
   flex: 0 0 240px;
   border-radius: 4px;
-  padding: 16px;
+  padding: @margin-base;
 }
 .n9e-metric-views-list-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: @margin-base;
 }
 .n9e-metric-views-list-content {
-  margin-top: 16px;
+  margin-top: @margin-base;
 }
 .n9e-metric-views-list-content-item {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 8px;
   padding: 8px;
   border-radius: 4px;
   cursor: pointer;
@@ -62,31 +63,31 @@
 .n9e-metric-views-labels-values {
   flex: 0 0 240px;
   border-radius: 4px;
-  padding: 16px;
+  padding: @margin-base;
   overflow-y: auto;
 }
 .n9e-metric-views-filters {
-  margin: 16px 0;
+  margin: @margin-base 0;
   word-break: break-all;
 }
 .n9e-metric-views-dynamicLabels {
-  margin-top: 16px;
+  margin-top: @margin-base;
 }
 .n9e-metric-views-dynamicLabels-item {
-  margin-bottom: 16px;
+  margin-bottom: @margin-base;
 }
 .n9e-metric-views-dynamicLabels-item-label {
   margin-bottom: 8px;
 }
 .n9e-metric-views-dimensionLabel {
-  margin-top: 16px;
+  margin-top: @margin-base;
 }
 .n9e-metric-views-dimensionLabel-content {
-  margin-top: 16px;
+  margin-top: @margin-base;
 }
 .n9e-metric-views-dimensionLabel-content-item {
-  padding: 8px;
-  margin-bottom: 4px;
+  padding: 6px;
+  margin-bottom: 2px;
   border-radius: 4px;
   cursor: pointer;
   &.active {
@@ -97,7 +98,7 @@
   width: calc(~'100% - 500px');
   overflow-y: auto;
   border-radius: 4px;
-  padding: 16px;
+  padding: @margin-base;
 }
 .n9e-metric-views-metrics-content {
   list-style: none;

@@ -37,7 +37,7 @@ export default function List(props: IProps) {
   const [search, setSearch] = useState('');
   const [refreshFlag, setRefreshFlag] = useState(_.uniqueId('refreshFlag_'));
   useEffect(() => {
-    getList(props.range).then((res) => {
+    getList().then((res) => {
       setList(res);
       let curId;
       if (!defaultMetricViewId || !_.find(res, { id: defaultMetricViewId })) {
@@ -108,53 +108,68 @@ export default function List(props: IProps) {
                     onClick={() => {
                       setActive(item.id);
                       localStorage.setItem('metric-view-id', item.id);
+                      const curItem = _.find(list, { id: item.id });
+                      let configs = {} as IMatch;
+                      try {
+                        configs = JSON.parse(curItem.configs);
+                      } catch (e) {
+                        console.error(e);
+                      }
+                      props.onSelect({
+                        ...configs,
+                      });
                     }}
                   >
-                    <span className='name'>{item.name}</span>
-                    <span>
-                      <EditOutlined
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          let configs = {} as IMatch;
-                          try {
-                            configs = JSON.parse(item.configs);
-                            configs.dynamicLabels = _.map(configs.dynamicLabels, 'label');
-                          } catch (e) {
-                            console.error(e);
-                          }
-                          const initialValues = {
-                            id: item.id,
-                            name: item.name,
-                            ...configs,
-                          };
-                          Form({
-                            action: 'edit',
-                            visible: true,
-                            range: props.range,
-                            initialValues,
-                            onOk: () => {
-                              setRefreshFlag(_.uniqueId('refreshFlag_'));
-                            },
-                          });
-                        }}
-                      />
-                      <DeleteOutlined
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          Modal.confirm({
-                            title: '是否要删除？',
-                            onOk: () => {
-                              deleteMetricView({
-                                ids: [item.id],
-                              }).then(() => {
-                                message.success('删除成功');
-                                setRefreshFlag(_.uniqueId('refreshFlag_'));
-                              });
-                            },
-                          });
-                        }}
-                      />
+                    <span className='name'>
+                      {item.cate === 0 ? '[内置]' : ''}
+                      {item.name}
                     </span>
+                    {item.cate === 1 && (
+                      <span>
+                        <EditOutlined
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            let configs = {} as IMatch;
+                            try {
+                              configs = JSON.parse(item.configs);
+                              configs.dynamicLabels = _.map(configs.dynamicLabels, 'label');
+                            } catch (e) {
+                              console.error(e);
+                            }
+                            const initialValues = {
+                              id: item.id,
+                              name: item.name,
+                              ...configs,
+                            };
+                            Form({
+                              action: 'edit',
+                              visible: true,
+                              range: props.range,
+                              initialValues,
+                              onOk: () => {
+                                setRefreshFlag(_.uniqueId('refreshFlag_'));
+                              },
+                            });
+                          }}
+                        />
+                        <DeleteOutlined
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            Modal.confirm({
+                              title: '是否要删除？',
+                              onOk: () => {
+                                deleteMetricView({
+                                  ids: [item.id],
+                                }).then(() => {
+                                  message.success('删除成功');
+                                  setRefreshFlag(_.uniqueId('refreshFlag_'));
+                                });
+                              },
+                            });
+                          }}
+                        />
+                      </span>
+                    )}
                   </div>
                 );
               },

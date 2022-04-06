@@ -22,7 +22,7 @@ import { SearchOutlined } from '@ant-design/icons';
 import { getLabelValues } from '@/services/metricViews';
 import { Range } from '@/components/DateRangePicker';
 import { IMatch } from '../types';
-import { getFiltersStr } from './utils';
+import { getFiltersStr, getDynamicLabelsStr } from './utils';
 
 interface IProps {
   range: Range;
@@ -34,22 +34,43 @@ export default function LabelsValues(props: IProps) {
   const { value, range, onChange } = props;
   const { filters, dynamicLabels, dimensionLabel } = value;
   const [labelValues, setLabelValues] = useState<{ [key: string]: string[] }>({});
+  const [dimensionLabelValues, setDimensionLabelValues] = useState<string[]>([]);
   const [dimensionLabelSearch, setDimensionLabelSearch] = useState('');
   const filtersStr = getFiltersStr(filters);
+  const dynamicLabelsStr = getDynamicLabelsStr(dynamicLabels);
 
   useEffect(() => {
-    const labels = _.compact(_.concat(_.map(dynamicLabels, 'label'), dimensionLabel.label));
-    const _labelValues = {};
-    const request = _.map(labels, (label) => {
-      return getLabelValues(label, range);
+    const dynamicLabelsRequests = _.map(dynamicLabels, (item) => {
+      return getLabelValues(item.label, range, filtersStr ? `{${filtersStr}}` : '');
     });
-    Promise.all(request).then((res) => {
+    Promise.all(dynamicLabelsRequests).then((res) => {
+      const _labelValues = {};
       _.forEach(res, (item, idx) => {
-        _labelValues[labels[idx]] = item;
+        _labelValues[dynamicLabels[idx].label] = item;
       });
-      setLabelValues(_labelValues);
+      setLabelValues({
+        ...labelValues,
+        ..._labelValues,
+      });
     });
-  }, [JSON.stringify(value)]);
+  }, [filtersStr]);
+
+  useEffect(() => {
+    if (!dimensionLabel.label) return;
+    const matchArr = _.join(_.compact(_.concat(filtersStr, dynamicLabelsStr)), ',');
+    getLabelValues(dimensionLabel.label, range, matchArr ? `{${matchArr}}` : '').then((res) => {
+      if (_.isEmpty(dimensionLabel.value)) {
+        onChange({
+          ...value,
+          dimensionLabel: {
+            ...value.dimensionLabel,
+            value: [_.head(res)],
+          },
+        });
+      }
+      setDimensionLabelValues(res);
+    });
+  }, [dynamicLabelsStr, dimensionLabel.label]);
 
   return (
     <div className='n9e-metric-views-labels-values'>
@@ -73,7 +94,7 @@ export default function LabelsValues(props: IProps) {
                     value={item.value}
                     onChange={(val) => {
                       const _dynamicLabels = _.map(dynamicLabels, (obj) => {
-                        if ((item.label = obj.label)) {
+                        if (item.label === obj.label) {
                           return {
                             ...obj,
                             value: val,
@@ -112,12 +133,12 @@ export default function LabelsValues(props: IProps) {
             }}
           />
           <div className='n9e-metric-views-dimensionLabel-content'>
-            {_.isEmpty(labelValues[dimensionLabel.label]) ? (
+            {_.isEmpty(dimensionLabelValues) ? (
               '暂无数据'
             ) : (
               <div>
                 {_.map(
-                  _.filter(labelValues[dimensionLabel.label], (item) => {
+                  _.filter(dimensionLabelValues, (item) => {
                     return item.indexOf(dimensionLabelSearch) > -1;
                   }),
                   (item: string) => {

@@ -26,14 +26,7 @@ import Metrics from './metricViews/Metrics';
 import './style.less';
 
 export default function index() {
-  const [match, setMatch] = useState<IMatch>({
-    filters: [],
-    dynamicLabels: [],
-    dimensionLabel: {
-      label: '',
-      value: [],
-    },
-  });
+  const [match, setMatch] = useState<IMatch>();
   const [range, setRange] = useState<Range>({
     num: 1,
     unit: 'hour',
@@ -49,14 +42,18 @@ export default function index() {
           }}
           range={range}
         />
-        <LabelsValues
-          range={range}
-          value={match}
-          onChange={(val) => {
-            setMatch(val);
-          }}
-        />
-        <Metrics range={range} setRange={setRange} match={match} />
+        {match ? (
+          <>
+            <LabelsValues
+              range={range}
+              value={match}
+              onChange={(val) => {
+                setMatch(val);
+              }}
+            />
+            <Metrics range={range} setRange={setRange} match={match} />
+          </>
+        ) : null}
       </div>
     </PageLayout>
   );
