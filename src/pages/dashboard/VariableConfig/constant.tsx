@@ -141,13 +141,9 @@ export const convertExpressionToQuery = (expression: string, range: Range) => {
     return getLabelNames({ start, end }).then((res) => res.data);
   } else if (expression.startsWith('label_values(')) {
     if (expression.includes(',')) {
-      let i, metric, label;
-      const res = expression.match(/\((.+), (.+?)\)/);
-      if (res && res.length > 2) {
-        [i, metric, label] = res;
-      } else {
-        [metric, label] = expression.substring('label_values('.length, expression.length - 1).split(',');
-      }
+      let metricsAndLabel = expression.substring('label_values('.length, expression.length - 1).split(',');
+      const label = metricsAndLabel.pop();
+      const metric = metricsAndLabel.join(', ');
       return getMetricSeries({ 'match[]': metric.trim(), start, end }).then((res) => Array.from(new Set(res.data.map((item) => item[label.trim()]))));
     } else {
       const label = expression.substring('label_values('.length, expression.length - 1);
