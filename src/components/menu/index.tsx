@@ -65,7 +65,7 @@ const SideMenu: FC = () => {
         },
         {
           key: '/object/explorer',
-          title: t('对象视角'),
+          title: t('快捷视图'),
         },
         {
           key: '/dashboards',
