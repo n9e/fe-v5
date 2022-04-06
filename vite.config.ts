@@ -128,6 +128,7 @@ export default defineConfig({
         additionalData: `@import "/src/global.variable.less";`,
         javascriptEnabled: true,
         modifyVars: {
+          'primary-color': '#1890ff',
           'font-size-base': '12px',
           'color-base': '#333',
           'form-item-margin-bottom': '18px',

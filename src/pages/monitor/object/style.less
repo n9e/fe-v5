@@ -1,0 +1,111 @@
+.page-title {
+  &::before {
+    width: 4px;
+    height: 16px;
+    background-color: @primary-color;
+    border-radius: 2px;
+    margin-right: 8px;
+    opacity: 1;
+    content: ' ';
+    display: inline-block;
+  }
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.n9e-metric-views {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+  .mt16 {
+    margin-top: 16px;
+  }
+  .mb16 {
+    margin-bottom: 16px;
+  }
+}
+.n9e-metric-views-list {
+  flex: 0 0 240px;
+  border-radius: 4px;
+  padding: 16px;
+}
+.n9e-metric-views-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.n9e-metric-views-list-content {
+  margin-top: 16px;
+}
+.n9e-metric-views-list-content-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  .anticon {
+    margin-left: 8px;
+    display: none;
+  }
+  &:hover {
+    .anticon {
+      display: inline;
+    }
+  }
+  &.active {
+    background-color: #f0edf7;
+  }
+}
+.n9e-metric-views-labels-values {
+  flex: 0 0 240px;
+  border-radius: 4px;
+  padding: 16px;
+  overflow-y: auto;
+}
+.n9e-metric-views-filters {
+  margin: 16px 0;
+  word-break: break-all;
+}
+.n9e-metric-views-dynamicLabels {
+  margin-top: 16px;
+}
+.n9e-metric-views-dynamicLabels-item {
+  margin-bottom: 16px;
+}
+.n9e-metric-views-dynamicLabels-item-label {
+  margin-bottom: 8px;
+}
+.n9e-metric-views-dimensionLabel {
+  margin-top: 16px;
+}
+.n9e-metric-views-dimensionLabel-content {
+  margin-top: 16px;
+}
+.n9e-metric-views-dimensionLabel-content-item {
+  padding: 8px;
+  margin-bottom: 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  &.active {
+    background-color: #f0edf7;
+  }
+}
+.n9e-metric-views-metrics {
+  width: calc(~'100% - 500px');
+  overflow-y: auto;
+  border-radius: 4px;
+  padding: 16px;
+}
+.n9e-metric-views-metrics-content {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.n9e-metric-views-metrics-content .item {
+  height: 24px;
+  line-height: 24px;
+  cursor: pointer;
+}
