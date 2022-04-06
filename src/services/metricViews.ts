@@ -122,7 +122,7 @@ export const getQueryRange = function (params: {
       }
     });
   });
-  return Promise.all(requests).then((res) => {
+  return Promise.all(requests).then((res: any) => {
     const series: any[] = [];
     _.forEach(['current', ...comparison], (item, idx) => {
       const dat = res[idx]?.data ? res[idx]?.data : res[idx]; // 处理环比的情况返回结构不一致
