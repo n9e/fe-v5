@@ -12,12 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FOLDER=src/Packages/
-SUBFOLDER=$(ls $FOLDER)
-cd $FOLDER
-for i in $SUBFOLDER; do
-    cd ${i}
-    echo "install npm in ${i}"
-    npm i
-    cd ..
-done
+header:
+  license:
+    spdx-id: Apache-2.0
+    copyright-owner: Nightingale Team
+
+  paths-ignore:
+    - 'dist'
+    - 'licenses'
+    - '**/*.md'
+    - '**/*.less'
+    - '**/*.jsx'
+    - '**/*.json'
+    - 'LICENSE'
+    - 'NOTICE'
+    - '.gitignore'
+    - '.github'
+    - '.git'
+    - '.husky'
+    - '.prettierignore'
+
+  comment: on-failure
