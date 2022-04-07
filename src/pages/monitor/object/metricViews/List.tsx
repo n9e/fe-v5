@@ -138,6 +138,7 @@ export default function List(props: IProps) {
                             try {
                               configs = JSON.parse(item.configs);
                               configs.dynamicLabels = _.map(configs.dynamicLabels, 'label');
+                              configs.dimensionLabels = _.map(configs.dimensionLabels, 'label');
                             } catch (e) {
                               console.error(e);
                             }

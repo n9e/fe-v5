@@ -32,9 +32,9 @@ interface IProps {
 
 export default function LabelsValues(props: IProps) {
   const { value, range, onChange } = props;
-  const { id, filters, dynamicLabels, dimensionLabel } = value;
+  const { id, filters, dynamicLabels, dimensionLabels } = value;
   const [labelValues, setLabelValues] = useState<{ [key: string]: string[] }>({});
-  const [dimensionLabelValues, setDimensionLabelValues] = useState<string[]>([]);
+  const [dimensionLabelsValues, setDimensionLabelsValues] = useState<{ [key: string]: string[] }>({});
   const [dimensionLabelSearch, setDimensionLabelSearch] = useState('');
   const filtersStr = getFiltersStr(filters);
   const dynamicLabelsStr = getDynamicLabelsStr(dynamicLabels);
@@ -48,29 +48,34 @@ export default function LabelsValues(props: IProps) {
       _.forEach(res, (item, idx) => {
         _labelValues[dynamicLabels[idx].label] = item;
       });
-      setLabelValues({
-        ...labelValues,
-        ..._labelValues,
-      });
+      setLabelValues(_labelValues);
     });
   }, [filtersStr]);
 
   useEffect(() => {
-    if (!dimensionLabel.label) return;
     const matchStr = _.join(_.compact(_.concat(filtersStr, dynamicLabelsStr)), ',');
-    getLabelValues(dimensionLabel.label, range, matchStr ? `{${matchStr}}` : '').then((res) => {
-      if (_.isEmpty(dimensionLabel.value)) {
+    const dimensionLabelsRequests = _.map(dimensionLabels, (item) => {
+      return getLabelValues(item.label, range, matchStr ? `{${matchStr}}` : '');
+    });
+    Promise.all(dimensionLabelsRequests).then((res) => {
+      const _labelValues = {};
+      _.forEach(res, (item, idx) => {
+        _labelValues[dimensionLabels[idx].label] = item;
+      });
+      setDimensionLabelsValues(_labelValues);
+      if (_.every(dimensionLabels, (item) => _.isEmpty(item.value))) {
         onChange({
           ...value,
-          dimensionLabel: {
-            ...value.dimensionLabel,
-            value: [_.head(res)],
-          },
+          dimensionLabels: _.map(dimensionLabels, (item) => {
+            return {
+              label: item.label,
+              value: [_.head(_labelValues[item.label])],
+            };
+          }),
         });
       }
-      setDimensionLabelValues(res);
     });
-  }, [filtersStr, dynamicLabelsStr, dimensionLabel.label, id]);
+  }, [filtersStr, dynamicLabelsStr, id]);
 
   return (
     <div className='n9e-metric-views-labels-values'>
@@ -125,91 +130,91 @@ export default function LabelsValues(props: IProps) {
         </div>
       </div>
       <div>
-        <div className='page-title' style={{ marginTop: 20 }}>
-          <div
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              width: 200,
-            }}
-          >
-            <div>展开维度标签：</div>
-            <Tooltip title={dimensionLabel.label}>
-              <div
-                style={{
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  maxWidth: '100%',
-                }}
-              >
-                {dimensionLabel.label}
+        {_.map(dimensionLabels, (dimensionLabel) => {
+          const dimensionLabelValues = dimensionLabelsValues[dimensionLabel.label];
+          return (
+            <div key={dimensionLabel.label}>
+              <div className='page-title' style={{ marginTop: 20 }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    width: 200,
+                  }}
+                >
+                  <Tooltip title={dimensionLabel.label}>
+                    <div
+                      style={{
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        maxWidth: '100%',
+                      }}
+                    >
+                      {dimensionLabel.label}
+                    </div>
+                  </Tooltip>
+                </div>
               </div>
-            </Tooltip>
-          </div>
-        </div>
-        <div className='n9e-metric-views-dimensionLabel'>
-          <Input
-            prefix={<SearchOutlined />}
-            value={dimensionLabelSearch}
-            onChange={(e) => {
-              setDimensionLabelSearch(e.target.value);
-            }}
-          />
-          <div className='n9e-metric-views-dimensionLabel-content'>
-            {_.isEmpty(dimensionLabelValues) ? (
-              '暂无数据'
-            ) : (
-              <div>
-                {_.map(
-                  _.filter(dimensionLabelValues, (item) => {
-                    let result = true;
-                    if (dimensionLabelSearch) {
-                      try {
-                        const reg = new RegExp(dimensionLabelSearch, 'gi');
-                        result = reg.test(item);
-                      } catch (e) {
-                        console.log(e);
-                      }
-                    }
-                    return result;
-                  }),
-                  (item: string) => {
-                    return (
-                      <div
-                        key={item}
-                        className={classNames({
-                          'n9e-metric-views-dimensionLabel-content-item': true,
-                          active: _.includes(dimensionLabel.value, item),
-                        })}
-                        onClick={() => {
-                          if (_.includes(dimensionLabel.value, item)) {
-                            onChange({
-                              ...value,
-                              dimensionLabel: {
-                                ...value.dimensionLabel,
-                                value: _.without(dimensionLabel.value, item),
-                              },
-                            });
-                          } else {
-                            onChange({
-                              ...value,
-                              dimensionLabel: {
-                                ...value.dimensionLabel,
-                                value: _.compact(_.concat(dimensionLabel.value, item)),
-                              },
-                            });
+              <div className='n9e-metric-views-dimensionLabel'>
+                <Input
+                  prefix={<SearchOutlined />}
+                  value={dimensionLabelSearch}
+                  onChange={(e) => {
+                    setDimensionLabelSearch(e.target.value);
+                  }}
+                />
+                <div className='n9e-metric-views-dimensionLabel-content'>
+                  {_.isEmpty(dimensionLabelValues) ? (
+                    '暂无数据'
+                  ) : (
+                    <div>
+                      {_.map(
+                        _.filter(dimensionLabelValues, (item) => {
+                          let result = true;
+                          if (dimensionLabelSearch) {
+                            try {
+                              const reg = new RegExp(dimensionLabelSearch, 'gi');
+                              result = reg.test(item);
+                            } catch (e) {
+                              console.log(e);
+                            }
                           }
-                        }}
-                      >
-                        {item}
-                      </div>
-                    );
-                  },
-                )}
+                          return result;
+                        }),
+                        (item: string) => {
+                          return (
+                            <div
+                              key={item}
+                              className={classNames({
+                                'n9e-metric-views-dimensionLabel-content-item': true,
+                                active: _.includes(dimensionLabel.value, item),
+                              })}
+                              onClick={() => {
+                                const dimensionLabelsClone = _.cloneDeep(dimensionLabels);
+                                const currentDimensionLabel = _.find(dimensionLabelsClone, { label: dimensionLabel.label });
+                                if (_.includes(dimensionLabel.value, item)) {
+                                  currentDimensionLabel.value = _.without(dimensionLabel.value, item);
+                                } else {
+                                  currentDimensionLabel.value = _.concat(dimensionLabel.value, item);
+                                }
+                                onChange({
+                                  ...value,
+                                  dimensionLabels: dimensionLabelsClone,
+                                });
+                              }}
+                            >
+                              {item}
+                            </div>
+                          );
+                        },
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
-            )}
-          </div>
-        </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

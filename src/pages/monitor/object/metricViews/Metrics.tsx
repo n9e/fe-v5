@@ -111,6 +111,7 @@ export default function Metrics(props: IProps) {
   useEffect(() => {
     setSelectedMetrics([]);
     setActiveKey('all');
+    setMetrics([]);
   }, [match.id]);
 
   return (
