@@ -89,7 +89,7 @@ export default function Graph(props: IProps) {
     }).then((res) => {
       setSeries(res);
     });
-  }, [refreshFlag, metric, JSON.stringify(match), JSON.stringify(range), calcFunc, comparison, aggrFunc, aggrGroups]);
+  }, [refreshFlag, metric, JSON.stringify(match), JSON.stringify(range), step, calcFunc, comparison, aggrFunc, aggrGroups]);
 
   return (
     <Card
