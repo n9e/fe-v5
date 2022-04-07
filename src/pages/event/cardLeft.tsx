@@ -37,7 +37,7 @@ export default function CardLeft(props: Props) {
   }, [activeId]);
 
   const getList = (selectTheFirst = false) => {
-    getAggrAlerts().then((res) => {
+    return getAggrAlerts().then((res) => {
       const sortedList = res.dat.sort((a: CardAlertType, b: CardAlertType) => a.cate - b.cate);
       setAlertList(sortedList);
       selectTheFirst && sortedList.length > 0 && setActiveId(sortedList[0].id);
@@ -49,12 +49,13 @@ export default function CardLeft(props: Props) {
     const func = editForm ? updateAggrAlerts : AddAggrAlerts;
     const cur = await func(form.getFieldsValue());
     setVisible(false);
-    getList();
-    setActiveId(cur.dat.id);
+    await getList();
+    setActiveId(editForm ? editForm.id : cur.dat.id);
   };
 
   const handleCancel = () => {
     setVisible(false);
+    setEditForm(undefined);
   };
 
   const handleDelete = (alert) => {
@@ -111,8 +112,8 @@ export default function CardLeft(props: Props) {
           </div>
         ))}
 
-      <Modal title={(editForm ? '编辑' : '新增') + '聚合规则'} visible={visible} onOk={handleOk} onCancel={handleCancel}>
-        <Form form={form} layout='vertical'>
+      <Modal title={(editForm ? '编辑' : '新增') + '聚合规则'} visible={visible} onOk={handleOk} onCancel={handleCancel} destroyOnClose>
+        <Form form={form} layout='vertical' preserve={false}>
           <Form.Item
             label='Name'
             name='name'

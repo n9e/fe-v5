@@ -175,7 +175,7 @@ function Card(props: Props, ref) {
       <CardLeft onRefreshRule={setRule} />
       <div style={{ background: '#fff', flex: 1, padding: 16 }}>
         {header}
-        <Row gutter={16} style={{ marginTop: 16 }}>
+        <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
           {cardList?.map((card, i) => (
             <Col span={span} key={i}>
               <div className={`event-card ${SeverityColor[card.severity - 1]}`} onClick={() => fetchCardDetail(card)}>
@@ -192,7 +192,6 @@ function Card(props: Props, ref) {
             <span>{openedCard?.title}</span>
             <Button
               danger
-              size='small'
               style={{ marginRight: 20 }}
               disabled={selectedRowKeys.length === 0}
               onClick={() =>
