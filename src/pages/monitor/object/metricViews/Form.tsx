@@ -16,7 +16,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import _ from 'lodash';
-import { Modal, Form, Input, Space, Button, Table, Select, message } from 'antd';
+import { Modal, Form, Input, Space, Button, Table, Select, Tooltip, message } from 'antd';
 import { PlusCircleOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import ModalHOC, { ModalWrapProps } from '@/components/ModalHOC';
 import { getLabels, getLabelValues, addMetricView, updateMetricView } from '@/services/metricViews';
@@ -55,6 +55,7 @@ function FormCpt(props: ModalWrapProps & IProps) {
   useEffect(() => {
     getLabels('', range).then((res) => {
       setLabels(res);
+      setFilteredLabels(res);
     });
   }, [JSON.stringify(range)]);
 
@@ -174,9 +175,10 @@ function FormCpt(props: ModalWrapProps & IProps) {
               const values = form.getFieldsValue();
               setPreviewVisible(true);
               setPreviewLoading(true);
+              const filtersStr = getFiltersStr(values.filters);
               const _labels = _.compact(_.concat(values.dynamicLabels, values.dimensionLabel?.label));
               const requests = _.map(_labels, (item) => {
-                return getLabelValues(item, range);
+                return getLabelValues(item, range, filtersStr ? `{${filtersStr}}` : '');
               });
               Promise.all(requests).then((res) => {
                 const data = _.map(_labels, (item, idx) => {
@@ -213,7 +215,18 @@ function FormCpt(props: ModalWrapProps & IProps) {
                 title: 'Lable Value 样例',
                 dataIndex: 'values',
                 render: (text) => {
-                  return _.head(text);
+                  return (
+                    <Tooltip
+                      placement='right'
+                      title={
+                        <div>
+                          {_.map(text, (item) => {
+                            return <div key={item}>{item}</div>;
+                          })}
+                        </div>
+                      }
+                    >{`${_.head(text)}...`}</Tooltip>
+                  );
                 },
               },
             ]}

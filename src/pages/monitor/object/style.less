@@ -1,15 +1,5 @@
 @margin-base: 10px;
 .page-title {
-  &::before {
-    width: 4px;
-    height: 14px;
-    background-color: @primary-color;
-    border-radius: 2px;
-    margin-right: 8px;
-    opacity: 1;
-    content: ' ';
-    display: inline-block;
-  }
   font-size: 14px;
   font-weight: 700;
   display: flex;
@@ -29,7 +19,6 @@
 }
 .n9e-metric-views-list {
   flex: 0 0 240px;
-  border-radius: 4px;
   padding: @margin-base;
 }
 .n9e-metric-views-list-header {
@@ -45,7 +34,6 @@
   display: flex;
   justify-content: space-between;
   padding: 8px;
-  border-radius: 4px;
   cursor: pointer;
   .anticon {
     margin-left: 8px;
@@ -57,12 +45,11 @@
     }
   }
   &.active {
-    background-color: #f0edf7;
+    background-color: #d4ecf9;
   }
 }
 .n9e-metric-views-labels-values {
   flex: 0 0 240px;
-  border-radius: 4px;
   padding: @margin-base;
   overflow-y: auto;
 }
@@ -88,25 +75,45 @@
 .n9e-metric-views-dimensionLabel-content-item {
   padding: 6px;
   margin-bottom: 2px;
-  border-radius: 4px;
   cursor: pointer;
   &.active {
-    background-color: #f0edf7;
+    background-color: #d4ecf9;
   }
 }
 .n9e-metric-views-metrics {
   width: calc(~'100% - 500px');
   overflow-y: auto;
-  border-radius: 4px;
   padding: @margin-base;
+  .ant-tabs-large > .ant-tabs-nav .ant-tabs-tab {
+    font-size: 12px;
+    padding: 10px 0;
+  }
+  .ant-tabs-tab + .ant-tabs-tab {
+    margin-left: 20px;
+  }
+}
+.n9e-metric-views-metrics-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  .ant-input-group-wrapper {
+    width: 50%;
+  }
 }
 .n9e-metric-views-metrics-content {
   list-style: none;
   margin: 0;
   padding: 0;
-}
-.n9e-metric-views-metrics-content .item {
-  height: 24px;
-  line-height: 24px;
-  cursor: pointer;
+  overflow: hidden;
+  .item {
+    height: 24px;
+    line-height: 24px;
+    cursor: pointer;
+    display: flex;
+  }
+  .desc {
+    padding-left: 20px;
+    color: #999;
+    white-space: nowrap;
+  }
 }

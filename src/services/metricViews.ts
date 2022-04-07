@@ -125,8 +125,6 @@ export const getQueryRange = function (params: {
   let { start, end } = formatPickerDate(range);
   let _step = step;
   if (!step) _step = Math.max(Math.floor((end - start) / 250), 1);
-  const calcArr = _.split(calcFunc, '_');
-  const isAggr = aggrGroups.length > 0;
   const exprs = getExprs({
     metric,
     match,
@@ -151,6 +149,7 @@ export const getQueryRange = function (params: {
       const data = dat.result || [];
       _.forEach(data, (subItem) => {
         series.push({
+          metric: subItem.metric,
           name: `${getSerieName(subItem.metric)}${item !== 'current' ? ` offset ${item}` : ''}`,
           id: _.uniqueId('series_'),
           data: subItem.values,
@@ -200,5 +199,14 @@ export const setTmpChartData = function (data: { configs: string }[]) {
   return request(`/api/n9e/share-charts`, {
     method: RequestMethod.Post,
     data,
+  });
+};
+
+export const getMetricsDesc = function (data) {
+  return request('/api/n9e/metrics/desc', {
+    method: RequestMethod.Post,
+    data,
+  }).then((res) => {
+    return res?.dat;
   });
 };

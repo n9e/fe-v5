@@ -86,6 +86,7 @@ export const getLegendValues = (series: any[], { util, decimals }) => {
     return {
       id: serie.id,
       name: serie.name,
+      metric: serie.metric,
       max: valueFormatter({ util, decimals }, results.max),
       min: valueFormatter({ util, decimals }, results.min),
       avg: valueFormatter({ util, decimals }, results.avg),

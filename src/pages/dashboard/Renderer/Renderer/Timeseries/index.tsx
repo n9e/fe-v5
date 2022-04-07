@@ -163,11 +163,29 @@ export default function index(props: IProps) {
               ellipsis: {
                 showTitle: false,
               },
-              render: (text) => (
-                <Tooltip placement='topLeft' title={text} getTooltipContainer={() => document.body}>
-                  {text}
-                </Tooltip>
-              ),
+              render: (text, record: any) => {
+                console.log(record);
+                return (
+                  <Tooltip
+                    placement='topLeft'
+                    title={
+                      <div>
+                        <div>{_.get(record, 'metric.__name__')}</div>
+                        {_.map(_.omit(record.metric, '__name__'), (val, key) => {
+                          return (
+                            <div>
+                              {key}={val}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    }
+                    getTooltipContainer={() => document.body}
+                  >
+                    {text}
+                  </Tooltip>
+                );
+              },
             },
             {
               title: 'Max',

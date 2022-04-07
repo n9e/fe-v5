@@ -20,7 +20,7 @@ import { Card, Space, Dropdown, Menu, Tag, Popover } from 'antd';
 import { ShareAltOutlined, SyncOutlined, CloseCircleOutlined, DownOutlined, PlusCircleOutlined, SettingOutlined } from '@ant-design/icons';
 import { Range } from '@/components/DateRangePicker';
 import { getLabels, getQueryRange, getExprs, setTmpChartData } from '@/services/metricViews';
-import { getMatchStr } from './utils';
+import { getMatchStr, getFiltersStr, getDynamicLabelsStr } from './utils';
 import { IMatch } from '../types';
 import Timeseries from '../../../dashboard/Renderer/Renderer/Timeseries';
 import GraphStandardOptions from './GraphStandardOptions';
@@ -70,7 +70,8 @@ export default function Graph(props: IProps) {
   };
 
   useEffect(() => {
-    getLabels(getMatchStr(match), range).then((res) => {
+    const matchStr = getMatchStr(match);
+    getLabels(`${metric}${matchStr}`, range).then((res) => {
       setLabels(res);
     });
   }, [refreshFlag, JSON.stringify(match), JSON.stringify(range)]);

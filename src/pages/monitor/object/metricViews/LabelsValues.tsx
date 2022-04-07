@@ -32,7 +32,7 @@ interface IProps {
 
 export default function LabelsValues(props: IProps) {
   const { value, range, onChange } = props;
-  const { filters, dynamicLabels, dimensionLabel } = value;
+  const { id, filters, dynamicLabels, dimensionLabel } = value;
   const [labelValues, setLabelValues] = useState<{ [key: string]: string[] }>({});
   const [dimensionLabelValues, setDimensionLabelValues] = useState<string[]>([]);
   const [dimensionLabelSearch, setDimensionLabelSearch] = useState('');
@@ -57,8 +57,8 @@ export default function LabelsValues(props: IProps) {
 
   useEffect(() => {
     if (!dimensionLabel.label) return;
-    const matchArr = _.join(_.compact(_.concat(filtersStr, dynamicLabelsStr)), ',');
-    getLabelValues(dimensionLabel.label, range, matchArr ? `{${matchArr}}` : '').then((res) => {
+    const matchStr = _.join(_.compact(_.concat(filtersStr, dynamicLabelsStr)), ',');
+    getLabelValues(dimensionLabel.label, range, matchStr ? `{${matchStr}}` : '').then((res) => {
       if (_.isEmpty(dimensionLabel.value)) {
         onChange({
           ...value,
@@ -70,7 +70,7 @@ export default function LabelsValues(props: IProps) {
       }
       setDimensionLabelValues(res);
     });
-  }, [dynamicLabelsStr, dimensionLabel.label]);
+  }, [filtersStr, dynamicLabelsStr, dimensionLabel.label, id]);
 
   return (
     <div className='n9e-metric-views-labels-values'>
@@ -139,7 +139,16 @@ export default function LabelsValues(props: IProps) {
               <div>
                 {_.map(
                   _.filter(dimensionLabelValues, (item) => {
-                    return item.indexOf(dimensionLabelSearch) > -1;
+                    let result = true;
+                    if (dimensionLabelSearch) {
+                      try {
+                        const reg = new RegExp(dimensionLabelSearch, 'gi');
+                        result = reg.test(item);
+                      } catch (e) {
+                        console.log(e);
+                      }
+                    }
+                    return result;
                   }),
                   (item: string) => {
                     return (

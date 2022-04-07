@@ -16,13 +16,13 @@
  */
 import React, { useState, useEffect } from 'react';
 import _ from 'lodash';
-import { Input, Card, Row, Col, Space, Button } from 'antd';
+import { Input, Card, Row, Col, Space, Button, Tooltip } from 'antd';
 import { SearchOutlined, SyncOutlined } from '@ant-design/icons';
-import DateRangePicker, { formatPickerDate } from '@/components/DateRangePicker';
+import DateRangePicker from '@/components/DateRangePicker';
 import Graph from './Graph';
 import Resolution from '@/components/Resolution';
 import { Range } from '@/components/DateRangePicker';
-import { getMetricValues } from '@/services/metricViews';
+import { getMetricValues, getMetricsDesc } from '@/services/metricViews';
 import { IMatch } from '../types';
 import { getMatchStr } from './utils';
 
@@ -37,6 +37,7 @@ export default function Metrics(props: IProps) {
   const [refreshFlag, setRefreshFlag] = useState(_.uniqueId('refreshFlag_'));
   const [search, setSearch] = useState('');
   const [metrics, setMetrics] = useState([]);
+  const [metricsDesc, setMetricsDesc] = useState({});
   const [activeKey, setActiveKey] = useState('all');
   const [metricPrefixes, setMetricPrefixes] = useState([]);
   const [selectedMetrics, setSelectedMetrics] = useState([]);
@@ -48,7 +49,7 @@ export default function Metrics(props: IProps) {
       flag = metricTabKey === 'all' ? true : metric.indexOf(metricTabKey) === 0;
       if (flag && search) {
         try {
-          const reg = new RegExp(search, 'i');
+          const reg = new RegExp(search, 'gi');
           flag = reg.test(metric);
         } catch (e) {
           flag = false;
@@ -66,11 +67,16 @@ export default function Metrics(props: IProps) {
                   className='item'
                   key={i}
                   onClick={() => {
-                    setSelectedMetrics(_.union(_.concat(selectedMetrics, metric)));
+                    setSelectedMetrics(_.union(_.concat(metric, selectedMetrics)));
                   }}
                 >
                   <span>{metric}</span>
                   {_.find(selectedMetrics, (sm) => sm === metric) ? <span style={{ marginLeft: 8 }}>+1</span> : null}
+                  {metricsDesc[metric] ? (
+                    <Tooltip title={metricsDesc[metric]}>
+                      <span className='desc'>{metricsDesc[metric]}</span>
+                    </Tooltip>
+                  ) : null}
                 </li>
               );
             })}
@@ -95,6 +101,9 @@ export default function Metrics(props: IProps) {
         );
         setMetrics(_metrics);
         setMetricPrefixes(metricPrefixes);
+        getMetricsDesc(_metrics).then((res) => {
+          setMetricsDesc(res);
+        });
       });
     }
   }, [refreshFlag, matchStr]);
@@ -106,28 +115,28 @@ export default function Metrics(props: IProps) {
   return (
     <div className='n9e-metric-views-metrics'>
       <div>
-        <div className='page-title'>监控指标</div>
+        <div className='n9e-metric-views-metrics-header'>
+          <div className='page-title'>监控指标</div>
+          <Input
+            prefix={<SearchOutlined />}
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+            }}
+            placeholder='搜索，空格分隔多个关键字'
+            addonAfter={
+              <SyncOutlined
+                style={{ cursor: 'pointer' }}
+                onClick={() => {
+                  setRefreshFlag(_.uniqueId('refreshFlag_'));
+                }}
+              />
+            }
+          />
+        </div>
         <div>
           {metrics.length > 0 ? (
             <>
-              <div className='mt16 mb16'>
-                <Input
-                  prefix={<SearchOutlined />}
-                  value={search}
-                  onChange={(e) => {
-                    setSearch(e.target.value);
-                  }}
-                  placeholder='搜索，空格分隔多个关键字'
-                  addonAfter={
-                    <SyncOutlined
-                      style={{ cursor: 'pointer' }}
-                      onClick={() => {
-                        setRefreshFlag(_.uniqueId('refreshFlag_'));
-                      }}
-                    />
-                  }
-                />
-              </div>
               <Card
                 size='small'
                 style={{ width: '100%' }}

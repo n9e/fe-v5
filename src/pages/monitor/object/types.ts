@@ -15,6 +15,7 @@
  *
  */
 export interface IMatch {
+  id: number;
   filters: {
     label: string;
     oper: '=' | '=~';

@@ -17,7 +17,7 @@
 import React, { useEffect, useState } from 'react';
 import _ from 'lodash';
 import classNames from 'classnames';
-import { Input, message, Modal } from 'antd';
+import { Input, message, Modal, Tag } from 'antd';
 import { PlusSquareOutlined, SearchOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { getList, deleteMetricView } from '@/services/metricViews';
 import { Range } from '@/components/DateRangePicker';
@@ -29,14 +29,13 @@ interface IProps {
   onSelect: (item: IMatch) => void;
 }
 
-const defaultMetricViewId = localStorage.getItem('metric-view-id') !== null ? Number(localStorage.getItem('metric-view-id')) : null;
-
 export default function List(props: IProps) {
   const [list, setList] = useState([]);
   const [active, setActive] = useState<number>();
   const [search, setSearch] = useState('');
   const [refreshFlag, setRefreshFlag] = useState(_.uniqueId('refreshFlag_'));
   useEffect(() => {
+    const defaultMetricViewId = localStorage.getItem('metric-view-id') !== null ? Number(localStorage.getItem('metric-view-id')) : null;
     getList().then((res) => {
       setList(res);
       let curId;
@@ -51,6 +50,7 @@ export default function List(props: IProps) {
         let configs = {} as IMatch;
         try {
           configs = JSON.parse(curItem.configs);
+          configs.id = curId;
         } catch (e) {
           console.error(e);
         }
@@ -93,7 +93,14 @@ export default function List(props: IProps) {
           : _.map(
               _.filter(list, (item) => {
                 if (search) {
-                  return item.name.indexOf(search) > 0;
+                  let result = true;
+                  try {
+                    const reg = new RegExp(search, 'gi');
+                    result = reg.test(item.name);
+                  } catch (e) {
+                    console.log(e);
+                  }
+                  return result;
                 }
                 return true;
               }),
@@ -112,6 +119,7 @@ export default function List(props: IProps) {
                       let configs = {} as IMatch;
                       try {
                         configs = JSON.parse(curItem.configs);
+                        configs.id = item.id;
                       } catch (e) {
                         console.error(e);
                       }
@@ -120,16 +128,13 @@ export default function List(props: IProps) {
                       });
                     }}
                   >
-                    <span className='name'>
-                      {item.cate === 0 ? '[内置]' : ''}
-                      {item.name}
-                    </span>
-                    {item.cate === 1 && (
+                    <span className='name'>{item.name}</span>
+                    {item.cate === 1 ? (
                       <span>
                         <EditOutlined
                           onClick={(e) => {
                             e.stopPropagation();
-                            let configs = {} as IMatch;
+                            let configs = {} as any;
                             try {
                               configs = JSON.parse(item.configs);
                               configs.dynamicLabels = _.map(configs.dynamicLabels, 'label');
@@ -169,6 +174,8 @@ export default function List(props: IProps) {
                           }}
                         />
                       </span>
+                    ) : (
+                      <span style={{ color: '#ccc' }}>内置</span>
                     )}
                   </div>
                 );

@@ -31,7 +31,7 @@ export function getFiltersStr(filters: IMatch['filters']) {
 export function getDynamicLabelsStr(dynamicLabels: IMatch['dynamicLabels']) {
   const arr= _.map(dynamicLabels, (item) => {
     if (item.value) {
-      return `${item.label}=~"${item.value}"`;
+      return `${item.label}="${item.value}"`;
     }
     return '';
   });
