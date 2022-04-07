@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { SketchPicker } from 'react-color';
 import { Popover } from 'antd';
 import useOnClickOutside from '@/components/useOnClickOutside';
+import './style.less';
 
 interface IProps {
   value?: string;
@@ -22,6 +23,7 @@ export default function index(props: IProps) {
       trigger='click'
       placement='left'
       visible={visible}
+      overlayClassName='color-picker-popover'
       content={
         <div
           ref={eleRef}
@@ -39,7 +41,6 @@ export default function index(props: IProps) {
           />
         </div>
       }
-      title='Title'
     >
       <div
         style={{ background: value, width: 32, height: 32, borderRadius: 2, cursor: 'pointer' }}
