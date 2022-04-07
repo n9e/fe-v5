@@ -79,10 +79,12 @@ export default function LabelsValues(props: IProps) {
         <div className='n9e-metric-views-filters'>{filtersStr ? filtersStr : '暂无数据'}</div>
       </div>
       <div>
-        <div className='page-title'>动态过滤条件</div>
+        <div className='page-title' style={{ marginTop: 20 }}>
+          动态过滤条件
+        </div>
         <div className='n9e-metric-views-dynamicLabels'>
           {_.isEmpty(dynamicLabels) ? (
-            <div style={{ marginBottom: 18 }}>暂无数据</div>
+            <div style={{ marginBottom: 10 }}>暂无数据</div>
           ) : (
             _.map(dynamicLabels, (item) => {
               return (
@@ -123,7 +125,9 @@ export default function LabelsValues(props: IProps) {
         </div>
       </div>
       <div>
-        <div className='page-title'>展开维度标签：{dimensionLabel.label}</div>
+        <div className='page-title' style={{ marginTop: 20 }}>
+          展开维度标签：{dimensionLabel.label}
+        </div>
         <div className='n9e-metric-views-dimensionLabel'>
           <Input
             prefix={<SearchOutlined />}
