@@ -48,24 +48,6 @@ interface Props {
   onSubmit: Function;
 }
 
-const columns = [
-  {
-    title: '规则',
-    dataIndex: 'name',
-  },
-  {
-    title: '导入结果',
-    dataIndex: 'isTrue',
-    render: (data) => {
-      return data ? <CheckCircleOutlined style={{ color: '#389e0d', fontSize: '18px' }} /> : <CloseCircleOutlined style={{ color: '#d4380d', fontSize: '18px' }} />;
-    },
-  },
-  {
-    title: '错误消息',
-    dataIndex: 'msg',
-  },
-];
-
 export default function ImportAndDownloadModal(props: Props) {
   const { t } = useTranslation();
   const exportTextRef = useRef(null as any);
@@ -74,9 +56,26 @@ export default function ImportAndDownloadModal(props: Props) {
   const { clusters: clusterList } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const [buildinList, setBuildinList] = useState<{ name: string }[]>([]);
   const [importResult, setImportResult] = useState<{ name: string; isTrue: boolean; msg: string }[]>();
+  const columns = [
+    {
+      title: label,
+      dataIndex: 'name',
+    },
+    {
+      title: '导入结果',
+      dataIndex: 'isTrue',
+      render: (data) => {
+        return data ? <CheckCircleOutlined style={{ color: '#389e0d', fontSize: '18px' }} /> : <CloseCircleOutlined style={{ color: '#d4380d', fontSize: '18px' }} />;
+      },
+    },
+    {
+      title: '错误消息',
+      dataIndex: 'msg',
+    },
+  ];
   const builtinColumn = [
     {
-      title: '规则名称',
+      title: `${label}名称`,
       dataIndex: 'name',
     },
     {
@@ -219,31 +218,49 @@ export default function ImportAndDownloadModal(props: Props) {
             return (
               <>
                 <Form form={form} preserve={false} layout='vertical'>
-                  <Form.Item
-                    label={t('生效集群：')}
-                    name='cluster'
-                    initialValue={clusterList[0] || 'Default'}
-                    rules={[
-                      {
-                        required: true,
-                        message: t('生效集群不能为空'),
-                      },
-                    ]}
-                  >
-                    <Select>
-                      {clusterList?.map((item) => (
-                        <Option value={item} key={item}>
-                          {item}
-                        </Option>
-                      ))}
-                    </Select>
-                  </Form.Item>
+                  {crossCluster && (
+                    <Form.Item
+                      label={t('生效集群：')}
+                      name='cluster'
+                      initialValue={clusterList[0] || 'Default'}
+                      rules={[
+                        {
+                          required: true,
+                          message: t('生效集群不能为空'),
+                        },
+                      ]}
+                    >
+                      <Select>
+                        {clusterList?.map((item) => (
+                          <Option value={item} key={item}>
+                            {item}
+                          </Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+                  )}
                 </Form>
-                <Table className='samll_table' dataSource={buildinList} columns={builtinColumn} pagination={false} size='small' />
+                <Table
+                  className='samll_table'
+                  dataSource={buildinList}
+                  columns={builtinColumn}
+                  pagination={{
+                    defaultPageSize: 5,
+                  }}
+                  size='small'
+                />
                 {importResult && (
                   <>
                     <Divider />
-                    <Table className='samll_table' dataSource={importResult} columns={columns} pagination={false} size='small' />
+                    <Table
+                      className='samll_table'
+                      dataSource={importResult}
+                      columns={columns}
+                      pagination={{
+                        defaultPageSize: 5,
+                      }}
+                      size='small'
+                    />
                   </>
                 )}
               </>

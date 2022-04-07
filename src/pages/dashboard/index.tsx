@@ -253,54 +253,67 @@ export default function Dashboard() {
                   {t('新建大盘')}
                 </Button>
                 <div className={'table-more-options'}>
-                  <Button.Group>
-                    <Button size='middle' type='default' icon={<DownloadOutlined />} onClick={() => setModalType(ModalStatus.BuiltIn)}>
-                      {t('导入')}
-                    </Button>
-                    <Button
-                      size='middle'
-                      type='default'
-                      icon={<UploadOutlined />}
-                      onClick={async () => {
-                        if (selectRowKeys.length) {
-                          let exportData = await exportDashboard(busiId as number, selectRowKeys);
-                          setExportData(JSON.stringify(exportData.dat, null, 2));
-                          setModalType(ModalStatus.Export);
-                        } else {
-                          message.warning(t('未选择任何大盘'));
-                        }
-                      }}
-                    >
-                      {t('导出')}
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        if (selectRowKeys.length) {
-                          confirm({
-                            title: '是否批量删除大盘?',
-                            onOk: async () => {
-                              const reuqests = selectRowKeys.map((id) => {
-                                console.log(id);
-                                return removeDashboard(busiId as number, id);
+                  <Dropdown
+                    overlay={
+                      <ul className='ant-dropdown-menu'>
+                        <li className='ant-dropdown-menu-item' onClick={() => setModalType(ModalStatus.BuiltIn)}>
+                          <span>{t('导入监控大盘')}</span>
+                        </li>
+                        <li
+                          className='ant-dropdown-menu-item'
+                          onClick={async () => {
+                            if (selectRowKeys.length) {
+                              let exportData = await exportDashboard(busiId as number, selectRowKeys);
+                              setExportData(JSON.stringify(exportData.dat, null, 2));
+                              setModalType(ModalStatus.Export);
+                            } else {
+                              message.warning(t('未选择任何大盘'));
+                            }
+                          }}
+                        >
+                          <span>{t('导出监控大盘')}</span>
+                        </li>
+                        <li
+                          className='ant-dropdown-menu-item'
+                          onClick={() => {
+                            if (selectRowKeys.length) {
+                              confirm({
+                                title: '是否批量删除大盘?',
+                                onOk: async () => {
+                                  const reuqests = selectRowKeys.map((id) => {
+                                    console.log(id);
+                                    return removeDashboard(busiId as number, id);
+                                  });
+                                  Promise.all(reuqests).then(() => {
+                                    message.success(t('批量删除大盘成功'));
+                                  });
+                                  // TODO: 删除完后立马刷新数据有时候不是实时的，这里暂时间隔0.5s后再刷新列表
+                                  setTimeout(() => {
+                                    (ref?.current as any)?.refreshList();
+                                  }, 500);
+                                },
+                                onCancel() {},
                               });
-                              Promise.all(reuqests).then(() => {
-                                message.success(t('批量删除大盘成功'));
-                              });
-                              // TODO: 删除完后立马刷新数据有时候不是实时的，这里暂时间隔0.5s后再刷新列表
-                              setTimeout(() => {
-                                (ref?.current as any)?.refreshList();
-                              }, 500);
-                            },
-                            onCancel() {},
-                          });
-                        } else {
-                          message.warning(t('未选择任何大盘'));
-                        }
-                      }}
-                    >
-                      批量删除
+                            } else {
+                              message.warning(t('未选择任何大盘'));
+                            }
+                          }}
+                        >
+                          <span>{t('批量删除大盘')}</span>
+                        </li>
+                      </ul>
+                    }
+                    trigger={['click']}
+                  >
+                    <Button onClick={(e) => e.stopPropagation()}>
+                      {t('更多操作')}
+                      <DownOutlined
+                        style={{
+                          marginLeft: 2,
+                        }}
+                      />
                     </Button>
-                  </Button.Group>
+                  </Dropdown>
                 </div>
               </div>
             </div>
@@ -385,6 +398,7 @@ export default function Dashboard() {
       <ImportAndDownloadModal
         bgid={busiId}
         status={modalType}
+        crossCluster={false}
         fetchBuiltinFunc={getBuiltinDashboards}
         submitBuiltinFunc={createBuiltinDashboards}
         onClose={() => {
