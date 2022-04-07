@@ -294,12 +294,52 @@ export const getBuiltinAlerts = function () {
   return request('/api/n9e/alert-rules/builtin/list', {
     method: RequestMethod.Get,
   });
-  // return Promise.resolve({ dat: [{ name: '123', id: 123 }] });
 };
 
 export const createBuiltinAlerts = function (name: string, cluster: string, id: number) {
   return request(`/api/n9e/busi-group/${id}/alert-rules/builtin`, {
     method: RequestMethod.Post,
     data: { name, cluster },
+  });
+};
+
+export const getAggrAlerts = function () {
+  return request('/api/n9e/alert-aggr-views', {
+    method: RequestMethod.Get,
+  });
+};
+
+export const AddAggrAlerts = function (data) {
+  return request('/api/n9e/alert-aggr-views', {
+    method: RequestMethod.Post,
+    data,
+  });
+};
+
+export const updateAggrAlerts = function (data) {
+  return request('/api/n9e/alert-aggr-views', {
+    method: RequestMethod.Put,
+    data,
+  });
+};
+
+export const deleteAggrAlerts = function (ids: number[]) {
+  return request('/api/n9e/alert-aggr-views', {
+    method: RequestMethod.Delete,
+    data: { ids },
+  });
+};
+
+export const getAlertCards = function (params) {
+  return request('/api/n9e/alert-cur-events/card', {
+    method: RequestMethod.Get,
+    params,
+  });
+};
+
+export const getCardDetail = function (ids) {
+  return request('/api/n9e/alert-cur-events/card/details', {
+    method: RequestMethod.Post,
+    data: { ids },
   });
 };
