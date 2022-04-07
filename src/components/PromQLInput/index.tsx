@@ -104,7 +104,6 @@ const ExpressionInput: FC<CMExpressionInputProps> = ({ url, headers, value, onCh
               {
                 key: 'Enter',
                 run: (v: EditorView): boolean => {
-                  console.log('enter');
                   if (typeof executeQueryCallback.current === 'function') {
                     executeQueryCallback.current();
                   }

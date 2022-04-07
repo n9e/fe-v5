@@ -17,7 +17,7 @@
 import React, { useEffect, useState } from 'react';
 import _ from 'lodash';
 import classNames from 'classnames';
-import { Select, Input } from 'antd';
+import { Select, Input, Tooltip } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { getLabelValues } from '@/services/metricViews';
 import { Range } from '@/components/DateRangePicker';
@@ -126,7 +126,26 @@ export default function LabelsValues(props: IProps) {
       </div>
       <div>
         <div className='page-title' style={{ marginTop: 20 }}>
-          展开维度标签：{dimensionLabel.label}
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              width: 200,
+            }}
+          >
+            <div>展开维度标签：</div>
+            <Tooltip title={dimensionLabel.label}>
+              <div
+                style={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  maxWidth: '100%',
+                }}
+              >
+                {dimensionLabel.label}
+              </div>
+            </Tooltip>
+          </div>
         </div>
         <div className='n9e-metric-views-dimensionLabel'>
           <Input
