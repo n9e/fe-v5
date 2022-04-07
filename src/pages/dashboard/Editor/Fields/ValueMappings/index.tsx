@@ -18,8 +18,8 @@ import React from 'react';
 import { Form, Input, InputNumber, Button, Select, Row, Col, Tooltip } from 'antd';
 import { DeleteOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash';
-
 import { Panel } from '../../Components/Collapse';
+import ColorPicker from '../../../Components/ColorPicker';
 
 interface IProps {
   preNamePrefix?: (string | number)[];
@@ -61,8 +61,8 @@ export default function index(props: IProps) {
                     条件 <InfoCircleOutlined />
                   </Tooltip>
                 </Col>
-                <Col flex='100'>显示文字</Col>
-                <Col flex='50'>颜色</Col>
+                <Col flex='210'>显示文字</Col>
+                <Col flex='45'>颜色</Col>
                 <Col flex='50'>操作</Col>
               </Row>
             )}
@@ -124,14 +124,14 @@ export default function index(props: IProps) {
                       </Col>
                     </Row>
                   </Col>
-                  <Col flex='100'>
+                  <Col flex='210'>
                     <Form.Item noStyle {...restField} name={[name, 'result', 'text']}>
                       <Input placeholder='可选' />
                     </Form.Item>
                   </Col>
-                  <Col flex='50'>
+                  <Col flex='45'>
                     <Form.Item noStyle {...restField} name={[name, 'result', 'color']}>
-                      <Input type='color' />
+                      <ColorPicker />
                     </Form.Item>
                   </Col>
                   <Col flex='50'>

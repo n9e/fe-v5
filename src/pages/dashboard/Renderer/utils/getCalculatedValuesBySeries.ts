@@ -36,16 +36,16 @@ export const getSerieTextObj = (value: number | string | null, standardOptions?:
       }
       return false;
     } else {
-      const numberValue = _.toNumber(value);
+      value = _.toNumber(value) as number;
       if (type === 'special') {
-        return numberValue === match?.special;
+        return value === match?.special;
       } else if (type === 'range') {
         if (match?.from && match?.to) {
-          return numberValue >= match?.from && numberValue <= match?.to;
+          return value >= match?.from && value <= match?.to;
         } else if (match?.from) {
-          return numberValue >= match?.from;
+          return value >= match?.from;
         } else if (match?.to) {
-          return numberValue <= match?.to;
+          return value <= match?.to;
         }
         return false;
       }

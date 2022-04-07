@@ -18,8 +18,8 @@ import React from 'react';
 import { Form, Input, InputNumber, Button } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import _ from 'lodash';
-
 import { Panel } from '../../Components/Collapse';
+import ColorPicker from '../../../Components/ColorPicker';
 
 export default function index() {
   const namePrefix = ['options', 'thresholds'];
@@ -43,7 +43,7 @@ export default function index() {
               return (
                 <Input.Group key={key} compact style={{ marginBottom: 5 }}>
                   <Form.Item noStyle {...restField} name={[name, 'color']}>
-                    <Input type='color' style={{ width: 50, padding: 0 }} />
+                    <ColorPicker />
                   </Form.Item>
                   <Form.Item noStyle {...restField} name={[name, 'value']}>
                     <InputNumber style={{ width: 430 }} />
