@@ -150,6 +150,8 @@ export const getQueryRange = function (params: {
       _.forEach(data, (subItem) => {
         series.push({
           metric: subItem.metric,
+          color: subItem.color,
+          offset: item,
           name: `${getSerieName(subItem.metric)}${item !== 'current' ? ` offset ${item}` : ''}`,
           id: _.uniqueId('series_'),
           data: subItem.values,

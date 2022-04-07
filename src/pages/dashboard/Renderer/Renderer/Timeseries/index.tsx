@@ -74,10 +74,14 @@ export default function index(props: IProps) {
     }
     if (hasLegend) {
       setLegendData(
-        getLegendValues(series, {
-          util: options?.standardOptions?.util,
-          decimals: options?.standardOptions?.decimals,
-        }),
+        getLegendValues(
+          series,
+          {
+            util: options?.standardOptions?.util,
+            decimals: options?.standardOptions?.decimals,
+          },
+          hexPalette,
+        ),
       );
     } else {
       setLegendData([]);
@@ -137,10 +141,14 @@ export default function index(props: IProps) {
     }
     if (hasLegend) {
       setLegendData(
-        getLegendValues(series, {
-          util: options?.standardOptions?.util,
-          decimals: options?.standardOptions?.decimals,
-        }),
+        getLegendValues(
+          series,
+          {
+            util: options?.standardOptions?.util,
+            decimals: options?.standardOptions?.decimals,
+          },
+          hexPalette,
+        ),
       );
     } else {
       setLegendData([]);
@@ -163,17 +171,17 @@ export default function index(props: IProps) {
               ellipsis: {
                 showTitle: false,
               },
-              render: (text, record: any) => {
-                console.log(record);
+              render: (_text, record: any) => {
                 return (
                   <Tooltip
                     placement='topLeft'
                     title={
                       <div>
                         <div>{_.get(record, 'metric.__name__')}</div>
+                        <div>{record.offset && record.offset !== 'current' ? `offfset ${record.offset}` : ''}</div>
                         {_.map(_.omit(record.metric, '__name__'), (val, key) => {
                           return (
-                            <div>
+                            <div key={key}>
                               {key}={val}
                             </div>
                           );
@@ -182,7 +190,9 @@ export default function index(props: IProps) {
                     }
                     getTooltipContainer={() => document.body}
                   >
-                    {text}
+                    <span style={{ color: record.color, fontSize: 14, paddingRight: 5, position: 'relative', top: 2 }}>ꔷ</span>
+                    {record.offset && record.offset !== 'current' ? <span style={{ paddingRight: 5 }}>offfset {record.offset}</span> : ''}
+                    <span>{JSON.stringify(record.metric)}</span>
                   </Tooltip>
                 );
               },

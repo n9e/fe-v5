@@ -20,7 +20,7 @@ import { Card, Space, Dropdown, Menu, Tag, Popover } from 'antd';
 import { ShareAltOutlined, SyncOutlined, CloseCircleOutlined, DownOutlined, PlusCircleOutlined, SettingOutlined } from '@ant-design/icons';
 import { Range } from '@/components/DateRangePicker';
 import { getLabels, getQueryRange, getExprs, setTmpChartData } from '@/services/metricViews';
-import { getMatchStr, getFiltersStr, getDynamicLabelsStr } from './utils';
+import { getMatchStr } from './utils';
 import { IMatch } from '../types';
 import Timeseries from '../../../dashboard/Renderer/Renderer/Timeseries';
 import GraphStandardOptions from './GraphStandardOptions';
