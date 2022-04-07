@@ -1,9 +1,25 @@
+/*
+ * Copyright 2022 Nightingale Team
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 import React from 'react';
 import { Form, Input, InputNumber, Button, Select, Row, Col, Tooltip } from 'antd';
 import { DeleteOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash';
-
 import { Panel } from '../../Components/Collapse';
+import ColorPicker from '../../../Components/ColorPicker';
 
 interface IProps {
   preNamePrefix?: (string | number)[];
@@ -45,8 +61,8 @@ export default function index(props: IProps) {
                     条件 <InfoCircleOutlined />
                   </Tooltip>
                 </Col>
-                <Col flex='100'>显示文字</Col>
-                <Col flex='50'>颜色</Col>
+                <Col flex='210'>显示文字</Col>
+                <Col flex='45'>颜色</Col>
                 <Col flex='50'>操作</Col>
               </Row>
             )}
@@ -61,6 +77,7 @@ export default function index(props: IProps) {
                           <Select style={{ width: 80 }}>
                             <Select.Option value='special'>固定值</Select.Option>
                             <Select.Option value='range'>范围值</Select.Option>
+                            <Select.Option value='specialValue'>特殊值</Select.Option>
                           </Select>
                         </Form.Item>
                       </Col>
@@ -91,20 +108,30 @@ export default function index(props: IProps) {
                                 </Row>
                               );
                             }
+                            if (type === 'specialValue') {
+                              return (
+                                <Form.Item noStyle {...restField} name={[name, 'match', 'specialValue']}>
+                                  <Select>
+                                    <Select.Option value='null'>Null</Select.Option>
+                                    <Select.Option value='empty'>Empty string</Select.Option>
+                                  </Select>
+                                </Form.Item>
+                              );
+                            }
                             return null;
                           }}
                         </Form.Item>
                       </Col>
                     </Row>
                   </Col>
-                  <Col flex='100'>
+                  <Col flex='210'>
                     <Form.Item noStyle {...restField} name={[name, 'result', 'text']}>
                       <Input placeholder='可选' />
                     </Form.Item>
                   </Col>
-                  <Col flex='50'>
+                  <Col flex='45'>
                     <Form.Item noStyle {...restField} name={[name, 'result', 'color']}>
-                      <Input type='color' />
+                      <ColorPicker />
                     </Form.Item>
                   </Col>
                   <Col flex='50'>

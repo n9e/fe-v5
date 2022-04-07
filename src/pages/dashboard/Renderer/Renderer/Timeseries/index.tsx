@@ -1,3 +1,19 @@
+/*
+ * Copyright 2022 Nightingale Team
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 import React, { useRef, useEffect, useState } from 'react';
 import _ from 'lodash';
 import { Table, Tooltip } from 'antd';
@@ -11,12 +27,15 @@ import { getLegendValues } from '../../utils/getCalculatedValuesBySeries';
 import './style.less';
 
 interface IProps {
+  inDashboard?: boolean;
+  chartHeight?: string;
+  tableHeight?: string;
   values: IPanel;
   series: any[];
 }
 
 export default function index(props: IProps) {
-  const { values, series } = props;
+  const { values, series, inDashboard = true, chartHeight = '200px', tableHeight = '200px' } = props;
   const { custom, options = {} } = values;
   const chartEleRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<TsGraph>(null);
@@ -24,6 +43,13 @@ export default function index(props: IProps) {
   const legendEleSize = useSize(legendEleRef);
   const hasLegend = options.legend?.displayMode !== 'hidden';
   const [legendData, setLegendData] = useState([]);
+  let _chartHeight = hasLegend ? '70%' : '100%';
+  let _tableHeight = hasLegend ? '30%' : '0px';
+
+  if (!inDashboard) {
+    _chartHeight = chartHeight;
+    _tableHeight = tableHeight;
+  }
 
   useEffect(() => {
     if (chartEleRef.current) {
@@ -48,10 +74,14 @@ export default function index(props: IProps) {
     }
     if (hasLegend) {
       setLegendData(
-        getLegendValues(series, {
-          util: options?.standardOptions?.util,
-          decimals: options?.standardOptions?.decimals,
-        }),
+        getLegendValues(
+          series,
+          {
+            util: options?.standardOptions?.util,
+            decimals: options?.standardOptions?.decimals,
+          },
+          hexPalette,
+        ),
       );
     } else {
       setLegendData([]);
@@ -94,9 +124,9 @@ export default function index(props: IProps) {
         },
         yAxis: {
           ...chartRef.current.options.yAxis,
-          min: options.standardOptions?.min,
-          max: options.standardOptions?.max,
-          plotLines: options.thresholds?.steps,
+          min: options?.standardOptions?.min,
+          max: options?.standardOptions?.max,
+          plotLines: options?.thresholds?.steps,
           tickValueFormatter: (val) => {
             return valueFormatter(
               {
@@ -111,10 +141,14 @@ export default function index(props: IProps) {
     }
     if (hasLegend) {
       setLegendData(
-        getLegendValues(series, {
-          util: options?.standardOptions?.util,
-          decimals: options?.standardOptions?.decimals,
-        }),
+        getLegendValues(
+          series,
+          {
+            util: options?.standardOptions?.util,
+            decimals: options?.standardOptions?.decimals,
+          },
+          hexPalette,
+        ),
       );
     } else {
       setLegendData([]);
@@ -123,8 +157,8 @@ export default function index(props: IProps) {
 
   return (
     <div className='renderer-timeseries-container'>
-      <div ref={chartEleRef} style={{ height: hasLegend ? '70%' : '100%' }} />
-      <div className='renderer-timeseries-legend' style={{ height: hasLegend ? '30%' : 0, overflow: 'hidden' }} ref={legendEleRef}>
+      <div ref={chartEleRef} style={{ height: _chartHeight }} />
+      <div className='renderer-timeseries-legend' style={{ [inDashboard ? 'height' : 'maxHeight']: _tableHeight, overflow: 'hidden' }} ref={legendEleRef}>
         <Table
           rowKey='id'
           size='small'
@@ -137,11 +171,31 @@ export default function index(props: IProps) {
               ellipsis: {
                 showTitle: false,
               },
-              render: (text) => (
-                <Tooltip placement='topLeft' title={text} getTooltipContainer={() => document.body}>
-                  {text}
-                </Tooltip>
-              ),
+              render: (_text, record: any) => {
+                return (
+                  <Tooltip
+                    placement='topLeft'
+                    title={
+                      <div>
+                        <div>{_.get(record, 'metric.__name__')}</div>
+                        <div>{record.offset && record.offset !== 'current' ? `offfset ${record.offset}` : ''}</div>
+                        {_.map(_.omit(record.metric, '__name__'), (val, key) => {
+                          return (
+                            <div key={key}>
+                              {key}={val}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    }
+                    getTooltipContainer={() => document.body}
+                  >
+                    <span style={{ color: record.color, fontSize: 14, paddingRight: 5, position: 'relative', top: 2 }}>ꔷ</span>
+                    {record.offset && record.offset !== 'current' ? <span style={{ paddingRight: 5 }}>offfset {record.offset}</span> : ''}
+                    <span>{JSON.stringify(record.metric)}</span>
+                  </Tooltip>
+                );
+              },
             },
             {
               title: 'Max',

@@ -1,3 +1,19 @@
+/*
+ * Copyright 2022 Nightingale Team
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 import React, { useRef, ReactNode, isValidElement, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/common';
@@ -32,24 +48,6 @@ interface Props {
   onSubmit: Function;
 }
 
-const columns = [
-  {
-    title: '规则',
-    dataIndex: 'name',
-  },
-  {
-    title: '导入结果',
-    dataIndex: 'isTrue',
-    render: (data) => {
-      return data ? <CheckCircleOutlined style={{ color: '#389e0d', fontSize: '18px' }} /> : <CloseCircleOutlined style={{ color: '#d4380d', fontSize: '18px' }} />;
-    },
-  },
-  {
-    title: '错误消息',
-    dataIndex: 'msg',
-  },
-];
-
 export default function ImportAndDownloadModal(props: Props) {
   const { t } = useTranslation();
   const exportTextRef = useRef(null as any);
@@ -58,9 +56,26 @@ export default function ImportAndDownloadModal(props: Props) {
   const { clusters: clusterList } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const [buildinList, setBuildinList] = useState<{ name: string }[]>([]);
   const [importResult, setImportResult] = useState<{ name: string; isTrue: boolean; msg: string }[]>();
+  const columns = [
+    {
+      title: label,
+      dataIndex: 'name',
+    },
+    {
+      title: '导入结果',
+      dataIndex: 'isTrue',
+      render: (data) => {
+        return data ? <CheckCircleOutlined style={{ color: '#389e0d', fontSize: '18px' }} /> : <CloseCircleOutlined style={{ color: '#d4380d', fontSize: '18px' }} />;
+      },
+    },
+    {
+      title: '错误消息',
+      dataIndex: 'msg',
+    },
+  ];
   const builtinColumn = [
     {
-      title: '规则名称',
+      title: `${label}名称`,
       dataIndex: 'name',
     },
     {
@@ -203,25 +218,27 @@ export default function ImportAndDownloadModal(props: Props) {
             return (
               <>
                 <Form form={form} preserve={false} layout='vertical'>
-                  <Form.Item
-                    label={t('生效集群：')}
-                    name='cluster'
-                    initialValue={clusterList[0] || 'Default'}
-                    rules={[
-                      {
-                        required: true,
-                        message: t('生效集群不能为空'),
-                      },
-                    ]}
-                  >
-                    <Select>
-                      {clusterList?.map((item) => (
-                        <Option value={item} key={item}>
-                          {item}
-                        </Option>
-                      ))}
-                    </Select>
-                  </Form.Item>
+                  {crossCluster && (
+                    <Form.Item
+                      label={t('生效集群：')}
+                      name='cluster'
+                      initialValue={clusterList[0] || 'Default'}
+                      rules={[
+                        {
+                          required: true,
+                          message: t('生效集群不能为空'),
+                        },
+                      ]}
+                    >
+                      <Select>
+                        {clusterList?.map((item) => (
+                          <Option value={item} key={item}>
+                            {item}
+                          </Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+                  )}
                 </Form>
                 <Table className='samll_table' dataSource={buildinList} columns={builtinColumn} pagination={buildinList.length < 5 ? false : { pageSize: 5 }} size='small' />
                 {importResult && (

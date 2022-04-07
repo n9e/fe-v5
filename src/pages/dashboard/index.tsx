@@ -1,11 +1,37 @@
+/*
+ * Copyright 2022 Nightingale Team
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 import React, { useState, useEffect, useRef } from 'react';
 import { useHistory, Link } from 'react-router-dom';
 import PageLayout from '@/components/pageLayout';
 import BaseTable, { IBaseTableProps } from '@/components/BaseTable';
 import { ColumnsType } from 'antd/lib/table';
-import { getDashboard, createDashboard, cloneDashboard, removeDashboard, exportDashboard, importDashboard, updateSingleDashboard } from '@/services/dashboard';
+import {
+  getDashboard,
+  createDashboard,
+  cloneDashboard,
+  removeDashboard,
+  exportDashboard,
+  importDashboard,
+  updateSingleDashboard,
+  getBuiltinDashboards,
+  createBuiltinDashboards,
+} from '@/services/dashboard';
 import { SearchOutlined, DownOutlined, FundOutlined, FundViewOutlined, DownloadOutlined, UploadOutlined } from '@ant-design/icons';
-import { Button, Modal, Form, Input, Tag, message, Dropdown, notification, Select } from 'antd';
+import { Button, Modal, Form, Input, Tag, message, Dropdown, notification, Select, Tabs } from 'antd';
 import dayjs from 'dayjs';
 import { Dashboard as DashboardType } from '@/store/dashboardInterface';
 import ImportAndDownloadModal, { ModalStatus } from '@/components/ImportAndDownloadModal';
@@ -14,6 +40,7 @@ import BlankBusinessPlaceholder from '@/components/BlankBusinessPlaceholder';
 import './index.less';
 import { useTranslation } from 'react-i18next';
 const { confirm } = Modal;
+const { TabPane } = Tabs;
 const type = 'dashboard';
 export default function Dashboard() {
   const { t } = useTranslation();
@@ -226,54 +253,67 @@ export default function Dashboard() {
                   {t('新建大盘')}
                 </Button>
                 <div className={'table-more-options'}>
-                  <Button.Group>
-                    <Button size='middle' type='default' icon={<DownloadOutlined />} onClick={() => setModalType(ModalStatus.Import)}>
-                      {t('导入')}
-                    </Button>
-                    <Button
-                      size='middle'
-                      type='default'
-                      icon={<UploadOutlined />}
-                      onClick={async () => {
-                        if (selectRowKeys.length) {
-                          let exportData = await exportDashboard(busiId as number, selectRowKeys);
-                          setExportData(JSON.stringify(exportData.dat, null, 2));
-                          setModalType(ModalStatus.Export);
-                        } else {
-                          message.warning(t('未选择任何大盘'));
-                        }
-                      }}
-                    >
-                      {t('导出')}
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        if (selectRowKeys.length) {
-                          confirm({
-                            title: '是否批量删除大盘?',
-                            onOk: async () => {
-                              const reuqests = selectRowKeys.map((id) => {
-                                console.log(id);
-                                return removeDashboard(busiId as number, id);
+                  <Dropdown
+                    overlay={
+                      <ul className='ant-dropdown-menu'>
+                        <li className='ant-dropdown-menu-item' onClick={() => setModalType(ModalStatus.BuiltIn)}>
+                          <span>{t('导入监控大盘')}</span>
+                        </li>
+                        <li
+                          className='ant-dropdown-menu-item'
+                          onClick={async () => {
+                            if (selectRowKeys.length) {
+                              let exportData = await exportDashboard(busiId as number, selectRowKeys);
+                              setExportData(JSON.stringify(exportData.dat, null, 2));
+                              setModalType(ModalStatus.Export);
+                            } else {
+                              message.warning(t('未选择任何大盘'));
+                            }
+                          }}
+                        >
+                          <span>{t('导出监控大盘')}</span>
+                        </li>
+                        <li
+                          className='ant-dropdown-menu-item'
+                          onClick={() => {
+                            if (selectRowKeys.length) {
+                              confirm({
+                                title: '是否批量删除大盘?',
+                                onOk: async () => {
+                                  const reuqests = selectRowKeys.map((id) => {
+                                    console.log(id);
+                                    return removeDashboard(busiId as number, id);
+                                  });
+                                  Promise.all(reuqests).then(() => {
+                                    message.success(t('批量删除大盘成功'));
+                                  });
+                                  // TODO: 删除完后立马刷新数据有时候不是实时的，这里暂时间隔0.5s后再刷新列表
+                                  setTimeout(() => {
+                                    (ref?.current as any)?.refreshList();
+                                  }, 500);
+                                },
+                                onCancel() {},
                               });
-                              Promise.all(reuqests).then(() => {
-                                message.success(t('批量删除大盘成功'));
-                              });
-                              // TODO: 删除完后立马刷新数据有时候不是实时的，这里暂时间隔0.5s后再刷新列表
-                              setTimeout(() => {
-                                (ref?.current as any)?.refreshList();
-                              }, 500);
-                            },
-                            onCancel() {},
-                          });
-                        } else {
-                          message.warning(t('未选择任何大盘'));
-                        }
-                      }}
-                    >
-                      批量删除
+                            } else {
+                              message.warning(t('未选择任何大盘'));
+                            }
+                          }}
+                        >
+                          <span>{t('批量删除大盘')}</span>
+                        </li>
+                      </ul>
+                    }
+                    trigger={['click']}
+                  >
+                    <Button onClick={(e) => e.stopPropagation()}>
+                      {t('更多操作')}
+                      <DownOutlined
+                        style={{
+                          marginLeft: 2,
+                        }}
+                      />
                     </Button>
-                  </Button.Group>
+                  </Dropdown>
                 </div>
               </div>
             </div>
@@ -356,16 +396,29 @@ export default function Dashboard() {
         </Form>
       </Modal>
       <ImportAndDownloadModal
-        crossCluster={false}
+        bgid={busiId}
         status={modalType}
-        onSuccess={() => {
-          (ref?.current as any)?.refreshList();
-        }}
+        crossCluster={false}
+        fetchBuiltinFunc={getBuiltinDashboards}
+        submitBuiltinFunc={createBuiltinDashboards}
         onClose={() => {
           setModalType(ModalStatus.None);
         }}
+        onSuccess={() => {
+          (ref?.current as any)?.refreshList();
+        }}
         onSubmit={handleImportDashboard}
-        title={t('大盘')}
+        label='大盘'
+        title={
+          ModalStatus.Export === modalType ? (
+            '大盘'
+          ) : (
+            <Tabs defaultActiveKey={ModalStatus.BuiltIn} onChange={(e: ModalStatus) => setModalType(e)} className='custom-import-alert-title'>
+              <TabPane tab=' 导入内置大盘模块' key={ModalStatus.BuiltIn}></TabPane>
+              <TabPane tab='导入大盘JSON' key={ModalStatus.Import}></TabPane>
+            </Tabs>
+          )
+        }
         exportData={exportData}
       />
     </PageLayout>

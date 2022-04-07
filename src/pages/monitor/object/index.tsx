@@ -1,241 +1,60 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { Button, InputNumber, Layout, Row, Col, Space, Checkbox, Popover, Select } from 'antd';
-import { LineChartOutlined, SyncOutlined, CloseCircleOutlined } from '@ant-design/icons';
-import PageLayout from '@/components/pageLayout';
-import { useTranslation } from 'react-i18next';
-import HostSelect from './components/HostSelect';
-import MetricSelect from './components/MetricSelect';
-import DateRangePicker, { formatPickerDate } from '@/components/DateRangePicker';
-import { Range } from '@/components/DateRangePicker';
-import { getHosts } from '@/services';
-import { getMetrics, getMetricsDesc } from '@/services/warning';
+/*
+ * Copyright 2022 Nightingale Team
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+import React, { useEffect, useState } from 'react';
 import _ from 'lodash';
-import './index.less';
-import Graph from '@/components/Graph';
-import Resolution from '@/components/Resolution';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/store/common';
-import { CommonStoreState } from '@/store/commonInterface';
+import { LineChartOutlined } from '@ant-design/icons';
+import PageLayout from '@/components/pageLayout';
+import { Range } from '@/components/DateRangePicker';
+import { IMatch } from './types';
+import List from './metricViews/List';
+import LabelsValues from './metricViews/LabelsValues';
+import Metrics from './metricViews/Metrics';
+import './style.less';
 
-export interface Host {
-  id: number;
-  ident: string;
-  tags: string;
-  note: string;
-}
-
-function usePrevious(value) {
-  const ref = useRef();
-  useEffect(() => {
-    ref.current = value;
+export default function index() {
+  const [match, setMatch] = useState<IMatch>();
+  const [range, setRange] = useState<Range>({
+    num: 1,
+    unit: 'hour',
+    description: 'hour',
   });
-  return ref.current || [];
-}
-export default () => {
-  const { t, i18n } = useTranslation();
-  const [hosts, setHosts] = useState([]);
-  const [selectedHosts, setSelectedHosts] = useState([]);
-  const previousSelectedHosts: Array<Host> = usePrevious(selectedHosts);
-  const { busiGroups, curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
-  const [busiGroup, setBusiGroup] = useState(curBusiItem);
-  const [metrics, setMetrics] = useState([]);
-  const [metricDescs, setMetricDescs] = useState({});
-  const [graphs, setGraphs] = useState<Array<any>>([]);
-  const [step, setStep] = useState<number | null>(null);
-  const [queryHost, setQueryHost] = useState('');
-  const [curCluster, setCurCluster] = useState('');
-  const [range, setRange] = useState<Range>({ num: 1, unit: 'hour', description: 'hour' });
-  const [range1, setRange1] = useState<Range>({ num: 1, unit: 'hour', description: 'hour' });
-  const [getHostsTimes, setGetHostsTimes] = useState(0);
-  const getHostsRequest = () => {
-    const cluster = localStorage.getItem('curCluster') || '';
-    let transportData = busiGroup
-      ? {
-          bgid: busiGroup.id,
-          query: queryHost,
-          clusters: cluster,
-        }
-      : {
-          query: queryHost,
-          clusters: cluster,
-        };
-    return getHosts(transportData);
-  };
-
-  useEffect(() => {
-    getHostsRequest().then((res) => {
-      const allHosts = res?.dat?.list || [];
-      setHosts(allHosts);
-      if (getHostsTimes > 0) return;
-      setGetHostsTimes(getHostsTimes + 1);
-      getMetricsAndDesc(allHosts.slice(0, 10));
-    });
-  }, [busiGroup, queryHost, curCluster]);
-  useEffect(() => {
-    const isPreviousHaveSelectedHosts = previousSelectedHosts && previousSelectedHosts.length > 0;
-    const isPreviousDontHaveSelectedHosts = !previousSelectedHosts || previousSelectedHosts.length === 0;
-    // 原来有选中的hosts，后来用户全部取消，右侧的metrics要清空
-    if (isPreviousHaveSelectedHosts && selectedHosts.length === 0) {
-      setMetrics([]);
-    } else if (isPreviousDontHaveSelectedHosts && selectedHosts.length > 0) {
-      getMetricsAndDesc(selectedHosts);
-    }
-  }, [selectedHosts]);
-  const getMetricsAndDesc = (hosts) => {
-    const showHosts = hosts || selectedHosts;
-    if (showHosts.length === 0) return;
-    const hostsMatchParams = `{ident=~"${showHosts.map((h: any) => h.ident).join('|')}"}`;
-    getMetrics({
-      match: [hostsMatchParams],
-      ...formatPickerDate(range1),
-    }).then((res) => {
-      setMetrics(res.data);
-      // const newGraphs = graphs.map((graph) => ({
-      //   ...graph,
-      //   showHosts,
-      // }));
-      // setGraphs(newGraphs);
-      getMetricsDesc(res.data).then((res) => {
-        setMetricDescs(res.dat);
-      });
-    });
-  };
-  const handleRemoveGraphs = () => {
-    setGraphs([]);
-  };
-  // 不需要输入的时候就触发，所以不需要防抖了
-  const debouncedChangeHostName = useCallback(
-    _.debounce((v) => {
-      setQueryHost(v);
-    }, 0),
-    [],
-  );
 
   return (
-    <PageLayout
-      title={t('对象视角')}
-      icon={<LineChartOutlined />}
-      onChangeCluster={(cluster) => {
-        setCurCluster(cluster);
-      }}
-    >
-      <div className='object-view'>
-        <Layout style={{ padding: 10 }}>
-          <Row gutter={10}>
-            <Col span={12}>
-              <HostSelect
-                allHosts={hosts}
-                changeBusiGroup={(busiGroup) => {
-                  setBusiGroup(busiGroup);
-                }}
-                changeSelectedHosts={(hosts) => {
-                  setSelectedHosts(hosts);
-                }}
-                onSearchHostName={(value) => {
-                  debouncedChangeHostName(value);
-                }}
-              />
-            </Col>
-            <Col span={12}>
-              <MetricSelect
-                metrics={metrics}
-                metricDescs={metricDescs}
-                selectedMetrics={graphs.map((g) => g.metric)}
-                handleMetricClick={(metric) => {
-                  let newGraphs = [...graphs];
-                  const alreadyHaveGraphIndex = newGraphs.findIndex((g) => g.metric === metric);
-                  const orgGraph = newGraphs[alreadyHaveGraphIndex];
-                  if (alreadyHaveGraphIndex !== -1) {
-                    newGraphs.splice(alreadyHaveGraphIndex, 1);
-                    newGraphs.unshift(orgGraph);
-                  } else {
-                    newGraphs.unshift({
-                      step,
-                      range,
-                      selectedHosts,
-                      metric,
-                      ref: React.createRef(),
-                    });
-                  }
-                  setGraphs(newGraphs);
-                }}
-                handleRefreshMetrics={getMetricsAndDesc}
-              />
-            </Col>
-          </Row>
-          <Row style={{ padding: '10px 0' }}>
-            <Col span={8}>
-              <Space>
-                <DateRangePicker
-                  value={range}
-                  onChange={(e) => {
-                    // console.log(e);
-                    setRange1(e);
-                    let newGraphs = [...graphs];
-                    newGraphs.forEach((graph) => {
-                      graph.range = e;
-                    });
-                    setGraphs(newGraphs);
-                  }}
-                />
-                <Resolution
-                  onChange={(v) => {
-                    setStep(v);
-                    let newGraphs = [...graphs];
-                    newGraphs.forEach((graph) => {
-                      graph.step = v;
-                    });
-                    setGraphs(newGraphs);
-                  }}
-                  initialValue={step}
-                />
-                <Button
-                  style={{ padding: '4px 8px' }}
-                  onClick={() => {
-                    graphs.forEach((graph) => {
-                      const graphInstance = graph.ref?.current;
-                      graphInstance && graphInstance.refresh();
-                    });
-                  }}
-                  icon={<SyncOutlined />}
-                ></Button>
-              </Space>
-            </Col>
-            <Col span={16} style={{ textAlign: 'right' }}>
-              <Button onClick={handleRemoveGraphs} disabled={!graphs.length} style={{ background: '#fff' }}>
-                清空图表
-              </Button>
-            </Col>
-          </Row>
-          <div>
-            {_.map(graphs, (o, i) => {
-              return (
-                <div style={{ marginBottom: 10 }} key={o.metric}>
-                  <Graph
-                    ref={o.ref}
-                    data={{ ...o }}
-                    graphConfigInnerVisible={true}
-                    extraRender={(graph) => {
-                      return [
-                        <Button type='link' danger size='small' onClick={(e) => e.preventDefault()}>
-                          <CloseCircleOutlined
-                            onClick={(_) => {
-                              const newGraphs = [...graphs];
-                              newGraphs.splice(i, 1);
-                              setGraphs(newGraphs);
-                            }}
-                          />
-                        </Button>,
-                      ];
-                    }}
-                  ></Graph>
-                </div>
-              );
-            })}
-            {graphs.length === 0 && <div className='empty-graph'>请先选中指标生成图表</div>}
-          </div>
-        </Layout>
+    <PageLayout title='快捷视图' icon={<LineChartOutlined />}>
+      <div className='n9e-metric-views'>
+        <List
+          onSelect={(record: IMatch) => {
+            setMatch(record);
+          }}
+          range={range}
+        />
+        {match ? (
+          <>
+            <LabelsValues
+              range={range}
+              value={match}
+              onChange={(val) => {
+                setMatch(val);
+              }}
+            />
+            <Metrics range={range} setRange={setRange} match={match} />
+          </>
+        ) : null}
       </div>
     </PageLayout>
   );
-};
+}
