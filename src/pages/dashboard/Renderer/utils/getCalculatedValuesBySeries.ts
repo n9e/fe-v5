@@ -22,21 +22,34 @@ const getValueAndToNumber = (value: any[]) => {
   return _.toNumber(_.get(value, 1, NaN));
 };
 
-export const getSerieTextObj = (value: number, standardOptions?: any, valueMappings?: IValueMapping[]) => {
+export const getSerieTextObj = (value: number | string | null, standardOptions?: any, valueMappings?: IValueMapping[]) => {
   const { util, decimals } = standardOptions || {};
   const matchedValueMapping = _.find(valueMappings, (item) => {
     const { type, match } = item;
-    if (type === 'special') {
-      return value === match?.special;
-    } else if (type === 'range') {
-      if (match?.from && match?.to) {
-        return value >= match?.from && value <= match?.to;
-      } else if (match?.from) {
-        return value >= match?.from;
-      } else if (match?.to) {
-        return value <= match?.to;
+    if (value === null || value === '') {
+      if (type === 'specialValue') {
+        if (match?.specialValue === 'empty') {
+          return value === '';
+        } else if (match?.specialValue === 'null') {
+          return value === null;
+        }
       }
-      return true;
+      return false;
+    } else {
+      const numberValue = _.toNumber(value);
+      if (type === 'special') {
+        return numberValue === match?.special;
+      } else if (type === 'range') {
+        if (match?.from && match?.to) {
+          return numberValue >= match?.from && numberValue <= match?.to;
+        } else if (match?.from) {
+          return numberValue >= match?.from;
+        } else if (match?.to) {
+          return numberValue <= match?.to;
+        }
+        return false;
+      }
+      return false;
     }
   });
   return {
@@ -48,10 +61,10 @@ export const getSerieTextObj = (value: number, standardOptions?: any, valueMappi
 const getCalculatedValuesBySeries = (series: any[], calc: string, { util, decimals }, valueMappings?: IValueMapping[]) => {
   const values = _.map(series, (serie) => {
     const results = {
-      lastNotNull: () => getValueAndToNumber(_.last(_.filter(serie.data, (item) => item[1] !== null))),
-      last: () => getValueAndToNumber(_.last(serie.data)),
-      firstNotNull: () => getValueAndToNumber(_.first(_.filter(serie.data, (item) => item[1] !== null))),
-      first: () => getValueAndToNumber(_.first(serie.data)),
+      lastNotNull: () => _.get(_.last(_.filter(serie.data, (item) => item[1] !== null)), 1),
+      last: () => _.get(_.last(serie.data), 1),
+      firstNotNull: () => _.get(_.first(_.filter(serie.data, (item) => item[1] !== null)), 1),
+      first: () => _.get(_.first(serie.data), 1),
       min: () => getValueAndToNumber(_.minBy(serie.data, (item) => _.toNumber(item[1]))),
       max: () => getValueAndToNumber(_.maxBy(serie.data, (item) => _.toNumber(item[1]))),
       avg: () => _.meanBy(serie.data, (item) => _.toNumber(item[1])),

@@ -43,7 +43,7 @@ export interface IValueMapping {
     color: string;
     text: string;
   };
-  type: 'range' | 'special'
+  type: 'range' | 'special' | 'specialValue'; // TODO: 历史原因 special 是固定值，specialValue 是特殊值
 }
 
 export interface IThresholds {

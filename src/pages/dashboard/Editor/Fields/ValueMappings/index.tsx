@@ -77,6 +77,7 @@ export default function index(props: IProps) {
                           <Select style={{ width: 80 }}>
                             <Select.Option value='special'>固定值</Select.Option>
                             <Select.Option value='range'>范围值</Select.Option>
+                            <Select.Option value='specialValue'>特殊值</Select.Option>
                           </Select>
                         </Form.Item>
                       </Col>
@@ -105,6 +106,16 @@ export default function index(props: IProps) {
                                     </Form.Item>
                                   </Col>
                                 </Row>
+                              );
+                            }
+                            if (type === 'specialValue') {
+                              return (
+                                <Form.Item noStyle {...restField} name={[name, 'match', 'specialValue']}>
+                                  <Select>
+                                    <Select.Option value='null'>Null</Select.Option>
+                                    <Select.Option value='empty'>Empty string</Select.Option>
+                                  </Select>
+                                </Form.Item>
                               );
                             }
                             return null;
