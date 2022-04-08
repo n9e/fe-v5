@@ -23,24 +23,36 @@ export default function CardLeft(props: Props) {
   const [alertList, setAlertList] = useState<CardAlertType[]>();
   const [visible, setVisible] = useState(false);
   const [editForm, setEditForm] = useState<CardAlertType>();
-  const [activeId, setActiveId] = useState<number>();
+  const localSelectId = localStorage.getItem('selectedAlertRule');
+  const [activeId, setActiveId] = useState<number>(localSelectId ? Number(localSelectId) : 0);
   const [search, setSearch] = useState('');
+
   useEffect(() => {
     getList(true);
   }, []);
 
   useEffect(() => {
-    if (activeId) {
-      const { rule } = alertList?.find((item) => item.id === activeId) as CardAlertType;
-      onRefreshRule(rule);
+    if (activeId && alertList && alertList.length > 0) {
+      const currentAlert = alertList?.find((item) => item.id === activeId) as CardAlertType;
+      if (currentAlert) {
+        onRefreshRule(currentAlert.rule);
+      } else {
+        saveActiveId(alertList[0].id);
+      }
     }
   }, [activeId]);
+
+  function saveActiveId(id: number) {
+    if (!id) return;
+    setActiveId(id);
+    localStorage.setItem('selectedAlertRule', String(id));
+  }
 
   const getList = (selectTheFirst = false) => {
     return getAggrAlerts().then((res) => {
       const sortedList = res.dat.sort((a: CardAlertType, b: CardAlertType) => a.cate - b.cate);
       setAlertList(sortedList);
-      selectTheFirst && sortedList.length > 0 && setActiveId(sortedList[0].id);
+      selectTheFirst && sortedList.length > 0 && !sortedList.find((item) => item.id === activeId) && saveActiveId(sortedList[0].id);
     });
   };
 
@@ -50,7 +62,7 @@ export default function CardLeft(props: Props) {
     const cur = await func(form.getFieldsValue());
     setVisible(false);
     await getList();
-    setActiveId(editForm ? editForm.id : cur.dat.id);
+    saveActiveId(editForm ? editForm.id : cur.dat.id);
   };
 
   const handleCancel = () => {
@@ -89,7 +101,7 @@ export default function CardLeft(props: Props) {
       {alertList
         ?.filter((alert) => alert.name.includes(search))
         .map((alert) => (
-          <div className={alert.id === activeId ? 'card-menu-item is-active' : 'card-menu-item'} onClick={() => setActiveId(alert.id)} key={alert.id}>
+          <div className={alert.id === activeId ? 'card-menu-item is-active' : 'card-menu-item'} onClick={() => saveActiveId(alert.id)} key={alert.id}>
             <div className='label-area'>
               <div className='title'>{alert.name}</div>
               {/* <div className='desc'>{alert.rule}</div> */}
@@ -106,7 +118,12 @@ export default function CardLeft(props: Props) {
                     form.setFieldsValue(alert);
                   }}
                 />
-                <DeleteOutlined onClick={() => handleDelete(alert)} />
+                <DeleteOutlined
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(alert);
+                  }}
+                />
               </div>
             )}
           </div>

@@ -192,7 +192,6 @@ function Card(props: Props, ref) {
             <span>{openedCard?.title}</span>
             <Button
               danger
-              style={{ marginRight: 20 }}
               disabled={selectedRowKeys.length === 0}
               onClick={() =>
                 deleteAlertEventsModal(undefined, selectedRowKeys, () => {
