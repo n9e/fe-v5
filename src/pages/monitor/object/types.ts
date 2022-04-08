@@ -25,8 +25,8 @@ export interface IMatch {
     label: string;
     value: string;
   }[];
-  dimensionLabel: {
+  dimensionLabels: {
     label: string;
     value: string[];
-  };
+  }[];
 }

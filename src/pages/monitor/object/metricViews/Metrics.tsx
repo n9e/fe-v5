@@ -111,7 +111,8 @@ export default function Metrics(props: IProps) {
   useEffect(() => {
     setSelectedMetrics([]);
     setActiveKey('all');
-  }, [match.id]);
+    setMetrics([]);
+  }, [match.id, matchStr]);
 
   return (
     <div className='n9e-metric-views-metrics'>

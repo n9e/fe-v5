@@ -35,11 +35,15 @@ interface IProps {
 
 export default function Graph(props: IProps) {
   const { metric, match, range, step, onClose } = props;
+  const newGroups = _.map(
+    _.filter(match.dimensionLabels, (item) => !_.isEmpty(item.value)),
+    'label',
+  );
   const [refreshFlag, setRefreshFlag] = useState(_.uniqueId('refreshFlag_'));
   const [calcFunc, setCalcFunc] = useState('');
   const [comparison, setComparison] = useState<string[]>([]);
   const [aggrFunc, setAggrFunc] = useState('avg');
-  const [aggrGroups, setAggrGroups] = useState<string[]>([match.dimensionLabel.label]);
+  const [aggrGroups, setAggrGroups] = useState<string[]>(newGroups);
   const [labels, setLabels] = useState<string[]>([]);
   const [series, setSeries] = useState<any[]>([]);
   const [highLevelConfig, setHighLevelConfig] = useState({
@@ -68,6 +72,10 @@ export default function Graph(props: IProps) {
       },
     },
   };
+
+  useEffect(() => {
+    setAggrGroups(newGroups);
+  }, [JSON.stringify(newGroups)]);
 
   useEffect(() => {
     const matchStr = getMatchStr(match);

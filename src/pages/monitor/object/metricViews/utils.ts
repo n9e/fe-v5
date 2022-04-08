@@ -29,7 +29,7 @@ export function getFiltersStr(filters: IMatch['filters']) {
 }
 
 export function getDynamicLabelsStr(dynamicLabels: IMatch['dynamicLabels']) {
-  const arr= _.map(dynamicLabels, (item) => {
+  const arr = _.map(dynamicLabels, (item) => {
     if (item.value) {
       return `${item.label}="${item.value}"`;
     }
@@ -39,6 +39,12 @@ export function getDynamicLabelsStr(dynamicLabels: IMatch['dynamicLabels']) {
 }
 
 export function getMatchStr(match: IMatch) {
-  const dimensionLabelStr = match.dimensionLabel.label && !_.isEmpty(match.dimensionLabel.value) ? [`${match.dimensionLabel.label}=~"${_.join(match.dimensionLabel.value, '|')}"`] : '';
-  return dimensionLabelStr ? `{${dimensionLabelStr}}` : '';
+  const arr = _.map(match.dimensionLabels, (item) => {
+    if (!_.isEmpty(item.value)) {
+      return `${item.label}=~"${_.join(item.value, '|')}"`;
+    }
+    return '';
+  });
+  const str = _.join(_.compact(arr), ',');
+  return str ? `{${str}}` : '';
 }

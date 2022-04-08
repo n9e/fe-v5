@@ -75,6 +75,12 @@ function FormCpt(props: ModalWrapProps & IProps) {
               value: '',
             };
           });
+          _values.dimensionLabels = _.map(_values.dimensionLabels, (item) => {
+            return {
+              label: item,
+              value: '',
+            };
+          });
           const { name } = _values;
           const configs = JSON.stringify(_.omit(_values, 'name'));
           const data: any = {
@@ -164,8 +170,8 @@ function FormCpt(props: ModalWrapProps & IProps) {
             {getLablesOptions(filteredLabels)}
           </Select>
         </Form.Item>
-        <Form.Item label='展开维度标签' name={['dimensionLabel', 'label']} rules={[{ required: true }]}>
-          <Select allowClear showSearch>
+        <Form.Item label='展开维度标签' name={'dimensionLabels'} rules={[{ required: true }]}>
+          <Select allowClear showSearch mode='multiple'>
             {getLablesOptions(filteredLabels)}
           </Select>
         </Form.Item>
@@ -176,7 +182,7 @@ function FormCpt(props: ModalWrapProps & IProps) {
               setPreviewVisible(true);
               setPreviewLoading(true);
               const filtersStr = getFiltersStr(values.filters);
-              const _labels = _.compact(_.concat(values.dynamicLabels, values.dimensionLabel?.label));
+              const _labels = _.compact(_.concat(values.dynamicLabels, values.dimensionLabels));
               const requests = _.map(_labels, (item) => {
                 return getLabelValues(item, range, filtersStr ? `{${filtersStr}}` : '');
               });
