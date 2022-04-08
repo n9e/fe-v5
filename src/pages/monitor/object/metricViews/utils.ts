@@ -40,8 +40,8 @@ export function getDynamicLabelsStr(dynamicLabels: IMatch['dynamicLabels']) {
 
 export function getMatchStr(match: IMatch) {
   const arr = _.map(match.dimensionLabels, (item) => {
-    if (item.value) {
-      return `${item.label}="${item.value}"`;
+    if (!_.isEmpty(item.value)) {
+      return `${item.label}=~"${_.join(item.value, '|')}"`;
     }
     return '';
   });

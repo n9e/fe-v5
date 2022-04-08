@@ -66,11 +66,14 @@ export default function LabelsValues(props: IProps) {
       if (_.every(dimensionLabels, (item) => _.isEmpty(item.value))) {
         onChange({
           ...value,
-          dimensionLabels: _.map(dimensionLabels, (item) => {
-            return {
-              label: item.label,
-              value: [_.head(_labelValues[item.label])],
-            };
+          dimensionLabels: _.map(dimensionLabels, (item, idx) => {
+            if (idx === 0) {
+              return {
+                label: item.label,
+                value: [_.head(_labelValues[item.label])],
+              };
+            }
+            return item;
           }),
         });
       }
@@ -142,7 +145,7 @@ export default function LabelsValues(props: IProps) {
                     width: 200,
                   }}
                 >
-                  <Tooltip title={dimensionLabel.label}>
+                  <Tooltip title={dimensionLabel.label} placement='left'>
                     <div
                       style={{
                         overflow: 'hidden',
@@ -193,16 +196,22 @@ export default function LabelsValues(props: IProps) {
                                 active: _.includes(dimensionLabel.value, item),
                               })}
                               onClick={() => {
-                                const dimensionLabelsClone = _.cloneDeep(dimensionLabels);
-                                const currentDimensionLabel = _.find(dimensionLabelsClone, { label: dimensionLabel.label });
-                                if (_.includes(dimensionLabel.value, item)) {
-                                  currentDimensionLabel.value = _.without(dimensionLabel.value, item);
-                                } else {
-                                  currentDimensionLabel.value = _.concat(dimensionLabel.value, item);
-                                }
+                                const value = _.includes(dimensionLabel.value, item) ? _.without(dimensionLabel.value, item) : _.concat(dimensionLabel.value, item);
+                                const newDimensionLabels = _.map(dimensionLabels, (item) => {
+                                  if (item.label === dimensionLabel.label) {
+                                    return {
+                                      ...item,
+                                      value: value,
+                                    };
+                                  }
+                                  return {
+                                    ...item,
+                                    value: [],
+                                  };
+                                });
                                 onChange({
                                   ...value,
-                                  dimensionLabels: dimensionLabelsClone,
+                                  dimensionLabels: newDimensionLabels,
                                 });
                               }}
                             >

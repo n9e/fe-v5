@@ -39,7 +39,12 @@ export default function Graph(props: IProps) {
   const [calcFunc, setCalcFunc] = useState('');
   const [comparison, setComparison] = useState<string[]>([]);
   const [aggrFunc, setAggrFunc] = useState('avg');
-  const [aggrGroups, setAggrGroups] = useState<string[]>(_.map(match.dimensionLabels, 'label'));
+  const [aggrGroups, setAggrGroups] = useState<string[]>(
+    _.map(
+      _.filter(match.dimensionLabels, (item) => !_.isEmpty(item.value)),
+      'label',
+    ),
+  );
   const [labels, setLabels] = useState<string[]>([]);
   const [series, setSeries] = useState<any[]>([]);
   const [highLevelConfig, setHighLevelConfig] = useState({
