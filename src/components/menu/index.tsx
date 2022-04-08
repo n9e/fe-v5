@@ -254,30 +254,6 @@ const SideMenu: FC = () => {
             )
           );
         })}
-        {/* <SubMenu key='/targets' icon={<DatabaseOutlined />} title={t('监控对象')}>
-          <Menu.Item key='/targets'>{t('对象列表')}</Menu.Item>
-        </SubMenu>
-        <SubMenu key='/metric,/object,/dashboard' icon={<LineChartOutlined />} title={t('监控看图')}>
-          <Menu.Item key='/metric/explorer'>{t('即时查询')}</Menu.Item>
-          <Menu.Item key='/object/explorer'>{t('对象视角')}</Menu.Item>
-          <Menu.Item key='/dashboard'>{t('监控大盘')}</Menu.Item>
-        </SubMenu>
-        <SubMenu key='/alert-rules,/shield,/event,/history-events' icon={<SettingOutlined />} title={t('告警管理')}>
-          <Menu.Item key='/alert-rules'>{t('告警规则')}</Menu.Item>
-          <Menu.Item key='/alert-mutes'>{t('屏蔽规则')}</Menu.Item>
-          <Menu.Item key='/alert-subscribes'>{t('订阅规则')}</Menu.Item>
-          <Menu.Item key='/event'>{t('活跃告警')}</Menu.Item>
-          <Menu.Item key='/history-events'>{t('历史告警')}</Menu.Item>
-        </SubMenu>
-        <SubMenu key='/job-tpls,/job-tasks' icon={<CodeOutlined />} title={t('告警自愈')}>
-          <Menu.Item key='/job-tpls'>{t('自愈脚本')}</Menu.Item>
-          <Menu.Item key='/job-tasks'>{t('执行历史')}</Menu.Item>
-        </SubMenu>
-        <SubMenu key='/manage' icon={<UserOutlined />} title={t('人员组织')}>
-          <Menu.Item key='/manage/user'>{t('用户管理')}</Menu.Item>
-          <Menu.Item key='/manage/group'>{t('团队管理')}</Menu.Item>
-          <Menu.Item key='/manage/business'>{t('业务组管理')}</Menu.Item>
-        </SubMenu> */}
         {lazyMenu.sort((a, b) => b.weight - a.weight).map((item) => item.content)}
       </Menu>
       <Button type='text' onClick={toggleCollapsed} className='collapseBtn'>

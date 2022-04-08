@@ -22,7 +22,6 @@ import { RootState, accountStoreState } from '@/store/accountInterface';
 import NotFound from '@/pages/NotFound';
 import Login from '@/pages/login';
 import LoginCallback from '@/pages/loginCallback';
-import ResourcePage from '@/pages/resource';
 import Strategy from '@/pages/warning/strategy';
 import Profile from '@/pages/account/profile';
 // const Dashboard = React.lazy(() => import('@/pages/dashboard'));
@@ -122,7 +121,6 @@ export default function Content() {
         <Route path='/dashboard/:busiId/:id' component={DashboardDetail} />
         <Route path='/dashboards' component={Dashboard} />
         <Route path='/chart/:ids' component={Chart} />
-        <Route path='/resource/:id?' component={ResourcePage} />
         <Route path='/indicator' component={IndicatorPage} />
 
         <Route exact path='/alert-rules/add/:group_id' component={StrategyAdd} />
