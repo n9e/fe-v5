@@ -72,7 +72,8 @@ export default function List(props: IProps) {
                 action: 'add',
                 visible: true,
                 range: props.range,
-                onOk: () => {
+                onOk: (record) => {
+                  localStorage.setItem('metric-view-id', record.id);
                   setRefreshFlag(_.uniqueId('refreshFlag_'));
                 },
               });
@@ -153,6 +154,7 @@ export default function List(props: IProps) {
                               range: props.range,
                               initialValues,
                               onOk: () => {
+                                localStorage.setItem('metric-view-id', item.id);
                                 setRefreshFlag(_.uniqueId('refreshFlag_'));
                               },
                             });

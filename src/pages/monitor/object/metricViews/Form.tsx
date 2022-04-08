@@ -88,9 +88,9 @@ function FormCpt(props: ModalWrapProps & IProps) {
             configs,
           };
           if (action === 'add') {
-            addMetricView(data).then(() => {
+            addMetricView(data).then((res) => {
               message.success('添加成功');
-              onOk();
+              onOk(res);
               destroy();
             });
           } else if (action === 'edit') {
