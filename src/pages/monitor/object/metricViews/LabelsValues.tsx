@@ -35,7 +35,7 @@ export default function LabelsValues(props: IProps) {
   const { id, filters, dynamicLabels, dimensionLabels } = value;
   const [labelValues, setLabelValues] = useState<{ [key: string]: string[] }>({});
   const [dimensionLabelsValues, setDimensionLabelsValues] = useState<{ [key: string]: string[] }>({});
-  const [dimensionLabelSearch, setDimensionLabelSearch] = useState('');
+  const [dimensionLabelsSearch, setDimensionLabelsSearch] = useState({});
   const filtersStr = getFiltersStr(filters);
   const dynamicLabelsStr = getDynamicLabelsStr(dynamicLabels);
 
@@ -158,9 +158,12 @@ export default function LabelsValues(props: IProps) {
               <div className='n9e-metric-views-dimensionLabel'>
                 <Input
                   prefix={<SearchOutlined />}
-                  value={dimensionLabelSearch}
+                  value={dimensionLabelsSearch[dimensionLabel.label]}
                   onChange={(e) => {
-                    setDimensionLabelSearch(e.target.value);
+                    setDimensionLabelsSearch({
+                      ...dimensionLabelsSearch,
+                      [dimensionLabel.label]: e.target.value,
+                    });
                   }}
                 />
                 <div className='n9e-metric-views-dimensionLabel-content'>
@@ -171,9 +174,9 @@ export default function LabelsValues(props: IProps) {
                       {_.map(
                         _.filter(dimensionLabelValues, (item) => {
                           let result = true;
-                          if (dimensionLabelSearch) {
+                          if (dimensionLabelsSearch[dimensionLabel.label]) {
                             try {
-                              const reg = new RegExp(dimensionLabelSearch, 'gi');
+                              const reg = new RegExp(dimensionLabelsSearch[dimensionLabel.label], 'gi');
                               result = reg.test(item);
                             } catch (e) {
                               console.log(e);
