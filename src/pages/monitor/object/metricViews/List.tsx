@@ -44,7 +44,7 @@ export default function List(props: IProps) {
       } else {
         curId = defaultMetricViewId;
       }
-      if (curId && curId !== active) {
+      if (curId) {
         setActive(curId);
         const curItem = _.find(res, { id: curId });
         let configs = {} as IMatch;
