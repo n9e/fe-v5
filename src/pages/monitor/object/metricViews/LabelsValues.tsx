@@ -32,7 +32,7 @@ interface IProps {
 
 export default function LabelsValues(props: IProps) {
   const { value, range, onChange } = props;
-  const { id, filters, dynamicLabels, dimensionLabels } = value;
+  const { id, refreshFlag, filters, dynamicLabels, dimensionLabels } = value;
   const [labelValues, setLabelValues] = useState<{ [key: string]: string[] }>({});
   const [dimensionLabelsValues, setDimensionLabelsValues] = useState<{ [key: string]: string[] }>({});
   const [dimensionLabelsSearch, setDimensionLabelsSearch] = useState({});
@@ -78,7 +78,7 @@ export default function LabelsValues(props: IProps) {
         });
       }
     });
-  }, [filtersStr, dynamicLabelsStr, id]);
+  }, [filtersStr, dynamicLabelsStr, id, refreshFlag]);
 
   return (
     <div className='n9e-metric-views-labels-values'>

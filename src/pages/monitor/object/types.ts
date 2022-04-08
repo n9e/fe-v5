@@ -16,6 +16,7 @@
  */
 export interface IMatch {
   id: number;
+  refreshFlag?: string; // 用于修改记录后刷新
   filters: {
     label: string;
     oper: '=' | '=~';

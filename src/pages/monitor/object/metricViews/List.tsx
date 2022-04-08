@@ -51,6 +51,7 @@ export default function List(props: IProps) {
         try {
           configs = JSON.parse(curItem.configs);
           configs.id = curId;
+          configs.refreshFlag = refreshFlag;
         } catch (e) {
           console.error(e);
         }
