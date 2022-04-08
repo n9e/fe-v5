@@ -17,23 +17,6 @@
 import request from '@/utils/request';
 import { RequestMethod } from '@/store/common';
 import { N9EAPI } from '../../config/constant';
-import { ISearchTagKeyParams, ISearchTagValueParams } from '@/components/FormComponents/MultipleDynamicSelect/definition';
-
-// 查询tagkey
-export const getTagKey = function (data: ISearchTagKeyParams) {
-  return request(`/api/n9e/tag-keys`, {
-    method: RequestMethod.Post,
-    data,
-  });
-};
-
-// 查询tag value
-export const getTagValue = function (data: ISearchTagValueParams) {
-  return request(`/api/n9e/tag-values`, {
-    method: RequestMethod.Post,
-    data,
-  });
-};
 
 interface DashboardQuery {}
 // 大盘列表

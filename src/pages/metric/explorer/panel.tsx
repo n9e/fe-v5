@@ -15,7 +15,7 @@
  *
  */
 import { AreaChartOutlined, CloseCircleOutlined, LineChartOutlined } from '@ant-design/icons';
-import { Tabs, List, DatePicker, Radio, Alert } from 'antd';
+import { Tabs, List, DatePicker, Radio, Alert, Space } from 'antd';
 import moment, { Moment } from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
@@ -366,21 +366,23 @@ const Panel: React.FC<PanelProps> = ({ metrics, defaultPromQL, removePanel }) =>
           {/* 操作栏 */}
           <div className='graph-operate-box'>
             <div className='left'>
-              <DateRangePicker placement='bottomRight' value={optionsRecord.range} onChange={handleGraphDateChange} />
-              <Resolution onChange={(v: number) => setOptions({ resolution: v })} initialValue={optionsRecord.resolution} />
-              <Radio.Group
-                options={[
-                  { label: <LineChartOutlined />, value: ChartType.Line },
-                  { label: <AreaChartOutlined />, value: ChartType.StackArea },
-                ]}
-                onChange={(e) => {
-                  e.preventDefault();
-                  setChartType(e.target.value);
-                }}
-                value={chartType}
-                optionType='button'
-                buttonStyle='solid'
-              />
+              <Space>
+                <DateRangePicker placement='bottomRight' value={optionsRecord.range} onChange={handleGraphDateChange} />
+                <Resolution onChange={(v: number) => setOptions({ resolution: v })} initialValue={optionsRecord.resolution} />
+                <Radio.Group
+                  options={[
+                    { label: <LineChartOutlined />, value: ChartType.Line },
+                    { label: <AreaChartOutlined />, value: ChartType.StackArea },
+                  ]}
+                  onChange={(e) => {
+                    e.preventDefault();
+                    setChartType(e.target.value);
+                  }}
+                  value={chartType}
+                  optionType='button'
+                  buttonStyle='solid'
+                />
+              </Space>
             </div>
           </div>
           {/* 图 */}
