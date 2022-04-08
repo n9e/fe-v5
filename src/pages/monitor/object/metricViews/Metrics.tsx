@@ -112,7 +112,7 @@ export default function Metrics(props: IProps) {
     setSelectedMetrics([]);
     setActiveKey('all');
     setMetrics([]);
-  }, [match.id]);
+  }, [match.id, matchStr]);
 
   return (
     <div className='n9e-metric-views-metrics'>

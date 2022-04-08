@@ -196,12 +196,12 @@ export default function LabelsValues(props: IProps) {
                                 active: _.includes(dimensionLabel.value, item),
                               })}
                               onClick={() => {
-                                const value = _.includes(dimensionLabel.value, item) ? _.without(dimensionLabel.value, item) : _.concat(dimensionLabel.value, item);
+                                const dimensionLabelValue = _.includes(dimensionLabel.value, item) ? _.without(dimensionLabel.value, item) : _.concat(dimensionLabel.value, item);
                                 const newDimensionLabels = _.map(dimensionLabels, (item) => {
                                   if (item.label === dimensionLabel.label) {
                                     return {
                                       ...item,
-                                      value: value,
+                                      value: _.compact(dimensionLabelValue),
                                     };
                                   }
                                   return {
