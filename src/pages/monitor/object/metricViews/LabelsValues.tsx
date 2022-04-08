@@ -173,23 +173,25 @@ export default function LabelsValues(props: IProps) {
                       });
                     }}
                   />
-                  <Button
-                    icon={<ClearOutlined />}
-                    onClick={() => {
-                      onChange({
-                        ...value,
-                        dimensionLabels: _.map(dimensionLabels, (item) => {
-                          if (item.label === dimensionLabel.label) {
-                            return {
-                              ...item,
-                              value: [],
-                            };
-                          }
-                          return item;
-                        }),
-                      });
-                    }}
-                  />
+                  <Tooltip title='清空已选的值' placement='right' getTooltipContainer={() => document.body}>
+                    <Button
+                      icon={<ClearOutlined />}
+                      onClick={() => {
+                        onChange({
+                          ...value,
+                          dimensionLabels: _.map(dimensionLabels, (item) => {
+                            if (item.label === dimensionLabel.label) {
+                              return {
+                                ...item,
+                                value: [],
+                              };
+                            }
+                            return item;
+                          }),
+                        });
+                      }}
+                    />
+                  </Tooltip>
                 </Input.Group>
 
                 <div className='n9e-metric-views-dimensionLabel-content'>
