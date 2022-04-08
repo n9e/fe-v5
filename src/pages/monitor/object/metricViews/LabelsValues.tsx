@@ -17,8 +17,8 @@
 import React, { useEffect, useState } from 'react';
 import _ from 'lodash';
 import classNames from 'classnames';
-import { Select, Input, Tooltip } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
+import { Select, Input, Tooltip, Button } from 'antd';
+import { SearchOutlined, ClearOutlined } from '@ant-design/icons';
 import { getLabelValues } from '@/services/metricViews';
 import { Range } from '@/components/DateRangePicker';
 import { IMatch } from '../types';
@@ -83,7 +83,9 @@ export default function LabelsValues(props: IProps) {
   return (
     <div className='n9e-metric-views-labels-values'>
       <div>
-        <div className='page-title'>前置过滤条件</div>
+        <div className='page-title' style={{ marginTop: 6 }}>
+          前置过滤条件
+        </div>
         <div className='n9e-metric-views-filters'>{filtersStr ? filtersStr : '暂无数据'}</div>
       </div>
       <div>
@@ -159,16 +161,37 @@ export default function LabelsValues(props: IProps) {
                 </div>
               </div>
               <div className='n9e-metric-views-dimensionLabel'>
-                <Input
-                  prefix={<SearchOutlined />}
-                  value={dimensionLabelsSearch[dimensionLabel.label]}
-                  onChange={(e) => {
-                    setDimensionLabelsSearch({
-                      ...dimensionLabelsSearch,
-                      [dimensionLabel.label]: e.target.value,
-                    });
-                  }}
-                />
+                <Input.Group compact>
+                  <Input
+                    style={{ width: 'calc(100% - 32px)' }}
+                    prefix={<SearchOutlined />}
+                    value={dimensionLabelsSearch[dimensionLabel.label]}
+                    onChange={(e) => {
+                      setDimensionLabelsSearch({
+                        ...dimensionLabelsSearch,
+                        [dimensionLabel.label]: e.target.value,
+                      });
+                    }}
+                  />
+                  <Button
+                    icon={<ClearOutlined />}
+                    onClick={() => {
+                      onChange({
+                        ...value,
+                        dimensionLabels: _.map(dimensionLabels, (item) => {
+                          if (item.label === dimensionLabel.label) {
+                            return {
+                              ...item,
+                              value: [],
+                            };
+                          }
+                          return item;
+                        }),
+                      });
+                    }}
+                  />
+                </Input.Group>
+
                 <div className='n9e-metric-views-dimensionLabel-content'>
                   {_.isEmpty(dimensionLabelValues) ? (
                     '暂无数据'
