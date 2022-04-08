@@ -22,16 +22,16 @@ const getValueAndToNumber = (value: any[]) => {
   return _.toNumber(_.get(value, 1, NaN));
 };
 
-export const getSerieTextObj = (value: number | string | null, standardOptions?: any, valueMappings?: IValueMapping[]) => {
+export const getSerieTextObj = (value: number | string | null | undefined, standardOptions?: any, valueMappings?: IValueMapping[]) => {
   const { util, decimals } = standardOptions || {};
   const matchedValueMapping = _.find(valueMappings, (item) => {
     const { type, match } = item;
-    if (value === null || value === '') {
+    if (value === null || value === '' || value === undefined) {
       if (type === 'specialValue') {
         if (match?.specialValue === 'empty') {
           return value === '';
         } else if (match?.specialValue === 'null') {
-          return value === null;
+          return value === null || value === undefined;
         }
       }
       return false;

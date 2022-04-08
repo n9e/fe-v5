@@ -55,6 +55,7 @@ export default function index(props: IProps) {
                       <div>
                         <div>范围值说明: from &gt;= value &lt;= to</div>
                         <div>范围值默认值: from=-Infinity; to=Infinity </div>
+                        <div>特殊值Null说明: 匹配值为 null 或 undefined 或 no data</div>
                       </div>
                     }
                   >
