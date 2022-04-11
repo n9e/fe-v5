@@ -47,15 +47,24 @@ request.interceptors.response.use(
         .clone()
         .json()
         .then((data) => {
-          if (data.err === '' || data.status === 'success') {
-            if (data.data || data.dat) {
-              if (data.dat && Object.prototype.toString.call(data.dat.list) === '[object Null]') {
-                data.dat.list = [];
-              }
+          if (response.url.includes('/api/v1/')) {
+            if (status === 200 && !data.error) {
+              return { ...data, success: true };
+            } else if (data.error) {
+              // @ts-ignore
+              throw new Error(data.error.message, { cause: options.silence });
             }
-            return { ...data, success: true };
           } else {
-            throw new Error(data.err);
+            if (data.err === '' || data.status === 'success') {
+              if (data.data || data.dat) {
+                if (data.dat && Object.prototype.toString.call(data.dat.list) === '[object Null]') {
+                  data.dat.list = [];
+                }
+              }
+              return { ...data, success: true };
+            } else {
+              throw new Error(data.err);
+            }
           }
         });
     }
