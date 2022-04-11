@@ -59,18 +59,6 @@ export default defineConfig({
   resolve: {
     alias: [
       {
-        find: '@/store/eventWallInterface',
-        replacement: '/src/Packages/EventWall/interface',
-      },
-      {
-        find: '@/services/outfire',
-        replacement: '/src/Packages/Outfire/services/outfire',
-      },
-      {
-        find: '@/pages/outfire',
-        replacement: '/src/Packages/Outfire/pages',
-      },
-      {
         find: '@',
         replacement: '/src',
       },
@@ -79,48 +67,16 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      // 字符串简写写法
-      // '/foo': 'http://localhost:4567/foo',
-      // 选项写法
-      // '/api': {
-      //   target: 'http://10.86.76.13:8085',
-      //   changeOrigin: true,
-      // },
       '/api/n9e': {
         // target: 'http://10.206.0.11:8765/',
         target: 'http://10.206.0.16:18000/',
         changeOrigin: true,
       },
-      '/filters': {
-        target: 'http://10.206.0.11:8765/',
+      '/api/v1/': {
+        // target: 'http://10.206.0.17:9012',
+        target: 'http://10.129.0.11:9999',
         changeOrigin: true,
       },
-      '/integrations': {
-        target: 'http://10.206.0.11:8765/',
-        changeOrigin: true,
-      },
-      '/alerts': {
-        target: 'http://10.206.0.11:8765/',
-        changeOrigin: true,
-      },
-      '/changes': {
-        target: 'http://10.206.0.11:8765/',
-        changeOrigin: true,
-      },
-      '/dimension/api/v1': {
-        target: 'http://10.166.53.215:8089',
-        changeOrigin: true,
-      },
-      '/v1/api/fireplate': {
-        target: 'http://172.20.70.60:8010',
-        changeOrigin: true,
-      },
-      // 正则表达式写法
-      // '^/fallback/.*': {
-      //   target: 'http://jsonplaceholder.typicode.com',
-      //   changeOrigin: true,
-      //   rewrite: (path) => path.replace(/^\/fallback/, '')
-      // }
     },
   },
   build: {
