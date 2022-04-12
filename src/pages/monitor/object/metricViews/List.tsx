@@ -65,7 +65,7 @@ export default function List(props: IProps) {
   return (
     <div className='n9e-metric-views-list'>
       <div className='n9e-metric-views-list-header'>
-        <div className='page-title'>快捷视图列表</div>
+        <div className='metric-page-title'>快捷视图列表</div>
         <a>
           <PlusSquareOutlined
             onClick={() => {

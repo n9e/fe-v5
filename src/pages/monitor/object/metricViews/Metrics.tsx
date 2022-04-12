@@ -118,7 +118,7 @@ export default function Metrics(props: IProps) {
     <div className='n9e-metric-views-metrics'>
       <div>
         <div className='n9e-metric-views-metrics-header'>
-          <div className='page-title'>监控指标</div>
+          <div className='metric-page-title'>监控指标</div>
           <Input
             prefix={<SearchOutlined />}
             value={search}

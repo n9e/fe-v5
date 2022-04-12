@@ -84,7 +84,7 @@ export default function CardLeft(props: Props) {
 
   return (
     <div className='left-area' style={{ width: 240, background: '#fff' }}>
-      <div className='page-title'>
+      <div className='event-page-title'>
         <span>聚合规则</span>
         <a onClick={() => setVisible(true)}>
           <PlusSquareOutlined />
