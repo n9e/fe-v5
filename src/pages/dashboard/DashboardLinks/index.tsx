@@ -30,7 +30,7 @@ interface IProps {
 export default function index(props: IProps) {
   const { editable = true, value } = props;
   return (
-    <Space style={{ marginBottom: 10 }}>
+    <Space style={{ marginBottom: 10 }} align='baseline'>
       <Dropdown
         overlay={
           <Menu>
