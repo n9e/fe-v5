@@ -3,10 +3,8 @@
   "version": "5.2.0",
   "scripts": {
     "dev": "vite --port 8765 --host",
-    "preinstall": "sh beforeinstall.sh",
     "build": "tsc && vite build",
-    "serve": "vite preview",
-    "prepare": "husky install"
+    "serve": "vite preview"
   },
   "dependencies": {
     "@ant-design/icons": "^4.6.2",
@@ -22,7 +20,7 @@
     "@fc-plot/ts-graph": "^0.14.1",
     "@types/echarts": "^4.9.7",
     "@y0c/react-datepicker": "^1.0.4",
-    "ahooks": "^2.10.2",
+    "ahooks": "^3.1.5",
     "antd": "4.17.4",
     "better-babel-generator": "^6.26.1",
     "classnames": "^2.3.1",
@@ -76,7 +74,6 @@
     "babel-traverse": "^6.26.0",
     "babel-types": "^6.26.0",
     "better-babel-generator": "^6.26.1",
-    "husky": "^6.0.0",
     "less": "^4.1.1",
     "less-loader": "^8.1.1",
     "lint-staged": "^11.0.0",

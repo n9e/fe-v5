@@ -100,6 +100,7 @@ export default defineConfig({
         additionalData: `@import "/src/global.variable.less";`,
         javascriptEnabled: true,
         modifyVars: {
+          // modify-start
           'primary-color': '#1890ff',
           'font-size-base': '12px',
           'color-base': '#333',
@@ -108,6 +109,7 @@ export default defineConfig({
           'text-color': '#333',
           'menu-dark-bg': '#2C3D5E',
           'menu-dark-inline-submenu-bg': '#2C3D5E',
+          // modify-end
         },
       },
     },
