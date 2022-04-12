@@ -175,7 +175,7 @@ const Event: React.FC = () => {
             antProps={{
               rowKey: 'id',
               rowClassName: (record: { severity: number; is_recovered: number }, index) => {
-                return SeverityColor[record.is_recovered ? 3 : record.severity - 1];
+                return SeverityColor[record.is_recovered ? 3 : record.severity - 1] + '-left-border';
               },
               // scroll: { x: 'max-content' },
             }}

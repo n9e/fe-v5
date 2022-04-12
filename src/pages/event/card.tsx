@@ -178,7 +178,7 @@ function Card(props: Props, ref) {
         <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
           {cardList?.map((card, i) => (
             <Col span={span} key={i}>
-              <div className={`event-card ${SeverityColor[card.severity - 1]}`} onClick={() => fetchCardDetail(card)}>
+              <div className={`event-card ${SeverityColor[card.severity - 1]} ${SeverityColor[card.severity - 1]}-left-border`} onClick={() => fetchCardDetail(card)}>
                 <div className='event-card-title'>{card.title}</div>
                 <div className='event-card-num'>{card.total}</div>
               </div>
@@ -213,7 +213,7 @@ function Card(props: Props, ref) {
           rowKey={'id'}
           className='card-event-drawer'
           rowClassName={(record: { severity: number }, index) => {
-            return SeverityColor[record.severity - 1];
+            return SeverityColor[record.severity - 1] + '-left-border';
           }}
           rowSelection={{
             selectedRowKeys: selectedRowKeys,

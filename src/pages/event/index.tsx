@@ -317,7 +317,7 @@ const Event: React.FC = () => {
               antProps={{
                 rowKey: 'id',
                 rowClassName: (record: { severity: number }, index) => {
-                  return SeverityColor[record.severity - 1];
+                  return SeverityColor[record.severity - 1] + '-left-border';
                 },
                 rowSelection: {
                   selectedRowKeys: selectedRowKeys,
