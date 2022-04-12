@@ -49,7 +49,7 @@ interface IProps {
 function index(props: IProps) {
   const { dashboardId, id, time, refreshFlag, step, type, variableConfig, values, isPreview, onCloneClick, onShareClick, onEditClick, onDeleteClick } = props;
   const ref = useRef<HTMLDivElement>(null);
-  const inViewPort = useInViewport(ref);
+  const [inViewPort] = useInViewport(ref);
   const { series, loading } = usePrometheus({
     id,
     dashboardId,
