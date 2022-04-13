@@ -194,7 +194,7 @@ const index = (_props: any) => {
               </Col>
               <Col span={10} className='textAlignRight'>
                 <Link to={{ pathname: `/job-tpls/add` }}>
-                  <Button icon={<PlusOutlined />} style={{ marginRight: 10 }}>
+                  <Button icon={<PlusOutlined />} style={{ marginRight: 10 }} type='primary' ghost>
                     {t('tpl.create')}
                   </Button>
                 </Link>

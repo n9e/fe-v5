@@ -367,7 +367,7 @@ const PageTable: React.FC<Props> = ({ bgid }) => {
           <SearchInput className={'searchInput'} placeholder={t('搜索名称或标签')} onSearch={setQuery} allowClear />
         </div>
         <div className='strategy-table-search-right'>
-          <Button type='primary' onClick={goToAddWarningStrategy} className='strategy-table-search-right-create'>
+          <Button type='primary' onClick={goToAddWarningStrategy} className='strategy-table-search-right-create' ghost>
             {t('新增告警规则')}
           </Button>
           <div className={'table-more-options'}>

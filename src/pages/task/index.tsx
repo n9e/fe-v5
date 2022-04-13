@@ -144,6 +144,8 @@ const index = (_props: any) => {
               </Col>
               <Col span={8} style={{ textAlign: 'right' }}>
                 <Button
+                  type='primary'
+                  ghost
                   onClick={() => {
                     history.push('/job-tasks/add');
                   }}

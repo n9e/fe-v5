@@ -249,7 +249,7 @@ export default function Dashboard() {
                 />
               </div>
               <div className='table-handle-buttons'>
-                <Button type='primary' onClick={showModal}>
+                <Button type='primary' onClick={showModal} ghost>
                   {t('新建大盘')}
                 </Button>
                 <div className={'table-more-options'}>

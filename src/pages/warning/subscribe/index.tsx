@@ -240,6 +240,7 @@ const Shield: React.FC = () => {
                 <Button
                   type='primary'
                   className='add'
+                  ghost
                   onClick={() => {
                     history.push('/alert-subscribes/add');
                   }}

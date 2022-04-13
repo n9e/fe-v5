@@ -167,7 +167,7 @@ const Resource: React.FC = () => {
             <div className='event-table-search-right'>
               {activeKey === UserType.User && profile.roles.includes('Admin') && (
                 <div className='user-manage-operate'>
-                  <Button type='primary' onClick={() => handleClick(activeKey === UserType.User ? ActionType.CreateUser : t('创建团队'))}>
+                  <Button type='primary' onClick={() => handleClick(activeKey === UserType.User ? ActionType.CreateUser : t('创建团队'))} ghost>
                     {t('创建用户')}
                   </Button>
                 </div>

@@ -279,6 +279,7 @@ const Resource: React.FC = () => {
                 </Col>
                 <Button
                   type='primary'
+                  ghost
                   onClick={() => {
                     handleClick(ActionType.AddBusinessMember, teamId);
                   }}
