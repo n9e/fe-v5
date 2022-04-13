@@ -87,7 +87,7 @@ const MetricExplorerPage: React.FC = () => {
   }, [clusters]);
 
   return (
-    <PageLayout title='即时查询' icon={<LineChartOutlined />}>
+    <PageLayout title='即时查询' icon={<LineChartOutlined />} hideCluster={false}>
       <div className='prometheus-page'>
         <PanelList metrics={metrics} />
       </div>

@@ -34,7 +34,7 @@ export default function index() {
   });
 
   return (
-    <PageLayout title='快捷视图' icon={<LineChartOutlined />}>
+    <PageLayout title='快捷视图' icon={<LineChartOutlined />} hideCluster={false}>
       <div className='n9e-metric-views'>
         <List
           onSelect={(record: IMatch) => {

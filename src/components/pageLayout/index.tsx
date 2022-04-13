@@ -37,7 +37,7 @@ interface IPageLayoutProps {
   onChangeCluster?: (string) => void;
 }
 
-const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, children, customArea, showBack, onChangeCluster, hideCluster = false }) => {
+const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, children, customArea, showBack, onChangeCluster, hideCluster = true }) => {
   const { t, i18n } = useTranslation();
   const history = useHistory();
   const dispatch = useDispatch();
