@@ -248,10 +248,28 @@ export default function ChartGroup(props: Props) {
           })
         : [];
       let haveNewChart = false;
-      const innerLayout = charts.map((item: { configs: { layout: { i: string } } }, index: string | number) => {
+      const innerLayout = charts.map((item: { configs: { layout: { i: string; x?: number; y?: number; w: number; h: number } } }, index: string | number) => {
         if (item.configs.layout) {
           // 当Chart被删除后 layout中的i会中断，ResponsiveReactGridLayout会有问题
           item.configs.layout.i = '' + index;
+          // 克隆图表后 layout 不具备 x/y 值，需要计算设置
+          if (item.configs.layout.x === undefined && item.configs.layout.y === undefined) {
+            haveNewChart = true;
+            return getNewItemLayout(
+              charts.slice(0, index).map(
+                (item: {
+                  configs: {
+                    layout: any;
+                  };
+                }) => item.configs.layout,
+              ),
+              Number(index),
+              {
+                w: item.configs.layout.w,
+                h: item.configs.layout.h,
+              },
+            );
+          }
           return item.configs.layout;
         } else {
           haveNewChart = true;
@@ -289,9 +307,8 @@ export default function ChartGroup(props: Props) {
     });
   };
 
-  const getNewItemLayout = function (curentLayouts: Array<Layout>, index: number): Layout {
-    const w = unit;
-    const h = unit / 3;
+  const getNewItemLayout = function (curentLayouts: Array<Layout>, index: number, size?: { w: number; h: number }): Layout {
+    const { w, h } = size || { w: unit, h: unit / 3 };
     const layoutArrayLayoutFillArray = new Array<Array<number>>();
     curentLayouts.forEach((layoutItem) => {
       if (layoutItem) {

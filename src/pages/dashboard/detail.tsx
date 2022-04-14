@@ -214,8 +214,13 @@ export default function DashboardDetail() {
 
   const handleCloneChart = async (group: Group, item: Chart) => {
     groupId = group.id;
+    const configsClone = _.cloneDeep(item.configs);
+    configsClone.layout = {
+      w: configsClone.layout.w,
+      h: configsClone.layout.h,
+    };
     await createChart(busiId, {
-      configs: JSON.stringify(_.omit(item.configs, 'layout')),
+      configs: JSON.stringify(configsClone),
       weight: 0,
       group_id: groupId,
     });
