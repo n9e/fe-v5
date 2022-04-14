@@ -46,6 +46,7 @@ function Card(props: Props, ref) {
   const [selectedRowKeys, setSelectedRowKeys] = useState<number[]>([]);
   const [drawerList, setDrawerList] = useState<any>();
   const [visible, setVisible] = useState(false);
+
   useEffect(() => {
     reloadCard();
   }, [filter, rule]);

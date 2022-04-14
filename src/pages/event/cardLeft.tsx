@@ -28,7 +28,16 @@ export default function CardLeft(props: Props) {
   const [search, setSearch] = useState('');
 
   useEffect(() => {
-    getList(true);
+    getList(true).then((res) => {
+      if (activeId && res && res.length > 0) {
+        const currentAlert = res?.find((item) => item.id === activeId) as CardAlertType;
+        if (currentAlert) {
+          onRefreshRule(currentAlert.rule);
+        } else {
+          saveActiveId(res[0].id);
+        }
+      }
+    });
   }, []);
 
   useEffect(() => {
@@ -53,6 +62,7 @@ export default function CardLeft(props: Props) {
       const sortedList = res.dat.sort((a: CardAlertType, b: CardAlertType) => a.cate - b.cate);
       setAlertList(sortedList);
       selectTheFirst && sortedList.length > 0 && !sortedList.find((item) => item.id === activeId) && saveActiveId(sortedList[0].id);
+      return sortedList;
     });
   };
 
