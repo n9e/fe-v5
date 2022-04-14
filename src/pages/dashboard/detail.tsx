@@ -59,6 +59,7 @@ const layout = {
 let groupId: number;
 let isAddGroup: boolean = true;
 export default function DashboardDetail() {
+  const refreshRef = useRef<{ closeRefresh: Function }>();
   const { t } = useTranslation();
   const { id, busiId } = useParams<URLParam>();
   const [groupForm] = Form.useForm();
@@ -84,6 +85,7 @@ export default function DashboardDetail() {
   const [titleEditing, setTitleEditing] = useState(false);
   const [chartGroup, setChartGroup] = useState<Group[]>([]);
   const [variableConfig, setVariableConfig] = useState<VariableType>();
+  const [variableConfigWithOptions, setVariableConfigWithOptions] = useState<VariableType>();
   const [dashboardLinks, setDashboardLinks] = useState<ILink[]>();
   const [groupModalVisible, setGroupModalVisible] = useState(false);
   const [chartModalVisible, setChartModalVisible] = useState(false);
@@ -110,7 +112,7 @@ export default function DashboardDetail() {
         });
         setRefreshFlag(newRefreshFlag);
       }
-      init();
+      init(false);
     },
     { wait: 1000 },
   );
@@ -119,12 +121,13 @@ export default function DashboardDetail() {
     init();
   }, []);
 
-  const init = () => {
+  const init = (needUpdateVariable = true) => {
     getSingleDashboard(busiId, id).then((res) => {
       setDashboard(res.dat);
       if (res.dat.configs) {
         const configs = JSON.parse(res.dat.configs);
         setVariableConfig(configs);
+        setVariableConfigWithOptions(configs);
         setDashboardLinks(configs.links);
       }
     });
@@ -160,7 +163,7 @@ export default function DashboardDetail() {
     groupId = gid;
     editor({
       visible: true,
-      variableConfig,
+      variableConfig: variableConfigWithOptions,
       cluster: curCluster,
       busiId,
       groupId,
@@ -232,7 +235,7 @@ export default function DashboardDetail() {
       dataProps: {
         ...item.configs,
         targets: _.map(item.configs.targets, (target) => {
-          const realExpr = variableConfig ? replaceExpressionVars(target.expr, variableConfig, variableConfig.var.length, id) : target.expr;
+          const realExpr = variableConfigWithOptions ? replaceExpressionVars(target.expr, variableConfigWithOptions, variableConfigWithOptions.var.length, id) : target.expr;
           return {
             ...target,
             expr: realExpr,
@@ -330,7 +333,12 @@ export default function DashboardDetail() {
     }
     dashboardConfigs.var = value.var;
     b && updateSingleDashboard(busiId, id, { ...dashboard, configs: JSON.stringify(dashboardConfigs) });
-    setVariableConfig(valueWithOptions);
+    setVariableConfig(dashboardConfigs);
+    setVariableConfigWithOptions(valueWithOptions);
+  };
+
+  const stopAutoRefresh = () => {
+    refreshRef.current?.closeRefresh();
   };
   const clusterMenu = (
     <Menu selectedKeys={[curCluster]}>
@@ -386,7 +394,7 @@ export default function DashboardDetail() {
               </div>
               <DateRangePicker onChange={handleDateChange} />
               <Resolution onChange={(v) => setStep(v)} initialValue={step} />
-              <Refresh onRefresh={run} />
+              <Refresh onRefresh={run} ref={refreshRef} />
             </Space>
           </div>
         </div>
@@ -395,7 +403,7 @@ export default function DashboardDetail() {
       <div className='dashboard-detail-content'>
         <div className='dashboard-detail-content-header'>
           <div className='variable-area'>
-            <VariableConfig onChange={handleVariableChange} value={variableConfig} cluster={curCluster} range={range} id={id} />
+            <VariableConfig onChange={handleVariableChange} value={variableConfig} cluster={curCluster} range={range} id={id} onOpenFire={stopAutoRefresh} />
           </div>
           <DashboardLinks
             value={dashboardLinks}
@@ -438,7 +446,7 @@ export default function DashboardDetail() {
               onDelChartGroup={handleDelChartGroup}
               range={range}
               refreshFlag={refreshFlag}
-              variableConfig={variableConfig!}
+              variableConfig={variableConfigWithOptions!}
               moveUpEnable={i > 0}
               moveDownEnable={i < chartGroup.length - 1}
             />
@@ -491,7 +499,7 @@ export default function DashboardDetail() {
           groupId={groupId}
           show={chartModalVisible}
           onVisibleChange={handleChartConfigVisibleChange}
-          variableConfig={variableConfig}
+          variableConfig={variableConfigWithOptions}
         />
       )}
     </PageLayout>

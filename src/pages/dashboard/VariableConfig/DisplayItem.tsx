@@ -67,7 +67,6 @@ const DisplayItem: React.FC<Props> = ({ expression, index, data, onChange, clust
         convertExpressionToQuery(newExpression, range).then((res) => {
           // 逻辑上只有导入大盘后初始化那一次 selected会为空
           const regFilterRes = res.filter((i) => !!i && (!reg || !stringToRegex(reg) || (stringToRegex(reg) as RegExp).test(i)));
-          console.log('regFilterRes', regFilterRes);
           setOptions(regFilterRes);
           if (res.length > 0) {
             if (selected) {
