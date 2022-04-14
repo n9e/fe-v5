@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useImperativeHandle } from 'react';
 import { Dropdown, Button, Menu } from 'antd';
 import { DownOutlined, SyncOutlined } from '@ant-design/icons';
 import _ from 'lodash';
@@ -39,7 +39,7 @@ interface IProps {
 
 const intervalSecondsCache = _.toNumber(window.localStorage.getItem('refresh-interval-seconds'));
 
-export default function Refresh(props: IProps) {
+function Refresh(props: IProps, ref) {
   const [intervalSeconds, setIntervalSeconds] = useState(intervalSecondsCache);
   const intervalRef = useRef<NodeJS.Timeout>();
 
@@ -61,6 +61,13 @@ export default function Refresh(props: IProps) {
       }
     };
   }, []);
+
+  useImperativeHandle(ref, () => ({
+    closeRefresh() {
+      setIntervalSeconds(0);
+      window.localStorage.setItem('refresh-interval-seconds', '0');
+    },
+  }));
 
   return (
     <div className='refresh-container'>
@@ -87,3 +94,5 @@ export default function Refresh(props: IProps) {
     </div>
   );
 }
+
+export default React.forwardRef(Refresh);

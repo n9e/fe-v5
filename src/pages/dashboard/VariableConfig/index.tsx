@@ -37,6 +37,7 @@ interface ITagFilterProps {
   value?: FormType;
   range: Range;
   onChange: (data: FormType, needSave: boolean, options?: FormType) => void;
+  onOpenFire?: () => void;
 }
 
 export function setVaraiableSelected(name: string, value: string | string[], id: string) {
@@ -49,7 +50,7 @@ export function getVaraiableSelected(name: string, id: string) {
   return v ? JSON.parse(v) : null;
 }
 
-const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = ({ isOpen = false, value, onChange, editable = true, cluster, range, id }, ref) => {
+const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = ({ isOpen = false, value, onChange, editable = true, cluster, range, id, onOpenFire }, ref) => {
   const { t } = useTranslation();
   const [editing, setEditing] = useState<boolean>(isOpen);
   const [varsMap, setVarsMap] = useState<{ string?: string | string[] | undefined }>({});
@@ -95,11 +96,25 @@ const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = ({ isOpe
                 varsMap={varsMap}
               ></DisplayItem>
             ))}
-            {editable && <EditOutlined className='icon' onClick={() => setEditing(true)}></EditOutlined>}
+            {editable && (
+              <EditOutlined
+                className='icon'
+                onClick={() => {
+                  setEditing(true);
+                  onOpenFire && onOpenFire();
+                }}
+              ></EditOutlined>
+            )}
           </>
         )}
         {(data ? data?.var.length === 0 : true) && editable && (
-          <div className='add-variable-tips' onClick={() => setEditing(true)}>
+          <div
+            className='add-variable-tips'
+            onClick={() => {
+              setEditing(true);
+              onOpenFire && onOpenFire();
+            }}
+          >
             {t('添加大盘变量')}
           </div>
         )}
