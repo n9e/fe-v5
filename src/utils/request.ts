@@ -87,6 +87,13 @@ request.interceptors.response.use(
       }
     } else if (status === 404) {
       location.href = '/404';
+    } else if (status === 403 && response.url.includes('/api/v1')) {
+      return response
+        .clone()
+        .json()
+        .then((data) => {
+          if (data.error && data.error.message) throw new Error(data.error.message);
+        });
     } else {
       const contentType = response.headers.get('content-type');
       const isPlainText = contentType?.indexOf('text/plain; charset=utf-8') !== -1;
