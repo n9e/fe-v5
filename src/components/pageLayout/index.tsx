@@ -119,8 +119,14 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, childr
               {icon}
               {title}
             </div>
+
             {/* <div className={'page-header-right-area'}>{rightArea}</div> */}
             <div className={'page-header-right-area'}>
+              {import.meta.env.VITE_DOC_LINK && (
+                <a href={import.meta.env.VITE_DOC_LINK as string} target='_blank' style={{ marginRight: 20 }}>
+                  文档
+                </a>
+              )}
               {!hideCluster && (
                 <div style={{ marginRight: 20 }}>
                   集群：
