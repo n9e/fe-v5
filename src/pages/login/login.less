@@ -8,6 +8,12 @@
   justify-content: center;
   align-items: center;
   .banner {
+    &.integration {
+      background: none;
+      display: flex;
+      width: 900px;
+      justify-content: center;
+    }
     background: rgb(20, 22, 49);
     width: 720px;
     height: 100%;
@@ -35,15 +41,43 @@
   @media screen and (max-width: 1070px) {
     .banner {
       display: none;
+      &.integration {
+        display: none;
+      }
     }
   }
   .login-panel {
     height: 100%;
-    width: 100%;
+    // width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     .login-main {
+      &.integration {
+        z-index: 5;
+        .login-title {
+          text-align: center;
+          width: 80%;
+        }
+        .ant-form-item {
+          margin-bottom: 40px;
+        }
+        .ant-form-item-label > label {
+          font-size: 16px;
+        }
+        input {
+          border: none;
+          border-radius: 0px;
+          font-size: 14px;
+          border-bottom: 1px solid #999999;
+          box-shadow: none !important;
+          padding-left: 0px;
+        }
+        .ant-btn {
+          font-size: 18px;
+          background: linear-gradient(to right, #8874c0, #6c53b1);
+        }
+      }
       width: 600px;
       padding: 50px;
       .login-title {
