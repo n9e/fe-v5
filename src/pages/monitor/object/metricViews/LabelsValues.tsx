@@ -74,7 +74,7 @@ export default function LabelsValues(props: IProps) {
             if (idx === 0) {
               return {
                 label: item.label,
-                value: [_.head(_labelValues[item.label])],
+                value: _.slice(_labelValues[item.label], 0, 10),
               };
             }
             return item;
@@ -125,6 +125,7 @@ export default function LabelsValues(props: IProps) {
                     <div className='n9e-metric-views-dynamicLabels-item-label'>{item.label}:</div>
                     <Select
                       allowClear
+                      showSearch
                       style={{ width: '100%' }}
                       value={item.value}
                       onChange={(val) => {
@@ -140,6 +141,15 @@ export default function LabelsValues(props: IProps) {
                         onChange({
                           ...value,
                           dynamicLabels: _dynamicLabels,
+                          dimensionLabels: _.map(dimensionLabels, (item, idx) => {
+                            if (idx === 0) {
+                              return {
+                                label: item.label,
+                                value: [],
+                              };
+                            }
+                            return item;
+                          }),
                         });
                       }}
                     >
@@ -168,7 +178,9 @@ export default function LabelsValues(props: IProps) {
                   style={{
                     display: 'flex',
                     flexWrap: 'wrap',
-                    width: 200,
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    width: 220,
                   }}
                 >
                   <Tooltip title={dimensionLabel.label} placement='left'>
@@ -176,12 +188,31 @@ export default function LabelsValues(props: IProps) {
                       style={{
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
-                        maxWidth: '100%',
+                        maxWidth: 'calc(100% - 30px)',
                       }}
                     >
                       {dimensionLabel.label}
                     </div>
                   </Tooltip>
+                  <a
+                    style={{ fontSize: 12, fontWeight: 'normal' }}
+                    onClick={() => {
+                      onChange({
+                        ...value,
+                        dimensionLabels: _.map(dimensionLabels, (item) => {
+                          if (item.label === dimensionLabel.label) {
+                            return {
+                              ...item,
+                              value: dimensionLabelValues,
+                            };
+                          }
+                          return item;
+                        }),
+                      });
+                    }}
+                  >
+                    全选
+                  </a>
                 </div>
               </div>
               <div className='n9e-metric-views-dimensionLabel'>
