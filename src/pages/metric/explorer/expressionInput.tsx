@@ -30,7 +30,6 @@ import { autocompletion, completionKeymap, CompletionContext, CompletionResult }
 import { baseTheme, promqlHighlighter } from '@/components/PromqlEditor/CMTheme';
 
 import { CompleteStrategy, PromQLExtension } from 'codemirror-promql';
-import { newCompleteStrategy } from 'codemirror-promql/cjs/complete';
 import { GlobalOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 
@@ -111,12 +110,6 @@ const ExpressionInput: FC<CMExpressionInputProps> = ({ value, onExpressionChange
       .activateCompletion(true)
       .activateLinter(true)
       .setComplete({
-        // completeStrategy: new HistoryCompleteStrategy(
-        //   newCompleteStrategy({
-        //     remote: { url, fetchFn: myHTTPClient, cache: { initialMetricList: metricNames } },
-        //   }),
-        //   queryHistory,
-        // ),
         remote: { url, fetchFn: myHTTPClient, cache: { initialMetricList: metricNames } },
       });
 
