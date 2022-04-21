@@ -54,14 +54,14 @@ const DisplayItem: React.FC<Props> = ({ expression, index, data, onChange, clust
         exp !== newExpression ||
         curCluster !== cluster ||
         _range !== range ||
-        JSON.stringify(_select) !== JSON.stringify(selected) ||
+        // JSON.stringify(_select) !== JSON.stringify(selected) ||
         _multi !== multi ||
         _allOption !== allOption
       ) {
         setExp(newExpression);
         setRange(range);
         setCurCluster(cluster);
-        setSelect(selected);
+        // setSelect(selected);
         setAllOption(allOption);
         setMulti(multi);
         convertExpressionToQuery(newExpression, range).then((res) => {
