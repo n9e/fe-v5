@@ -23,6 +23,9 @@ export const baseTheme = EditorView.theme({
       outline: 'none',
       outline_fallback: 'none',
     },
+    '&.cm-editor.cm-focused': {
+      outline: 'none',
+    },
   },
   '.cm-scroller': {
     overflow: 'hidden',
