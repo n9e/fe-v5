@@ -134,7 +134,7 @@ request.interceptors.response.use(
           .clone()
           .json()
           .then((data) => {
-            if (response.url.indexOf('/api/n9e/prometheus/api/v1') > -1) {
+            if (response.url.indexOf('/api/n9e/prometheus/api/v1') > -1 || response.url.indexOf('/api/v1/datasource/prometheus') > -1) {
               return data;
             }
             if (response.url.includes('/api/v1')) {
