@@ -6,7 +6,8 @@ import { UpdateAccessToken } from '@/services/login';
 /** 异常处理程序，所有的error都被这里处理，页面无法感知具体error */
 const errorHandler = (error: Error): Response => {
   // 忽略 AbortError 类型的报错
-  if (!(error.name === 'AbortError')) {
+  // @ts-ignore
+  if (!(error.name === 'AbortError') && !error.silence) {
     notification.error({
       message: error.message,
     });
@@ -39,7 +40,7 @@ request.interceptors.request.use((url, options) => {
  * 响应拦截
  */
 request.interceptors.response.use(
-  async (response) => {
+  async (response, options) => {
     const { status } = response;
 
     if (status === 200) {
@@ -65,6 +66,30 @@ request.interceptors.response.use(
             } else {
               throw new Error(data.err);
             }
+          }
+        });
+    }
+    // 兼容异常处理
+    if (status === 500 && response.url.includes('/api/v1')) {
+      return response
+        .clone()
+        .json()
+        .then((data) => {
+          if (!data.error) {
+            return { ...data, success: true };
+            // if (data.data || data.dat) {
+            //   return { ...data, success: true };
+            // } else {
+            //   return { success: true };
+            // }
+          } else if (data.error) {
+            throw {
+              name: data.error.name,
+              message: data.error.message,
+              silence: options.silence,
+              data,
+              response,
+            };
           }
         });
     }
@@ -112,7 +137,18 @@ request.interceptors.response.use(
             if (response.url.indexOf('/api/n9e/prometheus/api/v1') > -1) {
               return data;
             }
-            throw new Error(data.err ? data.err : data);
+            if (response.url.includes('/api/v1')) {
+              throw {
+                // TODO: 后端服务异常后可能返回的错误数据也不是一个正常的结构，后面得考虑下怎么处理
+                name: data.error ? data.error.name : JSON.stringify(data),
+                message: data.error ? data.error.message : JSON.stringify(data),
+                silence: options.silence,
+                data,
+                response,
+              };
+            } else {
+              throw new Error(data.err ? data.err : data);
+            }
           });
       }
     }
