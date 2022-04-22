@@ -112,7 +112,7 @@ export default function index(props: IProps) {
                             if (type === 'specialValue') {
                               return (
                                 <Form.Item noStyle {...restField} name={[name, 'match', 'specialValue']}>
-                                  <Select>
+                                  <Select suffixIcon={<CaretDownOutlined />}>
                                     <Select.Option value='null'>Null</Select.Option>
                                     <Select.Option value='empty'>Empty string</Select.Option>
                                   </Select>

@@ -354,7 +354,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                         },
                       ]}
                     >
-                      <Select>
+                      <Select suffixIcon={<CaretDownOutlined />}>
                         {clusterList?.map((item) => (
                           <Option value={item} key={item}>
                             {item}

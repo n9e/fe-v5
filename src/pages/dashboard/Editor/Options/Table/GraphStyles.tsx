@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import { Form, Select, Row, Col, Switch, Input } from 'antd';
+import { CaretDownOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { Panel } from '../../Components/Collapse';
 import { calcsOptions } from '../../config';
@@ -34,7 +35,7 @@ export default function GraphStyles() {
           </Col>
         </Row>
         <Form.Item label='取值计算' name={[...namePrefix, 'calc']}>
-          <Select>
+          <Select suffixIcon={<CaretDownOutlined />}>
             {_.map(calcsOptions, (item, key) => {
               return (
                 <Select.Option key={key} value={key}>
@@ -47,7 +48,7 @@ export default function GraphStyles() {
         <Row gutter={10}>
           <Col span={12}>
             <Form.Item label='显示模式' name={[...namePrefix, 'displayMode']}>
-              <Select>
+              <Select suffixIcon={<CaretDownOutlined />}>
                 <Select.Option value='seriesToRows'>每行展示 serie 的值</Select.Option>
                 <Select.Option value='labelValuesToRows'>每行展示指定聚合维度的值</Select.Option>
               </Select>

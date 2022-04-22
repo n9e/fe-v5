@@ -190,7 +190,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }) => {
     >
       <Card>
         <Form.Item label={t('业务组：')} name='busiGroup'>
-          <Select>
+          <Select suffixIcon={<CaretDownOutlined />}>
             {busiGroups?.map((item) => (
               <Option value={item.id} key={item.id}>
                 {item.name}
@@ -209,7 +209,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }) => {
             },
           ]}
         >
-          <Select>
+          <Select suffixIcon={<CaretDownOutlined />}>
             {clusterList?.map((item) => (
               <Option value={item} key={item}>
                 {item}

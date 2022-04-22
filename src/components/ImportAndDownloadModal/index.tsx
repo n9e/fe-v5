@@ -24,7 +24,7 @@ import { Button, Modal, Form, Input, message, Table, Select, Divider } from 'ant
 const { Option } = Select;
 import './index.less';
 import { useTranslation } from 'react-i18next';
-import { CopyOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { CopyOutlined, CheckCircleOutlined, CloseCircleOutlined, CaretDownOutlined } from '@ant-design/icons';
 import { stringify } from 'querystring';
 const { TextArea } = Input;
 export const enum ModalStatus {
@@ -230,7 +230,7 @@ export default function ImportAndDownloadModal(props: Props) {
                         },
                       ]}
                     >
-                      <Select>
+                      <Select suffixIcon={<CaretDownOutlined />}>
                         {clusterList?.map((item) => (
                           <Option value={item} key={item}>
                             {item}
@@ -267,7 +267,7 @@ export default function ImportAndDownloadModal(props: Props) {
                         },
                       ]}
                     >
-                      <Select>
+                      <Select suffixIcon={<CaretDownOutlined />}>
                         {clusterList?.map((item) => (
                           <Option value={item} key={item}>
                             {item}

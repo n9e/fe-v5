@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import { Form, Radio, Select, Row, Col, InputNumber } from 'antd';
+import { CaretDownOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { Panel } from '../../Components/Collapse';
 import { calcsOptions, legendPostion } from '../../config';
@@ -29,7 +30,7 @@ export default function GraphStyles() {
         <Row gutter={10}>
           <Col span={12}>
             <Form.Item label='取值计算' name={[...namePrefix, 'calc']}>
-              <Select>
+              <Select suffixIcon={<CaretDownOutlined />}>
                 {_.map(calcsOptions, (item, key) => {
                   return (
                     <Select.Option key={key} value={key}>
@@ -42,7 +43,7 @@ export default function GraphStyles() {
           </Col>
           <Col span={12}>
             <Form.Item label='图例位置' name={[...namePrefix, 'legengPosition']}>
-              <Select>
+              <Select suffixIcon={<CaretDownOutlined />}>
                 {legendPostion.map((item) => {
                   return (
                     <Select.Option key={item} value={item}>

@@ -17,6 +17,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory, useParams, useLocation } from 'react-router-dom';
+import { CaretDownOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import { Card, Form, Input, InputNumber, Radio, Select, Row, Col, Button, TimePicker, Checkbox, Modal, message, Space, Switch, Tooltip, Tag, notification } from 'antd';
 const { TextArea } = Input;
@@ -287,7 +288,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                 },
               ]}
             >
-              <Select>
+              <Select suffixIcon={<CaretDownOutlined />}>
                 {clusterList?.map((item) => (
                   <Option value={item} key={item}>
                     {item}

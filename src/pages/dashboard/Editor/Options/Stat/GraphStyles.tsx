@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import { Form, Radio, Select, Row, Col, InputNumber } from 'antd';
+import { CaretDownOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { Panel } from '../../Components/Collapse';
 import { calcsOptions } from '../../config';
@@ -49,7 +50,7 @@ export default function GraphStyles() {
         <Row gutter={10}>
           <Col span={12}>
             <Form.Item label='取值计算' name={[...namePrefix, 'calc']}>
-              <Select>
+              <Select suffixIcon={<CaretDownOutlined />}>
                 {_.map(calcsOptions, (item, key) => {
                   return (
                     <Select.Option key={key} value={key}>
@@ -62,7 +63,7 @@ export default function GraphStyles() {
           </Col>
           <Col span={12}>
             <Form.Item label='每行最多显示' name={[...namePrefix, 'colSpan']}>
-              <Select>
+              <Select suffixIcon={<CaretDownOutlined />}>
                 {_.map(colSpans, (item) => {
                   return (
                     <Select.Option key={item} value={item}>
