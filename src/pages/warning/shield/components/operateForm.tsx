@@ -70,7 +70,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }) => {
   const history = useHistory();
   const [btnLoading, setBtnLoading] = useState<boolean>(false);
   const [timeLen, setTimeLen] = useState('1h');
-  const { curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
+  const { curBusiItem, busiGroups } = useSelector<RootState, CommonStoreState>((state) => state.common);
 
   useEffect(() => {
     const btime = form.getFieldValue('btime');
@@ -80,6 +80,14 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }) => {
       const h = moment.duration(etime - btime).hours();
       const m = moment.duration(etime - btime).minutes();
       const s = moment.duration(etime - btime).seconds();
+    }
+    if (curBusiItem) {
+      form.setFieldsValue({ busiGroup: curBusiItem.id });
+    } else if (busiGroups.length > 0) {
+      form.setFieldsValue({ busiGroup: busiGroups[0].id });
+    } else {
+      message.warning('无可用业务组');
+      history.push('/alert-mutes');
     }
     return () => {};
   }, [form]);
@@ -127,7 +135,8 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }) => {
       etime: moment(values.etime).unix(),
       tags,
     };
-    addShield(params, curBusiItem.id)
+    const curBusiItemId = form.getFieldValue('busiGroup');
+    addShield(params, curBusiItemId)
       .then((_) => {
         message.success(t('新建告警屏蔽成功'));
         history.push('/alert-mutes');
@@ -180,6 +189,16 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }) => {
       }}
     >
       <Card>
+        <Form.Item label={t('业务组：')} name='busiGroup'>
+          <Select>
+            {busiGroups?.map((item) => (
+              <Option value={item.id} key={item.id}>
+                {item.name}
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
+
         <Form.Item
           label={t('生效集群：')}
           name='cluster'

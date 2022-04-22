@@ -159,6 +159,7 @@ const Event: React.FC = () => {
               type='link'
               onClick={() => {
                 history.push('/alert-mutes/add', {
+                  cluster: record.cluster,
                   tags: record.tags.map((tag) => {
                     const [key, value] = tag.split('=');
                     return {

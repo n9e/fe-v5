@@ -125,6 +125,7 @@ function Card(props: Props, ref) {
               type='link'
               onClick={() => {
                 history.push('/alert-mutes/add', {
+                  cluster: record.cluster,
                   tags: record.tags
                     ? record.tags.map((tag) => {
                         const [key, value] = tag.split('=');
