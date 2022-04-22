@@ -20,7 +20,7 @@ import { Form, Input, Button, Modal, Row, Col, message, Space, Select } from 'an
 import { getNotifyChannels } from '@/services/manage';
 import { RootState, accountStoreState } from '@/store/accountInterface';
 import { ContactsItem } from '@/store/manageInterface';
-import { MinusCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import { MinusCircleOutlined, PlusCircleOutlined, CaretDownOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 const { Option } = Select;
 export default function Info() {
@@ -211,7 +211,7 @@ export default function Info() {
                             },
                           ]}
                         >
-                          <Select placeholder={t('请选择联系方式')}>
+                          <Select suffixIcon={<CaretDownOutlined />} placeholder={t('请选择联系方式')}>
                             {contactsList.map((item, index) => (
                               <Option value={item.key} key={index}>
                                 {item.label}

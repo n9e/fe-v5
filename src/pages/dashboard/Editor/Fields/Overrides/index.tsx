@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import { Form, Space, Input, Select } from 'antd';
-import { PlusCircleOutlined, MinusCircleOutlined } from '@ant-design/icons';
+import { PlusCircleOutlined, MinusCircleOutlined, CaretDownOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { Panel } from '../../Components/Collapse';
 import ValueMappings from '../ValueMappings';
@@ -54,7 +54,7 @@ export default function index({ targets }) {
                 }
               >
                 <Form.Item label='查询条件名称' {...restField} name={[name, 'matcher', 'value']}>
-                  <Select allowClear>
+                  <Select suffixIcon={<CaretDownOutlined />} allowClear>
                     {_.map(targets, (target) => {
                       return (
                         <Select.Option key={target.refId} value={target.refId}>

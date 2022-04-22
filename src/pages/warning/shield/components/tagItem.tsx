@@ -18,7 +18,7 @@ import React, { useState, useEffect } from 'react';
 import { Form, Input, Select, Col, Button, Row, message } from 'antd';
 const { Option } = Select;
 const { TextArea } = Input;
-import { MinusCircleOutlined } from '@ant-design/icons';
+import { MinusCircleOutlined, CaretDownOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 interface Itag {
   field: any;
@@ -56,7 +56,7 @@ const TagItem: React.FC<Itag> = ({ field, remove, form }) => {
         </Col>
         <Col span={3}>
           <Form.Item style={{ marginBottom: 0 }} name={[field.name, 'func']} fieldKey={[field.name, 'func']} initialValue='=='>
-            <Select onChange={funcChange}>
+            <Select suffixIcon={<CaretDownOutlined />} onChange={funcChange}>
               <Option value='=='>==</Option>
               <Option value='=~'>=~</Option>
               <Option value='in'>in</Option>

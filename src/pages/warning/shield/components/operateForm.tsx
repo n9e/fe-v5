@@ -16,7 +16,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import { Form, Input, Card, Select, Col, Button, Row, message, DatePicker, Tooltip } from 'antd';
-import { QuestionCircleFilled, PlusCircleOutlined } from '@ant-design/icons';
+import { QuestionCircleFilled, PlusCircleOutlined, CaretDownOutlined } from '@ant-design/icons';
 import moment from 'moment';
 
 import TagItem from './tagItem';
@@ -226,7 +226,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }) => {
           </Col>
           <Col span={8}>
             <Form.Item label={t('屏蔽时长：')}>
-              <Select placeholder={t('请选择屏蔽时长')} onChange={timeLenChange} value={timeLen}>
+              <Select suffixIcon={<CaretDownOutlined />} placeholder={t('请选择屏蔽时长')} onChange={timeLenChange} value={timeLen}>
                 {timeLensDefault.map((item: any, index: number) => (
                   <Option key={index} value={item.value}>
                     {item.value}

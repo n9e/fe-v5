@@ -19,7 +19,7 @@ import { Form, Input, Select, Space, Button } from 'antd';
 import { layout } from '../../const';
 import { getUserInfo, getNotifyChannels, getRoles } from '@/services/manage';
 import { UserAndPasswordFormProps, Contacts, ContactsItem, User } from '@/store/manageInterface';
-import { MinusCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import { MinusCircleOutlined, PlusCircleOutlined, CaretDownOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 const { Option } = Select;
 const UserForm = React.forwardRef<ReactNode, UserAndPasswordFormProps>((props, ref) => {
@@ -187,7 +187,7 @@ const UserForm = React.forwardRef<ReactNode, UserAndPasswordFormProps>((props, r
                       },
                     ]}
                   >
-                    <Select placeholder={t('请选择联系方式')}>
+                    <Select suffixIcon={<CaretDownOutlined />} placeholder={t('请选择联系方式')}>
                       {contactsList.map((item, index) => (
                         <Option value={item.key} key={index}>
                           {item.label}

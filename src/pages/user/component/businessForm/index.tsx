@@ -17,7 +17,7 @@
 import React, { useEffect, useState, useImperativeHandle, ReactNode, useCallback } from 'react';
 import { Form, Input, Select, Switch, Row, Tag, Space, Button } from 'antd';
 import { layout } from '../../const';
-import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import { MinusCircleOutlined, PlusOutlined, CaretDownOutlined } from '@ant-design/icons';
 import { getBusinessTeamInfo, getTeamInfoList } from '@/services/manage';
 import { TeamProps, Team, TeamInfo, ActionType } from '@/store/manageInterface';
 import { useTranslation } from 'react-i18next';
@@ -155,7 +155,14 @@ const TeamForm = React.forwardRef<ReactNode, TeamProps>((props, ref) => {
                       fieldKey={[fieldKey, 'user_group_id']}
                       rules={[{ required: true, message: t('业务组团队不能为空！') }]}
                     >
-                      <Select style={{ width: '100%' }} filterOption={false} onSearch={(e) => debounceFetcher(e)} showSearch onBlur={() => getList('')}>
+                      <Select
+                        suffixIcon={<CaretDownOutlined />}
+                        style={{ width: '100%' }}
+                        filterOption={false}
+                        onSearch={(e) => debounceFetcher(e)}
+                        showSearch
+                        onBlur={() => getList('')}
+                      >
                         {userTeam.map((team) => (
                           <Option key={team.id} value={team.id}>
                             {team.name}

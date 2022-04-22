@@ -19,7 +19,7 @@ import { useSelector } from 'react-redux';
 import moment from 'moment';
 import { Form, Input, InputNumber, Radio, Select, Row, Col, TimePicker, Checkbox, Tag, message, Space, Switch, Tooltip, Modal } from 'antd';
 const { Option } = Select;
-import { QuestionCircleFilled, MinusCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import { QuestionCircleFilled, MinusCircleOutlined, PlusCircleOutlined, CaretDownOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { RootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
@@ -306,7 +306,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
               },
             ]}
           >
-            <Select style={{ width: '100%' }} onChange={fieldChange}>
+            <Select suffixIcon={<CaretDownOutlined />} style={{ width: '100%' }} onChange={fieldChange}>
               {fields.map((item) => (
                 <Option key={item.id} value={item.field}>
                   {item.name}

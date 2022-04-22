@@ -17,7 +17,7 @@
 import React, { useState, useEffect } from 'react';
 import _ from 'lodash';
 import { Modal, Form, Input, Space, Button, Table, Select, Tooltip, message } from 'antd';
-import { PlusCircleOutlined, MinusCircleOutlined } from '@ant-design/icons';
+import { PlusCircleOutlined, MinusCircleOutlined, CaretDownOutlined } from '@ant-design/icons';
 import ModalHOC, { ModalWrapProps } from '@/components/ModalHOC';
 import { getLabels, getLabelValues, addMetricView, updateMetricView } from '@/services/metricViews';
 import { Range } from '@/components/DateRangePicker';
@@ -137,12 +137,12 @@ function FormCpt(props: ModalWrapProps & IProps) {
                 return (
                   <Space key={key}>
                     <Form.Item name={[name, 'label']} rules={[{ required: true }]}>
-                      <Select allowClear showSearch style={{ width: 170 }}>
+                      <Select suffixIcon={<CaretDownOutlined />} allowClear showSearch style={{ width: 170 }}>
                         {getLablesOptions(labels)}
                       </Select>
                     </Form.Item>
                     <Form.Item name={[name, 'oper']} rules={[{ required: true }]}>
-                      <Select style={{ width: 60 }}>
+                      <Select suffixIcon={<CaretDownOutlined />} style={{ width: 60 }}>
                         <Select.Option value='='>=</Select.Option>
                         <Select.Option value='!='>!=</Select.Option>
                         <Select.Option value='=~'>=~</Select.Option>

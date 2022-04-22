@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import { Form, Input, InputNumber, Button, Select, Row, Col, Tooltip } from 'antd';
-import { DeleteOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { DeleteOutlined, InfoCircleOutlined, CaretDownOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { Panel } from '../../Components/Collapse';
 import ColorPicker from '../../../Components/ColorPicker';
@@ -75,7 +75,7 @@ export default function index(props: IProps) {
                     <Row gutter={10}>
                       <Col flex='80px'>
                         <Form.Item noStyle {...restField} name={[name, 'type']}>
-                          <Select style={{ width: 80 }}>
+                          <Select suffixIcon={<CaretDownOutlined />} style={{ width: 80 }}>
                             <Select.Option value='special'>固定值</Select.Option>
                             <Select.Option value='range'>范围值</Select.Option>
                             <Select.Option value='specialValue'>特殊值</Select.Option>

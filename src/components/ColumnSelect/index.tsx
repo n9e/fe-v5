@@ -17,6 +17,7 @@
 import React, { useState, useCallback } from 'react';
 import { Select, Space } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
+import { CaretDownOutlined } from '@ant-design/icons';
 import { RootState } from '@/store/common';
 import { getBusiGroups } from '@/services/common';
 import { CommonStoreState } from '@/store/commonInterface';
@@ -82,14 +83,14 @@ export default function ColumnSelect(props: Props) {
         </Select>
       )}
       {onSeverityChange && (
-        <Select allowClear style={{ minWidth: 80 }} placeholder='事件级别' onChange={onSeverityChange} getPopupContainer={() => document.body}>
+        <Select suffixIcon={<CaretDownOutlined />} allowClear style={{ minWidth: 80 }} placeholder='事件级别' onChange={onSeverityChange} getPopupContainer={() => document.body}>
           <Select.Option value={1}>一级告警</Select.Option>
           <Select.Option value={2}>二级告警</Select.Option>
           <Select.Option value={3}>三级告警</Select.Option>
         </Select>
       )}
       {onEventTypeChange && (
-        <Select allowClear style={{ minWidth: 80 }} placeholder='事件类别' onChange={onEventTypeChange} getPopupContainer={() => document.body}>
+        <Select suffixIcon={<CaretDownOutlined />} allowClear style={{ minWidth: 80 }} placeholder='事件类别' onChange={onEventTypeChange} getPopupContainer={() => document.body}>
           <Select.Option value={0}>Triggered</Select.Option>
           <Select.Option value={1}>Recovered</Select.Option>
         </Select>
