@@ -9,3 +9,4 @@ pub
 deploy.sh
 src/Packages/*
 stats.html
+build.sh
