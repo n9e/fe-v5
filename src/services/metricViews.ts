@@ -208,6 +208,7 @@ export const getMetricsDesc = function (data) {
   return request('/api/n9e/metrics/desc', {
     method: RequestMethod.Post,
     data,
+    silence: true,
   }).then((res) => {
     return res?.dat;
   });
