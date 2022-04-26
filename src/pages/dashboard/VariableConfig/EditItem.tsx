@@ -93,7 +93,15 @@ export default function EditItem(props: Props) {
               {fields.map(({ key, name, fieldKey, ...restField }) => (
                 <Row gutter={[6, 6]} className='tag-content-item' key={key}>
                   <Col span={4}>
-                    <Form.Item {...restField} name={[name, 'name']} fieldKey={[fieldKey, 'name']} rules={[{ required: true, message: t('请输入变量名') }]}>
+                    <Form.Item
+                      {...restField}
+                      name={[name, 'name']}
+                      fieldKey={[fieldKey, 'name']}
+                      rules={[
+                        { required: true, message: t('请输入变量名') },
+                        { pattern: /^[0-9a-zA-Z_]+$/, message: t('仅支持数字和字符下划线') },
+                      ]}
+                    >
                       <Input />
                     </Form.Item>
                   </Col>
