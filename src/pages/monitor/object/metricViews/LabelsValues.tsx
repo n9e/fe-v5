@@ -40,7 +40,7 @@ export default function LabelsValues(props: IProps) {
   const dynamicLabelsStr = getDynamicLabelsStr(dynamicLabels);
   const [expaned, setExpaned] = useState({
     filters: false,
-    dynamicLabels: false,
+    dynamicLabels: true,
   });
 
   useEffect(() => {
@@ -86,88 +86,92 @@ export default function LabelsValues(props: IProps) {
 
   return (
     <div className='n9e-metric-views-labels-values'>
-      <div>
-        <div
-          className='page-title'
-          style={{ marginTop: 6, cursor: 'pointer' }}
-          onClick={() => {
-            setExpaned({
-              ...expaned,
-              filters: !expaned.filters,
-            });
-          }}
-        >
-          前置过滤条件 {expaned.filters ? <UpOutlined /> : <DownOutlined />}
+      {!_.isEmpty(expaned.filters) && (
+        <div>
+          <div
+            className='page-title'
+            style={{ marginTop: 6, cursor: 'pointer' }}
+            onClick={() => {
+              setExpaned({
+                ...expaned,
+                filters: !expaned.filters,
+              });
+            }}
+          >
+            前置过滤条件 {expaned.filters ? <UpOutlined /> : <DownOutlined />}
+          </div>
+          {expaned.filters && <div className='n9e-metric-views-filters'>{filtersStr ? filtersStr : '暂无数据'}</div>}
         </div>
-        {expaned.filters && <div className='n9e-metric-views-filters'>{filtersStr ? filtersStr : '暂无数据'}</div>}
-      </div>
-      <div>
-        <div
-          className='page-title'
-          style={{ marginTop: 20, cursor: 'pointer' }}
-          onClick={() => {
-            setExpaned({
-              ...expaned,
-              dynamicLabels: !expaned.dynamicLabels,
-            });
-          }}
-        >
-          动态过滤条件 {expaned.dynamicLabels ? <UpOutlined /> : <DownOutlined />}
-        </div>
-        {expaned.dynamicLabels && (
-          <div className='n9e-metric-views-dynamicLabels'>
-            {_.isEmpty(dynamicLabels) ? (
-              <div style={{ marginBottom: 10 }}>暂无数据</div>
-            ) : (
-              _.map(dynamicLabels, (item) => {
-                return (
-                  <div key={item.label} className='n9e-metric-views-dynamicLabels-item'>
-                    <div className='n9e-metric-views-dynamicLabels-item-label'>{item.label}:</div>
-                    <Select
-                      allowClear
-                      showSearch
-                      style={{ width: '100%' }}
-                      value={item.value}
-                      onChange={(val) => {
-                        const _dynamicLabels = _.map(dynamicLabels, (obj) => {
-                          if (item.label === obj.label) {
-                            return {
-                              ...obj,
-                              value: val,
-                            };
-                          }
-                          return obj;
-                        });
-                        onChange({
-                          ...value,
-                          dynamicLabels: _dynamicLabels,
-                          dimensionLabels: _.map(dimensionLabels, (item, idx) => {
-                            if (idx === 0) {
+      )}
+      {!_.isEmpty(dynamicLabels) && (
+        <div>
+          <div
+            className='page-title'
+            style={{ marginTop: 20, cursor: 'pointer' }}
+            onClick={() => {
+              setExpaned({
+                ...expaned,
+                dynamicLabels: !expaned.dynamicLabels,
+              });
+            }}
+          >
+            动态过滤条件 {expaned.dynamicLabels ? <UpOutlined /> : <DownOutlined />}
+          </div>
+          {expaned.dynamicLabels && (
+            <div className='n9e-metric-views-dynamicLabels'>
+              {_.isEmpty(dynamicLabels) ? (
+                <div style={{ marginBottom: 10 }}>暂无数据</div>
+              ) : (
+                _.map(dynamicLabels, (item) => {
+                  return (
+                    <div key={item.label} className='n9e-metric-views-dynamicLabels-item'>
+                      <div className='n9e-metric-views-dynamicLabels-item-label'>{item.label}:</div>
+                      <Select
+                        allowClear
+                        showSearch
+                        style={{ width: '100%' }}
+                        value={item.value}
+                        onChange={(val) => {
+                          const _dynamicLabels = _.map(dynamicLabels, (obj) => {
+                            if (item.label === obj.label) {
                               return {
-                                label: item.label,
-                                value: [],
+                                ...obj,
+                                value: val,
                               };
                             }
-                            return item;
-                          }),
-                        });
-                      }}
-                    >
-                      {_.map(labelValues[item.label], (value) => {
-                        return (
-                          <Select.Option key={value} value={value}>
-                            {value}
-                          </Select.Option>
-                        );
-                      })}
-                    </Select>
-                  </div>
-                );
-              })
-            )}
-          </div>
-        )}
-      </div>
+                            return obj;
+                          });
+                          onChange({
+                            ...value,
+                            dynamicLabels: _dynamicLabels,
+                            dimensionLabels: _.map(dimensionLabels, (item, idx) => {
+                              if (idx === 0) {
+                                return {
+                                  label: item.label,
+                                  value: [],
+                                };
+                              }
+                              return item;
+                            }),
+                          });
+                        }}
+                      >
+                        {_.map(labelValues[item.label], (value) => {
+                          return (
+                            <Select.Option key={value} value={value}>
+                              {value}
+                            </Select.Option>
+                          );
+                        })}
+                      </Select>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          )}
+        </div>
+      )}
       <div>
         {_.map(dimensionLabels, (dimensionLabel) => {
           const dimensionLabelValues = dimensionLabelsValues[dimensionLabel.label];
