@@ -17,8 +17,10 @@
 import React, { useEffect, useState } from 'react';
 import _ from 'lodash';
 import classNames from 'classnames';
-import { Input, message, Modal, Tag } from 'antd';
+import { Input, message, Modal } from 'antd';
 import { PlusSquareOutlined, SearchOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { useSelector } from 'react-redux';
+import { RootState as AccountRootState, accountStoreState } from '@/store/accountInterface';
 import { getList, deleteMetricView } from '@/services/metricViews';
 import { Range } from '@/components/DateRangePicker';
 import { IMatch } from '../types';
@@ -34,6 +36,7 @@ export default function List(props: IProps) {
   const [active, setActive] = useState<number>();
   const [search, setSearch] = useState('');
   const [refreshFlag, setRefreshFlag] = useState(_.uniqueId('refreshFlag_'));
+  const { profile } = useSelector<AccountRootState, accountStoreState>((state) => state.account);
   useEffect(() => {
     const defaultMetricViewId = localStorage.getItem('metric-view-id') !== null ? Number(localStorage.getItem('metric-view-id')) : null;
     getList().then((res) => {
@@ -70,6 +73,7 @@ export default function List(props: IProps) {
           <PlusSquareOutlined
             onClick={() => {
               Form({
+                admin: profile.admin,
                 action: 'add',
                 visible: true,
                 range: props.range,
@@ -131,8 +135,9 @@ export default function List(props: IProps) {
                     }}
                   >
                     <span className='name'>{item.name}</span>
-                    {item.cate === 1 ? (
+                    {item.cate === 1 || profile.admin ? (
                       <span>
+                        {item.cate === 0 && <span style={{ color: '#ccc' }}>公开</span>}
                         <EditOutlined
                           onClick={(e) => {
                             e.stopPropagation();
@@ -147,9 +152,11 @@ export default function List(props: IProps) {
                             const initialValues = {
                               id: item.id,
                               name: item.name,
+                              cate: item.cate === 0,
                               ...configs,
                             };
                             Form({
+                              admin: profile.admin,
                               action: 'edit',
                               visible: true,
                               range: props.range,
@@ -179,7 +186,7 @@ export default function List(props: IProps) {
                         />
                       </span>
                     ) : (
-                      <span style={{ color: '#ccc' }}>内置</span>
+                      <span style={{ color: '#ccc' }}>公开</span>
                     )}
                   </div>
                 );

@@ -16,7 +16,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import _ from 'lodash';
-import { Modal, Form, Input, Space, Button, Table, Select, Tooltip, message } from 'antd';
+import { Modal, Form, Input, Space, Button, Table, Select, Tooltip, Switch, message } from 'antd';
 import { PlusCircleOutlined, MinusCircleOutlined, CaretDownOutlined } from '@ant-design/icons';
 import ModalHOC, { ModalWrapProps } from '@/components/ModalHOC';
 import { getLabels, getLabelValues, addMetricView, updateMetricView } from '@/services/metricViews';
@@ -27,6 +27,7 @@ interface IProps {
   action: 'add' | 'edit';
   initialValues: any;
   range: Range;
+  admin: boolean;
 }
 
 const titleMap = {
@@ -35,7 +36,7 @@ const titleMap = {
 };
 
 function FormCpt(props: ModalWrapProps & IProps) {
-  const { action, visible, initialValues, destroy, range, onOk } = props;
+  const { action, visible, initialValues, destroy, range, onOk, admin } = props;
   const [form] = Form.useForm();
   const [labels, setLabels] = useState<string[]>([]);
   const [filteredLabels, setFilteredLabels] = useState<string[]>([]);
@@ -81,10 +82,11 @@ function FormCpt(props: ModalWrapProps & IProps) {
               value: '',
             };
           });
-          const { name } = _values;
-          const configs = JSON.stringify(_.omit(_values, 'name'));
+          const { name, cate } = _values;
+          const configs = JSON.stringify(_.omit(_values, ['name', 'cate']));
           const data: any = {
             name,
+            cate: cate ? 0 : 1,
             configs,
           };
           if (action === 'add') {
@@ -106,7 +108,11 @@ function FormCpt(props: ModalWrapProps & IProps) {
     >
       <Form
         layout='vertical'
-        initialValues={initialValues}
+        initialValues={
+          initialValues || {
+            cate: false,
+          }
+        }
         form={form}
         onValuesChange={(changedValues, allValues) => {
           if (changedValues.filters) {
@@ -120,6 +126,11 @@ function FormCpt(props: ModalWrapProps & IProps) {
         <Form.Item label='视图名称' name='name' rules={[{ required: true }]}>
           <Input />
         </Form.Item>
+        {admin && (
+          <Form.Item label='是否公开' name='cate' rules={[{ required: true }]} valuePropName='checked'>
+            <Switch />
+          </Form.Item>
+        )}
         <Form.List name='filters'>
           {(fields, { add, remove }) => (
             <>
@@ -170,7 +181,7 @@ function FormCpt(props: ModalWrapProps & IProps) {
             {getLablesOptions(filteredLabels)}
           </Select>
         </Form.Item>
-        <Form.Item label='展开维度标签' name={'dimensionLabels'} rules={[{ required: true }]}>
+        <Form.Item label='展开维度标签' name='dimensionLabels' rules={[{ required: true }]}>
           <Select allowClear showSearch mode='multiple'>
             {getLablesOptions(filteredLabels)}
           </Select>
