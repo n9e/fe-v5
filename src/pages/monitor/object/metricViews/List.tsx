@@ -17,14 +17,15 @@
 import React, { useEffect, useState } from 'react';
 import _ from 'lodash';
 import classNames from 'classnames';
-import { Input, message, Modal } from 'antd';
-import { PlusSquareOutlined, SearchOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Input, message, Modal, Tooltip } from 'antd';
+import { PlusSquareOutlined, SearchOutlined, EditOutlined, DeleteOutlined, ExportOutlined } from '@ant-design/icons';
 import { useSelector } from 'react-redux';
 import { RootState as AccountRootState, accountStoreState } from '@/store/accountInterface';
 import { getList, deleteMetricView } from '@/services/metricViews';
 import { Range } from '@/components/DateRangePicker';
 import { IMatch } from '../types';
 import Form from './Form';
+import Export from './Export';
 
 interface IProps {
   range: Range;
@@ -137,53 +138,69 @@ export default function List(props: IProps) {
                     <span className='name'>{item.name}</span>
                     {item.cate === 1 || profile.admin ? (
                       <span>
-                        {item.cate === 0 && <span style={{ color: '#ccc' }}>公开</span>}
-                        <EditOutlined
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            let configs = {} as any;
-                            try {
-                              configs = JSON.parse(item.configs);
-                              configs.dynamicLabels = _.map(configs.dynamicLabels, 'label');
-                              configs.dimensionLabels = _.map(configs.dimensionLabels, 'label');
-                            } catch (e) {
-                              console.error(e);
-                            }
-                            const initialValues = {
-                              id: item.id,
-                              name: item.name,
-                              cate: item.cate === 0,
-                              ...configs,
-                            };
-                            Form({
-                              admin: profile.admin,
-                              action: 'edit',
-                              visible: true,
-                              range: props.range,
-                              initialValues,
-                              onOk: () => {
-                                localStorage.setItem('metric-view-id', item.id);
-                                setRefreshFlag(_.uniqueId('refreshFlag_'));
-                              },
-                            });
-                          }}
-                        />
-                        <DeleteOutlined
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            Modal.confirm({
-                              title: '是否要删除？',
-                              onOk: () => {
-                                deleteMetricView({
-                                  ids: [item.id],
-                                }).then(() => {
-                                  message.success('删除成功');
+                        {item.cate === 0 && (
+                          <span className='n9e-metric-views-list-content-item-cate' style={{ color: '#ccc' }}>
+                            公开
+                          </span>
+                        )}
+                        <div className='n9e-metric-views-list-content-item-opes'>
+                          <EditOutlined
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              let configs = {} as any;
+                              try {
+                                configs = JSON.parse(item.configs);
+                                configs.dynamicLabels = _.map(configs.dynamicLabels, 'label');
+                                configs.dimensionLabels = _.map(configs.dimensionLabels, 'label');
+                              } catch (e) {
+                                console.error(e);
+                              }
+                              const initialValues = {
+                                id: item.id,
+                                name: item.name,
+                                cate: item.cate === 0,
+                                ...configs,
+                              };
+                              Form({
+                                admin: profile.admin,
+                                action: 'edit',
+                                visible: true,
+                                range: props.range,
+                                initialValues,
+                                onOk: () => {
+                                  localStorage.setItem('metric-view-id', item.id);
                                   setRefreshFlag(_.uniqueId('refreshFlag_'));
+                                },
+                              });
+                            }}
+                          />
+                          <DeleteOutlined
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              Modal.confirm({
+                                title: '是否要删除？',
+                                onOk: () => {
+                                  deleteMetricView({
+                                    ids: [item.id],
+                                  }).then(() => {
+                                    message.success('删除成功');
+                                    setRefreshFlag(_.uniqueId('refreshFlag_'));
+                                  });
+                                },
+                              });
+                            }}
+                          />
+                          <Tooltip title='导出配置' placement='right'>
+                            <ExportOutlined
+                              onClick={() => {
+                                Export({
+                                  visible: true,
+                                  data: item.configs,
                                 });
-                              },
-                            });
-                          }}
-                        />
+                              }}
+                            />
+                          </Tooltip>
+                        </div>
                       </span>
                     ) : (
                       <span style={{ color: '#ccc' }}>公开</span>

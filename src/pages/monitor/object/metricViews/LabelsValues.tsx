@@ -87,10 +87,10 @@ export default function LabelsValues(props: IProps) {
   return (
     <div className='n9e-metric-views-labels-values'>
       {!_.isEmpty(expaned.filters) && (
-        <div>
+        <div className='n9e-metric-views-labels-values-item'>
           <div
             className='page-title'
-            style={{ marginTop: 6, cursor: 'pointer' }}
+            style={{ cursor: 'pointer' }}
             onClick={() => {
               setExpaned({
                 ...expaned,
@@ -104,10 +104,10 @@ export default function LabelsValues(props: IProps) {
         </div>
       )}
       {!_.isEmpty(dynamicLabels) && (
-        <div>
+        <div className='n9e-metric-views-labels-values-item'>
           <div
             className='page-title'
-            style={{ marginTop: 20, cursor: 'pointer' }}
+            style={{ cursor: 'pointer' }}
             onClick={() => {
               setExpaned({
                 ...expaned,
@@ -172,34 +172,68 @@ export default function LabelsValues(props: IProps) {
           )}
         </div>
       )}
-      <div>
-        {_.map(dimensionLabels, (dimensionLabel) => {
-          const dimensionLabelValues = dimensionLabelsValues[dimensionLabel.label];
-          return (
-            <div key={dimensionLabel.label}>
-              <div className='page-title' style={{ marginTop: 20 }}>
-                <div
-                  style={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    width: 220,
+      {_.map(dimensionLabels, (dimensionLabel) => {
+        const dimensionLabelValues = dimensionLabelsValues[dimensionLabel.label];
+        return (
+          <div key={dimensionLabel.label} className='n9e-metric-views-labels-values-item'>
+            <div className='page-title'>
+              <div
+                style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  width: 220,
+                }}
+              >
+                <Tooltip title={dimensionLabel.label} placement='left'>
+                  <div
+                    style={{
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      maxWidth: 'calc(100% - 30px)',
+                    }}
+                  >
+                    {dimensionLabel.label}
+                  </div>
+                </Tooltip>
+                <a
+                  style={{ fontSize: 12, fontWeight: 'normal' }}
+                  onClick={() => {
+                    onChange({
+                      ...value,
+                      dimensionLabels: _.map(dimensionLabels, (item) => {
+                        if (item.label === dimensionLabel.label) {
+                          return {
+                            ...item,
+                            value: dimensionLabelValues,
+                          };
+                        }
+                        return item;
+                      }),
+                    });
                   }}
                 >
-                  <Tooltip title={dimensionLabel.label} placement='left'>
-                    <div
-                      style={{
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        maxWidth: 'calc(100% - 30px)',
-                      }}
-                    >
-                      {dimensionLabel.label}
-                    </div>
-                  </Tooltip>
-                  <a
-                    style={{ fontSize: 12, fontWeight: 'normal' }}
+                  全选
+                </a>
+              </div>
+            </div>
+            <div className='n9e-metric-views-dimensionLabel'>
+              <Input.Group compact>
+                <Input
+                  style={{ width: 'calc(100% - 32px)' }}
+                  prefix={<SearchOutlined />}
+                  value={dimensionLabelsSearch[dimensionLabel.label]}
+                  onChange={(e) => {
+                    setDimensionLabelsSearch({
+                      ...dimensionLabelsSearch,
+                      [dimensionLabel.label]: e.target.value,
+                    });
+                  }}
+                />
+                <Tooltip title='清空已选的值' placement='right' getTooltipContainer={() => document.body}>
+                  <Button
+                    icon={<ClearOutlined />}
                     onClick={() => {
                       onChange({
                         ...value,
@@ -207,111 +241,75 @@ export default function LabelsValues(props: IProps) {
                           if (item.label === dimensionLabel.label) {
                             return {
                               ...item,
-                              value: dimensionLabelValues,
+                              value: [],
                             };
                           }
                           return item;
                         }),
                       });
                     }}
-                  >
-                    全选
-                  </a>
-                </div>
-              </div>
-              <div className='n9e-metric-views-dimensionLabel'>
-                <Input.Group compact>
-                  <Input
-                    style={{ width: 'calc(100% - 32px)' }}
-                    prefix={<SearchOutlined />}
-                    value={dimensionLabelsSearch[dimensionLabel.label]}
-                    onChange={(e) => {
-                      setDimensionLabelsSearch({
-                        ...dimensionLabelsSearch,
-                        [dimensionLabel.label]: e.target.value,
-                      });
-                    }}
                   />
-                  <Tooltip title='清空已选的值' placement='right' getTooltipContainer={() => document.body}>
-                    <Button
-                      icon={<ClearOutlined />}
-                      onClick={() => {
-                        onChange({
-                          ...value,
-                          dimensionLabels: _.map(dimensionLabels, (item) => {
-                            if (item.label === dimensionLabel.label) {
-                              return {
-                                ...item,
-                                value: [],
-                              };
-                            }
-                            return item;
-                          }),
-                        });
-                      }}
-                    />
-                  </Tooltip>
-                </Input.Group>
+                </Tooltip>
+              </Input.Group>
 
-                <div className='n9e-metric-views-dimensionLabel-content'>
-                  {_.isEmpty(dimensionLabelValues) ? (
-                    '暂无数据'
-                  ) : (
-                    <div>
-                      {_.map(
-                        _.filter(dimensionLabelValues, (item) => {
-                          let result = true;
-                          if (dimensionLabelsSearch[dimensionLabel.label]) {
-                            try {
-                              const reg = new RegExp(dimensionLabelsSearch[dimensionLabel.label], 'gi');
-                              result = reg.test(item);
-                            } catch (e) {
-                              console.log(e);
-                            }
+              <div className='n9e-metric-views-dimensionLabel-content'>
+                {_.isEmpty(dimensionLabelValues) ? (
+                  '暂无数据'
+                ) : (
+                  <div>
+                    {_.map(
+                      _.filter(dimensionLabelValues, (item) => {
+                        let result = true;
+                        if (dimensionLabelsSearch[dimensionLabel.label]) {
+                          try {
+                            const reg = new RegExp(dimensionLabelsSearch[dimensionLabel.label], 'gi');
+                            result = reg.test(item);
+                          } catch (e) {
+                            console.log(e);
                           }
-                          return result;
-                        }),
-                        (item: string) => {
-                          return (
-                            <div
-                              key={item}
-                              className={classNames({
-                                'n9e-metric-views-dimensionLabel-content-item': true,
-                                active: _.includes(dimensionLabel.value, item),
-                              })}
-                              onClick={() => {
-                                const dimensionLabelValue = _.includes(dimensionLabel.value, item) ? _.without(dimensionLabel.value, item) : _.concat(dimensionLabel.value, item);
-                                const newDimensionLabels = _.map(dimensionLabels, (item) => {
-                                  if (item.label === dimensionLabel.label) {
-                                    return {
-                                      ...item,
-                                      value: _.compact(dimensionLabelValue),
-                                    };
-                                  }
+                        }
+                        return result;
+                      }),
+                      (item: string) => {
+                        return (
+                          <div
+                            key={item}
+                            className={classNames({
+                              'n9e-metric-views-dimensionLabel-content-item': true,
+                              active: _.includes(dimensionLabel.value, item),
+                            })}
+                            onClick={() => {
+                              const dimensionLabelValue = _.includes(dimensionLabel.value, item) ? _.without(dimensionLabel.value, item) : _.concat(dimensionLabel.value, item);
+                              const newDimensionLabels = _.map(dimensionLabels, (item) => {
+                                if (item.label === dimensionLabel.label) {
                                   return {
                                     ...item,
-                                    value: [],
+                                    value: _.compact(dimensionLabelValue),
                                   };
-                                });
-                                onChange({
-                                  ...value,
-                                  dimensionLabels: newDimensionLabels,
-                                });
-                              }}
-                            >
-                              {item}
-                            </div>
-                          );
-                        },
-                      )}
-                    </div>
-                  )}
-                </div>
+                                }
+                                return {
+                                  ...item,
+                                  value: [],
+                                };
+                              });
+                              onChange({
+                                ...value,
+                                dimensionLabels: newDimensionLabels,
+                              });
+                            }}
+                          >
+                            {item}
+                          </div>
+                        );
+                      },
+                    )}
+                  </div>
+                )}
               </div>
             </div>
-          );
-        })}
-      </div>
+          </div>
+        );
+      })}
     </div>
   );
 }

@@ -40,6 +40,7 @@
   display: flex;
   justify-content: space-between;
   padding: 8px;
+  position: relative;
   cursor: pointer;
   .anticon {
     margin-left: 8px;
@@ -49,15 +50,28 @@
     .anticon {
       display: inline;
     }
+    .n9e-metric-views-list-content-item-cate {
+      display: none;
+    }
   }
   &.active {
     background-color: fade(@primary-color, 10%);
-  }
+  }  
 }
 .n9e-metric-views-labels-values {
   flex: 0 0 240px;
   padding: @margin-base;
   overflow-y: auto;
+}
+.n9e-metric-views-labels-values-item {
+  .page-title {
+    margin-top: 20px;
+  }
+  &:first-child {
+    .page-title {
+      margin-top: 6px;
+    }
+  }
 }
 .n9e-metric-views-filters {
   margin: @margin-base 0;
@@ -121,5 +135,15 @@
     padding-left: 20px;
     color: #999;
     white-space: nowrap;
+  }
+}
+.n9e-metric-views-modal {
+  .ant-modal-header {
+    padding-bottom: 0px;
+  }
+  .custom-import-title {
+    .ant-tabs-nav {
+      margin: 0;
+    }
   }
 }
