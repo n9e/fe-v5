@@ -17,7 +17,7 @@
 export interface accountStoreState {
   num?: number;
   profile: {
-    admin: boolean;
+    admin?: boolean;
     nickname: string;
     role: string;
     roles: string[];
