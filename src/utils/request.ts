@@ -134,8 +134,11 @@ request.interceptors.response.use(
           .clone()
           .json()
           .then((data) => {
-            if (response.url.indexOf('/api/n9e/prometheus/api/v1') > -1 || response.url.indexOf('/api/v1/datasource/prometheus') > -1) {
-              return data;
+            // 兼容 n9e 中的 prometheus api
+            if (options.silence === undefined) {
+              if (response.url.indexOf('/api/n9e/prometheus/api/v1') > -1 || response.url.indexOf('/api/v1/datasource/prometheus') > -1) {
+                return data;
+              }
             }
             if (response.url.includes('/api/v1')) {
               throw {
