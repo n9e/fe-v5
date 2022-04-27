@@ -12,7 +12,13 @@ const errorHandler = (error: Error): Response => {
       message: error.message,
     });
   }
-  throw new Error(error.message);
+  // @ts-ignore
+  if (error.silence) {
+    // TODO: 兼容 n9e，暂时认定只有开启 silence 的场景才需要传递 error 详情
+    throw error;
+  } else {
+    throw new Error(error.message);
+  }
 };
 
 /** 配置request请求时的默认参数 */
