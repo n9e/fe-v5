@@ -70,7 +70,7 @@ function FormCpt(props: ModalWrapProps & IProps) {
       title={
         <Tabs className='custom-import-title' activeKey={activeKey} onChange={setActiveKey}>
           <TabPane tab={titleMap[action]} key='form' />
-          {action === 'add' && <TabPane tab='导入大盘' key='import' />}
+          {action === 'add' && <TabPane tab='导入快捷视图' key='import' />}
         </Tabs>
       }
       visible={visible}
