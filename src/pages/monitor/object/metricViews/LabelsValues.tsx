@@ -86,7 +86,7 @@ export default function LabelsValues(props: IProps) {
 
   return (
     <div className='n9e-metric-views-labels-values'>
-      {!_.isEmpty(expaned.filters) && (
+      {!_.isEmpty(filtersStr) && (
         <div className='n9e-metric-views-labels-values-item'>
           <div
             className='page-title'
