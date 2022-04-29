@@ -88,8 +88,7 @@ const DisplayItem: React.FC<Props> = ({ expression, index, data, onChange, clust
             } else {
               onChange(index, multi ? [regFilterRes[0]] : regFilterRes[0], regFilterRes);
             }
-          }
-          if (exp && newExpression && exp !== newExpression) {
+          } else if (exp && newExpression && exp !== newExpression) {
             onChange(index, multi ? [] : '', regFilterRes);
           }
         });
