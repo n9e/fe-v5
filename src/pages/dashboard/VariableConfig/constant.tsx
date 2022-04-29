@@ -184,6 +184,14 @@ export const convertExpressionToQuery = (expression: string, range: Range) => {
   return Promise.resolve(expression.length > 0 ? expression.split(',').map((i) => i.trim()) : '');
 };
 
+const replaceAllPolyfill = (str, substr, newSubstr): string => {
+  let result = str;
+  while (result.includes(substr)) {
+    result = result.replace(substr, newSubstr);
+  }
+  return result;
+};
+
 export const replaceExpressionVars = (expression: string, formData: FormType, limit: number, id: string) => {
   var newExpression = expression;
   const vars = newExpression.match(/\$[0-9a-zA-Z_]+/g);
@@ -195,15 +203,16 @@ export const replaceExpressionVars = (expression: string, formData: FormType, li
       if (vars.includes('$' + name) && selected) {
         if (Array.isArray(selected)) {
           if (selected.includes('all') && options) {
-            newExpression = newExpression.replaceAll(
+            newExpression = replaceAllPolyfill(
+              newExpression,
               '$' + name,
               `(${(options as string[]).filter((i) => !reg || !stringToRegex(reg) || (stringToRegex(reg) as RegExp).test(i)).join('|')})`,
             );
           } else {
-            newExpression = newExpression.replaceAll('$' + name, `(${(selected as string[]).join('|')})`);
+            newExpression = replaceAllPolyfill(newExpression, '$' + name, `(${(selected as string[]).join('|')})`);
           }
         } else if (typeof selected === 'string') {
-          newExpression = newExpression.replaceAll('$' + name, selected as string);
+          newExpression = replaceAllPolyfill(newExpression, '$' + name, selected as string);
         }
       }
     }
