@@ -101,20 +101,20 @@ request.interceptors.response.use(
     }
     if (status === 401) {
       if (response.url.indexOf('/api/n9e/auth/refresh') > 0) {
-        location.href = `/login${location.pathname != '/' ? '?redirect=' + location.pathname : ''}`;
+        location.href = `/login${location.pathname != '/' ? '?redirect=' + location.pathname + location.search : ''}`;
       } else {
         localStorage.getItem('refresh_token')
           ? UpdateAccessToken().then((res) => {
               console.log('401 err', res);
               if (res.err) {
-                location.href = `/login${location.pathname != '/' ? '?redirect=' + location.pathname : ''}`;
+                location.href = `/login${location.pathname != '/' ? '?redirect=' + location.pathname + location.search : ''}`;
               } else {
                 const { access_token, refresh_token } = res.dat;
                 localStorage.setItem('access_token', access_token);
                 localStorage.setItem('refresh_token', refresh_token);
               }
             })
-          : (location.href = `/login${location.pathname != '/' ? '?redirect=' + location.pathname : ''}`);
+          : (location.href = `/login${location.pathname != '/' ? '?redirect=' + location.pathname + location.search : ''}`);
       }
     } else if (status === 404) {
       location.href = '/404';
