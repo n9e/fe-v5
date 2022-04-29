@@ -334,7 +334,7 @@ export default function DashboardDetail() {
     dashboardConfigs.var = value.var;
     b && updateSingleDashboard(busiId, id, { ...dashboard, configs: JSON.stringify(dashboardConfigs) });
     setVariableConfig(dashboardConfigs);
-    setVariableConfigWithOptions(valueWithOptions);
+    valueWithOptions && setVariableConfigWithOptions(valueWithOptions);
   };
 
   const stopAutoRefresh = () => {
