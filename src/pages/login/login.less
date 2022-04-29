@@ -7,6 +7,18 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  .left-top-bg {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 600px;
+  }
+  .right-bottom-bg {
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    width: 632px;
+  }
   .banner {
     &.integration {
       background: none;
@@ -36,14 +48,6 @@
         left: 76px;
         font-size: @baseFontSizeMiddle;
         color: @colorWhite;
-      }
-    }
-  }
-  @media screen and (max-width: 1070px) {
-    .banner {
-      display: none;
-      &.integration {
-        display: none;
       }
     }
   }
@@ -116,6 +120,36 @@
     font-size: 14px;
     strong {
       font-weight: 500;
+    }
+  }
+  @media screen and (max-width: 1070px) {
+    .banner {
+      display: none;
+      &.integration {
+        display: none;
+      }
+    }
+  }
+  @media screen and (max-width: 600px) {
+    .left-top-bg {
+      width: 100%;
+    }
+    .right-bottom-bg {
+      width: 100%;
+    }
+    .login-panel {
+      width: 100%;
+    }
+    .login-main {
+      width: 100%;
+      &.integration {
+        .login-title {
+          width: 100%;
+        }
+        .ant-form-vertical {
+          width: 100%;
+        }
+      }
     }
   }
 }
