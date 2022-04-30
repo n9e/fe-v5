@@ -20,6 +20,7 @@ import reactRefresh from '@vitejs/plugin-react-refresh';
 import { md } from './plugins/md';
 const reactSvgPlugin = require('vite-plugin-react-svg');
 import { visualizer } from 'rollup-plugin-visualizer';
+import legacy from '@vitejs/plugin-legacy';
 
 const chunk2 = [
   '@codemirror/autocomplete',
@@ -53,6 +54,7 @@ export default defineConfig({
     md(),
     reactRefresh(),
     reactSvgPlugin({ defaultExport: 'component' }),
+    legacy({ targets: ['Chrome 84'], modernPolyfills: ['es.string.replace', 'esnext.string.replace-all'], polyfills: ['es.string.replace', 'esnext.string.replace-all'] }),
     // visualizer()
   ],
   define: {},
