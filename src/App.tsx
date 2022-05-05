@@ -27,8 +27,6 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import zhCN from 'antd/lib/locale/zh_CN';
 import en from 'antd/lib/locale/en_US';
 import { useTranslation } from 'react-i18next';
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
 import TaskOutput from '@/pages/taskOutput';
 import TaskHostOutput from '@/pages/taskOutput/host';
 
@@ -58,9 +56,7 @@ function App() {
               <Route exact path='/job-task/:busiId/output/:taskId/:host/:outputType' component={TaskHostOutput} />
               <>
                 <HeaderMenu></HeaderMenu>
-                <DndProvider backend={HTML5Backend}>
-                  <Content></Content>
-                </DndProvider>
+                <Content></Content>
               </>
             </Switch>
           </Router>
