@@ -90,8 +90,8 @@ export default function Stat(props: IProps) {
         key: name,
         render: (text) => {
           let textObj = {
-            text: text.text,
-            color: text.color,
+            text: text?.text,
+            color: text?.color,
           };
           const overrideProps = getOverridePropertiesByName(overrides, name);
           if (!_.isEmpty(overrideProps)) {
