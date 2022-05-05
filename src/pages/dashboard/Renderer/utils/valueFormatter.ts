@@ -66,7 +66,7 @@ function timeFormatter(val, type: 'seconds' | 'milliseconds', decimals) {
 
 const valueFormatter = ({util, decimals = 3}, val) => {
   if (val === null || val === '' || val === undefined) {
-    return 'no data';
+    return '';
   }
   if (typeof val !== 'number') {
     val = _.toNumber(val);
