@@ -74,7 +74,13 @@ export default function Stat(props: IProps) {
 
   if (aggrDimension) {
     tableDataSource = formatToTable(calculatedValues, aggrDimension, 'refId');
-    const firstItem = _.first(tableDataSource);
+    const groupNames = _.reduce(
+      tableDataSource,
+      (pre, item) => {
+        return _.union(_.concat(pre, item.groupNames));
+      },
+      [],
+    );
     columns = [
       {
         title: aggrDimension,
@@ -83,15 +89,18 @@ export default function Stat(props: IProps) {
         render: (text) => <div className='renderer-table-td-content'>{text}</div>,
       },
     ];
-    _.map(firstItem?.groupNames, (name) => {
+    _.map(groupNames, (name) => {
+      const result = _.find(tableDataSource, (item) => {
+        return item[name];
+      });
       columns.push({
-        title: firstItem[name].name,
+        title: result[name]?.name,
         dataIndex: name,
         key: name,
         render: (text) => {
           let textObj = {
-            text: text.text,
-            color: text.color,
+            text: text?.text,
+            color: text?.color,
           };
           const overrideProps = getOverridePropertiesByName(overrides, name);
           if (!_.isEmpty(overrideProps)) {
