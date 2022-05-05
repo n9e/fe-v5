@@ -45,6 +45,9 @@ const ExpressionInput: FC<CMExpressionInputProps> = ({ url, headers, value, onCh
   const viewRef = useRef<EditorView | null>(null);
   const executeQueryCallback = useRef(executeQuery);
   const realValue = useRef<string | undefined>(value || '');
+  const defaultHeaders = {
+    Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
+  };
 
   useEffect(() => {
     executeQueryCallback.current = executeQuery;
@@ -59,7 +62,14 @@ const ExpressionInput: FC<CMExpressionInputProps> = ({ url, headers, value, onCh
             const search = params ? `?${params}` : '';
             return fetch(resource + search, {
               method: 'Get',
-              headers: headers ? new Headers(headers) : undefined,
+              headers: new Headers(
+                headers
+                  ? {
+                      ...defaultHeaders,
+                      ...headers,
+                    }
+                  : defaultHeaders,
+              ),
             });
           },
         },
