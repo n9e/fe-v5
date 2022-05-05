@@ -29,18 +29,19 @@ import { lintKeymap } from '@codemirror/lint';
 import { autocompletion, completionKeymap } from '@codemirror/autocomplete';
 import { PromQLExtension } from 'codemirror-promql';
 import { baseTheme, promqlHighlighter } from './CMTheme';
-
+import classNames from 'classnames';
 const promqlExtension = new PromQLExtension();
 
 interface CMExpressionInputProps {
   url: string;
+  readonly?: boolean;
   headers?: { [index: string]: string };
   value?: string;
   onChange?: (expr?: string) => void;
   executeQuery?: () => void;
 }
 
-const ExpressionInput: FC<CMExpressionInputProps> = ({ url, headers, value, onChange, executeQuery }) => {
+const ExpressionInput: FC<CMExpressionInputProps> = ({ url, headers, value, onChange, executeQuery, readonly = false }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const executeQueryCallback = useRef(executeQuery);
@@ -100,6 +101,7 @@ const ExpressionInput: FC<CMExpressionInputProps> = ({ url, headers, value, onCh
           keymap.of([...closeBracketsKeymap, ...defaultKeymap, ...historyKeymap, ...commentKeymap, ...completionKeymap, ...lintKeymap]),
           placeholder('Expression (press Shift+Enter for newlines)'),
           promqlExtension.asExtension(),
+          EditorView.editable.of(!readonly),
           keymap.of([
             {
               key: 'Escape',
@@ -163,7 +165,7 @@ const ExpressionInput: FC<CMExpressionInputProps> = ({ url, headers, value, onCh
 
   return (
     <div
-      className='ant-input'
+      className={classNames({ 'ant-input': true, readonly: readonly, 'promql-input': true })}
       style={{
         minHeight: 32,
         height: 'unset',
