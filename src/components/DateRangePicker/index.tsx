@@ -103,7 +103,7 @@ export default function DateRangePicker(props: Props) {
   useEffect(() => {
     if (!value) {
       if (!nullable) {
-        const defaultSelect = 3;
+        const defaultSelect = localStorage.getItem('relativeDateIndex') ? Number(localStorage.getItem('relativeDateIndex')) : 3;
         setLeftSelect(defaultSelect);
         emitValue(leftList[defaultSelect]);
       }
@@ -163,6 +163,7 @@ export default function DateRangePicker(props: Props) {
   const handleRightOk = () => {
     setVisible(false);
     setLeftSelect(-1);
+    localStorage.setItem('relativeDateIndex', '');
     emitValue({
       start: unit === 's' ? startTime.unix() : startTime.valueOf(),
       end: unit === 's' ? endTime.unix() : endTime.valueOf(),
@@ -171,6 +172,7 @@ export default function DateRangePicker(props: Props) {
 
   const handleLeftClick = (i) => {
     setLeftSelect(i);
+    localStorage.setItem('relativeDateIndex', i);
     emitValue(leftList[i]);
     setVisible(false);
   };
