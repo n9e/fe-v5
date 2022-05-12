@@ -14,21 +14,29 @@
  * limitations under the License.
  *
  */
-import React from 'react';
-import _ from 'lodash';
-import Timeseries from './Timeseries';
-import Stat from './Stat';
-import Table from './Table';
-import Pie from './Pie';
-import Hexbin from './Hexbin';
-
-export default function index({ type, targets }) {
-  const OptionsCptMap = {
-    timeseries: <Timeseries />,
-    stat: <Stat />,
-    table: <Table targets={targets} />,
-    pie: <Pie />,
-    hexbin: <Hexbin />,
-  };
-  return OptionsCptMap[type] || `无效的图表类型 ${type}`;
-}
+export const colors = [
+  {
+    label: 'green / orange',
+    value: ['#83c898', '#c2c2c2', '#fc653f'],
+  },
+  {
+    label: 'yellow / green',
+    value: ['#f0ee6e', '#6ba261', '#306d52'],
+  },
+  {
+    label: 'warm',
+    value: ['#ffeda0', '#fc4e2a', '#800026'],
+  },
+  {
+    label: 'cool',
+    value: ['#c7f1ff', '#42a1fa', '#083294'],
+  },
+  {
+    label: 'plasma',
+    value: ['#f0f921', '#b12a90', '#0d0887'],
+  },
+  {
+    label: 'viridis',
+    value: ['#fde725', '#2a788e', '#440154'],
+  },
+];

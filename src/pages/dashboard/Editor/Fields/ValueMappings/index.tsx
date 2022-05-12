@@ -83,7 +83,7 @@ export default function index(props: IProps) {
                         </Form.Item>
                       </Col>
                       <Col flex='1'>
-                        <Form.Item noStyle {...restField} shouldUpdate={(prevValues, curValues) => _.get(prevValues, [name, 'type']) !== _.get(curValues, [name, 'type'])}>
+                        <Form.Item noStyle {...restField} shouldUpdate>
                           {({ getFieldValue }) => {
                             const type = getFieldValue([...preNamePrefix, ...namePrefix, name, 'type']);
                             if (type === 'special') {
@@ -112,7 +112,7 @@ export default function index(props: IProps) {
                             if (type === 'specialValue') {
                               return (
                                 <Form.Item noStyle {...restField} name={[name, 'match', 'specialValue']}>
-                                  <Select suffixIcon={<CaretDownOutlined />}>
+                                  <Select suffixIcon={<CaretDownOutlined />} style={{ width: '100%' }}>
                                     <Select.Option value='null'>Null</Select.Option>
                                     <Select.Option value='empty'>Empty string</Select.Option>
                                   </Select>

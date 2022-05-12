@@ -14,6 +14,9 @@
  * limitations under the License.
  *
  */
+import _ from 'lodash';
+import { colors } from '../Components/ColorRangeMenu/config';
+
 export const visualizations = [
   {
     type: 'timeseries',
@@ -30,6 +33,10 @@ export const visualizations = [
   {
     type: 'pie',
     name: '饼图',
+  },
+  {
+    type: 'hexbin',
+    name: '蜂窝图',
   },
 ];
 
@@ -118,6 +125,13 @@ export const defaultCustomValuesMap = {
     showHeader: true,
     calc: 'lastNotNull',
     displayMode: 'seriesToRows',
+  },
+  hexbin: {
+    calc: 'lastNotNull',
+    colorRange: _.join(colors[0].value, ','),
+    colorDomainAuto: true,
+    colorDomain: [],
+    reverseColorOrder: false,
   },
 };
 

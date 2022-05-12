@@ -31,7 +31,7 @@ export interface ITarget {
   step?: number; // 固定时间间隔
 }
 
-export type IType = 'timeseries' | 'stat' | 'table' | 'pie';
+export type IType = 'timeseries' | 'stat' | 'table' | 'pie' | 'hexbin';
 
 export interface IValueMapping {
   match: {
@@ -118,6 +118,15 @@ export interface ITableStyles {
   displayMode: 'seriesToRows' | 'labelValuesToRows';
   // aggrOperator: string;
   aggrDimension: string;
+}
+
+export interface IHexbinStyles {
+  version: string; // 时序图组件使用的版本
+  calc: string;
+  colorRange: string[]; // 三个颜色值
+  colorDomainAuto: boolean;
+  colorDomain: number[]; // 自定义 [min, max]
+  reverseColorOrder: boolean;
 }
 
 export interface IPanel {
