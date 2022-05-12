@@ -14,21 +14,19 @@
  * limitations under the License.
  *
  */
-import PageLayout from '@/components/pageLayout';
 import React, { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router';
-import { getAlertEventsById, getHistoryEventsById } from '@/services/warning';
-import { Button, Card, Col, message, Row, Space, Spin, Tag, Typography } from 'antd';
-import { priorityColor } from '@/utils/constant';
-import './detail.less';
 import moment from 'moment';
+import { Button, Card, Col, message, Row, Space, Spin, Tag, Typography } from 'antd';
 import { PlayCircleOutlined } from '@ant-design/icons';
-import PromqlEditor from '@/components/PromqlEditor';
+import PageLayout from '@/components/pageLayout';
+import { getAlertEventsById, getHistoryEventsById } from '@/services/warning';
+import { priorityColor } from '@/utils/constant';
 import PromQLInput from '@/components/PromQLInput';
 import { deleteAlertEventsModal } from '.';
+import './detail.less';
 
 const { Paragraph } = Typography;
-
 const EventDetailPage: React.FC = () => {
   const { busiId, eventId } = useParams<{ busiId: string; eventId: string }>();
   const history = useHistory();
@@ -90,6 +88,26 @@ const EventDetailPage: React.FC = () => {
       key: 'recover_time',
       render(time) {
         return moment((time || 0) * 1000).format('YYYY-MM-DD HH:mm:ss');
+      },
+    },
+    {
+      label: '告警方式',
+      key: 'rule_algo',
+      render(text) {
+        if (text) {
+          return '异常检测';
+        }
+        return '阈值告警';
+      },
+    },
+    {
+      label: '使用算法',
+      key: 'rule_algo',
+      visible(_text, record) {
+        return record.rule_algo;
+      },
+      render(text) {
+        return text;
       },
     },
     {
@@ -231,7 +249,12 @@ const EventDetailPage: React.FC = () => {
           >
             {eventDetail &&
               descriptionInfo
-                .filter((item) => (eventDetail.is_recovered ? true : item.key !== 'recover_time'))
+                .filter((item) => {
+                  if (typeof item.visible === 'function') {
+                    return item.visible(eventDetail[item.key], eventDetail);
+                  }
+                  return eventDetail.is_recovered ? true : item.key !== 'recover_time';
+                })
                 .map(({ label, key, render }) => {
                   return (
                     <div className='desc-row'>
