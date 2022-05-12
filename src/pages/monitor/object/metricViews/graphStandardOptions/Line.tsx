@@ -18,58 +18,12 @@ import React from 'react';
 import _ from 'lodash';
 import { Menu, Checkbox, Dropdown } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
+import { utils } from '../config';
 
 interface IProps {
   highLevelConfig: any;
   setHighLevelConfig: (val: any) => void;
 }
-
-const utils = [
-  {
-    label: 'none',
-    value: 'none',
-  },
-  {
-    label: 'bits(SI)',
-    value: 'bitsSI',
-  },
-  {
-    label: 'bytes(SI)',
-    value: 'bytesSI',
-  },
-  {
-    label: 'bits(IEC)',
-    value: 'bitsIEC',
-  },
-  {
-    label: 'bytes(IEC)',
-    value: 'bytesIEC',
-  },
-  {
-    label: '百分比(0-100)',
-    value: 'percent',
-  },
-  {
-    label: '百分比(0.0-1.0)',
-    value: 'percentUnit',
-  },
-  {
-    label: 'seconds',
-    value: 'seconds',
-  },
-  {
-    label: 'milliseconds',
-    value: 'milliseconds',
-  },
-  {
-    label: 'humanize(seconds)',
-    value: 'humantimeSeconds',
-  },
-  {
-    label: 'humanize(milliseconds)',
-    value: 'humantimeMilliseconds',
-  },
-];
 
 export default function GraphStandardOptions(props: IProps) {
   const { highLevelConfig, setHighLevelConfig } = props;

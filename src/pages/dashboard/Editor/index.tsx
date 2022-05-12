@@ -39,7 +39,8 @@ interface IProps {
 
 function index(props: ModalWrapProps & IProps) {
   const { t } = useTranslation();
-  const { visible, initialValues, variableConfig, cluster, id } = props;
+  const { visible, variableConfig, cluster, id } = props;
+  const initialValues = _.cloneDeep(props.initialValues);
   const [chartForm] = Form.useForm();
   const [range, setRange] = useState<Range>({
     description: '小时',
@@ -51,9 +52,12 @@ function index(props: ModalWrapProps & IProps) {
   const [step, setStep] = useState<number | null>(null);
   const [changedFlag, setChangedFlag] = useState<string>(_.uniqueId('xxx_'));
   const [values, setValues] = useState<any>(chartForm.getFieldsValue());
-
   const handleAddChart = async () => {
     return chartForm.validateFields().then(async (values) => {
+      // TODO: 渲染 hexbin 图时，colorRange 需要从 string 转换为 array
+      if (type === 'hexbin') {
+        _.set(values, 'custom.colorRange', _.split(values.custom.colorRange, ','));
+      }
       let formData = Object.assign(values, {
         version: '2.0.0',
         type,
@@ -68,6 +72,11 @@ function index(props: ModalWrapProps & IProps) {
       props.destroy();
     });
   };
+
+  // TODO: 渲染 hexbin 配置时，colorRange 需要从 array 转换为 string
+  if (initialValues.type === 'hexbin') {
+    _.set(initialValues, 'custom.colorRange', _.join(initialValues.custom.colorRange, ','));
+  }
 
   useEffect(() => {
     setValues(chartForm.getFieldsValue());

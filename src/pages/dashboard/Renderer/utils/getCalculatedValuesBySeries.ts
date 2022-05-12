@@ -80,7 +80,7 @@ const getCalculatedValuesBySeries = (series: any[], calc: string, { util, decima
         ...serie.metric,
         refId: serie.refId,
       },
-      stat,
+      stat: _.toNumber(stat),
       ...getSerieTextObj(stat, { util, decimals }, valueMappings),
     };
   });
