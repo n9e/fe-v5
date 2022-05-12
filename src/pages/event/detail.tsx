@@ -18,6 +18,7 @@ import React, { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router';
 import moment from 'moment';
 import _ from 'lodash';
+import { useSelector } from 'react-redux';
 import { Button, Card, Col, message, Row, Space, Spin, Tag, Typography } from 'antd';
 import { PlayCircleOutlined } from '@ant-design/icons';
 import PageLayout from '@/components/pageLayout';
@@ -29,6 +30,8 @@ import Resolution from '@/components/Resolution';
 import { Range, formatPickerDate } from '@/components/DateRangePicker';
 import { deleteAlertEventsModal } from '.';
 import Graph from './Graph';
+import { RootState } from '@/store/common';
+import { CommonStoreState } from '@/store/commonInterface';
 import './detail.less';
 
 const { Paragraph } = Typography;
@@ -44,6 +47,15 @@ const getUUIDByTags = (tags: string[]) => {
 };
 const EventDetailPage: React.FC = () => {
   const { busiId, eventId } = useParams<{ busiId: string; eventId: string }>();
+  const { busiGroups } = useSelector<RootState, CommonStoreState>((state) => state.common);
+  useEffect(() => {}, [busiGroups]);
+  const handleNavToWarningList = (id) => {
+    if (busiGroups.find((item) => item.id === id)) {
+      history.push(`/alert-rules?id=${id}`);
+    } else {
+      message.error('该业务组已删除或无查看权限');
+    }
+  };
   const history = useHistory();
   const [isHistory, setIsHistory] = useState<boolean>(history.location.pathname.includes('alert-his-events'));
   const [eventDetail, setEventDetail] = useState<any>();
@@ -61,6 +73,17 @@ const EventDetailPage: React.FC = () => {
               history.push(`/alert-rules/edit/${rule_id}`);
             }}
           >
+            {content}
+          </Button>
+        );
+      },
+    },
+    {
+      label: '业务组',
+      key: 'group_name',
+      render(content, { group_id }) {
+        return (
+          <Button size='small' type='link' className='rule-link-btn' onClick={() => handleNavToWarningList(group_id)}>
             {content}
           </Button>
         );

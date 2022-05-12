@@ -36,6 +36,7 @@ interface groupProps {
 }
 
 interface BusiGroupProps {
+  defaultSelect?: number | undefined;
   showNotGroupItem?: boolean;
   showAlertings?: boolean;
   onChange?: ChangeFunction;
@@ -201,8 +202,19 @@ const busiGroupContent = (busiGroupProps: BusiGroupProps): IGroupItemProps => {
       data: busiGroups[0],
     });
   }
+  if (busiGroupProps.defaultSelect && busiGroups.length > 0 && curBusiItem.id !== busiGroupProps.defaultSelect) {
+    const curBusiness = busiGroups.find((item) => item.id === busiGroupProps.defaultSelect);
+    if (curBusiness) {
+      localStorage.setItem('curBusiItem', JSON.stringify(curBusiness));
+      dispatch({
+        type: 'common/saveData',
+        prop: 'curBusiItem',
+        data: curBusiness,
+      });
+    }
+  }
   // 初始化选中项
-  const initCurBusiItem = useMemo(() => (curBusiItem.id ? curBusiItem : { id: undefined }), [curBusiItem]);
+  const initCurBusiItem = useMemo(() => (busiGroupProps.defaultSelect ? { id: busiGroupProps.defaultSelect } : curBusiItem.id ? curBusiItem : { id: undefined }), [curBusiItem]);
 
   // 初始化展示所有业务组
   useEffect(() => {
