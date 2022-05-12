@@ -78,6 +78,10 @@ export default defineConfig({
         target: 'http://10.129.0.11:9999',
         changeOrigin: true,
       },
+      '/api/fc-brain': {
+        target: 'http://10.206.0.7:29000/',
+        changeOrigin: true,
+      }
     },
   },
   build: {
