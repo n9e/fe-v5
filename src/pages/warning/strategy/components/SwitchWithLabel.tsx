@@ -24,7 +24,6 @@ interface Props {
 }
 
 export const SwitchWithLabel: React.FC<Props> = ({ checked, onChange, label }) => {
-  console.log('checked', checked);
   return (
     <>
       <Switch checked={checked} onChange={onChange} style={{ marginRight: 5 }} />
