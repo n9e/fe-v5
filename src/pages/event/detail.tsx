@@ -24,6 +24,7 @@ import './detail.less';
 import moment from 'moment';
 import { PlayCircleOutlined } from '@ant-design/icons';
 import PromqlEditor from '@/components/PromqlEditor';
+import PromQLInput from '@/components/PromQLInput';
 import { deleteAlertEventsModal } from '.';
 
 const { Paragraph } = Typography;
@@ -98,7 +99,7 @@ const EventDetailPage: React.FC = () => {
         return (
           <Row className='promql-row'>
             <Col span={20}>
-              <PromqlEditor className='promql-editor' xCluster='Default' value={promql} editable={false} />
+              <PromQLInput value={promql} url='/api/n9e/prometheus' readonly />
             </Col>
             <Col span={4}>
               <Button

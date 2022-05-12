@@ -117,7 +117,7 @@ export default function FormCpt(props) {
                                   <PromQLInput
                                     url='/api/n9e/prometheus'
                                     headers={{
-                                      'X-Cluster': 'Default',
+                                      'X-Cluster': localStorage.getItem('curCluster') || 'DEFAULT',
                                       Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
                                     }}
                                   />

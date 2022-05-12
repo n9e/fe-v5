@@ -28,7 +28,8 @@ import { RootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
 import { getTeamInfoList, getNotifiesList } from '@/services/manage';
 import { addOrEditStrategy, EditStrategy, prometheusQuery, deleteStrategy } from '@/services/warning';
-import PromqlEditor from '@/components/PromqlEditor';
+// import PromqlEditor from '@/components/PromqlEditor';
+import PromQLInput from '@/components/PromQLInput';
 import { SwitchWithLabel } from './SwitchWithLabel';
 import { debounce } from 'lodash';
 const layout = {
@@ -306,13 +307,11 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                 trigger='onChange'
                 rules={[{ required: true, message: t('请输入PromQL') }]}
               >
-                <PromqlEditor
-                  // className='promql-editor'
-                  xCluster='Default'
-                  onChange={(val) => {
-                    if (val) {
-                      form.validateFields(['prom_ql']);
-                    }
+                <PromQLInput
+                  url='/api/n9e/prometheus'
+                  headers={{
+                    'X-Cluster': localStorage.getItem('curCluster') || 'DEFAULT',
+                    Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
                   }}
                 />
               </Form.Item>
