@@ -14,35 +14,35 @@
  * limitations under the License.
  *
  */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PageLayout from '@/components/pageLayout';
+import { useHistory } from 'react-router-dom';
 import LeftTree from '@/components/LeftTree';
 import BlankBusinessPlaceholder from '@/components/BlankBusinessPlaceholder';
 import PageTable from './PageTable';
 import { SettingOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import '../index.less';
+import { useQuery } from '@/utils';
 
 const Strategy: React.FC = () => {
+  const urlQuery = useQuery();
+  const history = useHistory();
+  const id = urlQuery.get('id');
   const { t } = useTranslation();
-  const [bgid, setBgid] = useState(undefined);
-  const [clusters, setClusters] = useState([]);
-  const [severity, setSeverity] = useState<number | undefined>();
-  const clusterChange = (data) => {
-    setClusters(data);
-  };
-  const busiChange = (data) => {
-    setBgid(data);
+  const busiChange = (id) => {
+    history.push(`/alert-rules?id=${id}`);
   };
   return (
     <PageLayout title={t('告警规则')} icon={<SettingOutlined />} hideCluster>
       <div className='strategy-content'>
         <LeftTree
           busiGroup={{
+            defaultSelect: id ? Number(id) : undefined,
             onChange: busiChange,
           }}
         ></LeftTree>
-        {bgid ? <PageTable bgid={bgid}></PageTable> : <BlankBusinessPlaceholder text='告警规则' />}
+        {id ? <PageTable bgid={Number(id)}></PageTable> : <BlankBusinessPlaceholder text='告警规则' />}
       </div>
     </PageLayout>
   );

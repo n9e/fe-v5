@@ -26,11 +26,22 @@ import { PlayCircleOutlined } from '@ant-design/icons';
 import PromqlEditor from '@/components/PromqlEditor';
 import PromQLInput from '@/components/PromQLInput';
 import { deleteAlertEventsModal } from '.';
-
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/store/common';
+import { CommonStoreState } from '@/store/commonInterface';
 const { Paragraph } = Typography;
 
 const EventDetailPage: React.FC = () => {
   const { busiId, eventId } = useParams<{ busiId: string; eventId: string }>();
+  const { busiGroups } = useSelector<RootState, CommonStoreState>((state) => state.common);
+  useEffect(() => {}, [busiGroups]);
+  const handleNavToWarningList = (id) => {
+    if (busiGroups.find((item) => item.id === id)) {
+      history.push(`/alert-rules?id=${id}`);
+    } else {
+      message.error('该业务组已删除或无查看权限');
+    }
+  };
   const history = useHistory();
   const [isHistory, setIsHistory] = useState<boolean>(history.location.pathname.includes('alert-his-events'));
   const [eventDetail, setEventDetail] = useState<any>();
@@ -48,6 +59,17 @@ const EventDetailPage: React.FC = () => {
               history.push(`/alert-rules/edit/${rule_id}`);
             }}
           >
+            {content}
+          </Button>
+        );
+      },
+    },
+    {
+      label: '业务组',
+      key: 'group_name',
+      render(content, { group_id }) {
+        return (
+          <Button size='small' type='link' className='rule-link-btn' onClick={() => handleNavToWarningList(group_id)}>
             {content}
           </Button>
         );
