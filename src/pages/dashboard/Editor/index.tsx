@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useReducer } from 'react';
 import { Modal, Form, Select, Space, Button } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
 import _ from 'lodash';
@@ -28,6 +28,7 @@ import Renderer from '../Renderer/Renderer';
 import { VariableType } from '../VariableConfig';
 import FormCpt from './Form';
 import { IPanel } from '../types';
+import { Reducer } from '../Context';
 
 interface IProps {
   initialValues: IPanel | null;
@@ -151,23 +152,25 @@ function index(props: ModalWrapProps & IProps) {
         padding: '10px 24px 24px 24px',
       }}
     >
-      <FormCpt
-        chartForm={chartForm}
-        setChangedFlag={setChangedFlag}
-        initialValues={initialValues}
-        type={type}
-        variableConfig={variableConfig}
-        cluster={cluster}
-        range={range}
-        id={id}
-        render={(innerVariableConfig) => {
-          return (
-            <div style={{ height: 300, border: '1px solid #d9d9d9' }}>
-              <Renderer dashboardId={id} time={range} step={step} type={type} values={values} variableConfig={innerVariableConfig} isPreview />
-            </div>
-          );
-        }}
-      />
+      <Reducer>
+        <FormCpt
+          chartForm={chartForm}
+          setChangedFlag={setChangedFlag}
+          initialValues={initialValues}
+          type={type}
+          variableConfig={variableConfig}
+          cluster={cluster}
+          range={range}
+          id={id}
+          render={(innerVariableConfig) => {
+            return (
+              <div style={{ height: 300, border: '1px solid #d9d9d9' }}>
+                <Renderer dashboardId={id} time={range} step={step} type={type} values={values} variableConfig={innerVariableConfig} isPreview />
+              </div>
+            );
+          }}
+        />
+      </Reducer>
     </Modal>
   );
 }

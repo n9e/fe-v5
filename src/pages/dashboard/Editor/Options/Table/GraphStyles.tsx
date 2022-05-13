@@ -14,15 +14,17 @@
  * limitations under the License.
  *
  */
-import React from 'react';
-import { Form, Select, Row, Col, Switch, Input } from 'antd';
+import React, { useContext } from 'react';
+import { Form, Select, Row, Col, Switch, AutoComplete } from 'antd';
 import { CaretDownOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { Panel } from '../../Components/Collapse';
 import { calcsOptions } from '../../config';
+import { Context } from '../../../Context';
 
 export default function GraphStyles() {
   const namePrefix = ['custom'];
+  const { state } = useContext(Context);
 
   return (
     <Panel header='图表样式'>
@@ -50,17 +52,43 @@ export default function GraphStyles() {
             <Form.Item label='显示模式' name={[...namePrefix, 'displayMode']}>
               <Select suffixIcon={<CaretDownOutlined />}>
                 <Select.Option value='seriesToRows'>每行展示 serie 的值</Select.Option>
+                <Select.Option value='labelsOfSeriesToRows'>每行展示 labels 的值</Select.Option>
                 <Select.Option value='labelValuesToRows'>每行展示指定聚合维度的值</Select.Option>
               </Select>
             </Form.Item>
           </Col>
           <Form.Item noStyle shouldUpdate={(prevValues, curValues) => _.get(prevValues, [...namePrefix, 'displayMode']) !== _.get(curValues, [...namePrefix, 'displayMode'])}>
             {({ getFieldValue }) => {
+              if (getFieldValue([...namePrefix, 'displayMode']) === 'labelsOfSeriesToRows') {
+                return (
+                  <Col span={12}>
+                    <Form.Item label='显示列' name={[...namePrefix, 'columns']}>
+                      <Select mode='multiple' placeholder='默认全选'>
+                        {_.map(state.metric, (item) => {
+                          return (
+                            <Select.Option key={item} value={item}>
+                              {item}
+                            </Select.Option>
+                          );
+                        })}
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                );
+              }
               if (getFieldValue([...namePrefix, 'displayMode']) === 'labelValuesToRows') {
                 return (
                   <Col span={12}>
                     <Form.Item label='显示维度' name={[...namePrefix, 'aggrDimension']}>
-                      <Input />
+                      <Select>
+                        {_.map(state.metric, (item) => {
+                          return (
+                            <Select.Option key={item} value={item}>
+                              {item}
+                            </Select.Option>
+                          );
+                        })}
+                      </Select>
                     </Form.Item>
                   </Col>
                 );
