@@ -183,7 +183,17 @@ export default function Stat(props: IProps) {
   return (
     <div className='renderer-table-container' ref={eleRef}>
       <div className='renderer-table-container-box'>
-        <Table rowKey='id' showHeader={showHeader} dataSource={tableDataSource} columns={tableColumns} scroll={{ y: height }} bordered={false} pagination={false} />
+        <Table
+          rowKey='id'
+          getPopupContainer={() => document.body}
+          showSorterTooltip={false}
+          showHeader={showHeader}
+          dataSource={tableDataSource}
+          columns={tableColumns}
+          scroll={{ y: height }}
+          bordered={false}
+          pagination={false}
+        />
       </div>
     </div>
   );
