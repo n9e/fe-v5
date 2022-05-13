@@ -70,6 +70,7 @@ export default defineConfig({
       '/api/n9e': {
         // target: 'http://10.206.0.11:8765/',
         target: 'http://10.206.0.16:18000/',
+        // target: 'http://10.206.0.7:18000/',
         changeOrigin: true,
       },
       '/api/v1/': {
