@@ -14,13 +14,14 @@
  * limitations under the License.
  *
  */
-import React, { useRef } from 'react';
+import React, { useRef, useContext, useEffect } from 'react';
 import _ from 'lodash';
 import { Table } from 'antd';
 import { IPanel } from '../../../types';
 import getCalculatedValuesBySeries, { getSerieTextObj } from '../../utils/getCalculatedValuesBySeries';
 import getOverridePropertiesByName from '../../utils/getOverridePropertiesByName';
 import formatToTable from '../../utils/formatToTable';
+import { Context } from '../../../Context';
 import './style.less';
 
 interface IProps {
@@ -28,22 +29,46 @@ interface IProps {
   series: any[];
 }
 
+const getColumnsKeys = (data: any[]) => {
+  const keys = _.reduce(
+    data,
+    (result, item) => {
+      return _.union(result, _.keys(item.metric));
+    },
+    [],
+  );
+  return _.uniq(keys);
+};
+
 export default function Stat(props: IProps) {
   const eleRef = useRef<HTMLDivElement>(null);
+  const { dispatch } = useContext(Context);
   const { values, series } = props;
   const { custom, options, overrides } = values;
-  const { showHeader, calc, aggrDimension } = custom;
-  const calculatedValues = getCalculatedValuesBySeries(
-    series,
-    calc,
-    {
-      util: options?.standardOptions?.util,
-      decimals: options?.standardOptions?.decimals,
-    },
-    options?.valueMappings,
-  );
+  const { showHeader, calc, aggrDimension, displayMode, columns } = custom;
+  const [calculatedValues, setCalculatedValues] = React.useState([]);
+
+  useEffect(() => {
+    const data = getCalculatedValuesBySeries(
+      series,
+      calc,
+      {
+        util: options?.standardOptions?.util,
+        decimals: options?.standardOptions?.decimals,
+      },
+      options?.valueMappings,
+    );
+    if (dispatch) {
+      dispatch({
+        type: 'updateMetric',
+        payload: getColumnsKeys(data),
+      });
+    }
+    setCalculatedValues(data);
+  }, [JSON.stringify(series), calc, JSON.stringify(options)]);
+
   let tableDataSource = calculatedValues;
-  let columns: any[] = [
+  let tableColumns: any[] = [
     {
       title: 'name',
       dataIndex: 'name',
@@ -72,7 +97,21 @@ export default function Stat(props: IProps) {
     },
   ];
 
-  if (aggrDimension) {
+  if (displayMode === 'labelsOfSeriesToRows') {
+    const columnsKeys = _.isEmpty(columns) ? getColumnsKeys(calculatedValues) : columns;
+    tableColumns = _.map(columnsKeys, (key) => {
+      return {
+        title: key,
+        dataIndex: key,
+        key: key,
+        render: (_text, record) => {
+          return _.get(record.metric, key);
+        },
+      };
+    });
+  }
+
+  if (displayMode === 'labelValuesToRows' && aggrDimension) {
     tableDataSource = formatToTable(calculatedValues, aggrDimension, 'refId');
     const groupNames = _.reduce(
       tableDataSource,
@@ -81,7 +120,7 @@ export default function Stat(props: IProps) {
       },
       [],
     );
-    columns = [
+    tableColumns = [
       {
         title: aggrDimension,
         dataIndex: aggrDimension,
@@ -93,7 +132,7 @@ export default function Stat(props: IProps) {
       const result = _.find(tableDataSource, (item) => {
         return item[name];
       });
-      columns.push({
+      tableColumns.push({
         title: result[name]?.name,
         dataIndex: name,
         key: name,
@@ -122,7 +161,7 @@ export default function Stat(props: IProps) {
   return (
     <div className='renderer-table-container' ref={eleRef}>
       <div className='renderer-table-container-box'>
-        <Table rowKey='id' showHeader={showHeader} dataSource={tableDataSource} columns={columns} scroll={{ y: height }} bordered={false} pagination={false} />
+        <Table rowKey='id' showHeader={showHeader} dataSource={tableDataSource} columns={tableColumns} scroll={{ y: height }} bordered={false} pagination={false} />
       </div>
     </div>
   );
