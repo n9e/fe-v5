@@ -29,7 +29,7 @@ interface IProps {
 export default function Pie(props: IProps) {
   const { values, series } = props;
   const { custom, options } = values;
-  const { calc, legengPosition, max } = custom;
+  const { calc, legengPosition, max, labelWithName } = custom;
   const calculatedValues = getCalculatedValuesBySeries(
     series,
     calc,
@@ -50,7 +50,7 @@ export default function Pie(props: IProps) {
       : sortedValues.map((i) => ({ name: i.name, value: i.stat }));
   return (
     <div className='renderer-pie-container'>
-      <G2PieChart data={data} positon={legengPosition !== 'hidden' ? legengPosition : undefined} hidden={legengPosition === 'hidden'} />
+      <G2PieChart data={data} positon={legengPosition !== 'hidden' ? legengPosition : undefined} hidden={legengPosition === 'hidden'} labelWithName={labelWithName} />
     </div>
   );
 }

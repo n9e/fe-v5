@@ -15,7 +15,7 @@
  *
  */
 import React from 'react';
-import { Form, Radio, Select, Row, Col, InputNumber } from 'antd';
+import { Form, Radio, Select, Row, Col, InputNumber, Switch } from 'antd';
 import { CaretDownOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { Panel } from '../../Components/Collapse';
@@ -57,6 +57,11 @@ export default function GraphStyles() {
           <Col span={12}>
             <Form.Item label='最多展示块数' name={[...namePrefix, 'max']} tooltip='超过的块数则合并展示为其他'>
               <InputNumber style={{ width: '100%' }} />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item label='label是否包含名称' name={[...namePrefix, 'labelWithName']} valuePropName='checked'>
+              <Switch />
             </Form.Item>
           </Col>
         </Row>

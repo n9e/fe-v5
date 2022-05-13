@@ -14,9 +14,8 @@
  * limitations under the License.
  *
  */
-import React, { useState, useEffect } from 'react';
-import ReactDOM from 'react-dom';
-import { Pie, PieConfig, Options } from '@ant-design/plots';
+import React from 'react';
+import { Pie, PieConfig } from '@ant-design/plots';
 
 type Marker = {
   symbol?: string;
@@ -35,10 +34,11 @@ interface Props {
   data: DataType[];
   positon: 'top' | 'left' | 'right' | 'bottom';
   hidden: boolean;
+  labelWithName: boolean;
 }
 
 const DemoPie = (props: Props) => {
-  const { data, positon, hidden } = props;
+  const { data, positon, hidden, labelWithName } = props;
 
   const config: PieConfig = {
     padding: [16, 8, 16, 8],
@@ -51,7 +51,9 @@ const DemoPie = (props: Props) => {
     label: {
       type: 'spider',
       // offset: '-30%',
-      content: ({ percent }) => `${(percent * 100).toFixed(0)}%`,
+      content: (record) => {
+        return `${labelWithName ? `${record.name}: ` : ''}${(record.percent * 100).toFixed(0)}%`;
+      },
       style: {
         fontSize: 14,
         textAlign: 'center',
