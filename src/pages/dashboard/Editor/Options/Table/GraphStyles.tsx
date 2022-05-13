@@ -110,7 +110,7 @@ export default function GraphStyles() {
                 } else if (displayMode === 'labelsOfSeriesToRows') {
                   keys = columns;
                 } else if (displayMode === 'labelValuesToRows') {
-                  keys = [aggrDimension, 'value'];
+                  keys = [aggrDimension || 'name', 'value'];
                 }
                 return (
                   <Form.Item label='默认排序列' name={[...namePrefix, 'sortColumn']}>
