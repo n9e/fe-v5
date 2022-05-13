@@ -98,13 +98,16 @@ export default function Stat(props: IProps) {
   ];
 
   if (displayMode === 'labelsOfSeriesToRows') {
-    const columnsKeys = _.isEmpty(columns) ? getColumnsKeys(calculatedValues) : columns;
+    const columnsKeys = _.isEmpty(columns) ? _.concat(getColumnsKeys(calculatedValues), 'value') : columns;
     tableColumns = _.map(columnsKeys, (key) => {
       return {
         title: key,
         dataIndex: key,
         key: key,
         render: (_text, record) => {
+          if (key === 'value') {
+            return _.get(record, 'text');
+          }
           return _.get(record.metric, key);
         },
       };

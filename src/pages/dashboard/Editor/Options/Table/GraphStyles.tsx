@@ -64,7 +64,7 @@ export default function GraphStyles() {
                   <Col span={12}>
                     <Form.Item label='显示列' name={[...namePrefix, 'columns']}>
                       <Select mode='multiple' placeholder='默认全选'>
-                        {_.map(state.metric, (item) => {
+                        {_.map(_.concat(state.metric, 'value'), (item) => {
                           return (
                             <Select.Option key={item} value={item}>
                               {item}
