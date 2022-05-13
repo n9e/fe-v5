@@ -47,8 +47,8 @@ const getSortOrder = (key, sortObj) => {
 
 export default function Stat(props: IProps) {
   const eleRef = useRef<HTMLDivElement>(null);
-  const { dispatch } = useContext(Context);
   const size = useSize(eleRef);
+  const { dispatch } = useContext(Context);
   const { values, series } = props;
   const { custom, options, overrides } = values;
   const { showHeader, calc, aggrDimension, displayMode, columns, sortColumn, sortOrder } = custom;
