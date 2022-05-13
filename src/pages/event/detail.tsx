@@ -45,6 +45,12 @@ const getUUIDByTags = (tags: string[]) => {
   });
   return uuid;
 };
+const serieColorMap = {
+  origin: '#573BA7',
+  upper_bound: '#1A94FF',
+  lower_bound: '#2ACA96',
+  anomaly: 'red',
+};
 const EventDetailPage: React.FC = () => {
   const { busiId, eventId } = useParams<{ busiId: string; eventId: string }>();
   const { busiGroups } = useSelector<RootState, CommonStoreState>((state) => state.common);
@@ -235,10 +241,10 @@ const EventDetailPage: React.FC = () => {
   ]);
   const [range, setRange] = useState<Range>({
     num: 1,
-    unit: 'hours',
+    unit: 'hour',
     description: '',
   });
-  const [step, setStep] = useState<number | null>(null);
+  const [step, setStep] = useState<number | null>(15);
   const [series, setSeries] = useState<any[]>([]);
 
   useEffect(() => {
@@ -261,12 +267,20 @@ const EventDetailPage: React.FC = () => {
         step: _step,
       }).then((res) => {
         setSeries(
-          _.map(res.data, (item) => {
-            return {
-              name: `${item.metric.value_type}`,
-              data: item.values,
-            };
-          }),
+          _.map(
+            _.filter(res.data, (item) => {
+              return item.metric.value_type !== 'predict';
+            }),
+            (item) => {
+              const type = item.metric.value_type;
+              return {
+                name: `${type}`,
+                data: item.values,
+                color: serieColorMap[type],
+                lineDash: type === 'origin' || type === 'anomaly' ? [] : [4, 4],
+              };
+            },
+          ),
         );
       });
     }
@@ -327,8 +341,8 @@ const EventDetailPage: React.FC = () => {
                 {eventDetail.rule_algo && (
                   <div>
                     <Space>
-                      <DateRangePicker onChange={setRange} />
-                      <Resolution onChange={(v) => setStep(v)} initialValue={step} />
+                      <DateRangePicker value={range} onChange={setRange} />
+                      <Resolution value={step} onChange={(v) => setStep(v)} initialValue={step} />
                     </Space>
                     <Graph series={series} />
                   </div>
