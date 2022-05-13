@@ -63,7 +63,7 @@ export default function GraphStyles() {
                 return (
                   <Col span={12}>
                     <Form.Item label='显示列' name={[...namePrefix, 'columns']}>
-                      <Select mode='multiple' placeholder='默认全选'>
+                      <Select mode='multiple' placeholder='默认全选' suffixIcon={<CaretDownOutlined />}>
                         {_.map(_.concat(state.metric, 'value'), (item) => {
                           return (
                             <Select.Option key={item} value={item}>
@@ -80,7 +80,7 @@ export default function GraphStyles() {
                 return (
                   <Col span={12}>
                     <Form.Item label='显示维度' name={[...namePrefix, 'aggrDimension']}>
-                      <Select>
+                      <Select suffixIcon={<CaretDownOutlined />}>
                         {_.map(state.metric, (item) => {
                           return (
                             <Select.Option key={item} value={item}>
@@ -96,6 +96,46 @@ export default function GraphStyles() {
               return null;
             }}
           </Form.Item>
+        </Row>
+        <Row gutter={10}>
+          <Col span={12}>
+            <Form.Item noStyle shouldUpdate>
+              {({ getFieldValue }) => {
+                const displayMode = getFieldValue([...namePrefix, 'displayMode']);
+                const columns = getFieldValue([...namePrefix, 'columns']) ? getFieldValue([...namePrefix, 'columns']) : _.concat(state.metric, 'value');
+                const aggrDimension = getFieldValue([...namePrefix, 'aggrDimension']);
+                let keys: string[] = [];
+                if (displayMode === 'seriesToRows') {
+                  keys = ['name', 'value'];
+                } else if (displayMode === 'labelsOfSeriesToRows') {
+                  keys = columns;
+                } else if (displayMode === 'labelValuesToRows') {
+                  keys = [aggrDimension, 'value'];
+                }
+                return (
+                  <Form.Item label='默认排序列' name={[...namePrefix, 'sortColumn']}>
+                    <Select suffixIcon={<CaretDownOutlined />} allowClear>
+                      {_.map(keys, (item) => {
+                        return (
+                          <Select.Option key={item} value={item}>
+                            {item}
+                          </Select.Option>
+                        );
+                      })}
+                    </Select>
+                  </Form.Item>
+                );
+              }}
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item label='默认排序顺序' name={[...namePrefix, 'sortOrder']}>
+              <Select suffixIcon={<CaretDownOutlined />} allowClear>
+                <Select.Option value='ascend'>asc</Select.Option>
+                <Select.Option value='descend'>desc</Select.Option>
+              </Select>
+            </Form.Item>
+          </Col>
         </Row>
       </>
     </Panel>

@@ -27,50 +27,49 @@ export default function index({ targets }) {
 
   return (
     <Form.List name={namePrefix}>
-      {(fields, { add, remove }) => (
-        <>
-          {fields.map(({ key, name, ...restField }) => {
-            return (
-              <Panel
-                isInner
-                header='override'
-                extra={
-                  <Space>
-                    <PlusCircleOutlined
+      {(fields, { add, remove }) =>
+        fields.map(({ key, name, ...restField }) => {
+          return (
+            <Panel
+              key={key}
+              isInner
+              header='override'
+              extra={
+                <Space>
+                  <PlusCircleOutlined
+                    onClick={() => {
+                      add({
+                        type: 'special',
+                      });
+                    }}
+                  />
+                  {fields.length > 1 && (
+                    <MinusCircleOutlined
                       onClick={() => {
-                        add({
-                          type: 'special',
-                        });
+                        remove(name);
                       }}
                     />
-                    {fields.length > 1 && (
-                      <MinusCircleOutlined
-                        onClick={() => {
-                          remove(name);
-                        }}
-                      />
-                    )}
-                  </Space>
-                }
-              >
-                <Form.Item label='查询条件名称' {...restField} name={[name, 'matcher', 'value']}>
-                  <Select suffixIcon={<CaretDownOutlined />} allowClear>
-                    {_.map(targets, (target) => {
-                      return (
-                        <Select.Option key={target.refId} value={target.refId}>
-                          {target.refId}
-                        </Select.Option>
-                      );
-                    })}
-                  </Select>
-                </Form.Item>
-                <ValueMappings preNamePrefix={namePrefix} namePrefix={[name, 'properties', 'valueMappings']} />
-                <StandardOptions preNamePrefix={namePrefix} namePrefix={[name, 'properties', 'standardOptions']} />
-              </Panel>
-            );
-          })}
-        </>
-      )}
+                  )}
+                </Space>
+              }
+            >
+              <Form.Item label='查询条件名称' {...restField} name={[name, 'matcher', 'value']}>
+                <Select suffixIcon={<CaretDownOutlined />} allowClear>
+                  {_.map(targets, (target) => {
+                    return (
+                      <Select.Option key={target.refId} value={target.refId}>
+                        {target.refId}
+                      </Select.Option>
+                    );
+                  })}
+                </Select>
+              </Form.Item>
+              <ValueMappings preNamePrefix={namePrefix} namePrefix={[name, 'properties', 'valueMappings']} />
+              <StandardOptions preNamePrefix={namePrefix} namePrefix={[name, 'properties', 'standardOptions']} />
+            </Panel>
+          );
+        })
+      }
     </Form.List>
   );
 }

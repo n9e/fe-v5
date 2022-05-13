@@ -40,14 +40,28 @@ const getColumnsKeys = (data: any[]) => {
   );
   return _.uniq(keys);
 };
+const getSortOrder = (key, sortObj) => {
+  return sortObj.sortColumn === key ? sortObj.sortOrder : false;
+};
 
 export default function Stat(props: IProps) {
   const eleRef = useRef<HTMLDivElement>(null);
   const { dispatch } = useContext(Context);
   const { values, series } = props;
   const { custom, options, overrides } = values;
-  const { showHeader, calc, aggrDimension, displayMode, columns } = custom;
+  const { showHeader, calc, aggrDimension, displayMode, columns, sortColumn, sortOrder } = custom;
   const [calculatedValues, setCalculatedValues] = React.useState([]);
+  const [sortObj, setSortObj] = React.useState({
+    sortColumn,
+    sortOrder,
+  });
+
+  useEffect(() => {
+    setSortObj({
+      sortColumn,
+      sortOrder,
+    });
+  }, [sortColumn, sortOrder]);
 
   useEffect(() => {
     const data = getCalculatedValuesBySeries(
@@ -77,6 +91,7 @@ export default function Stat(props: IProps) {
       sorter: (a, b) => {
         return localeCompare(a.name, b.name);
       },
+      sortOrder: getSortOrder('name', sortObj),
       render: (text) => <div className='renderer-table-td-content'>{text}</div>,
     },
     {
@@ -86,6 +101,7 @@ export default function Stat(props: IProps) {
       sorter: (a, b) => {
         return a.stat - b.stat;
       },
+      sortOrder: getSortOrder('value', sortObj),
       render: (text, record) => {
         let textObj = {
           text,
@@ -117,6 +133,7 @@ export default function Stat(props: IProps) {
           }
           return localeCompare(a.name, b.name);
         },
+        sortOrder: getSortOrder(key, sortObj),
         render: (_text, record) => {
           if (key === 'value') {
             return _.get(record, 'text');
@@ -144,6 +161,7 @@ export default function Stat(props: IProps) {
         sorter: (a, b) => {
           return localeCompare(a[aggrDimension], b[aggrDimension]);
         },
+        sortOrder: getSortOrder(aggrDimension, sortObj),
         render: (text) => <div className='renderer-table-td-content'>{text}</div>,
       },
     ];
@@ -158,6 +176,7 @@ export default function Stat(props: IProps) {
         sorter: (a, b) => {
           return _.get(a[name], 'stat') - _.get(b[name], 'stat');
         },
+        sortOrder: getSortOrder('value', sortObj),
         render: (text) => {
           let textObj = {
             text: text?.text,
@@ -193,6 +212,12 @@ export default function Stat(props: IProps) {
           scroll={{ y: height }}
           bordered={false}
           pagination={false}
+          onChange={(pagination, filters, sorter: any) => {
+            setSortObj({
+              sortColumn: sorter.columnKey,
+              sortOrder: sorter.order,
+            });
+          }}
         />
       </div>
     </div>
