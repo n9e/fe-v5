@@ -20,6 +20,7 @@ import { Table } from 'antd';
 import { IPanel } from '../../../types';
 import getCalculatedValuesBySeries, { getSerieTextObj } from '../../utils/getCalculatedValuesBySeries';
 import getOverridePropertiesByName from '../../utils/getOverridePropertiesByName';
+import localeCompare from '../../utils/localeCompare';
 import formatToTable from '../../utils/formatToTable';
 import { Context } from '../../../Context';
 import './style.less';
@@ -73,12 +74,18 @@ export default function Stat(props: IProps) {
       title: 'name',
       dataIndex: 'name',
       key: 'name',
+      sorter: (a, b) => {
+        return localeCompare(a.name, b.name);
+      },
       render: (text) => <div className='renderer-table-td-content'>{text}</div>,
     },
     {
       title: 'value',
       dataIndex: 'text',
       key: 'text',
+      sorter: (a, b) => {
+        return a.stat - b.stat;
+      },
       render: (text, record) => {
         let textObj = {
           text,
@@ -104,6 +111,12 @@ export default function Stat(props: IProps) {
         title: key,
         dataIndex: key,
         key: key,
+        sorter: (a, b) => {
+          if (key === 'value') {
+            return a.stat - b.stat;
+          }
+          return localeCompare(a.name, b.name);
+        },
         render: (_text, record) => {
           if (key === 'value') {
             return _.get(record, 'text');
@@ -128,6 +141,9 @@ export default function Stat(props: IProps) {
         title: aggrDimension,
         dataIndex: aggrDimension,
         key: aggrDimension,
+        sorter: (a, b) => {
+          return localeCompare(a[aggrDimension], b[aggrDimension]);
+        },
         render: (text) => <div className='renderer-table-td-content'>{text}</div>,
       },
     ];
@@ -139,6 +155,9 @@ export default function Stat(props: IProps) {
         title: result[name]?.name,
         dataIndex: name,
         key: name,
+        sorter: (a, b) => {
+          return _.get(a[name], 'stat') - _.get(b[name], 'stat');
+        },
         render: (text) => {
           let textObj = {
             text: text?.text,
