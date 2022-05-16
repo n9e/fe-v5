@@ -83,6 +83,7 @@ export default defineConfig({
     target: 'chrome58',
     outDir: 'pub',
     chunkSizeWarningLimit: 650,
+    sourcemap: true,
     rollupOptions: {
       output: {
         manualChunks: {
