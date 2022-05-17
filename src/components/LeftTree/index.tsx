@@ -75,10 +75,7 @@ interface SelectListProps {
 
 // 内容可选列表
 export const SelectList: React.FC<SelectListProps> = ({ dataSource, fieldNames = {}, allowNotSelect = false, defaultSelect, showBadge = true, badgeInfo = {}, onChange }) => {
-  const [curSeletedKey, setCurSelectedKey] = useState<string | number>(
-    defaultSelect && typeof defaultSelect === 'object' ? defaultSelect[fieldNames.key || 'value'] : defaultSelect,
-  );
-  const [active, setActive] = useState();
+  const [active, setActive] = useState<string | number>(defaultSelect && typeof defaultSelect === 'object' ? defaultSelect[fieldNames.key || 'value'] : defaultSelect);
 
   return (
     <div className='radio-list'>
@@ -89,13 +86,12 @@ export const SelectList: React.FC<SelectListProps> = ({ dataSource, fieldNames =
               <div
                 className={classNames({
                   'n9e-metric-views-list-content-item': true,
-                  active: item.id === active,
+                  active: item.id == active,
                 })}
                 key={item.id}
                 onClick={(e) => {
                   if (item.id !== active) {
                     setActive(item.id);
-                    localStorage.setItem('metric-view-id', item.id);
                     onChange && onChange(item.id, item);
                   }
                 }}
