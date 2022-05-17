@@ -271,6 +271,7 @@ const Event: React.FC = () => {
           <RefreshIcon
             onClick={() => {
               view === 'list' && tableRef.current.handleReload();
+              view === 'card' && cardRef.current.reloadCard()
             }}
           />
           <Dropdown overlay={menu}>
@@ -292,7 +293,7 @@ const Event: React.FC = () => {
 
   useEffect(() => {
     view === 'list' && tableRef.current.handleReload();
-  }, [curClusterItems, severity, hourRange, curBusiId]);
+  }, [curClusterItems, severity, hourRange, curBusiId, view]);
 
   return (
     <PageLayout icon={<AlertOutlined />} title={t('活跃告警')} hideCluster>
