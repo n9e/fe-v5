@@ -69,7 +69,7 @@ export const importDashboard = function (busiId: number, data: any[]) {
   });
 };
 
-// 创建大盘
+// 获取大盘详情
 export const getSingleDashboard = function (busiId: string, id: string | number) {
   return request(`/api/n9e/busi-group/${busiId}/dashboard/${id}`, {
     method: RequestMethod.Get,
@@ -244,5 +244,13 @@ export const createBuiltinDashboards = function (name: string, cluster: string, 
   return request(`/api/n9e/busi-group/${id}/dashboards/builtin`, {
     method: RequestMethod.Post,
     data: { name, cluster },
+  });
+};
+
+// boards v2 api
+export const migrateDashboard = function (id: number, data: { name: string; tags: string; configs: string }) {
+  return request(`/api/n9e/dashboard/${id}/migrate`, {
+    method: RequestMethod.Put,
+    data,
   });
 };

@@ -163,6 +163,10 @@ const SideMenu: FC = () => {
           key: '/help/contact',
           title: t('联系我们'),
         },
+        {
+          key: '/help/migrate',
+          title: t('管理员迁移'),
+        },
       ],
     },
   ];

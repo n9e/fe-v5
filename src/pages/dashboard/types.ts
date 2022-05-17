@@ -22,7 +22,7 @@ export interface IGridPos {
   y: number;
 }
 
-// query interface 
+// query interface
 export interface ITarget {
   refId: string;
   expr: string; // promQL
@@ -37,7 +37,7 @@ export interface IValueMapping {
   match: {
     special?: string | number;
     from?: number;
-    to?: number
+    to?: number;
   };
   result: {
     color: string;
@@ -64,14 +64,15 @@ export interface IOptions {
     max?: number;
     decimals?: number;
   };
-  legend?: { // TODO: 目前不支持这么复杂的自定义
+  legend?: {
+    // TODO: 目前不支持这么复杂的自定义
     calcs: string[];
     displayMode: 'list' | 'hidden';
-    placement: 'right' | 'bottom'
+    placement: 'right' | 'bottom';
   };
   tooltip?: {
-    mode: 'single' | 'all',
-    sort: 'none' | 'asc' | 'desc'
+    mode: 'single' | 'all';
+    sort: 'none' | 'asc' | 'desc';
   };
 }
 
@@ -79,10 +80,10 @@ export interface IOverride {
   matcher: {
     type: 'byName'; // 目前只支持 byName
     value: string;
-  },
+  };
   properties: {
     [key: string]: any; // standardOptions | valueMappings
-  }
+  };
 }
 
 export interface ILink {
@@ -93,7 +94,7 @@ export interface ILink {
 
 export interface ITimeseriesStyles {
   version: string; // 时序图组件使用的版本
-  drawStyle: 'lines' |'bars';
+  drawStyle: 'lines' | 'bars';
   lineInterpolation: 'linear' | 'smooth';
   fillOpacity: number;
   stack: 'off' | 'noraml'; // off 关闭；normal 开启，此结构未后期其他模式预留
@@ -101,7 +102,7 @@ export interface ITimeseriesStyles {
 
 export interface IStatStyles {
   version: string; // 时序图组件使用的版本
-  textMode: 'valueAndName' |'value';
+  textMode: 'valueAndName' | 'value';
   textSize: {
     title: number;
     value: number;
@@ -122,7 +123,7 @@ export interface ITableStyles {
 
 export interface IPanel {
   version: string; // 单个图表面板使用的版本
-  id: number;
+  id: number | string;
   name: string;
   links?: ILink[];
   description: string;
@@ -132,6 +133,7 @@ export interface IPanel {
   options: IOptions;
   custom: any; // 图表
   overrides: IOverride[];
+  visible?: boolean; // 用于 row 展开收起控制是否显示
 }
 
 export interface IDashboard {
