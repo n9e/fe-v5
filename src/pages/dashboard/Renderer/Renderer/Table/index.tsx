@@ -17,6 +17,7 @@
 import React, { useRef, useContext, useEffect } from 'react';
 import _ from 'lodash';
 import { Table } from 'antd';
+import { useSize } from 'ahooks';
 import { IPanel } from '../../../types';
 import getCalculatedValuesBySeries, { getSerieTextObj } from '../../utils/getCalculatedValuesBySeries';
 import getOverridePropertiesByName from '../../utils/getOverridePropertiesByName';
@@ -47,6 +48,7 @@ const getSortOrder = (key, sortObj) => {
 export default function Stat(props: IProps) {
   const eleRef = useRef<HTMLDivElement>(null);
   const { dispatch } = useContext(Context);
+  const size = useSize(eleRef);
   const { values, series } = props;
   const { custom, options, overrides } = values;
   const { showHeader, calc, aggrDimension, displayMode, columns, sortColumn, sortOrder } = custom;
@@ -197,7 +199,8 @@ export default function Stat(props: IProps) {
   }
 
   const headerHeight = showHeader ? 40 : 0;
-  const height = eleRef?.current?.clientHeight! - headerHeight;
+  const height = _.get(size, 'height') - headerHeight;
+  const realHeight = isNaN(height) ? 0 : height;
 
   return (
     <div className='renderer-table-container' ref={eleRef}>
@@ -209,7 +212,7 @@ export default function Stat(props: IProps) {
           showHeader={showHeader}
           dataSource={tableDataSource}
           columns={tableColumns}
-          scroll={{ y: height }}
+          scroll={{ y: realHeight }}
           bordered={false}
           pagination={false}
           onChange={(pagination, filters, sorter: any) => {

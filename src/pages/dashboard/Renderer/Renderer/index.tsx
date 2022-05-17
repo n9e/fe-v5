@@ -82,7 +82,7 @@ function index(props: IProps) {
 
   return (
     <div className='renderer-container' ref={ref}>
-      <div className='renderer-header graph-header'>
+      <div className='renderer-header graph-header dashboards-panels-item-drag-handle'>
         {tipsVisible ? (
           <Tooltip
             placement='rightTop'
