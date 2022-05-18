@@ -26,12 +26,12 @@ export default function index(props: IProps) {
                         form.setFieldsValue({
                           algorithm: 'holtwinters',
                           algo_params: {
-                            seasonal_duration: 3600,
-                            rollup_interval: 240,
+                            seasonal_duration: 86400,
+                            rollup_interval: 450,
                             upper_bound: 1,
-                            upper_times_num: 3,
+                            upper_times_num: 5,
                             lower_bound: 1,
-                            lower_times_num: 3,
+                            lower_times_num: 5,
                           },
                         });
                       } else {
