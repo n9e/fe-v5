@@ -336,9 +336,8 @@ export default function Dashboard() {
                   return `共 ${total} 条数据`;
                 },
                 pageSizeOptions: [30, 50, 100, 300],
-                defaultPageSize: 10,
+                defaultPageSize: 30,
                 showSizeChanger: true,
-                showQuickJumper: true,
               }}
               rowKey='id'
               rowSelection={{
