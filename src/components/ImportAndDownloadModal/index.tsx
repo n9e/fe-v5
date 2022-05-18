@@ -251,7 +251,7 @@ export default function ImportAndDownloadModal(props: Props) {
                     let str = e.target.value;
                     let filterArr: { name: string }[] = [];
                     allList.forEach((el) => {
-                      if (el.name.indexOf(str) != -1) filterArr.push(el);
+                      if (el.name.toLowerCase().indexOf(str.toLowerCase()) != -1) filterArr.push(el);
                     });
                     setBuildinList(filterArr);
                   }}
