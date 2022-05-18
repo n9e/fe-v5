@@ -17,7 +17,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useHistory, Link } from 'react-router-dom';
 import PageLayout from '@/components/pageLayout';
-import BaseTable, { IBaseTableProps } from '@/components/BaseTable';
 import { ColumnsType } from 'antd/lib/table';
 import {
   getDashboard,
@@ -31,7 +30,7 @@ import {
   createBuiltinDashboards,
 } from '@/services/dashboard';
 import { SearchOutlined, DownOutlined, FundOutlined, FundViewOutlined, DownloadOutlined, UploadOutlined } from '@ant-design/icons';
-import { Button, Modal, Form, Input, Tag, message, Dropdown, notification, Select, Tabs } from 'antd';
+import { Button, Modal, Form, Input, Tag, message, Dropdown, notification, Select, Tabs, Table } from 'antd';
 import dayjs from 'dayjs';
 import { Dashboard as DashboardType } from '@/store/dashboardInterface';
 import ImportAndDownloadModal, { ModalStatus } from '@/components/ImportAndDownloadModal';
@@ -54,7 +53,7 @@ export default function Dashboard() {
   const [editing, setEditing] = useState(false);
   const [query, setQuery] = useState<string>('');
   const [searchVal, setsearchVal] = useState<string>('');
-
+  const [dashboardList, setDashboardList] = useState<DashboardType[]>();
   const [busiId, setBusiId] = useState<number>();
 
   const showModal = () => {
@@ -78,8 +77,18 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    (ref?.current as any)?.refreshList();
-  }, [busiId]);
+    if (busiId) {
+      getDashboard(busiId).then((res) => {
+        if (searchVal && res.dat) {
+          const filters = searchVal.split(' ');
+          for (var i = 0; i < filters.length; i++) {
+            res.dat = res.dat.filter((item) => item.name.includes(filters[i]) || item.tags.includes(filters[i]));
+          }
+        }
+        setDashboardList(res.dat);
+      });
+    }
+  }, [busiId, searchVal]);
 
   const create = async () => {
     let { name, tags } = form.getFieldsValue();
@@ -317,24 +326,8 @@ export default function Dashboard() {
                 </div>
               </div>
             </div>
-            <BaseTable
-              ref={ref}
-              fetchHandle={() =>
-                getDashboard(busiId).then((res) => {
-                  if (searchVal && res.dat) {
-                    const filters = searchVal.split(' ');
-                    console.log(filters);
-                    for (var i = 0; i < filters.length; i++) {
-                      res.dat = res.dat.filter((item) => item.name.includes(filters[i]) || item.tags.includes(filters[i]));
-                    }
-                  }
-                  return res;
-                })
-              }
-              fetchParams={{
-                query: searchVal,
-              }}
-              // feQuery={searchVal}
+            <Table
+              dataSource={dashboardList}
               className='dashboard-table'
               columns={dashboardColumn}
               rowKey='id'
@@ -344,7 +337,7 @@ export default function Dashboard() {
                   setSelectRowKeys(selectedRowKeys);
                 },
               }}
-            ></BaseTable>
+            ></Table>
           </div>
         ) : (
           <BlankBusinessPlaceholder text='监控大盘' />

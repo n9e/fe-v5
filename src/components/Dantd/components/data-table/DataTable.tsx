@@ -311,17 +311,17 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
     ...sorterState,
   });
   // TODO 支持监听 customQuery
-  useEffect(() => {
-    if (url && isUrlLoad.current !== url) {
-      let fetchParams = getAllFetchParams();
-      fetchData(fetchParams);
+  // useEffect(() => {
+  //   if (url && isUrlLoad.current !== url) {
+  //     let fetchParams = getAllFetchParams();
+  //     fetchData(fetchParams);
 
-      setTimeout(() => {
-        isUrlLoad.current = url;
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [url]);
+  //     setTimeout(() => {
+  //       isUrlLoad.current = url;
+  //     });
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [url]);
 
   useEffect(() => {
     if (!isUrlLoad.current) {
