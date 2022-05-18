@@ -19,12 +19,12 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
 import { download, copyToClipBoard } from '@/utils';
-import { Button, Modal, Form, Input, message, Table, Select, Divider } from 'antd';
+import { Button, Modal, Form, Input, message, Table, Select, Divider, Row, Col } from 'antd';
 
 const { Option } = Select;
 import './index.less';
 import { useTranslation } from 'react-i18next';
-import { CopyOutlined, CheckCircleOutlined, CloseCircleOutlined, CaretDownOutlined } from '@ant-design/icons';
+import { CopyOutlined, CheckCircleOutlined, CloseCircleOutlined, CaretDownOutlined, SearchOutlined } from '@ant-design/icons';
 import { stringify } from 'querystring';
 const { TextArea } = Input;
 export const enum ModalStatus {
@@ -54,6 +54,7 @@ export default function ImportAndDownloadModal(props: Props) {
   const { status, title, exportData, description, onClose, onSubmit, crossCluster = true, onSuccess, label, fetchBuiltinFunc, submitBuiltinFunc, bgid } = props;
   const [form] = Form.useForm();
   const { clusters: clusterList } = useSelector<RootState, CommonStoreState>((state) => state.common);
+  const [allList, setAllList] = useState<{ name: string }[]>([]);
   const [buildinList, setBuildinList] = useState<{ name: string }[]>([]);
   const [importResult, setImportResult] = useState<{ name: string; isTrue: boolean; msg: string }[]>();
   const columns = [
@@ -115,7 +116,9 @@ export default function ImportAndDownloadModal(props: Props) {
     if (status === ModalStatus.BuiltIn || status == ModalStatus.Import) {
       fetchBuiltinFunc &&
         fetchBuiltinFunc().then((res) => {
-          setBuildinList(res.dat.map((name) => ({ name })));
+          let arr = res.dat.map((name) => ({ name }));
+          setBuildinList(arr);
+          setAllList(arr);
         });
     }
     setImportResult(undefined);
@@ -212,7 +215,6 @@ export default function ImportAndDownloadModal(props: Props) {
                 <pre>{exportData}</pre>
               </div>
             );
-            break;
 
           case ModalStatus.BuiltIn:
             return (
@@ -240,6 +242,20 @@ export default function ImportAndDownloadModal(props: Props) {
                     </Form.Item>
                   )}
                 </Form>
+                <Input
+                  placeholder={`请输入要查询的${label}名称`}
+                  prefix={<SearchOutlined />}
+                  style={{ marginBottom: '8px' }}
+                  allowClear
+                  onChange={(e) => {
+                    let str = e.target.value;
+                    let filterArr: { name: string }[] = [];
+                    allList.forEach((el) => {
+                      if (el.name.indexOf(str) != -1) filterArr.push(el);
+                    });
+                    setBuildinList(filterArr);
+                  }}
+                />
                 <Table className='samll_table' dataSource={buildinList} columns={builtinColumn} pagination={buildinList.length < 5 ? false : { pageSize: 5 }} size='small' />
                 {importResult && (
                   <>
@@ -249,7 +265,6 @@ export default function ImportAndDownloadModal(props: Props) {
                 )}
               </>
             );
-            break;
 
           case ModalStatus.Import:
             return (
@@ -298,7 +313,6 @@ export default function ImportAndDownloadModal(props: Props) {
                 )}
               </>
             );
-            break;
         }
       })()}
     </Modal>
