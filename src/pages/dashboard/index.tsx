@@ -330,6 +330,16 @@ export default function Dashboard() {
               dataSource={dashboardList}
               className='dashboard-table'
               columns={dashboardColumn}
+              pagination={{
+                total: dashboardList?.length,
+                showTotal(total: number) {
+                  return `共 ${total} 条数据`;
+                },
+                pageSizeOptions: [30, 50, 100, 300],
+                defaultPageSize: 10,
+                showSizeChanger: true,
+                showQuickJumper: true,
+              }}
               rowKey='id'
               rowSelection={{
                 selectedRowKeys: selectRowKeys,
