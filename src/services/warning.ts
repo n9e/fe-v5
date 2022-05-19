@@ -366,3 +366,11 @@ export const getBrainData = function (params) {
     params,
   });
 };
+
+export const getBrainParams = function () {
+  return request('/api/fc-brain/params', {
+    method: RequestMethod.Get,
+  }).then((res) => {
+    return res.data;
+  });
+};

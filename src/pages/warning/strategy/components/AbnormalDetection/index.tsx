@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, InputNumber, Radio, Select, Checkbox } from 'antd';
 import AdvancedWrap from '@/components/AdvancedWrap';
+import { getBrainParams } from '@/services/warning';
 
 interface IProps {
   form: any;
@@ -9,6 +10,13 @@ interface IProps {
 export default function index(props: IProps) {
   const { form } = props;
   const [settingsVisible, setSettingsVisible] = useState(false);
+  const [defaultParams, setDefaultParams] = useState<any>({});
+
+  useEffect(() => {
+    getBrainParams().then((res) => {
+      setDefaultParams(res);
+    });
+  }, []);
 
   return (
     <>
@@ -25,14 +33,7 @@ export default function index(props: IProps) {
                       if (e.target.value === 'abnormalDetection') {
                         form.setFieldsValue({
                           algorithm: 'holtwinters',
-                          algo_params: {
-                            seasonal_duration: 86400,
-                            rollup_interval: 450,
-                            upper_bound: 1,
-                            upper_times_num: 5,
-                            lower_bound: 1,
-                            lower_times_num: 5,
-                          },
+                          algo_params: defaultParams?.holtwinters,
                         });
                       } else {
                         form.setFieldsValue({
