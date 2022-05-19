@@ -2,8 +2,9 @@
   "name": "n9e-fe",
   "version": "5.3.0",
   "scripts": {
-    "dev": "vite --port 8765 --host",
+    "dev": "vite --port 8765 --host --mode advanced",
     "build": "tsc && vite build",
+    "build:advanced": "tsc && vite build --mode advanced",
     "serve": "vite preview"
   },
   "dependencies": {

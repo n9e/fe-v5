@@ -15,19 +15,35 @@
  *
  */
 import React from 'react';
-import { Switch } from 'antd';
+import _ from 'lodash';
+import Timeseries from '../dashboard/Renderer/Renderer/Timeseries';
 
-interface Props {
-  label: string;
-  checked?: boolean;
-  onChange?: (value: boolean) => void;
+interface IProps {
+  series: any[];
 }
 
-export const SwitchWithLabel: React.FC<Props> = ({ checked, onChange, label }) => {
+export default function Graph(props: IProps) {
+  const { series } = props;
+  const graphProps = {
+    custom: {
+      drawStyle: 'lines',
+      fillOpacity: 0,
+      stack: 'hidden',
+      lineInterpolation: 'smooth',
+    },
+    options: {
+      legend: {
+        displayMode: 'hidden',
+      },
+      tooltip: {
+        mode: 'all',
+      },
+    },
+  };
+
   return (
-    <>
-      <Switch checked={checked} onChange={onChange} style={{ marginRight: 5 }} />
-      {label}
-    </>
+    <div style={{ height: 200 }}>
+      <Timeseries values={graphProps as any} series={series} />
+    </div>
   );
-};
+}

@@ -15,23 +15,23 @@
  *
  */
 import React, { useState, useEffect, useCallback } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { useHistory, useParams, useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import { CaretDownOutlined } from '@ant-design/icons';
+import { debounce } from 'lodash';
 import moment from 'moment';
 import { Card, Form, Input, InputNumber, Radio, Select, Row, Col, Button, TimePicker, Checkbox, Modal, message, Space, Switch, Tooltip, Tag, notification } from 'antd';
-const { TextArea } = Input;
-const { Option } = Select;
 import { QuestionCircleFilled, MinusCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { RootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
 import { getTeamInfoList, getNotifiesList } from '@/services/manage';
 import { addOrEditStrategy, EditStrategy, prometheusQuery, deleteStrategy } from '@/services/warning';
-// import PromqlEditor from '@/components/PromqlEditor';
 import PromQLInput from '@/components/PromQLInput';
 import { SwitchWithLabel } from './SwitchWithLabel';
-import { debounce } from 'lodash';
+import AbnormalDetection from './AbnormalDetection';
+
+const { Option } = Select;
 const layout = {
   labelCol: {
     span: 3,
@@ -297,16 +297,9 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                 ))}
               </Select>
             </Form.Item>
-
+            <AbnormalDetection form={form} />
             <Form.Item label='PromQL' className={'Promeql-content'} required>
-              <Form.Item
-                name='prom_ql'
-                // labelCol={{ span: 3 }}
-                // wrapperCol={{ span: 23 }}
-                validateTrigger={['onBlur']}
-                trigger='onChange'
-                rules={[{ required: true, message: t('请输入PromQL') }]}
-              >
+              <Form.Item name='prom_ql' validateTrigger={['onBlur']} trigger='onChange' rules={[{ required: true, message: t('请输入PromQL') }]}>
                 <PromQLInput
                   url='/api/n9e/prometheus'
                   headers={{

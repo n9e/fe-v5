@@ -62,7 +62,7 @@ request.interceptors.response.use(
               throw new Error(data.error.message, { cause: options.silence });
             }
           } else {
-            if (data.err === '' || data.status === 'success') {
+            if (data.err === '' || data.status === 'success' || data.error === '') {
               if (data.data || data.dat) {
                 if (data.dat && Object.prototype.toString.call(data.dat.list) === '[object Null]') {
                   data.dat.list = [];

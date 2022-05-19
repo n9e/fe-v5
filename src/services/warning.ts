@@ -359,3 +359,10 @@ export const getCardDetail = function (ids) {
     data: { ids },
   });
 };
+
+export const getBrainData = function (params) {
+  return request('/api/fc-brain/data', {
+    method: RequestMethod.Get,
+    params,
+  });
+};

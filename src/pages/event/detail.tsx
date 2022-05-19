@@ -14,23 +14,43 @@
  * limitations under the License.
  *
  */
-import PageLayout from '@/components/pageLayout';
 import React, { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router';
-import { getAlertEventsById, getHistoryEventsById } from '@/services/warning';
-import { Button, Card, Col, message, Row, Space, Spin, Tag, Typography } from 'antd';
-import { priorityColor } from '@/utils/constant';
-import './detail.less';
 import moment from 'moment';
+import _ from 'lodash';
+import { useSelector } from 'react-redux';
+import { Button, Card, Col, message, Row, Space, Spin, Tag, Typography } from 'antd';
 import { PlayCircleOutlined } from '@ant-design/icons';
-import PromqlEditor from '@/components/PromqlEditor';
+import PageLayout from '@/components/pageLayout';
+import { getAlertEventsById, getHistoryEventsById, getBrainData } from '@/services/warning';
+import { priorityColor } from '@/utils/constant';
 import PromQLInput from '@/components/PromQLInput';
+import DateRangePicker from '@/components/DateRangePicker';
+import Resolution from '@/components/Resolution';
+import { Range, formatPickerDate } from '@/components/DateRangePicker';
 import { deleteAlertEventsModal } from '.';
-import { useDispatch, useSelector } from 'react-redux';
+import Graph from './Graph';
 import { RootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
-const { Paragraph } = Typography;
+import './detail.less';
 
+const { Paragraph } = Typography;
+const getUUIDByTags = (tags: string[]) => {
+  let uuid = '';
+  _.forEach(tags, (tag) => {
+    const arr = _.split(tag, 'uuid=');
+    if (arr[1]) {
+      uuid = arr[1];
+    }
+  });
+  return uuid;
+};
+const serieColorMap = {
+  origin: '#573BA7',
+  upper_bound: '#1A94FF',
+  lower_bound: '#2ACA96',
+  anomaly: 'red',
+};
 const EventDetailPage: React.FC = () => {
   const { busiId, eventId } = useParams<{ busiId: string; eventId: string }>();
   const { busiGroups } = useSelector<RootState, CommonStoreState>((state) => state.common);
@@ -95,7 +115,13 @@ const EventDetailPage: React.FC = () => {
       label: '事件标签',
       key: 'tags',
       render(tags) {
-        return tags ? tags.map((tag) => <Tag color='blue'>{tag}</Tag>) : '';
+        return tags
+          ? tags.map((tag) => (
+              <Tag color='blue' key={tag}>
+                {tag}
+              </Tag>
+            ))
+          : '';
       },
     },
     { label: '对象备注', key: 'target_note' },
@@ -112,6 +138,26 @@ const EventDetailPage: React.FC = () => {
       key: 'recover_time',
       render(time) {
         return moment((time || 0) * 1000).format('YYYY-MM-DD HH:mm:ss');
+      },
+    },
+    {
+      label: '告警方式',
+      key: 'rule_algo',
+      render(text) {
+        if (text) {
+          return '异常检测';
+        }
+        return '阈值告警';
+      },
+    },
+    {
+      label: '使用算法',
+      key: 'rule_algo',
+      visible(_text, record) {
+        return record.rule_algo;
+      },
+      render(text) {
+        return text;
       },
     },
     {
@@ -193,6 +239,13 @@ const EventDetailPage: React.FC = () => {
       },
     },
   ]);
+  const [range, setRange] = useState<Range>({
+    num: 1,
+    unit: 'hour',
+    description: '',
+  });
+  const [step, setStep] = useState<number | null>(15);
+  const [series, setSeries] = useState<any[]>([]);
 
   useEffect(() => {
     const requestPromise = isHistory ? getHistoryEventsById(busiId, eventId) : getAlertEventsById(busiId, eventId);
@@ -200,6 +253,38 @@ const EventDetailPage: React.FC = () => {
       setEventDetail(res.dat);
     });
   }, [busiId, eventId]);
+
+  useEffect(() => {
+    if (eventDetail && eventDetail.rule_algo) {
+      let { start, end } = formatPickerDate(range);
+      let _step = step;
+      if (!step) _step = Math.max(Math.floor((end - start) / 250), 1);
+      getBrainData({
+        rid: eventDetail.rule_id,
+        uuid: getUUIDByTags(eventDetail.tags),
+        start,
+        end,
+        step: _step,
+      }).then((res) => {
+        setSeries(
+          _.map(
+            _.filter(res.data, (item) => {
+              return item.metric.value_type !== 'predict';
+            }),
+            (item) => {
+              const type = item.metric.value_type;
+              return {
+                name: `${type}`,
+                data: item.values,
+                color: serieColorMap[type],
+                lineDash: type === 'origin' || type === 'anomaly' ? [] : [4, 4],
+              };
+            },
+          ),
+        );
+      });
+    }
+  }, [JSON.stringify(eventDetail), JSON.stringify(range), step]);
 
   return (
     <PageLayout title='告警详情' showBack hideCluster>
@@ -251,17 +336,34 @@ const EventDetailPage: React.FC = () => {
               </div>,
             ]}
           >
-            {eventDetail &&
-              descriptionInfo
-                .filter((item) => (eventDetail.is_recovered ? true : item.key !== 'recover_time'))
-                .map(({ label, key, render }) => {
-                  return (
-                    <div className='desc-row'>
-                      <div className='desc-label'>{label}：</div>
-                      <div className='desc-content'>{render ? render(eventDetail[key], eventDetail) : eventDetail[key]}</div>
-                    </div>
-                  );
-                })}
+            {eventDetail && (
+              <div>
+                {eventDetail.rule_algo && (
+                  <div>
+                    <Space>
+                      <DateRangePicker value={range} onChange={setRange} />
+                      <Resolution value={step} onChange={(v) => setStep(v)} initialValue={step} />
+                    </Space>
+                    <Graph series={series} />
+                  </div>
+                )}
+                {descriptionInfo
+                  .filter((item) => {
+                    if (typeof item.visible === 'function') {
+                      return item.visible(eventDetail[item.key], eventDetail);
+                    }
+                    return eventDetail.is_recovered ? true : item.key !== 'recover_time';
+                  })
+                  .map(({ label, key, render }, i) => {
+                    return (
+                      <div className='desc-row' key={key + i}>
+                        <div className='desc-label'>{label}：</div>
+                        <div className='desc-content'>{render ? render(eventDetail[key], eventDetail) : eventDetail[key]}</div>
+                      </div>
+                    );
+                  })}
+              </div>
+            )}
           </Card>
         </Spin>
       </div>
