@@ -18,13 +18,13 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Form, Select, Space, Button } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
 import _ from 'lodash';
-import { v4 as uuidv4 } from 'uuid';
 import { useTranslation } from 'react-i18next';
 import DateRangePicker, { Range } from '@/components/DateRangePicker';
 import Resolution from '@/components/Resolution';
 import ModalHOC, { ModalWrapProps } from '../Components/ModalHOC';
 import { visualizations, defaultValues, defaultCustomValuesMap } from './config';
 import Renderer from '../Renderer/Renderer';
+import { createChart, updateCharts } from '@/services/dashboard';
 import { VariableType } from '../VariableConfig';
 import FormCpt from './Form';
 import { IPanel } from '../types';
@@ -33,13 +33,15 @@ interface IProps {
   initialValues: IPanel | null;
   variableConfig?: VariableType;
   cluster: string;
+  busiId: string;
+  groupId: number;
   id: string;
-  onOK: (formData: any) => void;
+  onOK: () => void;
 }
 
 function index(props: ModalWrapProps & IProps) {
   const { t } = useTranslation();
-  const { visible, initialValues, variableConfig, cluster, id } = props;
+  const { visible, initialValues, variableConfig, cluster, busiId, groupId, id } = props;
   const [chartForm] = Form.useForm();
   const [range, setRange] = useState<Range>({
     description: '小时',
@@ -54,18 +56,31 @@ function index(props: ModalWrapProps & IProps) {
 
   const handleAddChart = async () => {
     return chartForm.validateFields().then(async (values) => {
-      let formData = Object.assign(values, {
-        version: '2.0.0',
-        type,
-        layout: initialValues?.layout,
-      });
-      if (initialValues && initialValues.id) {
-        formData.id = initialValues.id;
-      } else {
-        formData.id = uuidv4();
+      try {
+        let formData = Object.assign(values, {
+          version: '2.0.0',
+          type,
+          layout: initialValues?.layout,
+        });
+        if (initialValues && initialValues.id) {
+          await updateCharts(busiId, [
+            {
+              configs: formData,
+              weight: 0,
+              group_id: groupId,
+              id: initialValues.id,
+            },
+          ]);
+        } else {
+          await createChart(busiId, {
+            configs: JSON.stringify(formData),
+            weight: 0,
+            group_id: groupId,
+          });
+        }
+      } catch (errorInfo) {
+        console.log('Failed:', errorInfo);
       }
-      props.onOK(formData);
-      props.destroy();
     });
   };
 
@@ -129,7 +144,10 @@ function index(props: ModalWrapProps & IProps) {
           key='ok'
           type='primary'
           onClick={() => {
-            handleAddChart();
+            handleAddChart().then(() => {
+              props.onOK();
+              props.destroy();
+            });
           }}
         >
           确认

@@ -14,17 +14,13 @@
  * limitations under the License.
  *
  */
-import React, { useContext, useEffect, useState, memo } from 'react';
-import { Row, Col, Input, Select, Checkbox, AutoComplete } from 'antd';
-import { resourceGroupItem } from '@/store/businessInterface';
-import { useTranslation } from 'react-i18next';
-import { FormType } from './EditItem';
+import React, { useEffect, useState } from 'react';
+import { Select } from 'antd';
 import { Variable } from './definition';
 import { convertExpressionToQuery, replaceExpressionVars, stringToRegex, extractExpressionVars } from './constant';
 const { Option } = Select;
 import { Range } from '@/components/DateRangePicker';
 import { getVaraiableSelected } from './index';
-import { RestFilled } from '@ant-design/icons';
 interface Props {
   varsMap: any;
   id: string;

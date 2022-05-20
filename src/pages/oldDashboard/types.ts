@@ -20,7 +20,6 @@ export interface IGridPos {
   w: number;
   x: number;
   y: number;
-  i: string;
 }
 
 // query interface
@@ -32,7 +31,7 @@ export interface ITarget {
   step?: number; // 固定时间间隔
 }
 
-export type IType = 'row' | 'timeseries' | 'stat' | 'table' | 'pie';
+export type IType = 'timeseries' | 'stat' | 'table' | 'pie';
 
 export interface IValueMapping {
   match: {
@@ -124,7 +123,7 @@ export interface ITableStyles {
 
 export interface IPanel {
   version: string; // 单个图表面板使用的版本
-  id: string;
+  id: number | string;
   name: string;
   links?: ILink[];
   description: string;
@@ -134,8 +133,7 @@ export interface IPanel {
   options: IOptions;
   custom: any; // 图表
   overrides: IOverride[];
-  collapsed?: boolean; // 用于 row 展开收起控制是否显示
-  panels?: IPanel[]; // 用于 row 收起时保存子面板
+  visible?: boolean; // 用于 row 展开收起控制是否显示
 }
 
 export interface IDashboard {

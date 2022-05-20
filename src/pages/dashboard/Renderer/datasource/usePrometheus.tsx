@@ -47,7 +47,7 @@ const getSerieName = (metric: Object, expr: string) => {
 };
 
 export default function usePrometheus(props: IProps) {
-  const { id = 0, dashboardId, time, refreshFlag, step, targets, variableConfig, inViewPort } = props;
+  const { id, dashboardId, time, refreshFlag, step, targets, variableConfig, inViewPort } = props;
   const [series, setSeries] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const cachedVariableValues = _.map(variableConfig?.var, (item) => {

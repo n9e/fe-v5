@@ -87,7 +87,7 @@ export default function Title(props: IProps) {
         {titleEditing ? (
           <Input
             ref={titleRef}
-            value={name}
+            defaultValue={name}
             onPressEnter={(e: any) => {
               handleModifyTitle(e.target.value);
             }}
