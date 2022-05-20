@@ -34,6 +34,7 @@ import Title from './Title';
 import { replaceExpressionVars } from '../VariableConfig/constant';
 import { JSONParse } from '../utils';
 import editor from '../Editor';
+import { defaultCustomValuesMap } from '../Editor/config';
 import { sortPanelsByGridLayout, panelsMergeToConfigs, updatePanelsInsertNewPanelToGlobal } from '../Panels/utils';
 import './style.less';
 
@@ -149,6 +150,7 @@ export default function DetailV2() {
                       expr: '',
                     },
                   ],
+                  custom: defaultCustomValuesMap[type],
                 },
                 onOK: (values) => {
                   const newPanels = updatePanelsInsertNewPanelToGlobal(panels, values, 'chart');
