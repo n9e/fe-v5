@@ -20,6 +20,7 @@ import Timeseries from './Timeseries';
 import Stat from './Stat';
 import Table from './Table';
 import Pie from './Pie';
+import Hexbin from './Hexbin';
 
 export default function index({ type, targets }) {
   const OptionsCptMap = {
@@ -27,6 +28,7 @@ export default function index({ type, targets }) {
     stat: <Stat />,
     table: <Table targets={targets} />,
     pie: <Pie />,
+    hexbin: <Hexbin />,
   };
   return OptionsCptMap[type] || `无效的图表类型 ${type}`;
 }

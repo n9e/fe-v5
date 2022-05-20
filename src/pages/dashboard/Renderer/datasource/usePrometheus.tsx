@@ -47,7 +47,7 @@ const getSerieName = (metric: Object, expr: string) => {
 };
 
 export default function usePrometheus(props: IProps) {
-  const { id = 0, dashboardId, time, refreshFlag, step, targets, variableConfig, inViewPort } = props;
+  const { id, dashboardId, time, refreshFlag, step, targets, variableConfig, inViewPort } = props;
   const [series, setSeries] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const cachedVariableValues = _.map(variableConfig?.var, (item) => {
@@ -60,7 +60,7 @@ export default function usePrometheus(props: IProps) {
     if (!step) _step = Math.max(Math.floor((end - start) / 250), 1);
     const _series: any[] = [];
     const promises: Promise<any>[] = [];
-    _.forEach(targets, (target, idx) => {
+    _.forEach(targets, (target) => {
       if (target.time) {
         const { start: _start, end: _end } = formatPickerDate(target.time);
         start = _start;
@@ -70,7 +70,7 @@ export default function usePrometheus(props: IProps) {
         _step = target.step;
       }
       const realExpr = variableConfig ? replaceExpressionVars(target.expr, variableConfig, variableConfig.var.length, dashboardId) : target.expr;
-      const signalKey = `${id}-${idx}`;
+      const signalKey = `${id}-${target.expr}`;
       if (realExpr) {
         promises.push(
           api

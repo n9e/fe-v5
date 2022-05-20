@@ -16,14 +16,20 @@
  */
 import React, { useState, useEffect } from 'react';
 import _ from 'lodash';
-import { Card, Space, Dropdown, Menu, Tag, Popover } from 'antd';
-import { ShareAltOutlined, SyncOutlined, CloseCircleOutlined, DownOutlined, PlusCircleOutlined, SettingOutlined } from '@ant-design/icons';
+import classNames from 'classnames';
+import { Card, Space, Dropdown, Menu, Tag, Popover, Divider } from 'antd';
+import { ShareAltOutlined, SyncOutlined, CloseCircleOutlined, DownOutlined, PlusCircleOutlined, SettingOutlined, LineChartOutlined } from '@ant-design/icons';
 import { Range } from '@/components/DateRangePicker';
 import { getLabels, getQueryRange, getExprs, setTmpChartData } from '@/services/metricViews';
 import { getMatchStr } from './utils';
 import { IMatch } from '../types';
 import Timeseries from '../../../dashboard/Renderer/Renderer/Timeseries';
-import GraphStandardOptions from './GraphStandardOptions';
+import Hexbin from '../../../dashboard/Renderer/Renderer/Hexbin';
+import { calcsOptions } from '../../../dashboard/Editor/config';
+import { colors } from '../../../dashboard/Components/ColorRangeMenu/config';
+import LineGraphStandardOptions from './graphStandardOptions/Line';
+import HexbinGraphStandardOptions from './graphStandardOptions/Hexbin';
+import { HexbinIcon } from './config';
 
 interface IProps {
   metric: string;
@@ -51,8 +57,15 @@ export default function Graph(props: IProps) {
     sharedSortDirection: 'desc',
     legend: true,
     util: 'none',
+    colorRange: colors[0].value,
+    reverseColorOrder: false,
+    colorDomainAuto: true,
+    colorDomain: [],
+    chartheight: 300,
   });
-  const graphProps = {
+  const [chartType, setChartType] = useState('line');
+  const [reduceFunc, setReduceFunc] = useState('last');
+  const lineGraphProps = {
     custom: {
       drawStyle: 'lines',
       fillOpacity: 0,
@@ -71,6 +84,24 @@ export default function Graph(props: IProps) {
         util: highLevelConfig.util,
       },
     },
+  };
+  const hexbinGraphProps = {
+    custom: {
+      calc: reduceFunc,
+      colorRange: highLevelConfig.colorRange,
+      reverseColorOrder: highLevelConfig.reverseColorOrder,
+      colorDomainAuto: highLevelConfig.colorDomainAuto,
+      colorDomain: highLevelConfig.colorDomain,
+    },
+    options: {
+      standardOptions: {
+        util: highLevelConfig.util,
+      },
+    },
+  };
+  const graphStandardOptions = {
+    line: <LineGraphStandardOptions highLevelConfig={highLevelConfig} setHighLevelConfig={setHighLevelConfig} />,
+    hexbin: <HexbinGraphStandardOptions highLevelConfig={highLevelConfig} setHighLevelConfig={setHighLevelConfig} />,
   };
 
   useEffect(() => {
@@ -104,15 +135,31 @@ export default function Graph(props: IProps) {
       size='small'
       style={{ marginBottom: 10 }}
       title={metric}
+      className='n9e-metric-views-metrics-graph'
       extra={
         <Space>
-          <Popover
-            placement='left'
-            content={<GraphStandardOptions highLevelConfig={highLevelConfig} setHighLevelConfig={setHighLevelConfig} />}
-            trigger='click'
-            autoAdjustOverflow={false}
-            getPopupContainer={() => document.body}
-          >
+          <Space size={0} style={{ marginRight: 10 }}>
+            <LineChartOutlined
+              className={classNames({
+                'button-link-icon': true,
+                active: chartType === 'line',
+              })}
+              onClick={() => {
+                setChartType('line');
+              }}
+            />
+            <Divider type='vertical' />
+            <HexbinIcon
+              className={classNames({
+                'button-link-icon': true,
+                active: chartType === 'hexbin',
+              })}
+              onClick={() => {
+                setChartType('hexbin');
+              }}
+            />
+          </Space>
+          <Popover placement='left' content={graphStandardOptions[chartType]} trigger='click' autoAdjustOverflow={false} getPopupContainer={() => document.body}>
             <a>
               <SettingOutlined />
             </a>
@@ -134,7 +181,7 @@ export default function Graph(props: IProps) {
                   name: metric,
                   step,
                   range,
-                  ...graphProps,
+                  ...lineGraphProps,
                   targets: _.map(
                     getExprs({
                       metric,
@@ -287,10 +334,33 @@ export default function Graph(props: IProps) {
               </Dropdown>
             </div>
           ) : null}
+          {chartType === 'hexbin' && (
+            <div>
+              取值计算：
+              <Dropdown
+                overlay={
+                  <Menu onClick={(e) => setReduceFunc(e.key)} selectedKeys={[reduceFunc]}>
+                    {_.map(calcsOptions, (val, key) => {
+                      return <Menu.Item key={key}>{val.name}</Menu.Item>;
+                    })}
+                  </Menu>
+                }
+              >
+                <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
+                  {calcsOptions[reduceFunc]?.name} <DownOutlined />
+                </a>
+              </Dropdown>
+            </div>
+          )}
         </Space>
       </div>
       <div>
-        <Timeseries inDashboard={false} values={graphProps as any} series={series} />
+        {chartType === 'line' && <Timeseries inDashboard={false} values={lineGraphProps as any} series={series} />}
+        {chartType === 'hexbin' && (
+          <div style={{ padding: '20px 0 0 0', height: highLevelConfig.chartheight }}>
+            <Hexbin values={hexbinGraphProps as any} series={series} />
+          </div>
+        )}
       </div>
     </Card>
   );

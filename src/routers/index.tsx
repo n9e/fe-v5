@@ -14,9 +14,8 @@
  * limitations under the License.
  *
  */
-import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Switch, Route, useLocation, Redirect } from 'react-router-dom';
-import Loadable from '@/routers/loadable';
+import React from 'react';
+import { Switch, Route, useLocation, Redirect } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, accountStoreState } from '@/store/accountInterface';
 import NotFound from '@/pages/NotFound';
@@ -24,10 +23,9 @@ import Login from '@/pages/login';
 import LoginCallback from '@/pages/loginCallback';
 import Strategy from '@/pages/warning/strategy';
 import Profile from '@/pages/account/profile';
-// const Dashboard = React.lazy(() => import('@/pages/dashboard'));
-import Dashboard from '@/pages/dashboard';
+import Dashboard from '@/pages/dashboard/List';
 import Chart from '@/pages/chart';
-import DashboardDetail from '@/pages/dashboard/detail';
+import DashboardDetail from '@/pages/dashboard/Detail/index';
 import Groups from '@/pages/user/groups';
 import Users from '@/pages/user/users';
 import Business from '@/pages/user/business';
@@ -46,6 +44,7 @@ import Event from '@/pages/event';
 import EventDetail from '@/pages/event/detail';
 import historyEvents from '@/pages/historyEvents';
 import MonObjectManage from '@/pages/monObjectManage';
+import TargetsMap from '@/pages/TargetsMap';
 import Demo from '@/pages/demo';
 import TaskTpl from '@/pages/taskTpl';
 import TaskTplAdd from '@/pages/taskTpl/add';
@@ -58,6 +57,7 @@ import TaskResult from '@/pages/task/result';
 import TaskDetail from '@/pages/task/detail';
 import Version from '@/pages/help/version';
 import Contact from '@/pages/help/contact';
+import Migrate from '@/pages/help/migrate';
 
 import { dynamicPackages, Entry } from '@/utils';
 
@@ -95,16 +95,6 @@ export default function Content() {
     }
   }
 
-  // // this is a workaround for D3Chart, it's destroy function has some problem
-  // useEffect(() => {
-  //   const chartTooltip = document.querySelectorAll('.ts-graph-tooltip');
-  //   if (chartTooltip.length > 0) {
-  //     chartTooltip.forEach((item) => {
-  //       item.remove();
-  //     });
-  //   }
-  // }, [location]);
-
   return (
     <div className='content'>
       <Switch>
@@ -118,7 +108,7 @@ export default function Content() {
         <Route path='/user-groups' component={Groups} />
         <Route path='/account/profile/:tab' component={Profile} />
 
-        <Route path='/dashboard/:busiId/:id' component={DashboardDetail} />
+        <Route path='/dashboard/:id' exact component={DashboardDetail} />
         <Route path='/dashboards' component={Dashboard} />
         <Route path='/chart/:ids' component={Chart} />
         <Route path='/indicator' component={IndicatorPage} />
@@ -138,6 +128,7 @@ export default function Content() {
         <Route exact path='/alert-cur-events/:eventId' component={EventDetail} />
         <Route exact path='/alert-his-events/:eventId' component={EventDetail} />
         <Route exact path='/targets' component={MonObjectManage} />
+        <Route exact path='/targets-map' component={TargetsMap} />
 
         <Route exact path='/job-tpls' component={TaskTpl} />
         <Route exact path='/job-tpls/add' component={TaskTplAdd} />
@@ -152,6 +143,7 @@ export default function Content() {
 
         <Route exact path='/help/version' component={Version} />
         <Route exact path='/help/contact' component={Contact} />
+        <Route exact path='/help/migrate' component={Migrate} />
 
         {lazyRoutes.map((route, i) => (
           <RouteWithSubRoutes key={i} {...route} />

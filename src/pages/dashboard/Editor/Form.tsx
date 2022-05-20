@@ -57,18 +57,20 @@ export default function FormCpt(props) {
           }}
         >
           <Col flex={1} style={{ minWidth: 100 }}>
-            <div style={{ marginBottom: 20 }}>{render(innerVariableConfig)}</div>
-            <div style={{ height: 'calc(100% - 320px)', overflowY: 'auto' }}>
-              <VariableConfig
-                onChange={(value) => {
-                  setInnerVariableConfig(value);
-                }}
-                value={innerVariableConfig}
-                editable={false}
-                cluster={cluster}
-                range={range}
-                id={id}
-              />
+            <div style={{ marginBottom: 10 }}>{render(innerVariableConfig)}</div>
+            <div style={{ height: 'calc(100% - 310px)', overflowY: 'auto' }}>
+              <div style={{ marginBottom: 10 }}>
+                <VariableConfig
+                  onChange={(value) => {
+                    setInnerVariableConfig(value);
+                  }}
+                  value={innerVariableConfig}
+                  editable={false}
+                  cluster={cluster}
+                  range={range}
+                  id={id}
+                />
+              </div>
               <Form.List name='targets'>
                 {(fields, { add, remove }, { errors }) => {
                   return (

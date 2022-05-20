@@ -14,34 +14,34 @@
  * limitations under the License.
  *
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useReducer } from 'react';
 import { Modal, Form, Select, Space, Button } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
 import _ from 'lodash';
+import { v4 as uuidv4 } from 'uuid';
 import { useTranslation } from 'react-i18next';
 import DateRangePicker, { Range } from '@/components/DateRangePicker';
 import Resolution from '@/components/Resolution';
 import ModalHOC, { ModalWrapProps } from '../Components/ModalHOC';
 import { visualizations, defaultValues, defaultCustomValuesMap } from './config';
 import Renderer from '../Renderer/Renderer';
-import { createChart, updateCharts } from '@/services/dashboard';
 import { VariableType } from '../VariableConfig';
 import FormCpt from './Form';
 import { IPanel } from '../types';
+import { Reducer } from '../Context';
 
 interface IProps {
   initialValues: IPanel | null;
   variableConfig?: VariableType;
   cluster: string;
-  busiId: string;
-  groupId: number;
   id: string;
-  onOK: () => void;
+  onOK: (formData: any) => void;
 }
 
 function index(props: ModalWrapProps & IProps) {
   const { t } = useTranslation();
-  const { visible, initialValues, variableConfig, cluster, busiId, groupId, id } = props;
+  const { visible, variableConfig, cluster, id } = props;
+  const initialValues = _.cloneDeep(props.initialValues);
   const [chartForm] = Form.useForm();
   const [range, setRange] = useState<Range>({
     description: '小时',
@@ -53,36 +53,31 @@ function index(props: ModalWrapProps & IProps) {
   const [step, setStep] = useState<number | null>(null);
   const [changedFlag, setChangedFlag] = useState<string>(_.uniqueId('xxx_'));
   const [values, setValues] = useState<any>(chartForm.getFieldsValue());
-
   const handleAddChart = async () => {
     return chartForm.validateFields().then(async (values) => {
-      try {
-        let formData = Object.assign(values, {
-          version: '2.0.0',
-          type,
-          layout: initialValues?.layout,
-        });
-        if (initialValues && initialValues.id) {
-          await updateCharts(busiId, [
-            {
-              configs: formData,
-              weight: 0,
-              group_id: groupId,
-              id: initialValues.id,
-            },
-          ]);
-        } else {
-          await createChart(busiId, {
-            configs: JSON.stringify(formData),
-            weight: 0,
-            group_id: groupId,
-          });
-        }
-      } catch (errorInfo) {
-        console.log('Failed:', errorInfo);
+      // TODO: 渲染 hexbin 图时，colorRange 需要从 string 转换为 array
+      if (type === 'hexbin') {
+        _.set(values, 'custom.colorRange', _.split(values.custom.colorRange, ','));
       }
+      let formData = Object.assign(values, {
+        version: '2.0.0',
+        type,
+        layout: initialValues?.layout,
+      });
+      if (initialValues && initialValues.id) {
+        formData.id = initialValues.id;
+      } else {
+        formData.id = uuidv4();
+      }
+      props.onOK(formData);
+      props.destroy();
     });
   };
+
+  // TODO: 渲染 hexbin 配置时，colorRange 需要从 array 转换为 string
+  if (initialValues.type === 'hexbin') {
+    _.set(initialValues, 'custom.colorRange', _.join(initialValues.custom.colorRange, ','));
+  }
 
   useEffect(() => {
     setValues(chartForm.getFieldsValue());
@@ -144,10 +139,7 @@ function index(props: ModalWrapProps & IProps) {
           key='ok'
           type='primary'
           onClick={() => {
-            handleAddChart().then(() => {
-              props.onOK();
-              props.destroy();
-            });
+            handleAddChart();
           }}
         >
           确认
@@ -160,23 +152,25 @@ function index(props: ModalWrapProps & IProps) {
         padding: '10px 24px 24px 24px',
       }}
     >
-      <FormCpt
-        chartForm={chartForm}
-        setChangedFlag={setChangedFlag}
-        initialValues={initialValues}
-        type={type}
-        variableConfig={variableConfig}
-        cluster={cluster}
-        range={range}
-        id={id}
-        render={(innerVariableConfig) => {
-          return (
-            <div style={{ height: 300, border: '1px solid #d9d9d9' }}>
-              <Renderer dashboardId={id} time={range} step={step} type={type} values={values} variableConfig={innerVariableConfig} isPreview />
-            </div>
-          );
-        }}
-      />
+      <Reducer>
+        <FormCpt
+          chartForm={chartForm}
+          setChangedFlag={setChangedFlag}
+          initialValues={initialValues}
+          type={type}
+          variableConfig={variableConfig}
+          cluster={cluster}
+          range={range}
+          id={id}
+          render={(innerVariableConfig) => {
+            return (
+              <div style={{ height: 300, border: '1px solid #d9d9d9' }}>
+                <Renderer dashboardId={id} time={range} step={step} type={type} values={values} variableConfig={innerVariableConfig} isPreview />
+              </div>
+            );
+          }}
+        />
+      </Reducer>
     </Modal>
   );
 }
