@@ -22,11 +22,11 @@ import Table from './Table';
 import Pie from './Pie';
 import Hexbin from './Hexbin';
 
-export default function index({ type, targets }) {
+export default function index({ type, targets, chartForm }) {
   const OptionsCptMap = {
     timeseries: <Timeseries />,
     stat: <Stat />,
-    table: <Table targets={targets} />,
+    table: <Table targets={targets} chartForm={chartForm} />,
     pie: <Pie />,
     hexbin: <Hexbin />,
   };
