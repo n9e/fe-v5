@@ -16,10 +16,10 @@
  */
 import React from 'react';
 import _ from 'lodash';
+import G2PieChart from '@/components/G2PieChart';
 import { IPanel } from '../../../types';
 import getCalculatedValuesBySeries from '../../utils/getCalculatedValuesBySeries';
 import './style.less';
-import G2PieChart from '@/components/G2PieChart';
 
 interface IProps {
   values: IPanel;

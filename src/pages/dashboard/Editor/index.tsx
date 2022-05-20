@@ -18,13 +18,13 @@ import React, { useState, useEffect, useReducer } from 'react';
 import { Modal, Form, Select, Space, Button } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
 import _ from 'lodash';
+import { v4 as uuidv4 } from 'uuid';
 import { useTranslation } from 'react-i18next';
 import DateRangePicker, { Range } from '@/components/DateRangePicker';
 import Resolution from '@/components/Resolution';
 import ModalHOC, { ModalWrapProps } from '../Components/ModalHOC';
 import { visualizations, defaultValues, defaultCustomValuesMap } from './config';
 import Renderer from '../Renderer/Renderer';
-import { createChart, updateCharts } from '@/services/dashboard';
 import { VariableType } from '../VariableConfig';
 import FormCpt from './Form';
 import { IPanel } from '../types';
@@ -34,15 +34,13 @@ interface IProps {
   initialValues: IPanel | null;
   variableConfig?: VariableType;
   cluster: string;
-  busiId: string;
-  groupId: number;
   id: string;
-  onOK: () => void;
+  onOK: (formData: any) => void;
 }
 
 function index(props: ModalWrapProps & IProps) {
   const { t } = useTranslation();
-  const { visible, variableConfig, cluster, busiId, groupId, id } = props;
+  const { visible, variableConfig, cluster, id } = props;
   const initialValues = _.cloneDeep(props.initialValues);
   const [chartForm] = Form.useForm();
   const [range, setRange] = useState<Range>({
@@ -61,37 +59,26 @@ function index(props: ModalWrapProps & IProps) {
       if (type === 'hexbin') {
         _.set(values, 'custom.colorRange', _.split(values.custom.colorRange, ','));
       }
-      try {
-        let formData = Object.assign(values, {
-          version: '2.0.0',
-          type,
-          layout: initialValues?.layout,
-        });
-        if (initialValues && initialValues.id) {
-          await updateCharts(busiId, [
-            {
-              configs: formData,
-              weight: 0,
-              group_id: groupId,
-              id: initialValues.id,
-            },
-          ]);
-        } else {
-          await createChart(busiId, {
-            configs: JSON.stringify(formData),
-            weight: 0,
-            group_id: groupId,
-          });
-        }
-      } catch (errorInfo) {
-        console.log('Failed:', errorInfo);
+      let formData = Object.assign(values, {
+        version: '2.0.0',
+        type,
+        layout: initialValues?.layout,
+      });
+      if (initialValues && initialValues.id) {
+        formData.id = initialValues.id;
+      } else {
+        formData.id = uuidv4();
       }
+      props.onOK(formData);
+      props.destroy();
     });
   };
 
   // TODO: 渲染 hexbin 配置时，colorRange 需要从 array 转换为 string
-  if (initialValues.type === 'hexbin') {
-    _.set(initialValues, 'custom.colorRange', _.join(initialValues.custom.colorRange, ','));
+  if (initialValues.type === 'hexbin' && initialValues?.custom?.colorRange) {
+    if (_.isArray(initialValues.custom.colorRange)) {
+      _.set(initialValues, 'custom.colorRange', _.join(initialValues.custom.colorRange, ','));
+    }
   }
 
   useEffect(() => {
@@ -154,10 +141,7 @@ function index(props: ModalWrapProps & IProps) {
           key='ok'
           type='primary'
           onClick={() => {
-            handleAddChart().then(() => {
-              props.onOK();
-              props.destroy();
-            });
+            handleAddChart();
           }}
         >
           确认

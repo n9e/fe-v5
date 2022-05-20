@@ -1,0 +1,114 @@
+.dashboard {
+  .ant-table-wrapper {
+    padding: 0 10px 10px;
+  }
+}
+
+.dashboard-detail-header {
+  display: flex;
+  height: 51px;
+  justify-content: space-between;
+  padding: 9px 20px;
+  border-bottom: 1px solid @baseBorderColor;
+  &-left {
+    display: flex;
+    align-items: center;
+    .back {
+      font-size: @baseFontSizeMiddle;
+      width: 20px;
+      height: 20px;
+      margin-right: 15px;
+      &:hover {
+        color: @primary-color;
+      }
+    }
+    .title {
+      font-size: @baseFontSizeMiddle;
+      color: black;
+      font-weight: bold;
+    }
+    .edit {
+      font-size: @baseFontSizeMiddle;
+      width: 20px;
+      height: 20px;
+      margin-left: 15px;
+    }
+  }
+  &-right {
+    display: flex;
+    height: 32px;
+    & > button {
+      margin-right: 10px;
+    }
+  }
+}
+
+.dashboard-detail-content {
+  background: #f6f5f6;
+  height: 100%;
+  .variable-area {
+    // padding: 10px 20px 0px;
+    // background: @colorWhite;
+    display: flex;
+    .date-picker-area {
+      display: flex;
+      width: 400px;
+      height: 32px;
+      flex-shrink: 0;
+    }
+  }
+  .charts {
+    padding: 0px 20px 15px;
+    .ant-collapse {
+      margin-bottom: 15px;
+    }
+    .ant-collapse-header {
+      font-size: @baseFontSizeTiny;
+      height: 40px;
+    }
+    .ant-collapse-extra {
+      margin-top: -3px;
+      button {
+        font-size: @baseFontSizeTiny;
+      }
+    }
+    .ant-collapse-content-box {
+      display: flex;
+      padding: 2px;
+      .empty-group-holder {
+        flex: 1;
+        text-align: center;
+      }
+    }
+  }
+}
+
+// 现在大盘里面边框线太多了，尝试去掉 collapse 的所有边框线
+.n9e-dashboard-group {
+  .ant-collapse,
+  .ant-collapse-item,
+  .ant-collapse-content {
+    border: 0 none;
+    background-color: #f9f9f9;
+  }
+  .ant-collapse-extra {
+    display: none;
+  }
+  .ant-collapse-header:hover {
+    .ant-collapse-extra {
+      display: block;
+    }
+  }
+}
+
+.dashboard-detail-content-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 0px 10px 0px 10px;
+  background-color: unset !important;
+}
+.dashboards-panels {
+  background-color: unset !important;
+}
+
+

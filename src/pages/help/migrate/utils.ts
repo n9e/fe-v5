@@ -17,7 +17,7 @@
 import _ from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import semver from 'semver';
-import { defaultCustomValuesMap } from '../../dashboardV2/Editor/config';
+import { defaultCustomValuesMap } from '../../dashboard/Editor/config';
 
 const alphabet = 'ABCDEFGHIGKLMNOPQRSTUVWXYZ'.split('');
 

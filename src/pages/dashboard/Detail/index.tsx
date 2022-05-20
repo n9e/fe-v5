@@ -35,6 +35,7 @@ import { replaceExpressionVars } from '../VariableConfig/constant';
 import { JSONParse } from '../utils';
 import editor from '../Editor';
 import { sortPanelsByGridLayout, panelsMergeToConfigs, updatePanelsInsertNewPanelToGlobal } from '../Panels/utils';
+import './style.less';
 
 interface URLParam {
   id: string;

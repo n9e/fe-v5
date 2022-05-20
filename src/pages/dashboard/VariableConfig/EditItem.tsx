@@ -14,15 +14,13 @@
  * limitations under the License.
  *
  */
-import React, { useRef, useEffect, useState } from 'react';
-import { Modal, Form, Input, Button, Space, Row, Col, Switch } from 'antd';
+import React, { useEffect } from 'react';
+import { Modal, Form, Input, Button, Row, Col, Switch } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { DeleteOutlined, PlusOutlined, ArrowUpOutlined, ArrowDownOutlined, CopyOutlined, QuestionCircleOutlined } from '@ant-design/icons';
-import PromqlEditor from '@/components/PromqlEditor';
-import '../index.less';
+import { Range } from '@/components/DateRangePicker';
 import { Variable } from './definition';
 import { convertExpressionToQuery, replaceExpressionVars, stringToRegex } from './constant';
-import { Range } from '@/components/DateRangePicker';
 import { setVaraiableSelected } from './index';
 export interface FormType {
   var: Variable[];

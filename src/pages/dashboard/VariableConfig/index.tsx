@@ -14,19 +14,15 @@
  * limitations under the License.
  *
  */
-import React, { useImperativeHandle, useMemo, useReducer, useState } from 'react';
-import { Row, Col } from 'antd';
-import DisplayItem from './DisplayItem';
-import EditItem, { FormType } from './EditItem';
-import { Button } from 'antd';
-import { ADD_ITEM, CLASS_PATH_VALUE, CLASS_PATH_PREFIX_VALUE, INIT_DATA, TagFilterReducer, TagFilterStore } from './constant';
-import { EditOutlined, PlusOutlined } from '@ant-design/icons';
+import React, { useState, useEffect } from 'react';
+import { EditOutlined } from '@ant-design/icons';
 import classNames from 'classnames';
-import { useEffect } from 'react';
-import './index.less';
+import _ from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { Range } from '@/components/DateRangePicker';
-import _ from 'lodash';
+import DisplayItem from './DisplayItem';
+import EditItem, { FormType } from './EditItem';
+import './index.less';
 export type VariableType = FormType;
 
 interface ITagFilterProps {
@@ -70,7 +66,6 @@ const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = ({ isOpe
   const handleVariableChange = (index: number, v: string | string[], options) => {
     const newData = data ? { var: _.cloneDeep(data.var) } : { var: [] };
     const newDataWithOptions = data ? { var: _.cloneDeep(data.var) } : { var: [] };
-    // newData.var[index].selected = v;
     setVaraiableSelected(newData.var[index].name, v, id);
     setVarsMap((varsMap) => ({ ...varsMap, [`$${newData.var[index].name}`]: v }));
     options && (newDataWithOptions.var[index].options = options);
@@ -107,7 +102,7 @@ const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = ({ isOpe
             )}
           </>
         )}
-        {(data ? data?.var.length === 0 : true) && editable && (
+        {(data ? data?.var?.length === 0 : true) && editable && (
           <div
             className='add-variable-tips'
             onClick={() => {
