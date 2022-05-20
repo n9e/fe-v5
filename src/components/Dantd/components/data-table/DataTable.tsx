@@ -218,6 +218,7 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
     },
   } = props;
 
+  isUrlLoad.current = url;
   const tableClassName = classNames(prefixCls, props.className);
   const tableContentClassName = classNames({
     [`${prefixCls}-table-content`]: true,
