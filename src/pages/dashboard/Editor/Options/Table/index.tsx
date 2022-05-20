@@ -20,10 +20,10 @@ import StandardOptions from '../../Fields/StandardOptions';
 import ValueMappings from '../../Fields/ValueMappings';
 import Overrides from '../../Fields/Overrides';
 
-export default function Timeseries({ targets }) {
+export default function Timeseries({ targets, chartForm }) {
   return (
     <>
-      <GraphStyles />
+      <GraphStyles chartForm={chartForm} />
       <ValueMappings />
       <StandardOptions />
       <Overrides targets={targets} />

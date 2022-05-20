@@ -15,14 +15,14 @@
  *
  */
 import React, { useContext } from 'react';
-import { Form, Select, Row, Col, Switch, AutoComplete } from 'antd';
+import { Form, Select, Row, Col, Switch } from 'antd';
 import { CaretDownOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { Panel } from '../../Components/Collapse';
 import { calcsOptions } from '../../config';
 import { Context } from '../../../Context';
 
-export default function GraphStyles() {
+export default function GraphStyles({ chartForm }) {
   const namePrefix = ['custom'];
   const { state } = useContext(Context);
 
@@ -114,7 +114,19 @@ export default function GraphStyles() {
                 }
                 return (
                   <Form.Item label='默认排序列' name={[...namePrefix, 'sortColumn']}>
-                    <Select suffixIcon={<CaretDownOutlined />} allowClear>
+                    <Select
+                      suffixIcon={<CaretDownOutlined />}
+                      allowClear
+                      onChange={() => {
+                        if (!chartForm.getFieldValue([...namePrefix, 'sortOrder'])) {
+                          const customValues = chartForm.getFieldValue('custom');
+                          _.set(customValues, 'sortOrder', 'ascend');
+                          chartForm.setFieldsValue({
+                            custom: customValues,
+                          });
+                        }
+                      }}
+                    >
                       {_.map(keys, (item) => {
                         return (
                           <Select.Option key={item} value={item}>
