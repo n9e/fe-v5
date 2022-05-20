@@ -75,8 +75,10 @@ function index(props: ModalWrapProps & IProps) {
   };
 
   // TODO: 渲染 hexbin 配置时，colorRange 需要从 array 转换为 string
-  if (initialValues.type === 'hexbin') {
-    _.set(initialValues, 'custom.colorRange', _.join(initialValues.custom.colorRange, ','));
+  if (initialValues.type === 'hexbin' && initialValues?.custom?.colorRange) {
+    if (_.isArray(initialValues.custom.colorRange)) {
+      _.set(initialValues, 'custom.colorRange', _.join(initialValues.custom.colorRange, ','));
+    }
   }
 
   useEffect(() => {
