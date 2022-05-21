@@ -93,9 +93,9 @@ function index(props: IProps) {
               <div>
                 <Markdown content={values.description} />
                 <div>
-                  {_.map(values.links, (link) => {
+                  {_.map(values.links, (link, i) => {
                     return (
-                      <div style={{ marginTop: 8 }}>
+                      <div key={i} style={{ marginTop: 8 }}>
                         <a href={link.url} target={link.targetBlank ? '_blank' : '_self'}>
                           {link.title}
                         </a>
