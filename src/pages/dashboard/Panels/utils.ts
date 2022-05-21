@@ -91,7 +91,7 @@ export function getRowPanelsMaxY(panels: IPanel[], rowId: string) {
   });
   return maxY;
 }
-export function getRowExpandedPanels(panels: IPanel[], row: IPanel) {
+export function getRowCollapsedPanels(panels: IPanel[], row: IPanel) {
   let newPanels = _.cloneDeep(panels);
   const rowIndex = getRowIndex(newPanels, row.id);
   const cacheRowPanels = row.panels;
@@ -117,6 +117,18 @@ export function getRowExpandedPanels(panels: IPanel[], row: IPanel) {
   }
   return newPanels;
 }
+export function getRowUnCollapsedPanels(panels: IPanel[], row: IPanel) {
+  let newPanels = _.cloneDeep(panels);
+  const curRowPanels = getRowPanels(newPanels, row.id);
+  if (curRowPanels.length > 0) {
+    newPanels = _.filter(newPanels, (panel) => {
+      return !_.find(curRowPanels, { id: panel.id });
+    });
+    const curRow = _.find(newPanels, { id: row.id });
+    curRow.panels = curRowPanels;
+  }
+  return newPanels;
+}
 /**
  * 处理 Row 组件切换时需要更新的 panels，返回更新后的 panels
  * 关闭 row 时，需要把 row 下面的 rowPanels 删除掉，并且缓存被删除的 panels
@@ -125,16 +137,9 @@ export function getRowExpandedPanels(panels: IPanel[], row: IPanel) {
 export function handleRowToggle(collapsed, panels: IPanel[], row: IPanel): IPanel[] {
   let newPanels = _.cloneDeep(panels);
   if (collapsed) {
-    newPanels = getRowExpandedPanels(newPanels, row);
+    newPanels = getRowCollapsedPanels(newPanels, row);
   } else {
-    const curRowPanels = getRowPanels(newPanels, row.id);
-    if (curRowPanels.length > 0) {
-      newPanels = _.filter(newPanels, (panel) => {
-        return !_.find(curRowPanels, { id: panel.id });
-      });
-      const curRow = _.find(newPanels, { id: row.id });
-      curRow.panels = curRowPanels;
-    }
+    newPanels = getRowUnCollapsedPanels(newPanels, row);
   }
   const curRow = _.find(newPanels, { id: row.id });
   curRow.collapsed = collapsed;

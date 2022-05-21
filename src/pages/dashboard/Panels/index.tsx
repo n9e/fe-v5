@@ -33,7 +33,8 @@ import {
   updatePanelsInsertNewPanel,
   panelsMergeToConfigs,
   updatePanelsInsertNewPanelToRow,
-  getRowExpandedPanels,
+  getRowCollapsedPanels,
+  getRowUnCollapsedPanels,
 } from './utils';
 import Renderer from '../Renderer/Renderer/index';
 import Row from './Row';
@@ -230,9 +231,10 @@ function index(props: IProps) {
                   onDeleteClick={(mode: 'self' | 'withPanels') => {
                     let newPanels: any[] = _.cloneDeep(panels);
                     if (mode === 'self') {
-                      newPanels = getRowExpandedPanels(newPanels, item);
+                      newPanels = getRowCollapsedPanels(newPanels, item);
                       newPanels = _.filter(newPanels, (panel) => panel.id !== item.id);
                     } else {
+                      newPanels = getRowUnCollapsedPanels(newPanels, item);
                       newPanels = _.filter(newPanels, (panel) => panel.id !== item.id);
                     }
                     allowUpdateDashboardConfigs.current = true;
