@@ -41,6 +41,7 @@ export default function index(props: IProps) {
                 overlayInnerStyle={{
                   width: 500,
                 }}
+                getTooltipContainer={() => document.body}
                 title={
                   <div>
                     <div>默认会做 SI Prefixes 处理，如不想默认的处理可选择 none 关闭</div>

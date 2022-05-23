@@ -44,6 +44,7 @@ export const baseTheme = EditorView.theme({
     },
     '& > ul > li': {
       padding: '2px 1em 2px 3px',
+      overflowY: 'hidden',
     },
     minWidth: '30%',
   },

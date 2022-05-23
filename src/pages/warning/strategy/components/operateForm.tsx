@@ -28,6 +28,7 @@ import { CommonStoreState } from '@/store/commonInterface';
 import { getTeamInfoList, getNotifiesList } from '@/services/manage';
 import { addOrEditStrategy, EditStrategy, prometheusQuery, deleteStrategy } from '@/services/warning';
 import PromQLInput from '@/components/PromQLInput';
+import AdvancedWrap from '@/components/AdvancedWrap';
 import { SwitchWithLabel } from './SwitchWithLabel';
 import AbnormalDetection from './AbnormalDetection';
 
@@ -297,7 +298,9 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                 ))}
               </Select>
             </Form.Item>
-            <AbnormalDetection form={form} />
+            <AdvancedWrap>
+              <AbnormalDetection form={form} />
+            </AdvancedWrap>
             <Form.Item label='PromQL' className={'Promeql-content'} required>
               <Form.Item name='prom_ql' validateTrigger={['onBlur']} trigger='onChange' rules={[{ required: true, message: t('请输入PromQL') }]}>
                 <PromQLInput

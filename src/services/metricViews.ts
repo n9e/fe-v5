@@ -213,3 +213,24 @@ export const getMetricsDesc = function (data) {
     return res?.dat;
   });
 };
+
+export const getQueryRangeSingleMetric = function (params: {
+  metric: string;
+  match: string;
+  range: Range;
+  calcFunc: string;
+}) {
+  const { metric, match, range, calcFunc } = params;
+  let { start, end } = formatPickerDate(range);
+  const step = Math.max(Math.floor((end - start) / 250), 1);
+  const query = `${calcFunc}(${metric}${match}) by (ident)`;
+  return request('/api/n9e/prometheus/api/v1/query_range', {
+    method: RequestMethod.Get,
+    params: {
+      start,
+      end,
+      step,
+      query,
+    }
+  });
+};

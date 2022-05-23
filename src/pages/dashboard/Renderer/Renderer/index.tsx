@@ -24,6 +24,7 @@ import Timeseries from './Timeseries';
 import Stat from './Stat';
 import Table from './Table';
 import Pie from './Pie';
+import Hexbin from './Hexbin';
 import { VariableType } from '../../VariableConfig';
 import Markdown from '../../Editor/Components/Markdown';
 import usePrometheus from '../datasource/usePrometheus';
@@ -47,7 +48,8 @@ interface IProps {
 }
 
 function index(props: IProps) {
-  const { dashboardId, id, time, refreshFlag, step, type, variableConfig, values, isPreview, onCloneClick, onShareClick, onEditClick, onDeleteClick } = props;
+  const { dashboardId, id, time, refreshFlag, step, type, variableConfig, isPreview, onCloneClick, onShareClick, onEditClick, onDeleteClick } = props;
+  const values = _.cloneDeep(props.values);
   const ref = useRef<HTMLDivElement>(null);
   const [inViewPort] = useInViewport(ref);
   const { series, loading } = usePrometheus({
@@ -60,22 +62,27 @@ function index(props: IProps) {
     variableConfig,
     inViewPort: isPreview || inViewPort,
   });
+  const tipsVisible = values.description || !_.isEmpty(values.links);
+  if (_.isEmpty(values)) return null;
+  // TODO: 如果 hexbin 的 colorRange 为 string 时转成成 array
+  if (typeof _.get(values, 'custom.colorRange') === 'string') {
+    _.set(values, 'custom.colorRange', _.split(_.get(values, 'custom.colorRange'), ','));
+  }
   const subProps = {
     values,
     series,
   };
-  const tipsVisible = values.description || !_.isEmpty(values.links);
-  if (_.isEmpty(values)) return null;
   const RendererCptMap = {
     timeseries: () => <Timeseries {...subProps} />,
     stat: () => <Stat {...subProps} />,
     table: () => <Table {...subProps} />,
     pie: () => <Pie {...subProps} />,
+    hexbin: () => <Hexbin {...subProps} />,
   };
 
   return (
     <div className='renderer-container' ref={ref}>
-      <div className='renderer-header graph-header'>
+      <div className='renderer-header graph-header dashboards-panels-item-drag-handle'>
         {tipsVisible ? (
           <Tooltip
             placement='rightTop'
@@ -86,9 +93,9 @@ function index(props: IProps) {
               <div>
                 <Markdown content={values.description} />
                 <div>
-                  {_.map(values.links, (link) => {
+                  {_.map(values.links, (link, i) => {
                     return (
-                      <div style={{ marginTop: 8 }}>
+                      <div key={i} style={{ marginTop: 8 }}>
                         <a href={link.url} target={link.targetBlank ? '_blank' : '_self'}>
                           {link.title}
                         </a>

@@ -192,24 +192,22 @@ export default function Metrics(props: IProps) {
                   </Button>
                 </Col>
               </Row>
-              <div>
-                {_.map(selectedMetrics, (metric, i) => {
-                  return (
-                    <Graph
-                      key={metric}
-                      metric={metric}
-                      match={match}
-                      range={range}
-                      step={step}
-                      onClose={() => {
-                        const newselectedMetrics = [...selectedMetrics];
-                        newselectedMetrics.splice(i, 1);
-                        setSelectedMetrics(newselectedMetrics);
-                      }}
-                    />
-                  );
-                })}
-              </div>
+              {_.map(selectedMetrics, (metric, i) => {
+                return (
+                  <Graph
+                    key={metric}
+                    metric={metric}
+                    match={match}
+                    range={range}
+                    step={step}
+                    onClose={() => {
+                      const newselectedMetrics = [...selectedMetrics];
+                      newselectedMetrics.splice(i, 1);
+                      setSelectedMetrics(newselectedMetrics);
+                    }}
+                  />
+                );
+              })}
             </>
           ) : (
             <div style={{ marginTop: 12 }}>暂无指标数据，请选择左侧 Lables</div>
