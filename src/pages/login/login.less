@@ -19,12 +19,19 @@
     right: 0px;
     width: 632px;
   }
+  .logo.integration {
+    display: block;
+    &.slim {
+      display: none;
+    }
+  }
   .banner {
     &.integration {
-      background: none;
+      background-image: linear-gradient(212deg, #9c52ff 0%, #694df4 36%, #6a4df4 76%, #a343f5 100%);
       display: flex;
       width: 900px;
-      justify-content: center;
+      justify-content: left;
+      align-items: center;
     }
     flex: 1;
     background: rgb(20, 22, 49);
@@ -72,12 +79,7 @@
           font-size: 16px;
         }
         input {
-          border: none;
-          border-radius: 0px;
           font-size: 14px;
-          border-bottom: 1px solid #999999;
-          box-shadow: none !important;
-          padding-left: 0px;
         }
         .ant-btn {
           font-size: 16px;
@@ -94,7 +96,6 @@
       .ant-form-vertical {
         width: 80%;
         .ant-input-affix-wrapper {
-          border-radius: 18px;
           height: 36px;
           line-height: 36px;
           background: transparent;
@@ -111,7 +112,6 @@
         .ant-btn {
           width: 100%;
           height: 40px;
-          border-radius: 20px;
         }
       }
     }
@@ -127,6 +127,12 @@
       display: none;
       &.integration {
         display: none;
+      }
+    }
+    .logo.integration {
+      display: none;
+      &.slim {
+        display: block;
       }
     }
   }

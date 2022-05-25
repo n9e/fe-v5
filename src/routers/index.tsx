@@ -20,6 +20,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState, accountStoreState } from '@/store/accountInterface';
 import NotFound from '@/pages/NotFound';
 import Login from '@/pages/login';
+import Overview from '@/pages/login/overview';
 import LoginCallback from '@/pages/loginCallback';
 import Strategy from '@/pages/warning/strategy';
 import Profile from '@/pages/account/profile';
@@ -99,6 +100,7 @@ export default function Content() {
     <div className='content'>
       <Switch>
         <Route path='/demo' component={Demo} />
+        <Route path='/overview' component={Overview} />
         <Route path='/login' component={Login} exact />
         <Route path='/callback' component={LoginCallback} exact />
         <Route path='/metric/explorer' component={Explore} exact />
