@@ -35,18 +35,6 @@ import { Button } from 'antd';
 
 import MetricsExplorer from './metricsExplorer';
 
-const url = '/api/n9e/prometheus';
-function myHTTPClient(resource: string, options = {}): Promise<Response> {
-  return fetch(resource, {
-    method: 'Get',
-    headers: new Headers({
-      'X-Cluster': localStorage.getItem('curCluster') || '',
-      Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
-    }),
-    ...options,
-  });
-}
-
 const promqlExtension = new PromQLExtension();
 
 interface CMExpressionInputProps {
@@ -99,6 +87,17 @@ export class HistoryCompleteStrategy implements CompleteStrategy {
 }
 
 const ExpressionInput: FC<CMExpressionInputProps> = ({ value, onExpressionChange, queryHistory, metricNames, isLoading, executeQuery }) => {
+  const url = '/api/n9e/prometheus';
+  function myHTTPClient(resource: string, options = {}): Promise<Response> {
+    return fetch(resource, {
+      method: 'Get',
+      headers: new Headers({
+        'X-Cluster': localStorage.getItem('curCluster') || '',
+        Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
+      }),
+      ...options,
+    });
+  }
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const executeQueryCallback = useRef(executeQuery);
@@ -179,7 +178,7 @@ const ExpressionInput: FC<CMExpressionInputProps> = ({ value, onExpressionChange
 
       view.focus();
     }
-  }, [executeQuery, onExpressionChange, queryHistory]);
+  }, [executeQuery, onExpressionChange, queryHistory, localStorage.getItem('curCluster')]);
 
   const insertAtCursor = (value: string) => {
     const view = viewRef.current;
