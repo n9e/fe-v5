@@ -127,8 +127,8 @@ request.interceptors.response.use(
         .clone()
         .json()
         .then((data) => {
-          if (data.error && data.error.message) throw new Error(data.error.message);
           location.href = '/403';
+          if (data.error && data.error.message) throw new Error(data.error.message);
         });
     } else {
       const contentType = response.headers.get('content-type');

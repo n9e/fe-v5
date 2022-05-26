@@ -20,7 +20,7 @@ import Loadable from '@/routers/loadable';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, accountStoreState } from '@/store/accountInterface';
 import NotFound from '@/pages/NotFound';
-import Page403 from '@/pages/NotFound';
+import Page403 from '@/pages/NotFound/Page403';
 import Login from '@/pages/login';
 import LoginCallback from '@/pages/loginCallback';
 import Strategy from '@/pages/warning/strategy';
