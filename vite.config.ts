@@ -69,19 +69,16 @@ export default defineConfig({
     proxy: {
       '/api/n9e': {
         target: 'http://10.206.0.11:8765/',
-        // target: 'http://10.206.0.16:18000/',
-        // target: 'http://10.206.0.7:18000/',
         changeOrigin: true,
       },
       '/api/v1/': {
-        // target: 'http://10.206.0.17:9012',
-        target: 'http://10.129.0.11:9999',
+        target: 'http://10.206.0.11:8757/',
         changeOrigin: true,
       },
       '/api/fc-brain': {
         target: 'http://10.206.0.11:8765/',
         changeOrigin: true,
-      }
+      },
     },
   },
   build: {

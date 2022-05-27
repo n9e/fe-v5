@@ -45,7 +45,15 @@ export default function ColumnSelect(props: Props) {
   return (
     <Space style={{ marginLeft: noLeftPadding ? 0 : 8, marginRight: noRightPadding ? 0 : 8 }}>
       {onClusterChange && (
-        <Select mode='multiple' allowClear style={{ minWidth: 80 }} placeholder='集群' onChange={onClusterChange} getPopupContainer={() => document.body}>
+        <Select
+          mode='multiple'
+          allowClear
+          style={{ minWidth: 80 }}
+          placeholder='集群'
+          onChange={onClusterChange}
+          getPopupContainer={() => document.body}
+          dropdownMatchSelectWidth={false}
+        >
           {clusters.map((k) => (
             <Select.Option value={k} key={k}>
               {k}
