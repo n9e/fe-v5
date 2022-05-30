@@ -75,6 +75,7 @@ const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = ({ isOpe
     const newData = data ? { var: _.cloneDeep(data.var) } : { var: [] };
     setVaraiableSelected(newData.var[index].name, v, id);
     setVarsMap((varsMap) => ({ ...varsMap, [`$${newData.var[index].name}`]: v }));
+    setData(newData);
     setDataWithOptions((dataWithOptions) => {
       let newDataWithOptions = dataWithOptions ? { var: _.cloneDeep(dataWithOptions.var) } : { var: [] };
       options && newDataWithOptions && (newDataWithOptions.var[index].options = options);
