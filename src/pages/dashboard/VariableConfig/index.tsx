@@ -68,7 +68,7 @@ const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = ({ isOpe
   }, [JSON.stringify(value)]);
 
   useEffect(() => {
-    data && dataWithOptions && onChange(data, false, dataWithOptions);
+    data && dataWithOptions && dataWithOptions?.var.every((item) => !!item.options) && onChange(data, false, dataWithOptions);
   }, [dataWithOptions]);
 
   const handleVariableChange = (index: number, v: string | string[], options) => {
