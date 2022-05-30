@@ -190,7 +190,7 @@ export default function DetailV2() {
           range={range}
           step={step}
           refreshFlag={refreshFlag}
-          variableConfig={variableConfig}
+          variableConfig={variableConfigWithOptions}
           onShareClick={(panel) => {
             const serielData = {
               dataProps: {

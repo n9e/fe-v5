@@ -51,6 +51,7 @@ const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = ({ isOpe
   const [editing, setEditing] = useState<boolean>(isOpen);
   const [varsMap, setVarsMap] = useState<{ string?: string | string[] | undefined }>({});
   const [data, setData] = useState<FormType>();
+  const [dataWithOptions, setDataWithOptions] = useState<FormType>();
   const handleEditClose = (v: FormType) => {
     if (v) {
       onChange(v, true);
@@ -60,17 +61,25 @@ const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = ({ isOpe
   };
 
   useEffect(() => {
-    value && setData(value);
-  }, [value]);
+    if (value) {
+      setData(value);
+      setDataWithOptions(value);
+    }
+  }, [JSON.stringify(value)]);
+
+  useEffect(() => {
+    data && dataWithOptions && onChange(data, false, dataWithOptions);
+  }, [dataWithOptions]);
 
   const handleVariableChange = (index: number, v: string | string[], options) => {
     const newData = data ? { var: _.cloneDeep(data.var) } : { var: [] };
-    const newDataWithOptions = data ? { var: _.cloneDeep(data.var) } : { var: [] };
     setVaraiableSelected(newData.var[index].name, v, id);
     setVarsMap((varsMap) => ({ ...varsMap, [`$${newData.var[index].name}`]: v }));
-    options && (newDataWithOptions.var[index].options = options);
-    setData(newData);
-    onChange(newData, false, newDataWithOptions);
+    setDataWithOptions((dataWithOptions) => {
+      let newDataWithOptions = dataWithOptions ? { var: _.cloneDeep(dataWithOptions.var) } : { var: [] };
+      options && newDataWithOptions && (newDataWithOptions.var[index].options = options);
+      return newDataWithOptions;
+    });
   };
 
   return (
