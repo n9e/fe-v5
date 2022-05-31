@@ -86,13 +86,13 @@ const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = ({ isOpe
   return (
     <div className='tag-area'>
       <div className={classNames('tag-content', 'tag-content-close')}>
-        {data?.var && data?.var.length > 0 && (
+        {dataWithOptions?.var && dataWithOptions?.var.length > 0 && (
           <>
-            {data.var.map((expression, index) => (
+            {dataWithOptions.var.map((expression, index) => (
               <DisplayItem
                 expression={expression}
                 index={index}
-                data={data.var}
+                data={dataWithOptions.var}
                 onChange={handleVariableChange}
                 cluster={cluster}
                 range={range}
