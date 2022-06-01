@@ -162,7 +162,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
 
   const addSubmit = () => {
     form.validateFields().then(async (values) => {
-      const res = await prometheusQuery({ query: values.prom_ql });
+      const res = await prometheusQuery({ query: values.prom_ql }, values.cluster);
       if (res.error) {
         notification.error({
           message: res.error,
