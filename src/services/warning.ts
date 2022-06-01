@@ -170,10 +170,13 @@ export const batchDeleteStrategy = function (ruleId, ids: Array<number>) {
   });
 };
 
-export const prometheusQuery = function (data): Promise<any> {
+export const prometheusQuery = function (data, cluster): Promise<any> {
   return request(`/api/n9e/prometheus/api/v1/query`, {
     method: RequestMethod.Get,
     params: data,
+    headers: {
+      'X-Cluster': cluster,
+    },
   });
 };
 
