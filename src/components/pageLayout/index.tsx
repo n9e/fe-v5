@@ -48,6 +48,11 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, childr
   if (!localCluster && clusters.length > 0) {
     setCurCluster(clusters[0]);
     localStorage.setItem('curCluster', clusters[0]);
+    dispatch({
+      type: 'common/saveData',
+      prop: 'curCluster',
+      data: clusters[0],
+    });
   }
 
   const menu = (
@@ -92,6 +97,11 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, childr
             setCurCluster(cluster);
             onChangeCluster && onChangeCluster(cluster);
             localStorage.setItem('curCluster', cluster);
+            dispatch({
+              type: 'common/saveData',
+              prop: 'curCluster',
+              data: cluster,
+            });
           }}
         >
           {cluster}
