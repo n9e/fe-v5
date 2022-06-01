@@ -301,16 +301,22 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
             <AdvancedWrap>
               <AbnormalDetection form={form} />
             </AdvancedWrap>
-            <Form.Item label='PromQL' className={'Promeql-content'} required>
-              <Form.Item name='prom_ql' validateTrigger={['onBlur']} trigger='onChange' rules={[{ required: true, message: t('请输入PromQL') }]}>
-                <PromQLInput
-                  url='/api/n9e/prometheus'
-                  headers={{
-                    'X-Cluster': localStorage.getItem('curCluster') || 'DEFAULT',
-                    Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
-                  }}
-                />
-              </Form.Item>
+            <Form.Item noStyle shouldUpdate={(prevValues, curValues) => prevValues.cluster !== curValues.cluster}>
+              {() => {
+                return (
+                  <Form.Item label='PromQL' className={'Promeql-content'} required>
+                    <Form.Item name='prom_ql' validateTrigger={['onBlur']} trigger='onChange' rules={[{ required: true, message: t('请输入PromQL') }]}>
+                      <PromQLInput
+                        url='/api/n9e/prometheus'
+                        headers={{
+                          'X-Cluster': form.getFieldValue('cluster'),
+                          Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
+                        }}
+                      />
+                    </Form.Item>
+                  </Form.Item>
+                );
+              }}
             </Form.Item>
             <Form.Item required label={t('执行频率')}>
               <Space>
