@@ -153,7 +153,7 @@ const ExpressionInput = ({ url, headers, value, onChange, executeQuery, readonly
 
       view.focus();
     }
-  }, [onChange]);
+  }, [onChange, JSON.stringify(headers)]);
 
   useEffect(() => {
     if (realValue.current !== value) {
