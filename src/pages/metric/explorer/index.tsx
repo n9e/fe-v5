@@ -82,9 +82,13 @@ const MetricExplorerPage: React.FC = () => {
 
   useEffect(() => {
     if (clusters.length) {
-      getMetrics().then((res) => {
-        setMetrics(res.data || []);
-      });
+      getMetrics()
+        .then((res) => {
+          setMetrics(res.data || []);
+        })
+        .catch(() => {
+          setMetrics([]);
+        });
     }
   }, [clusters, rerenderFlag]);
 
