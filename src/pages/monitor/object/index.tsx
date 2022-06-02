@@ -32,10 +32,18 @@ export default function index() {
     unit: 'hour',
     description: 'hour',
   });
+  const [rerenderFlag, setRerenderFlag] = useState(_.uniqueId('rerenderFlag_'));
 
   return (
-    <PageLayout title='快捷视图' icon={<LineChartOutlined />} hideCluster={false}>
-      <div className='n9e-metric-views'>
+    <PageLayout
+      title='快捷视图'
+      icon={<LineChartOutlined />}
+      hideCluster={false}
+      onChangeCluster={() => {
+        setRerenderFlag(_.uniqueId('rerenderFlag_'));
+      }}
+    >
+      <div className='n9e-metric-views' key={rerenderFlag}>
         <List
           onSelect={(record: IMatch) => {
             setMatch(record);

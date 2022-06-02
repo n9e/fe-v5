@@ -20,6 +20,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState as CommonRootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
 import { Button } from 'antd';
+import _ from 'lodash';
 import React, { useEffect, useState } from 'react';
 import './index.less';
 import { generateID } from '@/utils';
@@ -77,18 +78,30 @@ const PanelList: React.FC<PanelListProps> = ({ metrics }) => {
 const MetricExplorerPage: React.FC = () => {
   const [metrics, setMetrics] = useState<string[]>([]);
   const { clusters } = useSelector<CommonRootState, CommonStoreState>((state) => state.common);
+  const [rerenderFlag, setRerenderFlag] = useState(_.uniqueId('rerenderFlag_'));
 
   useEffect(() => {
     if (clusters.length) {
-      getMetrics().then((res) => {
-        setMetrics(res.data || []);
-      });
+      getMetrics()
+        .then((res) => {
+          setMetrics(res.data || []);
+        })
+        .catch(() => {
+          setMetrics([]);
+        });
     }
-  }, [clusters]);
+  }, [clusters, rerenderFlag]);
 
   return (
-    <PageLayout title='即时查询' icon={<LineChartOutlined />} hideCluster={false}>
-      <div className='prometheus-page'>
+    <PageLayout
+      title='即时查询'
+      icon={<LineChartOutlined />}
+      hideCluster={false}
+      onChangeCluster={() => {
+        setRerenderFlag(_.uniqueId('rerenderFlag_'));
+      }}
+    >
+      <div className='prometheus-page' key={rerenderFlag}>
         <PanelList metrics={metrics} />
       </div>
     </PageLayout>
