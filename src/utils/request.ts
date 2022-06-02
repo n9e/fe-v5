@@ -116,6 +116,7 @@ request.interceptors.response.use(
                 const { access_token, refresh_token } = res.dat;
                 localStorage.setItem('access_token', access_token);
                 localStorage.setItem('refresh_token', refresh_token);
+                location.href = `${location.pathname}${location.search}`;
               }
             })
           : (location.href = `/login${location.pathname != '/' ? '?redirect=' + location.pathname + location.search : ''}`);
