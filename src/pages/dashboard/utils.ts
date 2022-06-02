@@ -218,15 +218,21 @@ function convertPanlesGrafanaToN9E(panels: any) {
           ...item.gridPos,
           i: uid,
         },
-        targets: _.map(item.targets, (item) => {
-          return {
-            refId: item.refId,
-            expr: _.replace(item.expr, '$__rate_interval', '5m'),
-            legend: item.legendFormat,
-            // time: item.time, // TODO: 待验证
-            // step: item.step, // TODO: 此处的 step 可能和 grafana 的不一样，待验证
-          };
-        }),
+        targets: _.chain(item.targets)
+          .filter((item) => {
+            // TODO: 目前只能丢掉被隐藏的 query
+            return item.hide !== true;
+          })
+          .map((item) => {
+            return {
+              refId: item.refId,
+              expr: _.replace(item.expr, '$__rate_interval', '5m'),
+              legend: item.legendFormat,
+              // time: item.time, // TODO: 待验证
+              // step: item.step, // TODO: 此处的 step 可能和 grafana 的不一样，待验证
+            };
+          })
+          .value(),
         options: convertOptionsGrafanaToN9E(item),
         custom: chartsMap[item.type] ? chartsMap[item.type].fn(item) : {},
       };
