@@ -58,8 +58,12 @@ request.interceptors.response.use(
             if (status === 200 && !data.error) {
               return { ...data, success: true };
             } else if (data.error) {
-              // @ts-ignore
-              throw new Error(data.error.message, { cause: options.silence });
+              if (response.url.indexOf('/api/n9e/prometheus/api/v1') > -1 || response.url.indexOf('/api/v1/datasource/prometheus') > -1) {
+                return data;
+              } else {
+                // @ts-ignore
+                throw new Error(data.error.message, { cause: options.silence });
+              }
             }
           } else {
             if (data.err === '' || data.status === 'success' || data.error === '') {
@@ -116,13 +120,14 @@ request.interceptors.response.use(
             })
           : (location.href = `/login${location.pathname != '/' ? '?redirect=' + location.pathname + location.search : ''}`);
       }
-    } else if (status === 404) {
-      location.href = '/404';
+      // } else if (status === 404) {
+      //   location.href = '/404';
     } else if (status === 403 && response.url.includes('/api/v1')) {
       return response
         .clone()
         .json()
         .then((data) => {
+          location.href = '/403';
           if (data.error && data.error.message) throw new Error(data.error.message);
         });
     } else {

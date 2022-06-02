@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-import React, { FC, useEffect, useRef } from 'react';
-
+import React, { useEffect, useRef } from 'react';
+import classNames from 'classnames';
 import { EditorView, highlightSpecialChars, keymap, ViewUpdate, placeholder } from '@codemirror/view';
 import { EditorState, Prec } from '@codemirror/state';
 import { indentOnInput } from '@codemirror/language';
@@ -29,7 +29,7 @@ import { lintKeymap } from '@codemirror/lint';
 import { autocompletion, completionKeymap } from '@codemirror/autocomplete';
 import { PromQLExtension } from 'codemirror-promql';
 import { baseTheme, promqlHighlighter } from './CMTheme';
-import classNames from 'classnames';
+
 const promqlExtension = new PromQLExtension();
 
 interface CMExpressionInputProps {
@@ -38,10 +38,10 @@ interface CMExpressionInputProps {
   headers?: { [index: string]: string };
   value?: string;
   onChange?: (expr?: string) => void;
-  executeQuery?: () => void;
+  executeQuery?: (expr?: string) => void;
 }
 
-const ExpressionInput: FC<CMExpressionInputProps> = ({ url, headers, value, onChange, executeQuery, readonly = false }) => {
+const ExpressionInput = ({ url, headers, value, onChange, executeQuery, readonly = false }: CMExpressionInputProps, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const executeQueryCallback = useRef(executeQuery);
@@ -117,7 +117,7 @@ const ExpressionInput: FC<CMExpressionInputProps> = ({ url, headers, value, onCh
                 key: 'Enter',
                 run: (v: EditorView): boolean => {
                   if (typeof executeQueryCallback.current === 'function') {
-                    executeQueryCallback.current();
+                    executeQueryCallback.current(realValue.current);
                   }
                   return true;
                 },
@@ -129,9 +129,12 @@ const ExpressionInput: FC<CMExpressionInputProps> = ({ url, headers, value, onCh
             ]),
           ),
           EditorView.updateListener.of((update: ViewUpdate): void => {
-            const val = update.state.doc.toString();
-            if (val !== realValue.current) {
-              realValue.current = val;
+            if (typeof onChange === 'function') {
+              const val = update.state.doc.toString();
+              if (val !== realValue.current) {
+                realValue.current = val;
+                onChange(val);
+              }
             }
           }),
         ],
@@ -144,12 +147,17 @@ const ExpressionInput: FC<CMExpressionInputProps> = ({ url, headers, value, onCh
 
       viewRef.current = view;
 
+      if (ref) {
+        ref.current = view;
+      }
+
       view.focus();
     }
   }, [onChange]);
 
   useEffect(() => {
     if (realValue.current !== value) {
+      const oldValue = realValue.current;
       realValue.current = value || '';
       const view = viewRef.current;
       if (view === null) {
@@ -157,7 +165,7 @@ const ExpressionInput: FC<CMExpressionInputProps> = ({ url, headers, value, onCh
       }
       view.dispatch(
         view.state.update({
-          changes: { from: 0, to: view.state.doc.length, insert: value },
+          changes: { from: 0, to: oldValue?.length || 0, insert: value },
         }),
       );
     }
@@ -166,10 +174,6 @@ const ExpressionInput: FC<CMExpressionInputProps> = ({ url, headers, value, onCh
   return (
     <div
       className={classNames({ 'ant-input': true, readonly: readonly, 'promql-input': true })}
-      style={{
-        minHeight: 32,
-        height: 'unset',
-      }}
       onBlur={() => {
         if (typeof onChange === 'function') {
           onChange(realValue.current);
@@ -181,4 +185,4 @@ const ExpressionInput: FC<CMExpressionInputProps> = ({ url, headers, value, onCh
   );
 };
 
-export default ExpressionInput;
+export default React.forwardRef(ExpressionInput);
