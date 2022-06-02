@@ -20,9 +20,9 @@ import { Modal, Input, Tabs, Form, Table, Button, message } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import ModalHOC, { ModalWrapProps } from '@/components/ModalHOC';
 import { getBuiltinDashboards, getBuiltinDashboard, createDashboard } from '@/services/dashboardV2';
-import { getValidImportData } from './utils';
+import { getValidImportData, convertDashboardGrafanaToN9E, JSONParse } from './utils';
 
-type ModalType = 'BuiltIn' | 'Import';
+type ModalType = 'BuiltIn' | 'Import' | 'ImportGrafana';
 interface IProps {
   busiId: number;
   type: ModalType;
@@ -62,6 +62,7 @@ function Import(props: IProps & ModalWrapProps) {
         <Tabs activeKey={modalType} onChange={(e: ModalType) => setModalType(e)} className='custom-import-alert-title'>
           <TabPane tab='导入内置大盘模块' key='BuiltIn'></TabPane>
           <TabPane tab='导入大盘JSON' key='Import'></TabPane>
+          <TabPane tab='导入Grafana大盘JSON' key='ImportGrafana'></TabPane>
         </Tabs>
       }
       visible={visible}
@@ -113,7 +114,8 @@ function Import(props: IProps & ModalWrapProps) {
             pagination={filteredBuildinList.length < 5 ? false : { pageSize: 5 }}
           />
         </>
-      ) : (
+      ) : null}
+      {modalType === 'Import' ? (
         <Form
           layout='vertical'
           onFinish={(vals) => {
@@ -146,7 +148,42 @@ function Import(props: IProps & ModalWrapProps) {
             </Button>
           </Form.Item>
         </Form>
-      )}
+      ) : null}
+      {modalType === 'ImportGrafana' ? (
+        <Form
+          layout='vertical'
+          onFinish={(vals) => {
+            const data = convertDashboardGrafanaToN9E(JSONParse(vals.import));
+            createDashboard(busiId, {
+              ...data,
+              tags: '',
+              configs: JSON.stringify(data.configs),
+            }).then(() => {
+              message.success('导入成功');
+              refreshList();
+              destroy();
+            });
+          }}
+        >
+          <Form.Item
+            label='大盘JSON'
+            name='import'
+            rules={[
+              {
+                required: true,
+                message: '请输入大盘JSON',
+              },
+            ]}
+          >
+            <Input.TextArea className='code-area' placeholder='请输入大盘 JSON' rows={16} />
+          </Form.Item>
+          <Form.Item>
+            <Button type='primary' htmlType='submit'>
+              导入
+            </Button>
+          </Form.Item>
+        </Form>
+      ) : null}
     </Modal>
   );
 }
