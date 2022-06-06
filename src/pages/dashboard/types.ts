@@ -52,6 +52,7 @@ export interface IThresholds {
     color: string;
     value: number;
   }[];
+  // mode: 'absolute' | 'percent'; 目前不支持
   style: 'line'; // 目前只支持 line
 }
 
@@ -130,6 +131,18 @@ export interface IHexbinStyles {
   colorDomain: number[]; // 自定义 [min, max]
   reverseColorOrder: boolean;
 }
+export interface IPieStyles {
+  version: string; // 时序图组件使用的版本
+  calc: string;
+  legengPosition: string;
+}
+export interface IRow {
+  id: string;
+  type: 'row';
+  title: string;
+  collapsed: boolean;
+  layout: IGridPos;
+}
 
 export interface IPanel {
   version: string; // 单个图表面板使用的版本
@@ -147,17 +160,18 @@ export interface IPanel {
   panels?: IPanel[]; // 用于 row 收起时保存子面板
 }
 
+export interface IVariable {
+  name: string;
+  definition: string;
+  options?: string[];
+  allOption?: boolean;
+  multi?: boolean;
+}
+
+// IDashboard.configs
 export interface IDashboard {
   version: string; // 整个仪表盘使用的版本，遵循版本规范 '1.0.0'
-  id: number;
-  title: string;
-  cluster: string;
-  time: {
-    start: number;
-    end: number;
-  };
-  refresh: string; // off | 10s ...
-  variable: any; // 变量配置
-  editable: boolean; // 备用
+  links: ILink[];
+  var: IVariable[]; // 变量配置
   panels: IPanel[];
 }
