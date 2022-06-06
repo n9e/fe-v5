@@ -18,7 +18,6 @@ import _ from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import { IDashboard } from './types';
 import { defaultValues } from './Editor/config';
-import mockData from '../demo/grafanaMock';
 
 export function JSONParse(str) {
   if (str) {
@@ -70,7 +69,8 @@ function convertOptionsGrafanaToN9E(panel: any) {
     return defaultValues.options;
   }
   const { fieldConfig, options } = panel;
-  const config = fieldConfig.defaults;
+  const config = fieldConfig?.defaults;
+  if (!config) return {};
   const unitMap = {
     percent: 'percent',
     percentunit: 'percentUnit',
@@ -127,13 +127,6 @@ function convertPieGrafanaToN9E(panel: any) {
   };
 }
 
-function convertTableGrafanaToN9E(panel: any) {
-  return {
-    version: '2.0.0',
-    textMode: 'value',
-  };
-}
-
 function convertStatGrafanaToN9E(panel: any) {
   // gauge and stat -> stat
   return {
@@ -163,10 +156,6 @@ function convertPanlesGrafanaToN9E(panels: any) {
       type: 'pie',
       fn: convertPieGrafanaToN9E,
     },
-    // table: {
-    //   type: 'table',
-    //   fn: convertTableGrafanaToN9E,
-    // },
     gauge: {
       type: 'stat',
       fn: convertStatGrafanaToN9E,
@@ -178,18 +167,12 @@ function convertPanlesGrafanaToN9E(panels: any) {
   };
   return _.chain(panels)
     .filter((item) => {
-      // 此处有两种定义 datasource type 的方式
-      if (item.datasource) {
-        if (item.datasource.type !== 'prometheus') return false;
-      }
-      if (_.get(item, 'targets[0].datasource')) {
-        return _.every(item.targets, (item) => {
-          return item.datasource.type === 'prometheus';
+      if (item.targets) {
+        return _.every(item.targets, (subItem) => {
+          return !!subItem.expr;
         });
       }
       return true;
-      // 2.0.0 版本只支持以上几个类型的 panel
-      // return !!chartsMap[item.type];
     })
     .map((item) => {
       const uid = uuidv4();
@@ -226,10 +209,8 @@ function convertPanlesGrafanaToN9E(panels: any) {
           .map((item) => {
             return {
               refId: item.refId,
-              expr: _.replace(item.expr, '$__rate_interval', '5m'),
+              expr: _.replace(item.expr, '$__rate_interval', '5m'), // TODO: 目前不支持 $__rate_interval 暂时统一替换为 5m
               legend: item.legendFormat,
-              // time: item.time, // TODO: 待验证
-              // step: item.step, // TODO: 此处的 step 可能和 grafana 的不一样，待验证
             };
           })
           .value(),
@@ -240,7 +221,7 @@ function convertPanlesGrafanaToN9E(panels: any) {
     .value();
 }
 
-export function convertDashboardGrafanaToN9E(data = mockData) {
+export function convertDashboardGrafanaToN9E(data) {
   const dashboard: {
     name: string;
     configs: IDashboard;
