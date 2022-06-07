@@ -30,6 +30,7 @@ interface IPageLayoutProps {
   icon?: ReactNode;
   title?: String | JSX.Element;
   children?: ReactNode;
+  introIcon?: ReactNode;
   rightArea?: ReactNode;
   customArea?: ReactNode;
   showBack?: Boolean;
@@ -37,7 +38,7 @@ interface IPageLayoutProps {
   onChangeCluster?: (string) => void;
 }
 
-const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, children, customArea, showBack, onChangeCluster, hideCluster = true }) => {
+const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea,introIcon,  children, customArea, showBack, onChangeCluster, hideCluster = true }) => {
   const { t, i18n } = useTranslation();
   const history = useHistory();
   const dispatch = useDispatch();
@@ -132,6 +133,7 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, childr
 
             {/* <div className={'page-header-right-area'}>{rightArea}</div> */}
             <div className={'page-header-right-area'}>
+             {introIcon}
               {import.meta.env.VITE_DOC_LINK && (
                 <a href={import.meta.env.VITE_DOC_LINK as string} target='_blank' style={{ marginRight: 20 }}>
                   文档
