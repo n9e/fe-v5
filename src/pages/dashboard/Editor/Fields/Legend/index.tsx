@@ -27,7 +27,8 @@ export default function index() {
       <>
         <Form.Item noStyle label='' name={[...namePrefix, 'displayMode']}>
           <Radio.Group buttonStyle='solid'>
-            <Radio.Button value='table'>开启</Radio.Button>
+            <Radio.Button value='table'>表格</Radio.Button>
+            <Radio.Button value='list'>列表</Radio.Button>
             <Radio.Button value='hidden'>关闭</Radio.Button>
           </Radio.Group>
         </Form.Item>

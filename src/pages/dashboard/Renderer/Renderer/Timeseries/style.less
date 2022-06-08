@@ -1,7 +1,7 @@
 .renderer-timeseries-container {
   height: 100%;
 }
-.renderer-timeseries-legend {
+.renderer-timeseries-legend-table {
   .ant-table,
   .ant-table-wrapper {
     margin-top: 0 !important;
@@ -10,5 +10,20 @@
     height: unset !important;
     line-height: unset !important;
     padding: 0 !important;
+  }
+}
+.renderer-timeseries-legend-list {
+  overflow-y: auto;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  column-gap: 20px;
+  align-content: flex-start;
+  padding: 0 10px 10px 10px;
+  cursor: pointer;
+  user-select: none;
+  & > div.disabled {
+    color: #24292e80
   }
 }

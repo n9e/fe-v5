@@ -37,11 +37,14 @@ interface IProps {
 export default function index(props: IProps) {
   const { values, series, inDashboard = true, chartHeight = '200px', tableHeight = '200px' } = props;
   const { custom, options = {} } = values;
+  const [seriesData, setSeriesData] = useState(series);
+  const [activeLegend, setActiveLegend] = useState('');
   const chartEleRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<TsGraph>(null);
   const legendEleRef = useRef<HTMLDivElement>(null);
   const legendEleSize = useSize(legendEleRef);
-  const hasLegend = options.legend?.displayMode !== 'hidden';
+  const displayMode = options.legend?.displayMode;
+  const hasLegend = displayMode !== 'hidden';
   const [legendData, setLegendData] = useState([]);
   let _chartHeight = hasLegend ? '70%' : '100%';
   let _tableHeight = hasLegend ? '30%' : '0px';
@@ -75,7 +78,7 @@ export default function index(props: IProps) {
     if (hasLegend) {
       setLegendData(
         getLegendValues(
-          series,
+          seriesData,
           {
             util: options?.standardOptions?.util,
             decimals: options?.standardOptions?.decimals,
@@ -94,10 +97,14 @@ export default function index(props: IProps) {
   }, [hasLegend]);
 
   useEffect(() => {
+    setSeriesData(series);
+  }, [JSON.stringify(series)]);
+
+  useEffect(() => {
     if (chartRef.current) {
       chartRef.current.update({
         type: custom.drawStyle === 'lines' ? 'line' : 'bar',
-        series,
+        series: seriesData,
         area: {
           opacity: custom.fillOpacity,
         },
@@ -142,7 +149,7 @@ export default function index(props: IProps) {
     if (hasLegend) {
       setLegendData(
         getLegendValues(
-          series,
+          seriesData,
           {
             util: options?.standardOptions?.util,
             decimals: options?.standardOptions?.decimals,
@@ -153,78 +160,108 @@ export default function index(props: IProps) {
     } else {
       setLegendData([]);
     }
-  }, [JSON.stringify(series), JSON.stringify(custom), JSON.stringify(options)]);
+  }, [JSON.stringify(seriesData), JSON.stringify(custom), JSON.stringify(options)]);
 
   return (
     <div className='renderer-timeseries-container'>
       <div ref={chartEleRef} style={{ height: _chartHeight }} />
-      <div className='renderer-timeseries-legend' style={{ [inDashboard ? 'height' : 'maxHeight']: _tableHeight, overflow: 'hidden' }} ref={legendEleRef}>
-        <Table
-          rowKey='id'
-          size='small'
-          scroll={{ x: 650, y: legendEleSize?.height || 100 - 46 }}
-          columns={[
-            {
-              title: `Series (${series.length})`,
-              dataIndex: 'name',
-              width: 150,
-              ellipsis: {
-                showTitle: false,
-              },
-              render: (_text, record: any) => {
+      {hasLegend && (
+        <div className='renderer-timeseries-legend-table' style={{ [inDashboard ? 'height' : 'maxHeight']: _tableHeight, overflow: 'hidden' }} ref={legendEleRef}>
+          {displayMode === 'table' && (
+            <Table
+              rowKey='id'
+              size='small'
+              scroll={{ x: 650, y: legendEleSize?.height || 100 - 46 }}
+              columns={[
+                {
+                  title: `Series (${series.length})`,
+                  dataIndex: 'name',
+                  width: 150,
+                  ellipsis: {
+                    showTitle: false,
+                  },
+                  render: (_text, record: any) => {
+                    return (
+                      <Tooltip
+                        placement='topLeft'
+                        title={
+                          <div>
+                            <div>{_.get(record, 'metric.__name__')}</div>
+                            <div>{record.offset && record.offset !== 'current' ? `offfset ${record.offset}` : ''}</div>
+                            {_.map(_.omit(record.metric, '__name__'), (val, key) => {
+                              return (
+                                <div key={key}>
+                                  {key}={val}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        }
+                        getTooltipContainer={() => document.body}
+                      >
+                        <span style={{ color: record.color, fontSize: 14, paddingRight: 5, position: 'relative', top: 2 }}>ꔷ</span>
+                        {record.offset && record.offset !== 'current' ? <span style={{ paddingRight: 5 }}>offfset {record.offset}</span> : ''}
+                        <span>{JSON.stringify(record.metric)}</span>
+                      </Tooltip>
+                    );
+                  },
+                },
+                {
+                  title: 'Max',
+                  dataIndex: 'max',
+                },
+                {
+                  title: 'Min',
+                  dataIndex: 'min',
+                },
+                {
+                  title: 'Avg',
+                  dataIndex: 'avg',
+                },
+                {
+                  title: 'Sum',
+                  dataIndex: 'sum',
+                },
+                {
+                  title: 'Last',
+                  dataIndex: 'last',
+                },
+              ]}
+              dataSource={legendData}
+              locale={{
+                emptyText: '暂无数据',
+              }}
+              pagination={false}
+            />
+          )}
+          {displayMode === 'list' && (
+            <div className='renderer-timeseries-legend-list'>
+              {_.map(legendData, (item) => {
                 return (
-                  <Tooltip
-                    placement='topLeft'
-                    title={
-                      <div>
-                        <div>{_.get(record, 'metric.__name__')}</div>
-                        <div>{record.offset && record.offset !== 'current' ? `offfset ${record.offset}` : ''}</div>
-                        {_.map(_.omit(record.metric, '__name__'), (val, key) => {
-                          return (
-                            <div key={key}>
-                              {key}={val}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    }
-                    getTooltipContainer={() => document.body}
+                  <div
+                    key={item.id}
+                    onClick={() => {
+                      setActiveLegend(activeLegend !== item.id ? item.id : '');
+                      setSeriesData(
+                        _.map(seriesData, (subItem) => {
+                          return {
+                            ...subItem,
+                            visible: activeLegend === item.id ? true : item.id === subItem.id,
+                          };
+                        }),
+                      );
+                    }}
+                    className={item.disabled ? 'disabled' : ''}
                   >
-                    <span style={{ color: record.color, fontSize: 14, paddingRight: 5, position: 'relative', top: 2 }}>ꔷ</span>
-                    {record.offset && record.offset !== 'current' ? <span style={{ paddingRight: 5 }}>offfset {record.offset}</span> : ''}
-                    <span>{JSON.stringify(record.metric)}</span>
-                  </Tooltip>
+                    <span style={{ color: item.color, fontSize: 14, paddingRight: 5, position: 'relative', top: 2 }}>ꔷ</span>
+                    {item.name}
+                  </div>
                 );
-              },
-            },
-            {
-              title: 'Max',
-              dataIndex: 'max',
-            },
-            {
-              title: 'Min',
-              dataIndex: 'min',
-            },
-            {
-              title: 'Avg',
-              dataIndex: 'avg',
-            },
-            {
-              title: 'Sum',
-              dataIndex: 'sum',
-            },
-            {
-              title: 'Last',
-              dataIndex: 'last',
-            },
-          ]}
-          dataSource={legendData}
-          locale={{
-            emptyText: '暂无数据',
-          }}
-          pagination={false}
-        />
-      </div>
+              })}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

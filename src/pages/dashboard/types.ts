@@ -69,7 +69,7 @@ export interface IOptions {
   legend?: {
     // TODO: 目前不支持这么复杂的自定义
     calcs: string[];
-    displayMode: 'list' | 'hidden';
+    displayMode: 'list' | 'table' | 'hidden';
     placement: 'right' | 'bottom';
   };
   tooltip?: {
