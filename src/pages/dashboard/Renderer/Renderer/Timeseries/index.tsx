@@ -43,7 +43,8 @@ export default function index(props: IProps) {
   const chartRef = useRef<TsGraph>(null);
   const legendEleRef = useRef<HTMLDivElement>(null);
   const legendEleSize = useSize(legendEleRef);
-  const displayMode = options.legend?.displayMode;
+  const displayMode = options.legend?.displayMode || 'table';
+  const placement = options.legend?.placement || 'bottom';
   const hasLegend = displayMode !== 'hidden';
   const [legendData, setLegendData] = useState([]);
   let _chartHeight = hasLegend ? '70%' : '100%';
@@ -52,6 +53,11 @@ export default function index(props: IProps) {
   if (!inDashboard) {
     _chartHeight = chartHeight;
     _tableHeight = tableHeight;
+  }
+
+  if (placement === 'right') {
+    _chartHeight = '100%';
+    _tableHeight = '100%';
   }
 
   useEffect(() => {
@@ -162,9 +168,21 @@ export default function index(props: IProps) {
     }
   }, [JSON.stringify(seriesData), JSON.stringify(custom), JSON.stringify(options)]);
 
+  useEffect(() => {
+    // TODO: 这里布局变化了，但是 fc-plot 没有自动 resize，所以这里需要手动 resize
+    if (chartRef.current) {
+      chartRef.current.handleResize();
+    }
+  }, [placement]);
+
   return (
-    <div className='renderer-timeseries-container'>
-      <div ref={chartEleRef} style={{ height: _chartHeight }} />
+    <div
+      className='renderer-timeseries-container'
+      style={{
+        display: placement === 'right' ? 'flex' : 'block',
+      }}
+    >
+      <div ref={chartEleRef} style={{ height: _chartHeight, width: placement === 'right' ? '60%' : '100%' }} />
       {hasLegend && (
         <div className='renderer-timeseries-legend-table' style={{ [inDashboard ? 'height' : 'maxHeight']: _tableHeight, overflow: 'hidden' }} ref={legendEleRef}>
           {displayMode === 'table' && (
@@ -199,7 +217,7 @@ export default function index(props: IProps) {
                         }
                         getTooltipContainer={() => document.body}
                       >
-                        <span style={{ color: record.color, fontSize: 14, paddingRight: 5, position: 'relative', top: 2 }}>ꔷ</span>
+                        <span className='renderer-timeseries-legend-color-symbol' style={{ backgroundColor: record.color }} />
                         {record.offset && record.offset !== 'current' ? <span style={{ paddingRight: 5 }}>offfset {record.offset}</span> : ''}
                         <span>{JSON.stringify(record.metric)}</span>
                       </Tooltip>
@@ -253,7 +271,7 @@ export default function index(props: IProps) {
                     }}
                     className={item.disabled ? 'disabled' : ''}
                   >
-                    <span style={{ color: item.color, fontSize: 14, paddingRight: 5, position: 'relative', top: 2 }}>ꔷ</span>
+                    <span className='renderer-timeseries-legend-color-symbol' style={{ backgroundColor: item.color }} />
                     {item.name}
                   </div>
                 );
