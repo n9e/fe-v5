@@ -70,6 +70,7 @@ export default function index(props: IProps) {
         timestamp: 'X',
         xkey: 0,
         ykey: 1,
+        ykey2: 2,
         ykeyFormatter: (value) => Number(value),
         chart: {
           renderTo: chartEleRef.current,
