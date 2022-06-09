@@ -35,14 +35,24 @@ interface ITagFilterProps {
   onChange: (data: FormType, needSave: boolean, options?: FormType) => void;
   onOpenFire?: () => void;
 }
+function attachVariable2Url(key, value) {
+  const { protocol, host, pathname, search } = window.location;
+  var searchObj = new URLSearchParams(search);
+  searchObj.set(key, value);
+  var newurl = `${protocol}//${host}${pathname}?${searchObj.toString()}`;
+  window.history.replaceState({ path: newurl }, '', newurl);
+}
 
-export function setVaraiableSelected(name: string, value: string | string[], id: string) {
+export function setVaraiableSelected(name: string, value: string | string[], id: string, urlAttach = false) {
   if (value === undefined) return;
   localStorage.setItem(`dashboard_${id}_${name}`, JSON.stringify(value));
+  urlAttach && attachVariable2Url(name, JSON.stringify(value));
 }
 
 export function getVaraiableSelected(name: string, id: string) {
-  const v = localStorage.getItem(`dashboard_${id}_${name}`);
+  const { search } = window.location;
+  var searchObj = new URLSearchParams(search);
+  const v = searchObj.get(name) || localStorage.getItem(`dashboard_${id}_${name}`);
   return v ? JSON.parse(v) : null;
 }
 
@@ -73,7 +83,7 @@ const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = ({ isOpe
 
   const handleVariableChange = (index: number, v: string | string[], options) => {
     const newData = data ? { var: _.cloneDeep(data.var) } : { var: [] };
-    setVaraiableSelected(newData.var[index].name, v, id);
+    setVaraiableSelected(newData.var[index].name, v, id, true);
     setVarsMap((varsMap) => ({ ...varsMap, [`$${newData.var[index].name}`]: v }));
     setData(newData);
     setDataWithOptions((dataWithOptions) => {
