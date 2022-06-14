@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Tooltip } from 'antd';
 import _ from 'lodash';
+import moment from 'moment';
 import AdvancedWrap from '@/components/AdvancedWrap';
 import { getBrainLicense } from '@/services/warning';
 
@@ -8,8 +9,9 @@ export default function License() {
   const [days, setDays] = useState<any>();
   const [rules, setRules] = useState<any>();
   useEffect(() => {
+    const now = moment().unix();
     getBrainLicense().then((res) => {
-      setDays(_.round(res?.data?.expire / 86400));
+      setDays(_.round((res?.data?.expire - now) / 86400));
       setRules(res?.data?.rules_remaining);
     });
   }, []);

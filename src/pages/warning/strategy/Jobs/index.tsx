@@ -6,27 +6,35 @@ import _ from 'lodash';
 import PageLayout from '@/components/pageLayout';
 import { getBrainJobs } from '@/services/warning';
 import Graph from './Graph';
+import './style.less';
 
-const colorMap = {
+const typeMap = {
   total: {
     border: '#9684C6',
     bg: '#EBE8F2',
     text: '总曲线数',
+    title: '所有曲线',
   },
   success: {
     border: '#83D35C',
     bg: '#E8F4E3',
     text: '训练成功',
+    title: '训练成功',
+    status: 1,
   },
   fail: {
     border: '#EE5A52',
     bg: '#FCE7E6',
     text: '训练失败',
+    title: '训练失败',
+    status: 2,
   },
   training: {
     border: '#CCCCCC',
     bg: '#F4F4F4',
     text: '训练中',
+    title: '训练中',
+    status: 0,
   },
 };
 
@@ -35,6 +43,7 @@ export default function Jobs() {
   const [jobs, setJobs] = useState<any[]>([]);
   const [search, setSearch] = useState<string>('');
   const [graphParams, setGraphParams] = useState<any>({});
+  const [activeType, setActiveType] = useState<string>('total');
   const params: any = useParams();
 
   useEffect(() => {
@@ -59,21 +68,25 @@ export default function Jobs() {
                 <Col key={key} span={6}>
                   <div
                     style={{
-                      border: `1px solid ${colorMap[key].border}`,
+                      border: `1px solid ${typeMap[key].border}`,
                       borderRadius: 2,
-                      background: colorMap[key].bg,
+                      background: typeMap[key].bg,
                       height: 86,
                       display: 'flex',
                       gap: 16,
                       alignItems: 'center',
                       justifyContent: 'center',
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => {
+                      setActiveType(key);
                     }}
                   >
                     <Progress
                       width={60}
                       type='circle'
                       percent={(value / data.total) * 100}
-                      strokeColor={colorMap[key].border}
+                      strokeColor={typeMap[key].border}
                       strokeWidth={12}
                       trailColor='#FFFFFF'
                       format={(percent) => {
@@ -105,7 +118,7 @@ export default function Jobs() {
                           color: '#666',
                         }}
                       >
-                        {colorMap[key].text}
+                        {typeMap[key].text}
                       </div>
                     </div>
                   </div>
@@ -116,9 +129,14 @@ export default function Jobs() {
           <Table
             style={{ marginTop: 6 }}
             rowKey='uuid'
+            showHeader
+            title={() => <h3>{typeMap[activeType].title}</h3>}
             dataSource={_.filter(jobs, (item) => {
               if (search) {
                 return item.promql.indexOf(search) > -1;
+              }
+              if (activeType !== 'total') {
+                return item.status === typeMap[activeType].status;
               }
               return true;
             })}
