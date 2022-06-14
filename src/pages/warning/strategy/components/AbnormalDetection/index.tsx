@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Form, InputNumber, Radio, Select, Checkbox } from 'antd';
+import { Form, InputNumber, Radio, Select, Checkbox, Space, Input } from 'antd';
+import { PlusCircleOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import { getBrainParams } from '@/services/warning';
 
 interface IProps {
@@ -79,7 +80,7 @@ export default function index(props: IProps) {
                       </div>
                       <div style={{ display: 'flex', alignItems: 'baseline', marginTop: 16 }}>
                         <div style={{ marginRight: 16 }}>偏离</div>
-                        <div>
+                        <div style={{ display: 'flex', gap: 20 }}>
                           <div style={{ marginBottom: 16 }}>
                             <Form.Item
                               noStyle
@@ -113,6 +114,60 @@ export default function index(props: IProps) {
                             倍误差
                           </div>
                         </div>
+                      </div>
+                      <div>
+                        <Form.List name='compares'>
+                          {(fields, { add, remove }) => (
+                            <>
+                              <div style={{ marginBottom: 10 }}>
+                                同环比{' '}
+                                <PlusCircleOutlined
+                                  onClick={() => {
+                                    add({
+                                      operator: 1,
+                                      offset: 86400,
+                                      bound_type: 0,
+                                    });
+                                  }}
+                                />
+                              </div>
+                              {fields.map(({ key, name, ...restField }) => (
+                                <Space key={key} style={{ display: 'flex', marginBottom: 8 }} align='baseline'>
+                                  <Form.Item {...restField} name={[name, 'operator']}>
+                                    <Select>
+                                      <Select.Option value={1}>且</Select.Option>
+                                      <Select.Option value={0}>或</Select.Option>
+                                    </Select>
+                                  </Form.Item>
+                                  <span>相比</span>
+                                  <Form.Item {...restField} name={[name, 'offset']}>
+                                    <Select>
+                                      <Select.Option value={1 * 86400}>1</Select.Option>
+                                      <Select.Option value={2 * 86400}>2</Select.Option>
+                                      <Select.Option value={3 * 86400}>3</Select.Option>
+                                      <Select.Option value={4 * 86400}>4</Select.Option>
+                                      <Select.Option value={5 * 86400}>5</Select.Option>
+                                      <Select.Option value={6 * 86400}>6</Select.Option>
+                                      <Select.Option value={7 * 86400}>7</Select.Option>
+                                    </Select>
+                                  </Form.Item>
+                                  <span>天前同时期</span>
+                                  <Form.Item {...restField} name={[name, 'bound_type']}>
+                                    <Select>
+                                      <Select.Option value={0}>偏离</Select.Option>
+                                      <Select.Option value={1}>上升</Select.Option>
+                                      <Select.Option value={2}>下降</Select.Option>
+                                    </Select>
+                                  </Form.Item>
+                                  <Form.Item {...restField} name={[name, 'value']}>
+                                    <InputNumber />
+                                  </Form.Item>
+                                  <MinusCircleOutlined onClick={() => remove(name)} />
+                                </Space>
+                              ))}
+                            </>
+                          )}
+                        </Form.List>
                       </div>
                     </div>
                   </Form.Item>
