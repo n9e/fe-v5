@@ -43,12 +43,12 @@ export default function index(props: IProps) {
                   }}
                 >
                   <Radio.Button value='threshold'>阈值告警</Radio.Button>
-                  <Radio.Button value='abnormalDetection'>异常检测</Radio.Button>
+                  <Radio.Button value='abnormalDetection'>智能告警</Radio.Button>
                 </Radio.Group>
               </Form.Item>
               {getFieldValue('algorithm') === 'holtwinters' && (
                 <>
-                  <Form.Item label='使用算法' name='algorithm'>
+                  <Form.Item label='使用算法' name='algorithm' style={{ display: 'none' }}>
                     <Select>
                       <Select.Option value='holtwinters'>holtwinters</Select.Option>
                     </Select>
@@ -72,11 +72,11 @@ export default function index(props: IProps) {
                             <Select.Option value={2592000}>月</Select.Option>
                           </Select>
                         </Form.Item>{' '}
-                        , 根据{' '}
+                        {/* , 根据{' '}
                         <Form.Item noStyle name={['algo_params', 'rollup_interval']}>
                           <InputNumber />
                         </Form.Item>{' '}
-                        秒区间, 对数据进行平滑计算
+                        秒区间, 对数据进行平滑计算 */}
                       </div>
                       <div style={{ display: 'flex', alignItems: 'baseline', marginTop: 16 }}>
                         <div style={{ marginRight: 16 }}>偏离</div>
@@ -162,6 +162,7 @@ export default function index(props: IProps) {
                                   <Form.Item {...restField} name={[name, 'value']}>
                                     <InputNumber />
                                   </Form.Item>
+                                  {' %'}
                                   <MinusCircleOutlined onClick={() => remove(name)} />
                                 </Space>
                               ))}

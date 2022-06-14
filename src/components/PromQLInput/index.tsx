@@ -176,7 +176,9 @@ const ExpressionInput = ({ url, headers, value, onChange, executeQuery, readonly
       className={classNames({ 'ant-input': true, readonly: readonly, 'promql-input': true })}
       onBlur={() => {
         if (typeof onChange === 'function') {
-          onChange(realValue.current);
+          if (realValue.current !== value) {
+            onChange(realValue.current);
+          }
         }
       }}
     >

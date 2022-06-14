@@ -378,10 +378,11 @@ export const getBrainParams = function () {
   });
 };
 
-export const tryTrain = function (data) {
-  return request('/api/fc-brain/try-train', {
+export const checkBrainPromql = function (data) {
+  return request('/api/fc-brain/promql-check', {
     method: RequestMethod.Post,
     data,
+    silence: true,
   }).then((res) => {
     return res.data;
   });

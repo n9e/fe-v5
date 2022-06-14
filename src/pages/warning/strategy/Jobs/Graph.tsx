@@ -6,6 +6,7 @@ import DateRangePicker from '@/components/DateRangePicker';
 import Resolution from '@/components/Resolution';
 import { Range, formatPickerDate } from '@/components/DateRangePicker';
 import Graph from '@/pages/event/Graph';
+import PromQLInput from '@/components/PromQLInput';
 
 interface IProps {
   rid: string;
@@ -95,7 +96,7 @@ export default function GraphCpt(props: IProps) {
             alignItems: 'center',
           }}
         >
-          <div>{promql}</div>
+          <PromQLInput readonly url='/api/n9e/prometheus' value={promql} />
           <Space>
             <DateRangePicker value={range} onChange={setRange} />
             <Resolution value={step} onChange={(v) => setStep(v)} initialValue={step} />
