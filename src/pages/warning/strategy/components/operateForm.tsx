@@ -307,7 +307,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
             <Form.Item noStyle shouldUpdate={(prevValues, curValues) => prevValues.cluster !== curValues.cluster}>
               {() => {
                 return (
-                  <Form.Item label='PromQL' className={'Promeql-content'} required>
+                  <Form.Item label='PromQL' className={'Promeql-content'} required style={{ marginBottom: 0 }}>
                     <AdvancedWrap>
                       {(isAvanced) => {
                         return (
