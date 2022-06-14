@@ -116,7 +116,7 @@ export default function index(props: IProps) {
                         </div>
                       </div>
                       <div>
-                        <Form.List name='compares'>
+                        <Form.List name={['algo_params', 'compares']}>
                           {(fields, { add, remove }) => (
                             <>
                               <div style={{ marginBottom: 10 }}>
