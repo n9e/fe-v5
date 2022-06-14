@@ -27,6 +27,7 @@ export const baseTheme = EditorView.theme({
   '.cm-scroller': {
     overflow: 'hidden',
     fontFamily: 'verdana, Microsoft YaHei, Consolas, Deja Vu Sans Mono, Bitstream Vera Sans Mono;',
+    lineHeight: 'unset', // input group 里不能设置 lineHeight
   },
   '.cm-matchingBracket': {
     color: '#000',

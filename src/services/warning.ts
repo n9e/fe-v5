@@ -377,3 +377,29 @@ export const getBrainParams = function () {
     return res.data;
   });
 };
+
+export const tryTrain = function (data) {
+  return request('/api/fc-brain/try-train', {
+    method: RequestMethod.Post,
+    data,
+  }).then((res) => {
+    return res.data;
+  });
+};
+
+export const getBrainJobs = function (id) {
+  return request('/api/fc-brain/jobs', {
+    method: RequestMethod.Get,
+    params: {
+      id,
+    },
+  }).then((res) => {
+    return res.data;
+  });
+};
+
+export function getBrainLicense() {
+  return request('/api/fc-brain/license', {
+    method: RequestMethod.Get,
+  });
+}

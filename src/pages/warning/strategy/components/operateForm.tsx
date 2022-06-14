@@ -26,7 +26,7 @@ import { useTranslation } from 'react-i18next';
 import { RootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
 import { getTeamInfoList, getNotifiesList } from '@/services/manage';
-import { addOrEditStrategy, EditStrategy, prometheusQuery, deleteStrategy } from '@/services/warning';
+import { addOrEditStrategy, EditStrategy, prometheusQuery, deleteStrategy, tryTrain } from '@/services/warning';
 import PromQLInput from '@/components/PromQLInput';
 import AdvancedWrap from '@/components/AdvancedWrap';
 import { SwitchWithLabel } from './SwitchWithLabel';
@@ -305,15 +305,59 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
               {() => {
                 return (
                   <Form.Item label='PromQL' className={'Promeql-content'} required>
-                    <Form.Item name='prom_ql' validateTrigger={['onBlur']} trigger='onChange' rules={[{ required: true, message: t('请输入PromQL') }]}>
-                      <PromQLInput
-                        url='/api/n9e/prometheus'
-                        headers={{
-                          'X-Cluster': form.getFieldValue('cluster'),
-                          Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
-                        }}
-                      />
-                    </Form.Item>
+                    <AdvancedWrap>
+                      {(isAvanced) => {
+                        return (
+                          <Input.Group compact>
+                            <Form.Item
+                              style={{
+                                width: isAvanced ? 'calc(100% - 80px)' : '100%',
+                              }}
+                              name='prom_ql'
+                              validateTrigger={['onBlur']}
+                              trigger='onChange'
+                              rules={[{ required: true, message: t('请输入PromQL') }]}
+                            >
+                              <PromQLInput
+                                url='/api/n9e/prometheus'
+                                headers={{
+                                  'X-Cluster': form.getFieldValue('cluster'),
+                                  Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
+                                }}
+                              />
+                            </Form.Item>
+                            {isAvanced && (
+                              <Button
+                                onClick={() => {
+                                  const values = form.getFieldsValue();
+                                  if (values.prom_ql) {
+                                    tryTrain({
+                                      cluster: values.cluster,
+                                      algorithm: values.algorithm,
+                                      algo_params: values.algo_params,
+                                      prom_ql: values.prom_ql,
+                                      prom_eval_interval: values.prom_eval_interval,
+                                    })
+                                      .then(() => {
+                                        message.success('校验通过');
+                                      })
+                                      .catch((res) => {
+                                        message.error(
+                                          <div>
+                                            校验失败<div>{res.error}</div>
+                                          </div>,
+                                        );
+                                      });
+                                  }
+                                }}
+                              >
+                                指标校验
+                              </Button>
+                            )}
+                          </Input.Group>
+                        );
+                      }}
+                    </AdvancedWrap>
                   </Form.Item>
                 );
               }}
