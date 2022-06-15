@@ -126,7 +126,7 @@ export default function CardLeft(props: Props) {
 
             {alert.cate === 1 || profile.admin ? (
               <div>
-                {alert.cate === 0 && <div className='default-holder'>内置</div>}
+                {alert.cate === 0 && <div className='default-holder'>公开</div>}
                 <div className='icon-area'>
                   <EditOutlined
                     onClick={() => {
@@ -148,7 +148,7 @@ export default function CardLeft(props: Props) {
                 </div>
               </div>
             ) : (
-              <div className='default-holder'>内置</div>
+              <div className='default-holder'>公开</div>
             )}
           </div>
         ))}
