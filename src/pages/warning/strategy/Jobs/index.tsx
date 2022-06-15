@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Progress, Row, Col, Table, Input, Space } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
+import { SearchOutlined, LoadingOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import PageLayout from '@/components/pageLayout';
 import { getBrainJobs } from '@/services/warning';
@@ -182,6 +182,14 @@ export default function Jobs() {
                 },
               },
             ]}
+            locale={{
+              emptyText: (
+                <div style={{ padding: '20px 0' }}>
+                  <LoadingOutlined style={{ fontSize: 24 }} />
+                  <div>曲线模型训练中</div>
+                </div>
+              ),
+            }}
           />
         </div>
       </div>

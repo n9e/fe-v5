@@ -18,7 +18,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { CaretDownOutlined } from '@ant-design/icons';
-import { debounce } from 'lodash';
+import _, { debounce } from 'lodash';
 import moment from 'moment';
 import { Card, Form, Input, InputNumber, Radio, Select, Row, Col, Button, TimePicker, Checkbox, Modal, message, Space, Switch, Tooltip, Tag, notification } from 'antd';
 import { QuestionCircleFilled, MinusCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
@@ -195,6 +195,10 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
           history.push('/alert-rules');
         }
       } else {
+        const licenseRulesRemaining = _.toNumber(window.localStorage.getItem('license_rules_remaining'));
+        if (licenseRulesRemaining === 0 && data.algorithm === 'holtwinters') {
+          message.error('可添加的智能告警规则数量已达上限，请联系客服');
+        }
         reqBody = [data];
         const { dat } = await addOrEditStrategy(reqBody, curBusiItem.id, method);
         let errorNum = 0;
