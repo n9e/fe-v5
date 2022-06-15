@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Input, Form, Modal, message } from 'antd';
+import { Input, Form, Modal, Switch, message } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusSquareOutlined, SearchOutlined } from '@ant-design/icons';
 import { getAggrAlerts, AddAggrAlerts, updateAggrAlerts, deleteAggrAlerts } from '@/services/warning';
 import { useSelector } from 'react-redux';
@@ -72,7 +72,11 @@ export default function CardLeft(props: Props) {
   const handleOk = async () => {
     await form.validateFields();
     const func = editForm ? updateAggrAlerts : AddAggrAlerts;
-    const cur = await func(form.getFieldsValue());
+    const values = form.getFieldsValue();
+    const cur = await func({
+      ...values,
+      cate: values.cate ? 0 : 1,
+    });
     setVisible(false);
     await getList();
     saveActiveId(editForm ? editForm.id : cur.dat.id);
@@ -128,7 +132,11 @@ export default function CardLeft(props: Props) {
                     onClick={() => {
                       setEditForm(alert);
                       setVisible(true);
-                      form.setFieldsValue(alert);
+                      form.setFieldsValue({
+                        ...alert,
+                        cate: alert.cate === 0,
+                      });
+                      onRefreshRule(alert.rule);
                     }}
                   />
                   <DeleteOutlined
@@ -179,10 +187,14 @@ export default function CardLeft(props: Props) {
                 },
               }),
             ]}
-            style={{ marginBottom: 5 }}
           >
             <Input />
           </Form.Item>
+          {profile.admin && (
+            <Form.Item label='是否公开' name='cate' rules={[{ required: true }]} valuePropName='checked'>
+              <Switch />
+            </Form.Item>
+          )}
         </Form>
       </Modal>
     </div>
