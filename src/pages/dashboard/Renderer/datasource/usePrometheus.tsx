@@ -76,8 +76,8 @@ export default function usePrometheus(props: IProps) {
           api
             .fetchHistory(
               {
-                start,
-                end,
+                start: start - (start % _step!),
+                end: end - (end % _step!),
                 step: _step,
                 query: realExpr,
               },
