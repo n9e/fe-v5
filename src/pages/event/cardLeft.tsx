@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Button, Input, Form, Modal, message } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusSquareOutlined, SearchOutlined } from '@ant-design/icons';
 import { getAggrAlerts, AddAggrAlerts, updateAggrAlerts, deleteAggrAlerts } from '@/services/warning';
+import { useSelector } from 'react-redux';
+import { RootState as AccountRootState, accountStoreState } from '@/store/accountInterface';
 import './index.less';
 interface Props {
   onRefreshRule: (rule: string) => void;
@@ -26,6 +28,7 @@ export default function CardLeft(props: Props) {
   const localSelectId = localStorage.getItem('selectedAlertRule');
   const [activeId, setActiveId] = useState<number>(localSelectId ? Number(localSelectId) : 0);
   const [search, setSearch] = useState('');
+  const { profile } = useSelector<AccountRootState, accountStoreState>((state) => state.account);
 
   useEffect(() => {
     getList(true).then((res) => {
@@ -117,24 +120,27 @@ export default function CardLeft(props: Props) {
               {/* <div className='desc'>{alert.rule}</div> */}
             </div>
 
-            {alert.cate === 0 ? (
-              <div className='default-holder'>内置</div>
-            ) : (
-              <div className='icon-area'>
-                <EditOutlined
-                  onClick={() => {
-                    setEditForm(alert);
-                    setVisible(true);
-                    form.setFieldsValue(alert);
-                  }}
-                />
-                <DeleteOutlined
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete(alert);
-                  }}
-                />
+            {alert.cate === 1 || profile.admin ? (
+              <div>
+                {alert.cate === 0 && <div className='default-holder'>内置</div>}
+                <div className='icon-area'>
+                  <EditOutlined
+                    onClick={() => {
+                      setEditForm(alert);
+                      setVisible(true);
+                      form.setFieldsValue(alert);
+                    }}
+                  />
+                  <DeleteOutlined
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(alert);
+                    }}
+                  />
+                </div>
               </div>
+            ) : (
+              <div className='default-holder'>内置</div>
             )}
           </div>
         ))}
