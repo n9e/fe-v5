@@ -145,19 +145,9 @@ const EventDetailPage: React.FC = () => {
       key: 'rule_algo',
       render(text) {
         if (text) {
-          return '异常检测';
+          return '智能告警';
         }
         return '阈值告警';
-      },
-    },
-    {
-      label: '使用算法',
-      key: 'rule_algo',
-      visible(_text, record) {
-        return record.rule_algo;
-      },
-      render(text) {
-        return text;
       },
     },
     {
