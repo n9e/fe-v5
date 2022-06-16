@@ -34,6 +34,7 @@ import ObjectExplore from '@/pages/monitor/object';
 import IndicatorPage from '@/pages/monitor/indicator';
 import StrategyAdd from '@/pages/warning/strategy/add';
 import StrategyEdit from '@/pages/warning/strategy/edit';
+import StrategyBrain from '@/pages/warning/strategy/Jobs';
 import Shield from '@/pages/warning/shield';
 import AddShield from '@/pages/warning/shield/add';
 import ShieldEdit from '@/pages/warning/shield/edit';
@@ -116,6 +117,7 @@ export default function Content() {
         <Route exact path='/alert-rules/add/:group_id' component={StrategyAdd} />
         <Route exact path='/alert-rules/edit/:id' component={StrategyEdit} />
         <Route exact path='/alert-rules/:id?' component={Strategy} />
+        <Route exact path='/alert-rules/brain/:id' component={StrategyBrain} />
         <Route exact path='/alert-mutes' component={Shield} />
         <Route exact path='/alert-mutes/add/:from?' component={AddShield} />
         <Route exact path='/alert-mutes/edit/:id' component={ShieldEdit} />

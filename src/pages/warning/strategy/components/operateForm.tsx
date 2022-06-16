@@ -26,7 +26,7 @@ import { useTranslation } from 'react-i18next';
 import { RootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
 import { getTeamInfoList, getNotifiesList } from '@/services/manage';
-import { addOrEditStrategy, EditStrategy, prometheusQuery, deleteStrategy } from '@/services/warning';
+import { addOrEditStrategy, EditStrategy, prometheusQuery, deleteStrategy, checkBrainPromql } from '@/services/warning';
 import PromQLInput from '@/components/PromQLInput';
 import AdvancedWrap from '@/components/AdvancedWrap';
 import { SwitchWithLabel } from './SwitchWithLabel';
@@ -102,15 +102,14 @@ function isValidFormat() {
 const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
   const { t, i18n } = useTranslation();
   const history = useHistory(); // 创建的时候默认选中的值
-
   const [form] = Form.useForm();
   const { clusters: clusterList } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const { curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
-
   const [contactList, setInitContactList] = useState([]);
   const [notifyGroups, setNotifyGroups] = useState<any[]>([]);
   const [initVal, setInitVal] = useState<any>({});
   const [refresh, setRefresh] = useState(true);
+  const [isChecked, setIsChecked] = useState(true);
   useEffect(() => {
     getNotifyChannel();
     getGroups('');
@@ -162,6 +161,10 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
 
   const addSubmit = () => {
     form.validateFields().then(async (values) => {
+      if (!isChecked && values.algorithm === 'holtwinters') {
+        message.warning('请先校验指标');
+        return;
+      }
       const res = await prometheusQuery({ query: values.prom_ql }, values.cluster);
       if (res.error) {
         notification.error({
@@ -304,16 +307,64 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
             <Form.Item noStyle shouldUpdate={(prevValues, curValues) => prevValues.cluster !== curValues.cluster}>
               {() => {
                 return (
-                  <Form.Item label='PromQL' className={'Promeql-content'} required>
-                    <Form.Item name='prom_ql' validateTrigger={['onBlur']} trigger='onChange' rules={[{ required: true, message: t('请输入PromQL') }]}>
-                      <PromQLInput
-                        url='/api/n9e/prometheus'
-                        headers={{
-                          'X-Cluster': form.getFieldValue('cluster'),
-                          Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
-                        }}
-                      />
-                    </Form.Item>
+                  <Form.Item label='PromQL' className={'Promeql-content'} required style={{ marginBottom: 0 }}>
+                    <AdvancedWrap>
+                      {(isAvanced) => {
+                        return (
+                          <Input.Group compact>
+                            <Form.Item
+                              style={{
+                                width: isAvanced ? 'calc(100% - 80px)' : '100%',
+                              }}
+                              name='prom_ql'
+                              validateTrigger={['onBlur']}
+                              trigger='onChange'
+                              rules={[{ required: true, message: t('请输入PromQL') }]}
+                            >
+                              <PromQLInput
+                                url='/api/n9e/prometheus'
+                                headers={{
+                                  'X-Cluster': form.getFieldValue('cluster'),
+                                  Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
+                                }}
+                                onChange={() => {
+                                  setIsChecked(false);
+                                }}
+                              />
+                            </Form.Item>
+                            {isAvanced && (
+                              <Button
+                                onClick={() => {
+                                  const values = form.getFieldsValue();
+                                  if (values.prom_ql) {
+                                    setIsChecked(true);
+                                    checkBrainPromql({
+                                      cluster: values.cluster,
+                                      algorithm: values.algorithm,
+                                      algo_params: values.algo_params,
+                                      prom_ql: values.prom_ql,
+                                      prom_eval_interval: values.prom_eval_interval,
+                                    })
+                                      .then(() => {
+                                        message.success('校验通过');
+                                      })
+                                      .catch((res) => {
+                                        message.error(
+                                          <div>
+                                            校验失败<div>{res.data.error}</div>
+                                          </div>,
+                                        );
+                                      });
+                                  }
+                                }}
+                              >
+                                指标校验
+                              </Button>
+                            )}
+                          </Input.Group>
+                        );
+                      }}
+                    </AdvancedWrap>
                   </Form.Item>
                 );
               }}
