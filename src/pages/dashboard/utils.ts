@@ -83,11 +83,11 @@ function convertOptionsGrafanaToN9E(panel: any) {
   };
   // 这里有 default 和 overrides 区别，目前 n9e 暂不支持 overrides
   return {
-    valueMappings: config.mappings, // TODO: 待验证
+    valueMappings: config?.mappings, // TODO: 待验证
     thresholds: {
-      mode: config.thresholds.mode, // mode 目前是不支持的
+      mode: config.thresholds?.mode, // mode 目前是不支持的
       style: 'line', // 目前只有固定的 line 风格，但是这个只用于折线图
-      steps: config.thresholds.steps,
+      steps: config.thresholds?.steps,
     },
     standardOptions: {
       util: unitMap[config.unit] ? unitMap[config.unit] : 'none',
@@ -101,7 +101,7 @@ function convertOptionsGrafanaToN9E(panel: any) {
       placement: options?.legend?.placement,
     },
     tooltip: {
-      mode: options.tooltip === 'single' ? 'single' : 'multi',
+      mode: options?.tooltip === 'single' ? 'single' : 'multi',
     },
   };
 }
@@ -157,6 +157,10 @@ function convertPanlesGrafanaToN9E(panels: any) {
       fn: convertPieGrafanaToN9E,
     },
     gauge: {
+      type: 'stat',
+      fn: convertStatGrafanaToN9E,
+    },
+    singlestat: {
       type: 'stat',
       fn: convertStatGrafanaToN9E,
     },

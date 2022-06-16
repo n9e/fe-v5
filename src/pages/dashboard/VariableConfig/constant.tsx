@@ -194,7 +194,7 @@ const replaceAllPolyfill = (str, substr, newSubstr): string => {
 
 export const replaceExpressionVars = (expression: string, formData: FormType, limit: number, id: string) => {
   var newExpression = expression;
-  const vars = newExpression.match(/\$[0-9a-zA-Z_]+/g);
+  const vars = newExpression ? newExpression.match(/\$[0-9a-zA-Z_]+/g) : [];
   if (vars && vars.length > 0) {
     for (let i = 0; i < limit; i++) {
       const { name, options, reg } = formData.var[i];
@@ -222,8 +222,11 @@ export const replaceExpressionVars = (expression: string, formData: FormType, li
 
 export const extractExpressionVars = (expression: string) => {
   var newExpression = expression;
-  const vars = newExpression.match(/\$[0-9a-zA-Z\._\-]+/g);
-  return vars;
+  if (newExpression) {
+    const vars = newExpression.match(/\$[0-9a-zA-Z\._\-]+/g);
+    return vars;
+  }
+  return [];
 };
 
 // const stringToRegex = (str) => {
