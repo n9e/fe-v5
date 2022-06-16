@@ -353,9 +353,6 @@ const EventDetailPage: React.FC = () => {
                 )}
                 {descriptionInfo
                   .filter((item) => {
-                    if (typeof item.visible === 'function') {
-                      return item.visible(eventDetail[item.key], eventDetail);
-                    }
                     return eventDetail.is_recovered ? true : item.key !== 'recover_time';
                   })
                   .map(({ label, key, render }, i) => {
