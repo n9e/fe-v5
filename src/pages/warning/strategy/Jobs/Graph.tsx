@@ -66,7 +66,10 @@ export default function GraphCpt(props: IProps) {
         newSeries.push({
           name: 'lower_upper_bound',
           data: _.map(lower?.data, (dataItem, idx) => {
-            return [...dataItem, upper.data[idx][1]];
+            if (upper) {
+              return [...dataItem, upper?.data[idx][1]];
+            }
+            return [];
           }),
           color: '#ddd',
           opacity: 0.5,
