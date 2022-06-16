@@ -75,7 +75,9 @@ export default function GraphCpt(props: IProps) {
           opacity: 0.5,
         });
 
-        newSeries.push(origin);
+        if (origin) {
+          newSeries.push(origin);
+        }
         setSeries(newSeries);
       });
     }
