@@ -539,6 +539,27 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                 </Tooltip>
               </Space>
             </Form.Item>
+            <Form.Item label={t('最大发送次数')} required>
+              <Space>
+                <Form.Item
+                  style={{ marginBottom: 0 }}
+                  name='notify_max_number'
+                  initialValue={0}
+                  wrapperCol={{ span: 10 }}
+                  rules={[
+                    {
+                      required: true,
+                      message: t('最大发送次数不能为空'),
+                    },
+                  ]}
+                >
+                  <InputNumber min={0} precision={0} />
+                </Form.Item>
+                <Tooltip title={t(`如果值为0，则不做最大发送次数的限制`)}>
+                  <QuestionCircleFilled />
+                </Tooltip>
+              </Space>
+            </Form.Item>
             <Form.Item label={t('回调地址')}>
               <Form.List name='callbacks' initialValue={[{}]}>
                 {(fields, { add, remove }) => (
