@@ -22,7 +22,7 @@ import { IshieldState } from '@/store/warningInterface/shield';
 // }
 
 const initData: any = {
-  curShieldData: {}
+  curShieldData: {},
 };
 
 const ShieldStore: IStore<IshieldState> = {
@@ -36,21 +36,21 @@ const ShieldStore: IStore<IshieldState> = {
   effects: {
     *setCurShieldData({ data }, { put }) {
       // const { dat: data } = yield getCommonClusters();
-      const tags = data.tags.map(item => {
+      const tags = data.tags.map((item) => {
         return {
           ...item,
-          value: item.func === 'in' ? item.value.split(' ') : item.value
-        }
-      })
+          value: item.func === 'in' ? item.value.split(' ') : item.value,
+        };
+      });
       yield put({
         type: 'saveData',
         prop: 'curShieldData',
         data: {
           ...data,
-          tags
+          tags,
         },
       });
-    }
+    },
   },
 };
 
