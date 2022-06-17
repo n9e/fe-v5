@@ -82,7 +82,6 @@ export default function DetailV2() {
               var: [],
             };
         setVariableConfig(variableConfig);
-        setVariableConfigWithOptions(variableConfig);
         setDashboardLinks(configs.links);
         setPanels(sortPanelsByGridLayout(configs.panels));
       }
@@ -182,43 +181,45 @@ export default function DetailV2() {
             }}
           />
         </div>
-        <Panels
-          panels={panels}
-          setPanels={setPanels}
-          curCluster={curCluster}
-          dashboard={dashboard}
-          range={range}
-          step={step}
-          refreshFlag={refreshFlag}
-          variableConfig={variableConfig}
-          onShareClick={(panel) => {
-            const serielData = {
-              dataProps: {
-                ...panel,
-                targets: _.map(panel.targets, (target) => {
-                  const realExpr = variableConfigWithOptions
-                    ? replaceExpressionVars(target.expr, variableConfigWithOptions, variableConfigWithOptions.var.length, id)
-                    : target.expr;
-                  return {
-                    ...target,
-                    expr: realExpr,
-                  };
-                }),
-                step,
-                range,
-              },
-              curCluster: localStorage.getItem('curCluster'),
-            };
-            SetTmpChartData([
-              {
-                configs: JSON.stringify(serielData),
-              },
-            ]).then((res) => {
-              const ids = res.dat;
-              window.open('/chart/' + ids);
-            });
-          }}
-        />
+        {variableConfigWithOptions && (
+          <Panels
+            panels={panels}
+            setPanels={setPanels}
+            curCluster={curCluster}
+            dashboard={dashboard}
+            range={range}
+            step={step}
+            refreshFlag={refreshFlag}
+            variableConfig={variableConfigWithOptions}
+            onShareClick={(panel) => {
+              const serielData = {
+                dataProps: {
+                  ...panel,
+                  targets: _.map(panel.targets, (target) => {
+                    const realExpr = variableConfigWithOptions
+                      ? replaceExpressionVars(target.expr, variableConfigWithOptions, variableConfigWithOptions.var.length, id)
+                      : target.expr;
+                    return {
+                      ...target,
+                      expr: realExpr,
+                    };
+                  }),
+                  step,
+                  range,
+                },
+                curCluster: localStorage.getItem('curCluster'),
+              };
+              SetTmpChartData([
+                {
+                  configs: JSON.stringify(serielData),
+                },
+              ]).then((res) => {
+                const ids = res.dat;
+                window.open('/chart/' + ids);
+              });
+            }}
+          />
+        )}
       </div>
     </PageLayout>
   );

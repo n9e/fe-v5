@@ -56,7 +56,7 @@ export const getSerieTextObj = (value: number | string | null | undefined, stand
     text: matchedValueMapping?.result?.text ? matchedValueMapping?.result?.text : valueFormatter({ util, decimals }, value),
     color: matchedValueMapping?.result?.color,
   };
-}
+};
 
 const getCalculatedValuesBySeries = (series: any[], calc: string, { util, decimals }, valueMappings?: IValueMapping[]) => {
   const values = _.map(series, (serie) => {
@@ -102,6 +102,7 @@ export const getLegendValues = (series: any[], { util, decimals }, hexPalette: s
       metric: serie.metric,
       offset: serie.offset,
       color: hexPalette[idx % hexPalette.length],
+      disabled: serie.visible === false ? true : undefined,
       max: valueFormatter({ util, decimals }, results.max),
       min: valueFormatter({ util, decimals }, results.min),
       avg: valueFormatter({ util, decimals }, results.avg),
@@ -110,6 +111,6 @@ export const getLegendValues = (series: any[], { util, decimals }, hexPalette: s
     };
   });
   return values;
-}
+};
 
 export default getCalculatedValuesBySeries;

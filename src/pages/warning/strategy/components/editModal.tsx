@@ -108,6 +108,11 @@ const fields = [
     name: '留观时长',
   },
   {
+    id: 16,
+    field: 'notify_max_number',
+    name: '最大发送次数',
+  },
+  {
     id: 11,
     field: 'callbacks',
     name: '回调地址',
@@ -553,6 +558,32 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                         </Form.Item>
                         分钟
                         <Tooltip title={t(`如果告警持续未恢复，间隔${form.getFieldValue('notify_repeat_step')}分钟之后重复提醒告警接收组的成员`)}>
+                          <QuestionCircleFilled />
+                        </Tooltip>
+                      </Space>
+                    </Form.Item>
+                  </>
+                );
+              case 'notify_max_number':
+                return (
+                  <>
+                    <Form.Item label={t('改为：')}>
+                      <Space>
+                      <Form.Item
+                          style={{ marginBottom: 0 }}
+                          name='notify_max_number'
+                          initialValue={0}
+                          wrapperCol={{ span: 10 }}
+                          rules={[
+                            {
+                              required: true,
+                              message: t('最大发送次数不能为空'),
+                            },
+                          ]}
+                        >
+                          <InputNumber min={0} precision={0} />
+                        </Form.Item>
+                        <Tooltip title={t(`如果值为0，则不做最大发送次数的限制`)}>
                           <QuestionCircleFilled />
                         </Tooltip>
                       </Space>

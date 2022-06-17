@@ -145,19 +145,9 @@ const EventDetailPage: React.FC = () => {
       key: 'rule_algo',
       render(text) {
         if (text) {
-          return '异常检测';
+          return '智能告警';
         }
         return '阈值告警';
-      },
-    },
-    {
-      label: '使用算法',
-      key: 'rule_algo',
-      visible(_text, record) {
-        return record.rule_algo;
-      },
-      render(text) {
-        return text;
       },
     },
     {
@@ -266,22 +256,36 @@ const EventDetailPage: React.FC = () => {
         end,
         step: _step,
       }).then((res) => {
-        setSeries(
-          _.map(
-            _.filter(res.data, (item) => {
-              return item.metric.value_type !== 'predict';
-            }),
-            (item) => {
-              const type = item.metric.value_type;
-              return {
-                name: `${type}`,
-                data: item.values,
-                color: serieColorMap[type],
-                lineDash: type === 'origin' || type === 'anomaly' ? [] : [4, 4],
-              };
-            },
-          ),
+        const dat = _.map(
+          _.filter(res.data, (item) => {
+            return item.metric.value_type !== 'predict';
+          }),
+          (item) => {
+            const type = item.metric.value_type;
+            return {
+              name: `${type}`,
+              data: item.values,
+              color: serieColorMap[type],
+              lineDash: type === 'origin' || type === 'anomaly' ? [] : [4, 4],
+            };
+          },
         );
+        const newSeries: any[] = [];
+        const origin = _.cloneDeep(_.find(dat, { name: 'origin' }));
+        const lower = _.find(dat, { name: 'lower_bound' });
+        const upper = _.find(dat, { name: 'upper_bound' });
+
+        newSeries.push({
+          name: 'lower_upper_bound',
+          data: _.map(lower.data, (dataItem, idx) => {
+            return [...dataItem, upper.data[idx][1]];
+          }),
+          color: '#ddd',
+          opacity: 0.5,
+        });
+
+        newSeries.push(origin);
+        setSeries(newSeries);
       });
     }
   }, [JSON.stringify(eventDetail), JSON.stringify(range), step]);
@@ -349,9 +353,6 @@ const EventDetailPage: React.FC = () => {
                 )}
                 {descriptionInfo
                   .filter((item) => {
-                    if (typeof item.visible === 'function') {
-                      return item.visible(eventDetail[item.key], eventDetail);
-                    }
                     return eventDetail.is_recovered ? true : item.key !== 'recover_time';
                   })
                   .map(({ label, key, render }, i) => {

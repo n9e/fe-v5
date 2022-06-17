@@ -398,7 +398,6 @@ const MonObjectManage: React.FC = () => {
     {
       title: '业务组',
       dataIndex: 'group_obj',
-      width: 140,
       render(groupObj: BusiGroupItem | null) {
         return groupObj ? groupObj.name : '未归组';
       },

@@ -35,14 +35,24 @@ interface ITagFilterProps {
   onChange: (data: FormType, needSave: boolean, options?: FormType) => void;
   onOpenFire?: () => void;
 }
+function attachVariable2Url(key, value) {
+  const { protocol, host, pathname, search } = window.location;
+  var searchObj = new URLSearchParams(search);
+  searchObj.set(key, value);
+  var newurl = `${protocol}//${host}${pathname}?${searchObj.toString()}`;
+  window.history.replaceState({ path: newurl }, '', newurl);
+}
 
-export function setVaraiableSelected(name: string, value: string | string[], id: string) {
+export function setVaraiableSelected(name: string, value: string | string[], id: string, urlAttach = false) {
   if (value === undefined) return;
   localStorage.setItem(`dashboard_${id}_${name}`, JSON.stringify(value));
+  urlAttach && attachVariable2Url(name, JSON.stringify(value));
 }
 
 export function getVaraiableSelected(name: string, id: string) {
-  const v = localStorage.getItem(`dashboard_${id}_${name}`);
+  const { search } = window.location;
+  var searchObj = new URLSearchParams(search);
+  const v = searchObj.get(name) || localStorage.getItem(`dashboard_${id}_${name}`);
   return v ? JSON.parse(v) : null;
 }
 
@@ -51,6 +61,7 @@ const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = ({ isOpe
   const [editing, setEditing] = useState<boolean>(isOpen);
   const [varsMap, setVarsMap] = useState<{ string?: string | string[] | undefined }>({});
   const [data, setData] = useState<FormType>();
+  const [dataWithOptions, setDataWithOptions] = useState<FormType>();
   const handleEditClose = (v: FormType) => {
     if (v) {
       onChange(v, true);
@@ -60,29 +71,38 @@ const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = ({ isOpe
   };
 
   useEffect(() => {
-    value && setData(value);
-  }, [value]);
+    if (value) {
+      setData(value);
+      setDataWithOptions(value);
+    }
+  }, [JSON.stringify(value)]);
+
+  useEffect(() => {
+    data && dataWithOptions && dataWithOptions?.var.every((item) => !!item.options) && onChange(data, false, dataWithOptions);
+  }, [dataWithOptions]);
 
   const handleVariableChange = (index: number, v: string | string[], options) => {
     const newData = data ? { var: _.cloneDeep(data.var) } : { var: [] };
-    const newDataWithOptions = data ? { var: _.cloneDeep(data.var) } : { var: [] };
-    setVaraiableSelected(newData.var[index].name, v, id);
+    setVaraiableSelected(newData.var[index].name, v, id, true);
     setVarsMap((varsMap) => ({ ...varsMap, [`$${newData.var[index].name}`]: v }));
-    options && (newDataWithOptions.var[index].options = options);
     setData(newData);
-    onChange(newData, false, newDataWithOptions);
+    setDataWithOptions((dataWithOptions) => {
+      let newDataWithOptions = dataWithOptions ? { var: _.cloneDeep(dataWithOptions.var) } : { var: [] };
+      options && newDataWithOptions && (newDataWithOptions.var[index].options = options);
+      return newDataWithOptions;
+    });
   };
 
   return (
     <div className='tag-area'>
       <div className={classNames('tag-content', 'tag-content-close')}>
-        {data?.var && data?.var.length > 0 && (
+        {dataWithOptions?.var && dataWithOptions?.var.length > 0 && (
           <>
-            {data.var.map((expression, index) => (
+            {dataWithOptions.var.map((expression, index) => (
               <DisplayItem
                 expression={expression}
                 index={index}
-                data={data.var}
+                data={dataWithOptions.var}
                 onChange={handleVariableChange}
                 cluster={cluster}
                 range={range}

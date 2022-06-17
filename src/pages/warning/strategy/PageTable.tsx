@@ -19,8 +19,7 @@ import { useSelector } from 'react-redux';
 import { Tag, Button, Select, Modal, message, Switch, Dropdown, Table, Tabs } from 'antd';
 import { getStrategyGroupSubList, updateAlertRules } from '@/services/warning';
 import SearchInput from '@/components/BaseSearchInput';
-import { useHistory } from 'react-router-dom';
-
+import { useHistory, Link } from 'react-router-dom';
 import { strategyItem, strategyStatus } from '@/store/warningInterface';
 import { CommonStoreState } from '@/store/commonInterface';
 import { addOrEditStrategy, deleteStrategy, getBuiltinAlerts, createBuiltinAlerts } from '@/services/warning';
@@ -218,8 +217,8 @@ const PageTable: React.FC<Props> = ({ bgid }) => {
     {
       title: t('操作'),
       dataIndex: 'operator',
-      width: 100,
-      render: (data, record) => {
+      width: 160,
+      render: (data, record: any) => {
         return (
           <div className='table-operator-area'>
             <div
@@ -248,6 +247,11 @@ const PageTable: React.FC<Props> = ({ bgid }) => {
             >
               {t('删除')}
             </div>
+            {record.algorithm === 'holtwinters' && (
+              <div>
+                <Link to={{ pathname: `/alert-rules/brain/${record.id}` }}>训练结果</Link>
+              </div>
+            )}
           </div>
         );
       },
