@@ -26,12 +26,14 @@ import { RootState as CommonRootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
 import { getDashboard, updateDashboardConfigs } from '@/services/dashboardV2';
 import { SetTmpChartData } from '@/services/metric';
-import VariableConfig, { VariableType } from '../VariableConfig';
+// import VariableConfig, { VariableType } from '../VariableConfig';
+import NewVariableConfig from '../NewVariableConfig';
 import { ILink } from '../types';
 import DashboardLinks from '../DashboardLinks';
 import Panels from '../Panels';
 import Title from './Title';
-import { replaceExpressionVars } from '../VariableConfig/constant';
+import { replaceExpressionVars } from '../NewVariableConfig/constant';
+import { IVariable } from '../NewVariableConfig/definition';
 import { JSONParse } from '../utils';
 import editor from '../Editor';
 import { defaultCustomValuesMap } from '../Editor/config';
@@ -58,8 +60,8 @@ export default function DetailV2() {
     update_by: '',
   });
   // TODO: variableConfig 里面也有可能包含 options
-  const [variableConfig, setVariableConfig] = useState<VariableType>();
-  const [variableConfigWithOptions, setVariableConfigWithOptions] = useState<VariableType>();
+  const [variableConfig, setVariableConfig] = useState<IVariable[]>();
+  const [variableConfigWithOptions, setVariableConfigWithOptions] = useState<IVariable[]>();
   const [dashboardLinks, setDashboardLinks] = useState<ILink[]>();
   const [panels, setPanels] = useState<any[]>([]);
   const [range, setRange] = useState<Range>({
@@ -81,7 +83,7 @@ export default function DetailV2() {
               ...configs,
               var: [],
             };
-        setVariableConfig(variableConfig);
+        setVariableConfig(variableConfig.var);
         setDashboardLinks(configs.links);
         setPanels(sortPanelsByGridLayout(configs.panels));
       }
@@ -89,9 +91,9 @@ export default function DetailV2() {
   };
   const handleVariableChange = (value, b, valueWithOptions) => {
     const dashboardConfigs: any = JSONParse(dashboard.configs);
-    dashboardConfigs.var = value.var;
+    dashboardConfigs.var = value;
     b && updateDashboardConfigs(id, { configs: JSON.stringify(dashboardConfigs) });
-    setVariableConfig(dashboardConfigs);
+    // setVariableConfig(dashboardConfigs);
     valueWithOptions && setVariableConfigWithOptions(valueWithOptions);
   };
   const stopAutoRefresh = () => {
@@ -167,7 +169,8 @@ export default function DetailV2() {
       <div className='dashboard-detail-content'>
         <div className='dashboard-detail-content-header'>
           <div className='variable-area'>
-            <VariableConfig onChange={handleVariableChange} value={variableConfig} cluster={curCluster} range={range} id={id} onOpenFire={stopAutoRefresh} />
+            {/* <VariableConfig onChange={handleVariableChange} value={variableConfig} cluster={curCluster} range={range} id={id} onOpenFire={stopAutoRefresh} /> */}
+            <NewVariableConfig onChange={handleVariableChange} value={variableConfig} cluster={curCluster} range={range} id={id} onOpenFire={stopAutoRefresh} />
           </div>
           <DashboardLinks
             value={dashboardLinks}
@@ -196,9 +199,7 @@ export default function DetailV2() {
                 dataProps: {
                   ...panel,
                   targets: _.map(panel.targets, (target) => {
-                    const realExpr = variableConfigWithOptions
-                      ? replaceExpressionVars(target.expr, variableConfigWithOptions, variableConfigWithOptions.var.length, id)
-                      : target.expr;
+                    const realExpr = variableConfigWithOptions ? replaceExpressionVars(target.expr, variableConfigWithOptions, variableConfigWithOptions.length, id) : target.expr;
                     return {
                       ...target,
                       expr: realExpr,

@@ -19,8 +19,8 @@ import _ from 'lodash';
 import * as api from '@/components/Graph/api';
 import { Range, formatPickerDate } from '@/components/DateRangePicker';
 import { ITarget } from '../../types';
-import { VariableType } from '../../VariableConfig';
-import { replaceExpressionVars } from '../../VariableConfig/constant';
+import { replaceExpressionVars } from '../../NewVariableConfig/constant';
+import { IVariable } from '../../NewVariableConfig/definition';
 import replaceExpressionBracket from '../utils/replaceExpressionBracket';
 import { getVaraiableSelected } from '../../VariableConfig';
 
@@ -31,7 +31,7 @@ interface IProps {
   refreshFlag?: string;
   step: number | null;
   targets: ITarget[];
-  variableConfig?: VariableType;
+  variableConfig?: IVariable[];
   inViewPort?: boolean;
 }
 
@@ -50,7 +50,7 @@ export default function usePrometheus(props: IProps) {
   const { id, dashboardId, time, refreshFlag, step, targets, variableConfig, inViewPort } = props;
   const [series, setSeries] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const cachedVariableValues = _.map(variableConfig?.var, (item) => {
+  const cachedVariableValues = _.map(variableConfig, (item) => {
     return getVaraiableSelected(item.name, dashboardId);
   });
   const flag = useRef(false);
@@ -69,7 +69,7 @@ export default function usePrometheus(props: IProps) {
       if (target.step) {
         _step = target.step;
       }
-      const realExpr = variableConfig ? replaceExpressionVars(target.expr, variableConfig, variableConfig.var.length, dashboardId) : target.expr;
+      const realExpr = variableConfig ? replaceExpressionVars(target.expr, variableConfig, variableConfig.length, dashboardId) : target.expr;
       const signalKey = `${id}-${target.expr}`;
       if (realExpr) {
         promises.push(
