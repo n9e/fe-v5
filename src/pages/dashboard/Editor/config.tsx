@@ -123,6 +123,7 @@ export const defaultCustomValuesMap = {
   },
   table: {
     showHeader: true,
+    colorMode: 'value',
     calc: 'lastNotNull',
     displayMode: 'seriesToRows',
   },
