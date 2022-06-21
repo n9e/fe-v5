@@ -45,7 +45,6 @@ import Event from '@/pages/event';
 import EventDetail from '@/pages/event/detail';
 import historyEvents from '@/pages/historyEvents';
 import MonObjectManage from '@/pages/monObjectManage';
-import TargetsMap from '@/pages/TargetsMap';
 import Demo from '@/pages/demo';
 import TaskTpl from '@/pages/taskTpl';
 import TaskTplAdd from '@/pages/taskTpl/add';
@@ -130,7 +129,6 @@ export default function Content() {
         <Route exact path='/alert-cur-events/:eventId' component={EventDetail} />
         <Route exact path='/alert-his-events/:eventId' component={EventDetail} />
         <Route exact path='/targets' component={MonObjectManage} />
-        <Route exact path='/targets-map' component={TargetsMap} />
 
         <Route exact path='/job-tpls' component={TaskTpl} />
         <Route exact path='/job-tpls/add' component={TaskTplAdd} />
