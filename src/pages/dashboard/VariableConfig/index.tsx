@@ -76,7 +76,7 @@ function index(props: IProps) {
     <div className='tag-area'>
       <div className={classNames('tag-content', 'tag-content-close')}>
         {_.map(data, (expression) => {
-          return <DisplayItem key={expression.name} id={expression} expression={expression} />;
+          return <DisplayItem key={expression.name} id={id} expression={expression} />;
         })}
         {editable && (
           <EditOutlined
