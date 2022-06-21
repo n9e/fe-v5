@@ -26,14 +26,12 @@ import { RootState as CommonRootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
 import { getDashboard, updateDashboardConfigs } from '@/services/dashboardV2';
 import { SetTmpChartData } from '@/services/metric';
-// import VariableConfig, { VariableType } from '../VariableConfig';
-import NewVariableConfig from '../NewVariableConfig';
+import VariableConfig, { IVariable } from '../VariableConfig';
+import { replaceExpressionVars } from '../VariableConfig/constant';
 import { ILink } from '../types';
 import DashboardLinks from '../DashboardLinks';
 import Panels from '../Panels';
 import Title from './Title';
-import { replaceExpressionVars } from '../NewVariableConfig/constant';
-import { IVariable } from '../NewVariableConfig/definition';
 import { JSONParse } from '../utils';
 import editor from '../Editor';
 import { defaultCustomValuesMap } from '../Editor/config';
@@ -59,7 +57,6 @@ export default function DetailV2() {
     update_at: 0,
     update_by: '',
   });
-  // TODO: variableConfig 里面也有可能包含 options
   const [variableConfig, setVariableConfig] = useState<IVariable[]>();
   const [variableConfigWithOptions, setVariableConfigWithOptions] = useState<IVariable[]>();
   const [dashboardLinks, setDashboardLinks] = useState<ILink[]>();
@@ -83,17 +80,21 @@ export default function DetailV2() {
               ...configs,
               var: [],
             };
-        setVariableConfig(variableConfig.var);
+        setVariableConfig(
+          _.map(variableConfig.var, (item) => {
+            return _.omit(item, 'options'); // 兼容性代码，去除掉已保存的 options
+          }),
+        );
         setDashboardLinks(configs.links);
         setPanels(sortPanelsByGridLayout(configs.panels));
       }
     });
   };
+
   const handleVariableChange = (value, b, valueWithOptions) => {
     const dashboardConfigs: any = JSONParse(dashboard.configs);
     dashboardConfigs.var = value;
     b && updateDashboardConfigs(id, { configs: JSON.stringify(dashboardConfigs) });
-    // setVariableConfig(dashboardConfigs);
     valueWithOptions && setVariableConfigWithOptions(valueWithOptions);
   };
   const stopAutoRefresh = () => {
@@ -169,8 +170,7 @@ export default function DetailV2() {
       <div className='dashboard-detail-content'>
         <div className='dashboard-detail-content-header'>
           <div className='variable-area'>
-            {/* <VariableConfig onChange={handleVariableChange} value={variableConfig} cluster={curCluster} range={range} id={id} onOpenFire={stopAutoRefresh} /> */}
-            <NewVariableConfig onChange={handleVariableChange} value={variableConfig} cluster={curCluster} range={range} id={id} onOpenFire={stopAutoRefresh} />
+            <VariableConfig onChange={handleVariableChange} value={variableConfig} cluster={curCluster} range={range} id={id} onOpenFire={stopAutoRefresh} />
           </div>
           <DashboardLinks
             value={dashboardLinks}

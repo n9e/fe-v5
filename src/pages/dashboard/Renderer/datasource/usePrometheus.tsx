@@ -19,10 +19,9 @@ import _ from 'lodash';
 import * as api from '@/components/Graph/api';
 import { Range, formatPickerDate } from '@/components/DateRangePicker';
 import { ITarget } from '../../types';
-import { replaceExpressionVars } from '../../NewVariableConfig/constant';
-import { IVariable } from '../../NewVariableConfig/definition';
+import { replaceExpressionVars, getVaraiableSelected } from '../../VariableConfig/constant';
+import { IVariable } from '../../VariableConfig/definition';
 import replaceExpressionBracket from '../utils/replaceExpressionBracket';
-import { getVaraiableSelected } from '../../VariableConfig';
 
 interface IProps {
   id?: string;

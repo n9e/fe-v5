@@ -25,7 +25,7 @@ import Stat from './Stat';
 import Table from './Table';
 import Pie from './Pie';
 import Hexbin from './Hexbin';
-import { VariableType } from '../../VariableConfig';
+import { IVariable } from '../../VariableConfig/definition';
 import Markdown from '../../Editor/Components/Markdown';
 import usePrometheus from '../datasource/usePrometheus';
 import { IPanel } from '../../types';
@@ -39,7 +39,7 @@ interface IProps {
   step: number | null;
   type: string;
   values: IPanel;
-  variableConfig?: VariableType;
+  variableConfig?: IVariable[];
   isPreview?: boolean; // 是否是预览，预览中不显示编辑和分享
   onCloneClick?: () => void;
   onShareClick?: () => void;

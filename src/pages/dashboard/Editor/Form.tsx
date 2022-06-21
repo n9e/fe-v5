@@ -24,14 +24,14 @@ import Resolution from '@/components/Resolution';
 import { defaultValues, defaultCustomValuesMap } from './config';
 import Options from './Options';
 import Collapse, { Panel } from './Components/Collapse';
-import VariableConfig, { VariableType } from '../VariableConfig';
+import VariableConfig, { IVariable } from '../VariableConfig';
 import getFirstUnusedLetter from '../Renderer/utils/getFirstUnusedLetter';
 
 const alphabet = 'ABCDEFGHIGKLMNOPQRSTUVWXYZ'.split('');
 
 export default function FormCpt(props) {
   const { chartForm, setChangedFlag, initialValues, type, variableConfig, cluster, render, range, id } = props;
-  const [innerVariableConfig, setInnerVariableConfig] = useState<VariableType | undefined>(variableConfig);
+  const [innerVariableConfig, setInnerVariableConfig] = useState<IVariable[] | undefined>(variableConfig);
 
   defaultValues.custom = defaultCustomValuesMap[_.get(initialValues, 'type') || defaultValues.type];
 

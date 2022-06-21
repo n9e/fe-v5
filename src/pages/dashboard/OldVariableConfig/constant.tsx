@@ -19,12 +19,13 @@ import { resourceGroupItem } from '@/store/businessInterface';
 import { favoriteFrom } from '@/store/common';
 import { getLabelNames, getMetricSeries, getLabelValues, getMetric, getQueryResult } from '@/services/dashboard';
 import { Range, formatPickerDate } from '@/components/DateRangePicker';
-import { IVariable } from './definition';
-
+import { FormType } from './EditItem';
+import { getVaraiableSelected } from './index';
 export const CLASS_PATH_VALUE = 'classpath';
 export const CLASS_PATH_PREFIX_VALUE = 'classpath_prefix';
 export const DEFAULT_VALUE = '*';
 export const DEFAULT_NAME = 'var';
+
 export const TagFilterStore = createContext<any>({});
 export const INIT_DATA = 'init_data';
 export const ADD_ITEM = 'add_item';
@@ -191,50 +192,27 @@ const replaceAllPolyfill = (str, substr, newSubstr): string => {
   return result;
 };
 
-function attachVariable2Url(key, value) {
-  const { protocol, host, pathname, search } = window.location;
-  var searchObj = new URLSearchParams(search);
-  searchObj.set(key, value);
-  var newurl = `${protocol}//${host}${pathname}?${searchObj.toString()}`;
-  window.history.replaceState({ path: newurl }, '', newurl);
-}
-
-export function setVaraiableSelected(name: string, value: string | string[], id: string, urlAttach = false) {
-  if (value === undefined) return;
-  localStorage.setItem(`dashboard_${id}_${name}`, JSON.stringify(value));
-  urlAttach && attachVariable2Url(name, JSON.stringify(value));
-}
-
-export function getVaraiableSelected(name: string, id: string) {
-  const { search } = window.location;
-  var searchObj = new URLSearchParams(search);
-  const v = searchObj.get(name) || localStorage.getItem(`dashboard_${id}_${name}`);
-  return v ? JSON.parse(v) : null;
-}
-
-export const replaceExpressionVars = (expression: string, formData: IVariable[], limit: number, id: string) => {
+export const replaceExpressionVars = (expression: string, formData: FormType, limit: number, id: string) => {
   var newExpression = expression;
   const vars = newExpression.match(/\$[0-9a-zA-Z_]+/g);
   if (vars && vars.length > 0) {
     for (let i = 0; i < limit; i++) {
-      if (formData[i]) {
-        const { name, options, reg } = formData[i];
-        const selected = getVaraiableSelected(name, id);
+      const { name, options, reg } = formData.var[i];
+      const selected = getVaraiableSelected(name, id);
 
-        if (vars.includes('$' + name) && selected) {
-          if (Array.isArray(selected)) {
-            if (selected.includes('all') && options) {
-              newExpression = replaceAllPolyfill(
-                newExpression,
-                '$' + name,
-                `(${(options as string[]).filter((i) => !reg || !stringToRegex(reg) || (stringToRegex(reg) as RegExp).test(i)).join('|')})`,
-              );
-            } else {
-              newExpression = replaceAllPolyfill(newExpression, '$' + name, `(${(selected as string[]).join('|')})`);
-            }
-          } else if (typeof selected === 'string') {
-            newExpression = replaceAllPolyfill(newExpression, '$' + name, selected as string);
+      if (vars.includes('$' + name) && selected) {
+        if (Array.isArray(selected)) {
+          if (selected.includes('all') && options) {
+            newExpression = replaceAllPolyfill(
+              newExpression,
+              '$' + name,
+              `(${(options as string[]).filter((i) => !reg || !stringToRegex(reg) || (stringToRegex(reg) as RegExp).test(i)).join('|')})`,
+            );
+          } else {
+            newExpression = replaceAllPolyfill(newExpression, '$' + name, `(${(selected as string[]).join('|')})`);
           }
+        } else if (typeof selected === 'string') {
+          newExpression = replaceAllPolyfill(newExpression, '$' + name, selected as string);
         }
       }
     }
@@ -247,6 +225,17 @@ export const extractExpressionVars = (expression: string) => {
   const vars = newExpression.match(/\$[0-9a-zA-Z\._\-]+/g);
   return vars;
 };
+
+// const stringToRegex = (str) => {
+//   // Main regex
+//   const main = str.match(/\/(.+)\/.*/)[1];
+
+//   // Regex options
+//   const options = str.match(/\/.+\/(.*)/)[1];
+
+//   // Compiled regex
+//   return new RegExp(main, options);
+// };
 
 export function stringStartsAsRegEx(str: string): boolean {
   if (!str) {
@@ -262,6 +251,10 @@ export function stringToRegex(str: string): RegExp | false {
   }
 
   const match = str.match(new RegExp('^/(.*?)/(g?i?m?y?)$'));
+
+  // if (!match) {
+  //   throw new Error(`'${str}' is not a valid regular expression.`);
+  // }
 
   if (match) {
     return new RegExp(match[1], match[2]);

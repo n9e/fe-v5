@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-import React, { useState, useEffect, useReducer } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, Form, Select, Space, Button } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
 import _ from 'lodash';
@@ -25,14 +25,14 @@ import Resolution from '@/components/Resolution';
 import ModalHOC, { ModalWrapProps } from '../Components/ModalHOC';
 import { visualizations, defaultValues, defaultCustomValuesMap } from './config';
 import Renderer from '../Renderer/Renderer';
-import { VariableType } from '../VariableConfig';
+import { IVariable } from '../VariableConfig';
 import FormCpt from './Form';
 import { IPanel } from '../types';
 import { Reducer } from '../Context';
 
 interface IProps {
   initialValues: IPanel | null;
-  variableConfig?: VariableType;
+  variableConfig?: IVariable[];
   cluster: string;
   id: string;
   onOK: (formData: any) => void;
