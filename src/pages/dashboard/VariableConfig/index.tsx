@@ -19,7 +19,7 @@ import _ from 'lodash';
 import classNames from 'classnames';
 import { EditOutlined } from '@ant-design/icons';
 import { Range } from '@/components/DateRangePicker';
-import { convertExpressionToQuery, replaceExpressionVars, getVaraiableSelected, setVaraiableSelected } from './constant';
+import { convertExpressionToQuery, replaceExpressionVars, getVaraiableSelected, setVaraiableSelected, stringToRegex } from './constant';
 import { IVariable } from './definition';
 import DisplayItem from './DisplayItem';
 import EditItem from './EditItem';
@@ -51,13 +51,14 @@ function index(props: IProps) {
             if (item.definition) {
               const definition = idx > 0 ? replaceExpressionVars(item.definition, result, idx, id) : item.definition;
               const options = await convertExpressionToQuery(definition, range);
+              const regFilterOptions = _.filter(options, (i) => !!i && (!item.reg || !stringToRegex(item.reg) || (stringToRegex(item.reg) as RegExp).test(i)));
               result[idx] = item;
               result[idx].fullDefinition = definition;
-              result[idx].options = options;
+              result[idx].options = regFilterOptions;
               // 当大盘变量值为空时，设置默认值
               const selected = getVaraiableSelected(item.name, id);
               if (!selected) {
-                const head = options?.[0];
+                const head = regFilterOptions?.[0];
                 const defaultVal = item.multi ? (head ? [head] : []) : head;
                 setVaraiableSelected(item.name, defaultVal, id, true);
               }
