@@ -175,7 +175,7 @@ export default function Title(props: IProps) {
             }}
           />
           <Resolution onChange={(v) => setStep(v)} initialValue={step} />
-          <Refresh onRefresh={run} ref={refreshRef} />
+          <Refresh range={range} step={step} onRefresh={run} ref={refreshRef} />
         </Space>
       </div>
     </div>

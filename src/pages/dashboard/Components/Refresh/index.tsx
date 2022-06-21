@@ -18,6 +18,7 @@ import React, { useState, useEffect, useRef, useImperativeHandle } from 'react';
 import { Dropdown, Button, Menu, Tooltip } from 'antd';
 import { DownOutlined, SyncOutlined } from '@ant-design/icons';
 import _ from 'lodash';
+import { Range, formatPickerDate } from '@/components/DateRangePicker';
 import './style.less';
 
 const refreshMap = {
@@ -34,14 +35,20 @@ const refreshMap = {
 };
 
 interface IProps {
+  range: Range;
+  step: number | null;
   onRefresh: () => void;
 }
 
 const intervalSecondsCache = _.toNumber(window.localStorage.getItem('refresh-interval-seconds'));
 
 function Refresh(props: IProps, ref) {
+  const { range, step } = props;
   const [intervalSeconds, setIntervalSeconds] = useState(intervalSecondsCache);
   const intervalRef = useRef<NodeJS.Timeout>();
+  let { start, end } = formatPickerDate(range);
+  let _step = step;
+  if (!step) _step = Math.max(Math.floor((end - start) / 250), 1);
 
   useEffect(() => {
     if (intervalRef.current) {
@@ -71,7 +78,7 @@ function Refresh(props: IProps, ref) {
 
   return (
     <div className='refresh-container'>
-      <Tooltip title='刷新间隔小于 step 降不会更新数据'>
+      <Tooltip title={`刷新间隔小于 step(${_step}s) 降不会更新数据`}>
         <Button className='refresh-btn' icon={<SyncOutlined />} onClick={props.onRefresh} />
       </Tooltip>
       <Dropdown
