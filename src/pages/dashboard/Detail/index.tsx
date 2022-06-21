@@ -67,7 +67,6 @@ export default function DetailV2() {
     description: '',
   });
   const [step, setStep] = useState<number | null>(null);
-  const [refreshFlag, setRefreshFlag] = useState(_.uniqueId('refreshFlag_'));
   const refresh = () => {
     getDashboard(id).then((res) => {
       setDashboard(res);
@@ -90,7 +89,6 @@ export default function DetailV2() {
       }
     });
   };
-
   const handleVariableChange = (value, b, valueWithOptions) => {
     const dashboardConfigs: any = JSONParse(dashboard.configs);
     dashboardConfigs.var = value;
@@ -103,7 +101,7 @@ export default function DetailV2() {
 
   useEffect(() => {
     refresh();
-  }, [id, refreshFlag]);
+  }, [id]);
 
   return (
     <PageLayout
@@ -114,13 +112,16 @@ export default function DetailV2() {
           setCurCluster={setCurCluster}
           dashboard={dashboard}
           setDashboard={setDashboard}
-          refresh={refresh}
+          refresh={(flag) => {
+            // 集群修改需要刷新数据
+            if (flag) {
+              refresh();
+            }
+          }}
           range={range}
           setRange={setRange}
           step={step}
           setStep={setStep}
-          refreshFlag={refreshFlag}
-          setRefreshFlag={setRefreshFlag}
           refreshRef={refreshRef}
           onAddPanel={(type) => {
             if (type === 'row') {
@@ -192,7 +193,6 @@ export default function DetailV2() {
             dashboard={dashboard}
             range={range}
             step={step}
-            refreshFlag={refreshFlag}
             variableConfig={variableConfigWithOptions}
             onShareClick={(panel) => {
               const serielData = {

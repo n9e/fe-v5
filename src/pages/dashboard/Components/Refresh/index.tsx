@@ -15,7 +15,7 @@
  *
  */
 import React, { useState, useEffect, useRef, useImperativeHandle } from 'react';
-import { Dropdown, Button, Menu } from 'antd';
+import { Dropdown, Button, Menu, Tooltip } from 'antd';
 import { DownOutlined, SyncOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import './style.less';
@@ -71,7 +71,9 @@ function Refresh(props: IProps, ref) {
 
   return (
     <div className='refresh-container'>
-      <Button className='refresh-btn' icon={<SyncOutlined />} onClick={props.onRefresh} />
+      <Tooltip title='刷新间隔小于 step 降不会更新数据'>
+        <Button className='refresh-btn' icon={<SyncOutlined />} onClick={props.onRefresh} />
+      </Tooltip>
       <Dropdown
         trigger={['click']}
         overlay={

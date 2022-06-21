@@ -46,7 +46,6 @@ interface IProps {
   dashboard: Dashboard;
   range: Range;
   step: number | null;
-  refreshFlag: string;
   variableConfig: any;
   panels: any[];
   setPanels: (panels: any[]) => void;
@@ -56,7 +55,7 @@ interface IProps {
 const ReactGridLayout = WidthProvider(RGL);
 
 function index(props: IProps) {
-  const { curCluster, dashboard, range, step, refreshFlag, variableConfig, panels, setPanels, onShareClick } = props;
+  const { curCluster, dashboard, range, step, variableConfig, panels, setPanels, onShareClick } = props;
   const layoutInitialized = useRef(false);
   const allowUpdateDashboardConfigs = useRef(false);
   const reactGridLayoutDefaultProps = {
@@ -113,7 +112,6 @@ function index(props: IProps) {
                     dashboardId={_.toString(dashboard.id)}
                     id={item.id}
                     time={range}
-                    refreshFlag={refreshFlag}
                     step={step}
                     type={item.type}
                     values={item as any}

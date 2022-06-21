@@ -28,20 +28,24 @@ function index(props: IProps) {
   useEffect(() => {
     if (value) {
       const result: IVariable[] = [];
-      (async () => {
-        for (let idx = 0; idx < value.length; idx++) {
-          const item = _.cloneDeep(value[idx]);
-          if (item.definition) {
-            const definition = idx > 0 ? replaceExpressionVars(item.definition, result, idx, id) : item.definition;
-            const options = await convertExpressionToQuery(definition, range);
-            result[idx] = item;
-            result[idx].fullDefinition = definition;
-            result[idx].options = options;
+      try {
+        (async () => {
+          for (let idx = 0; idx < value.length; idx++) {
+            const item = _.cloneDeep(value[idx]);
+            if (item.definition) {
+              const definition = idx > 0 ? replaceExpressionVars(item.definition, result, idx, id) : item.definition;
+              const options = await convertExpressionToQuery(definition, range);
+              result[idx] = item;
+              result[idx].fullDefinition = definition;
+              result[idx].options = options;
+            }
           }
-        }
-        setData(result);
-        onChange(value, false, result);
-      })();
+          setData(result);
+          onChange(value, false, result);
+        })();
+      } catch (e) {
+        console.log(e);
+      }
     }
   }, [JSON.stringify(value), cluster]);
 

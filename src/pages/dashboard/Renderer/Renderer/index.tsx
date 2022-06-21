@@ -35,7 +35,6 @@ interface IProps {
   dashboardId: string;
   id?: string;
   time: Range;
-  refreshFlag?: string;
   step: number | null;
   type: string;
   values: IPanel;
@@ -48,7 +47,7 @@ interface IProps {
 }
 
 function index(props: IProps) {
-  const { dashboardId, id, time, refreshFlag, step, type, variableConfig, isPreview, onCloneClick, onShareClick, onEditClick, onDeleteClick } = props;
+  const { dashboardId, id, time, step, type, variableConfig, isPreview, onCloneClick, onShareClick, onEditClick, onDeleteClick } = props;
   const values = _.cloneDeep(props.values);
   const ref = useRef<HTMLDivElement>(null);
   const [inViewPort] = useInViewport(ref);
@@ -56,7 +55,6 @@ function index(props: IProps) {
     id,
     dashboardId,
     time,
-    refreshFlag,
     step,
     targets: values.targets,
     variableConfig,
