@@ -23,6 +23,7 @@ import { VariableType } from '../../VariableConfig';
 import { replaceExpressionVars } from '../../VariableConfig/constant';
 import replaceExpressionBracket from '../utils/replaceExpressionBracket';
 import { getVaraiableSelected } from '../../VariableConfig';
+import { completeBreakpoints } from './utils';
 
 interface IProps {
   id?: string;
@@ -105,7 +106,7 @@ export default function usePrometheus(props: IProps) {
               name: target?.legend ? replaceExpressionBracket(target?.legend, serie.metric) : getSerieName(serie.metric, item.expr),
               metric: serie.metric,
               expr: item.expr,
-              data: serie.values,
+              data: completeBreakpoints(_step, serie.values),
             });
           });
         });

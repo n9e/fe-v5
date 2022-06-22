@@ -166,7 +166,7 @@ function index(props: ModalWrapProps & IProps) {
           id={id}
           render={(innerVariableConfig) => {
             return (
-              <div style={{ height: 300, border: '1px solid #d9d9d9' }}>
+              <div style={{ height: 300 }}>
                 <Renderer dashboardId={id} time={range} step={step} type={type} values={values} variableConfig={innerVariableConfig} isPreview />
               </div>
             );
