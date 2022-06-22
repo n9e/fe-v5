@@ -223,6 +223,7 @@ const SideMenu: FC = () => {
       style={{
         display: 'flex',
         flexDirection: 'column',
+        padding: '10px 0 10px 10px',
       }}
     >
       <div className={`home ${collapsed ? 'collapse' : ''}`}>
@@ -233,7 +234,7 @@ const SideMenu: FC = () => {
 
       <Menu
         className='left-menu-container'
-        theme='dark'
+        // theme='dark'
         inlineCollapsed={collapsed}
         openKeys={openKeys}
         selectedKeys={selectedKeys}
