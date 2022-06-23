@@ -198,7 +198,7 @@ function index(props: IProps) {
                   onAddClick={() => {
                     editor({
                       visible: true,
-                      variableConfig,
+                      variableConfigWithOptions: variableConfig,
                       cluster: curCluster,
                       id: item.id,
                       initialValues: {
