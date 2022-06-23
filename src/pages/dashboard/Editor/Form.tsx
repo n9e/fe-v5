@@ -30,8 +30,7 @@ import getFirstUnusedLetter from '../Renderer/utils/getFirstUnusedLetter';
 const alphabet = 'ABCDEFGHIGKLMNOPQRSTUVWXYZ'.split('');
 
 export default function FormCpt(props) {
-  const { chartForm, setChangedFlag, initialValues, type, variableConfig, cluster, render, range, id } = props;
-  const [innerVariableConfig, setInnerVariableConfig] = useState<IVariable[] | undefined>(variableConfig);
+  const { chartForm, setChangedFlag, initialValues, type, variableConfigWithOptions, cluster, render, range, id } = props;
 
   defaultValues.custom = defaultCustomValuesMap[_.get(initialValues, 'type') || defaultValues.type];
 
@@ -57,14 +56,14 @@ export default function FormCpt(props) {
           }}
         >
           <Col flex={1} style={{ minWidth: 100 }}>
-            <div style={{ marginBottom: 10 }}>{render(innerVariableConfig)}</div>
+            <div style={{ marginBottom: 10 }}>{render(variableConfigWithOptions)}</div>
             <div style={{ height: 'calc(100% - 310px)', overflowY: 'auto' }}>
               <div style={{ marginBottom: 10 }}>
                 <VariableConfig
-                  onChange={(value) => {
-                    setInnerVariableConfig(value);
+                  onChange={(value, bool, withOptions) => {
+                    // setInnerVariableConfig(withOptions);
                   }}
-                  value={innerVariableConfig}
+                  value={variableConfigWithOptions}
                   editable={false}
                   cluster={cluster}
                   range={range}

@@ -40,6 +40,7 @@ function index(props: IProps) {
   const { id, cluster, editable = true, value, range, onChange, onOpenFire } = props;
   const [editing, setEditing] = useState<boolean>(false);
   const [data, setData] = useState<IVariable[]>([]);
+  const [refreshFlag, setRefreshFlag] = useState<string>(_.uniqueId('refreshFlag_'));
 
   useEffect(() => {
     if (value) {
@@ -71,13 +72,22 @@ function index(props: IProps) {
         console.log(e);
       }
     }
-  }, [JSON.stringify(value), cluster]);
+  }, [JSON.stringify(value), cluster, refreshFlag]);
 
   return (
     <div className='tag-area'>
       <div className={classNames('tag-content', 'tag-content-close')}>
         {_.map(data, (expression) => {
-          return <DisplayItem key={expression.name} id={id} expression={expression} />;
+          return (
+            <DisplayItem
+              key={expression.name}
+              id={id}
+              expression={expression}
+              onChange={() => {
+                setRefreshFlag(_.uniqueId('refreshFlag_'));
+              }}
+            />
+          );
         })}
         {editable && (
           <EditOutlined

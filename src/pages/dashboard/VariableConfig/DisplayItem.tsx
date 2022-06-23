@@ -23,10 +23,11 @@ import { getVaraiableSelected, setVaraiableSelected } from './constant';
 interface IProps {
   id: string;
   expression: IVariable;
+  onChange: () => void; // 目前只为了外层更新变量 options
 }
 
 export default function DisplayItem(props: IProps) {
-  const { id, expression } = props;
+  const { id, expression, onChange } = props;
   const { name, multi, allOption, options } = expression;
   const [selected, setSelected] = useState<string[]>(getVaraiableSelected(name, id));
 
@@ -50,6 +51,7 @@ export default function DisplayItem(props: IProps) {
           }
           setVaraiableSelected(name, val, id, true);
           setSelected(val);
+          onChange();
         }}
         defaultActiveFirstOption={false}
         showSearch

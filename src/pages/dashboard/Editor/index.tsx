@@ -32,7 +32,7 @@ import { Reducer } from '../Context';
 
 interface IProps {
   initialValues: IPanel | null;
-  variableConfig?: IVariable[];
+  variableConfigWithOptions?: IVariable[];
   cluster: string;
   id: string;
   onOK: (formData: any) => void;
@@ -40,7 +40,7 @@ interface IProps {
 
 function index(props: ModalWrapProps & IProps) {
   const { t } = useTranslation();
-  const { visible, variableConfig, cluster, id } = props;
+  const { visible, variableConfigWithOptions, cluster, id } = props;
   const initialValues = _.cloneDeep(props.initialValues);
   const [chartForm] = Form.useForm();
   const [range, setRange] = useState<Range>({
@@ -160,7 +160,7 @@ function index(props: ModalWrapProps & IProps) {
           setChangedFlag={setChangedFlag}
           initialValues={initialValues}
           type={type}
-          variableConfig={variableConfig}
+          variableConfigWithOptions={variableConfigWithOptions}
           cluster={cluster}
           range={range}
           id={id}

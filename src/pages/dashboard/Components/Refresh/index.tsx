@@ -78,7 +78,7 @@ function Refresh(props: IProps, ref) {
 
   return (
     <div className='refresh-container'>
-      <Tooltip title={`刷新间隔小于 step(${_step}s) 降不会更新数据`}>
+      <Tooltip title={`刷新间隔小于 step(${_step}s) 将不会更新数据`}>
         <Button className='refresh-btn' icon={<SyncOutlined />} onClick={props.onRefresh} />
       </Tooltip>
       <Dropdown

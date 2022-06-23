@@ -135,7 +135,7 @@ function index(props: IProps) {
                     onEditClick={() => {
                       editor({
                         visible: true,
-                        variableConfig,
+                        variableConfigWithOptions: variableConfig,
                         cluster: curCluster,
                         id: item.id,
                         initialValues: {

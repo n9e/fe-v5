@@ -147,7 +147,7 @@ export default function DetailV2() {
             } else {
               editor({
                 visible: true,
-                variableConfig,
+                variableConfigWithOptions,
                 cluster: curCluster,
                 id,
                 initialValues: {
