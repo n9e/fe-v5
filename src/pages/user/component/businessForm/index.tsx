@@ -116,7 +116,7 @@ const TeamForm = React.forwardRef<ReactNode, TeamProps>((props, ref) => {
                     tooltip={{
                       title: (
                         <span>
-                          尽量用英文，不能与其他业务组标识重复，系统会自动生成 <Tag color='blue'>busigroup={form.getFieldValue('label_value')}</Tag> 的标签
+                          尽量用英文，不能与其他业务组标识重复，系统会自动生成 <Tag color='purple'>busigroup={form.getFieldValue('label_value')}</Tag> 的标签
                         </span>
                       ),
                       getPopupContainer: () => document.body,

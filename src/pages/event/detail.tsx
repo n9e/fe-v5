@@ -117,7 +117,7 @@ const EventDetailPage: React.FC = () => {
       render(tags) {
         return tags
           ? tags.map((tag) => (
-              <Tag color='blue' key={tag}>
+              <Tag color='purple' key={tag}>
                 {tag}
               </Tag>
             ))
@@ -209,7 +209,7 @@ const EventDetailPage: React.FC = () => {
       label: '告警接收组',
       key: 'notify_groups_obj',
       render(groups) {
-        return groups ? groups.map((group) => <Tag color='blue'>{group.name}</Tag>) : '';
+        return groups ? groups.map((group) => <Tag color='purple'>{group.name}</Tag>) : '';
       },
     },
     {

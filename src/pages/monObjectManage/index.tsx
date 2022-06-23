@@ -374,7 +374,7 @@ const MonObjectManage: React.FC = () => {
           tagArr &&
           tagArr.map((item) => (
             <Tag
-              color='blue'
+              color='purple'
               key={item}
               onClick={(e) => {
                 if (!tableQueryContent.includes(item)) {

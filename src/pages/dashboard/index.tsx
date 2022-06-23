@@ -160,7 +160,7 @@ export default function Dashboard() {
           {text.map((tag, index) => {
             return tag ? (
               <Tag
-                color='blue'
+                color='purple'
                 key={index}
                 style={{
                   cursor: 'pointer',
