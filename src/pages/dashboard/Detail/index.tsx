@@ -89,10 +89,15 @@ export default function DetailV2() {
       }
     });
   };
+  const handleUpdateDashboardConfigs = (id, configs) => {
+    updateDashboardConfigs(id, configs).then(() => {
+      refresh();
+    });
+  };
   const handleVariableChange = (value, b, valueWithOptions) => {
     const dashboardConfigs: any = JSONParse(dashboard.configs);
     dashboardConfigs.var = value;
-    b && updateDashboardConfigs(id, { configs: JSON.stringify(dashboardConfigs) });
+    b && handleUpdateDashboardConfigs(id, { configs: JSON.stringify(dashboardConfigs) });
     valueWithOptions && setVariableConfigWithOptions(valueWithOptions);
   };
   const stopAutoRefresh = () => {
@@ -136,7 +141,7 @@ export default function DetailV2() {
                 'row',
               );
               setPanels(newPanels);
-              updateDashboardConfigs(dashboard.id, {
+              handleUpdateDashboardConfigs(dashboard.id, {
                 configs: panelsMergeToConfigs(dashboard.configs, newPanels),
               });
             } else {
@@ -158,7 +163,7 @@ export default function DetailV2() {
                 onOK: (values) => {
                   const newPanels = updatePanelsInsertNewPanelToGlobal(panels, values, 'chart');
                   setPanels(newPanels);
-                  updateDashboardConfigs(dashboard.id, {
+                  handleUpdateDashboardConfigs(dashboard.id, {
                     configs: panelsMergeToConfigs(dashboard.configs, newPanels),
                   });
                 },
@@ -178,7 +183,7 @@ export default function DetailV2() {
             onChange={(v) => {
               const dashboardConfigs: any = JSONParse(dashboard.configs);
               dashboardConfigs.links = v;
-              updateDashboardConfigs(id, {
+              handleUpdateDashboardConfigs(id, {
                 configs: JSON.stringify(dashboardConfigs),
               });
               setDashboardLinks(v);
