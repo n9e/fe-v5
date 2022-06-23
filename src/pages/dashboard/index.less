@@ -47,6 +47,8 @@
   font-family: verdana, Microsoft YaHei, Consolas, Deja Vu Sans Mono, Bitstream Vera Sans Mono;
   background: #f6f5f6;
   height: 100%;
+  display: flex;
+  flex-direction: column;
   .variable-area {
     // padding: 10px 20px 0px;
     background: @colorWhite;
@@ -58,7 +60,14 @@
       flex-shrink: 0;
     }
   }
+  .dashboard-detail-content-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 20px 0px;
+  }
   .charts {
+    flex: 1;
+    overflow: auto;
     padding: 0px 20px 15px;
     .ant-collapse {
       margin-bottom: 15px;
@@ -100,10 +109,4 @@
       display: block;
     }
   }
-}
-
-.dashboard-detail-content-header {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px 20px 0px;
 }

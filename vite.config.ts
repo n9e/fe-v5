@@ -115,6 +115,7 @@ export default defineConfig({
           // 'text-color': '#333',
           // 'menu-dark-bg': '#2C3D5E',
           // 'menu-dark-inline-submenu-bg': '#2C3D5E',
+          // modify-end
 
           // 下面是云眼的全局样式
           'primary-color': '#6C53B1',
