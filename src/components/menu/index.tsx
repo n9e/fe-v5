@@ -228,7 +228,7 @@ const SideMenu: FC = () => {
     >
       <div className={`home ${collapsed ? 'collapse' : ''}`}>
         <div className='name' onClick={() => history.push('/metric/explorer')} key='overview'>
-          <img src={collapsed ? '/image/logo.svg' : '/image/logo-l.svg'} alt='' className='logo' />
+          <img src={collapsed ? '/image/logo.svg' : '/image/logo-l(1).svg'} alt='' className='logo' />
         </div>
       </div>
 

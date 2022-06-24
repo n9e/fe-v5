@@ -145,7 +145,7 @@ export default defineConfig({
           'checkbox-color': 'fade(@checkbox-check-color, 10)',
           // 'input-bg': '#fff',
           'btn-padding-horizontal-base': '12px',
-          'menu-inline-toplevel-item-height': '48px',
+          // 'menu-inline-toplevel-item-height': '48px',
           // 'item-hover-bg': 'fade(@checkbox-check-color, 10)',
         },
       },
