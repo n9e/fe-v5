@@ -184,6 +184,7 @@ const SideMenu: FC = () => {
     localStorage.setItem('menuCollapsed', !collapsed ? '1' : '0');
   };
   const handleClick: MenuClickEventHandler = ({ key }) => {
+    if (location.pathname === key) return;
     setSelectedKeys([key as string]);
     // 写两个key as string 感觉有点傻
     if (key === 'changeLanguage') {
