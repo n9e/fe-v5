@@ -15,7 +15,7 @@
  *
  */
 import React, { useContext } from 'react';
-import { Form, Select, Row, Col, Switch } from 'antd';
+import { Form, Select, Row, Col, Switch, Radio } from 'antd';
 import { CaretDownOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { Panel } from '../../Components/Collapse';
@@ -33,6 +33,14 @@ export default function GraphStyles({ chartForm }) {
           <Col span={12}>
             <Form.Item label='显示表头' name={[...namePrefix, 'showHeader']} valuePropName='checked'>
               <Switch size='small' />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item label='颜色模式' name={[...namePrefix, 'colorMode']}>
+              <Radio.Group buttonStyle='solid'>
+                <Radio.Button value='value'>值</Radio.Button>
+                <Radio.Button value='background'>背景</Radio.Button>
+              </Radio.Group>
             </Form.Item>
           </Col>
         </Row>

@@ -215,7 +215,7 @@ export function getVaraiableSelected(name: string, id: string) {
 
 export const replaceExpressionVars = (expression: string, formData: IVariable[], limit: number, id: string) => {
   var newExpression = expression;
-  const vars = newExpression.match(/\$[0-9a-zA-Z_]+/g);
+  const vars = newExpression ? newExpression.match(/\$[0-9a-zA-Z_]+/g) : [];
   if (vars && vars.length > 0) {
     for (let i = 0; i < limit; i++) {
       if (formData[i]) {
@@ -245,8 +245,11 @@ export const replaceExpressionVars = (expression: string, formData: IVariable[],
 
 export const extractExpressionVars = (expression: string) => {
   var newExpression = expression;
-  const vars = newExpression.match(/\$[0-9a-zA-Z\._\-]+/g);
-  return vars;
+  if (newExpression) {
+    const vars = newExpression.match(/\$[0-9a-zA-Z\._\-]+/g);
+    return vars;
+  }
+  return [];
 };
 
 export function stringStartsAsRegEx(str: string): boolean {

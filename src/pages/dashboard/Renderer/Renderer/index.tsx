@@ -155,7 +155,7 @@ function index(props: IProps) {
         <div className='renderer-header-loading'>{loading && <SyncOutlined spin />}</div>
       </div>
       <div className='renderer-body' style={{ height: `calc(100% - 36px)` }}>
-        {RendererCptMap[type] ? RendererCptMap[type]() : `无效的图表类型 ${type}`}
+        {RendererCptMap[type] ? RendererCptMap[type]() : <div className='unknown-type'>{`无效的图表类型 ${type}`}</div>}
       </div>
     </div>
   );
