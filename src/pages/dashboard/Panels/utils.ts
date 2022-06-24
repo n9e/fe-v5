@@ -167,26 +167,20 @@ const PANEL_H = 4;
 export function updatePanelsInsertNewPanelToGlobal(panels: IPanel[], panel: any, type: 'row' | 'chart') {
   const w = type === 'row' ? 24 : PANEL_W;
   const h = type === 'row' ? 1 : PANEL_H;
+  const maxItem = _.maxBy(panels, (item: IPanel) => {
+    return item.layout.y + item.layout.h;
+  });
   const newPanel = {
     ...panel,
     layout: {
       x: 0,
-      y: 0,
+      y: maxItem ? maxItem.layout.y + maxItem.layout.h : 0,
       w,
       h,
       i: panel.id,
     },
   };
-  const newPanels = _.map(panels, (item: IPanel) => {
-    return {
-      ...item,
-      layout: {
-        ...item.layout,
-        y: item.layout.y + h,
-      },
-    };
-  });
-  return _.concat(newPanel, newPanels);
+  return _.concat([...panels], newPanel);
 }
 
 // 新增 panel 到分组

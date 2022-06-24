@@ -14,32 +14,42 @@
  * limitations under the License.
  *
  */
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Modal, Form, Input, Button, Row, Col, Switch } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { DeleteOutlined, PlusOutlined, ArrowUpOutlined, ArrowDownOutlined, CopyOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { Range } from '@/components/DateRangePicker';
-import { IVariable } from './definition';
-import { convertExpressionToQuery, replaceExpressionVars, stringToRegex, setVaraiableSelected } from './constant';
-
+import { Variable } from './definition';
+import { convertExpressionToQuery, replaceExpressionVars, stringToRegex } from './constant';
+import { setVaraiableSelected } from './index';
+export interface FormType {
+  var: Variable[];
+}
 interface Props {
   id: string;
   visible: boolean;
-  value?: IVariable[];
+  value: FormType | undefined;
   range: Range;
-  onChange: (v?: IVariable[]) => void;
+  onChange: (v: FormType | undefined) => void;
 }
 export default function EditItem(props: Props) {
   const { visible, onChange, value, range, id } = props;
   const { t } = useTranslation();
   const [form] = Form.useForm();
+  useEffect(() => {
+    value && form.setFieldsValue(value);
+  }, [value]);
   const handleOk = async () => {
     await form.validateFields();
-    const v = form.getFieldsValue();
-    onChange(v.var);
+    const v: FormType = form.getFieldsValue();
+    onChange(v);
   };
   const onCancel = () => {
-    onChange();
+    onChange(undefined);
+  };
+
+  const onFinish = (values) => {
+    console.log('Received values of form:', values);
   };
 
   const handleBlur = (index) => {
@@ -53,20 +63,14 @@ export default function EditItem(props: Props) {
         if (regFilterRes.length > 0) {
           setVaraiableSelected(formData.var[index].name, regFilterRes[0], id);
         }
+        // form.setFields([{ name: ['var', index, 'selected'], value: regFilterRes[0] }]);
       });
     }
   };
 
   return (
     <Modal title={t('大盘变量')} width={950} visible={visible} onOk={handleOk} onCancel={onCancel} wrapClassName='variable-modal'>
-      <Form
-        autoComplete='off'
-        preserve={false}
-        form={form}
-        initialValues={{
-          var: value,
-        }}
-      >
+      <Form name='dynamic_form_nest_item' onFinish={onFinish} autoComplete='off' preserve={false} form={form}>
         <Row gutter={[6, 6]} className='tag-header'>
           <Col span={4}>{t('变量名')}</Col>
           <Col span={6}>
@@ -142,6 +146,9 @@ export default function EditItem(props: Props) {
                       }}
                     </Form.Item>
                   </Col>
+                  {/* <Form.Item {...restField} name={[name, 'selected']} fieldKey={[fieldKey, 'selected']} hidden>
+                    <Input />
+                  </Form.Item> */}
                   <Col span={4}>
                     <Button type='link' size='small' onClick={() => move(name, name + 1)} disabled={name === fields.length - 1}>
                       <ArrowDownOutlined />

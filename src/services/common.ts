@@ -14,11 +14,31 @@
  * limitations under the License.
  *
  */
+import _ from 'lodash';
 import request from '@/utils/request';
 import { RequestMethod } from '@/store/common';
 
 // 获取集群信息
 export function getCommonClusters() {
+  if (import.meta.env.VITE_IS_ADVANCED === 'true') {
+    return request(`/api/v1/datasource/list`, {
+      method: RequestMethod.Post,
+      data: {
+        category: 'timeseries',
+        p: 1,
+        limit: 100,
+      },
+    }).then((res) => {
+      return {
+        dat: _.map(
+          _.filter(res.data.items, (item) => {
+            return item.plugin_type === 'prometheus';
+          }),
+          'name',
+        ),
+      };
+    });
+  }
   return request(`/api/n9e/clusters`, {
     method: RequestMethod.Get,
   });
@@ -36,8 +56,7 @@ export function getBusiGroups(query: string, limit: number = 200) {
   });
 }
 
-
-export function getPerm(busiGroup: string, perm: "ro" | "rw") {
+export function getPerm(busiGroup: string, perm: 'ro' | 'rw') {
   return request(`/api/n9e/busi-group/${busiGroup}/perm/${perm}`, {
     method: RequestMethod.Get,
   });
@@ -48,5 +67,3 @@ export function getMenuPerm() {
     method: RequestMethod.Get,
   });
 }
-
-

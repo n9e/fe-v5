@@ -15,104 +15,90 @@
  *
  */
 import React, { useState, useEffect } from 'react';
-import { EditOutlined } from '@ant-design/icons';
-import classNames from 'classnames';
 import _ from 'lodash';
-import { useTranslation } from 'react-i18next';
+import classNames from 'classnames';
+import { EditOutlined } from '@ant-design/icons';
 import { Range } from '@/components/DateRangePicker';
+import { convertExpressionToQuery, replaceExpressionVars, getVaraiableSelected, setVaraiableSelected, stringToRegex } from './constant';
+import { IVariable } from './definition';
 import DisplayItem from './DisplayItem';
-import EditItem, { FormType } from './EditItem';
+import EditItem from './EditItem';
 import './index.less';
-export type VariableType = FormType;
+export type { IVariable } from './definition';
 
-interface ITagFilterProps {
+interface IProps {
   id: string;
-  isOpen?: boolean;
-  cluster: string;
+  cluster: string; // 集群变动后需要重新获取数据
   editable?: boolean;
-  value?: FormType;
+  value?: IVariable[];
   range: Range;
-  onChange: (data: FormType, needSave: boolean, options?: FormType) => void;
+  onChange: (data: IVariable[], needSave: boolean, options?: IVariable[]) => void;
   onOpenFire?: () => void;
 }
 
-export function setVaraiableSelected(name: string, value: string | string[], id: string) {
-  if (value === undefined) return;
-  localStorage.setItem(`dashboard_${id}_${name}`, JSON.stringify(value));
-}
-
-export function getVaraiableSelected(name: string, id: string) {
-  const v = localStorage.getItem(`dashboard_${id}_${name}`);
-  return v ? JSON.parse(v) : null;
-}
-
-const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = ({ isOpen = false, value, onChange, editable = true, cluster, range, id, onOpenFire }, ref) => {
-  const { t } = useTranslation();
-  const [editing, setEditing] = useState<boolean>(isOpen);
-  const [varsMap, setVarsMap] = useState<{ string?: string | string[] | undefined }>({});
-  const [data, setData] = useState<FormType>();
-  const [dataWithOptions, setDataWithOptions] = useState<FormType>();
-  const handleEditClose = (v: FormType) => {
-    if (v) {
-      onChange(v, true);
-      setData(v);
-    }
-    setEditing(false);
-  };
+function index(props: IProps) {
+  const { id, cluster, editable = true, value, range, onChange, onOpenFire } = props;
+  const [editing, setEditing] = useState<boolean>(false);
+  const [data, setData] = useState<IVariable[]>([]);
+  const [refreshFlag, setRefreshFlag] = useState<string>(_.uniqueId('refreshFlag_'));
 
   useEffect(() => {
     if (value) {
-      setData(value);
-      setDataWithOptions(value);
+      const result: IVariable[] = [];
+      try {
+        (async () => {
+          for (let idx = 0; idx < value.length; idx++) {
+            const item = _.cloneDeep(value[idx]);
+            if (item.definition) {
+              const definition = idx > 0 ? replaceExpressionVars(item.definition, result, idx, id) : item.definition;
+              const options = await convertExpressionToQuery(definition, range);
+              const regFilterOptions = _.filter(options, (i) => !!i && (!item.reg || !stringToRegex(item.reg) || (stringToRegex(item.reg) as RegExp).test(i)));
+              result[idx] = item;
+              result[idx].fullDefinition = definition;
+              result[idx].options = regFilterOptions;
+              // 当大盘变量值为空时，设置默认值
+              const selected = getVaraiableSelected(item.name, id);
+              if (!selected) {
+                const head = regFilterOptions?.[0];
+                const defaultVal = item.multi ? (head ? [head] : []) : head;
+                setVaraiableSelected(item.name, defaultVal, id, true);
+              }
+            }
+          }
+          setData(result);
+          onChange(value, false, result);
+        })();
+      } catch (e) {
+        console.log(e);
+      }
     }
-  }, [JSON.stringify(value)]);
-
-  useEffect(() => {
-    data && dataWithOptions && dataWithOptions?.var.every((item) => !!item.options) && onChange(data, false, dataWithOptions);
-  }, [dataWithOptions]);
-
-  const handleVariableChange = (index: number, v: string | string[], options) => {
-    const newData = data ? { var: _.cloneDeep(data.var) } : { var: [] };
-    setVaraiableSelected(newData.var[index].name, v, id);
-    setVarsMap((varsMap) => ({ ...varsMap, [`$${newData.var[index].name}`]: v }));
-    setData(newData);
-    setDataWithOptions((dataWithOptions) => {
-      let newDataWithOptions = dataWithOptions ? { var: _.cloneDeep(dataWithOptions.var) } : { var: [] };
-      options && newDataWithOptions && (newDataWithOptions.var[index].options = options);
-      return newDataWithOptions;
-    });
-  };
+  }, [JSON.stringify(value), cluster, refreshFlag]);
 
   return (
     <div className='tag-area'>
       <div className={classNames('tag-content', 'tag-content-close')}>
-        {dataWithOptions?.var && dataWithOptions?.var.length > 0 && (
-          <>
-            {dataWithOptions.var.map((expression, index) => (
-              <DisplayItem
-                expression={expression}
-                index={index}
-                data={dataWithOptions.var}
-                onChange={handleVariableChange}
-                cluster={cluster}
-                range={range}
-                key={index}
-                id={id}
-                varsMap={varsMap}
-              ></DisplayItem>
-            ))}
-            {editable && (
-              <EditOutlined
-                className='icon'
-                onClick={() => {
-                  setEditing(true);
-                  onOpenFire && onOpenFire();
-                }}
-              ></EditOutlined>
-            )}
-          </>
+        {_.map(data, (expression) => {
+          return (
+            <DisplayItem
+              key={expression.name}
+              id={id}
+              expression={expression}
+              onChange={() => {
+                setRefreshFlag(_.uniqueId('refreshFlag_'));
+              }}
+            />
+          );
+        })}
+        {editable && (
+          <EditOutlined
+            className='icon'
+            onClick={() => {
+              setEditing(true);
+              onOpenFire && onOpenFire();
+            }}
+          />
         )}
-        {(data ? data?.var?.length === 0 : true) && editable && (
+        {(data ? data?.length === 0 : true) && editable && (
           <div
             className='add-variable-tips'
             onClick={() => {
@@ -120,13 +106,25 @@ const TagFilter: React.ForwardRefRenderFunction<any, ITagFilterProps> = ({ isOpe
               onOpenFire && onOpenFire();
             }}
           >
-            {t('添加大盘变量')}
+            添加大盘变量
           </div>
         )}
       </div>
-      <EditItem visible={editing} onChange={handleEditClose} value={data} range={range} id={id} />
+      <EditItem
+        visible={editing}
+        onChange={(v: IVariable[]) => {
+          if (v) {
+            onChange(v, true);
+            setData(v);
+          }
+          setEditing(false);
+        }}
+        value={value}
+        range={range}
+        id={id}
+      />
     </div>
   );
-};
+}
 
-export default React.forwardRef(TagFilter);
+export default React.memo(index);

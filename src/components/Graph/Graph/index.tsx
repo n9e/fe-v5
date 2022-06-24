@@ -243,8 +243,8 @@ export default class Graph extends Component<GraphProps, GraphState> {
     this.setState({ spinning: true });
     try {
       return api.fetchHistory({
-        start,
-        end,
+        start: start - (start % step),
+        end: end - (end % step),
         step,
         query,
       });

@@ -26,12 +26,12 @@ import { RootState as CommonRootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
 import { getDashboard, updateDashboardConfigs } from '@/services/dashboardV2';
 import { SetTmpChartData } from '@/services/metric';
-import VariableConfig, { VariableType } from '../VariableConfig';
+import VariableConfig, { IVariable } from '../VariableConfig';
+import { replaceExpressionVars } from '../VariableConfig/constant';
 import { ILink } from '../types';
 import DashboardLinks from '../DashboardLinks';
 import Panels from '../Panels';
 import Title from './Title';
-import { replaceExpressionVars } from '../VariableConfig/constant';
 import { JSONParse } from '../utils';
 import editor from '../Editor';
 import { defaultCustomValuesMap } from '../Editor/config';
@@ -57,9 +57,8 @@ export default function DetailV2() {
     update_at: 0,
     update_by: '',
   });
-  // TODO: variableConfig 里面也有可能包含 options
-  const [variableConfig, setVariableConfig] = useState<VariableType>();
-  const [variableConfigWithOptions, setVariableConfigWithOptions] = useState<VariableType>();
+  const [variableConfig, setVariableConfig] = useState<IVariable[]>();
+  const [variableConfigWithOptions, setVariableConfigWithOptions] = useState<IVariable[]>();
   const [dashboardLinks, setDashboardLinks] = useState<ILink[]>();
   const [panels, setPanels] = useState<any[]>([]);
   const [range, setRange] = useState<Range>({
@@ -68,7 +67,6 @@ export default function DetailV2() {
     description: '',
   });
   const [step, setStep] = useState<number | null>(null);
-  const [refreshFlag, setRefreshFlag] = useState(_.uniqueId('refreshFlag_'));
   const refresh = () => {
     getDashboard(id).then((res) => {
       setDashboard(res);
@@ -81,17 +79,25 @@ export default function DetailV2() {
               ...configs,
               var: [],
             };
-        setVariableConfig(variableConfig);
+        setVariableConfig(
+          _.map(variableConfig.var, (item) => {
+            return _.omit(item, 'options'); // 兼容性代码，去除掉已保存的 options
+          }),
+        );
         setDashboardLinks(configs.links);
         setPanels(sortPanelsByGridLayout(configs.panels));
       }
     });
   };
+  const handleUpdateDashboardConfigs = (id, configs) => {
+    updateDashboardConfigs(id, configs).then(() => {
+      refresh();
+    });
+  };
   const handleVariableChange = (value, b, valueWithOptions) => {
     const dashboardConfigs: any = JSONParse(dashboard.configs);
-    dashboardConfigs.var = value.var;
-    b && updateDashboardConfigs(id, { configs: JSON.stringify(dashboardConfigs) });
-    setVariableConfig(dashboardConfigs);
+    dashboardConfigs.var = value;
+    b && handleUpdateDashboardConfigs(id, { configs: JSON.stringify(dashboardConfigs) });
     valueWithOptions && setVariableConfigWithOptions(valueWithOptions);
   };
   const stopAutoRefresh = () => {
@@ -100,7 +106,7 @@ export default function DetailV2() {
 
   useEffect(() => {
     refresh();
-  }, [id, refreshFlag]);
+  }, [id]);
 
   return (
     <PageLayout
@@ -111,13 +117,16 @@ export default function DetailV2() {
           setCurCluster={setCurCluster}
           dashboard={dashboard}
           setDashboard={setDashboard}
-          refresh={refresh}
+          refresh={(flag) => {
+            // 集群修改需要刷新数据
+            if (flag) {
+              refresh();
+            }
+          }}
           range={range}
           setRange={setRange}
           step={step}
           setStep={setStep}
-          refreshFlag={refreshFlag}
-          setRefreshFlag={setRefreshFlag}
           refreshRef={refreshRef}
           onAddPanel={(type) => {
             if (type === 'row') {
@@ -132,13 +141,13 @@ export default function DetailV2() {
                 'row',
               );
               setPanels(newPanels);
-              updateDashboardConfigs(dashboard.id, {
+              handleUpdateDashboardConfigs(dashboard.id, {
                 configs: panelsMergeToConfigs(dashboard.configs, newPanels),
               });
             } else {
               editor({
                 visible: true,
-                variableConfig,
+                variableConfigWithOptions,
                 cluster: curCluster,
                 id,
                 initialValues: {
@@ -154,7 +163,7 @@ export default function DetailV2() {
                 onOK: (values) => {
                   const newPanels = updatePanelsInsertNewPanelToGlobal(panels, values, 'chart');
                   setPanels(newPanels);
-                  updateDashboardConfigs(dashboard.id, {
+                  handleUpdateDashboardConfigs(dashboard.id, {
                     configs: panelsMergeToConfigs(dashboard.configs, newPanels),
                   });
                 },
@@ -174,7 +183,7 @@ export default function DetailV2() {
             onChange={(v) => {
               const dashboardConfigs: any = JSONParse(dashboard.configs);
               dashboardConfigs.links = v;
-              updateDashboardConfigs(id, {
+              handleUpdateDashboardConfigs(id, {
                 configs: JSON.stringify(dashboardConfigs),
               });
               setDashboardLinks(v);
@@ -189,16 +198,13 @@ export default function DetailV2() {
             dashboard={dashboard}
             range={range}
             step={step}
-            refreshFlag={refreshFlag}
             variableConfig={variableConfigWithOptions}
             onShareClick={(panel) => {
               const serielData = {
                 dataProps: {
                   ...panel,
                   targets: _.map(panel.targets, (target) => {
-                    const realExpr = variableConfigWithOptions
-                      ? replaceExpressionVars(target.expr, variableConfigWithOptions, variableConfigWithOptions.var.length, id)
-                      : target.expr;
+                    const realExpr = variableConfigWithOptions ? replaceExpressionVars(target.expr, variableConfigWithOptions, variableConfigWithOptions.length, id) : target.expr;
                     return {
                       ...target,
                       expr: realExpr,
