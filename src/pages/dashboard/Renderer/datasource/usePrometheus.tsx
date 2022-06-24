@@ -19,27 +19,22 @@ import _ from 'lodash';
 import * as api from '@/components/Graph/api';
 import { Range, formatPickerDate } from '@/components/DateRangePicker';
 import { ITarget } from '../../types';
-import { VariableType } from '../../VariableConfig';
-import { replaceExpressionVars } from '../../VariableConfig/constant';
+import { replaceExpressionVars, getVaraiableSelected } from '../../VariableConfig/constant';
+import { IVariable } from '../../VariableConfig/definition';
 import replaceExpressionBracket from '../utils/replaceExpressionBracket';
-import { getVaraiableSelected } from '../../VariableConfig';
 
 interface IProps {
   id?: string;
   dashboardId: string;
   time: Range;
-  refreshFlag?: string;
   step: number | null;
   targets: ITarget[];
-  variableConfig?: VariableType;
+  variableConfig?: IVariable[];
   inViewPort?: boolean;
 }
 
 const getSerieName = (metric: Object, expr: string) => {
   let name = metric['__name__'] || '';
-  // if (_.keys(metric).length === 0) {
-  //   name = expr;
-  // }
   _.forEach(_.omit(metric, '__name__'), (value, key) => {
     name += ` ${key}: ${value}`;
   });
@@ -47,17 +42,20 @@ const getSerieName = (metric: Object, expr: string) => {
 };
 
 export default function usePrometheus(props: IProps) {
-  const { id, dashboardId, time, refreshFlag, step, targets, variableConfig, inViewPort } = props;
+  const { id, dashboardId, time, step, targets, variableConfig, inViewPort } = props;
   const [series, setSeries] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const cachedVariableValues = _.map(variableConfig?.var, (item) => {
+  const cachedVariableValues = _.map(variableConfig, (item) => {
     return getVaraiableSelected(item.name, dashboardId);
   });
   const flag = useRef(false);
+  let { start, end } = formatPickerDate(time);
+  let _step = step;
+  if (!step) _step = Math.max(Math.floor((end - start) / 250), 1); // TODO: 这个默认 step 不知道是基于什么计算的，并且是一个对用户透明可能存在理解问题
+  start = start - (start % _step!);
+  end = end - (end % _step!);
+
   const fetchData = () => {
-    let { start, end } = formatPickerDate(time);
-    let _step = step;
-    if (!step) _step = Math.max(Math.floor((end - start) / 250), 1);
     const _series: any[] = [];
     const promises: Promise<any>[] = [];
     _.forEach(targets, (target) => {
@@ -69,15 +67,15 @@ export default function usePrometheus(props: IProps) {
       if (target.step) {
         _step = target.step;
       }
-      const realExpr = variableConfig ? replaceExpressionVars(target.expr, variableConfig, variableConfig.var.length, dashboardId) : target.expr;
+      const realExpr = variableConfig ? replaceExpressionVars(target.expr, variableConfig, variableConfig.length, dashboardId) : target.expr;
       const signalKey = `${id}-${target.expr}`;
       if (realExpr) {
         promises.push(
           api
             .fetchHistory(
               {
-                start: start - (start % _step!),
-                end: end - (end % _step!),
+                start,
+                end,
                 step: _step,
                 query: realExpr,
               },
@@ -122,7 +120,7 @@ export default function usePrometheus(props: IProps) {
     } else {
       flag.current = false;
     }
-  }, [JSON.stringify(_.map(targets, 'expr')), JSON.stringify(time), refreshFlag, step, JSON.stringify(variableConfig), JSON.stringify(cachedVariableValues)]);
+  }, [JSON.stringify(_.map(targets, 'expr')), start, end, step, JSON.stringify(variableConfig), JSON.stringify(cachedVariableValues)]);
 
   useEffect(() => {
     if (inViewPort && !flag.current) {

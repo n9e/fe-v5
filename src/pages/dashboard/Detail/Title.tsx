@@ -40,14 +40,12 @@ interface IProps {
   setRange: (range: Range) => void;
   step: number | null;
   setStep: (step: number | null) => void;
-  refreshFlag: string;
-  setRefreshFlag: (refreshFlag: string) => void;
   refreshRef: any;
   onAddPanel: (type: string) => void;
 }
 
 export default function Title(props: IProps) {
-  const { curCluster, clusters, setCurCluster, dashboard, setDashboard, refresh, range, setRange, step, setStep, refreshFlag, setRefreshFlag, refreshRef, onAddPanel } = props;
+  const { curCluster, clusters, setCurCluster, dashboard, setDashboard, refresh, range, setRange, step, setStep, refreshRef, onAddPanel } = props;
   const { id, name } = dashboard;
   const history = useHistory();
   const [titleEditing, setTitleEditing] = useState(false);
@@ -73,7 +71,6 @@ export default function Title(props: IProps) {
           ...range,
           refreshFlag: newRefreshFlag,
         });
-        setRefreshFlag(newRefreshFlag);
       }
       refresh(false);
     },
@@ -157,7 +154,7 @@ export default function Title(props: IProps) {
                       onClick={(_) => {
                         setCurCluster(cluster);
                         localStorage.setItem('curCluster', cluster);
-                        refresh();
+                        refresh(true);
                       }}
                     >
                       {cluster}
@@ -171,9 +168,14 @@ export default function Title(props: IProps) {
               </Button>
             </Dropdown>
           </div>
-          <DateRangePicker value={range} onChange={setRange} />
+          <DateRangePicker
+            value={range}
+            onChange={(val) => {
+              setRange(val);
+            }}
+          />
           <Resolution onChange={(v) => setStep(v)} initialValue={step} />
-          <Refresh onRefresh={run} ref={refreshRef} />
+          <Refresh range={range} step={step} onRefresh={run} ref={refreshRef} />
         </Space>
       </div>
     </div>

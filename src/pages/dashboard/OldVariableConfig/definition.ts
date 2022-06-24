@@ -14,12 +14,12 @@
  * limitations under the License.
  *
  */
-export interface IVariable {
+export interface Variable {
   name: string;
   definition: string;
-  fullDefinition?: string; // 转换变量后的完整表达式
   reg?: string;
-  multi?: boolean;
-  allOption?: boolean;
+  // selected?: string | string[];
+  multi: boolean;
+  allOption: boolean;
   options?: string[];
 }

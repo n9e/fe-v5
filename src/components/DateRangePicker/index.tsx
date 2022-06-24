@@ -19,6 +19,7 @@ import { Popover, Button, DatePicker } from 'antd';
 import { CaretDownOutlined, CloseCircleFilled } from '@ant-design/icons';
 import moment, { unitOfTime, Moment } from 'moment';
 import classNames from 'classnames';
+import _ from 'lodash';
 import './index.less';
 import { useTranslation } from 'react-i18next';
 import { TooltipPlacement } from 'antd/es/tooltip';
@@ -177,10 +178,12 @@ export default function DateRangePicker(props: Props) {
     setVisible(false);
   };
 
-  const emitValue = (value: Range) => {
-    onChange && onChange(value);
-    if (value) {
-      setLabel(formatLabel(value, unit));
+  const emitValue = (val: Range) => {
+    if (!_.isEqual(_.omit(value, 'refreshFlag'), _.omit(val, 'refreshFlag'))) {
+      onChange && onChange(val);
+    }
+    if (val) {
+      setLabel(formatLabel(val, unit));
     } else {
       setLabel('选择时间');
     }

@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-import React, { useState, useEffect, useReducer } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, Form, Select, Space, Button } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
 import _ from 'lodash';
@@ -25,14 +25,14 @@ import Resolution from '@/components/Resolution';
 import ModalHOC, { ModalWrapProps } from '../Components/ModalHOC';
 import { visualizations, defaultValues, defaultCustomValuesMap } from './config';
 import Renderer from '../Renderer/Renderer';
-import { VariableType } from '../VariableConfig';
+import { IVariable } from '../VariableConfig';
 import FormCpt from './Form';
 import { IPanel } from '../types';
 import { Reducer } from '../Context';
 
 interface IProps {
   initialValues: IPanel | null;
-  variableConfig?: VariableType;
+  variableConfigWithOptions?: IVariable[];
   cluster: string;
   id: string;
   onOK: (formData: any) => void;
@@ -40,7 +40,7 @@ interface IProps {
 
 function index(props: ModalWrapProps & IProps) {
   const { t } = useTranslation();
-  const { visible, variableConfig, cluster, id } = props;
+  const { visible, variableConfigWithOptions, cluster, id } = props;
   const initialValues = _.cloneDeep(props.initialValues);
   const [chartForm] = Form.useForm();
   const [range, setRange] = useState<Range>({
@@ -160,7 +160,7 @@ function index(props: ModalWrapProps & IProps) {
           setChangedFlag={setChangedFlag}
           initialValues={initialValues}
           type={type}
-          variableConfig={variableConfig}
+          variableConfigWithOptions={variableConfigWithOptions}
           cluster={cluster}
           range={range}
           id={id}
