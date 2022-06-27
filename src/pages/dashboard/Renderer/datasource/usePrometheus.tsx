@@ -52,7 +52,7 @@ export default function usePrometheus(props: IProps) {
   const flag = useRef(false);
   let { start, end } = formatPickerDate(time);
   let _step = step;
-  if (!step) _step = Math.max(Math.floor((end - start) / 250), 1); // TODO: 这个默认 step 不知道是基于什么计算的，并且是一个对用户透明可能存在理解问题
+  if (!step) _step = Math.max(Math.floor((end - start) / 240), 1); // TODO: 这个默认 step 不知道是基于什么计算的，并且是一个对用户透明可能存在理解问题
   start = start - (start % _step!);
   end = end - (end % _step!);
 

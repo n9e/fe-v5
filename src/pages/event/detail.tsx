@@ -248,7 +248,7 @@ const EventDetailPage: React.FC = () => {
     if (eventDetail && eventDetail.rule_algo) {
       let { start, end } = formatPickerDate(range);
       let _step = step;
-      if (!step) _step = Math.max(Math.floor((end - start) / 250), 1);
+      if (!step) _step = Math.max(Math.floor((end - start) / 240), 1);
       getBrainData({
         rid: eventDetail.rule_id,
         uuid: getUUIDByTags(eventDetail.tags),

@@ -340,7 +340,7 @@ export default class Graph extends Component<GraphProps, GraphState> {
     let { promqls, range, step } = this.props.data;
     const { start, end } = formatPickerDate(range);
     // 如果没有 step(resolution)，计算一个默认的 step 值
-    if (!step) step = Math.max(Math.floor((end - start) / 250), 1);
+    if (!step) step = Math.max(Math.floor((end - start) / 240), 1);
 
     let obj: { curAggrFunc?: string; curAggrGroup?: string[]; offset?: string[]; calcFunc: string } = { calcFunc };
     if (aggrFunc) obj.curAggrFunc = aggrFunc;

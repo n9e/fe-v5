@@ -35,7 +35,7 @@ export default function GraphCpt(props: IProps) {
   useEffect(() => {
     let { start, end } = formatPickerDate(range);
     let _step = step;
-    if (!step) _step = Math.max(Math.floor((end - start) / 250), 1);
+    if (!step) _step = Math.max(Math.floor((end - start) / 240), 1);
     if (rid && uuid) {
       getBrainData({
         rid,
