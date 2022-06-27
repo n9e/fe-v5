@@ -48,7 +48,7 @@ function Refresh(props: IProps, ref) {
   const intervalRef = useRef<NodeJS.Timeout>();
   let { start, end } = formatPickerDate(range);
   let _step = step;
-  if (!step) _step = Math.max(Math.floor((end - start) / 250), 1);
+  if (!step) _step = Math.max(Math.floor((end - start) / 240), 1);
 
   useEffect(() => {
     if (intervalRef.current) {

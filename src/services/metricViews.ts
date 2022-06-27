@@ -118,7 +118,7 @@ export const getQueryRange = function (params: {
   const { metric, match, range, step, calcFunc, comparison, aggrFunc, aggrGroups } = params;
   let { start, end } = formatPickerDate(range);
   let _step = step;
-  if (!step) _step = Math.max(Math.floor((end - start) / 250), 1);
+  if (!step) _step = Math.max(Math.floor((end - start) / 240), 1);
   const exprs = getExprs({
     metric,
     match,
@@ -213,7 +213,7 @@ export const getMetricsDesc = function (data) {
 export const getQueryRangeSingleMetric = function (params: { metric: string; match: string; range: Range; calcFunc: string }) {
   const { metric, match, range, calcFunc } = params;
   let { start, end } = formatPickerDate(range);
-  const step = Math.max(Math.floor((end - start) / 250), 1);
+  const step = Math.max(Math.floor((end - start) / 240), 1);
   const query = `${calcFunc}(${metric}${match}) by (ident)`;
   return request('/api/n9e/prometheus/api/v1/query_range', {
     method: RequestMethod.Get,
