@@ -14,22 +14,22 @@
  * limitations under the License.
  *
  */
-import React, { useState, useEffect } from 'react';
-import { Form, Input, Card, Select, Col, Button, Row, message, DatePicker, Tooltip } from 'antd';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { Form, Input, Card, Select, Col, Button, Row, message, DatePicker, Tooltip, Spin } from 'antd';
 import { QuestionCircleFilled, PlusCircleOutlined, CaretDownOutlined } from '@ant-design/icons';
-import moment from 'moment';
-
-import TagItem from './tagItem';
-import { addShield } from '@/services/shield';
 import { useHistory } from 'react-router';
-import { shieldItem } from '@/store/warningInterface';
 import { useSelector } from 'react-redux';
-import { RootState } from '@/store/common';
-import { CommonStoreState } from '@/store/commonInterface';
-import '../index.less';
 import { useTranslation } from 'react-i18next';
 import _ from 'lodash';
+import moment from 'moment';
+import { addShield } from '@/services/shield';
+import { getBusiGroups } from '@/services/common';
+import { shieldItem } from '@/store/warningInterface';
+import { RootState } from '@/store/common';
+import { CommonStoreState } from '@/store/commonInterface';
+import TagItem from './tagItem';
 import { timeLensDefault } from '../../const';
+import '../index.less';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -44,7 +44,7 @@ interface Props {
   type?: number; // 1:创建; 2:克隆
 }
 
-const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }) => {
+const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) => {
   const btimeDefault = new Date().getTime();
   const etimeDefault = new Date().getTime() + 1 * 60 * 60 * 1000; // 默认时长1h
   const { t, i18n } = useTranslation();
@@ -71,6 +71,13 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }) => {
   const [btnLoading, setBtnLoading] = useState<boolean>(false);
   const [timeLen, setTimeLen] = useState('1h');
   const { curBusiItem, busiGroups } = useSelector<RootState, CommonStoreState>((state) => state.common);
+  const [filteredBusiGroups, setFilteredBusiGroups] = useState(busiGroups);
+
+  useEffect(() => {
+    if (!filteredBusiGroups.length) {
+      setFilteredBusiGroups(busiGroups);
+    }
+  }, [JSON.stringify(busiGroups)]);
 
   useEffect(() => {
     const btime = form.getFieldValue('btime');
@@ -83,8 +90,8 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }) => {
     }
     if (curBusiItem) {
       form.setFieldsValue({ busiGroup: curBusiItem.id });
-    } else if (busiGroups.length > 0) {
-      form.setFieldsValue({ busiGroup: busiGroups[0].id });
+    } else if (filteredBusiGroups.length > 0) {
+      form.setFieldsValue({ busiGroup: filteredBusiGroups[0].id });
     } else {
       message.warning('无可用业务组');
       history.push('/alert-mutes');
@@ -173,6 +180,29 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }) => {
     });
   };
 
+  const [fetching, setFetching] = useState(false);
+  const fetchRef = useRef(0);
+  const debounceFetcher = useMemo(() => {
+    const loadOptions = (value: string) => {
+      fetchRef.current += 1;
+      const fetchId = fetchRef.current;
+      setFilteredBusiGroups([]);
+      setFetching(true);
+
+      getBusiGroups(value).then((res) => {
+        if (fetchId !== fetchRef.current) {
+          // for fetch callback order
+          return;
+        }
+
+        setFilteredBusiGroups(res.dat || []);
+        setFetching(false);
+      });
+    };
+
+    return _.debounce(loadOptions, 500);
+  }, []);
+
   const content = (
     <Form
       form={form}
@@ -190,8 +220,8 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }) => {
     >
       <Card>
         <Form.Item label={t('业务组：')} name='busiGroup'>
-          <Select suffixIcon={<CaretDownOutlined />}>
-            {busiGroups?.map((item) => (
+          <Select showSearch filterOption={false} suffixIcon={<CaretDownOutlined />} onSearch={debounceFetcher} notFoundContent={fetching ? <Spin size='small' /> : null}>
+            {_.map(filteredBusiGroups, (item) => (
               <Option value={item.id} key={item.id}>
                 {item.name}
               </Option>
@@ -263,10 +293,6 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }) => {
             </>
           )}
         </Form.List>
-
-        {/* <Form.Item label={t('屏蔽时间')} name='time'>
-          <RangeDatePicker />
-        </Form.Item> */}
         <Form.Item
           label={t('屏蔽原因')}
           name='cause'
