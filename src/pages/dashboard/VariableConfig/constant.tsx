@@ -219,8 +219,8 @@ export const replaceExpressionVars = (expression: string, formData: IVariable[],
   if (vars && vars.length > 0) {
     for (let i = 0; i < limit; i++) {
       if (formData[i]) {
-        const { name, options, reg } = formData[i];
-        const selected = getVaraiableSelected(name, id);
+        const { name, options, reg, defaultValue } = formData[i];
+        const selected = getVaraiableSelected(name, id) || defaultValue;
 
         if (vars.includes('$' + name) && selected) {
           if (Array.isArray(selected)) {
