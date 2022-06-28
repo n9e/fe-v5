@@ -44,10 +44,16 @@ function attachVariable2Url(key, value) {
 }
 
 function index(props: IProps) {
-  const { id, cluster, editable = true, value, range, onChange, onOpenFire } = props;
+  const { id, cluster, editable = true, range, onChange, onOpenFire } = props;
   const [editing, setEditing] = useState<boolean>(false);
   const [data, setData] = useState<IVariable[]>([]);
   const [refreshFlag, setRefreshFlag] = useState<string>(_.uniqueId('refreshFlag_'));
+  const value = _.map(props.value, (item) => {
+    return {
+      ...item,
+      type: item.type || 'query',
+    };
+  });
 
   useEffect(() => {
     if (value) {
