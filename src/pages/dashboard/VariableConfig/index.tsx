@@ -62,7 +62,7 @@ function index(props: IProps) {
         (async () => {
           for (let idx = 0; idx < value.length; idx++) {
             const item = _.cloneDeep(value[idx]);
-            if (item.definition) {
+            if (item.type === 'query' && item.definition) {
               const definition = idx > 0 ? replaceExpressionVars(item.definition, result, idx, id) : item.definition;
               const options = await convertExpressionToQuery(definition, range);
               const regFilterOptions = _.filter(options, (i) => !!i && (!item.reg || !stringToRegex(item.reg) || (stringToRegex(item.reg) as RegExp).test(i)));
@@ -76,6 +76,8 @@ function index(props: IProps) {
                 const defaultVal = item.multi ? (head ? [head] : []) : head;
                 setVaraiableSelected(item.name, defaultVal, id, true);
               }
+            } else if (item.type === 'textbox') {
+              result[idx] = item;
             }
           }
           setData(result);
