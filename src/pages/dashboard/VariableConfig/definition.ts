@@ -22,4 +22,6 @@ export interface IVariable {
   multi?: boolean;
   allOption?: boolean;
   options?: string[];
+  type?: 'query' | 'textbox';
+  defaultValue?: string; // textbox 的默认值
 }
