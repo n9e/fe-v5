@@ -210,7 +210,8 @@ export function getVaraiableSelected(name: string, id: string) {
   const { search } = window.location;
   var searchObj = new URLSearchParams(search);
   const v = searchObj.get(name) || localStorage.getItem(`dashboard_${id}_${name}`);
-  return v ? JSON.parse(v) : null;
+  if (v === null) return null; // null 表示没有初始化过，空字符串表示值被设置成空
+  return v ? JSON.parse(v) : '';
 }
 
 export const replaceExpressionVars = (expression: string, formData: IVariable[], limit: number, id: string) => {
@@ -219,8 +220,8 @@ export const replaceExpressionVars = (expression: string, formData: IVariable[],
   if (vars && vars.length > 0) {
     for (let i = 0; i < limit; i++) {
       if (formData[i]) {
-        const { name, options, reg, defaultValue } = formData[i];
-        const selected = getVaraiableSelected(name, id) || defaultValue;
+        const { name, options, reg } = formData[i];
+        const selected = getVaraiableSelected(name, id);
 
         if (vars.includes('$' + name) && selected) {
           if (Array.isArray(selected)) {

@@ -71,13 +71,17 @@ function index(props: IProps) {
               result[idx].options = regFilterOptions;
               // 当大盘变量值为空时，设置默认值
               const selected = getVaraiableSelected(item.name, id);
-              if (!selected) {
+              if (selected === null) {
                 const head = regFilterOptions?.[0];
                 const defaultVal = item.multi ? (head ? [head] : []) : head;
                 setVaraiableSelected(item.name, defaultVal, id, true);
               }
             } else if (item.type === 'textbox') {
               result[idx] = item;
+              const selected = getVaraiableSelected(item.name, id);
+              if (selected === null) {
+                setVaraiableSelected(item.name, item.defaultValue, id, true);
+              }
             }
           }
           setData(result);

@@ -28,8 +28,8 @@ interface IProps {
 
 export default function DisplayItem(props: IProps) {
   const { id, expression, onChange } = props;
-  const { name, multi, allOption, options, type, defaultValue } = expression;
-  const [selected, setSelected] = useState<string[]>(getVaraiableSelected(name, id) || defaultValue);
+  const { name, multi, allOption, options, type } = expression;
+  const [selected, setSelected] = useState<string[]>(getVaraiableSelected(name, id));
 
   return (
     <div className='tag-content-close-item'>
