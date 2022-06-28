@@ -14,24 +14,25 @@
  * limitations under the License.
  *
  */
+import { Button, Result } from 'antd';
 import React from 'react';
-import { Tag, TagProps } from 'antd';
-import { useTranslation } from 'react-i18next';
-interface IColorTagProps {
-  text: string;
-}
-const tagColors = ['purple', 'lime', 'green', 'cyan'];
+import { useHistory } from 'react-router';
 
-const ColorTag: React.FC<IColorTagProps> = ({ text, ...props }) => {
-  const { t } = useTranslation();
-  const sumCharCode: number = Array.from(text).reduce<number>((prev: number, item: string) => {
-    return prev + item.charCodeAt(0);
-  }, 0);
+const NotFound: React.FC = () => {
+  const history = useHistory();
   return (
-    <Tag color={'purple'} {...props}>
-      {text}
-    </Tag>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+      <Result
+        title='403'
+        subTitle='你没有权限访问该页面, 请联系管理员!'
+        extra={
+          <Button type='primary' onClick={() => history.go(-2)}>
+            返回上一页
+          </Button>
+        }
+      />
+    </div>
   );
 };
 
-export default ColorTag;
+export default NotFound;

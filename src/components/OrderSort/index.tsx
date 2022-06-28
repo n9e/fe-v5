@@ -30,7 +30,7 @@ export default function OrderSort(props: Props) {
   const handleClick = (e) => {
     setIsDesc(!isDesc);
     onChange(!isDesc);
-    e.preventDefault()
+    e.preventDefault();
   };
 
   return (
@@ -40,12 +40,12 @@ export default function OrderSort(props: Props) {
       <div className='desc-sort-icon' onClick={handleClick}>
         <CaretUpOutlined
           style={{
-            color: isDesc === false ? 'blue' : '',
+            color: isDesc === false ? 'purple' : '',
           }}
         />
         <CaretDownOutlined
           style={{
-            color: isDesc === true ? 'blue' : '',
+            color: isDesc === true ? 'purple' : '',
             marginTop: '-0.3em',
           }}
         />

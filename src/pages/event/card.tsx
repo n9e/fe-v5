@@ -87,7 +87,7 @@ function Card(props: Props, ref) {
         const content =
           tags &&
           tags.map((item) => (
-            <Tag color='blue' key={item}>
+            <Tag color='purple' key={item}>
               {item}
             </Tag>
           ));

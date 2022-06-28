@@ -121,7 +121,7 @@ const index = (_props: any) => {
       dataIndex: 'tags',
       render: (text) => {
         return _.map(text, (item) => (
-          <Tag color='blue' key={item} onClick={() => handleTagClick(item)}>
+          <Tag color='purple' key={item} onClick={() => handleTagClick(item)}>
             {item}
           </Tag>
         ));

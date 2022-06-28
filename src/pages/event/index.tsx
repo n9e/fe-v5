@@ -113,7 +113,7 @@ const Event: React.FC = () => {
           tags &&
           tags.map((item) => (
             <Tag
-              color='blue'
+              color='purple'
               key={item}
               onClick={(e) => {
                 if (!queryContent.includes(item)) {
@@ -271,7 +271,7 @@ const Event: React.FC = () => {
           <RefreshIcon
             onClick={() => {
               view === 'list' && tableRef.current.handleReload();
-              view === 'card' && cardRef.current.reloadCard()
+              view === 'card' && cardRef.current.reloadCard();
             }}
           />
           <Dropdown overlay={menu}>

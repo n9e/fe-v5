@@ -36,12 +36,12 @@ function App() {
     <div className='App'>
       <ConfigProvider
         locale={i18n.language == 'en' ? en : zhCN}
-        getPopupContainer={(node: HTMLElement) => {
-          if (node) {
-            return node.parentNode as HTMLElement;
-          }
-          return document.body;
-        }}
+        // getPopupContainer={(node: HTMLElement) => {
+        //   if (node) {
+        //     return node.parentNode as HTMLElement;
+        //   }
+        //   return document.body;
+        // }}
         renderEmpty={() => (
           <div style={{ padding: 20 }}>
             <img src='/image/empty.png' width='64' />
