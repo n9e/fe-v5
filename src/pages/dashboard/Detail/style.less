@@ -44,7 +44,9 @@
 }
 
 .dashboard-detail-content {
-  font-family: verdana,Microsoft YaHei,Consolas,Deja Vu Sans Mono,Bitstream Vera Sans Mono;
+  display: flex;
+  flex-direction: column;
+  font-family: verdana, Microsoft YaHei, Consolas, Deja Vu Sans Mono, Bitstream Vera Sans Mono;
   background: #f6f5f6;
   height: 100%;
   .variable-area {
@@ -109,7 +111,7 @@
   background-color: unset !important;
 }
 .dashboards-panels {
+  flex: 1;
+  overflow: auto;
   background-color: unset !important;
 }
-
-
