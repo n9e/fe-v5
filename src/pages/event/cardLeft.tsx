@@ -154,7 +154,14 @@ export default function CardLeft(props: Props) {
         ))}
 
       <Modal title={(editForm ? '编辑' : '新增') + '聚合规则'} visible={visible} onOk={handleOk} onCancel={handleCancel} destroyOnClose>
-        <Form form={form} layout='vertical' preserve={false}>
+        <Form
+          form={form}
+          layout='vertical'
+          preserve={false}
+          initialValues={{
+            cate: false,
+          }}
+        >
           <Form.Item
             label='Name'
             name='name'
