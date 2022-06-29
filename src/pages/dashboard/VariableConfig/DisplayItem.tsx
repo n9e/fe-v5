@@ -74,11 +74,21 @@ export default function DisplayItem(props: IProps) {
       ) : (
         <Input
           value={selected}
-          onChange={(v) => {
-            let val = v.target.value;
+          onBlur={(e) => {
+            let val = e.target.value;
             setVaraiableSelected(name, val, id, true);
-            setSelected(val as any);
             onChange();
+          }}
+          onKeyDown={(e: any) => {
+            if (e.code === 'Enter') {
+              let val = e.target.value;
+              setVaraiableSelected(name, val, id, true);
+              onChange();
+            }
+          }}
+          onChange={(e) => {
+            let val = e.target.value;
+            setSelected(val as any);
           }}
         />
       )}

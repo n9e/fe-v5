@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form, Input, Row, Col, Button, Space, Switch, Tooltip } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import _ from 'lodash';
@@ -30,9 +30,14 @@ import getFirstUnusedLetter from '../Renderer/utils/getFirstUnusedLetter';
 const alphabet = 'ABCDEFGHIGKLMNOPQRSTUVWXYZ'.split('');
 
 export default function FormCpt(props) {
-  const { chartForm, setChangedFlag, initialValues, type, variableConfigWithOptions, cluster, render, range, id } = props;
+  const { chartForm, setChangedFlag, initialValues, type, cluster, render, range, id } = props;
+  const [variableConfigWithOptions, setVariableConfigWithOptions] = useState<IVariable[]>(props.variableConfigWithOptions);
 
   defaultValues.custom = defaultCustomValuesMap[_.get(initialValues, 'type') || defaultValues.type];
+
+  useEffect(() => {
+    setVariableConfigWithOptions(props.variableConfigWithOptions);
+  }, [JSON.stringify(props.variableConfigWithOptions)]);
 
   return (
     <Form
@@ -61,7 +66,7 @@ export default function FormCpt(props) {
               <div style={{ marginBottom: 10 }}>
                 <VariableConfig
                   onChange={(value, bool, withOptions) => {
-                    // setInnerVariableConfig(withOptions);
+                    setVariableConfigWithOptions(withOptions || []);
                   }}
                   value={variableConfigWithOptions}
                   editable={false}
