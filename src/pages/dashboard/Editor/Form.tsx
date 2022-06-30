@@ -121,6 +121,7 @@ export default function FormCpt(props) {
                                   style={{ flex: 1 }}
                                 >
                                   <PromQLInput
+                                    validateTrigger={['onBlur']}
                                     url='/api/n9e/prometheus'
                                     headers={{
                                       'X-Cluster': localStorage.getItem('curCluster') || 'DEFAULT',
