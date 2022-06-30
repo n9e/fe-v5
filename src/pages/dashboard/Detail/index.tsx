@@ -227,6 +227,9 @@ export default function DetailV2() {
                   window.open('/chart/' + ids);
                 });
               }}
+              onUpdated={() => {
+                refresh();
+              }}
             />
           )}
         </div>
