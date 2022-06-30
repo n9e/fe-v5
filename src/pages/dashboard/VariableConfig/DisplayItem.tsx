@@ -33,7 +33,7 @@ export default function DisplayItem(props: IProps) {
 
   useEffect(() => {
     setSelected(getVaraiableSelected(name, id));
-  }, [getVaraiableSelected(name, id)]);
+  }, [JSON.stringify(getVaraiableSelected(name, id))]);
 
   return (
     <div className='tag-content-close-item'>
