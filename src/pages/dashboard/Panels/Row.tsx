@@ -54,6 +54,7 @@ export default function Row(props: IProps) {
         <SettingOutlined
           onClick={() => {
             setEditVisble(true);
+            setNewName(name);
           }}
         />
         <DeleteOutlined
