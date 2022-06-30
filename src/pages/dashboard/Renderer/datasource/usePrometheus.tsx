@@ -50,15 +50,12 @@ export default function usePrometheus(props: IProps) {
     return getVaraiableSelected(item.name, dashboardId);
   });
   const flag = useRef(false);
-  let { start, end } = formatPickerDate(time);
-  let _step = step;
-  if (!step) _step = Math.max(Math.floor((end - start) / 240), 1); // TODO: 这个默认 step 不知道是基于什么计算的，并且是一个对用户透明可能存在理解问题
-  start = start - (start % _step!);
-  end = end - (end % _step!);
-
+  const [times, setTimes] = useState<any>({});
   const fetchData = () => {
+    if (!times.start) return;
     const _series: any[] = [];
     const promises: Promise<any>[] = [];
+    let { start, end, step } = times;
     _.forEach(targets, (target) => {
       if (target.time) {
         const { start: _start, end: _end } = formatPickerDate(target.time);
@@ -66,7 +63,7 @@ export default function usePrometheus(props: IProps) {
         end = _end;
       }
       if (target.step) {
-        _step = target.step;
+        step = target.step;
       }
       const realExpr = variableConfig ? replaceExpressionVars(target.expr, variableConfig, variableConfig.length, dashboardId) : target.expr;
       const signalKey = `${id}-${target.expr}`;
@@ -77,7 +74,7 @@ export default function usePrometheus(props: IProps) {
               {
                 start,
                 end,
-                step: _step,
+                step,
                 query: realExpr,
               },
               signalKey,
@@ -104,7 +101,7 @@ export default function usePrometheus(props: IProps) {
               name: target?.legend ? replaceExpressionBracket(target?.legend, serie.metric) : getSerieName(serie.metric, item.expr),
               metric: serie.metric,
               expr: item.expr,
-              data: completeBreakpoints(_step, serie.values),
+              data: completeBreakpoints(step, serie.values),
             });
           });
         });
@@ -116,12 +113,25 @@ export default function usePrometheus(props: IProps) {
   };
 
   useEffect(() => {
+    let { start, end } = formatPickerDate(time);
+    let _step = step;
+    if (!step) _step = Math.max(Math.floor((end - start) / 240), 1); // TODO: 这个默认 step 不知道是基于什么计算的，并且是一个对用户透明可能存在理解问题
+    start = start - (start % _step!);
+    end = end - (end % _step!);
+    setTimes({
+      start,
+      end,
+      step: _step,
+    });
+  }, [JSON.stringify(time)]);
+
+  useEffect(() => {
     if (inViewPort) {
       fetchData();
     } else {
       flag.current = false;
     }
-  }, [JSON.stringify(_.map(targets, 'expr')), start, end, step, JSON.stringify(variableConfig), JSON.stringify(cachedVariableValues)]);
+  }, [JSON.stringify(_.map(targets, 'expr')), JSON.stringify(times), step, JSON.stringify(variableConfig), JSON.stringify(cachedVariableValues)]);
 
   useEffect(() => {
     if (inViewPort && !flag.current) {
