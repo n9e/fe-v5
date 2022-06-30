@@ -51,7 +51,7 @@ export default function Stat(props: IProps) {
   const { dispatch } = useContext(Context);
   const { values, series } = props;
   const { custom, options, overrides } = values;
-  const { showHeader, calc, aggrDimension, displayMode, columns, sortColumn, sortOrder } = custom;
+  const { showHeader, calc, aggrDimension, displayMode, columns, sortColumn, sortOrder, colorMode = 'value' } = custom;
   const [calculatedValues, setCalculatedValues] = React.useState([]);
   const [sortObj, setSortObj] = React.useState({
     sortColumn,
@@ -104,17 +104,24 @@ export default function Stat(props: IProps) {
         return a.stat - b.stat;
       },
       sortOrder: getSortOrder('value', sortObj),
+      className: 'renderer-table-td-content-value-container',
       render: (text, record) => {
         let textObj = {
           text,
-          color: record.color,
+          color: record.color || '#000',
         };
         const overrideProps = getOverridePropertiesByName(overrides, record.fields.refId);
         if (!_.isEmpty(overrideProps)) {
           textObj = getSerieTextObj(record?.stat, overrideProps?.standardOptions, overrideProps?.valueMappings);
         }
         return (
-          <div className='renderer-table-td-content' style={{ color: textObj.color }}>
+          <div
+            className='renderer-table-td-content'
+            style={{
+              color: colorMode === 'background' ? '#fff' : textObj?.color,
+              backgroundColor: colorMode === 'background' ? textObj.color : 'unset',
+            }}
+          >
             {textObj.text}
           </div>
         );
@@ -136,9 +143,24 @@ export default function Stat(props: IProps) {
           return localeCompare(a.name, b.name);
         },
         sortOrder: getSortOrder(key, sortObj),
+        className: key === 'value' ? 'renderer-table-td-content-value-container' : '',
         render: (_text, record) => {
           if (key === 'value') {
-            return _.get(record, 'text');
+            const textObj = {
+              text: record?.text,
+              color: record?.color || '#000',
+            };
+            return (
+              <div
+                className='renderer-table-td-content'
+                style={{
+                  color: colorMode === 'background' ? '#fff' : textObj?.color,
+                  backgroundColor: colorMode === 'background' ? textObj.color : 'unset',
+                }}
+              >
+                {textObj?.text}
+              </div>
+            );
           }
           return _.get(record.metric, key);
         },
@@ -179,17 +201,24 @@ export default function Stat(props: IProps) {
           return _.get(a[name], 'stat') - _.get(b[name], 'stat');
         },
         sortOrder: getSortOrder('value', sortObj),
+        className: 'renderer-table-td-content-value-container',
         render: (text) => {
           let textObj = {
             text: text?.text,
-            color: text?.color,
+            color: text?.color || '#000',
           };
           const overrideProps = getOverridePropertiesByName(overrides, name);
           if (!_.isEmpty(overrideProps)) {
             textObj = getSerieTextObj(text?.stat, overrideProps?.standardOptions, overrideProps?.valueMappings);
           }
           return (
-            <div className='renderer-table-td-content' style={{ color: textObj?.color }}>
+            <div
+              className='renderer-table-td-content'
+              style={{
+                color: colorMode === 'background' ? '#fff' : textObj?.color,
+                backgroundColor: colorMode === 'background' ? textObj.color : 'unset',
+              }}
+            >
               {textObj?.text}
             </div>
           );

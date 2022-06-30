@@ -51,10 +51,11 @@ function renderHoneyComb(svgGroup, data, { width, height, fontAutoScale = true, 
   if (points.length >= mapColumns * 2) {
     adjustedOffSetX = (width - hexbinWidth * mapColumns - hexbinWidth / 2) / 2 + hexbinWidth / 2;
   }
+  const adjustedOffSetY = (height - hexRadius * 2 * mapRows) / 2 + hexRadius;
   const offSetY = hexRadius;
   const hexbin = d3Hexbin().radius(hexRadius);
   const translateX = adjustedOffSetX;
-  const translateY = offSetY;
+  const translateY = adjustedOffSetY;
   const hexbinPoints = hexbin(points);
   const textAreaHeight = hexRadius;
   const textAreaWidth = hexbinWidth * 0.9;

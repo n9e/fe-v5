@@ -16,6 +16,7 @@
  */
 import React, { useEffect, useRef } from 'react';
 import classNames from 'classnames';
+import _ from 'lodash';
 import { EditorView, highlightSpecialChars, keymap, ViewUpdate, placeholder } from '@codemirror/view';
 import { EditorState, Prec } from '@codemirror/state';
 import { indentOnInput } from '@codemirror/language';
@@ -39,9 +40,10 @@ interface CMExpressionInputProps {
   value?: string;
   onChange?: (expr?: string) => void;
   executeQuery?: (expr?: string) => void;
+  validateTrigger?: string[];
 }
 
-const ExpressionInput = ({ url, headers, value, onChange, executeQuery, readonly = false }: CMExpressionInputProps, ref) => {
+const ExpressionInput = ({ url, headers, value, onChange, executeQuery, readonly = false, validateTrigger = ['onChange', 'onBlur'] }: CMExpressionInputProps, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const executeQueryCallback = useRef(executeQuery);
@@ -133,7 +135,9 @@ const ExpressionInput = ({ url, headers, value, onChange, executeQuery, readonly
               const val = update.state.doc.toString();
               if (val !== realValue.current) {
                 realValue.current = val;
-                onChange(val);
+                if (_.includes(validateTrigger, 'onChange')) {
+                  onChange(val);
+                }
               }
             }
           }),
@@ -176,7 +180,18 @@ const ExpressionInput = ({ url, headers, value, onChange, executeQuery, readonly
       className={classNames({ 'ant-input': true, readonly: readonly, 'promql-input': true })}
       onBlur={() => {
         if (typeof onChange === 'function') {
-          onChange(realValue.current);
+          if (realValue.current !== value) {
+            onChange(realValue.current);
+          }
+        }
+      }}
+      onKeyDown={(e) => {
+        if (e.code === 'Enter') {
+          if (typeof onChange === 'function') {
+            if (realValue.current !== value) {
+              onChange(realValue.current);
+            }
+          }
         }
       }}
     >

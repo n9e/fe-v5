@@ -184,6 +184,7 @@ const SideMenu: FC = () => {
     localStorage.setItem('menuCollapsed', !collapsed ? '1' : '0');
   };
   const handleClick: MenuClickEventHandler = ({ key }) => {
+    if (location.pathname === key) return;
     setSelectedKeys([key as string]);
     // 写两个key as string 感觉有点傻
     if (key === 'changeLanguage') {
@@ -227,17 +228,18 @@ const SideMenu: FC = () => {
       style={{
         display: 'flex',
         flexDirection: 'column',
+        padding: '10px 0 10px 10px',
       }}
     >
       <div className={`home ${collapsed ? 'collapse' : ''}`}>
         <div className='name' onClick={() => history.push('/metric/explorer')} key='overview'>
-          <img src={collapsed ? '/image/logo.svg' : '/image/logo-l.svg'} alt='' className='logo' />
+          <img src={collapsed ? '/image/logo.svg' : '/image/logo-l(1).svg'} alt='' className='logo' />
         </div>
       </div>
 
       <Menu
         className='left-menu-container'
-        theme='dark'
+        // theme='dark'
         inlineCollapsed={collapsed}
         openKeys={openKeys}
         selectedKeys={selectedKeys}

@@ -46,17 +46,17 @@ interface IProps {
   dashboard: Dashboard;
   range: Range;
   step: number | null;
-  refreshFlag: string;
   variableConfig: any;
   panels: any[];
   setPanels: (panels: any[]) => void;
   onShareClick: (panel: any) => void;
+  onUpdated: () => void;
 }
 
 const ReactGridLayout = WidthProvider(RGL);
 
 function index(props: IProps) {
-  const { curCluster, dashboard, range, step, refreshFlag, variableConfig, panels, setPanels, onShareClick } = props;
+  const { curCluster, dashboard, range, step, variableConfig, panels, setPanels, onShareClick, onUpdated } = props;
   const layoutInitialized = useRef(false);
   const allowUpdateDashboardConfigs = useRef(false);
   const reactGridLayoutDefaultProps = {
@@ -80,6 +80,8 @@ function index(props: IProps) {
                 allowUpdateDashboardConfigs.current = false;
                 updateDashboardConfigs(dashboard.id, {
                   configs: panelsMergeToConfigs(dashboard.configs, newPanels),
+                }).then(() => {
+                  onUpdated();
                 });
               }
             }
@@ -91,6 +93,8 @@ function index(props: IProps) {
           if (!_.isEqual(panels, newPanels)) {
             updateDashboardConfigs(dashboard.id, {
               configs: panelsMergeToConfigs(dashboard.configs, newPanels),
+            }).then(() => {
+              onUpdated();
             });
           }
         }}
@@ -99,6 +103,8 @@ function index(props: IProps) {
           if (!_.isEqual(panels, newPanels)) {
             updateDashboardConfigs(dashboard.id, {
               configs: panelsMergeToConfigs(dashboard.configs, newPanels),
+            }).then(() => {
+              onUpdated();
             });
           }
         }}
@@ -113,7 +119,6 @@ function index(props: IProps) {
                     dashboardId={_.toString(dashboard.id)}
                     id={item.id}
                     time={range}
-                    refreshFlag={refreshFlag}
                     step={step}
                     type={item.type}
                     values={item as any}
@@ -137,7 +142,7 @@ function index(props: IProps) {
                     onEditClick={() => {
                       editor({
                         visible: true,
-                        variableConfig,
+                        variableConfigWithOptions: variableConfig,
                         cluster: curCluster,
                         id: item.id,
                         initialValues: {
@@ -149,6 +154,8 @@ function index(props: IProps) {
                           setPanels(newPanels);
                           updateDashboardConfigs(dashboard.id, {
                             configs: panelsMergeToConfigs(dashboard.configs, newPanels),
+                          }).then(() => {
+                            onUpdated();
                           });
                         },
                       });
@@ -162,6 +169,8 @@ function index(props: IProps) {
                           setPanels(newPanels);
                           updateDashboardConfigs(dashboard.id, {
                             configs: panelsMergeToConfigs(dashboard.configs, newPanels),
+                          }).then(() => {
+                            onUpdated();
                           });
                         },
                       });
@@ -178,6 +187,8 @@ function index(props: IProps) {
                           setPanels(newPanels);
                           updateDashboardConfigs(dashboard.id, {
                             configs: panelsMergeToConfigs(dashboard.configs, newPanels),
+                          }).then(() => {
+                            onUpdated();
                           });
                         }}
                       >
@@ -195,12 +206,14 @@ function index(props: IProps) {
                     setPanels(newPanels);
                     updateDashboardConfigs(dashboard.id, {
                       configs: panelsMergeToConfigs(dashboard.configs, newPanels),
+                    }).then(() => {
+                      onUpdated();
                     });
                   }}
                   onAddClick={() => {
                     editor({
                       visible: true,
-                      variableConfig,
+                      variableConfigWithOptions: variableConfig,
                       cluster: curCluster,
                       id: item.id,
                       initialValues: {
@@ -217,6 +230,8 @@ function index(props: IProps) {
                         setPanels(newPanels);
                         updateDashboardConfigs(dashboard.id, {
                           configs: panelsMergeToConfigs(dashboard.configs, newPanels),
+                        }).then(() => {
+                          onUpdated();
                         });
                       },
                     });
@@ -226,6 +241,8 @@ function index(props: IProps) {
                     setPanels(newPanels);
                     updateDashboardConfigs(dashboard.id, {
                       configs: panelsMergeToConfigs(dashboard.configs, newPanels),
+                    }).then(() => {
+                      onUpdated();
                     });
                   }}
                   onDeleteClick={(mode: 'self' | 'withPanels') => {
@@ -241,6 +258,8 @@ function index(props: IProps) {
                     setPanels(newPanels);
                     updateDashboardConfigs(dashboard.id, {
                       configs: panelsMergeToConfigs(dashboard.configs, newPanels),
+                    }).then(() => {
+                      onUpdated();
                     });
                   }}
                 />

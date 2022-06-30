@@ -14,8 +14,9 @@
  * limitations under the License.
  *
  */
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { Badge, Checkbox, Col, Input, Radio, Row, Space } from 'antd';
+import { Resizable } from 're-resizable';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/common';
 import { getBusiGroups } from '@/services/common';
@@ -332,32 +333,51 @@ const LeftTree: React.FC<LeftTreeProps> = ({ clusterGroup = {}, busiGroup = {}, 
       },
     },
   ];
+  const [width, setWidth] = useState(_.toNumber(localStorage.getItem('leftwidth') || 200));
 
   return (
-    <div className={collapse ? 'left-area collapse' : 'left-area'}>
-      <div
-        className='collapse-btn'
-        onClick={() => {
-          localStorage.setItem('leftlist', !collapse ? '1' : '0');
-          setCollapse(!collapse);
-        }}
-      >
-        {!collapse ? <LeftOutlined /> : <RightOutlined />}
-      </div>
-      {/* 遍历渲染左侧栏内容 */}
-      {groupItems.map(
-        ({ title, isShow, shrink = false, render }: IGroupItemProps, i) =>
-          isShow && (
-            <div key={i} className={`left-area-group ${shrink ? 'group-shrink' : ''}`} style={typeof shrink === 'object' ? shrink.style : {}}>
-              <div className='left-area-group-title'>
-                {title}
-                {title === '业务组' && <SettingOutlined onClick={() => history.push(`/busi-groups`)} />}
+    <Resizable
+      style={{
+        marginRight: collapse ? 0 : 10,
+      }}
+      size={{ width: collapse ? 0 : width, height: '100%' }}
+      enable={{
+        right: collapse ? false : true,
+      }}
+      onResizeStop={(e, direction, ref, d) => {
+        let curWidth = width + d.width;
+        if (curWidth < 200) {
+          curWidth = 200;
+        }
+        setWidth(curWidth);
+        localStorage.setItem('leftwidth', curWidth.toString());
+      }}
+    >
+      <div className={collapse ? 'left-area collapse' : 'left-area'}>
+        <div
+          className='collapse-btn'
+          onClick={() => {
+            localStorage.setItem('leftlist', !collapse ? '1' : '0');
+            setCollapse(!collapse);
+          }}
+        >
+          {!collapse ? <LeftOutlined /> : <RightOutlined />}
+        </div>
+        {/* 遍历渲染左侧栏内容 */}
+        {groupItems.map(
+          ({ title, isShow, shrink = false, render }: IGroupItemProps, i) =>
+            isShow && (
+              <div key={i} className={`left-area-group ${shrink ? 'group-shrink' : ''}`} style={typeof shrink === 'object' ? shrink.style : {}}>
+                <div className='left-area-group-title'>
+                  {title}
+                  {title === '业务组' && <SettingOutlined onClick={() => history.push(`/busi-groups`)} />}
+                </div>
+                {render()}
               </div>
-              {render()}
-            </div>
-          ),
-      )}
-    </div>
+            ),
+        )}
+      </div>
+    </Resizable>
   );
 };
 

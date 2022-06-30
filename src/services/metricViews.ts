@@ -54,24 +54,18 @@ export const getMetricValues = function (match: string, range: Range) {
     method: RequestMethod.Get,
     params: {
       ...formatPickerDate(range),
-      'match[]': match
-    }
+      'match[]': match,
+    },
   }).then((res) => {
     return res?.data;
   });
 };
 
-function getQuery(params: {
-  isAggr: boolean,
-  aggrFunc: string,
-  calcArr: string[],
-  metric: string,
-  match: string,
-  offset: string,
-  aggrGroups: string[],
-}) {
+function getQuery(params: { isAggr: boolean; aggrFunc: string; calcArr: string[]; metric: string; match: string; offset: string; aggrGroups: string[] }) {
   const { isAggr, aggrFunc, calcArr, metric, match, offset, aggrGroups } = params;
-  return `${isAggr ? aggrFunc+'(' : ''}${calcArr[0] ? calcArr[0]+'(' : ''}${metric}${match}${calcArr[1] ? `[${calcArr[1]}]` : ''}${offset ? ` offset ${offset}` : ''}${calcArr[0] ? ')' : ''}${isAggr ? `) by (${_.join(aggrGroups, ', ')})` : ''}`;
+  return `${isAggr ? aggrFunc + '(' : ''}${calcArr[0] ? calcArr[0] + '(' : ''}${metric}${match}${calcArr[1] ? `[${calcArr[1]}]` : ''}${offset ? ` offset ${offset}` : ''}${
+    calcArr[0] ? ')' : ''
+  }${isAggr ? `) by (${_.join(aggrGroups, ', ')})` : ''}`;
 }
 
 const getSerieName = (metric: Object) => {
@@ -106,10 +100,10 @@ export const getExprs = (params) => {
         offset: item,
         aggrGroups,
       });
-    })
+    }),
   ];
   return exprs;
-}
+};
 
 export const getQueryRange = function (params: {
   metric: string;
@@ -124,22 +118,24 @@ export const getQueryRange = function (params: {
   const { metric, match, range, step, calcFunc, comparison, aggrFunc, aggrGroups } = params;
   let { start, end } = formatPickerDate(range);
   let _step = step;
-  if (!step) _step = Math.max(Math.floor((end - start) / 250), 1);
+  if (!step) _step = Math.max(Math.floor((end - start) / 240), 1);
   const exprs = getExprs({
     metric,
     match,
     calcFunc,
-    comparison, aggrFunc, aggrGroups,
+    comparison,
+    aggrFunc,
+    aggrGroups,
   });
   const requests = _.map(exprs, (expr) => {
     return request('/api/n9e/prometheus/api/v1/query_range', {
       method: RequestMethod.Get,
       params: {
-        start,
-        end,
+        start: start - (start % _step!),
+        end: end - (end % _step!),
         step: _step,
         query: expr,
-      }
+      },
     });
   });
   return Promise.all(requests).then((res: any) => {
@@ -214,15 +210,10 @@ export const getMetricsDesc = function (data) {
   });
 };
 
-export const getQueryRangeSingleMetric = function (params: {
-  metric: string;
-  match: string;
-  range: Range;
-  calcFunc: string;
-}) {
+export const getQueryRangeSingleMetric = function (params: { metric: string; match: string; range: Range; calcFunc: string }) {
   const { metric, match, range, calcFunc } = params;
   let { start, end } = formatPickerDate(range);
-  const step = Math.max(Math.floor((end - start) / 250), 1);
+  const step = Math.max(Math.floor((end - start) / 240), 1);
   const query = `${calcFunc}(${metric}${match}) by (ident)`;
   return request('/api/n9e/prometheus/api/v1/query_range', {
     method: RequestMethod.Get,
@@ -231,6 +222,6 @@ export const getQueryRangeSingleMetric = function (params: {
       end,
       step,
       query,
-    }
+    },
   });
 };

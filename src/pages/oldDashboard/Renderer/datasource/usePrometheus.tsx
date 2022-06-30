@@ -57,7 +57,7 @@ export default function usePrometheus(props: IProps) {
   const fetchData = () => {
     let { start, end } = formatPickerDate(time);
     let _step = step;
-    if (!step) _step = Math.max(Math.floor((end - start) / 250), 1);
+    if (!step) _step = Math.max(Math.floor((end - start) / 240), 1);
     const _series: any[] = [];
     const promises: Promise<any>[] = [];
     _.forEach(targets, (target) => {

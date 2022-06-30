@@ -30,20 +30,18 @@
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    // margin-bottom: 5px;
     &-item {
       display: flex;
       flex-direction: row;
+      align-items: flex-start; // 防止其他 item 的 label被撑开
       margin-right: 12px;
-      // margin-bottom: 10px;
-      // width: 200px;
       .ant-select {
         flex: 1;
       }
       &-tagName {
         line-height: 32px;
         padding: 0 8px;
-        background: @colorGray7;
+        background: #eaeaea;
         border-radius: 4px 0 0 4px;
       }
     }

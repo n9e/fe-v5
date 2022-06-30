@@ -1,16 +1,17 @@
 #root,
 .App {
-  @media screen and (min-width: 600px) {
-    min-width: 1024px;
-  }
   height: 100%;
 }
+html {
+  --slider-rail: linear-gradient(to right, #45d678 0, #45d678 100%);
+}
 
-html.ant-scrolling-effect,
 .App {
-  font-family: @font-family;
   display: flex;
-  color: #333;
+  color: #333752;
+  background: #f9f9f9;
+  font-family: @font-family;
+  // min-width: 1180px;
   .ant-menu-inline-collapsed {
     width: 50px;
   }
@@ -19,19 +20,33 @@ html.ant-scrolling-effect,
     height: 100%;
     overflow: auto;
   }
-  .ant-table .ant-table-tbody td {
-    line-height: 24px;
-    padding-top: 2px;
-    padding-bottom: 2px;
-  }
-  .ant-table thead {
-    line-height: 2.5;
-  }
-  .srm {
-    .ant-table thead {
-      line-height: 1;
+  // pagination不要太亮，不要关注这里 --from 设计师
+  .ant-pagination {
+    &-prev,
+    &-next {
+      button {
+        color: #8c8c8c;
+      }
+    }
+    &-item {
+      &-active {
+        border: 0px;
+      }
+      a {
+        color: #8c8c8c;
+      }
+    }
+    color: #8c8c8c;
+    .ant-select {
+      color: #8c8c8c;
     }
   }
+
+  .dot-block {
+    padding: 16px;
+    border: 1px dashed @primary-color;
+  }
+
   .ant-divider-vertical {
     border-left: 1px solid rgba(0, 0, 0, 0.16);
   }
@@ -57,6 +72,12 @@ html.ant-scrolling-effect,
   .ant-pagination-total-text {
     line-height: 32px;
     margin-right: 16px;
+  }
+
+  .srm {
+    .ant-table thead {
+      line-height: 1;
+    }
   }
   // table
   .ant-table {
@@ -147,17 +168,179 @@ input::placeholder {
   padding: 16px !important;
 }
 
-// srm beginning
-.ellipsis {
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-}
-// srm ending
-
 .ant-input.promql-input {
   &.readonly {
     border: none;
     padding: 4px 0px;
   }
+}
+
+.ant-divider-horizontal {
+  margin: 16px 0px !important;
+}
+
+.page-title {
+  &::before {
+    width: 4px;
+    height: 14px;
+    background-color: @primary-color;
+    border-radius: 2px;
+    margin-right: 8px;
+    opacity: 1;
+    content: ' ';
+    display: inline-block;
+  }
+  // height: 54px;
+  margin: 24px 0 16px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.second-page-title {
+  &::before {
+    width: 4px;
+    height: 12px;
+    background-color: @primary-color;
+    border-radius: 2px;
+    margin-right: 8px;
+    opacity: 1;
+    content: ' ';
+    display: inline-block;
+  }
+  display: flex;
+  align-items: center;
+}
+
+::selection {
+  color: @primary-color !important;
+  background: fade(@primary-color, 10%) !important;
+}
+
+.theme-color {
+  color: @primary-color;
+}
+
+.title-color {
+  color: @text-color;
+  & > * {
+    color: @text-color;
+  }
+}
+.base-text-color {
+  color: @text-color;
+}
+.second-color {
+  color: @secondColor;
+  & > * {
+    color: @secondColor;
+  }
+}
+.danger-color {
+  color: #fd736c;
+  &:hover {
+    color: #fd736c;
+  }
+}
+
+.ellipsis {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  &.break {
+    word-break: break-all;
+    white-space: normal;
+  }
+}
+
+.copy {
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.flash-cat-block {
+  padding: 16px;
+  background: #e5e5e5;
+}
+
+.flash-cat-border-block {
+  border: 1px solid #e5e5e5;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+// 覆盖 ts-graph tooltip 样式
+.ts-graph-tooltip-content {
+  border: 1px solid #ddd !important;
+  box-shadow: 0px 1px 8px 0px rgba(0, 0, 0, 0.1) !important;
+}
+.ant-tabs-tab {
+  color: @secondColor;
+}
+
+.ant-spin-container {
+  height: 100%;
+}
+
+.md-block {
+  margin-top: 8px;
+  margin-bottom: 16px;
+  padding: 16px;
+  border: 1px dashed #e5e5e5;
+}
+
+.ant-tabs-top {
+  & > .ant-tabs-nav::before {
+    border-bottom: 0px;
+  }
+}
+.mt16 {
+  margin-top: 16px;
+}
+.mb16 {
+  margin-bottom: 16px;
+}
+.mb8 {
+  margin-bottom: 8px;
+}
+.mt8 {
+  margin-top: 8px;
+}
+
+.red-text {
+  &.anticon {
+    color: #ee5a52;
+  }
+  color: #ee5a52;
+}
+.green-text {
+  &.anticon {
+    color: #83d35c;
+  }
+  color: #83d35c;
+}
+
+.shaking {
+  .anticon-close {
+    color: @primary-color;
+    animation: shake-icon ease 1s;
+  }
+}
+@keyframes shake-icon {
+  33% {
+    transform: scale(1.4) rotateZ(45deg);
+  }
+  66% {
+    transform: scale(1.2) rotateZ(-45deg);
+  }
+  100% {
+    transform: scale(1) rotateZ(0deg);
+  }
+}
+
+.edit_area_background {
+  background-color: #f6f6f6;
+  border-radius: 4px;
+  padding: 8px;
 }

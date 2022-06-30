@@ -14,12 +14,14 @@
  * limitations under the License.
  *
  */
-export interface Variable {
+export interface IVariable {
   name: string;
   definition: string;
+  fullDefinition?: string; // 转换变量后的完整表达式
   reg?: string;
-  // selected?: string | string[];
-  multi: boolean;
-  allOption: boolean;
+  multi?: boolean;
+  allOption?: boolean;
   options?: string[];
+  type?: 'query' | 'textbox';
+  defaultValue?: string; // textbox 的默认值
 }

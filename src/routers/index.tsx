@@ -36,6 +36,7 @@ import ObjectExplore from '@/pages/monitor/object';
 import IndicatorPage from '@/pages/monitor/indicator';
 import StrategyAdd from '@/pages/warning/strategy/add';
 import StrategyEdit from '@/pages/warning/strategy/edit';
+import StrategyBrain from '@/pages/warning/strategy/Jobs';
 import Shield from '@/pages/warning/shield';
 import AddShield from '@/pages/warning/shield/add';
 import ShieldEdit from '@/pages/warning/shield/edit';
@@ -46,7 +47,6 @@ import Event from '@/pages/event';
 import EventDetail from '@/pages/event/detail';
 import historyEvents from '@/pages/historyEvents';
 import MonObjectManage from '@/pages/monObjectManage';
-import TargetsMap from '@/pages/TargetsMap';
 import Demo from '@/pages/demo';
 import TaskTpl from '@/pages/taskTpl';
 import TaskTplAdd from '@/pages/taskTpl/add';
@@ -119,6 +119,7 @@ export default function Content() {
         <Route exact path='/alert-rules/add/:group_id' component={StrategyAdd} />
         <Route exact path='/alert-rules/edit/:id' component={StrategyEdit} />
         <Route exact path='/alert-rules/:id?' component={Strategy} />
+        <Route exact path='/alert-rules/brain/:id' component={StrategyBrain} />
         <Route exact path='/alert-mutes' component={Shield} />
         <Route exact path='/alert-mutes/add/:from?' component={AddShield} />
         <Route exact path='/alert-mutes/edit/:id' component={ShieldEdit} />
@@ -131,7 +132,6 @@ export default function Content() {
         <Route exact path='/alert-cur-events/:eventId' component={EventDetail} />
         <Route exact path='/alert-his-events/:eventId' component={EventDetail} />
         <Route exact path='/targets' component={MonObjectManage} />
-        <Route exact path='/targets-map' component={TargetsMap} />
 
         <Route exact path='/job-tpls' component={TaskTpl} />
         <Route exact path='/job-tpls/add' component={TaskTplAdd} />

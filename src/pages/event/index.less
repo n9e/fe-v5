@@ -85,15 +85,17 @@
     }
     .icon-area {
       width: 48px;
-      visibility: hidden;
-      // display: none;
+      display: none;
       flex-shrink: 0;
+      text-align: right;
     }
     &:hover {
       background-color: fade(@primary-color, 10%);
       .icon-area {
-        visibility: visible;
-        // display: block;
+        display: block;
+      }
+      .default-holder {
+        display: none;
       }
     }
     .title {
@@ -159,6 +161,9 @@
     border-collapse: collapse;
     thead {
       border-left: 10px solid #fafafa;
+    }
+    td {
+      line-height: 28px;
     }
   }
 }

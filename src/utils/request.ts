@@ -74,7 +74,17 @@ request.interceptors.response.use(
               }
               return { ...data, success: true };
             } else {
-              throw new Error(data.err);
+              if (options.silence) {
+                throw {
+                  name: data.err,
+                  message: data.err,
+                  silence: true,
+                  data,
+                  response,
+                };
+              } else {
+                throw new Error(data.err);
+              }
             }
           }
         });

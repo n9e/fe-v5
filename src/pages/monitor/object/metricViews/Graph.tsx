@@ -74,7 +74,7 @@ export default function Graph(props: IProps) {
     },
     options: {
       legend: {
-        displayMode: highLevelConfig.legend ? 'list' : 'hidden',
+        displayMode: highLevelConfig.legend ? 'table' : 'hidden',
       },
       tooltip: {
         mode: highLevelConfig.shared ? 'all' : 'single',

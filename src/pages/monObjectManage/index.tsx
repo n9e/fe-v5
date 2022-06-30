@@ -374,7 +374,7 @@ const MonObjectManage: React.FC = () => {
           tagArr &&
           tagArr.map((item) => (
             <Tag
-              color='blue'
+              color='purple'
               key={item}
               onClick={(e) => {
                 if (!tableQueryContent.includes(item)) {
@@ -398,7 +398,6 @@ const MonObjectManage: React.FC = () => {
     {
       title: '业务组',
       dataIndex: 'group_obj',
-      width: 140,
       render(groupObj: BusiGroupItem | null) {
         return groupObj ? groupObj.name : '未归组';
       },

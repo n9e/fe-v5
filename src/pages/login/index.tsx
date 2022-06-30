@@ -55,17 +55,19 @@ export default function Login() {
 
   return (
     <div className='login-warp'>
-      <div className='banner'>
-        <div className='banner-bg'>
-          <img src={'/image/logo-l.svg'} className='logo' width='132'></img>
-        </div>
+      <img src={'/image/login-left-top-corner.png'} className='left-top-bg'></img>
+      <img src={'/image/login-right-bottom-corner.png'} className='right-bottom-bg'></img>
+      <div className='banner integration'>
+        <img src={'/image/login-dashboard.svg'} style={{ margin: '0 60px', zIndex: 5, width: 632 }}></img>
       </div>
       <div className='login-panel'>
-        <div className='login-main'>
-          <div className='login-title'>Nightingale</div>
+        <div className='login-main  integration'>
+          <div className='login-title'>
+            <img src={'/image/logo-l.svg'} style={{ width: '120px' }} />
+          </div>
           <Form form={form} layout='vertical' requiredMark={true}>
             <Form.Item
-              required
+              label='账户'
               name='username'
               rules={[
                 {
@@ -77,7 +79,7 @@ export default function Login() {
               <Input placeholder={t('请输入用户名')} prefix={<UserOutlined className='site-form-item-icon' />} />
             </Form.Item>
             <Form.Item
-              required
+              label='密码'
               name='password'
               rules={[
                 {

@@ -25,7 +25,7 @@ import Stat from './Stat';
 import Table from './Table';
 import Pie from './Pie';
 import Hexbin from './Hexbin';
-import { VariableType } from '../../VariableConfig';
+import { IVariable } from '../../VariableConfig/definition';
 import Markdown from '../../Editor/Components/Markdown';
 import usePrometheus from '../datasource/usePrometheus';
 import { IPanel } from '../../types';
@@ -35,11 +35,10 @@ interface IProps {
   dashboardId: string;
   id?: string;
   time: Range;
-  refreshFlag?: string;
   step: number | null;
   type: string;
   values: IPanel;
-  variableConfig?: VariableType;
+  variableConfig?: IVariable[];
   isPreview?: boolean; // 是否是预览，预览中不显示编辑和分享
   onCloneClick?: () => void;
   onShareClick?: () => void;
@@ -48,7 +47,7 @@ interface IProps {
 }
 
 function index(props: IProps) {
-  const { dashboardId, id, time, refreshFlag, step, type, variableConfig, isPreview, onCloneClick, onShareClick, onEditClick, onDeleteClick } = props;
+  const { dashboardId, id, time, step, type, variableConfig, isPreview, onCloneClick, onShareClick, onEditClick, onDeleteClick } = props;
   const values = _.cloneDeep(props.values);
   const ref = useRef<HTMLDivElement>(null);
   const [inViewPort] = useInViewport(ref);
@@ -56,7 +55,6 @@ function index(props: IProps) {
     id,
     dashboardId,
     time,
-    refreshFlag,
     step,
     targets: values.targets,
     variableConfig,
@@ -157,7 +155,7 @@ function index(props: IProps) {
         <div className='renderer-header-loading'>{loading && <SyncOutlined spin />}</div>
       </div>
       <div className='renderer-body' style={{ height: `calc(100% - 36px)` }}>
-        {RendererCptMap[type] ? RendererCptMap[type]() : `无效的图表类型 ${type}`}
+        {RendererCptMap[type] ? RendererCptMap[type]() : <div className='unknown-type'>{`无效的图表类型 ${type}`}</div>}
       </div>
     </div>
   );

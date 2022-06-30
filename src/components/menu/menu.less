@@ -1,50 +1,82 @@
 .home {
-  width: 160px;
+  width: 176px;
   align-items: center;
+  flex-direction: column;
   flex-shrink: 0;
+  border-radius: 8px 8px 0 0;
   &.collapse {
     width: 50px;
     padding-left: 0px;
     .name {
+      width: 32px;
       .logo {
-        width: 24px;
-        display: inline-block;
+        transition: none;
+        width: 32px;
       }
     }
   }
   height: 100%;
   display: flex;
   height: 50px;
-  background: #2c3d5e;
+  background: #f0f0f0;
   padding-top: 5px;
   strong {
     color: #fff;
     margin-left: 5px;
   }
   .name {
+    font-size: 20px;
+    color: #2d0b90;
     cursor: pointer;
-    flex: 1;
+    position: relative;
+    height: 50px;
+    width: 144px;
+    line-height: 50px;
+    border-bottom: 1px solid #e5e5e5;
     text-align: center;
     .logo {
-      width: 112px;
+      width: 122px;
+      transition: 0.3s all;
       display: inline-block;
     }
+    .collapse-icon {
+      position: absolute;
+      width: 32px;
+      right: -36px;
+    }
+  }
+  .collapse-area {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 50px;
+    padding-right: 16px;
+    justify-content: flex-end;
   }
 }
 .collapseBtn {
-  color: #fff;
-  background: #2c3d5e;
-  border-radius: 0;
+  color: #8c8c8c;
+  background: #f0f0f0;
+  width: 100%;
+  border-radius: 0 0 8px 8px;
   &:hover,
   &:focus {
-    color: #fff;
-    background: #2c3d5e;
+    color: @primary-color;
+    background: #f0f0f0;
   }
 }
 .ant-menu {
-  width: 160px;
+  width: 176px;
   transition: none;
   flex: 1;
+  &.left-menu-container {
+    height: calc(100% - 50px);
+    padding-top: 15px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+  }
   &.ant-menu-inline-collapsed {
     width: 50px;
   }
@@ -62,6 +94,10 @@
   .ant-menu-item,
   .ant-menu-submenu-title {
     transition: none;
+    flex-shrink: 0;
+  }
+  .ant-menu-submenu .ant-menu-title-content {
+    font-size: 12px;
   }
   .avator {
     line-height: @baseFontSizeMiddle;
@@ -82,38 +118,21 @@
   .ant-menu-submenu-title .anticon {
     transition: none;
   }
+  .menu-item-holder {
+    flex: 1;
+  }
+  .ant-tooltip-arrow-content {
+    background: #fff;
+  }
+  .ant-tooltip-inner {
+    color: @menu-item-color;
+    background: #fff;
+  }
 }
 .ant-menu-inline-collapsed .ant-menu-submenu-title,
 .ant-menu-inline-collapsed > .ant-menu-item {
   padding: 0 calc(50% - 16px / 2) !important;
 }
-
-.left-menu-container {
-  height: calc(100% - 50px);
-  overflow-y: auto;
-  overflow-x: hidden;
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
-  &::-webkit-scrollbar-thumb {
-    // background: -webkit-gradient(linear, left top, left bottom, from(#333), to(#eee));
-    background: #4a618a;
-    // background: linear-gradient(180deg, #333, #eee);
-    border-radius: 10px;
-    // box-shadow: inset 2px 2px 2px hsla(0, 0%, 100%, 0.25), inset -2px -2px 2px rgba(0, 0, 0, 0.25);
-  }
-  &::-webkit-scrollbar-track {
-    background: #2c3d5e;
-  }
-  &::-webkit-scrollbar-thumb:hover {
-    background: #4c6594;
-  }
-
-  // /* Hide scrollbar for Chrome, Safari and Opera */
-  // &::-webkit-scrollbar {
-  //   display: none;
-  // }
-  // /* Hide scrollbar for IE, Edge and Firefox */
-  // -ms-overflow-style: none; /* IE and Edge */
-  // scrollbar-width: none;
+.menu-collapse-icon {
+  font-size: 14px;
 }

@@ -46,7 +46,7 @@ export default (props) => {
         return (
           tagArr &&
           tagArr.map((item) => (
-            <Tag color='blue' key={item}>
+            <Tag color='purple' key={item}>
               {item}
             </Tag>
           ))

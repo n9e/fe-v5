@@ -77,7 +77,7 @@ const Event: React.FC = () => {
           tags &&
           tags.map((item) => (
             <Tag
-              color='blue'
+              color='purple'
               key={item}
               onClick={(e) => {
                 if (!hisQueryContent.includes(item)) {

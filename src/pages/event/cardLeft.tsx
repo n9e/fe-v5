@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Input, Form, Modal, message } from 'antd';
+import { Input, Form, Modal, Switch, message } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusSquareOutlined, SearchOutlined } from '@ant-design/icons';
 import { getAggrAlerts, AddAggrAlerts, updateAggrAlerts, deleteAggrAlerts } from '@/services/warning';
+import { useSelector } from 'react-redux';
+import { RootState as AccountRootState, accountStoreState } from '@/store/accountInterface';
 import './index.less';
 interface Props {
   onRefreshRule: (rule: string) => void;
@@ -26,6 +28,7 @@ export default function CardLeft(props: Props) {
   const localSelectId = localStorage.getItem('selectedAlertRule');
   const [activeId, setActiveId] = useState<number>(localSelectId ? Number(localSelectId) : 0);
   const [search, setSearch] = useState('');
+  const { profile } = useSelector<AccountRootState, accountStoreState>((state) => state.account);
 
   useEffect(() => {
     getList(true).then((res) => {
@@ -69,7 +72,11 @@ export default function CardLeft(props: Props) {
   const handleOk = async () => {
     await form.validateFields();
     const func = editForm ? updateAggrAlerts : AddAggrAlerts;
-    const cur = await func(form.getFieldsValue());
+    const values = form.getFieldsValue();
+    const cur = await func({
+      ...values,
+      cate: values.cate ? 0 : 1,
+    });
     setVisible(false);
     await getList();
     saveActiveId(editForm ? editForm.id : cur.dat.id);
@@ -117,30 +124,44 @@ export default function CardLeft(props: Props) {
               {/* <div className='desc'>{alert.rule}</div> */}
             </div>
 
-            {alert.cate === 0 ? (
-              <div className='default-holder'>内置</div>
-            ) : (
-              <div className='icon-area'>
-                <EditOutlined
-                  onClick={() => {
-                    setEditForm(alert);
-                    setVisible(true);
-                    form.setFieldsValue(alert);
-                  }}
-                />
-                <DeleteOutlined
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete(alert);
-                  }}
-                />
+            {alert.cate === 1 || profile.admin ? (
+              <div>
+                {alert.cate === 0 && <div className='default-holder'>公开</div>}
+                <div className='icon-area'>
+                  <EditOutlined
+                    onClick={() => {
+                      setEditForm(alert);
+                      setVisible(true);
+                      form.setFieldsValue({
+                        ...alert,
+                        cate: alert.cate === 0,
+                      });
+                      onRefreshRule(alert.rule);
+                    }}
+                  />
+                  <DeleteOutlined
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(alert);
+                    }}
+                  />
+                </div>
               </div>
+            ) : (
+              <div className='default-holder'>公开</div>
             )}
           </div>
         ))}
 
       <Modal title={(editForm ? '编辑' : '新增') + '聚合规则'} visible={visible} onOk={handleOk} onCancel={handleCancel} destroyOnClose>
-        <Form form={form} layout='vertical' preserve={false}>
+        <Form
+          form={form}
+          layout='vertical'
+          preserve={false}
+          initialValues={{
+            cate: false,
+          }}
+        >
           <Form.Item
             label='Name'
             name='name'
@@ -173,10 +194,14 @@ export default function CardLeft(props: Props) {
                 },
               }),
             ]}
-            style={{ marginBottom: 5 }}
           >
             <Input />
           </Form.Item>
+          {profile.admin && (
+            <Form.Item label='是否公开' name='cate' rules={[{ required: true }]} valuePropName='checked'>
+              <Switch />
+            </Form.Item>
+          )}
         </Form>
       </Modal>
     </div>

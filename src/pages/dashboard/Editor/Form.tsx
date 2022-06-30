@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form, Input, Row, Col, Button, Space, Switch, Tooltip } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import _ from 'lodash';
@@ -24,16 +24,20 @@ import Resolution from '@/components/Resolution';
 import { defaultValues, defaultCustomValuesMap } from './config';
 import Options from './Options';
 import Collapse, { Panel } from './Components/Collapse';
-import VariableConfig, { VariableType } from '../VariableConfig';
+import VariableConfig, { IVariable } from '../VariableConfig';
 import getFirstUnusedLetter from '../Renderer/utils/getFirstUnusedLetter';
 
 const alphabet = 'ABCDEFGHIGKLMNOPQRSTUVWXYZ'.split('');
 
 export default function FormCpt(props) {
-  const { chartForm, setChangedFlag, initialValues, type, variableConfig, cluster, render, range, id } = props;
-  const [innerVariableConfig, setInnerVariableConfig] = useState<VariableType | undefined>(variableConfig);
+  const { chartForm, setChangedFlag, initialValues, type, cluster, render, range, id } = props;
+  const [variableConfigWithOptions, setVariableConfigWithOptions] = useState<IVariable[]>(props.variableConfigWithOptions);
 
   defaultValues.custom = defaultCustomValuesMap[_.get(initialValues, 'type') || defaultValues.type];
+
+  useEffect(() => {
+    setVariableConfigWithOptions(props.variableConfigWithOptions);
+  }, [JSON.stringify(props.variableConfigWithOptions)]);
 
   return (
     <Form
@@ -57,14 +61,14 @@ export default function FormCpt(props) {
           }}
         >
           <Col flex={1} style={{ minWidth: 100 }}>
-            <div style={{ marginBottom: 10 }}>{render(innerVariableConfig)}</div>
+            <div style={{ marginBottom: 10 }}>{render(variableConfigWithOptions)}</div>
             <div style={{ height: 'calc(100% - 310px)', overflowY: 'auto' }}>
               <div style={{ marginBottom: 10 }}>
                 <VariableConfig
-                  onChange={(value) => {
-                    setInnerVariableConfig(value);
+                  onChange={(value, bool, withOptions) => {
+                    setVariableConfigWithOptions(withOptions || []);
                   }}
-                  value={innerVariableConfig}
+                  value={variableConfigWithOptions}
                   editable={false}
                   cluster={cluster}
                   range={range}
@@ -117,6 +121,7 @@ export default function FormCpt(props) {
                                   style={{ flex: 1 }}
                                 >
                                   <PromQLInput
+                                    validateTrigger={['onBlur']}
                                     url='/api/n9e/prometheus'
                                     headers={{
                                       'X-Cluster': localStorage.getItem('curCluster') || 'DEFAULT',
