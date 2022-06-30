@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Select, Input } from 'antd';
 import _ from 'lodash';
 import { IVariable } from './definition';
@@ -30,6 +30,10 @@ export default function DisplayItem(props: IProps) {
   const { id, expression, onChange } = props;
   const { name, multi, allOption, options, type } = expression;
   const [selected, setSelected] = useState<string[]>(getVaraiableSelected(name, id));
+
+  useEffect(() => {
+    setSelected(getVaraiableSelected(name, id));
+  }, [getVaraiableSelected(name, id)]);
 
   return (
     <div className='tag-content-close-item'>
