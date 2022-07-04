@@ -38,7 +38,7 @@ const valueMap = [
   { exp: 15, si: 'P', iec: 'Pi', iecExp: 50 },
   { exp: 18, si: 'E', iec: 'Ei', iecExp: 60 },
   { exp: 21, si: 'Z', iec: 'Zi', iecExp: 70 },
-  { exp: 24, si: 'Y', iec: 'Yi', iecExp: 80 }
+  { exp: 24, si: 'Y', iec: 'Yi', iecExp: 80 },
 ];
 
 const baseUtilMap = {
@@ -50,28 +50,33 @@ export const config = [
   {
     name: 'Data(SI)',
     type: 'si',
-    children: [{
-      name: 'bits',
-    }, {
-      name: 'bytes',
-    }]
-  }, {
+    children: [
+      {
+        name: 'bits',
+      },
+      {
+        name: 'bytes',
+      },
+    ],
+  },
+  {
     name: 'Data(IEC)',
     type: 'iec',
-    children: [{
-      name: 'bits',
-    }, {
-      name: 'bytes',
-    }]
-  }
+    children: [
+      {
+        name: 'bits',
+      },
+      {
+        name: 'bytes',
+      },
+    ],
+  },
 ];
 
 export function format(value: number, options = defaultOptions) {
   if (value === null || value === undefined) return;
   const baseUtil = options.base ? baseUtilMap[options.base] : ''; // 支持
-  if (
-    (options.type === 'si' && value < 1000) || (options.type === 'iec' && value < 1024)
-  ) {
+  if ((options.type === 'si' && Math.abs(value) < 1000) || (options.type === 'iec' && Math.abs(value) < 1024)) {
     return _.round(value, options.decimals) + baseUtil;
   }
 
@@ -97,6 +102,4 @@ export function format(value: number, options = defaultOptions) {
   return _.round(value, options.decimals);
 }
 
-export function parse(value: string, options = defaultOptions) {
-
-}
+export function parse(value: string, options = defaultOptions) {}

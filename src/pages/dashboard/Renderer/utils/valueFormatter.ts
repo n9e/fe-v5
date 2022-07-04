@@ -21,29 +21,36 @@ import * as byteConverter from './byteConverter';
 
 function timeFormatter(val, type: 'seconds' | 'milliseconds', decimals) {
   if (typeof val !== 'number') return val;
-  const timeMap = [{
-    unit: 'year',
-    value: 31104000,
-  }, {
-    unit: 'month',
-    value: 2592000,
-  }, {
-    unit: 'week',
-    value: 604800,
-  }, {
-    unit: 'day',
-    value: 86400,
-  }, {
-    unit: 'hour',
-    value: 3600,
-  }, {
-    unit: 'min',
-    value: 60,
-  }]
+  const timeMap = [
+    {
+      unit: 'year',
+      value: 31104000,
+    },
+    {
+      unit: 'month',
+      value: 2592000,
+    },
+    {
+      unit: 'week',
+      value: 604800,
+    },
+    {
+      unit: 'day',
+      value: 86400,
+    },
+    {
+      unit: 'hour',
+      value: 3600,
+    },
+    {
+      unit: 'min',
+      value: 60,
+    },
+  ];
   const shortTypeMap = {
     seconds: 's',
     milliseconds: 'ms',
-  }
+  };
   let newVal = val;
   let unit = shortTypeMap[type];
   _.forEach(timeMap, (item) => {
@@ -64,13 +71,13 @@ function timeFormatter(val, type: 'seconds' | 'milliseconds', decimals) {
   return _.round(newVal, decimals) + unit;
 }
 
-const valueFormatter = ({util, decimals = 3}, val) => {
+const valueFormatter = ({ util, decimals = 3 }, val) => {
   if (val === null || val === '' || val === undefined) {
     return '';
   }
   if (typeof val !== 'number') {
     val = _.toNumber(val);
-  };
+  }
   if (util) {
     const utilValObj = utilValMap[util];
     if (utilValObj) {

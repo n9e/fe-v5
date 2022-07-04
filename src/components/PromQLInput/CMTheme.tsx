@@ -47,6 +47,10 @@ export const baseTheme = EditorView.theme({
       padding: '2px 1em 2px 3px',
       overflowY: 'hidden',
     },
+    '& > ul > li[aria-selected]': {
+      backgroundColor: '#a7d0f2',
+      color: 'unset',
+    },
     minWidth: '30%',
   },
 
