@@ -56,7 +56,7 @@
   }
   &.active {
     background-color: fade(@primary-color, 10%);
-  }  
+  }
 }
 .n9e-metric-views-labels-values {
   flex: 0 0 240px;
@@ -111,7 +111,6 @@
   .ant-tabs-tab + .ant-tabs-tab {
     margin-left: 20px;
   }
-
 }
 .n9e-metric-views-metrics-header {
   display: flex;
@@ -150,13 +149,18 @@
 }
 .n9e-metric-views-metrics-graph {
   .button-link-icon {
+    color: #999;
     cursor: pointer;
     &:hover {
-      color: #40a9ff;
+      color: @primary-color;
     }
   }
   .button-link-icon.active {
-    color: #1890ff;
+    color: @primary-color;
     cursor: unset;
+  }
+
+  .a-icon {
+    color: #999;
   }
 }
