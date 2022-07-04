@@ -55,6 +55,8 @@ export default defineConfig({
     reactSvgPlugin({ defaultExport: 'component' }),
     // visualizer()
   ],
+  // 静态资源 js 加载前缀
+  base: "",
   define: {},
   resolve: {
     alias: [

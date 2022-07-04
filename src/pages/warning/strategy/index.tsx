@@ -31,7 +31,7 @@ const Strategy: React.FC = () => {
   const id = urlQuery.get('id');
   const { t } = useTranslation();
   const busiChange = (id) => {
-    history.push(`/alert-rules?id=${id}`);
+    history.push(import.meta.env.VITE_PREFIX + `/alert-rules?id=${id}`);
   };
   return (
     <PageLayout title={t('告警规则')} icon={<SettingOutlined />} hideCluster>

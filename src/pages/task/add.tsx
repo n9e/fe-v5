@@ -48,7 +48,7 @@ const Add = (props: any) => {
       }).then((res) => {
         message.success(t('msg.create.success'));
         props.history.push({
-          pathname: `/job-tasks/${res.dat}/result`,
+          pathname: import.meta.env.VITE_PREFIX + `/job-tasks/${res.dat}/result`,
         });
       });
     }
@@ -88,11 +88,11 @@ const Add = (props: any) => {
     <PageLayout hideCluster title={
       query.tpl ?
       <>
-        <RollbackOutlined className='back' onClick={() => history.push('/job-tpls')} />
+        <RollbackOutlined className='back' onClick={() => history.push(import.meta.env.VITE_PREFIX + '/job-tpls')} />
         自愈脚本
       </> :
       <>
-        <RollbackOutlined className='back' onClick={() => history.push('/job-tasks')} />
+        <RollbackOutlined className='back' onClick={() => history.push(import.meta.env.VITE_PREFIX + '/job-tasks')} />
         执行历史
       </>
     }>

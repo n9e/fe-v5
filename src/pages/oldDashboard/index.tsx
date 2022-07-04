@@ -146,7 +146,7 @@ export default function Dashboard() {
       render: (text: string, record: DashboardType) => {
         const { t } = useTranslation();
         return (
-          <div className='table-active-text' onClick={() => history.push(`/dashboard/${busiId}/${record.id}`)}>
+          <div className='table-active-text' onClick={() => history.push(import.meta.env.VITE_PREFIX + `/dashboard/${busiId}/${record.id}`)}>
             {text}
           </div>
         );

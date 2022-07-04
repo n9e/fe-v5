@@ -111,7 +111,7 @@ export default function version() {
               </span>
             </li>
           </ul>
-          <Image style={{ border: '1px solid #efefef', height: 250 }} preview={false} src={'/image/wx_n9e.jpg'} />
+          <Image style={{ border: '1px solid #efefef', height: 250 }} preview={false} src={import.meta.env.VITE_PREFIX + '/image/wx_n9e.jpg'} />
         </div>
       </div>
     </PageLayout>

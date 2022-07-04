@@ -128,7 +128,7 @@ const Event: React.FC = () => {
         return (
           <>
             <div>
-              <a style={{ padding: 0 }} onClick={() => history.push(`/alert-cur-events/${id}`)}>
+              <a style={{ padding: 0 }} onClick={() => history.push(import.meta.env.VITE_PREFIX + `/alert-cur-events/${id}`)}>
                 {title}
               </a>
             </div>
@@ -158,7 +158,7 @@ const Event: React.FC = () => {
               size='small'
               type='link'
               onClick={() => {
-                history.push('/alert-mutes/add', {
+                history.push(import.meta.env.VITE_PREFIX + '/alert-mutes/add', {
                   cluster: record.cluster,
                   tags: record.tags.map((tag) => {
                     const [key, value] = tag.split('=');

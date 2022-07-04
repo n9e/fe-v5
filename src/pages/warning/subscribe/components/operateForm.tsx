@@ -121,7 +121,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
       editSubscribe([{ ...params, id: detail.id }], curBusiItem.id)
         .then((_) => {
           message.success(t('编辑订阅规则成功'));
-          history.push('/alert-subscribes');
+          history.push(import.meta.env.VITE_PREFIX + '/alert-subscribes');
         })
         .finally(() => {
           setBtnLoading(false);
@@ -130,7 +130,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
       addSubscribe(params, curBusiItem.id)
         .then((_) => {
           message.success(t('新建订阅规则成功'));
-          history.push('/alert-subscribes');
+          history.push(import.meta.env.VITE_PREFIX + '/alert-subscribes');
         })
         .finally(() => {
           setBtnLoading(false);
@@ -199,7 +199,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
                   ghost
                   style={{ marginRight: '8px' }}
                   onClick={() => {
-                    ruleCur?.id && history.push(`/alert-rules/edit/${ruleCur?.id}`);
+                    ruleCur?.id && history.push(import.meta.env.VITE_PREFIX + `/alert-rules/edit/${ruleCur?.id}`);
                   }}
                 >
                   {ruleCur?.name}
@@ -303,7 +303,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
                         detail?.id &&
                           deleteSubscribes({ ids: [detail.id] }, curBusiItem.id).then(() => {
                             message.success(t('删除成功'));
-                            history.push('/alert-subscribes');
+                            history.push(import.meta.env.VITE_PREFIX + '/alert-subscribes');
                           });
                       },
 

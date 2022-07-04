@@ -108,11 +108,11 @@ const PageTable: React.FC<Props> = ({ bgid }) => {
   };
 
   const goToAddWarningStrategy = () => {
-    curBusiItem?.id && history.push(`/alert-rules/add/${curBusiItem.id}`);
+    curBusiItem?.id && history.push(import.meta.env.VITE_PREFIX + `/alert-rules/add/${curBusiItem.id}`);
   };
 
   const handleClickEdit = (id, isClone = false) => {
-    curBusiItem?.id && history.push(`/alert-rules/edit/${id}${isClone ? '?mode=clone' : ''}`);
+    curBusiItem?.id && history.push(import.meta.env.VITE_PREFIX + `/alert-rules/edit/${id}${isClone ? '?mode=clone' : ''}`);
   };
 
   const refreshList = () => {

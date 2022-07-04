@@ -42,7 +42,7 @@ const Modify = (props: any) => {
     }).then(() => {
       message.success(t('msg.modify.success'));
       props.history.push({
-        pathname: `/job-tpls`,
+        pathname: import.meta.env.VITE_PREFIX + `/job-tpls`,
       });
     });
   };
@@ -66,7 +66,7 @@ const Modify = (props: any) => {
   return (
     <PageLayout hideCluster title={
       <>
-        <RollbackOutlined className='back' onClick={() => history.push('/job-tpls')} />
+        <RollbackOutlined className='back' onClick={() => history.push(import.meta.env.VITE_PREFIX + '/job-tpls')} />
         自愈脚本
       </>
     }>

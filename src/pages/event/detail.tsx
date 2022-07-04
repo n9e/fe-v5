@@ -57,7 +57,7 @@ const EventDetailPage: React.FC = () => {
   useEffect(() => {}, [busiGroups]);
   const handleNavToWarningList = (id) => {
     if (busiGroups.find((item) => item.id === id)) {
-      history.push(`/alert-rules?id=${id}`);
+      history.push(import.meta.env.VITE_PREFIX + `/alert-rules?id=${id}`);
     } else {
       message.error('该业务组已删除或无查看权限');
     }
@@ -76,7 +76,7 @@ const EventDetailPage: React.FC = () => {
             type='link'
             className='rule-link-btn'
             onClick={() => {
-              history.push(`/alert-rules/edit/${rule_id}`);
+              history.push(import.meta.env.VITE_PREFIX + `/alert-rules/edit/${rule_id}`);
             }}
           >
             {content}
@@ -303,7 +303,7 @@ const EventDetailPage: React.FC = () => {
                   <Button
                     type='primary'
                     onClick={() => {
-                      history.push('/alert-mutes/add', {
+                      history.push(import.meta.env.VITE_PREFIX + '/alert-mutes/add', {
                         cluster: eventDetail.cluster,
                         tags: eventDetail.tags
                           ? eventDetail.tags.map((tag) => {

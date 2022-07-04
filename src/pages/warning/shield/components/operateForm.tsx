@@ -94,7 +94,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) 
       form.setFieldsValue({ busiGroup: filteredBusiGroups[0].id });
     } else {
       message.warning('无可用业务组');
-      history.push('/alert-mutes');
+      history.push(import.meta.env.VITE_PREFIX + '/alert-mutes');
     }
     return () => {};
   }, [form]);
@@ -146,7 +146,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) 
     addShield(params, curBusiItemId)
       .then((_) => {
         message.success(t('新建告警屏蔽成功'));
-        history.push('/alert-mutes');
+        history.push(import.meta.env.VITE_PREFIX + '/alert-mutes');
       })
       .finally(() => {
         setBtnLoading(false);

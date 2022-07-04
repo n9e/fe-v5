@@ -192,7 +192,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
           message.error(res.error);
         } else {
           message.success(t('编辑成功！'));
-          history.push('/alert-rules');
+          history.push(import.meta.env.VITE_PREFIX + '/alert-rules');
         }
       } else {
         const licenseRulesRemaining = _.toNumber(window.localStorage.getItem('license_rules_remaining'));
@@ -209,7 +209,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
 
         if (!errorNum) {
           message.success(`${type === 2 ? t('告警规则克隆成功') : t('告警规则创建成功')}`);
-          history.push('/alert-rules');
+          history.push(import.meta.env.VITE_PREFIX + '/alert-rules');
         } else {
           message.error(t(msg));
         }
@@ -606,7 +606,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                     onOk: () => {
                       deleteStrategy([detail.id], curBusiItem.id).then(() => {
                         message.success(t('删除成功'));
-                        history.push('/alert-rules');
+                        history.push(import.meta.env.VITE_PREFIX + '/alert-rules');
                       });
                     },
 
@@ -620,7 +620,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
 
             <Button
               onClick={() => {
-                history.push('/alert-rules');
+                history.push(import.meta.env.VITE_PREFIX + '/alert-rules');
               }}
             >
               {t('取消')}

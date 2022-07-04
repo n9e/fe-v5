@@ -49,21 +49,21 @@ export default function Login() {
     });
 
     if (!err) {
-      history.push(redirect || '/metric/explorer');
+      history.push(redirect || import.meta.env.VITE_PREFIX + '/metric/explorer');
     }
   };
 
   return (
     <div className='login-warp'>
-      <img src={'/image/login-left-top-corner.png'} className='left-top-bg'></img>
-      <img src={'/image/login-right-bottom-corner.png'} className='right-bottom-bg'></img>
+      <img src={import.meta.env.VITE_PREFIX + '/image/login-left-top-corner.png'} className='left-top-bg'></img>
+      <img src={import.meta.env.VITE_PREFIX + '/image/login-right-bottom-corner.png'} className='right-bottom-bg'></img>
       <div className='banner integration'>
-        <img src={'/image/login-dashboard.svg'} style={{ margin: '0 60px', zIndex: 5, width: 632 }}></img>
+        <img src={import.meta.env.VITE_PREFIX + '/image/login-dashboard.svg'} style={{ margin: '0 60px', zIndex: 5, width: 632 }}></img>
       </div>
       <div className='login-panel'>
         <div className='login-main  integration'>
           <div className='login-title'>
-            <img src={'/image/logo-l.svg'} style={{ width: '120px' }} />
+            <img src={import.meta.env.VITE_PREFIX + '/image/logo-l.svg'} style={{ width: '120px' }} />
           </div>
           <Form form={form} layout='vertical' requiredMark={true}>
             <Form.Item

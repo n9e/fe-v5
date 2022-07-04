@@ -280,7 +280,7 @@ const busiGroupContent = (busiGroupProps: BusiGroupProps): IGroupItemProps => {
             />
           ) : (
             <div style={{ display: 'flex', alignItems: 'center', flexDirection: 'column', padding: 20, marginLeft: -20 }}>
-              <img src='/image/empty.png' width='64' />
+              <img src={import.meta.env.VITE_PREFIX + '/image/empty.png'} width='64' />
               <div className='ant-empty-description'>{'暂无数据'}</div>
             </div>
           )}
@@ -370,7 +370,7 @@ const LeftTree: React.FC<LeftTreeProps> = ({ clusterGroup = {}, busiGroup = {}, 
               <div key={i} className={`left-area-group ${shrink ? 'group-shrink' : ''}`} style={typeof shrink === 'object' ? shrink.style : {}}>
                 <div className='left-area-group-title'>
                   {title}
-                  {title === '业务组' && <SettingOutlined onClick={() => history.push(`/busi-groups`)} />}
+                  {title === '业务组' && <SettingOutlined onClick={() => history.push(import.meta.env.VITE_PREFIX + `/busi-groups`)} />}
                 </div>
                 {render()}
               </div>

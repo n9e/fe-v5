@@ -109,7 +109,7 @@ const Shield: React.FC = () => {
                   display: 'inline-block',
                 }}
                 onClick={() => {
-                  curBusiItem?.id && history.push(`/alert-subscribes/edit/${record.id}`);
+                  curBusiItem?.id && history.push(import.meta.env.VITE_PREFIX + `/alert-subscribes/edit/${record.id}`);
                 }}
               >
                 {t('编辑')}
@@ -121,7 +121,7 @@ const Shield: React.FC = () => {
                   display: 'inline-block',
                 }}
                 onClick={() => {
-                  curBusiItem?.id && history.push(`/alert-subscribes/edit/${record.id}?mode=clone`);
+                  curBusiItem?.id && history.push(import.meta.env.VITE_PREFIX + `/alert-subscribes/edit/${record.id}?mode=clone`);
                 }}
               >
                 {t('克隆')}
@@ -242,7 +242,7 @@ const Shield: React.FC = () => {
                   className='add'
                   ghost
                   onClick={() => {
-                    history.push('/alert-subscribes/add');
+                    history.push(import.meta.env.VITE_PREFIX + '/alert-subscribes/add');
                   }}
                 >
                   {t('新增订阅规则')}

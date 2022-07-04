@@ -33,7 +33,7 @@ export default function Profile() {
   const history = useHistory();
 
   const handleChange = (tab) => {
-    history.push('/account/profile/' + tab);
+    history.push(import.meta.env.VITE_PREFIX + '/account/profile/' + tab);
   };
 
   return (

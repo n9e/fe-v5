@@ -28,7 +28,7 @@ import { dynamicPackages, Entry } from '@/utils';
 import TargetsSvg from '../../../public/image/targets.svg';
 import './menu.less';
 import IconFont from '../IconFont';
-
+const showMenu = import.meta.env.VITE_SHOW_MENU
 const { SubMenu } = Menu;
 const Packages = dynamicPackages();
 let lazyMenu = Packages.reduce((result: any, module: Entry) => {
@@ -67,7 +67,7 @@ const SideMenu: FC = () => {
       title: t('监控对象'),
       children: [
         {
-          key: '/targets',
+          key: import.meta.env.VITE_PREFIX + '/targets',
           title: t('对象列表'),
         },
       ],
@@ -78,15 +78,15 @@ const SideMenu: FC = () => {
       title: t('监控看图'),
       children: [
         {
-          key: '/metric/explorer',
+          key: import.meta.env.VITE_PREFIX + '/metric/explorer',
           title: t('即时查询'),
         },
         {
-          key: '/object/explorer',
+          key: import.meta.env.VITE_PREFIX + '/object/explorer',
           title: t('快捷视图'),
         },
         {
-          key: '/dashboards',
+          key: import.meta.env.VITE_PREFIX + '/dashboards',
           title: t('监控大盘'),
         },
       ],
@@ -98,23 +98,23 @@ const SideMenu: FC = () => {
       title: t('告警管理'),
       children: [
         {
-          key: '/alert-rules',
+          key: import.meta.env.VITE_PREFIX + '/alert-rules',
           title: t('告警规则'),
         },
         {
-          key: '/alert-mutes',
+          key: import.meta.env.VITE_PREFIX + '/alert-mutes',
           title: t('屏蔽规则'),
         },
         {
-          key: '/alert-subscribes',
+          key: import.meta.env.VITE_PREFIX + '/alert-subscribes',
           title: t('订阅规则'),
         },
         {
-          key: '/alert-cur-events',
+          key: import.meta.env.VITE_PREFIX + '/alert-cur-events',
           title: t('活跃告警'),
         },
         {
-          key: '/alert-his-events',
+          key: import.meta.env.VITE_PREFIX + '/alert-his-events',
           title: t('历史告警'),
         },
       ],
@@ -125,11 +125,11 @@ const SideMenu: FC = () => {
       title: t('告警自愈'),
       children: [
         {
-          key: '/job-tpls',
+          key: import.meta.env.VITE_PREFIX + '/job-tpls',
           title: t('自愈脚本'),
         },
         {
-          key: '/job-tasks',
+          key: import.meta.env.VITE_PREFIX + '/job-tasks',
           title: t('执行历史'),
         },
       ],
@@ -141,15 +141,15 @@ const SideMenu: FC = () => {
       title: t('人员组织'),
       children: [
         {
-          key: '/users',
+          key: import.meta.env.VITE_PREFIX + '/users',
           title: t('用户管理'),
         },
         {
-          key: '/user-groups',
+          key: import.meta.env.VITE_PREFIX + '/user-groups',
           title: t('团队管理'),
         },
         {
-          key: '/busi-groups',
+          key: import.meta.env.VITE_PREFIX + '/busi-groups',
           title: t('业务组管理'),
         },
       ],
@@ -161,15 +161,15 @@ const SideMenu: FC = () => {
       title: t('系统信息'),
       children: [
         {
-          key: '/help/version',
+          key: import.meta.env.VITE_PREFIX + '/help/version',
           title: t('系统版本'),
         },
         {
-          key: '/help/contact',
+          key: import.meta.env.VITE_PREFIX + '/help/contact',
           title: t('联系我们'),
         },
         {
-          key: '/help/migrate',
+          key: import.meta.env.VITE_PREFIX + '/help/migrate',
           title: t('管理员迁移'),
         },
       ],
@@ -230,15 +230,15 @@ const SideMenu: FC = () => {
 
   return hideSideMenu() ? null : (
     <div
+      className={`${showMenu=='true' ? 'display_flex' : 'display_n'}`}
       style={{
-        display: 'flex',
         flexDirection: 'column',
         padding: '10px 0 10px 10px',
       }}
     >
       <div className={`home ${collapsed ? 'collapse' : ''}`}>
-        <div className='name' onClick={() => history.push('/metric/explorer')} key='overview'>
-          <img src={collapsed ? '/image/logo.svg' : '/image/logo-l(1).svg'} alt='' className='logo' />
+        <div className='name' onClick={() => history.push(import.meta.env.VITE_PREFIX + '/metric/explorer')} key='overview'>
+          <img src={collapsed ? import.meta.env.VITE_PREFIX + '/image/logo.svg' : import.meta.env.VITE_PREFIX + '/image/logo-l(1).svg'} alt='' className='logo' />
         </div>
       </div>
 

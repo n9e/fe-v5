@@ -61,7 +61,7 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, childr
     <Menu>
       <Menu.Item
         onClick={() => {
-          history.push('/account/profile/info');
+          history.push(import.meta.env.VITE_PREFIX + '/account/profile/info');
         }}
       >
         {t('个人信息')}
@@ -81,7 +81,7 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, childr
               prop: 'busiGroups',
               data: [],
             });
-            history.push('/login');
+            history.push(import.meta.env.VITE_PREFIX + '/login');
           });
         }}
       >
@@ -166,7 +166,7 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, childr
               </span> */}
               <Dropdown overlay={menu} trigger={['click']}>
                 <span className='avator'>
-                  <img src={profile.portrait || '/image/avatar1.png'} alt='' />
+                  <img src={profile.portrait || (import.meta.env.VITE_PREFIX + '/image/avatar1.png')} alt='' />
                   <span className='display-name'>{profile.nickname || profile.username}</span>
                   <DownOutlined />
                 </span>

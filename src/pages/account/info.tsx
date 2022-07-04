@@ -29,7 +29,7 @@ export default function Info() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [contactsList, setContactsList] = useState<ContactsItem[]>([]);
   let { profile } = useSelector<RootState, accountStoreState>((state) => state.account);
-  const [selectAvatar, setSelectAvatar] = useState<string>(profile.portrait || '/image/avatar1.png');
+  const [selectAvatar, setSelectAvatar] = useState<string>(profile.portrait || (import.meta.env.VITE_PREFIX +'/image/avatar1.png'));
   const [customAvatar, setCustomAvatar] = useState('');
   const dispatch = useDispatch();
   useEffect(() => {
@@ -127,7 +127,7 @@ export default function Info() {
   const avatarList = new Array(8).fill(0).map((_, i) => i + 1);
 
   const handleImgClick = (i) => {
-    setSelectAvatar(`/image/avatar${i}.png`);
+    setSelectAvatar(import.meta.env.VITE_PREFIX +`/image/avatar${i}.png`);
   };
 
   return (
@@ -252,7 +252,7 @@ export default function Info() {
           </Col>
           <Col span={4}>
             <div className='avatar'>
-              <img src={profile.portrait || '/image/avatar1.png'} />
+              <img src={profile.portrait || (import.meta.env.VITE_PREFIX + '/image/avatar1.png') } />
               <Button type='primary' className='update-avatar' onClick={() => setIsModalVisible(true)}>
                 {t('更换头像')}
               </Button>
@@ -264,8 +264,8 @@ export default function Info() {
         <div className='avatar-content'>
           {avatarList.map((i) => {
             return (
-              <div key={i} className={`/image/avatar${i}.png` === selectAvatar ? 'avatar active' : 'avatar'} onClick={() => handleImgClick(i)}>
-                <img src={`/image/avatar${i}.png`} />
+              <div key={i} className={import.meta.env.VITE_PREFIX + `/image/avatar${i}.png` === selectAvatar ? 'avatar active' : 'avatar'} onClick={() => handleImgClick(i)}>
+                <img src={import.meta.env.VITE_PREFIX + `/image/avatar${i}.png`} />
               </div>
             );
           })}

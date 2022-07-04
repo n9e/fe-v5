@@ -58,7 +58,7 @@ const Detail = (props: any) => {
   return (
     <PageLayout hideCluster title={
       <>
-        <RollbackOutlined className='back' onClick={() => history.push('/job-tasks')} />
+        <RollbackOutlined className='back' onClick={() => history.push(import.meta.env.VITE_PREFIX + '/job-tasks')} />
         执行历史
       </>
     }>

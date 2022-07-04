@@ -37,7 +37,7 @@ const EditShield: React.FC = () => {
   const { curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const { curShieldData } = useSelector<RootState, IshieldState>((state) => state.shield);
   if (!curShieldData.id) {
-    history.push(`/alert-mutes`);
+    history.push(import.meta.env.VITE_PREFIX + `/alert-mutes`);
   }
   const query = useQuery();
   const isClone = query.get('mode');

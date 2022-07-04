@@ -92,7 +92,7 @@ const Event: React.FC = () => {
         return (
           <>
             <div>
-              <a style={{ padding: 0 }} onClick={() => history.push(`/alert-his-events/${id}`)}>
+              <a style={{ padding: 0 }} onClick={() => history.push(import.meta.env.VITE_PREFIX + `/alert-his-events/${id}`)}>
                 {title}
               </a>
             </div>

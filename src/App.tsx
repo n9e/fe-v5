@@ -44,7 +44,7 @@ function App() {
         // }}
         renderEmpty={() => (
           <div style={{ padding: 20 }}>
-            <img src='/image/empty.png' width='64' />
+            <img src={import.meta.env.VITE_PREFIX +'/image/empty.png'} width='64' />
             <div className='ant-empty-description'>{t('暂无数据')}</div>
           </div>
         )}

@@ -3,6 +3,9 @@ import { extend } from 'umi-request';
 import { notification } from 'antd';
 import { UpdateAccessToken } from '@/services/login';
 
+// 请求后端接口 统一前缀
+const backendBaseUrl = ''
+
 /** 异常处理程序，所有的error都被这里处理，页面无法感知具体error */
 const errorHandler = (error: Error): Response => {
   // 忽略 AbortError 类型的报错
@@ -37,7 +40,7 @@ request.interceptors.request.use((url, options) => {
   }
   headers['X-Language'] = 'zh';
   return {
-    url,
+    url:backendBaseUrl + url,
     options: { ...options, headers },
   };
 });

@@ -80,7 +80,7 @@ export default function Title(props: IProps) {
   return (
     <div className='dashboard-detail-header'>
       <div className='dashboard-detail-header-left'>
-        <RollbackOutlined className='back' onClick={() => history.push('/dashboards')} />
+        <RollbackOutlined className='back' onClick={() => history.push(import.meta.env.VITE_PREFIX + '/dashboards')} />
         {titleEditing ? (
           <Input
             ref={titleRef}

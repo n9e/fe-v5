@@ -95,65 +95,65 @@ export default function Content() {
       dispatch({ type: 'common/getBusiGroups' });
     }
   }
-
+  const prefixUrl = import.meta.env.VITE_PREFIX
   return (
     <div className='content'>
       <Switch>
-        <Route path='/demo' component={Demo} />
-        <Route path='/login' component={Login} exact />
-        <Route path='/callback' component={LoginCallback} exact />
-        <Route path='/metric/explorer' component={Explore} exact />
-        <Route path='/object/explorer' component={ObjectExplore} exact />
-        <Route path='/busi-groups' component={Business} />
-        <Route path='/users' component={Users} />
-        <Route path='/user-groups' component={Groups} />
-        <Route path='/account/profile/:tab' component={Profile} />
+        <Route path={prefixUrl + '/demo'} component={Demo} />
+        <Route path={prefixUrl + '/login'} component={Login} exact />
+        <Route path={prefixUrl + '/callback'} component={LoginCallback} exact />
+        <Route path={prefixUrl + '/metric/explorer'} component={Explore} exact />
+        <Route path={prefixUrl + '/object/explorer'} component={ObjectExplore} exact />
+        <Route path={prefixUrl + '/busi-groups'} component={Business} />
+        <Route path={prefixUrl + '/users'} component={Users} />
+        <Route path={prefixUrl + '/user-groups'} component={Groups} />
+        <Route path={prefixUrl + '/account/profile/:tab'} component={Profile} />
 
-        <Route path='/dashboard/:id' exact component={DashboardDetail} />
-        <Route path='/dashboards' component={Dashboard} />
-        <Route path='/chart/:ids' component={Chart} />
-        <Route path='/indicator' component={IndicatorPage} />
+        <Route path={prefixUrl + '/dashboard/:id'} exact component={DashboardDetail} />
+        <Route path={prefixUrl + '/dashboards'} component={Dashboard} />
+        <Route path={prefixUrl + '/chart/:ids'} component={Chart} />
+        <Route path={prefixUrl + '/indicator'} component={IndicatorPage} />
 
-        <Route exact path='/alert-rules/add/:group_id' component={StrategyAdd} />
-        <Route exact path='/alert-rules/edit/:id' component={StrategyEdit} />
-        <Route exact path='/alert-rules/:id?' component={Strategy} />
-        <Route exact path='/alert-rules/brain/:id' component={StrategyBrain} />
-        <Route exact path='/alert-mutes' component={Shield} />
-        <Route exact path='/alert-mutes/add/:from?' component={AddShield} />
-        <Route exact path='/alert-mutes/edit/:id' component={ShieldEdit} />
-        <Route exact path='/alert-subscribes' component={Subscribe} />
-        <Route exact path='/alert-subscribes/add' component={SubscribeAdd} />
-        <Route exact path='/alert-subscribes/edit/:id' component={SubscribeEdit} />
+        <Route exact path={prefixUrl + '/alert-rules/add/:group_id'} component={StrategyAdd} />
+        <Route exact path={prefixUrl + '/alert-rules/edit/:id'} component={StrategyEdit} />
+        <Route exact path={prefixUrl + '/alert-rules/:id?'} component={Strategy} />
+        <Route exact path={prefixUrl + '/alert-rules/brain/:id'} component={StrategyBrain} />
+        <Route exact path={prefixUrl + '/alert-mutes'} component={Shield} />
+        <Route exact path={prefixUrl + '/alert-mutes/add/:from?'} component={AddShield} />
+        <Route exact path={prefixUrl + '/alert-mutes/edit/:id'} component={ShieldEdit} />
+        <Route exact path={prefixUrl + '/alert-subscribes'} component={Subscribe} />
+        <Route exact path={prefixUrl + '/alert-subscribes/add'} component={SubscribeAdd} />
+        <Route exact path={prefixUrl + '/alert-subscribes/edit/:id'} component={SubscribeEdit} />
 
-        <Route exact path='/alert-cur-events' component={Event} />
-        <Route exact path='/alert-his-events' component={historyEvents} />
-        <Route exact path='/alert-cur-events/:eventId' component={EventDetail} />
-        <Route exact path='/alert-his-events/:eventId' component={EventDetail} />
-        <Route exact path='/targets' component={MonObjectManage} />
+        <Route exact path={prefixUrl + '/alert-cur-events'} component={Event} />
+        <Route exact path={prefixUrl + '/alert-his-events'} component={historyEvents} />
+        <Route exact path={prefixUrl + '/alert-cur-events/:eventId'} component={EventDetail} />
+        <Route exact path={prefixUrl + '/alert-his-events/:eventId'} component={EventDetail} />
+        <Route exact path={prefixUrl + '/targets'} component={MonObjectManage} />
 
-        <Route exact path='/job-tpls' component={TaskTpl} />
-        <Route exact path='/job-tpls/add' component={TaskTplAdd} />
-        <Route exact path='/job-tpls/add/task' component={TaskAdd} />
-        <Route exact path='/job-tpls/:id/detail' component={TaskTplDetail} />
-        <Route exact path='/job-tpls/:id/modify' component={TaskTplModify} />
-        <Route exact path='/job-tpls/:id/clone' component={TaskTplClone} />
-        <Route exact path='/job-tasks' component={Task} />
-        <Route exact path='/job-tasks/add' component={TaskAdd} />
-        <Route exact path='/job-tasks/:id/result' component={TaskResult} />
-        <Route exact path='/job-tasks/:id/detail' component={TaskDetail} />
+        <Route exact path={prefixUrl + '/job-tpls'} component={TaskTpl} />
+        <Route exact path={prefixUrl + '/job-tpls/add'} component={TaskTplAdd} />
+        <Route exact path={prefixUrl + '/job-tpls/add/task'} component={TaskAdd} />
+        <Route exact path={prefixUrl + '/job-tpls/:id/detail'} component={TaskTplDetail} />
+        <Route exact path={prefixUrl + '/job-tpls/:id/modify'} component={TaskTplModify} />
+        <Route exact path={prefixUrl + '/job-tpls/:id/clone'} component={TaskTplClone} />
+        <Route exact path={prefixUrl + '/job-tasks'} component={Task} />
+        <Route exact path={prefixUrl + '/job-tasks/add'} component={TaskAdd} />
+        <Route exact path={prefixUrl + '/job-tasks/:id/result'} component={TaskResult} />
+        <Route exact path={prefixUrl + '/job-tasks/:id/detail'} component={TaskDetail} />
 
-        <Route exact path='/help/version' component={Version} />
-        <Route exact path='/help/contact' component={Contact} />
-        <Route exact path='/help/migrate' component={Migrate} />
+        <Route exact path={prefixUrl + '/help/version'} component={Version} />
+        <Route exact path={prefixUrl + '/help/contact'} component={Contact} />
+        <Route exact path={prefixUrl + '/help/migrate'} component={Migrate} />
 
         {lazyRoutes.map((route, i) => (
           <RouteWithSubRoutes key={i} {...route} />
         ))}
-        <Route path='/' exact>
-          <Redirect to='/metric/explorer' />
+        <Route path={prefixUrl +'/'} exact>
+          <Redirect to = {prefixUrl + '/metric/explorer'} />
         </Route>
-        <Route path='/403' component={Page403} />
-        <Route path='/404' component={NotFound} />
+        <Route path={prefixUrl + '/403'} component={Page403} />
+        <Route path={prefixUrl + '/404'} component={NotFound} />
         <Route path='*' component={NotFound} />
       </Switch>
     </div>

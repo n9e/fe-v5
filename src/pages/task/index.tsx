@@ -147,7 +147,7 @@ const index = (_props: any) => {
                   type='primary'
                   ghost
                   onClick={() => {
-                    history.push('/job-tasks/add');
+                    history.push(import.meta.env.VITE_PREFIX + '/job-tasks/add');
                   }}
                 >
                   {t('task.temporary.create')}

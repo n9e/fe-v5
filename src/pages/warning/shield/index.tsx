@@ -139,7 +139,7 @@ const Shield: React.FC = () => {
                     type: 'shield/setCurShieldData',
                     data: record,
                   });
-                  curBusiItem?.id && history.push(`/alert-mutes/edit/${record.id}?mode=clone`);
+                  curBusiItem?.id && history.push(import.meta.env.VITE_PREFIX + `/alert-mutes/edit/${record.id}?mode=clone`);
                 }}
               >
                 {t('克隆')}
@@ -257,7 +257,7 @@ const Shield: React.FC = () => {
                   className='add'
                   ghost
                   onClick={() => {
-                    history.push('/alert-mutes/add');
+                    history.push(import.meta.env.VITE_PREFIX + '/alert-mutes/add');
                   }}
                 >
                   {t('新增屏蔽规则')}
