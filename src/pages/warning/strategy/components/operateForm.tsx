@@ -224,7 +224,8 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
         {...layout}
         form={form}
         className='strategy-form'
-        layout={refresh ? 'horizontal' : 'horizontal'}
+        // layout={refresh ? 'horizontal' : 'horizontal'}
+        layout='vertical'
         initialValues={{
           prom_eval_interval: 15,
           prom_for_duration: 60,
@@ -379,7 +380,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                   style={{ marginBottom: 0 }}
                   name='prom_eval_interval'
                   initialValue={15}
-                  wrapperCol={{ span: 10 }}
+                  wrapperCol={{ span: 24 }}
                   rules={[
                     {
                       required: true,
@@ -387,12 +388,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                     },
                   ]}
                 >
-                  <InputNumber
-                    min={1}
-                    onChange={(val) => {
-                      setRefresh(!refresh);
-                    }}
-                  />
+                  <InputNumber min={1} />
                 </Form.Item>
                 秒
                 <Tooltip title={t(`每隔${form.getFieldValue('prom_eval_interval')}秒，把PromQL作为查询条件，去查询后端存储，如果查到了数据就表示当次有监控数据触发了规则`)}>
@@ -503,12 +499,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
             <Form.Item label={t('留观时长')} required>
               <Space>
                 <Form.Item style={{ marginBottom: 0 }} name='recover_duration' initialValue={0} wrapperCol={{ span: 10 }}>
-                  <InputNumber
-                    min={0}
-                    onChange={(val) => {
-                      setRefresh(!refresh);
-                    }}
-                  />
+                  <InputNumber min={0} />
                 </Form.Item>
                 秒
                 <Tooltip title={t(`持续${form.getFieldValue('recover_duration')}秒没有再次触发阈值才发送恢复通知`)}>
@@ -530,12 +521,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                     },
                   ]}
                 >
-                  <InputNumber
-                    min={0}
-                    onChange={(val) => {
-                      setRefresh(!refresh);
-                    }}
-                  />
+                  <InputNumber min={0} />
                 </Form.Item>
                 分钟
                 <Tooltip title={t(`如果告警持续未恢复，间隔${form.getFieldValue('notify_repeat_step')}分钟之后重复提醒告警接收组的成员`)}>
