@@ -25,8 +25,9 @@ import _ from 'lodash';
 import { getMenuPerm } from '@/services/common';
 import { useTranslation } from 'react-i18next';
 import { dynamicPackages, Entry } from '@/utils';
-import SystemInfoSvg from '../../../public/image/system-info.svg';
+import TargetsSvg from '../../../public/image/targets.svg';
 import './menu.less';
+import IconFont from '../IconFont';
 
 const { SubMenu } = Menu;
 const Packages = dynamicPackages();
@@ -61,7 +62,8 @@ const SideMenu: FC = () => {
   const menuList = [
     {
       key: 'targets',
-      icon: <DatabaseOutlined />,
+      // icon: <DatabaseOutlined />,
+      icon: <Icon component={TargetsSvg as any} />,
       title: t('监控对象'),
       children: [
         {
@@ -91,7 +93,8 @@ const SideMenu: FC = () => {
     },
     {
       key: 'alarm',
-      icon: <AlertOutlined />,
+      // icon: <AlertOutlined />,
+      icon: <IconFont type='icon-gaojingguanli-weixuanzhongyangshi' />,
       title: t('告警管理'),
       children: [
         {
@@ -133,7 +136,8 @@ const SideMenu: FC = () => {
     },
     {
       key: 'manage',
-      icon: <UserOutlined />,
+      // icon: <UserOutlined />,
+      icon: <IconFont type='icon-renyuanzuzhi-weixuanzhongyangshi' />,
       title: t('人员组织'),
       children: [
         {
@@ -152,7 +156,8 @@ const SideMenu: FC = () => {
     },
     {
       key: 'help',
-      icon: <Icon component={SystemInfoSvg as any} />,
+      // icon: <Icon component={SystemInfoSvg as any} />,
+      icon: <IconFont type='icon-xitongxinxi-weixuanzhongyangshi' />,
       title: t('系统信息'),
       children: [
         {

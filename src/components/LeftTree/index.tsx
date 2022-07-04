@@ -75,7 +75,7 @@ interface SelectListProps {
 }
 
 // 内容可选列表
-export const SelectList: React.FC<SelectListProps> = ({ dataSource, fieldNames = {}, allowNotSelect = false, defaultSelect, showBadge = true, badgeInfo = {}, onChange }) => {
+export const SelectList: React.FC<SelectListProps> = ({ dataSource, fieldNames = {}, allowNotSelect = false, defaultSelect, showBadge = false, badgeInfo = {}, onChange }) => {
   const [active, setActive] = useState<string | number>(defaultSelect && typeof defaultSelect === 'object' ? defaultSelect[fieldNames.key || 'value'] : defaultSelect);
 
   return (
