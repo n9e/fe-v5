@@ -18,6 +18,7 @@ import React from 'react';
 import AceEditor from 'react-ace';
 import 'ace-builds/src-noconflict/mode-sh';
 import 'ace-builds/src-noconflict/theme-monokai';
+import 'ace-builds/src-noconflict/theme-kuroir';
 
 interface Props {
   height: string;
@@ -29,12 +30,13 @@ interface Props {
 export default function Editor(props: Props) {
   return (
     <AceEditor
-      placeholder="Placeholder Text"
+      placeholder='Placeholder Text'
       style={{ width: '100%' }}
       height={props.height}
-      mode="sh"
-      theme="monokai"
-      name="blah2"
+      mode='sh'
+      // theme='monokai'
+      theme='kuroir'
+      name='blah2'
       fontSize={14}
       showPrintMargin={false}
       showGutter
@@ -54,10 +56,10 @@ export default function Editor(props: Props) {
         }
       }}
     />
-  )
+  );
 }
 
 Editor.defaultProps = {
   readOnly: false,
   height: '500px',
-}
+};

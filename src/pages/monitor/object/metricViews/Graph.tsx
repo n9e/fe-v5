@@ -255,6 +255,7 @@ export default function Graph(props: IProps) {
             <Dropdown
               overlay={
                 <Menu
+                  style={{ maxHeight: '200px', overflowY: 'auto' }}
                   onClick={(e) => {
                     if (comparison.indexOf(e.key) === -1) {
                       setComparison([...comparison, e.key]);
@@ -268,7 +269,6 @@ export default function Graph(props: IProps) {
                   <Menu.Item key='7d'>7d</Menu.Item>
                 </Menu>
               }
-              overlayStyle={{ maxHeight: 400, overflow: 'auto' }}
             >
               <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
                 <PlusCircleOutlined />
@@ -309,6 +309,7 @@ export default function Graph(props: IProps) {
               <Dropdown
                 overlay={
                   <Menu
+                    style={{ maxHeight: '200px', overflowY: 'auto' }}
                     onClick={(e) => {
                       if (aggrGroups.indexOf(e.key) === -1) {
                         setAggrGroups([...aggrGroups, e.key]);
@@ -326,7 +327,6 @@ export default function Graph(props: IProps) {
                     )}
                   </Menu>
                 }
-                overlayStyle={{ maxHeight: 400, overflow: 'auto' }}
               >
                 <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
                   <PlusCircleOutlined />
