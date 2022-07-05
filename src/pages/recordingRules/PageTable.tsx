@@ -112,12 +112,13 @@ const PageTable: React.FC<Props> = ({ bgid }) => {
       title: t('集群'),
       dataIndex: 'cluster',
       render: (data, record) => {
-        return (
-          (data.length &&
-            data.map((index: string) => {
-              return <ColorTag text={index} key={index}></ColorTag>;
-            })) || <div></div>
-        );
+        // return (
+        //   (data.length &&
+        //     data.map((index: string) => {
+        //       return <ColorTag text={index} key={index}></ColorTag>;
+        //     })) || <div></div>
+        // );
+        return <ColorTag text={data} key={data}></ColorTag>
       },
     },
     {

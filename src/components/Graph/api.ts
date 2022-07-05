@@ -28,20 +28,23 @@ export const fetchHistory = (params?, signalKey?) => {
   }
   signals[signalKey] = controller;
   return request(`/api/n9e/prometheus/api/v1/query_range`, {
-    method: RequestMethod.Get,
-    params,
+    method: RequestMethod.Post,
+    body: queryString.stringify(params),
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
     signal,
   }).finally(() => {
     delete signals[signalKey];
   });
-}
+};
 
 export const fetchAggrGroups = (params?) => {
   return request(`/api/n9e/prometheus/api/v1/labels`, {
     method: RequestMethod.Get,
     params,
     paramsSerializer: function (params) {
-      return queryString.stringify(params, {arrayFormat: 'bracket'})
+      return queryString.stringify(params, { arrayFormat: 'bracket' });
     },
   });
-}
+};
