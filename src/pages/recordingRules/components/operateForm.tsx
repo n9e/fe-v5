@@ -5,7 +5,7 @@ import moment from 'moment';
 import { Card, Form, Input, InputNumber, Radio, Select, Row, Col, Button, TimePicker, Checkbox, Modal, message, Space, Switch, Tooltip, Tag, notification } from 'antd';
 const { TextArea } = Input;
 const { Option } = Select;
-import { QuestionCircleFilled, MinusCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import { QuestionCircleFilled, CaretDownOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { RootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
@@ -152,13 +152,13 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
         layout={refresh ? 'horizontal' : 'horizontal'}
         initialValues={{
           prom_eval_interval: 30,
-          cluster: clusterList || 'Default', // 生效集群
+          cluster: clusterList[0] || 'Default', // 生效集群
           ...detail,
         }}
       >
         <Space direction='vertical' style={{ width: '100%' }}>
           <Card title={t('基本配置')}>
-            <Form.Item required label={t('规则名称：')}>
+            <Form.Item required label={t('指标名称：')}>
               <Space>
                 <Form.Item
                   style={{ marginBottom: 0, width: 500 }}
@@ -166,16 +166,28 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                   rules={[
                     {
                       required: true,
-                      message: t('规则标题不能为空'),
+                      message: t('指标名称不能为空'),
                     },
+                    { pattern: new RegExp(/^[0-9a-zA-Z_:]{1,}$/, "g") , message: '指标名称非法' } 
                   ]}
                 >
-                  <Input placeholder={t('请输入记录规则名称')} />
+                  <Input placeholder={t('请输入指标名称')} />
                 </Form.Item>
-                <Tooltip title={t('记录规则的一般形式为 level:metric:operations，如job:nginx_http_request_duration_seconds:qps_by_app_host_2XX')}>
+                <Tooltip title={t('例如job:nginx_http_request_duration_seconds:qps_by_app_host_2XX')}>
                   <QuestionCircleFilled />
                 </Tooltip>
               </Space>
+            </Form.Item>
+            <Form.Item
+              label={t('规则备注：')}
+              name='note'
+              rules={[
+                {
+                  required: false,
+                },
+              ]}
+            >
+              <Input placeholder={t('请输入规则备注')} />
             </Form.Item>
             <Form.Item
               label={t('生效集群')}
@@ -188,7 +200,8 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
               ]}
             >
               <Select
-                mode='multiple'
+                suffixIcon={<CaretDownOutlined />}
+                // mode='multiple'
                 onChange={(value) => {
                   setCurClusters(value);
                 }}
