@@ -102,6 +102,10 @@ const SideMenu: FC = () => {
           title: t('告警规则'),
         },
         {
+          key: '/recording-rules',
+          title: t('记录规则'),
+        },
+        {
           key: '/alert-mutes',
           title: t('屏蔽规则'),
         },
