@@ -8,7 +8,7 @@ import { RootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
 import { prometheusQuery } from '@/services/warning';
 import { addOrEditRecordingRule, EditRecordingRule, deleteRecordingRule } from '@/services/recording';
-import PromqlEditor from '@/components/PromqlEditor';
+import PromQLInput from '@/components/PromQLInput';
 
 const { Option } = Select;
 const layout = {
@@ -165,7 +165,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                 >
                   <Input placeholder={t('请输入指标名称')} />
                 </Form.Item>
-                <Tooltip title={t('例如job:nginx_http_request_duration_seconds:qps_by_app_host_2XX')}>
+                <Tooltip title={t('promql周期性计算，会生成新的指标，这里填写新的指标的名字')}>
                   <QuestionCircleFilled />
                 </Tooltip>
               </Space>
@@ -193,7 +193,6 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
             >
               <Select
                 suffixIcon={<CaretDownOutlined />}
-                // mode='multiple'
                 onChange={(value) => {
                   setCurClusters(value);
                 }}
@@ -206,17 +205,27 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
               </Select>
             </Form.Item>
 
-            <Form.Item label='PromQL' className={'Promeql-content'} required>
-              <Form.Item name='prom_ql' validateTrigger={['onBlur']} trigger='onChange' rules={[{ required: true, message: t('请输入PromQL') }]}>
-                <PromqlEditor
-                  xCluster={curClusters}
-                  onChange={(val) => {
-                    if (val) {
-                      form.validateFields(['prom_ql']);
-                    }
-                  }}
-                />
-              </Form.Item>
+            <Form.Item noStyle shouldUpdate={(prevValues, curValues) => prevValues.cluster !== curValues.cluster}>
+              {({ getFieldValue, validateFields }) => {
+                return (
+                  <Form.Item label='PromQL' className={'Promeql-content'} required>
+                    <Form.Item name='prom_ql' validateTrigger={['onBlur']} trigger='onChange' rules={[{ required: true, message: t('请输入PromQL') }]}>
+                      <PromQLInput
+                        url='/api/n9e/prometheus'
+                        headers={{
+                          'X-Cluster': getFieldValue('cluster'),
+                          Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
+                        }}
+                        onChange={(val) => {
+                          if (val) {
+                            validateFields(['prom_ql']);
+                          }
+                        }}
+                      />
+                    </Form.Item>
+                  </Form.Item>
+                );
+              }}
             </Form.Item>
 
             <Form.Item required label={t('执行频率')}>
@@ -241,7 +250,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                   />
                 </Form.Item>
                 秒
-                <Tooltip title={t(`每隔${form.getFieldValue('prom_eval_interval')}秒，把PromQL作为查询条件，去查询后端存储，如果查到了数据就表示当次有监控数据触发了规则`)}>
+                <Tooltip title={t(`promql 执行频率，每隔 ${form.getFieldValue('prom_eval_interval')} 秒查询时序库，查到的结果重新命名写回时序库`)}>
                   <QuestionCircleFilled />
                 </Tooltip>
               </Space>
