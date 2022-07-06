@@ -1,48 +1,34 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { Tag, Button, Select, Modal, message, Switch, Dropdown, Table } from 'antd';
-import { getRecordingRuleSubList, updateRecordingRules } from '@/services/recording';
-import SearchInput from '@/components/BaseSearchInput';
+import { Button, Modal, message, Dropdown, Table } from 'antd';
 import { useHistory } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-
-import { RootState } from '@/store/common';
-import { CommonStoreState } from '@/store/commonInterface';
-import { strategyItem, strategyStatus } from '@/store/warningInterface';
-import { addOrEditRecordingRule, deleteRecordingRule } from '@/services/recording';
-import { priorityColor } from '@/utils/constant';
+import { useTranslation } from 'react-i18next';
 import { ColumnType } from 'antd/lib/table';
 import dayjs from 'dayjs';
 import RefreshIcon from '@/components/RefreshIcon';
 import ColorTag from '@/components/ColorTag';
 import { DownOutlined } from '@ant-design/icons';
 import ImportAndDownloadModal, { ModalStatus } from '@/components/ImportAndDownloadModal';
-import EditModal from './components/editModal';
 import ColumnSelect from '@/components/ColumnSelect';
-const { Option } = Select;
-const { confirm } = Modal;
+import { getRecordingRuleSubList, updateRecordingRules } from '@/services/recording';
+import SearchInput from '@/components/BaseSearchInput';
+import { RootState } from '@/store/common';
+import { CommonStoreState } from '@/store/commonInterface';
+import { strategyItem } from '@/store/warningInterface';
+import { addOrEditRecordingRule, deleteRecordingRule } from '@/services/recording';
+import EditModal from './components/editModal';
 
-import { useTranslation } from 'react-i18next';
-const pageSizeOptionsDefault = ['30', '50', '100', '300'];
-const exportIgnoreAttrsObj = {
-  cluster: undefined,
-  create_by: undefined,
-  user_id: undefined,
-  id: undefined,
-  notify_groups_obj: undefined,
-  notify_groups: undefined,
-  notify_users: undefined,
-  create_at: undefined,
-  update_at: undefined,
-  update_by: undefined,
-};
 interface Props {
   bgid?: number;
 }
 
+const { confirm } = Modal;
+const pageSizeOptionsDefault = ['30', '50', '100', '300'];
+
 const PageTable: React.FC<Props> = ({ bgid }) => {
-  const [severity, setSeverity] = useState<number>();
+  const [severity] = useState<number>();
   const [clusters, setClusters] = useState<string[]>([]);
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const history = useHistory();
   const [modalType, setModalType] = useState<ModalStatus>(ModalStatus.None);
   const [selectRowKeys, setSelectRowKeys] = useState<React.Key[]>([]);
@@ -111,14 +97,8 @@ const PageTable: React.FC<Props> = ({ bgid }) => {
     {
       title: t('集群'),
       dataIndex: 'cluster',
-      render: (data, record) => {
-        // return (
-        //   (data.length &&
-        //     data.map((index: string) => {
-        //       return <ColorTag text={index} key={index}></ColorTag>;
-        //     })) || <div></div>
-        // );
-        return <ColorTag text={data} key={data}></ColorTag>
+      render: (data) => {
+        return <ColorTag text={data} key={data}></ColorTag>;
       },
     },
     {
@@ -325,7 +305,6 @@ const PageTable: React.FC<Props> = ({ bgid }) => {
 
       <Table
         rowKey='id'
-        // sticky
         pagination={{
           total: currentStrategyData.length,
           showQuickJumper: true,

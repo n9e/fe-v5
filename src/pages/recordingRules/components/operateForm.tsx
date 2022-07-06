@@ -1,29 +1,22 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { useHistory, useParams, useLocation } from 'react-router-dom';
-import moment from 'moment';
-import { Card, Form, Input, InputNumber, Radio, Select, Row, Col, Button, TimePicker, Checkbox, Modal, message, Space, Switch, Tooltip, Tag, notification } from 'antd';
-const { TextArea } = Input;
-const { Option } = Select;
-import { QuestionCircleFilled, CaretDownOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useSelector } from 'react-redux';
+import { useHistory, useParams } from 'react-router-dom';
+import { Card, Form, Input, InputNumber, Select, Button, Modal, message, Space, Tooltip, Tag, notification } from 'antd';
+import { QuestionCircleFilled, CaretDownOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { RootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
 import { prometheusQuery } from '@/services/warning';
 import { addOrEditRecordingRule, EditRecordingRule, deleteRecordingRule } from '@/services/recording';
 import PromqlEditor from '@/components/PromqlEditor';
+
+const { Option } = Select;
 const layout = {
   labelCol: {
     span: 3,
   },
   wrapperCol: {
     span: 21,
-  },
-};
-
-const tailLayout = {
-  wrapperCol: {
-    offset: 3,
   },
 };
 
@@ -79,9 +72,8 @@ function isValidFormat() {
 }
 
 const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const history = useHistory(); // 创建的时候默认选中的值
-
   const [form] = Form.useForm();
   const { clusters: clusterList } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const [initVal, setInitVal] = useState<any>({});
@@ -168,7 +160,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                       required: true,
                       message: t('指标名称不能为空'),
                     },
-                    { pattern: new RegExp(/^[0-9a-zA-Z_:]{1,}$/, "g") , message: '指标名称非法' } 
+                    { pattern: new RegExp(/^[0-9a-zA-Z_:]{1,}$/, 'g'), message: '指标名称非法' },
                   ]}
                 >
                   <Input placeholder={t('请输入指标名称')} />
@@ -215,16 +207,8 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
             </Form.Item>
 
             <Form.Item label='PromQL' className={'Promeql-content'} required>
-              <Form.Item
-                name='prom_ql'
-                // labelCol={{ span: 3 }}
-                // wrapperCol={{ span: 23 }}
-                validateTrigger={['onBlur']}
-                trigger='onChange'
-                rules={[{ required: true, message: t('请输入PromQL') }]}
-              >
+              <Form.Item name='prom_ql' validateTrigger={['onBlur']} trigger='onChange' rules={[{ required: true, message: t('请输入PromQL') }]}>
                 <PromqlEditor
-                  // className='promql-editor'
                   xCluster={curClusters}
                   onChange={(val) => {
                     if (val) {
@@ -251,7 +235,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                 >
                   <InputNumber
                     min={1}
-                    onChange={(val) => {
+                    onChange={() => {
                       setRefresh(!refresh);
                     }}
                   />
@@ -267,7 +251,6 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
             </Form.Item>
           </Card>
           <Form.Item
-            // {...tailLayout}
             style={{
               marginTop: 20,
             }}

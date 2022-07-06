@@ -1,14 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import PageLayout from '@/components/pageLayout';
-import PageTable from './PageTable';
-import { SettingOutlined } from '@ant-design/icons';
-import { useTranslation } from 'react-i18next';
-import BlankBusinessPlaceholder from '@/components/BlankBusinessPlaceholder';
-import { RootState } from '@/store/common';
-import { CommonStoreState } from '@/store/commonInterface';
+import React from 'react';
 import { useHistory } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import PageLayout from '@/components/pageLayout';
+import { SettingOutlined } from '@ant-design/icons';
+import BlankBusinessPlaceholder from '@/components/BlankBusinessPlaceholder';
 import { useQuery } from '@/utils';
 import LeftTree from '@/components/LeftTree';
+import PageTable from './PageTable';
 
 const Strategy: React.FC = () => {
   const { t } = useTranslation();

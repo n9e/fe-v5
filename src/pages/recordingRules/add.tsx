@@ -1,8 +1,7 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import PageLayout from '@/components/pageLayout';
 import OperateForm from './components/operateForm';
-import { useTranslation } from 'react-i18next';
-
 import './index.less';
 
 const StrategyAdd: React.FC = () => {

@@ -1,24 +1,18 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import moment from 'moment';
-import { Form, Input, InputNumber, Radio, Select, Row, Col, TimePicker, Checkbox, Tag, message, Space, Switch, Tooltip, Modal } from 'antd';
-const { Option } = Select;
-import { QuestionCircleFilled, MinusCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import { Form, Input, InputNumber, Select, Tag, Space, Tooltip, Modal } from 'antd';
+import { QuestionCircleFilled } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { RootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
+
+const { Option } = Select;
 const layout = {
   labelCol: {
     span: 3,
   },
   wrapperCol: {
     span: 20,
-  },
-};
-
-const tailLayout = {
-  wrapperCol: {
-    offset: 5,
   },
 };
 
@@ -92,11 +86,10 @@ interface Props {
 }
 
 const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const [form] = Form.useForm();
   const { clusters: clusterList } = useSelector<RootState, CommonStoreState>((state) => state.common);
-
 
   const [field, setField] = useState<string>('cluster');
   const [refresh, setRefresh] = useState(true);
@@ -222,7 +215,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                         <Form.Item style={{ marginBottom: 0 }} name='prom_eval_interval' initialValue={15} wrapperCol={{ span: 10 }}>
                           <InputNumber
                             min={1}
-                            onChange={(val) => {
+                            onChange={() => {
                               setRefresh(!refresh);
                             }}
                           />
@@ -235,7 +228,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                     </Form.Item>
                   </>
                 );
-              
+
               case 'append_tags':
                 return (
                   <>

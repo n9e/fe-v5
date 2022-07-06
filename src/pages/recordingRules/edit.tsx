@@ -1,11 +1,10 @@
 import React, { useMemo, useEffect, useState } from 'react';
-import { useHistory, useParams, useLocation } from 'react-router-dom';
-import PageLayout from '@/components/pageLayout';
-import OperateForm from './components/operateForm';
+import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import PageLayout from '@/components/pageLayout';
 import { getRecordingRule } from '@/services/recording';
 import { useQuery } from '@/utils';
-
+import OperateForm from './components/operateForm';
 import './index.less';
 
 const StrategyEdit: React.FC = () => {
