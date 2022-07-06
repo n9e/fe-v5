@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Form, Input, InputNumber, Select, Tag, Space, Tooltip, Modal } from 'antd';
+import { Form, Input, InputNumber, Select, Tag, Space, Tooltip, Modal, Switch } from 'antd';
 import { QuestionCircleFilled } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { RootState } from '@/store/common';
@@ -26,6 +26,11 @@ const fields = [
     id: 5,
     field: 'prom_eval_interval',
     name: '执行频率',
+  },
+  {
+    id: 4,
+    field: 'disabled',
+    name: '启用',
   },
   {
     id: 12,
@@ -98,6 +103,10 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
     form.validateFields().then(async (values) => {
       const data = { ...values };
       delete data.field;
+      if (values.field === 'disabled') {
+        data.disabled = !values.enable_status ? 1 : 0;
+        delete data.enable_status;
+      }
       Object.keys(data).forEach((key) => {
         // 因为功能上有清除备注的需求，需要支持传空
         if (data[key] === undefined) {
@@ -138,6 +147,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
             prom_eval_interval: 15,
             cluster: clusterList[0] || 'Default', // 生效集群
             field: 'cluster',
+            enable_status: true,
           }}
         >
           <Form.Item
@@ -228,7 +238,14 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                     </Form.Item>
                   </>
                 );
-
+              case 'disabled':
+                return (
+                  <>
+                    <Form.Item label={t('改为：')} name='enable_status' valuePropName='checked'>
+                      <Switch />
+                    </Form.Item>
+                  </>
+                );
               case 'append_tags':
                 return (
                   <>
