@@ -569,7 +569,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                   <>
                     <Form.Item label={t('改为：')}>
                       <Space>
-                      <Form.Item
+                        <Form.Item
                           style={{ marginBottom: 0 }}
                           name='notify_max_number'
                           initialValue={0}
