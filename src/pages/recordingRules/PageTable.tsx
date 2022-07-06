@@ -24,6 +24,15 @@ interface Props {
 
 const { confirm } = Modal;
 const pageSizeOptionsDefault = ['30', '50', '100', '300'];
+const exportIgnoreAttrsObj = {
+  id: undefined,
+  group_id: undefined,
+  cluster: undefined,
+  create_at: undefined,
+  create_by: undefined,
+  update_at: undefined,
+  update_by: undefined,
+};
 
 const PageTable: React.FC<Props> = ({ bgid }) => {
   const [severity] = useState<number>();
@@ -173,6 +182,14 @@ const PageTable: React.FC<Props> = ({ bgid }) => {
         return (
           <div className='table-operator-area'>
             <div
+              className='table-operator-area-normal'
+              onClick={() => {
+                handleClickEdit(record.id, true);
+              }}
+            >
+              {t('克隆')}
+            </div>
+            <div
               className='table-operator-area-warning'
               onClick={() => {
                 confirm({
@@ -224,7 +241,7 @@ const PageTable: React.FC<Props> = ({ bgid }) => {
           onClick={() => {
             if (selectedRows.length) {
               const exportData = selectedRows.map((item) => {
-                return { ...item };
+                return { ...item, ...exportIgnoreAttrsObj };
               });
               setExportData(JSON.stringify(exportData, null, 2));
               setModalType(ModalStatus.Export);
@@ -270,8 +287,8 @@ const PageTable: React.FC<Props> = ({ bgid }) => {
   }, [selectRowKeys, t]);
 
   const handleImportStrategy = async (d) => {
-    const { data } = await addOrEditRecordingRule(d, curBusiItem.id, 'Post');
-    return data || {};
+    const { dat } = await addOrEditRecordingRule(d, curBusiItem.id, 'Post');
+    return dat || {};
   };
 
   const editModalFinish = async (isOk, fieldsData?) => {
