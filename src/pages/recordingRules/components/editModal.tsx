@@ -221,7 +221,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                           />
                         </Form.Item>
                         秒
-                        <Tooltip title={t(`每隔${form.getFieldValue('prom_eval_interval')}秒，把PromQL作为查询条件，去查询后端存储，如果查到了数据就表示当次有监控数据触发了规则`)}>
+                        <Tooltip title={t(`promql 执行频率，每隔 ${form.getFieldValue('prom_eval_interval')} 秒查询时序库，查到的结果重新命名写回时序库`)}>
                           <QuestionCircleFilled />
                         </Tooltip>
                       </Space>
