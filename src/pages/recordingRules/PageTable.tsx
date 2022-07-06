@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { Button, Modal, message, Dropdown, Table } from 'antd';
+import { Button, Modal, message, Dropdown, Table, Switch } from 'antd';
 import { useHistory } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
@@ -14,7 +14,7 @@ import { getRecordingRuleSubList, updateRecordingRules } from '@/services/record
 import SearchInput from '@/components/BaseSearchInput';
 import { RootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
-import { strategyItem } from '@/store/warningInterface';
+import { strategyItem, strategyStatus } from '@/store/warningInterface';
 import { addOrEditRecordingRule, deleteRecordingRule } from '@/services/recording';
 import EditModal from './components/editModal';
 
@@ -141,6 +141,30 @@ const PageTable: React.FC<Props> = ({ bgid }) => {
       title: t('更新时间'),
       dataIndex: 'update_at',
       render: (text: string) => dayjs(Number(text) * 1000).format('YYYY-MM-DD HH:mm:ss'),
+    },
+    {
+      title: t('启用'),
+      dataIndex: 'disabled',
+      render: (disabled, record) => (
+        <Switch
+          checked={disabled === strategyStatus.Enable}
+          size='small'
+          onChange={() => {
+            const { id, disabled } = record;
+            updateRecordingRules(
+              {
+                ids: [id],
+                fields: {
+                  disabled: !disabled ? 1 : 0,
+                },
+              },
+              curBusiItem.id,
+            ).then(() => {
+              refreshList();
+            });
+          }}
+        />
+      ),
     },
     {
       title: t('操作'),

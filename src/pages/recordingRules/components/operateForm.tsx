@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { RootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
 import { prometheusQuery } from '@/services/warning';
-import { addOrEditRecordingRule, EditRecordingRule, deleteRecordingRule } from '@/services/recording';
+import { addOrEditRecordingRule, editRecordingRule, deleteRecordingRule } from '@/services/recording';
 import PromQLInput from '@/components/PromQLInput';
 
 const { Option } = Select;
@@ -110,7 +110,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
       if (type === 1) {
         reqBody = d;
         method = 'Put';
-        const res = await EditRecordingRule(reqBody, curBusiItem.id, strategyId);
+        const res = await editRecordingRule(reqBody, curBusiItem.id, strategyId);
         if (res.err) {
           message.error(res.error);
         } else {

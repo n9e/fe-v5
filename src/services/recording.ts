@@ -21,7 +21,7 @@ export const getRecordingRule = function (id): Promise<any> {
   });
 };
 
-export const EditRecordingRule = function (data: any[], busiId: number, strategyId: number) {
+export const editRecordingRule = function (data: any[], busiId: number, strategyId: number) {
   return request(`/api/n9e/busi-group/${busiId}/recording-rule/${strategyId}`, {
     method: RequestMethod.Put,
     data: data,
