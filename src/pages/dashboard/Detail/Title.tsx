@@ -14,8 +14,9 @@
  * limitations under the License.
  *
  */
-import React, { useState, useRef } from 'react';
-import { useHistory } from 'react-router-dom';
+import React, { useState, useRef, useEffect } from 'react';
+import { useHistory, useLocation } from 'react-router-dom';
+import querystring from 'query-string';
 import { useThrottleFn } from 'ahooks';
 import moment from 'moment';
 import _ from 'lodash';
@@ -48,6 +49,9 @@ export default function Title(props: IProps) {
   const { curCluster, clusters, setCurCluster, dashboard, setDashboard, refresh, range, setRange, step, setStep, refreshRef, onAddPanel } = props;
   const { id, name } = dashboard;
   const history = useHistory();
+  const location = useLocation();
+  const query = querystring.parse(location.search);
+  const viewMode = query.viewMode;
   const [titleEditing, setTitleEditing] = useState(false);
   const titleRef = useRef<any>(null);
   const handleModifyTitle = async (newName) => {
@@ -176,6 +180,20 @@ export default function Title(props: IProps) {
           />
           <Resolution onChange={(v) => setStep(v)} initialValue={step} />
           <Refresh range={range} step={step} onRefresh={run} ref={refreshRef} />
+          <Button
+            onClick={() => {
+              const newQuery = _.omit(query, 'viewMode');
+              if (!viewMode) {
+                newQuery.viewMode = 'fullscreen';
+              }
+              history.replace({
+                pathname: location.pathname,
+                search: querystring.stringify(newQuery),
+              });
+            }}
+          >
+            {viewMode === 'fullscreen' ? '关闭全屏' : '全屏'}
+          </Button>
         </Space>
       </div>
     </div>

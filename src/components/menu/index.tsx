@@ -16,18 +16,19 @@
  */
 import React, { FC, useState, useEffect } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { MenuClickEventHandler } from 'rc-menu/lib/interface';
-import { RootState as AccountRootState, accountStoreState } from '@/store/accountInterface';
 import { Menu, Button } from 'antd';
-import Icon, { MenuUnfoldOutlined, MenuFoldOutlined, LineChartOutlined, DatabaseOutlined, UserOutlined, CodeOutlined, AlertOutlined, ContactsOutlined } from '@ant-design/icons';
+import Icon, { MenuUnfoldOutlined, MenuFoldOutlined, LineChartOutlined, CodeOutlined } from '@ant-design/icons';
 import _ from 'lodash';
-import { getMenuPerm } from '@/services/common';
 import { useTranslation } from 'react-i18next';
+import querystring from 'query-string';
 import { dynamicPackages, Entry } from '@/utils';
+import { getMenuPerm } from '@/services/common';
+import { RootState as AccountRootState, accountStoreState } from '@/store/accountInterface';
 import TargetsSvg from '../../../public/image/targets.svg';
-import './menu.less';
 import IconFont from '../IconFont';
+import './menu.less';
 
 const { SubMenu } = Menu;
 const Packages = dynamicPackages();
@@ -202,7 +203,20 @@ const SideMenu: FC = () => {
       history.push(key as string);
     }
   };
-  const hideSideMenu = () => location.pathname === '/login' || location.pathname.startsWith('/chart/') || location.pathname === '/callback';
+  const hideSideMenu = () => {
+    if (location.pathname === '/login' || location.pathname.startsWith('/chart/') || location.pathname === '/callback') {
+      return true;
+    }
+    // 大盘全屏模式下也需要隐藏左侧菜单
+    if (location.pathname.indexOf('/dashboard') === 0) {
+      const query = querystring.parse(location.search);
+      if (query?.viewMode === 'fullscreen') {
+        return true;
+      }
+      return false;
+    }
+    return false;
+  };
 
   useEffect(() => {
     setSelectedKeys([defaultSelectedKey(menus, pathname)]);
