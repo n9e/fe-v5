@@ -20,8 +20,8 @@ import { N9EAPI } from '../../config/constant';
 
 interface DashboardQuery {}
 // 大盘列表
-export const getDashboard = function (id: number) {
-  return request(`/api/n9e/busi-group/${id}/dashboards?`, {
+export const getDashboard = function () {
+  return request(`/api/n9e/dashboards`, {
     method: RequestMethod.Get,
   });
 };

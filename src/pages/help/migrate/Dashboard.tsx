@@ -14,67 +14,55 @@
  * limitations under the License.
  *
  */
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Select, Table, Button } from 'antd';
+import React, { useState, useEffect, useRef } from 'react';
+import { Table, Button } from 'antd';
 import _ from 'lodash';
 import moment from 'moment';
-import { useSelector } from 'react-redux';
 import { getDashboard } from '@/services/dashboard';
 import { exportDashboard, migrateDashboard } from '@/services/dashboardV2';
-import { getBusiGroups } from '@/services/common';
-import { RootState } from '@/store/common';
-import { CommonStoreState } from '@/store/commonInterface';
 import { convertDashboardV1ToV2 } from './utils';
 
 export default function Dashboard() {
-  const { busiGroups, curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
-  const [busiId, setBusiId] = useState<string>();
-  const [filteredBusiGroups, setFilteredBusiGroups] = useState(busiGroups);
   const [list, setList] = useState<any[]>([]);
   const [tableKey, setTableKey] = useState(_.uniqueId('tableKey_'));
   const listStatus = useRef({});
   const [allMigrated, setAllMigrated] = useState(false);
-  const fetchBusiGroup = (e) => {
-    getBusiGroups(e).then((res) => {
-      setFilteredBusiGroups(res.dat || []);
-    });
-  };
-  const handleSearch = useCallback(_.debounce(fetchBusiGroup, 800), []);
   const migrate = async () => {
-    if (busiId) {
-      _.forEach(list, (item) => {
-        listStatus.current[item.id] = 'migrating';
-      });
-      try {
-        const data = await exportDashboard(busiId, _.map(list, 'id'));
+    _.forEach(list, (item) => {
+      listStatus.current[item.id] = 'migrating';
+    });
+    setTableKey(_.uniqueId('tableKey_'));
+    try {
+      const groupData = _.groupBy(list, 'group_id');
+      for (const busiId of _.keys(groupData)) {
+        const busiData = groupData[busiId];
+        const data = await exportDashboard(busiId, _.map(busiData, 'id'));
         for (const item of data) {
-          const findedId = _.get(_.find(list, { name: item.name }), 'id');
-          await migrateDashboard(findedId, convertDashboardV1ToV2(item));
+          const finded = _.find(_.cloneDeep(list), { name: item.name });
+          const findedId = _.get(finded, 'id');
+          await migrateDashboard(findedId, convertDashboardV1ToV2(item)).catch((e) => {
+            listStatus.current[findedId] = 'failed';
+            setTableKey(_.uniqueId('tableKey_'));
+            throw {
+              id: finded,
+              err: e.message,
+            };
+          });
           listStatus.current[findedId] = 'migrated';
           setTableKey(_.uniqueId('tableKey_'));
         }
         setAllMigrated(true);
-      } catch (err) {
-        console.error(err);
       }
+    } catch (err) {
+      console.error(err);
     }
   };
 
   useEffect(() => {
-    setBusiId(_.get(curBusiItem, 'id'));
-  }, [curBusiItem]);
-
-  useEffect(() => {
-    setFilteredBusiGroups(busiGroups);
-  }, [JSON.stringify(busiGroups)]);
-
-  useEffect(() => {
-    if (busiId) {
-      getDashboard(_.toNumber(busiId)).then((res) => {
-        setList(res.dat);
-      });
-    }
-  }, [busiId]);
+    getDashboard().then((res) => {
+      setList(res.dat);
+    });
+  }, []);
 
   return (
     <div>
@@ -84,32 +72,6 @@ export default function Dashboard() {
           justifyContent: 'space-between',
         }}
       >
-        <Select
-          allowClear
-          showSearch
-          style={{ minWidth: 120 }}
-          placeholder='业务组'
-          dropdownClassName='overflow-586'
-          filterOption={false}
-          onSearch={handleSearch}
-          getPopupContainer={() => document.body}
-          onFocus={() => {
-            fetchBusiGroup('');
-          }}
-          onClear={() => {
-            fetchBusiGroup('');
-          }}
-          value={busiId}
-          onChange={(val: string) => {
-            setBusiId(val);
-          }}
-        >
-          {filteredBusiGroups.map((item) => (
-            <Select.Option value={item.id} key={item.id}>
-              {item.name}
-            </Select.Option>
-          ))}
-        </Select>
         <Button type='primary' onClick={migrate} disabled={allMigrated}>
           大盘迁移
         </Button>
@@ -124,6 +86,10 @@ export default function Dashboard() {
             title: '大盘名称',
             dataIndex: 'name',
             key: 'name',
+          },
+          {
+            title: '业务组',
+            dataIndex: 'group_id',
           },
           {
             title: '更新时间',
