@@ -43,7 +43,7 @@ const Hexbin: FunctionComponent<HoneyCombProps> = (props) => {
       series,
       calc,
       {
-        util: options?.standardOptions?.util,
+        unit: options?.standardOptions?.util,
         decimals: options?.standardOptions?.decimals,
       },
       options?.valueMappings,

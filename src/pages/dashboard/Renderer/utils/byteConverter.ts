@@ -74,10 +74,19 @@ export const config = [
 ];
 
 export function format(value: number, options = defaultOptions) {
-  if (value === null || value === undefined) return;
+  if (value === null || value === undefined)
+    return {
+      value: '',
+      unit: '',
+      text: '',
+    };
   const baseUtil = options.base ? baseUtilMap[options.base] : ''; // 支持
   if ((options.type === 'si' && Math.abs(value) < 1000) || (options.type === 'iec' && Math.abs(value) < 1024)) {
-    return _.round(value, options.decimals) + baseUtil;
+    return {
+      value: _.round(value, options.decimals),
+      unit: baseUtil,
+      text: _.round(value, options.decimals) + baseUtil,
+    };
   }
 
   const baseNum = options.type === 'iec' ? 2 : 10;
@@ -90,16 +99,28 @@ export function format(value: number, options = defaultOptions) {
     const map = _.find(valueMap, { exp: expVal });
 
     if (!map) {
-      return NaN;
+      return {
+        value: NaN,
+        unit: '',
+        text: NaN,
+      };
     }
     const unit = _.get(map, options.type);
     const exp = _.get(map, options.type === 'iec' ? 'iecExp' : 'exp');
     const divider = Math.pow(baseNum, exp);
     const newValue = _.round(value / divider, options.decimals);
 
-    return newValue + unit + baseUtil;
+    return {
+      value: newValue,
+      unit: unit + baseUtil,
+      text: newValue + unit + baseUtil,
+    };
   }
-  return _.round(value, options.decimals);
+  return {
+    value: _.round(value, options.decimals),
+    unit: '',
+    text: _.round(value, options.decimals),
+  };
 }
 
 export function parse(value: string, options = defaultOptions) {}

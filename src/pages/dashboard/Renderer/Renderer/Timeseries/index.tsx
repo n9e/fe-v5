@@ -87,7 +87,7 @@ export default function index(props: IProps) {
         getLegendValues(
           seriesData,
           {
-            util: options?.standardOptions?.util,
+            unit: options?.standardOptions?.util,
             decimals: options?.standardOptions?.decimals,
           },
           hexPalette,
@@ -129,11 +129,11 @@ export default function index(props: IProps) {
           pointValueformatter: (val) => {
             return valueFormatter(
               {
-                util: options?.standardOptions?.util,
+                unit: options?.standardOptions?.util,
                 decimals: options?.standardOptions?.decimals,
               },
               val,
-            );
+            ).text;
           },
         },
         yAxis: {
@@ -144,11 +144,11 @@ export default function index(props: IProps) {
           tickValueFormatter: (val) => {
             return valueFormatter(
               {
-                util: options?.standardOptions?.util,
+                unit: options?.standardOptions?.util,
                 decimals: options?.standardOptions?.decimals,
               },
               val,
-            );
+            ).text;
           },
         },
       });
@@ -158,7 +158,7 @@ export default function index(props: IProps) {
         getLegendValues(
           seriesData,
           {
-            util: options?.standardOptions?.util,
+            unit: options?.standardOptions?.util,
             decimals: options?.standardOptions?.decimals,
           },
           hexPalette,

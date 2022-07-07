@@ -27,12 +27,16 @@ interface IProps {
   series: any[];
 }
 
+const UNIT_SIZE = 12;
+const MIN_SIZE = 12;
+const UNIT_PADDING = 8;
+
 function StatItem(props) {
   const ele = useRef(null);
   const eleSize = useSize(ele);
   const { item, idx, colSpan, textMode, colorMode, textSize } = props;
-  const headerFontSize = textSize?.title ? textSize?.title : eleSize?.width! / _.toString(item.name).length || 12;
-  let statFontSize = textSize?.value ? textSize?.value : eleSize?.width! / _.toString(item.text).length || 12;
+  const headerFontSize = textSize?.title ? textSize?.title : eleSize?.width! / _.toString(item.name).length || MIN_SIZE;
+  let statFontSize = textSize?.value ? textSize?.value : (eleSize?.width! - item.unit.length * UNIT_SIZE - UNIT_PADDING) / _.toString(item.value).length || MIN_SIZE;
   const color = item.color ? item.color : hexPalette[idx % hexPalette.length];
 
   if (statFontSize > eleSize?.height! - 20) {
@@ -68,7 +72,8 @@ function StatItem(props) {
             fontSize: statFontSize > 100 ? 100 : statFontSize,
           }}
         >
-          {item.text}
+          {item.value}
+          <span style={{ fontSize: UNIT_SIZE, paddingLeft: UNIT_PADDING }}>{item.unit}</span>
         </div>
       </div>
     </div>
@@ -83,7 +88,7 @@ export default function Stat(props: IProps) {
     series,
     calc,
     {
-      util: options?.standardOptions?.util,
+      unit: options?.standardOptions?.util,
       decimals: options?.standardOptions?.decimals,
     },
     options?.valueMappings,

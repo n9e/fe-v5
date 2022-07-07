@@ -34,7 +34,7 @@ export default function Pie(props: IProps) {
     series,
     calc,
     {
-      util: options?.standardOptions?.util,
+      unit: options?.standardOptions?.util,
       decimals: options?.standardOptions?.decimals,
     },
     options?.valueMappings,
