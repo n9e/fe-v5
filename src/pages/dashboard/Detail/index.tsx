@@ -37,6 +37,7 @@ import editor from '../Editor';
 import { defaultCustomValuesMap } from '../Editor/config';
 import { sortPanelsByGridLayout, panelsMergeToConfigs, updatePanelsInsertNewPanelToGlobal } from '../Panels/utils';
 import './style.less';
+import './dark.less';
 
 interface URLParam {
   id: string;
