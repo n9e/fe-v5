@@ -111,6 +111,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) 
       form.setFieldsValue({
         tags: tags || [{}],
         cluster: tagsObj.cluster,
+        busiGroup: tagsObj.group_id,
       });
     }
   }, [tagsObj]);
