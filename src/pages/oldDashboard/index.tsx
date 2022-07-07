@@ -78,7 +78,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (busiId) {
-      getDashboard(busiId).then((res) => {
+      getDashboard().then((res) => {
         if (searchVal && res.dat) {
           const filters = searchVal.split(' ');
           for (var i = 0; i < filters.length; i++) {
