@@ -24,10 +24,11 @@ import './style.less';
 interface IProps {
   values: IPanel;
   series: any[];
+  themeMode?: 'dark';
 }
 
 export default function Pie(props: IProps) {
-  const { values, series } = props;
+  const { values, series, themeMode } = props;
   const { custom, options } = values;
   const { calc, legengPosition, max, labelWithName } = custom;
   const calculatedValues = getCalculatedValuesBySeries(
@@ -50,7 +51,13 @@ export default function Pie(props: IProps) {
       : sortedValues.map((i) => ({ name: i.name, value: i.stat }));
   return (
     <div className='renderer-pie-container'>
-      <G2PieChart data={data} positon={legengPosition !== 'hidden' ? legengPosition : undefined} hidden={legengPosition === 'hidden'} labelWithName={labelWithName} />
+      <G2PieChart
+        themeMode={themeMode}
+        data={data}
+        positon={legengPosition !== 'hidden' ? legengPosition : undefined}
+        hidden={legengPosition === 'hidden'}
+        labelWithName={labelWithName}
+      />
     </div>
   );
 }

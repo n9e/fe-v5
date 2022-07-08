@@ -75,7 +75,7 @@ function index(props: IProps) {
     timeseries: () => <Timeseries {...subProps} themeMode={themeMode} />,
     stat: () => <Stat {...subProps} />,
     table: () => <Table {...subProps} />,
-    pie: () => <Pie {...subProps} />,
+    pie: () => <Pie {...subProps} themeMode={themeMode} />,
     hexbin: () => <Hexbin {...subProps} />,
   };
 

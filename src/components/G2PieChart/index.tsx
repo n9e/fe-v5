@@ -35,28 +35,28 @@ interface Props {
   positon: 'top' | 'left' | 'right' | 'bottom';
   hidden: boolean;
   labelWithName: boolean;
+  themeMode?: 'dark';
 }
 
 const DemoPie = (props: Props) => {
-  const { data, positon, hidden, labelWithName } = props;
+  const { data, positon, hidden, labelWithName, themeMode } = props;
 
   const config: PieConfig = {
     padding: [16, 8, 16, 8],
     appendPadding: 10,
     data,
-    // autoFit: true,
     angleField: 'value',
     colorField: 'name',
     radius: 0.9,
     label: {
       type: 'spider',
-      // offset: '-30%',
       content: (record) => {
         return `${labelWithName ? `${record.name}: ` : ''}${(record.percent * 100).toFixed(0)}%`;
       },
       style: {
-        fontSize: 14,
+        fontSize: 12,
         textAlign: 'center',
+        fillStyle: themeMode === 'dark' ? '#fff' : '#333',
       },
     },
     interactions: [
@@ -67,24 +67,13 @@ const DemoPie = (props: Props) => {
     tooltip: {
       fields: ['name', 'value'],
       formatter: (datum) => {
-        // console.log(datum);
         return { name: datum.name, value: `${datum.value.toFixed(3)}` };
       },
-      // customContent: (title, data) => {
-      //   console.log(title, data);
-      //   return `<div style="color: green">${title}</div>`;
-      // },
     },
     legend: hidden
       ? false
       : {
           position: positon,
-          // itemName: {
-          //   formatter(text: string, item: ListItem, index: number) {
-          //     // console.log(text, item, index);
-          //     return text;
-          //   },
-          // },
         },
   };
   return <Pie {...config} />;
