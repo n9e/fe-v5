@@ -1,0 +1,70 @@
+.autocomplete-with-label {
+  padding: 4px;
+  display: inline-flex;
+  align-items: center;
+  background: #f0f0f0;
+  border-radius: 4px;
+
+  &-label {
+    padding: 0 10px;
+    height: 24px;
+    line-height: 24px;
+    border-radius: 4px;
+    display: inline-block;
+    background: #d8d8d8;
+    text-align: center;
+  }
+  &-content {
+    .ant-select {
+      .ant-select-selector {
+        height: 24px;
+        line-height: 24px;
+        border: 0px;
+        .ant-select-selection-search-input,
+        .ant-select-selection-item {
+          height: 24px;
+          line-height: 24px;
+        }
+        .ant-select-selection-placeholder {
+          height: 24px;
+          line-height: 24px;
+        }
+
+        .ant-select-selection-overflow {
+          .ant-select-selection-overflow-item {
+            align-self: auto;
+            .ant-select-selection-item {
+              height: 20px;
+              line-height: 20px;
+              margin-top: 0px;
+            }
+            .ant-select-selection-search-input,
+            .ant-select-selection-item {
+              height: 20px;
+              line-height: 20px;
+            }
+            .ant-select-selection-placeholder {
+              height: 20px;
+              line-height: 20px;
+            }
+            .ant-select-selection-search {
+              margin-top: -1px;
+            }
+          }
+        }
+      }
+    }
+    .ant-input {
+      line-height: 24px;
+      height: 24px;
+    }
+    input {
+      border: 0;
+      background: #f0f0f0;
+    }
+
+    .ant-select:not(.ant-select-customize-input) .ant-select-selector {
+      background: #f0f0f0;
+    }
+  }
+}

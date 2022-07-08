@@ -1,0 +1,74 @@
+@border-color: #d9d9d9;
+
+.prom-graph-container {
+  .ant-tabs-nav-wrap {
+    border-left: 1px solid @border-color;
+  }
+  .ant-tabs-card > .ant-tabs-nav .ant-tabs-tab {
+    border: 1px solid @border-color;
+    border-left: 0 none;
+    color: #c1c1c1;
+  }
+  .ant-tabs-card.ant-tabs-top > .ant-tabs-nav .ant-tabs-tab-active {
+    border-bottom-color: #fff;
+    border-top: 2px solid  @primary-color;
+  }
+  .ant-tabs-top > .ant-tabs-nav {
+    margin-bottom: 0;
+  }
+  .ant-tabs-content-holder {
+    border: 1px solid @border-color;
+    border-top: 0 none;
+    padding: 16px;
+  }
+  .ant-tabs-top > .ant-tabs-nav::before {
+    border-bottom: 1px solid @border-color;
+  }
+
+  .prom-graph-metrics-target {
+    cursor: pointer;
+  }
+}
+.prom-graph-expression-input {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  .ant-input-affix-wrapper {
+    padding: 5px 11px;
+  }
+  .ant-input-affix-wrapper > .ant-input {
+    padding: 0;
+    border: none;
+    outline: none;
+  }
+}
+.prom-graph-table-container {
+  .prom-graph-table-controls {
+    padding-bottom: 16px;
+    .ant-picker {
+      border-radius: unset
+    }
+  }
+  .prom-graph-table-list {
+    overflow: auto;
+  }
+  .ant-list-items {
+    border-top: 1px solid #f0f0f0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .ant-list-item {
+    padding: 8px;
+  }
+}
+.prom-graph-metrics-explorer-list {
+  margin-top: 16px;
+  max-height: 56vh;
+  overflow: auto;
+}
+.prom-graph-metrics-explorer-list-item {
+  padding: 6px 8px;
+  cursor: pointer;
+  &:hover {
+    background-color: #f0f0f0;
+  }
+}

@@ -15,16 +15,32 @@
  *
  */
 import { Button, Result } from 'antd';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router';
+import request from '@/utils/request';
+import { RequestMethod } from '@/store/common';
 
 const NotFound: React.FC = () => {
   const history = useHistory();
+  const [adminList, setAdminList] = useState<string[]>();
+  useEffect(() => {
+    request(`/api/v1/system/users/amdin`, {
+      method: RequestMethod.Get,
+    }).then((res) => {
+      console.log(res);
+      setAdminList(res.data.map((item) => item.username));
+    });
+  }, []);
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
       <Result
         title='403'
-        subTitle='你没有权限访问该页面, 请联系管理员!'
+        subTitle={
+          <div>
+            <div>你没有权限访问该页面, 请联系管理员!</div>
+            {adminList && <div>管理员： {adminList.join(', ')}</div>}
+          </div>
+        }
         extra={
           <Button type='primary' onClick={() => history.go(-2)}>
             返回上一页

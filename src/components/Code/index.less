@@ -1,0 +1,30 @@
+.code-area {
+  background: #f2f2f2;
+  padding: 16px;
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+
+  pre {
+    color: @primary-color;
+    margin-bottom: 0px;
+    line-height: 16px;
+  }
+  .code-text {
+    display: block;
+    height: 24px;
+    line-height: 24px;
+  }
+  &:hover {
+    .copy-btn {
+      display: block;
+    }
+  }
+  .copy-btn {
+    display: none;
+    margin-left: 16px;
+    cursor: pointer;
+    color: @primary-color;
+  }
+}

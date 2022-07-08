@@ -63,32 +63,40 @@ export default function Login() {
       <div className='login-panel'>
         <div className='login-main  integration'>
           <div className='login-title'>
-            <img src={'/image/logo-l.svg'} style={{ width: '120px' }} />
+            <img src={'/image/logo-l.svg'} />
           </div>
           <Form form={form} layout='vertical' requiredMark={true}>
             <Form.Item
               label='账户'
               name='username'
               rules={[
-                {
-                  required: true,
-                  message: t('请输入用户名'),
-                },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (!value || value.length === 0) {
+                      return Promise.reject(new Error('请输入用户名'));
+                    }
+                    return Promise.resolve();
+                  },
+                }),
               ]}
             >
-              <Input placeholder={t('请输入用户名')} prefix={<UserOutlined className='site-form-item-icon' />} />
+              <Input placeholder={t('请输入用户名')} />
             </Form.Item>
             <Form.Item
               label='密码'
               name='password'
               rules={[
-                {
-                  required: true,
-                  message: t('请输入密码'),
-                },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (!value || value.length === 0) {
+                      return Promise.reject(new Error('请输入密码'));
+                    }
+                    return Promise.resolve();
+                  },
+                }),
               ]}
             >
-              <Input type='password' placeholder={t('请输入密码')} onPressEnter={handleSubmit} prefix={<LockOutlined className='site-form-item-icon' />} />
+              <Input type='password' placeholder={t('请输入密码')} onPressEnter={handleSubmit} />
             </Form.Item>
 
             <Form.Item>

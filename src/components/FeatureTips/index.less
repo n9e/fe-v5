@@ -1,0 +1,32 @@
+.feature-tips {
+  position: relative;
+  .tip-icon {
+    &.debounce {
+      animation: debounce-icon ease 1s 5;
+    }
+    position: absolute;
+    left: 50%;
+    margin-left: -16px;
+    top: -32px;
+    // position: fixed;
+    // margin-left: -16px;
+    // left: 50%;
+  }
+}
+
+@keyframes debounce-icon {
+  0% {
+    top: -32px;
+    transform: translateY(0) scaleY(0.8);
+  }
+
+  50% {
+    top: -45px;
+    transform: translateY(0px) scaleY(1);
+  }
+
+  100% {
+    top: -32px;
+    transform: translateY(0) scaleY(0.8);
+  }
+}

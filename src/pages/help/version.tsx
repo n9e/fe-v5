@@ -44,7 +44,7 @@ export default function version() {
     >
       <div style={{ padding: 10 }}>
         <ul style={{ padding: '20px 30px' }}>
-          <li>前端版本：{pkgJson.version}</li>
+          <li>前端版本：{pkgJson.version} & {import.meta.env.VITE_VERSION}</li>
           <li>后端版本：{backendVersion}</li>
         </ul>
       </div>

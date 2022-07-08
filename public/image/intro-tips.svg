@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32px" height="32px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>编组 105</title>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="32" height="32"></rect>
+        <circle id="path-3" cx="7" cy="7" r="7"></circle>
+    </defs>
+    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="编组-105">
+            <mask id="mask-2" fill="white">
+                <use xlink:href="#path-1"></use>
+            </mask>
+            <use id="蒙版" fill="#FFFFFF" opacity="0" xlink:href="#path-1"></use>
+            <g mask="url(#mask-2)">
+                <g transform="translate(1.022070, 0.648101)">
+                    <g id="编组-11" stroke-width="1" fill="none">
+                        <path d="M0.834699504,10.0026437 C3.82577757,5.30940614 5.79051559,2.96278734 6.72891355,2.96278734 C7.66731152,2.96278734 9.46791753,4.76339335 12.1307316,8.36460537 L0.834699504,10.0026437 Z" id="路径-4" fill="#9684C6" transform="translate(6.482716, 6.482716) rotate(-45.000000) translate(-6.482716, -6.482716) "></path>
+                        <path d="M3.27355007,8.48271554 C4.97306091,5.81604888 6.08941209,4.48271554 6.62260363,4.48271554 C7.15579517,4.48271554 8.17888763,5.50580801 9.69188102,7.55199294 L3.27355007,8.48271554 Z" id="路径-4备份" fill="#FFFFFF" opacity="0.401408" transform="translate(6.482716, 6.482716) rotate(-45.000000) translate(-6.482716, -6.482716) "></path>
+                    </g>
+                    <g id="编组-11备份" stroke-width="1" fill="none" transform="translate(23.482716, 6.482716) scale(-1, 1) translate(-23.482716, -6.482716) translate(17.000000, 0.000000)">
+                        <path d="M0.834699504,10.0026437 C3.82577757,5.30940614 5.79051559,2.96278734 6.72891355,2.96278734 C7.66731152,2.96278734 9.46791753,4.76339335 12.1307316,8.36460537 L0.834699504,10.0026437 Z" id="路径-4" fill="#9684C6" transform="translate(6.482716, 6.482716) rotate(-45.000000) translate(-6.482716, -6.482716) "></path>
+                        <path d="M3.27355007,8.48271554 C4.97306091,5.81604888 6.08941209,4.48271554 6.62260363,4.48271554 C7.15579517,4.48271554 8.17888763,5.50580801 9.69188102,7.55199294 L3.27355007,8.48271554 Z" id="路径-4备份" fill="#FFFFFF" opacity="0.4" transform="translate(6.482716, 6.482716) rotate(-45.000000) translate(-6.482716, -6.482716) "></path>
+                    </g>
+                    <path d="M14.9779302,29.3518991 C21.6445969,22.3671308 24.9779302,17.0337975 24.9779302,13.3518991 C24.9779302,7.82905164 20.5007777,3.35189914 14.9779302,3.35189914 C9.45508271,3.35189914 4.9779302,7.82905164 4.9779302,13.3518991 C4.9779302,17.0337975 8.31126354,22.3671308 14.9779302,29.3518991 Z" id="椭圆形" fill="#9684C6"></path>
+                    <g id="新" stroke-width="1" fill="none" transform="translate(7.977930, 6.351899)">
+                        <mask id="mask-4" fill="white">
+                            <use xlink:href="#path-3"></use>
+                        </mask>
+                        <use id="蒙版" fill="#FFFFFF" xlink:href="#path-3"></use>
+                        <text mask="url(#mask-4)" font-family="PingFangSC-Regular, PingFang SC" font-size="10" font-weight="normal" line-spacing="14" fill="#6C53B1">
+                            <tspan x="2" y="11">新</tspan>
+                        </text>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
