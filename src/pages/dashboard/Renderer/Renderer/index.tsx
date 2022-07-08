@@ -32,6 +32,7 @@ import { IPanel } from '../../types';
 import './style.less';
 
 interface IProps {
+  themeMode?: 'dark';
   dashboardId: string;
   id?: string;
   time: Range;
@@ -47,7 +48,7 @@ interface IProps {
 }
 
 function index(props: IProps) {
-  const { dashboardId, id, time, step, type, variableConfig, isPreview, onCloneClick, onShareClick, onEditClick, onDeleteClick } = props;
+  const { themeMode, dashboardId, id, time, step, type, variableConfig, isPreview, onCloneClick, onShareClick, onEditClick, onDeleteClick } = props;
   const values = _.cloneDeep(props.values);
   const ref = useRef<HTMLDivElement>(null);
   const [inViewPort] = useInViewport(ref);
@@ -71,7 +72,7 @@ function index(props: IProps) {
     series,
   };
   const RendererCptMap = {
-    timeseries: () => <Timeseries {...subProps} />,
+    timeseries: () => <Timeseries {...subProps} themeMode={themeMode} />,
     stat: () => <Stat {...subProps} />,
     table: () => <Table {...subProps} />,
     pie: () => <Pie {...subProps} />,

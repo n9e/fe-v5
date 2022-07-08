@@ -32,10 +32,11 @@ interface IProps {
   tableHeight?: string;
   values: IPanel;
   series: any[];
+  themeMode?: 'dark';
 }
 
 export default function index(props: IProps) {
-  const { values, series, inDashboard = true, chartHeight = '200px', tableHeight = '200px' } = props;
+  const { values, series, inDashboard = true, chartHeight = '200px', tableHeight = '200px', themeMode = '' } = props;
   const { custom, options = {} } = values;
   const [seriesData, setSeriesData] = useState(series);
   const [activeLegend, setActiveLegend] = useState('');
@@ -66,7 +67,6 @@ export default function index(props: IProps) {
         chartRef.current.destroy();
       }
       chartRef.current = new TsGraph({
-        colors: hexPalette,
         timestamp: 'X',
         xkey: 0,
         ykey: 1,
@@ -75,6 +75,7 @@ export default function index(props: IProps) {
         chart: {
           renderTo: chartEleRef.current,
           height: chartEleRef.current.clientHeight,
+          colors: hexPalette,
         },
         series: [],
         line: {
@@ -136,11 +137,18 @@ export default function index(props: IProps) {
             ).text;
           },
         },
+        xAxis: {
+          ...chartRef.current.options.xAxis,
+          lineColor: themeMode === 'dark' ? 'rgba(255,255,255,0.2)' : '#ccc',
+          tickColor: themeMode === 'dark' ? 'rgba(255,255,255,0.2)' : '#ccc',
+        },
         yAxis: {
           ...chartRef.current.options.yAxis,
           min: options?.standardOptions?.min,
           max: options?.standardOptions?.max,
           plotLines: options?.thresholds?.steps,
+          backgroundColor: themeMode === 'dark' ? '#181b1f' : '#fff',
+          gridLineColor: themeMode === 'dark' ? 'rgba(255,255,255,0.05)' : '#efefef',
           tickValueFormatter: (val) => {
             return valueFormatter(
               {
@@ -167,7 +175,7 @@ export default function index(props: IProps) {
     } else {
       setLegendData([]);
     }
-  }, [JSON.stringify(seriesData), JSON.stringify(custom), JSON.stringify(options)]);
+  }, [JSON.stringify(seriesData), JSON.stringify(custom), JSON.stringify(options), themeMode]);
 
   useEffect(() => {
     // TODO: 这里布局变化了，但是 fc-plot 没有自动 resize，所以这里需要手动 resize

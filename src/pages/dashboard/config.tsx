@@ -18,7 +18,7 @@ import React from 'react';
 import Icon from '@ant-design/icons';
 
 export const hexPalette = [
-  '#3399CC',
+  '#573BA7',
   '#CC9933',
   '#9966CC',
   '#66CC66',

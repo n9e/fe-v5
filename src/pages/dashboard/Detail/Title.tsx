@@ -14,13 +14,13 @@
  * limitations under the License.
  *
  */
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import querystring from 'query-string';
 import { useThrottleFn } from 'ahooks';
 import moment from 'moment';
 import _ from 'lodash';
-import { Input, Button, Space, Dropdown, Menu } from 'antd';
+import { Input, Button, Space, Dropdown, Menu, Switch } from 'antd';
 import { RollbackOutlined, EditOutlined, DownOutlined } from '@ant-design/icons';
 import { updateDashboard } from '@/services/dashboardV2';
 import DateRangePicker from '@/components/DateRangePicker';
@@ -51,7 +51,7 @@ export default function Title(props: IProps) {
   const history = useHistory();
   const location = useLocation();
   const query = querystring.parse(location.search);
-  const viewMode = query.viewMode;
+  const { viewMode, themeMode } = query;
   const [titleEditing, setTitleEditing] = useState(false);
   const titleRef = useRef<any>(null);
   const handleModifyTitle = async (newName) => {
@@ -182,7 +182,7 @@ export default function Title(props: IProps) {
           <Refresh range={range} step={step} onRefresh={run} ref={refreshRef} />
           <Button
             onClick={() => {
-              const newQuery = _.omit(query, 'viewMode');
+              const newQuery = _.omit(query, ['viewMode', 'themeMode']);
               if (!viewMode) {
                 newQuery.viewMode = 'fullscreen';
               }
@@ -194,6 +194,23 @@ export default function Title(props: IProps) {
           >
             {viewMode === 'fullscreen' ? '关闭全屏' : '全屏'}
           </Button>
+          {viewMode === 'fullscreen' && (
+            <Switch
+              checkedChildren='dark'
+              unCheckedChildren='light'
+              checked={themeMode === 'dark'}
+              onChange={(checked) => {
+                const newQuery = _.omit(query, ['themeMode']);
+                if (checked) {
+                  newQuery.themeMode = 'dark';
+                }
+                history.replace({
+                  pathname: location.pathname,
+                  search: querystring.stringify(newQuery),
+                });
+              }}
+            />
+          )}
         </Space>
       </div>
     </div>

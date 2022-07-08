@@ -19,6 +19,8 @@ import _ from 'lodash';
 import semver from 'semver';
 import { v4 as uuidv4 } from 'uuid';
 import { Modal } from 'antd';
+import { useLocation } from 'react-router-dom';
+import querystring from 'query-string';
 import RGL, { WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import { Range } from '@/components/DateRangePicker';
@@ -56,6 +58,8 @@ interface IProps {
 const ReactGridLayout = WidthProvider(RGL);
 
 function index(props: IProps) {
+  const location = useLocation();
+  const { themeMode } = querystring.parse(location.search);
   const { curCluster, dashboard, range, step, variableConfig, panels, setPanels, onShareClick, onUpdated } = props;
   const layoutInitialized = useRef(false);
   const allowUpdateDashboardConfigs = useRef(false);
@@ -67,7 +71,7 @@ function index(props: IProps) {
   };
 
   return (
-    <div className='dashboards-panels'>
+    <div className='dashboards-panels scroll-container'>
       <ReactGridLayout
         layout={buildLayout(panels)}
         onLayoutChange={(layout) => {
@@ -116,6 +120,7 @@ function index(props: IProps) {
               {item.type !== 'row' ? (
                 semver.valid(item.version) ? (
                   <Renderer
+                    themeMode={themeMode as 'dark'}
                     dashboardId={_.toString(dashboard.id)}
                     id={item.id}
                     time={range}
