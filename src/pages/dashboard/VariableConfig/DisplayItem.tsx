@@ -37,65 +37,68 @@ export default function DisplayItem(props: IProps) {
 
   return (
     <div className='tag-content-close-item'>
-      <div className='tag-content-close-item-tagName'>{name}</div>
-      {type === 'query' ? (
-        <Select
-          mode={multi ? 'tags' : undefined}
-          style={{
-            width: '180px',
-          }}
-          onChange={(v) => {
-            let val = v;
-            if (multi && allOption && val.includes('all')) {
-              val = ['all'];
-            } else if (multi && !allOption) {
-              let allIndex = val.indexOf('all');
-              if (allIndex !== -1) {
-                val.splice(allIndex, 1);
+      <Input.Group>
+        <span className='ant-input-group-addon'>{name}</span>
+
+        {type === 'query' ? (
+          <Select
+            mode={multi ? 'tags' : undefined}
+            style={{
+              width: '180px',
+            }}
+            onChange={(v) => {
+              let val = v;
+              if (multi && allOption && val.includes('all')) {
+                val = ['all'];
+              } else if (multi && !allOption) {
+                let allIndex = val.indexOf('all');
+                if (allIndex !== -1) {
+                  val.splice(allIndex, 1);
+                }
               }
-            }
-            setVaraiableSelected(name, val, id, true);
-            setSelected(val);
-            onChange();
-          }}
-          defaultActiveFirstOption={false}
-          showSearch
-          value={selected}
-          dropdownClassName='overflow-586'
-        >
-          {allOption && (
-            <Select.Option key={'all'} value={'all'}>
-              all
-            </Select.Option>
-          )}
-          {options &&
-            options.map((value) => (
-              <Select.Option key={value} value={value}>
-                {value}
+              setVaraiableSelected(name, val, id, true);
+              setSelected(val);
+              onChange();
+            }}
+            defaultActiveFirstOption={false}
+            showSearch
+            value={selected}
+            dropdownClassName='overflow-586'
+          >
+            {allOption && (
+              <Select.Option key={'all'} value={'all'}>
+                all
               </Select.Option>
-            ))}
-        </Select>
-      ) : (
-        <Input
-          value={selected}
-          onBlur={(e) => {
-            let val = e.target.value;
-            setVaraiableSelected(name, val, id, true);
-            onChange();
-          }}
-          onKeyDown={(e: any) => {
-            if (e.code === 'Enter') {
+            )}
+            {options &&
+              options.map((value) => (
+                <Select.Option key={value} value={value}>
+                  {value}
+                </Select.Option>
+              ))}
+          </Select>
+        ) : (
+          <Input
+            value={selected}
+            onBlur={(e) => {
               let val = e.target.value;
               setVaraiableSelected(name, val, id, true);
               onChange();
-            }
-          }}
-          onChange={(e) => {
-            let val = e.target.value;
-            setSelected(val as any);
-          }}
-        />
-      )}
+            }}
+            onKeyDown={(e: any) => {
+              if (e.code === 'Enter') {
+                let val = e.target.value;
+                setVaraiableSelected(name, val, id, true);
+                onChange();
+              }
+            }}
+            onChange={(e) => {
+              let val = e.target.value;
+              setSelected(val as any);
+            }}
+          />
+        )}
+      </Input.Group>
     </div>
   );
 }
