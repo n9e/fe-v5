@@ -151,7 +151,7 @@ export default function index(props: IProps) {
           min: options?.standardOptions?.min,
           max: options?.standardOptions?.max,
           plotLines: options?.thresholds?.steps,
-          backgroundColor: themeMode === 'dark' ? '#181b1f' : '#fff',
+          backgroundColor: themeMode === 'dark' ? '#2A2D3C' : '#fff',
           gridLineColor: themeMode === 'dark' ? 'rgba(255,255,255,0.05)' : '#efefef',
           tickValueFormatter: (val) => {
             return valueFormatter(

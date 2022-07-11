@@ -29,7 +29,7 @@ interface IProps {
 
 const UNIT_SIZE = 12;
 const MIN_SIZE = 12;
-const UNIT_PADDING = 8;
+const UNIT_PADDING = 4;
 
 function StatItem(props) {
   const ele = useRef(null);
