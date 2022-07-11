@@ -45,14 +45,23 @@ export default function GraphStyles() {
                       </Radio.Group>
                     </Form.Item>
                   ) : null}
-                  <Form.Item label='透明度' name={[...namePrefix, 'fillOpacity']}>
-                    <Slider min={0} max={1} step={0.01} />
-                  </Form.Item>
                 </>
               );
             }
             return null;
           }}
+        </Form.Item>
+        <Form.Item label='曲线宽度' name={[...namePrefix, 'lineWidth']}>
+          <Slider min={0} max={10} step={1} />
+        </Form.Item>
+        <Form.Item label='透明度' name={[...namePrefix, 'fillOpacity']}>
+          <Slider min={0} max={1} step={0.01} />
+        </Form.Item>
+        <Form.Item label='渐变' name={[...namePrefix, 'gradientMode']}>
+          <Radio.Group buttonStyle='solid'>
+            <Radio.Button value='opacity'>开启</Radio.Button>
+            <Radio.Button value='none'>关闭</Radio.Button>
+          </Radio.Group>
         </Form.Item>
         <Form.Item label='堆叠' name={[...namePrefix, 'stack']}>
           <Radio.Group buttonStyle='solid'>

@@ -38,6 +38,7 @@ interface IProps {
 export default function index(props: IProps) {
   const { values, series, inDashboard = true, chartHeight = '200px', tableHeight = '200px', themeMode = '' } = props;
   const { custom, options = {} } = values;
+  const { lineWidth = 1, gradientMode = 'none' } = custom;
   const [seriesData, setSeriesData] = useState(series);
   const [activeLegend, setActiveLegend] = useState('');
   const chartEleRef = useRef<HTMLDivElement>(null);
@@ -78,9 +79,6 @@ export default function index(props: IProps) {
           colors: hexPalette,
         },
         series: [],
-        line: {
-          width: 1,
-        },
       });
     }
     if (hasLegend) {
@@ -113,8 +111,14 @@ export default function index(props: IProps) {
       chartRef.current.update({
         type: custom.drawStyle === 'lines' ? 'line' : 'bar',
         series: seriesData,
+        line: {
+          width: lineWidth,
+        },
         area: {
+          ...chartRef.current.options.area,
           opacity: custom.fillOpacity,
+          gradientMode,
+          gradientOpacityStopColor: themeMode === 'dark' ? 'rgba(0,0,0,0)' : 'rgba(255,255,255,0)',
         },
         stack: {
           enabled: custom.stack === 'noraml',

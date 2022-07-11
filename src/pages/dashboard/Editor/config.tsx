@@ -104,7 +104,9 @@ export const defaultCustomValuesMap = {
   timeseries: {
     drawStyle: 'lines',
     lineInterpolation: 'smooth',
+    lineWidth: 1,
     fillOpacity: 0.5,
+    gradientMode: 'none',
     stack: 'off',
   },
   stat: {
