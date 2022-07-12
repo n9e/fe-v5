@@ -1,5 +1,5 @@
 @backgroupColor: #20222E;
-@baseColor: rgb(204, 204, 220);
+@baseColor: #F7F8F2;
 @cardBackgroundColor: #2A2D3C;
 .theme-dark {
   background-color: @backgroupColor;
@@ -53,6 +53,10 @@
     & > div.disabled {
       color: #74778A
     }
+  }
+  .react-grid-item > .react-resizable-handle::after{
+    border-right: 2px solid #46495C;
+    border-bottom: 2px solid #46495C;
   }
 
   .scroll-container {

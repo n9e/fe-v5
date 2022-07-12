@@ -112,7 +112,8 @@ export default function Stat(props: IProps) {
   useEffect(() => {
     if (calculatedValues.length === 1 && colorMode === 'background' && containerRef.current) {
       const head = _.head(calculatedValues);
-      const colorObject = d3.color(head.color);
+      const color = head.color ? head.color : hexPalette[0];
+      const colorObject = d3.color(color);
       containerRef.current.style.border = `1px solid ${colorObject + ''}`;
       colorObject.opacity = 0.5;
       containerRef.current.style.backgroundColor = colorObject + '';
