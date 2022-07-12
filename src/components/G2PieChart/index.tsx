@@ -15,7 +15,8 @@
  *
  */
 import React from 'react';
-import { Pie, PieConfig } from '@ant-design/plots';
+import { Pie, PieConfig, measureTextWidth } from '@ant-design/plots';
+import _ from 'lodash';
 
 type Marker = {
   symbol?: string;
@@ -36,10 +37,27 @@ interface Props {
   hidden: boolean;
   labelWithName: boolean;
   themeMode?: 'dark';
+  donut?: boolean;
+}
+
+function renderStatistic(containerWidth, text, style) {
+  containerWidth = containerWidth - 20;
+  const textWidth = measureTextWidth(text, style);
+  const textHeight = 12;
+  const R = containerWidth / 2.5; // r^2 = (w / 2)^2 + (h - offsetY)^2
+
+  let scale = 1;
+
+  if (containerWidth < textWidth) {
+    scale = Math.min(Math.sqrt(Math.abs(Math.pow(R, 2) / (Math.pow(textWidth / 2, 2) + Math.pow(textHeight, 2)))), 1);
+  }
+
+  const textStyleStr = `width:${containerWidth}px;`;
+  return `<div style="${textStyleStr};font-size:${scale}em;line-height:${scale < 1 ? 1 : 'inherit'};">${text}</div>`;
 }
 
 const DemoPie = (props: Props) => {
-  const { data, positon, hidden, labelWithName, themeMode } = props;
+  const { data, positon, hidden, labelWithName, themeMode, donut } = props;
 
   const config: PieConfig = {
     padding: [16, 8, 16, 8],
@@ -48,6 +66,7 @@ const DemoPie = (props: Props) => {
     angleField: 'value',
     colorField: 'name',
     radius: 0.9,
+    innerRadius: donut ? 0.6 : 0,
     label: {
       type: 'spider',
       content: (record) => {
@@ -59,7 +78,40 @@ const DemoPie = (props: Props) => {
         fillStyle: themeMode === 'dark' ? '#fff' : '#333',
       },
     },
+    statistic: {
+      title: {
+        offsetY: 16,
+        style: {
+          color: themeMode === 'dark' ? '#ABADBA' : 'unset',
+        },
+        customHtml: (container, _view, datum) => {
+          const { width, height } = container.getBoundingClientRect();
+          const d = Math.sqrt(Math.pow(width / 2, 2) + Math.pow(height / 2, 2));
+          const text = datum ? datum.name : '总计';
+          return renderStatistic(d, text, {
+            fontSize: 28,
+          });
+        },
+      },
+      content: {
+        offsetY: -16,
+        style: {
+          color: themeMode === 'dark' ? '#fff' : 'unset',
+        },
+        customHtml: (container, _view, datum, data) => {
+          const { width } = container.getBoundingClientRect();
+          let text = datum ? `${datum.value}` : `${data?.reduce((r, d) => r + d.value, 0)}`;
+          text = _.toNumber(text).toFixed(3);
+          return renderStatistic(width, text, {
+            fontSize: 36,
+          });
+        },
+      },
+    },
     interactions: [
+      {
+        type: 'element-selected',
+      },
       {
         type: 'element-active',
       },
