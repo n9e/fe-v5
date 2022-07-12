@@ -14,8 +14,9 @@
  * limitations under the License.
  *
  */
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import _ from 'lodash';
+import * as d3 from 'd3';
 import { useSize } from 'ahooks';
 import { IPanel } from '../../../types';
 import { hexPalette } from '../../../config';
@@ -25,19 +26,31 @@ import './style.less';
 interface IProps {
   values: IPanel;
   series: any[];
+  containerRef: {
+    current: HTMLDivElement | null;
+  };
+  themeMode?: 'dark';
 }
 
 const UNIT_SIZE = 12;
 const MIN_SIZE = 12;
 const UNIT_PADDING = 4;
+const getTextColor = (color, colorMode, isFullSizeBackground, themeMode) => {
+  if (isFullSizeBackground) {
+    return themeMode === 'dark' ? '#fff' : color;
+  } else {
+    return colorMode === 'value' ? color : '#fff';
+  }
+};
 
 function StatItem(props) {
   const ele = useRef(null);
   const eleSize = useSize(ele);
-  const { item, idx, colSpan, textMode, colorMode, textSize } = props;
+  const { item, idx, colSpan, textMode, colorMode, textSize, isFullSizeBackground, themeMode } = props;
   const headerFontSize = textSize?.title ? textSize?.title : eleSize?.width! / _.toString(item.name).length || MIN_SIZE;
   let statFontSize = textSize?.value ? textSize?.value : (eleSize?.width! - item.unit.length * UNIT_SIZE - UNIT_PADDING) / _.toString(item.value).length || MIN_SIZE;
   const color = item.color ? item.color : hexPalette[idx % hexPalette.length];
+  const backgroundColor = colorMode === 'background' ? color : 'transparent';
 
   if (statFontSize > eleSize?.height! - 20) {
     statFontSize = eleSize?.height! - 20;
@@ -51,7 +64,7 @@ function StatItem(props) {
       style={{
         width: `${100 / colSpan}%`,
         flexBasis: `${100 / colSpan}%`,
-        backgroundColor: colorMode === 'background' ? color : 'transparent',
+        backgroundColor: isFullSizeBackground ? 'transparent' : backgroundColor,
       }}
     >
       <div className='renderer-stat-item-content'>
@@ -68,7 +81,7 @@ function StatItem(props) {
         <div
           className='renderer-stat-value'
           style={{
-            color: colorMode === 'value' ? color : '#fff',
+            color: getTextColor(color, colorMode, isFullSizeBackground, themeMode),
             fontSize: statFontSize > 100 ? 100 : statFontSize,
           }}
         >
@@ -81,7 +94,7 @@ function StatItem(props) {
 }
 
 export default function Stat(props: IProps) {
-  const { values, series } = props;
+  const { values, series, containerRef, themeMode } = props;
   const { custom, options } = values;
   const { calc, textMode, colorMode, colSpan, textSize } = custom;
   const calculatedValues = getCalculatedValuesBySeries(
@@ -93,12 +106,39 @@ export default function Stat(props: IProps) {
     },
     options?.valueMappings,
   );
+  const [isFullSizeBackground, setIsFullSizeBackground] = useState(false);
+
+  // 只有单个序列值且是背景色模式，则填充整个卡片的背景色
+  useEffect(() => {
+    if (calculatedValues.length === 1 && colorMode === 'background' && containerRef.current) {
+      const head = _.head(calculatedValues);
+      const colorObject = d3.color(head.color);
+      containerRef.current.style.border = `1px solid ${colorObject + ''}`;
+      colorObject.opacity = 0.5;
+      containerRef.current.style.backgroundColor = colorObject + '';
+      setIsFullSizeBackground(true);
+    } else {
+      setIsFullSizeBackground(false);
+    }
+  }, [JSON.stringify(calculatedValues), colorMode]);
 
   return (
     <div className='renderer-stat-container'>
       <div className='renderer-stat-container-box'>
         {_.map(calculatedValues, (item, idx) => {
-          return <StatItem key={item.name} item={item} idx={idx} colSpan={colSpan} textMode={textMode} colorMode={colorMode} textSize={textSize} />;
+          return (
+            <StatItem
+              key={item.name}
+              item={item}
+              idx={idx}
+              colSpan={colSpan}
+              textMode={textMode}
+              colorMode={colorMode}
+              textSize={textSize}
+              isFullSizeBackground={isFullSizeBackground}
+              themeMode={themeMode}
+            />
+          );
         })}
       </div>
     </div>

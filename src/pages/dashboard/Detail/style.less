@@ -98,6 +98,26 @@
       }
     }
   }
+
+  .scroll-container {
+  }
+  .scroll-container::-webkit-scrollbar {
+    height: 10px;
+    width: 4px;
+  }
+  .scroll-container::-webkit-scrollbar-corner {
+    background-color: transparent;
+  }
+  .scroll-container::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+    background: rgba(0,0,0,0.5);;
+  }
+  .scroll-container::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    background: unset;
+  }
 }
 
 // 现在大盘里面边框线太多了，尝试去掉 collapse 的所有边框线

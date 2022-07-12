@@ -49,6 +49,28 @@ export default function index(props: IProps) {
         >
           <SketchPicker
             color={value}
+            presetColors={[
+              '#FF656B',
+              '#FF8286',
+              '#CE4F52',
+
+              '#FF9919',
+              '#FFAE39',
+              '#CE7B00',
+
+              '#E6C627',
+              '#ECD245',
+              '#B99F00',
+
+              '#3FC453',
+              '#61D071',
+              '#2C9D3D',
+
+              '#9470FF',
+              '#634CD9',
+              '#51566B',
+              '#FFFFFF',
+            ]}
             onChange={(val) => {
               if (onChange) {
                 onChange(val.hex);

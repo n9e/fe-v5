@@ -64,8 +64,8 @@ export default function DetailV2() {
   const [dashboardLinks, setDashboardLinks] = useState<ILink[]>();
   const [panels, setPanels] = useState<any[]>([]);
   const [range, setRange] = useState<Range>({
-    unit: 'hours',
-    num: 6,
+    unit: 'day',
+    num: 1,
     description: '',
   });
   const [step, setStep] = useState<number | null>(null);

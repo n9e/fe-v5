@@ -17,6 +17,8 @@
 import React, { useRef, useEffect, useState } from 'react';
 import _ from 'lodash';
 import { Table, Tooltip } from 'antd';
+import classNames from 'classnames';
+import { VerticalRightOutlined, VerticalLeftOutlined } from '@ant-design/icons';
 import { useSize } from 'ahooks';
 import TsGraph from '@fc-plot/ts-graph';
 import '@fc-plot/ts-graph/dist/index.css';
@@ -49,6 +51,7 @@ export default function index(props: IProps) {
   const placement = options.legend?.placement || 'bottom';
   const hasLegend = displayMode !== 'hidden';
   const [legendData, setLegendData] = useState([]);
+  const [isExpanded, setIsExpanded] = useState(false);
   let _chartHeight = hasLegend ? '70%' : '100%';
   let _tableHeight = hasLegend ? '30%' : '0px';
 
@@ -195,9 +198,13 @@ export default function index(props: IProps) {
         display: placement === 'right' ? 'flex' : 'block',
       }}
     >
-      <div ref={chartEleRef} style={{ height: _chartHeight, width: placement === 'right' ? '60%' : '100%' }} />
+      <div ref={chartEleRef} style={{ height: _chartHeight, width: placement === 'right' ? (isExpanded ? 0 : '60%') : '100%' }} />
       {hasLegend && (
-        <div className='renderer-timeseries-legend-table' style={{ [inDashboard ? 'height' : 'maxHeight']: _tableHeight, overflow: 'hidden' }} ref={legendEleRef}>
+        <div
+          className='renderer-timeseries-legend-table'
+          style={{ [inDashboard ? 'height' : 'maxHeight']: _tableHeight, width: placement === 'right' ? (isExpanded ? '100%' : '40%') : '100%', overflow: 'hidden' }}
+          ref={legendEleRef}
+        >
           {displayMode === 'table' && (
             <Table
               rowKey='id'
@@ -265,30 +272,48 @@ export default function index(props: IProps) {
               pagination={false}
             />
           )}
-          {displayMode === 'list' && (
-            <div className='renderer-timeseries-legend-list'>
-              {_.map(legendData, (item) => {
-                return (
-                  <div
-                    key={item.id}
-                    onClick={() => {
-                      setActiveLegend(activeLegend !== item.id ? item.id : '');
-                      setSeriesData(
-                        _.map(seriesData, (subItem) => {
-                          return {
-                            ...subItem,
-                            visible: activeLegend === item.id ? true : item.id === subItem.id,
-                          };
-                        }),
-                      );
-                    }}
-                    className={item.disabled ? 'disabled' : ''}
-                  >
-                    <span className='renderer-timeseries-legend-color-symbol' style={{ backgroundColor: item.color }} />
-                    {item.name}
-                  </div>
-                );
-              })}
+          {displayMode === 'list' && !_.isEmpty(legendData) && (
+            <div className='renderer-timeseries-legend-container'>
+              <div
+                className={classNames({
+                  'renderer-timeseries-legend-list': true,
+                  'renderer-timeseries-legend-list-placement-right': placement === 'right',
+                  'scroll-container': true,
+                })}
+              >
+                {_.map(legendData, (item) => {
+                  return (
+                    <div
+                      key={item.id}
+                      onClick={() => {
+                        setActiveLegend(activeLegend !== item.id ? item.id : '');
+                        setSeriesData(
+                          _.map(seriesData, (subItem) => {
+                            return {
+                              ...subItem,
+                              visible: activeLegend === item.id ? true : item.id === subItem.id,
+                            };
+                          }),
+                        );
+                      }}
+                      className={item.disabled ? 'disabled' : ''}
+                    >
+                      <span className='renderer-timeseries-legend-color-symbol' style={{ backgroundColor: item.color }} />
+                      {item.name}
+                    </div>
+                  );
+                })}
+              </div>
+              {placement === 'right' && (
+                <div
+                  className='renderer-timeseries-legend-toggle'
+                  onClick={() => {
+                    setIsExpanded(!isExpanded);
+                  }}
+                >
+                  {isExpanded ? <VerticalLeftOutlined /> : <VerticalRightOutlined />}
+                </div>
+              )}
             </div>
           )}
         </div>
