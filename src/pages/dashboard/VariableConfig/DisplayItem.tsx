@@ -39,7 +39,6 @@ export default function DisplayItem(props: IProps) {
     <div className='tag-content-close-item'>
       <Input.Group>
         <span className='ant-input-group-addon'>{name}</span>
-
         {type === 'query' ? (
           <Select
             mode={multi ? 'tags' : undefined}
