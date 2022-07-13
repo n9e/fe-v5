@@ -18,7 +18,7 @@ import React, { useRef } from 'react';
 import _ from 'lodash';
 import { useInViewport } from 'ahooks';
 import { Dropdown, Menu, Tooltip } from 'antd';
-import { InfoOutlined, DownOutlined, LinkOutlined, SettingOutlined, ShareAltOutlined, DeleteOutlined, CopyOutlined, SyncOutlined } from '@ant-design/icons';
+import { InfoCircleOutlined, MoreOutlined, LinkOutlined, SettingOutlined, ShareAltOutlined, DeleteOutlined, CopyOutlined, SyncOutlined } from '@ant-design/icons';
 import { Range } from '@/components/DateRangePicker';
 import Timeseries from './Timeseries';
 import Stat from './Stat';
@@ -82,19 +82,20 @@ function index(props: IProps) {
   return (
     <div className='renderer-container' ref={ref}>
       <div className='renderer-header graph-header dashboards-panels-item-drag-handle'>
-        {tipsVisible ? (
-          <Tooltip
-            placement='rightTop'
-            overlayInnerStyle={{
-              width: 300,
-            }}
-            title={
-              <div>
-                <Markdown content={values.description} />
+        <div className='renderer-header-desc'>
+          {tipsVisible ? (
+            <Tooltip
+              placement='top'
+              overlayInnerStyle={{
+                width: 300,
+              }}
+              getPopupContainer={() => ref.current!}
+              title={
                 <div>
+                  <Markdown content={values.description} />
                   {_.map(values.links, (link, i) => {
                     return (
-                      <div key={i} style={{ marginTop: 8 }}>
+                      <div key={i}>
                         <a href={link.url} target={link.targetBlank ? '_blank' : '_self'}>
                           {link.title}
                         </a>
@@ -102,20 +103,25 @@ function index(props: IProps) {
                     );
                   })}
                 </div>
-              </div>
-            }
-          >
-            <div className='renderer-header-desc'>
-              <span className='renderer-header-info-corner-inner' />
-              {values.description ? <InfoOutlined /> : <LinkOutlined />}
-            </div>
-          </Tooltip>
-        ) : null}
+              }
+            >
+              <div className='renderer-header-desc'>{values.description ? <InfoCircleOutlined /> : <LinkOutlined />}</div>
+            </Tooltip>
+          ) : null}
+        </div>
         <div className='renderer-header-content'>
-          {!isPreview ? (
+          <Tooltip title={values.name} getPopupContainer={() => ref.current!}>
+            <div className='renderer-header-title'>{values.name}</div>
+          </Tooltip>
+        </div>
+        <div className='renderer-header-loading'>
+          {loading ? (
+            <SyncOutlined spin />
+          ) : (
             <Dropdown
               trigger={['click']}
               placement='bottomCenter'
+              getPopupContainer={() => ref.current!}
               overlayStyle={{
                 minWidth: '100px',
               }}
@@ -144,16 +150,10 @@ function index(props: IProps) {
                 </Menu>
               }
             >
-              <div className='renderer-header-title'>
-                {values.name}
-                <DownOutlined className='renderer-header-arrow' />
-              </div>
+              <MoreOutlined className='renderer-header-more' />
             </Dropdown>
-          ) : (
-            <div className='renderer-header-title'>{values.name}</div>
           )}
         </div>
-        <div className='renderer-header-loading'>{loading && <SyncOutlined spin />}</div>
       </div>
       <div className='renderer-body' style={{ height: `calc(100% - 35px)` }}>
         {RendererCptMap[type] ? RendererCptMap[type]() : <div className='unknown-type'>{`无效的图表类型 ${type}`}</div>}

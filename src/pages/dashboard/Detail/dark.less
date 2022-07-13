@@ -4,6 +4,7 @@
 .theme-dark {
   background-color: @backgroupColor;
   color: @baseColor;
+  
   .ant-table .ant-table-tbody td {
     border-color: #303030;
     color: unset;
@@ -24,27 +25,13 @@
   }
   .dashboards-panels-row {
     background-color: unset;
-    border: none;
-    &:hover {
-      background-color: #ccccdc29;
-      transition: background-color .1s ease-in-out;
-    }
   }
   .renderer-container {
     background-color: @cardBackgroundColor;
-    .renderer-header {
-      &:hover {
-        background-color: #ccccdc29;
-        transition: background-color .1s ease-in-out;
-      }
-    }
   }
   .tag-content-close-item-tagName {
     color: rgba(255, 255, 255, 0.85);
     background-color: rgba(255, 255, 255, 0.04);
-  }
-  .renderer-header-info-corner-inner {
-    border-left-color: #111217;
   }
   .renderer-timeseries-legend-list,.renderer-timeseries-legend-toggle {
     background-color: #323545;
