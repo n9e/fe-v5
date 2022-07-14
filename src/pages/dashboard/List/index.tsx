@@ -52,7 +52,7 @@ export default function index() {
 
   const data = _.filter(list, (item) => {
     if (searchVal) {
-      return _.includes(item.name, searchVal) || _.includes(item.tags, searchVal);
+      return _.includes(item.name.toLowerCase(), searchVal.toLowerCase()) || item.tags.toLowerCase().includes(searchVal.toLowerCase());
     }
     return true;
   });
