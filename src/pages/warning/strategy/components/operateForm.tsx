@@ -310,7 +310,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
               <AbnormalDetection form={form} />
             </AdvancedWrap>
             <Form.Item noStyle shouldUpdate={(prevValues, curValues) => prevValues.cluster !== curValues.cluster}>
-              {() => {
+              {({ getFieldValue }) => {
                 return (
                   <Form.Item label='PromQL' className={'Promeql-content'} required style={{ marginBottom: 0 }}>
                     <AdvancedWrap>
@@ -319,7 +319,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                           <Input.Group compact>
                             <Form.Item
                               style={{
-                                width: isAvanced ? 'calc(100% - 80px)' : '100%',
+                                width: isAvanced && getFieldValue('algorithm') === 'holtwinters' ? 'calc(100% - 80px)' : '100%',
                               }}
                               name='prom_ql'
                               validateTrigger={['onBlur']}
@@ -337,7 +337,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                                 }}
                               />
                             </Form.Item>
-                            {isAvanced && (
+                            {isAvanced && getFieldValue('algorithm') === 'holtwinters' && (
                               <Button
                                 onClick={() => {
                                   const values = form.getFieldsValue();
