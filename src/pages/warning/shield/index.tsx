@@ -31,6 +31,7 @@ import RefreshIcon from '@/components/RefreshIcon';
 import BlankBusinessPlaceholder from '@/components/BlankBusinessPlaceholder';
 import { pageSizeOptionsDefault } from '../const';
 import './index.less';
+import ColorTag from '@/components/ColorTag';
 import { useTranslation } from 'react-i18next';
 const { confirm } = Modal;
 import ColumnSelect from '@/components/ColumnSelect';
@@ -52,7 +53,13 @@ const Shield: React.FC = () => {
       title: t('集群'),
       dataIndex: 'cluster',
       render: (data) => {
-        return <div>{data}</div>;
+        const array = data.split(' ') || [];
+        return (
+          (array.length &&
+            array.map((tag: string, index: number) => {
+              return <ColorTag text={tag} key={index}></ColorTag>;
+            })) || <div></div>
+        );
       },
     },
     {

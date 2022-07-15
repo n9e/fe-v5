@@ -29,7 +29,7 @@ import { CommonStoreState } from '@/store/commonInterface';
 import '../index.less';
 import { useTranslation } from 'react-i18next';
 import _ from 'lodash';
-
+import { ClusterAll } from '../../strategy/components/operateForm';
 const { Option } = Select;
 const { TextArea } = Input;
 
@@ -116,6 +116,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
       rule_id: ruleCur.id,
       user_group_ids: values.user_group_ids ? values.user_group_ids.join(' ') : '',
       new_channels: values.new_channels ? values.new_channels.join(' ') : '',
+      cluster: values.cluster.join(' '),
     };
     if (type === 1) {
       editSubscribe([{ ...params, id: detail.id }], curBusiItem.id)
@@ -154,6 +155,12 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
     });
   };
 
+  const handleClusterChange = (v: string[]) => {
+    if (v.includes(ClusterAll)) {
+      form.setFieldsValue({ cluster: [ClusterAll] });
+    }
+  };
+
   return (
     <>
       <div className='operate-form-index' id={littleAffect ? 'littleAffect' : ''}>
@@ -166,7 +173,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
           onFinishFailed={onFinishFailed}
           initialValues={{
             ...detail,
-            cluster: clusterList[0] || 'Default',
+            cluster: detail.cluster ? detail.cluster.split(' ') : clusterList || ['Default'], // 生效集群
             redefine_severity: detail?.redefine_severity ? true : false,
             redefine_channels: detail?.redefine_channels ? true : false,
             user_group_ids: detail?.user_group_ids ? detail?.user_group_ids?.split(' ') : [],
@@ -184,7 +191,10 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type }) => {
                 },
               ]}
             >
-              <Select suffixIcon={<CaretDownOutlined />}>
+              <Select suffixIcon={<CaretDownOutlined />} mode='multiple' onChange={handleClusterChange}>
+                <Option value={ClusterAll} key={ClusterAll}>
+                  {ClusterAll}
+                </Option>
                 {clusterList?.map((item, index) => (
                   <Option value={item} key={index}>
                     {item}
