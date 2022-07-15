@@ -19,7 +19,7 @@ import _ from 'lodash';
 import * as d3 from 'd3';
 import { useSize } from 'ahooks';
 import { IPanel } from '../../../types';
-import { hexPalette } from '../../../config';
+import { statHexPalette } from '../../../config';
 import getCalculatedValuesBySeries from '../../utils/getCalculatedValuesBySeries';
 import './style.less';
 
@@ -36,11 +36,7 @@ const UNIT_SIZE = 12;
 const MIN_SIZE = 12;
 const UNIT_PADDING = 4;
 const getTextColor = (color, colorMode, isFullSizeBackground, themeMode) => {
-  if (isFullSizeBackground) {
-    return themeMode === 'dark' ? '#fff' : color;
-  } else {
-    return colorMode === 'value' ? color : '#fff';
-  }
+  return colorMode === 'value' ? color : '#fff';
 };
 
 function StatItem(props) {
@@ -49,7 +45,7 @@ function StatItem(props) {
   const { item, idx, colSpan, textMode, colorMode, textSize, isFullSizeBackground, themeMode } = props;
   const headerFontSize = textSize?.title ? textSize?.title : eleSize?.width! / _.toString(item.name).length || MIN_SIZE;
   let statFontSize = textSize?.value ? textSize?.value : (eleSize?.width! - item.unit.length * UNIT_SIZE - UNIT_PADDING) / _.toString(item.value).length || MIN_SIZE;
-  const color = item.color ? item.color : hexPalette[idx % hexPalette.length];
+  const color = item.color ? item.color : statHexPalette[idx % statHexPalette.length];
   const backgroundColor = colorMode === 'background' ? color : 'transparent';
 
   if (statFontSize > eleSize?.height! - 20) {
@@ -112,11 +108,11 @@ export default function Stat(props: IProps) {
   useEffect(() => {
     if (calculatedValues.length === 1 && colorMode === 'background' && containerRef.current) {
       const head = _.head(calculatedValues);
-      const color = head.color ? head.color : hexPalette[0];
+      const color = head.color ? head.color : statHexPalette[0];
       const colorObject = d3.color(color);
       containerRef.current.style.border = `1px solid ${colorObject + ''}`;
-      colorObject.opacity = 0.5;
       containerRef.current.style.backgroundColor = colorObject + '';
+      containerRef.current.style.color = '#fff';
       setIsFullSizeBackground(true);
     } else {
       setIsFullSizeBackground(false);
