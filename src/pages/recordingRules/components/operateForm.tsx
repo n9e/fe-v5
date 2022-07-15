@@ -9,7 +9,7 @@ import { CommonStoreState } from '@/store/commonInterface';
 import { prometheusQuery } from '@/services/warning';
 import { addOrEditRecordingRule, editRecordingRule, deleteRecordingRule } from '@/services/recording';
 import PromQLInput from '@/components/PromQLInput';
-
+import { ClusterAll } from '../../warning/strategy/components/operateForm';
 const { Option } = Select;
 const layout = {
   labelCol: {
@@ -94,7 +94,8 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
 
   const addSubmit = () => {
     form.validateFields().then(async (values) => {
-      const res = await prometheusQuery({ query: values.prom_ql }, values.cluster);
+      const cluster = values.cluster.includes(ClusterAll) && clusterList.length > 0 ? clusterList[0] : values.cluster[0] || '';
+      const res = await prometheusQuery({ query: values.prom_ql }, cluster);
       if (res.error) {
         notification.error({
           message: res.error,
@@ -104,6 +105,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
 
       const d = {
         ...values,
+        cluster: values.cluster.join(' '),
       };
       let reqBody,
         method = 'Post';
@@ -135,6 +137,12 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
     });
   };
 
+  const handleClusterChange = (v: string[]) => {
+    if (v.includes(ClusterAll)) {
+      form.setFieldsValue({ cluster: [ClusterAll] });
+    }
+  };
+
   return (
     <div className='operate_con'>
       <Form
@@ -144,8 +152,8 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
         layout={refresh ? 'horizontal' : 'horizontal'}
         initialValues={{
           prom_eval_interval: 30,
-          cluster: clusterList[0] || 'Default', // 生效集群
           ...detail,
+          cluster: detail.cluster ? detail.cluster.split(' ') : clusterList || ['Default'], // 生效集群
         }}
       >
         <Space direction='vertical' style={{ width: '100%' }}>
@@ -191,12 +199,10 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                 },
               ]}
             >
-              <Select
-                suffixIcon={<CaretDownOutlined />}
-                onChange={(value) => {
-                  setCurClusters(value);
-                }}
-              >
+              <Select suffixIcon={<CaretDownOutlined />} mode='multiple' onChange={handleClusterChange}>
+                <Option value={ClusterAll} key={ClusterAll}>
+                  {ClusterAll}
+                </Option>
                 {clusterList?.map((item) => (
                   <Option value={item} key={item}>
                     {item}
@@ -213,7 +219,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                       <PromQLInput
                         url='/api/n9e/prometheus'
                         headers={{
-                          'X-Cluster': getFieldValue('cluster'),
+                          'X-Cluster': form.getFieldValue('cluster').includes(ClusterAll) && clusterList.length > 0 ? clusterList[0] : form.getFieldValue('cluster')[0] || '',
                           Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
                         }}
                         onChange={(val) => {

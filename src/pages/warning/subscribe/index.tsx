@@ -50,7 +50,13 @@ const Shield: React.FC = () => {
       title: t('集群'),
       dataIndex: 'cluster',
       render: (data) => {
-        return <div>{data}</div>;
+        const array = data.split(' ') || [];
+        return (
+          (array.length &&
+            array.map((tag: string, index: number) => {
+              return <ColorTag text={tag} key={index}></ColorTag>;
+            })) || <div></div>
+        );
       },
     },
     {
