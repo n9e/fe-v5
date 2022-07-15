@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Form, Input, InputNumber, Select, Tag, Space, Tooltip, Modal, Switch } from 'antd';
-import { QuestionCircleFilled } from '@ant-design/icons';
+import { QuestionCircleFilled, CaretDownOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { RootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
-
+import { ClusterAll } from '../../warning/strategy/components/operateForm';
 const { Option } = Select;
 const layout = {
   labelCol: {
@@ -107,6 +107,9 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
         data.disabled = !values.enable_status ? 1 : 0;
         delete data.enable_status;
       }
+      if (values.field === 'cluster') {
+        data.cluster = values.cluster.join(' ');
+      }
       Object.keys(data).forEach((key) => {
         // 因为功能上有清除备注的需求，需要支持传空
         if (data[key] === undefined) {
@@ -118,6 +121,12 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
       });
       editModalFinish(true, data);
     });
+  };
+
+  const handleClusterChange = (v: string[]) => {
+    if (v.includes(ClusterAll)) {
+      form.setFieldsValue({ cluster: [ClusterAll] });
+    }
   };
 
   const editModalClose = () => {
@@ -145,7 +154,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
           layout={refresh ? 'horizontal' : 'horizontal'}
           initialValues={{
             prom_eval_interval: 15,
-            cluster: clusterList[0] || 'Default', // 生效集群
+            cluster: clusterList || ['Default'], // 生效集群
             field: 'cluster',
             enable_status: true,
           }}
@@ -198,7 +207,10 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                         },
                       ]}
                     >
-                      <Select>
+                      <Select suffixIcon={<CaretDownOutlined />} mode='multiple' onChange={handleClusterChange}>
+                        <Option value={ClusterAll} key={ClusterAll}>
+                          {ClusterAll}
+                        </Option>
                         {clusterList?.map((item) => (
                           <Option value={item} key={item}>
                             {item}
