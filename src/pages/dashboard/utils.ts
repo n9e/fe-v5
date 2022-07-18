@@ -16,6 +16,8 @@
  */
 import _ from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
+import moment from 'moment';
+import { IRawTimeRange, parseRange } from '@/components/TimeRangePicker';
 import { IDashboard } from './types';
 import { defaultValues } from './Editor/config';
 
@@ -28,6 +30,14 @@ export function JSONParse(str) {
     }
   }
   return {};
+}
+
+export function getStepByTimeAndStep(time: IRawTimeRange, step: number | null) {
+  if (step) return step;
+  const parsedRange = parseRange(time);
+  let start = moment(parsedRange.start).unix();
+  let end = moment(parsedRange.end).unix();
+  return Math.max(Math.floor((end - start) / 240), 1);
 }
 
 function convertVariablesGrafanaToN9E(templates: any) {

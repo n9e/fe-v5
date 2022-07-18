@@ -25,6 +25,7 @@ import Resolution from '@/components/Resolution';
 import { TimeRangePickerWithRefresh, IRawTimeRange } from '@/components/TimeRangePicker';
 import { AddPanelIcon } from '../config';
 import { visualizations } from '../Editor/config';
+import { getStepByTimeAndStep } from '../utils';
 
 interface IProps {
   curCluster: string;
@@ -148,7 +149,7 @@ export default function Title(props: IProps) {
               </Button>
             </Dropdown>
           </div>
-          <TimeRangePickerWithRefresh value={range} onChange={setRange} />
+          <TimeRangePickerWithRefresh refreshTooltip={`刷新间隔小于 step(${getStepByTimeAndStep(range, step)}s) 将不会更新数据`} value={range} onChange={setRange} />
           <Resolution onChange={(v) => setStep(v)} initialValue={step} />
           <Button
             onClick={() => {

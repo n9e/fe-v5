@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef, useImperativeHandle } from 'react';
-import { Dropdown, Button, Menu } from 'antd';
-import { DownOutlined, UpOutlined } from '@ant-design/icons';
+import { Dropdown, Button, Menu, Tooltip } from 'antd';
+import { DownOutlined, UpOutlined, SyncOutlined } from '@ant-design/icons';
 import _ from 'lodash';
-import RefreshIcon from '../RefreshIcon';
 import './style.less';
 
 const refreshMap = {
@@ -19,6 +18,7 @@ const refreshMap = {
 };
 
 interface IProps {
+  tooltip?: string;
   onRefresh: () => void;
 }
 
@@ -56,7 +56,9 @@ function Refresh(props: IProps, ref) {
 
   return (
     <div className='auto-refresh-container'>
-      <RefreshIcon onClick={props.onRefresh} />
+      <Tooltip title={props.tooltip}>
+        <Button className='refresh-btn' icon={<SyncOutlined />} onClick={props.onRefresh} />
+      </Tooltip>
       <Dropdown
         trigger={['click']}
         visible={visible}
