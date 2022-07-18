@@ -19,7 +19,7 @@ import './App.less';
 import 'antd/dist/antd.less';
 import './global.variable.less';
 import { Provider } from 'react-redux';
-import { ConfigProvider } from 'antd';
+import { ConfigProvider, Empty } from 'antd';
 import HeaderMenu from './components/menu';
 import Content from './routers';
 import store from '@/store';
