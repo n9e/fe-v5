@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-import React, { useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import _ from 'lodash';
 import { useInViewport } from 'ahooks';
 import { Dropdown, Menu, Tooltip } from 'antd';
@@ -29,6 +29,7 @@ import { IVariable } from '../../VariableConfig/definition';
 import Markdown from '../../Editor/Components/Markdown';
 import usePrometheus from '../datasource/usePrometheus';
 import { IPanel } from '../../types';
+import { getStepByTimeAndStep } from '../../utils';
 import './style.less';
 
 interface IProps {
@@ -48,7 +49,9 @@ interface IProps {
 }
 
 function index(props: IProps) {
-  const { themeMode, dashboardId, id, time, step, type, variableConfig, isPreview, onCloneClick, onShareClick, onEditClick, onDeleteClick } = props;
+  const { themeMode, dashboardId, id, step, type, variableConfig, isPreview, onCloneClick, onShareClick, onEditClick, onDeleteClick } = props;
+  const [time, setTime] = useState(props.time);
+  const [visible, setVisible] = useState(false);
   const values = _.cloneDeep(props.values);
   const ref = useRef<HTMLDivElement>(null);
   const [inViewPort] = useInViewport(ref);
@@ -62,7 +65,13 @@ function index(props: IProps) {
     inViewPort: isPreview || inViewPort,
   });
   const tipsVisible = values.description || !_.isEmpty(values.links);
+
+  useEffect(() => {
+    setTime(props.time);
+  }, [JSON.stringify(props.time)]);
+
   if (_.isEmpty(values)) return null;
+
   // TODO: 如果 hexbin 的 colorRange 为 string 时转成成 array
   if (typeof _.get(values, 'custom.colorRange') === 'string') {
     _.set(values, 'custom.colorRange', _.split(_.get(values, 'custom.colorRange'), ','));
@@ -118,40 +127,83 @@ function index(props: IProps) {
           {loading ? (
             <SyncOutlined spin />
           ) : (
-            <Dropdown
-              trigger={['click']}
-              placement='bottomCenter'
-              getPopupContainer={() => ref.current!}
-              overlayStyle={{
-                minWidth: '100px',
-              }}
-              overlay={
-                <Menu>
-                  {!isPreview ? (
-                    <>
-                      <Menu.Item onClick={onEditClick} key='0'>
-                        <SettingOutlined style={{ marginRight: 8 }} />
-                        编辑
-                      </Menu.Item>
-                      <Menu.Item onClick={onCloneClick} key='1'>
-                        <CopyOutlined style={{ marginRight: 8 }} />
-                        克隆
-                      </Menu.Item>
-                      <Menu.Item onClick={onShareClick} key='2'>
-                        <ShareAltOutlined style={{ marginRight: 8 }} />
-                        分享
-                      </Menu.Item>
-                      <Menu.Item onClick={onDeleteClick} key='3'>
-                        <DeleteOutlined style={{ marginRight: 8 }} />
-                        删除
-                      </Menu.Item>
-                    </>
-                  ) : null}
-                </Menu>
-              }
-            >
-              <MoreOutlined className='renderer-header-more' />
-            </Dropdown>
+            !isPreview && (
+              <Dropdown
+                trigger={['click']}
+                placement='bottomCenter'
+                getPopupContainer={() => ref.current!}
+                overlayStyle={{
+                  minWidth: '100px',
+                }}
+                visible={visible}
+                onVisibleChange={(visible) => {
+                  setVisible(visible);
+                }}
+                overlay={
+                  <Menu>
+                    <Menu.Item
+                      onClick={() => {
+                        setVisible(true);
+                        setTime({
+                          ...time,
+                          refreshFlag: _.uniqueId('refreshFlag_ '),
+                        });
+                      }}
+                      key='0'
+                    >
+                      <Tooltip title={`刷新间隔小于 step(${getStepByTimeAndStep(time, step)}s) 将不会更新数据`} placement='left'>
+                        <div>
+                          <SyncOutlined style={{ marginRight: 8 }} />
+                          刷新
+                        </div>
+                      </Tooltip>
+                    </Menu.Item>
+                    <Menu.Item
+                      onClick={() => {
+                        setVisible(false);
+                        if (onEditClick) onEditClick();
+                      }}
+                      key='1'
+                    >
+                      <SettingOutlined style={{ marginRight: 8 }} />
+                      编辑
+                    </Menu.Item>
+                    <Menu.Item
+                      onClick={() => {
+                        setVisible(false);
+                        if (onCloneClick) onCloneClick();
+                      }}
+                      key='2'
+                    >
+                      <CopyOutlined style={{ marginRight: 8 }} />
+                      克隆
+                    </Menu.Item>
+                    <Menu.Item
+                      onClick={() => {
+                        setVisible(false);
+                        if (onShareClick) onShareClick();
+                      }}
+                      key='3'
+                    >
+                      <ShareAltOutlined style={{ marginRight: 8 }} />
+                      分享
+                    </Menu.Item>
+                    <Menu.Item
+                      onClick={() => {
+                        setVisible(false);
+                        if (onDeleteClick) onDeleteClick();
+                      }}
+                      key='4'
+                    >
+                      <DeleteOutlined style={{ marginRight: 8 }} />
+                      删除
+                    </Menu.Item>
+                  </Menu>
+                }
+              >
+                <MoreOutlined className='renderer-header-more' />
+              </Dropdown>
+            )
           )}
         </div>
       </div>
