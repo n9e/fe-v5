@@ -1,13 +1,13 @@
 import { ITimeOption, TDurationUnit } from './types';
 
-export const spans: { [key: string]: { display: string; section?: number, displayZh: string } } = {
+export const spans: { [key: string]: { display: string; section?: number; displayZh: string } } = {
   s: { display: 'second', displayZh: '秒' },
   m: { display: 'minute', displayZh: '分钟' },
   h: { display: 'hour', displayZh: '小时' },
   d: { display: 'day', displayZh: '天' },
   w: { display: 'week', displayZh: '周' },
   M: { display: 'month', displayZh: '月' },
-  y: { display: 'year',  displayZh: '年' },
+  y: { display: 'year', displayZh: '年' },
 };
 
 export const rangeOptions: ITimeOption[] = [
@@ -53,7 +53,5 @@ export const momentLocaleZhCN = {
   weekdaysShort: '周日_周一_周二_周三_周四_周五_周六'.split('_'),
   weekdaysMin: '日_一_二_三_四_五_六'.split('_'),
 };
-
-export const dateFormat = 'YYYY-MM-DD HH:mm';
 
 export const units: TDurationUnit[] = ['y', 'M', 'w', 'd', 'h', 'm', 's', 'Q'];

@@ -26,6 +26,7 @@ import Options from './Options';
 import Collapse, { Panel } from './Components/Collapse';
 import VariableConfig, { IVariable } from '../VariableConfig';
 import getFirstUnusedLetter from '../Renderer/utils/getFirstUnusedLetter';
+import moment from 'moment';
 
 const alphabet = 'ABCDEFGHIGKLMNOPQRSTUVWXYZ'.split('');
 
@@ -40,8 +41,6 @@ export default function FormCpt(props) {
       delete item.time;
     }
   });
-
-  console.log(initialValues);
 
   useEffect(() => {
     setVariableConfigWithOptions(props.variableConfigWithOptions);
@@ -160,8 +159,14 @@ export default function FormCpt(props) {
                                       getPopupContainer: () => document.body,
                                       title: '可指定时间范围，默认为大盘全局时间范围',
                                     }}
+                                    normalize={(val) => {
+                                      return {
+                                        start: moment(val.start).format('YYYY-MM-DD HH:mm:ss'),
+                                        end: moment(val.end).format('YYYY-MM-DD HH:mm:ss'),
+                                      };
+                                    }}
                                   >
-                                    <TimeRangePicker />
+                                    <TimeRangePicker dateFormat='YYYY-MM-DD HH:mm:ss' />
                                   </Form.Item>
                                 </Col>
                                 <Col flex='72px'>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button, Popover, Row, Col, Input } from 'antd';
 import { DownOutlined, UpOutlined, CalendarOutlined, SearchOutlined } from '@ant-design/icons';
 import { PickerPanel } from 'rc-picker';
-import momentGenerateConfig from 'rc-picker/lib/generate/moment';
+import momentGenerateConfig from 'rc-picker/es/generate/moment';
 import zhCN from 'rc-picker/lib/locale/zh_CN';
 import 'rc-picker/assets/index.css';
 import classNames from 'classnames';
@@ -19,6 +19,7 @@ moment.locale('zh-cn', momentLocaleZhCN);
 interface IProps {
   style?: object;
   value?: IRawTimeRange;
+  dateFormat?: string;
   onChange?: (value: IRawTimeRange) => void;
 }
 
@@ -40,11 +41,11 @@ const getAbsoluteHistoryCache = () => {
   }
   return [];
 };
-const setAbsoluteHistoryCache = (range) => {
+const setAbsoluteHistoryCache = (range, dateFormat) => {
   const absoluteHistoryCache = getAbsoluteHistoryCache();
   const rangeClone = _.cloneDeep(range);
-  rangeClone.start = valueAsString(rangeClone.start);
-  rangeClone.end = valueAsString(rangeClone.end);
+  rangeClone.start = valueAsString(rangeClone.start, dateFormat);
+  rangeClone.end = valueAsString(rangeClone.end, dateFormat);
   const newAbsoluteHistoryCache = _.unionWith([rangeClone, ...absoluteHistoryCache], _.isEqual).slice(0, 4);
   try {
     const cacheStr = JSON.stringify(newAbsoluteHistoryCache);
@@ -56,7 +57,7 @@ const setAbsoluteHistoryCache = (range) => {
 
 export default function index(props: IProps) {
   const absoluteHistoryCache = getAbsoluteHistoryCache();
-  const { value, onChange = () => {} } = props;
+  const { value, onChange = () => {}, dateFormat = 'YYYY-MM-DD HH:mm' } = props;
   const [visible, setVisible] = useState(false);
   const [range, setRange] = useState<IRawTimeRange>(defaultRange);
   const [label, setLabel] = useState<string>('');
@@ -79,7 +80,7 @@ export default function index(props: IProps) {
         <span>{labelMap[key]}</span>
         <Input.Group compact style={{ marginTop: 4 }}>
           <Popover
-            title='选择开始时间'
+            title={`选择${labelMap[key]}`}
             placement='leftTop'
             trigger='click'
             overlayClassName='flashcat-timeRangePicker-single-popover'
@@ -112,7 +113,7 @@ export default function index(props: IProps) {
                     newRange.start = moment(newRange.end).startOf('day');
                   }
                   setRange(newRange);
-                  setAbsoluteHistoryCache(newRange);
+                  setAbsoluteHistoryCache(newRange, dateFormat);
                 }}
               />
             }
@@ -122,7 +123,7 @@ export default function index(props: IProps) {
           <Input
             style={{ width: 'calc(100% - 32px)' }}
             className={rangeStatus[key] === 'invalid' ? 'ant-input-status-error' : ''}
-            value={valueAsString(range[key])}
+            value={valueAsString(range[key], dateFormat)}
             onChange={(e) => {
               const val = e.target.value;
               setRangeStatus({
@@ -147,10 +148,13 @@ export default function index(props: IProps) {
               const otherKey = key === 'start' ? 'end' : 'start';
               // 必须是绝对时间才缓存
               if (!isMathString(val) && moment.isMoment(range[otherKey])) {
-                setAbsoluteHistoryCache({
-                  ...range,
-                  [key]: val,
-                });
+                setAbsoluteHistoryCache(
+                  {
+                    ...range,
+                    [key]: val,
+                  },
+                  dateFormat,
+                );
               }
             }}
           />
@@ -163,10 +167,10 @@ export default function index(props: IProps) {
   useEffect(() => {
     if (value) {
       setRange(value);
-      setLabel(describeTimeRange(value));
+      setLabel(describeTimeRange(value, dateFormat));
     } else {
       setRange(defaultRange);
-      setLabel(describeTimeRange(defaultRange));
+      setLabel(describeTimeRange(defaultRange, dateFormat));
     }
   }, [JSON.stringify(value), visible]);
 
@@ -196,11 +200,11 @@ export default function index(props: IProps) {
                                 };
                                 setRange(newValue);
                                 onChange(newValue);
-                                setAbsoluteHistoryCache(newValue);
+                                setAbsoluteHistoryCache(newValue, dateFormat);
                                 setVisible(false);
                               }}
                             >
-                              {describeTimeRange(range)}
+                              {describeTimeRange(range, dateFormat)}
                             </li>
                           );
                         })}
@@ -236,7 +240,7 @@ export default function index(props: IProps) {
                                 setRange(newValue);
                                 onChange(newValue);
                                 setVisible(false);
-                                setAbsoluteHistoryCache(newValue);
+                                setAbsoluteHistoryCache(newValue, dateFormat);
                               }}
                             >
                               {item.displayZh}

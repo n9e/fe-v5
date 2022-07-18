@@ -1,7 +1,7 @@
 import _, { includes, isDate } from 'lodash';
 import moment, { Moment } from 'moment';
 import { IRawTimeRange } from './types';
-import { spans, rangeOptions, dateFormat, units } from './config';
+import { spans, rangeOptions, units } from './config';
 
 export function isMathString(text: string | Moment | Date): boolean {
   if (!text) {
@@ -15,10 +15,7 @@ export function isMathString(text: string | Moment | Date): boolean {
   }
 }
 
-export function parse(
-  text?: string | Moment | Date | null,
-  roundUp?: boolean,
-): Moment | undefined {
+export function parse(text?: string | Moment | Date | null, roundUp?: boolean): Moment | undefined {
   if (!text) {
     return undefined;
   }
@@ -75,11 +72,7 @@ export function isValid(text: string | Moment): boolean {
   return false;
 }
 
-export function parseDateMath(
-  mathString: string,
-  time: any,
-  roundUp?: boolean,
-): Moment | undefined {
+export function parseDateMath(mathString: string, time: any, roundUp?: boolean): Moment | undefined {
   const strippedMathString = mathString.replace(/\s/g, '');
   const dateTime = time;
   let i = 0;
@@ -183,7 +176,7 @@ export function describeTextRange(expr: any) {
   return opt;
 }
 
-export function describeTimeRange(range: IRawTimeRange): string {
+export function describeTimeRange(range: IRawTimeRange, dateFormat: string): string {
   const option = rangeIndex[range.start.toString() + ' ~ ' + range.end.toString()];
 
   if (option) {
@@ -212,7 +205,7 @@ export function describeTimeRange(range: IRawTimeRange): string {
   return range.start.toString() + ' ~ ' + range.end.toString();
 }
 
-export const valueAsString = (value: Moment | string) => {
+export const valueAsString = (value: Moment | string, dateFormat: string) => {
   if (moment.isMoment(value)) {
     return value.format(dateFormat);
   }
@@ -223,5 +216,5 @@ export const parseRange = (range: IRawTimeRange) => {
   return {
     start: parse(range.start),
     end: parse(range.end, true),
-  }
-}
+  };
+};

@@ -111,7 +111,7 @@ function index(props: ModalWrapProps & IProps) {
                 );
               })}
             </Select>
-            <TimeRangePicker value={range} onChange={setRange} />
+            <TimeRangePicker dateFormat='YYYY-MM-DD HH:mm:ss' value={range} onChange={setRange} />
             <Resolution onChange={(v) => setStep(v)} initialValue={step} />
             <CloseOutlined
               style={{ fontSize: 18 }}
