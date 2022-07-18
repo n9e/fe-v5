@@ -24,7 +24,7 @@ import 'rc-picker/assets/index.css';
 import classNames from 'classnames';
 import moment, { Moment } from 'moment';
 import _ from 'lodash';
-import { isValid, describeTimeRange, valueAsString, isMathString, parseRange, parse } from './utils';
+import { isValid, describeTimeRange, valueAsString, isMathString, parseRange, parse, timeRangeUnix } from './utils';
 import { IRawTimeRange } from './types';
 import { rangeOptions, momentLocaleZhCN } from './config';
 import TimeRangePickerWithRefresh from './TimeRangePickerWithRefresh';
@@ -322,4 +322,4 @@ export default function index(props: IProps) {
 }
 
 export type { IRawTimeRange } from './types';
-export { TimeRangePickerWithRefresh, parseRange, parse, isMathString };
+export { TimeRangePickerWithRefresh, parseRange, parse, isMathString, timeRangeUnix };

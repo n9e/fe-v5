@@ -14,11 +14,11 @@
  * limitations under the License.
  *
  */
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import _ from 'lodash';
 import { LineChartOutlined } from '@ant-design/icons';
 import PageLayout from '@/components/pageLayout';
-import { Range } from '@/components/DateRangePicker';
+import { IRawTimeRange } from '@/components/TimeRangePicker';
 import { IMatch } from './types';
 import List from './metricViews/List';
 import LabelsValues from './metricViews/LabelsValues';
@@ -27,10 +27,9 @@ import './style.less';
 
 export default function index() {
   const [match, setMatch] = useState<IMatch>();
-  const [range, setRange] = useState<Range>({
-    num: 1,
-    unit: 'hour',
-    description: 'hour',
+  const [range, setRange] = useState<IRawTimeRange>({
+    start: 'now-1h',
+    end: 'now',
   });
   const [rerenderFlag, setRerenderFlag] = useState(_.uniqueId('rerenderFlag_'));
 

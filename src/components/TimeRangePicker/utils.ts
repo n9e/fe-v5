@@ -234,3 +234,13 @@ export const parseRange = (range: IRawTimeRange) => {
     end: parse(range.end, true),
   };
 };
+
+export const timeRangeUnix = (range: IRawTimeRange) => {
+  const parsedRange = parseRange(range);
+  const start = moment(parsedRange.start).unix();
+  const end = moment(parsedRange.end).unix();
+  return {
+    start,
+    end,
+  };
+};

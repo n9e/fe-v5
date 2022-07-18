@@ -19,7 +19,7 @@ import _ from 'lodash';
 import classNames from 'classnames';
 import { Card, Space, Dropdown, Menu, Tag, Popover, Divider } from 'antd';
 import { ShareAltOutlined, SyncOutlined, CloseCircleOutlined, DownOutlined, PlusCircleOutlined, SettingOutlined, LineChartOutlined } from '@ant-design/icons';
-import { Range } from '@/components/DateRangePicker';
+import { IRawTimeRange } from '@/components/TimeRangePicker';
 import { getLabels, getQueryRange, getExprs, setTmpChartData } from '@/services/metricViews';
 import { getMatchStr } from './utils';
 import { IMatch } from '../types';
@@ -34,7 +34,7 @@ import { HexbinIcon } from './config';
 interface IProps {
   metric: string;
   match: IMatch;
-  range: Range;
+  range: IRawTimeRange;
   step?: number;
   onClose: () => void;
 }

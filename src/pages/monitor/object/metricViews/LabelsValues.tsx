@@ -20,12 +20,12 @@ import classNames from 'classnames';
 import { Select, Input, Tooltip, Button } from 'antd';
 import { SearchOutlined, ClearOutlined, DownOutlined, UpOutlined } from '@ant-design/icons';
 import { getLabelValues } from '@/services/metricViews';
-import { Range } from '@/components/DateRangePicker';
+import { IRawTimeRange } from '@/components/TimeRangePicker';
 import { IMatch } from '../types';
 import { getFiltersStr, getDynamicLabelsStr } from './utils';
 
 interface IProps {
-  range: Range;
+  range: IRawTimeRange;
   value: IMatch;
   onChange: (value: IMatch) => void;
 }
