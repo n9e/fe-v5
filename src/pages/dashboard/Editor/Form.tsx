@@ -19,7 +19,7 @@ import { Form, Input, Row, Col, Button, Space, Switch, Tooltip } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import PromQLInput from '@/components/PromQLInput';
-import DateRangePicker from '@/components/DateRangePicker';
+import TimeRangePicker from '@/components/TimeRangePicker';
 import Resolution from '@/components/Resolution';
 import { defaultValues, defaultCustomValuesMap } from './config';
 import Options from './Options';
@@ -34,6 +34,14 @@ export default function FormCpt(props) {
   const [variableConfigWithOptions, setVariableConfigWithOptions] = useState<IVariable[]>(props.variableConfigWithOptions);
 
   defaultValues.custom = defaultCustomValuesMap[_.get(initialValues, 'type') || defaultValues.type];
+
+  _.forEach(initialValues.targets, (item) => {
+    if (_.get(item, 'time.unit')) {
+      delete item.time;
+    }
+  });
+
+  console.log(initialValues);
 
   useEffect(() => {
     setVariableConfigWithOptions(props.variableConfigWithOptions);
@@ -153,7 +161,7 @@ export default function FormCpt(props) {
                                       title: '可指定时间范围，默认为大盘全局时间范围',
                                     }}
                                   >
-                                    <DateRangePicker nullable />
+                                    <TimeRangePicker />
                                   </Form.Item>
                                 </Col>
                                 <Col flex='72px'>

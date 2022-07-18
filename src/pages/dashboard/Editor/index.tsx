@@ -20,7 +20,7 @@ import { CloseOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import { useTranslation } from 'react-i18next';
-import DateRangePicker, { Range } from '@/components/DateRangePicker';
+import TimeRangePicker, { IRawTimeRange } from '@/components/TimeRangePicker';
 import Resolution from '@/components/Resolution';
 import ModalHOC, { ModalWrapProps } from '../Components/ModalHOC';
 import { visualizations, defaultValues, defaultCustomValuesMap } from './config';
@@ -35,19 +35,16 @@ interface IProps {
   variableConfigWithOptions?: IVariable[];
   cluster: string;
   id: string;
+  time: IRawTimeRange;
   onOK: (formData: any) => void;
 }
 
 function index(props: ModalWrapProps & IProps) {
   const { t } = useTranslation();
-  const { visible, variableConfigWithOptions, cluster, id } = props;
+  const { visible, variableConfigWithOptions, cluster, id, time } = props;
   const initialValues = _.cloneDeep(props.initialValues);
   const [chartForm] = Form.useForm();
-  const [range, setRange] = useState<Range>({
-    description: '小时',
-    num: 1,
-    unit: 'hour',
-  });
+  const [range, setRange] = useState<IRawTimeRange>(time);
   const defaultType = _.get(initialValues, 'type') || defaultValues.type;
   const [type, setType] = useState<string>(defaultType);
   const [step, setStep] = useState<number | null>(null);
@@ -114,7 +111,7 @@ function index(props: ModalWrapProps & IProps) {
                 );
               })}
             </Select>
-            <DateRangePicker onChange={(e) => setRange(e)} />
+            <TimeRangePicker value={range} onChange={setRange} />
             <Resolution onChange={(v) => setStep(v)} initialValue={step} />
             <CloseOutlined
               style={{ fontSize: 18 }}

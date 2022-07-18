@@ -20,7 +20,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import PageLayout from '@/components/pageLayout';
-import { Range } from '@/components/DateRangePicker';
+import { IRawTimeRange } from '@/components/TimeRangePicker';
 import { Dashboard } from '@/store/dashboardInterface';
 import { RootState as CommonRootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
@@ -44,6 +44,23 @@ interface URLParam {
   id: string;
 }
 
+const dashboardTimeCacheKey = 'dashboard-timeRangePicker-value';
+const getDefaultDashboardTime = () => {
+  const defaultTime = {
+    start: 'now-1h',
+    end: 'now',
+  };
+  const cache = localStorage.getItem(dashboardTimeCacheKey);
+  if (cache) {
+    try {
+      return JSON.parse(cache);
+    } catch (e) {
+      return defaultTime;
+    }
+  }
+  return defaultTime;
+};
+
 export default function DetailV2() {
   const localCluster = localStorage.getItem('curCluster');
   const { id } = useParams<URLParam>();
@@ -63,11 +80,7 @@ export default function DetailV2() {
   const [variableConfigWithOptions, setVariableConfigWithOptions] = useState<IVariable[]>();
   const [dashboardLinks, setDashboardLinks] = useState<ILink[]>();
   const [panels, setPanels] = useState<any[]>([]);
-  const [range, setRange] = useState<Range>({
-    unit: 'day',
-    num: 1,
-    description: '',
-  });
+  const [range, setRange] = useState<IRawTimeRange>(getDefaultDashboardTime());
   const [step, setStep] = useState<number | null>(null);
   const refresh = () => {
     getDashboard(id).then((res) => {
@@ -126,7 +139,10 @@ export default function DetailV2() {
             }
           }}
           range={range}
-          setRange={setRange}
+          setRange={(v) => {
+            localStorage.setItem(dashboardTimeCacheKey, JSON.stringify(v));
+            setRange(v);
+          }}
           step={step}
           setStep={setStep}
           refreshRef={refreshRef}
@@ -152,6 +168,7 @@ export default function DetailV2() {
                 variableConfigWithOptions,
                 cluster: curCluster,
                 id,
+                time: range,
                 initialValues: {
                   type,
                   targets: [

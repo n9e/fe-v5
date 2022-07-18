@@ -18,7 +18,7 @@ import React, { useState, useEffect } from 'react';
 import _ from 'lodash';
 import classNames from 'classnames';
 import { EditOutlined } from '@ant-design/icons';
-import { Range } from '@/components/DateRangePicker';
+import { IRawTimeRange } from '@/components/TimeRangePicker';
 import { convertExpressionToQuery, replaceExpressionVars, getVaraiableSelected, setVaraiableSelected, stringToRegex } from './constant';
 import { IVariable } from './definition';
 import DisplayItem from './DisplayItem';
@@ -31,7 +31,7 @@ interface IProps {
   cluster: string; // 集群变动后需要重新获取数据
   editable?: boolean;
   value?: IVariable[];
-  range: Range;
+  range: IRawTimeRange;
   onChange: (data: IVariable[], needSave: boolean, options?: IVariable[]) => void;
   onOpenFire?: () => void;
 }

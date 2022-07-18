@@ -23,7 +23,7 @@ import { useLocation } from 'react-router-dom';
 import querystring from 'query-string';
 import RGL, { WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
-import { Range } from '@/components/DateRangePicker';
+import { IRawTimeRange } from '@/components/TimeRangePicker';
 import { updateDashboardConfigs } from '@/services/dashboardV2';
 import { Dashboard } from '@/store/dashboardInterface';
 import {
@@ -46,7 +46,7 @@ import './style.less';
 interface IProps {
   curCluster: string;
   dashboard: Dashboard;
-  range: Range;
+  range: IRawTimeRange;
   step: number | null;
   variableConfig: any;
   panels: any[];
@@ -150,6 +150,7 @@ function index(props: IProps) {
                         variableConfigWithOptions: variableConfig,
                         cluster: curCluster,
                         id: item.id,
+                        time: range,
                         initialValues: {
                           ...item,
                           id: item.id,

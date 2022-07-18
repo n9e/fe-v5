@@ -19,7 +19,7 @@ import _ from 'lodash';
 import { useInViewport } from 'ahooks';
 import { Dropdown, Menu, Tooltip } from 'antd';
 import { InfoCircleOutlined, MoreOutlined, LinkOutlined, SettingOutlined, ShareAltOutlined, DeleteOutlined, CopyOutlined, SyncOutlined } from '@ant-design/icons';
-import { Range } from '@/components/DateRangePicker';
+import { IRawTimeRange } from '@/components/TimeRangePicker';
 import Timeseries from './Timeseries';
 import Stat from './Stat';
 import Table from './Table';
@@ -35,7 +35,7 @@ interface IProps {
   themeMode?: 'dark';
   dashboardId: string;
   id?: string;
-  time: Range;
+  time: IRawTimeRange;
   step: number | null;
   type: string;
   values: IPanel;
