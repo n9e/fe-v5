@@ -23,7 +23,7 @@ import _ from 'lodash';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { GetTmpChartData } from '@/services/metric';
-import TimeRangePicker, { IRawTimeRange, parseRange } from '@/components/TimeRangePicker';
+import { TimeRangePickerWithRefresh, IRawTimeRange } from '@/components/TimeRangePicker';
 import Resolution from '@/components/Resolution';
 import Graph from '@/components/Graph';
 import { ChartType } from '@/components/D3Charts/src/interface';
@@ -31,6 +31,7 @@ import { HighLevelConfigType } from '@/components/Graph/Graph/index';
 import { CommonStoreState } from '@/store/commonInterface';
 import { RootState } from '@/store/common';
 import Renderer from '../dashboard/Renderer/Renderer';
+import { getStepByTimeAndStep } from '../dashboard/utils';
 import './index.less';
 
 export default function Chart() {
@@ -110,7 +111,7 @@ export default function Chart() {
                     </Button>
                   </Dropdown>
                 </div>
-                <TimeRangePicker onChange={setRange} value={range} />
+                <TimeRangePickerWithRefresh refreshTooltip={`刷新间隔小于 step(${getStepByTimeAndStep(range, step)}s) 将不会更新数据`} onChange={setRange} value={range} />
                 <Resolution onChange={(v) => setStep(v)} initialValue={step} />
                 {!semver.valid(chartData[0].dataProps?.version) && (
                   <Radio.Group
