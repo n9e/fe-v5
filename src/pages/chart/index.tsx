@@ -16,24 +16,22 @@
  */
 import React, { useEffect, useState } from 'react';
 import semver from 'semver';
-import { GetTmpChartData } from '@/services/metric';
-import { useParams } from 'react-router';
-import DateRangePicker, { isAbsoluteRange, RelativeRange } from '@/components/DateRangePicker';
-import { Range } from '@/components/DateRangePicker';
-import { AreaChartOutlined, DownOutlined, FieldNumberOutlined, LineChartOutlined } from '@ant-design/icons';
-import Resolution from '@/components/Resolution';
-import './index.less';
-import { useTranslation } from 'react-i18next';
-import Graph from '@/components/Graph';
-import { GraphDataProps } from '@/components/Graph/Graph/index';
-import _ from 'lodash';
 import { Button, Dropdown, Radio, Menu, Tooltip, Space } from 'antd';
+import { AreaChartOutlined, DownOutlined, FieldNumberOutlined, LineChartOutlined } from '@ant-design/icons';
+import { useParams } from 'react-router';
+import _ from 'lodash';
+import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
+import { GetTmpChartData } from '@/services/metric';
+import TimeRangePicker, { IRawTimeRange, parseRange } from '@/components/TimeRangePicker';
+import Resolution from '@/components/Resolution';
+import Graph from '@/components/Graph';
 import { ChartType } from '@/components/D3Charts/src/interface';
 import { HighLevelConfigType } from '@/components/Graph/Graph/index';
-import { useSelector } from 'react-redux';
 import { CommonStoreState } from '@/store/commonInterface';
 import { RootState } from '@/store/common';
 import Renderer from '../dashboard/Renderer/Renderer';
+import './index.less';
 
 export default function Chart() {
   const { t } = useTranslation();
@@ -48,10 +46,9 @@ export default function Chart() {
       highLevelConfig: HighLevelConfigType;
     }>
   >([]);
-  const [range, setRange] = useState<Range>({
-    num: 1,
-    unit: 'hour',
-    description: t('小时'),
+  const [range, setRange] = useState<IRawTimeRange>({
+    start: 'now-1h',
+    end: 'now',
   });
   const [step, setStep] = useState<number | null>(null);
   const [chartType, setChartType] = useState<ChartType>(ChartType.Line);
@@ -97,16 +94,6 @@ export default function Chart() {
     </Menu>
   );
 
-  const handleDateChange = (e) => {
-    if (isAbsoluteRange(e) ? !_.isEqual(e, range) : e.num !== (range as RelativeRange).num || e.unit !== (range as RelativeRange).unit) {
-      setRange(e);
-    }
-  };
-
-  const handleRefresh = () => {
-    initChart();
-  };
-
   return (
     <div className='chart-container'>
       {chartData && chartData.length > 0 && curCluster ? (
@@ -123,7 +110,7 @@ export default function Chart() {
                     </Button>
                   </Dropdown>
                 </div>
-                <DateRangePicker onChange={handleDateChange} value={chartData[0].dataProps.range} />
+                <TimeRangePicker onChange={setRange} value={range} />
                 <Resolution onChange={(v) => setStep(v)} initialValue={step} />
                 {!semver.valid(chartData[0].dataProps?.version) && (
                   <Radio.Group
@@ -141,7 +128,6 @@ export default function Chart() {
                   />
                 )}
               </Space>
-              {/* <ResfeshIcon onClick={handleRefresh} className='reload-icon' /> */}
             </div>
           </div>
           {chartData.map((item: any, index) => {

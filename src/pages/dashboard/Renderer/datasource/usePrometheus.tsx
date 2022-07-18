@@ -43,6 +43,9 @@ const getSerieName = (metric: Object, expr: string) => {
   });
   return _.trim(name);
 };
+const getDefaultStepByStartAndEnd = (start: number, end: number) => {
+  return Math.max(Math.floor((end - start) / 240), 1);
+};
 
 export default function usePrometheus(props: IProps) {
   const { id, dashboardId, time, step, targets, variableConfig, inViewPort } = props;
@@ -70,10 +73,15 @@ export default function usePrometheus(props: IProps) {
           start = moment(parsedRange.start).unix();
           end = moment(parsedRange.end).unix();
         }
+        step = getDefaultStepByStartAndEnd(start, end);
+        if (target.step) {
+          step = target.step;
+        }
       }
-      if (target.step) {
-        step = target.step;
-      }
+
+      start = start - (start % step!);
+      end = end - (end % step!);
+
       const realExpr = variableConfig ? replaceExpressionVars(target.expr, variableConfig, variableConfig.length, dashboardId) : target.expr;
       const signalKey = `${id}-${target.expr}`;
       if (realExpr) {
@@ -126,7 +134,7 @@ export default function usePrometheus(props: IProps) {
     let start = moment(parsedRange.start).unix();
     let end = moment(parsedRange.end).unix();
     let _step = step;
-    if (!step) _step = Math.max(Math.floor((end - start) / 240), 1); // TODO: 这个默认 step 不知道是基于什么计算的，并且是一个对用户透明可能存在理解问题
+    if (!step) _step = getDefaultStepByStartAndEnd(start, end);
     start = start - (start % _step!);
     end = end - (end % _step!);
     setTimes({

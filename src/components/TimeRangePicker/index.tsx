@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Popover, Row, Col, Input } from 'antd';
-import { DownOutlined, UpOutlined, CalendarOutlined, SearchOutlined } from '@ant-design/icons';
+import { DownOutlined, UpOutlined, CalendarOutlined, SearchOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import { PickerPanel } from 'rc-picker';
 import momentGenerateConfig from 'rc-picker/es/generate/moment';
 import zhCN from 'rc-picker/lib/locale/zh_CN';
@@ -21,6 +21,9 @@ interface IProps {
   value?: IRawTimeRange;
   dateFormat?: string;
   onChange?: (value: IRawTimeRange) => void;
+  placeholder?: string;
+  allowClear?: boolean;
+  onClear?: () => void;
 }
 
 const defaultRange = {
@@ -57,7 +60,7 @@ const setAbsoluteHistoryCache = (range, dateFormat) => {
 
 export default function index(props: IProps) {
   const absoluteHistoryCache = getAbsoluteHistoryCache();
-  const { value, onChange = () => {}, dateFormat = 'YYYY-MM-DD HH:mm' } = props;
+  const { value, onChange = () => {}, dateFormat = 'YYYY-MM-DD HH:mm', placeholder, allowClear = false, onClear = () => {} } = props;
   const [visible, setVisible] = useState(false);
   const [range, setRange] = useState<IRawTimeRange>(defaultRange);
   const [label, setLabel] = useState<string>('');
@@ -277,12 +280,25 @@ export default function index(props: IProps) {
       >
         <Button
           style={props.style}
+          className={classNames({
+            'flashcat-timeRangePicker-target': true,
+            'flashcat-timeRangePicker-target-allowClear': allowClear,
+          })}
           onClick={() => {
             setVisible(!visible);
           }}
         >
-          {label}
-          {visible ? <UpOutlined /> : <DownOutlined />}
+          {label || placeholder}
+          <span className='flashcat-timeRangePicker-target-icon'>
+            {visible ? <UpOutlined /> : <DownOutlined />}
+            <CloseCircleOutlined
+              onClick={(e) => {
+                e.nativeEvent.stopImmediatePropagation();
+                e.stopPropagation();
+                onClear();
+              }}
+            />
+          </span>
         </Button>
       </Popover>
     </>
@@ -290,4 +306,4 @@ export default function index(props: IProps) {
 }
 
 export type { IRawTimeRange } from './types';
-export { TimeRangePickerWithRefresh, parseRange, parse };
+export { TimeRangePickerWithRefresh, parseRange, parse, isMathString };

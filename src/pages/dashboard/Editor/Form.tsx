@@ -18,15 +18,15 @@ import React, { useEffect, useState } from 'react';
 import { Form, Input, Row, Col, Button, Space, Switch, Tooltip } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import _ from 'lodash';
+import moment from 'moment';
 import PromQLInput from '@/components/PromQLInput';
-import TimeRangePicker from '@/components/TimeRangePicker';
+import TimeRangePicker, { isMathString } from '@/components/TimeRangePicker';
 import Resolution from '@/components/Resolution';
 import { defaultValues, defaultCustomValuesMap } from './config';
 import Options from './Options';
 import Collapse, { Panel } from './Components/Collapse';
 import VariableConfig, { IVariable } from '../VariableConfig';
 import getFirstUnusedLetter from '../Renderer/utils/getFirstUnusedLetter';
-import moment from 'moment';
 
 const alphabet = 'ABCDEFGHIGKLMNOPQRSTUVWXYZ'.split('');
 
@@ -161,12 +161,23 @@ export default function FormCpt(props) {
                                     }}
                                     normalize={(val) => {
                                       return {
-                                        start: moment(val.start).format('YYYY-MM-DD HH:mm:ss'),
-                                        end: moment(val.end).format('YYYY-MM-DD HH:mm:ss'),
+                                        start: isMathString(val.start) ? val.start : moment(val.start).format('YYYY-MM-DD HH:mm:ss'),
+                                        end: isMathString(val.end) ? val.end : moment(val.end).format('YYYY-MM-DD HH:mm:ss'),
                                       };
                                     }}
                                   >
-                                    <TimeRangePicker dateFormat='YYYY-MM-DD HH:mm:ss' />
+                                    <TimeRangePicker
+                                      dateFormat='YYYY-MM-DD HH:mm:ss'
+                                      allowClear
+                                      onClear={() => {
+                                        const targets = chartForm.getFieldValue('targets');
+                                        const targetsClone = _.cloneDeep(targets);
+                                        _.set(targetsClone, [name, 'time'], undefined);
+                                        chartForm.setFieldsValue({
+                                          targets: targetsClone,
+                                        });
+                                      }}
+                                    />
                                   </Form.Item>
                                 </Col>
                                 <Col flex='72px'>
