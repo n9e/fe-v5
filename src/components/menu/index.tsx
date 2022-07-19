@@ -188,6 +188,10 @@ const SideMenu: FC = () => {
   const toggleCollapsed = () => {
     setCollapsed(!collapsed);
     localStorage.setItem('menuCollapsed', !collapsed ? '1' : '0');
+    // TODO: 解决大盘 layout resize 问题
+    setTimeout(() => {
+      window.dispatchEvent(new Event('resize'));
+    }, 500);
   };
   const handleClick: MenuClickEventHandler = ({ key }) => {
     if (location.pathname === key) return;

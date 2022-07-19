@@ -161,6 +161,10 @@ export default function Title(props: IProps) {
                 pathname: location.pathname,
                 search: querystring.stringify(newQuery),
               });
+              // TODO: 解决大盘 layout resize 问题
+              setTimeout(() => {
+                window.dispatchEvent(new Event('resize'));
+              }, 500);
             }}
           >
             {viewMode === 'fullscreen' ? '关闭全屏' : '全屏'}
