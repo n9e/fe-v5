@@ -107,6 +107,25 @@
   }
 
   .scroll-container {
+    .ant-table-scroll-horizontal {
+      .ant-table-body::-webkit-scrollbar {
+        height: 10px;
+        width: 4px;
+      }
+      .ant-table-body::-webkit-scrollbar-corner {
+        background-color: transparent;
+      }
+      .ant-table-body::-webkit-scrollbar-thumb {
+        border-radius: 10px;
+        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+        background: rgba(0,0,0,0.5);;
+      }
+      .ant-table-body::-webkit-scrollbar-track {
+        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+        background: unset;
+      }
+    }
   }
   .scroll-container::-webkit-scrollbar {
     height: 10px;

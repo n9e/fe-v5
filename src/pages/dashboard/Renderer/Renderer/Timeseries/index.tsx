@@ -209,6 +209,7 @@ export default function index(props: IProps) {
             <Table
               rowKey='id'
               size='small'
+              className='scroll-container-table'
               scroll={{ x: 650, y: legendEleSize?.height || 100 - 46 }}
               columns={[
                 {
