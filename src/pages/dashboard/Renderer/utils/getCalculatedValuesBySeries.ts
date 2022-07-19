@@ -107,11 +107,11 @@ export const getLegendValues = (series: any[], { unit, decimals }, hexPalette: s
       offset: serie.offset,
       color: hexPalette[idx % hexPalette.length],
       disabled: serie.visible === false ? true : undefined,
-      max: valueFormatter({ unit, decimals }, results.max).text,
-      min: valueFormatter({ unit, decimals }, results.min).text,
-      avg: valueFormatter({ unit, decimals }, results.avg).text,
-      sum: valueFormatter({ unit, decimals }, results.sum).text,
-      last: valueFormatter({ unit, decimals }, results.last).text,
+      max: valueFormatter({ unit, decimals }, results.max),
+      min: valueFormatter({ unit, decimals }, results.min),
+      avg: valueFormatter({ unit, decimals }, results.avg),
+      sum: valueFormatter({ unit, decimals }, results.sum),
+      last: valueFormatter({ unit, decimals }, results.last),
     };
   });
   return values;

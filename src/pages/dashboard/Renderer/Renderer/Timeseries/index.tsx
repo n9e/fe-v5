@@ -248,22 +248,42 @@ export default function index(props: IProps) {
                 {
                   title: 'Max',
                   dataIndex: 'max',
+                  sorter: (a, b) => a.max.value - b.max.value,
+                  render: (text) => {
+                    return text.text;
+                  },
                 },
                 {
                   title: 'Min',
                   dataIndex: 'min',
+                  sorter: (a, b) => a.min.value - b.min.value,
+                  render: (text) => {
+                    return text.text;
+                  },
                 },
                 {
                   title: 'Avg',
                   dataIndex: 'avg',
+                  sorter: (a, b) => a.avg.value - b.avg.value,
+                  render: (text) => {
+                    return text.text;
+                  },
                 },
                 {
                   title: 'Sum',
                   dataIndex: 'sum',
+                  sorter: (a, b) => a.sum.value - b.sum.value,
+                  render: (text) => {
+                    return text.text;
+                  },
                 },
                 {
                   title: 'Last',
                   dataIndex: 'last',
+                  sorter: (a, b) => a.last.value - b.last.value,
+                  render: (text) => {
+                    return text.text;
+                  },
                 },
               ]}
               dataSource={legendData}
