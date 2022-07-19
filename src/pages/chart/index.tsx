@@ -134,8 +134,22 @@ export default function Chart() {
           {chartData.map((item: any, index) => {
             if (semver.valid(item.dataProps?.version)) {
               return (
-                <div style={{ height: 400, border: '1px solid #efefef' }}>
-                  <Renderer dashboardId={item.id} key={index} time={range} step={step} type={item.dataProps?.type} values={item.dataProps as any} isPreview />
+                <div style={{ height: 740, border: '1px solid #efefef' }}>
+                  <Renderer
+                    dashboardId={item.id}
+                    key={index}
+                    time={range}
+                    step={step}
+                    type={item.dataProps?.type}
+                    values={_.merge({}, item.dataProps, {
+                      options: {
+                        legend: {
+                          displayMode: 'table',
+                        },
+                      },
+                    })}
+                    isPreview
+                  />
                 </div>
               );
             }
