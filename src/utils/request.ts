@@ -54,12 +54,16 @@ request.interceptors.response.use(
         .clone()
         .json()
         .then((data) => {
-          if (response.url.includes('/api/v1/')) {
+          if (response.url.includes('/api/v1/') || response.url.includes('/api/v2')) {
             if (status === 200 && !data.error) {
               return { ...data, success: true };
             } else if (data.error) {
-              // @ts-ignore
-              throw new Error(data.error.message, { cause: options.silence });
+              if (response.url.indexOf('/api/n9e/prometheus/api/v1') > -1 || response.url.indexOf('/api/v1/datasource/prometheus') > -1) {
+                return data;
+              } else {
+                // @ts-ignore
+                throw new Error(data.error.message, { cause: options.silence });
+              }
             }
           } else {
             if (data.err === '' || data.status === 'success' || data.error === '') {
@@ -86,7 +90,7 @@ request.interceptors.response.use(
         });
     }
     // 兼容异常处理
-    if (status === 500 && response.url.includes('/api/v1')) {
+    if (status === 500 && (response.url.includes('/api/v1') || response.url.includes('/api/v2'))) {
       return response
         .clone()
         .json()
@@ -122,17 +126,19 @@ request.interceptors.response.use(
                 const { access_token, refresh_token } = res.dat;
                 localStorage.setItem('access_token', access_token);
                 localStorage.setItem('refresh_token', refresh_token);
+                location.href = `${location.pathname}${location.search}`;
               }
             })
           : (location.href = `/login${location.pathname != '/' ? '?redirect=' + location.pathname + location.search : ''}`);
       }
-    } else if (status === 404) {
-      location.href = '/404';
-    } else if (status === 403 && response.url.includes('/api/v1')) {
+      // } else if (status === 404) {
+      //   location.href = '/404';
+    } else if (status === 403 && (response.url.includes('/api/v1') || response.url.includes('/api/v2'))) {
       return response
         .clone()
         .json()
         .then((data) => {
+          location.href = '/403';
           if (data.error && data.error.message) throw new Error(data.error.message);
         });
     } else {
@@ -156,7 +162,7 @@ request.interceptors.response.use(
                 return data;
               }
             }
-            if (response.url.includes('/api/v1')) {
+            if (response.url.includes('/api/v1') || response.url.includes('/api/v2')) {
               throw {
                 // TODO: 后端服务异常后可能返回的错误数据也不是一个正常的结构，后面得考虑下怎么处理
                 name: data.error ? data.error.name : JSON.stringify(data),
