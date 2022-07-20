@@ -121,7 +121,7 @@ export default function Stat(props: IProps) {
 
   return (
     <div className='renderer-stat-container'>
-      <div className='renderer-stat-container-box'>
+      <div className='renderer-stat-container-box scroll-container'>
         {_.map(calculatedValues, (item, idx) => {
           return (
             <StatItem
