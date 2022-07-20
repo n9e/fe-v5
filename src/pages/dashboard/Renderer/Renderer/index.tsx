@@ -25,6 +25,7 @@ import Stat from './Stat';
 import Table from './Table';
 import Pie from './Pie';
 import Hexbin from './Hexbin';
+import BarGauge from './BarGauge';
 import { IVariable } from '../../VariableConfig/definition';
 import Markdown from '../../Editor/Components/Markdown';
 import usePrometheus from '../datasource/usePrometheus';
@@ -86,6 +87,7 @@ function index(props: IProps) {
     table: () => <Table {...subProps} />,
     pie: () => <Pie {...subProps} themeMode={themeMode} />,
     hexbin: () => <Hexbin {...subProps} />,
+    barGauge: () => <BarGauge {...subProps} themeMode={themeMode} />,
   };
 
   return (

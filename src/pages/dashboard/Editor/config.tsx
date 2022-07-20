@@ -38,6 +38,10 @@ export const visualizations = [
     type: 'hexbin',
     name: '蜂窝图',
   },
+  {
+    type: 'barGauge',
+    name: '排行榜',
+  },
 ];
 
 export const IRefreshMap = {
@@ -135,6 +139,11 @@ export const defaultCustomValuesMap = {
     colorDomainAuto: true,
     colorDomain: [],
     reverseColorOrder: false,
+  },
+  barGauge: {
+    textMode: 'valueAndName',
+    calc: 'lastNotNull',
+    textSize: {},
   },
 };
 
