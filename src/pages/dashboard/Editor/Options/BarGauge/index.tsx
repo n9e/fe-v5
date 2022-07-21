@@ -15,22 +15,16 @@
  *
  */
 import React from 'react';
-import _ from 'lodash';
-import Timeseries from './Timeseries';
-import Stat from './Stat';
-import Table from './Table';
-import Pie from './Pie';
-import Hexbin from './Hexbin';
-import BarGauge from './BarGauge';
+import GraphStyles from './GraphStyles';
+import StandardOptions from '../../Fields/StandardOptions';
+import ValueMappings from '../../Fields/ValueMappings';
 
-export default function index({ type, targets, chartForm }) {
-  const OptionsCptMap = {
-    timeseries: <Timeseries />,
-    stat: <Stat />,
-    table: <Table targets={targets} chartForm={chartForm} />,
-    pie: <Pie />,
-    hexbin: <Hexbin />,
-    barGauge: <BarGauge />,
-  };
-  return OptionsCptMap[type] || `无效的图表类型 ${type}`;
+export default function Timeseries() {
+  return (
+    <>
+      <GraphStyles />
+      <ValueMappings />
+      <StandardOptions />
+    </>
+  );
 }

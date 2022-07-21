@@ -47,7 +47,7 @@ export default function BarGauge(props: IProps) {
 
   return (
     <div className='renderer-stat-container'>
-      <div className='renderer-stat-container-box scroll-container'></div>
+      <div className='renderer-stat-container-box scroll-container'>barGauge</div>
     </div>
   );
 }
