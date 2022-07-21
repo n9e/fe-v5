@@ -5,7 +5,7 @@ interface IProps {
 }
 
 export default function index(props: IProps) {
-  if (import.meta.env.VITE_IS_ADVANCED === 'true') {
+  if (import.meta.env.VITE_IS_ADVANCED === 'true' || import.meta.env.VITE_IS_ENHANCED === 'true') {
     if (typeof props.children === 'function') {
       return <div>{props.children(true)}</div>;
     }
