@@ -23,7 +23,7 @@ import { replaceExpressionVars, getVaraiableSelected } from '../../VariableConfi
 import { IVariable } from '../../VariableConfig/definition';
 import replaceExpressionBracket from '../utils/replaceExpressionBracket';
 import { completeBreakpoints } from './utils';
-import {fetchHistoryBatch} from "@/components/Graph/api";
+import { fetchHistoryBatch } from "@/components/Graph/api";
 
 interface IProps {
   id?: string;

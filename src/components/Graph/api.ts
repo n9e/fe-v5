@@ -37,13 +37,13 @@ export const fetchHistory = (params?, signalKey?) => {
   }).finally(() => {
     delete signals[signalKey];
   });
-}
+};
 export const fetchHistoryBatch = (data) => {
   return request(`/api/n9e/query-range-batch`, {
     method: RequestMethod.Post,
     data
   })
-}
+};
 
 export const fetchAggrGroups = (params?) => {
   return request(`/api/n9e/prometheus/api/v1/labels`, {
