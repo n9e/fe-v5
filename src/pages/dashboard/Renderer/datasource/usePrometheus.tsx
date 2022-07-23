@@ -23,6 +23,7 @@ import { replaceExpressionVars, getVaraiableSelected } from '../../VariableConfi
 import { IVariable } from '../../VariableConfig/definition';
 import replaceExpressionBracket from '../utils/replaceExpressionBracket';
 import { completeBreakpoints } from './utils';
+import {fetchHistoryBatch} from "@/components/Graph/api";
 
 interface IProps {
   id?: string;
@@ -51,11 +52,21 @@ export default function usePrometheus(props: IProps) {
   });
   const flag = useRef(false);
   const [times, setTimes] = useState<any>({});
+  interface QueryMetricItem {
+    start:number;
+    end:number;
+    step:number;
+    query:string;
+  }
+
   const fetchData = () => {
     if (!times.start) return;
     const _series: any[] = [];
-    const promises: Promise<any>[] = [];
     let { start, end, step } = times;
+    let batchParams: Array<QueryMetricItem> = []
+    let exprs: Array<string> = []
+    let refIds: Array<string> = []
+
     _.forEach(targets, (target) => {
       if (target.time) {
         const { start: _start, end: _end } = formatPickerDate(target.time);
@@ -66,50 +77,41 @@ export default function usePrometheus(props: IProps) {
         step = target.step;
       }
       const realExpr = variableConfig ? replaceExpressionVars(target.expr, variableConfig, variableConfig.length, dashboardId) : target.expr;
-      const signalKey = `${id}-${target.expr}`;
       if (realExpr) {
-        promises.push(
-          api
-            .fetchHistory(
-              {
-                start,
-                end,
-                step,
-                query: realExpr,
-              },
-              signalKey,
-            )
-            .then((res) => {
-              return {
-                result: res?.data?.result,
-                expr: target.expr,
-                refId: target.refId,
-              };
-            }),
-        );
+        batchParams.push({
+          end: end,
+          query: realExpr,
+          start: start,
+          step: step
+        })
+        exprs.push(target.expr)
+        refIds.push(target.refId)
       }
     });
     setLoading(true);
-    Promise.all(promises)
-      .then((res) => {
-        _.forEach(res, (item) => {
-          const target = _.find(targets, (t) => t.expr === item.expr);
-          _.forEach(item.result, (serie) => {
-            _series.push({
-              id: _.uniqueId('series_'),
-              refId: item.refId,
-              name: target?.legend ? replaceExpressionBracket(target?.legend, serie.metric) : getSerieName(serie.metric, item.expr),
-              metric: serie.metric,
-              expr: item.expr,
-              data: completeBreakpoints(step, serie.values),
-            });
+    fetchHistoryBatch({queries: batchParams}).then((res) => {
+      for (let i = 0; i < res.dat.length; i++) {
+        var item = {
+          result: res.dat[i],
+          expr: exprs[i],
+          refId: refIds[i]
+        }
+        const target = _.find(targets, (t) => t.expr === item.expr);
+        _.forEach(item.result, (serie) => {
+          _series.push({
+            id: _.uniqueId('series_'),
+            refId: item.refId,
+            name: target?.legend ? replaceExpressionBracket(target?.legend, serie.metric) : getSerieName(serie.metric, item.expr),
+            metric: serie.metric,
+            expr: item.expr,
+            data: completeBreakpoints(step, serie.values),
           });
         });
-        setSeries(_series);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+      }
+      setSeries(_series);
+    }).finally(() => {
+      setLoading(false);
+    });
   };
 
   useEffect(() => {
