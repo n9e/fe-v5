@@ -15,11 +15,12 @@
  *
  */
 import React, { useEffect, useRef, useState } from 'react';
+import { Tooltip } from 'antd';
 import _ from 'lodash';
+import Color from 'color';
 import * as d3 from 'd3';
 import { useSize } from 'ahooks';
 import { IPanel } from '../../../types';
-import { statHexPalette } from '../../../config';
 import getCalculatedValuesBySeries from '../../utils/getCalculatedValuesBySeries';
 import './style.less';
 
@@ -29,10 +30,71 @@ interface IProps {
   themeMode?: 'dark';
 }
 
+function Item(props) {
+  const { item, custom, themeMode, maxValue } = props;
+  const { baseColor = '#FF656B', displayMode = 'basic' } = custom;
+  const color = item.color ? item.color : baseColor;
+  const bgRef = useRef(null);
+  const bgSize = useSize(bgRef);
+  const textRef = useRef(null);
+  const textSize = useSize(textRef);
+  const getTextRight = () => {
+    if (bgSize?.width && textSize?.width) {
+      if (bgSize?.width < textSize?.width + 8) {
+        return -textSize?.width - 8;
+      }
+      return 0;
+    }
+    return 0;
+  };
+
+  return (
+    <div className='renderer-bar-gauge-item' key={item.name}>
+      <Tooltip title={item.name}>
+        <div className='renderer-bar-gauge-item-name'>{item.name}</div>
+      </Tooltip>
+      <div className='renderer-bar-gauge-item-value'>
+        <div
+          className='renderer-bar-gauge-item-value-bg'
+          style={{
+            backgroundColor: themeMode === 'dark' ? '#20222E' : '#F6F6F6',
+          }}
+        />
+        <div
+          ref={bgRef}
+          className='renderer-bar-gauge-item-value-color-bg'
+          style={{
+            color: themeMode === 'dark' ? '#fff' : '#20222E',
+            borderRight: `2px solid ${color}`,
+            backgroundColor: Color(color)
+              .alpha('basic' ? 0.2 : 1)
+              .rgb()
+              .string(),
+            width: `${(item.value / maxValue) * 100}%`,
+          }}
+        >
+          {displayMode === 'basic' && (
+            <div
+              ref={textRef}
+              className='renderer-bar-gauge-item-value-text'
+              style={{
+                color: color,
+                right: getTextRight(),
+              }}
+            >
+              {item.text}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function BarGauge(props: IProps) {
   const { values, series, themeMode } = props;
   const { custom, options } = values;
-  const { calc, textMode, colorMode, colSpan, textSize } = custom;
+  const { calc } = custom;
   const calculatedValues = getCalculatedValuesBySeries(
     series,
     calc,
@@ -42,12 +104,15 @@ export default function BarGauge(props: IProps) {
     },
     options?.valueMappings,
   );
-
-  console.log(calculatedValues);
+  const maxValue = _.maxBy(calculatedValues, 'value')?.value || 0;
 
   return (
     <div className='renderer-stat-container'>
-      <div className='renderer-stat-container-box scroll-container'>barGauge</div>
+      <div className='renderer-bar-gauge-container scroll-container'>
+        {_.map(calculatedValues, (item) => {
+          return <Item key={item.name} item={item} custom={custom} themeMode={themeMode} maxValue={maxValue} />;
+        })}
+      </div>
     </div>
   );
 }
