@@ -82,151 +82,144 @@ export default function FormCpt(props) {
                   id={id}
                 />
               </div>
-              <Form.List name='targets'>
-                {(fields, { add, remove }, { errors }) => {
-                  return (
-                    <>
-                      <Collapse>
-                        {_.map(fields, ({ name }, index) => {
-                          return (
-                            <Panel
-                              header={
-                                <Form.Item noStyle shouldUpdate>
-                                  {({ getFieldValue }) => {
-                                    return getFieldValue(['targets', name, 'refId']) || alphabet[index];
-                                  }}
+              {type !== 'text' && (
+                <Form.List name='targets'>
+                  {(fields, { add, remove }, { errors }) => {
+                    return (
+                      <>
+                        <Collapse>
+                          {_.map(fields, ({ name }, index) => {
+                            return (
+                              <Panel
+                                header={
+                                  <Form.Item noStyle shouldUpdate>
+                                    {({ getFieldValue }) => {
+                                      return getFieldValue(['targets', name, 'refId']) || alphabet[index];
+                                    }}
+                                  </Form.Item>
+                                }
+                                key={index}
+                                extra={
+                                  <div>
+                                    {fields.length > 1 ? (
+                                      <DeleteOutlined
+                                        style={{ marginLeft: 10 }}
+                                        onClick={() => {
+                                          remove(name);
+                                        }}
+                                      />
+                                    ) : null}
+                                  </div>
+                                }
+                              >
+                                <Form.Item noStyle name={[name, 'refId']}>
+                                  <div />
                                 </Form.Item>
-                              }
-                              key={index}
-                              extra={
-                                <div>
-                                  {fields.length > 1 ? (
-                                    <DeleteOutlined
-                                      style={{ marginLeft: 10 }}
-                                      onClick={() => {
-                                        remove(name);
-                                      }}
-                                    />
-                                  ) : null}
-                                </div>
-                              }
-                            >
-                              <Form.Item noStyle name={[name, 'refId']}>
-                                <div />
-                              </Form.Item>
-                              <div style={{ display: 'flex', alignItems: 'center' }}>
-                                <Form.Item
-                                  label='PromQL'
-                                  name={[name, 'expr']}
-                                  validateTrigger={['onBlur']}
-                                  rules={[
-                                    {
-                                      required: true,
-                                      message: '请输入PromQL',
-                                    },
-                                  ]}
-                                  style={{ flex: 1 }}
-                                >
-                                  <PromQLInput
+                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                  <Form.Item
+                                    label='PromQL'
+                                    name={[name, 'expr']}
                                     validateTrigger={['onBlur']}
-                                    url='/api/n9e/prometheus'
-                                    headers={{
-                                      'X-Cluster': localStorage.getItem('curCluster') || 'DEFAULT',
-                                      Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
-                                    }}
-                                  />
-                                </Form.Item>
-                              </div>
-                              <Row gutter={10}>
-                                <Col flex='auto'>
-                                  <Form.Item
-                                    label='Legend'
-                                    name={[name, 'legend']}
-                                    tooltip={{
-                                      getPopupContainer: () => document.body,
-                                      title:
-                                        'Controls the name of the time series, using name or pattern. For example {{hostname}} will be replaced with label value for the label hostname.',
-                                    }}
+                                    rules={[
+                                      {
+                                        required: true,
+                                        message: '请输入PromQL',
+                                      },
+                                    ]}
+                                    style={{ flex: 1 }}
                                   >
-                                    <Input />
-                                  </Form.Item>
-                                </Col>
-                                <Col flex='116px'>
-                                  <Form.Item
-                                    label='时间选择'
-                                    name={[name, 'time']}
-                                    tooltip={{
-                                      getPopupContainer: () => document.body,
-                                      title: '可指定时间范围，默认为大盘全局时间范围',
-                                    }}
-                                    normalize={(val) => {
-                                      return {
-                                        start: isMathString(val.start) ? val.start : moment(val.start).format('YYYY-MM-DD HH:mm:ss'),
-                                        end: isMathString(val.end) ? val.end : moment(val.end).format('YYYY-MM-DD HH:mm:ss'),
-                                      };
-                                    }}
-                                  >
-                                    <TimeRangePicker
-                                      dateFormat='YYYY-MM-DD HH:mm:ss'
-                                      allowClear
-                                      onClear={() => {
-                                        const targets = chartForm.getFieldValue('targets');
-                                        const targetsClone = _.cloneDeep(targets);
-                                        _.set(targetsClone, [name, 'time'], undefined);
-                                        chartForm.setFieldsValue({
-                                          targets: targetsClone,
-                                        });
+                                    <PromQLInput
+                                      validateTrigger={['onBlur']}
+                                      url='/api/n9e/prometheus'
+                                      headers={{
+                                        'X-Cluster': localStorage.getItem('curCluster') || 'DEFAULT',
+                                        Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
                                       }}
                                     />
                                   </Form.Item>
-                                </Col>
-                                <Col flex='72px'>
-                                  <Form.Item
-                                    label='Step'
-                                    name={[name, 'step']}
-                                    tooltip={{
-                                      getPopupContainer: () => document.body,
-                                      title: '可指定 step，默认为大盘全局 step',
-                                    }}
-                                  >
-                                    <Resolution />
-                                  </Form.Item>
-                                </Col>
-                              </Row>
-                            </Panel>
-                          );
-                        })}
+                                </div>
+                                <Row gutter={10}>
+                                  <Col flex='auto'>
+                                    <Form.Item
+                                      label='Legend'
+                                      name={[name, 'legend']}
+                                      tooltip={{
+                                        getPopupContainer: () => document.body,
+                                        title:
+                                          'Controls the name of the time series, using name or pattern. For example {{hostname}} will be replaced with label value for the label hostname.',
+                                      }}
+                                    >
+                                      <Input />
+                                    </Form.Item>
+                                  </Col>
+                                  <Col flex='116px'>
+                                    <Form.Item
+                                      label='时间选择'
+                                      name={[name, 'time']}
+                                      tooltip={{
+                                        getPopupContainer: () => document.body,
+                                        title: '可指定时间范围，默认为大盘全局时间范围',
+                                      }}
+                                      normalize={(val) => {
+                                        return {
+                                          start: isMathString(val.start) ? val.start : moment(val.start).format('YYYY-MM-DD HH:mm:ss'),
+                                          end: isMathString(val.end) ? val.end : moment(val.end).format('YYYY-MM-DD HH:mm:ss'),
+                                        };
+                                      }}
+                                    >
+                                      <TimeRangePicker
+                                        dateFormat='YYYY-MM-DD HH:mm:ss'
+                                        allowClear
+                                        onClear={() => {
+                                          const targets = chartForm.getFieldValue('targets');
+                                          const targetsClone = _.cloneDeep(targets);
+                                          _.set(targetsClone, [name, 'time'], undefined);
+                                          chartForm.setFieldsValue({
+                                            targets: targetsClone,
+                                          });
+                                        }}
+                                      />
+                                    </Form.Item>
+                                  </Col>
+                                  <Col flex='72px'>
+                                    <Form.Item
+                                      label='Step'
+                                      name={[name, 'step']}
+                                      tooltip={{
+                                        getPopupContainer: () => document.body,
+                                        title: '可指定 step，默认为大盘全局 step',
+                                      }}
+                                    >
+                                      <Resolution />
+                                    </Form.Item>
+                                  </Col>
+                                </Row>
+                              </Panel>
+                            );
+                          })}
 
-                        <Form.ErrorList errors={errors} />
-                      </Collapse>
-                      <Button
-                        style={{ width: '100%', marginTop: 10 }}
-                        onClick={() => {
-                          add({ expr: '', refId: getFirstUnusedLetter(_.map(chartForm.getFieldValue('targets'), 'refId')) });
-                        }}
-                      >
-                        + add query
-                      </Button>
-                    </>
-                  );
-                }}
-              </Form.List>
+                          <Form.ErrorList errors={errors} />
+                        </Collapse>
+                        <Button
+                          style={{ width: '100%', marginTop: 10 }}
+                          onClick={() => {
+                            add({ expr: '', refId: getFirstUnusedLetter(_.map(chartForm.getFieldValue('targets'), 'refId')) });
+                          }}
+                        >
+                          + add query
+                        </Button>
+                      </>
+                    );
+                  }}
+                </Form.List>
+              )}
             </div>
           </Col>
           <Col flex='600px' style={{ overflowY: 'auto' }}>
             <Collapse>
               <Panel header='面板配置'>
                 <>
-                  <Form.Item
-                    label={'标题'}
-                    name='name'
-                    rules={[
-                      {
-                        required: true,
-                        message: '图表名称',
-                      },
-                    ]}
-                  >
+                  <Form.Item label={'标题'} name='name'>
                     <Input />
                   </Form.Item>
                   <Form.Item label={'下钻链接'}>

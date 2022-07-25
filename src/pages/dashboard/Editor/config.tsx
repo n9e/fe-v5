@@ -42,6 +42,10 @@ export const visualizations = [
     type: 'barGauge',
     name: '排行榜',
   },
+  {
+    type: 'text',
+    name: '文字卡片',
+  },
 ];
 
 export const IRefreshMap = {
@@ -144,6 +148,14 @@ export const defaultCustomValuesMap = {
     calc: 'lastNotNull',
     baseColor: '#FF656B',
     displayMode: 'basic',
+  },
+  text: {
+    textSize: 12,
+    textColor: '#000000',
+    bgColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    content: '',
   },
 };
 

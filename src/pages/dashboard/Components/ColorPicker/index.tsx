@@ -81,7 +81,7 @@ export default function index(props: IProps) {
       }
     >
       <div
-        style={{ background: value, width: 32, height: 32, borderRadius: 2, cursor: 'pointer' }}
+        style={{ background: value, width: 32, height: 32, borderRadius: 2, cursor: 'pointer', border: '1px solid #d9d9d9' }}
         onClick={() => {
           setVisible(!visible);
         }}

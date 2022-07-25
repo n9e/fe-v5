@@ -16,6 +16,7 @@
  */
 import React, { useState, useEffect, useRef } from 'react';
 import _ from 'lodash';
+import classNames from 'classnames';
 import { useInViewport } from 'ahooks';
 import { Dropdown, Menu, Tooltip } from 'antd';
 import { InfoCircleOutlined, MoreOutlined, LinkOutlined, SettingOutlined, ShareAltOutlined, DeleteOutlined, CopyOutlined, SyncOutlined } from '@ant-design/icons';
@@ -26,6 +27,7 @@ import Table from './Table';
 import Pie from './Pie';
 import Hexbin from './Hexbin';
 import BarGauge from './BarGauge';
+import Text from './Text';
 import { IVariable } from '../../VariableConfig/definition';
 import Markdown from '../../Editor/Components/Markdown';
 import usePrometheus from '../datasource/usePrometheus';
@@ -88,10 +90,17 @@ function index(props: IProps) {
     pie: () => <Pie {...subProps} themeMode={themeMode} />,
     hexbin: () => <Hexbin {...subProps} />,
     barGauge: () => <BarGauge {...subProps} themeMode={themeMode} />,
+    text: () => <Text {...subProps} />,
   };
 
   return (
-    <div className='renderer-container' ref={ref}>
+    <div
+      className={classNames({
+        'renderer-container': true,
+        'renderer-container-no-title': !values.name,
+      })}
+      ref={ref}
+    >
       <div className='renderer-header graph-header dashboards-panels-item-drag-handle'>
         <div className='renderer-header-desc'>
           {tipsVisible ? (
@@ -209,7 +218,7 @@ function index(props: IProps) {
           )}
         </div>
       </div>
-      <div className='renderer-body' style={{ height: `calc(100% - 35px)` }}>
+      <div className='renderer-body' style={{ height: values.name ? `calc(100% - 35px)` : '100%' }}>
         {RendererCptMap[type] ? RendererCptMap[type]() : <div className='unknown-type'>{`无效的图表类型 ${type}`}</div>}
       </div>
     </div>
