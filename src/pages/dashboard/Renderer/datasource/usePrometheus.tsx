@@ -35,6 +35,13 @@ interface IProps {
   inViewPort?: boolean;
 }
 
+interface QueryMetricItem {
+  start:number;
+  end:number;
+  step:number;
+  query:string;
+}
+
 const getSerieName = (metric: Object, expr: string) => {
   let name = metric['__name__'] || '';
   _.forEach(_.omit(metric, '__name__'), (value, key) => {
@@ -52,12 +59,6 @@ export default function usePrometheus(props: IProps) {
   });
   const flag = useRef(false);
   const [times, setTimes] = useState<any>({});
-  interface QueryMetricItem {
-    start:number;
-    end:number;
-    step:number;
-    query:string;
-  }
 
   const fetchData = () => {
     if (!times.start) return;
@@ -66,7 +67,7 @@ export default function usePrometheus(props: IProps) {
     let batchParams: Array<QueryMetricItem> = []
     let exprs: Array<string> = []
     let refIds: Array<string> = []
-
+    let signalKey = `${id}`;
     _.forEach(targets, (target) => {
       if (target.time) {
         const { start: _start, end: _end } = formatPickerDate(target.time);
@@ -86,10 +87,11 @@ export default function usePrometheus(props: IProps) {
         })
         exprs.push(target.expr)
         refIds.push(target.refId)
+        signalKey+=`-${target.expr}`
       }
     });
     setLoading(true);
-    fetchHistoryBatch({queries: batchParams}).then((res) => {
+    fetchHistoryBatch({queries: batchParams},signalKey).then((res) => {
       for (let i = 0; i < res.dat.length; i++) {
         var item = {
           result: res.dat[i],

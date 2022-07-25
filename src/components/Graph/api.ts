@@ -38,11 +38,21 @@ export const fetchHistory = (params?, signalKey?) => {
     delete signals[signalKey];
   });
 };
-export const fetchHistoryBatch = (data) => {
+
+export const fetchHistoryBatch = (data,signalKey) => {
+  const controller = new AbortController();
+  const { signal } = controller;
+  if (signalKey && signals[signalKey] && signals[signalKey].abort) {
+    signals[signalKey].abort();
+  }
+  signals[signalKey] = controller;
   return request(`/api/n9e/query-range-batch`, {
     method: RequestMethod.Post,
-    data
-  })
+    data,
+    signal
+  }).finally(() => {
+    delete signals[signalKey];
+  });
 };
 
 export const fetchAggrGroups = (params?) => {
