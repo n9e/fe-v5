@@ -94,7 +94,7 @@ function Item(props) {
 export default function BarGauge(props: IProps) {
   const { values, series, themeMode } = props;
   const { custom, options } = values;
-  const { calc } = custom;
+  const { calc, maxValue } = custom;
   const calculatedValues = getCalculatedValuesBySeries(
     series,
     calc,
@@ -104,13 +104,13 @@ export default function BarGauge(props: IProps) {
     },
     options?.valueMappings,
   );
-  const maxValue = _.maxBy(calculatedValues, 'value')?.value || 0;
+  const curMaxValue = maxValue !== undefined ? maxValue : _.maxBy(calculatedValues, 'value')?.value || 0;
 
   return (
     <div className='renderer-stat-container'>
       <div className='renderer-bar-gauge-container scroll-container'>
         {_.map(calculatedValues, (item) => {
-          return <Item key={item.name} item={item} custom={custom} themeMode={themeMode} maxValue={maxValue} />;
+          return <Item key={item.name} item={item} custom={custom} themeMode={themeMode} maxValue={curMaxValue} />;
         })}
       </div>
     </div>

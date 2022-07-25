@@ -141,9 +141,9 @@ export const defaultCustomValuesMap = {
     reverseColorOrder: false,
   },
   barGauge: {
-    textMode: 'valueAndName',
     calc: 'lastNotNull',
-    textSize: {},
+    baseColor: '#FF656B',
+    displayMode: 'basic',
   },
 };
 
