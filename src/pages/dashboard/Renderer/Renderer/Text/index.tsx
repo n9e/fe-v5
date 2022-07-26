@@ -1,4 +1,5 @@
 import React from 'react';
+import Color from 'color';
 import { IPanel } from '../../../types';
 import Markdown from '../../../Editor/Components/Markdown';
 
@@ -20,6 +21,7 @@ export default function index(props: IProps) {
         fontSize: textSize,
         color: textColor,
         backgroundColor: bgColor,
+        border: `1px solid ${Color('#fff').alpha(0.2).rgb().string()}`,
         display: 'flex',
         justifyContent,
         alignItems,

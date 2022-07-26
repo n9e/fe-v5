@@ -14,11 +14,10 @@
  * limitations under the License.
  *
  */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { Tooltip } from 'antd';
 import _ from 'lodash';
 import Color from 'color';
-import * as d3 from 'd3';
 import { useSize } from 'ahooks';
 import { IPanel } from '../../../types';
 import getCalculatedValuesBySeries from '../../utils/getCalculatedValuesBySeries';
@@ -32,7 +31,7 @@ interface IProps {
 
 function Item(props) {
   const { item, custom, themeMode, maxValue } = props;
-  const { baseColor = '#FF656B', displayMode = 'basic' } = custom;
+  const { baseColor = '#FF656B', displayMode = 'basic', serieWidth = 20 } = custom;
   const color = item.color ? item.color : baseColor;
   const bgRef = useRef(null);
   const bgSize = useSize(bgRef);
@@ -51,9 +50,21 @@ function Item(props) {
   return (
     <div className='renderer-bar-gauge-item' key={item.name}>
       <Tooltip title={item.name}>
-        <div className='renderer-bar-gauge-item-name'>{item.name}</div>
+        <div
+          className='renderer-bar-gauge-item-name'
+          style={{
+            width: `${serieWidth}%`,
+          }}
+        >
+          {item.name}
+        </div>
       </Tooltip>
-      <div className='renderer-bar-gauge-item-value'>
+      <div
+        className='renderer-bar-gauge-item-value'
+        style={{
+          width: `${100 - serieWidth}%`,
+        }}
+      >
         <div
           className='renderer-bar-gauge-item-value-bg'
           style={{
@@ -67,7 +78,7 @@ function Item(props) {
             color: themeMode === 'dark' ? '#fff' : '#20222E',
             borderRight: `2px solid ${color}`,
             backgroundColor: Color(color)
-              .alpha('basic' ? 0.2 : 1)
+              .alpha(displayMode === 'basic' ? 0.2 : 1)
               .rgb()
               .string(),
             width: `${(item.value / maxValue) * 100}%`,

@@ -15,7 +15,7 @@
  *
  */
 import React from 'react';
-import { Form, Select, Row, Col, InputNumber } from 'antd';
+import { Form, Select, Row, Col, InputNumber, Input } from 'antd';
 import { CaretDownOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { Panel } from '../../Components/Collapse';
@@ -29,7 +29,7 @@ export default function GraphStyles() {
     <Panel header='图表样式'>
       <>
         <Row gutter={10}>
-          <Col span={16}>
+          <Col span={8}>
             <Form.Item label='取值计算' name={[...namePrefix, 'calc']}>
               <Select suffixIcon={<CaretDownOutlined />}>
                 {_.map(calcsOptions, (item, key) => {
@@ -40,6 +40,16 @@ export default function GraphStyles() {
                   );
                 })}
               </Select>
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item label='序列名宽度'>
+              <Input.Group>
+                <Form.Item noStyle name={[...namePrefix, 'serieWidth']}>
+                  <InputNumber style={{ width: '100%' }} placeholder='auto' />
+                </Form.Item>
+                <span className='ant-input-group-addon'>%</span>
+              </Input.Group>
             </Form.Item>
           </Col>
           <Col span={5}>

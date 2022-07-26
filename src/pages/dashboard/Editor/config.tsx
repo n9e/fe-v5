@@ -148,6 +148,7 @@ export const defaultCustomValuesMap = {
     calc: 'lastNotNull',
     baseColor: '#FF656B',
     displayMode: 'basic',
+    serieWidth: 20,
   },
   text: {
     textSize: 12,
