@@ -36,7 +36,7 @@ function computeTextFontSize(text: string, linesToDisplay: number, textAreaWidth
 function getHexbinHeight(mapRows, hexRadius) {
   let count = 0;
   for (let i = 1; i <= mapRows; i++) {
-    if (i === mapRows) {
+    if (i === mapRows && i !== 1) {
       count += 1.5;
     } else if (i % 2 === 1) {
       count += 2;
