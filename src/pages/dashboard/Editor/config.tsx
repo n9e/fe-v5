@@ -149,6 +149,7 @@ export const defaultCustomValuesMap = {
     baseColor: '#FF656B',
     displayMode: 'basic',
     serieWidth: 20,
+    sortOrder: 'desc',
   },
   text: {
     textSize: 12,

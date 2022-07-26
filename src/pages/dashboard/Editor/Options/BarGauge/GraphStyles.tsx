@@ -29,7 +29,7 @@ export default function GraphStyles() {
     <Panel header='图表样式'>
       <>
         <Row gutter={10}>
-          <Col span={8}>
+          <Col span={12}>
             <Form.Item label='取值计算' name={[...namePrefix, 'calc']}>
               <Select suffixIcon={<CaretDownOutlined />}>
                 {_.map(calcsOptions, (item, key) => {
@@ -43,6 +43,18 @@ export default function GraphStyles() {
             </Form.Item>
           </Col>
           <Col span={8}>
+            <Form.Item label='最大值' name={[...namePrefix, 'maxValue']}>
+              <InputNumber placeholder='auto' style={{ width: '100%' }} />
+            </Form.Item>
+          </Col>
+          <Col span={3}>
+            <Form.Item label='基础颜色' name={[...namePrefix, 'baseColor']}>
+              <ColorPicker />
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row gutter={10}>
+          <Col span={12}>
             <Form.Item label='序列名宽度'>
               <Input.Group>
                 <Form.Item noStyle name={[...namePrefix, 'serieWidth']}>
@@ -52,14 +64,13 @@ export default function GraphStyles() {
               </Input.Group>
             </Form.Item>
           </Col>
-          <Col span={5}>
-            <Form.Item label='最大值' name={[...namePrefix, 'maxValue']}>
-              <InputNumber placeholder='auto' />
-            </Form.Item>
-          </Col>
-          <Col span={3}>
-            <Form.Item label='基础颜色' name={[...namePrefix, 'baseColor']}>
-              <ColorPicker />
+          <Col span={12}>
+            <Form.Item label='排序' name={[...namePrefix, 'sortOrder']}>
+              <Select>
+                <Select.Option value='none'>none</Select.Option>
+                <Select.Option value='asc'>asc</Select.Option>
+                <Select.Option value='desc'>desc</Select.Option>
+              </Select>
             </Form.Item>
           </Col>
         </Row>

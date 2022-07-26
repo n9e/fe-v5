@@ -105,8 +105,8 @@ function Item(props) {
 export default function BarGauge(props: IProps) {
   const { values, series, themeMode } = props;
   const { custom, options } = values;
-  const { calc, maxValue } = custom;
-  const calculatedValues = getCalculatedValuesBySeries(
+  const { calc, maxValue, sortOrder = 'desc' } = custom;
+  let calculatedValues = getCalculatedValuesBySeries(
     series,
     calc,
     {
@@ -115,6 +115,9 @@ export default function BarGauge(props: IProps) {
     },
     options?.valueMappings,
   );
+  if (sortOrder && sortOrder !== 'none') {
+    calculatedValues = _.orderBy(calculatedValues, ['value'], [sortOrder]);
+  }
   const curMaxValue = maxValue !== undefined ? maxValue : _.maxBy(calculatedValues, 'value')?.value || 0;
 
   return (
