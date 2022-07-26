@@ -144,10 +144,10 @@ function renderHoneyComb(svgGroup, data, { width, height, fontAutoScale = true, 
     .on('mouseout', function (_d, i) {
       div.style('opacity', 0);
       const curPath = svgGroup.selectAll('.hexagon').nodes()[i];
-      curPath.setAttribute('stroke', themeMode === 'dark' ? '#2A2D3C' : '#fff');
+      curPath.setAttribute('stroke', data[i]?.color);
     })
-    .attr('stroke', (_d) => {
-      return themeMode === 'dark' ? '#2A2D3C' : '#fff';
+    .attr('stroke', (_d, i) => {
+      return data[i]?.color;
     })
     .attr('stroke-width', '2px')
     .style('fill', (_d, i) => {
@@ -156,7 +156,7 @@ function renderHoneyComb(svgGroup, data, { width, height, fontAutoScale = true, 
     .style('fill-opacity', 1)
     .transition(t)
     .attr('d', function (d) {
-      return 'M' + d.x + ',' + d.y + hexbin.hexagon([hexRadius - 6]);
+      return 'M' + d.x + ',' + d.y + hexbin.hexagon([hexRadius - 3]);
     });
 
   hexagons
