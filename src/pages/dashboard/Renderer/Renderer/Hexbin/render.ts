@@ -105,10 +105,9 @@ function renderHoneyComb(svgGroup, data, { width, height, fontAutoScale = true, 
         }
       }
     }
-    // TODO: 关闭 label 和 value 字体大小相同的设定
-    // if (activeValueFontSize > activeLabelFontSize) {
-    //   activeValueFontSize = activeLabelFontSize;
-    // }
+    if (activeValueFontSize > activeLabelFontSize) {
+      activeValueFontSize = activeLabelFontSize;
+    }
   }
 
   const valueWithLabelTextAlignment = textAreaHeight / 2 / 2 + activeValueFontSize / 2;
