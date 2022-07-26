@@ -14,21 +14,20 @@
  * limitations under the License.
  *
  */
-import React, { useEffect, useRef, useState, useCallback } from 'react';
-import PageLayout from '@/components/pageLayout';
-import LeftTree from '@/components/LeftTree';
-import { DatabaseOutlined, DownOutlined, SearchOutlined } from '@ant-design/icons';
+import React, { useEffect, useState, useCallback } from 'react';
+import { Modal, Tag, Form, Input, Alert, Select, Tooltip, message } from 'antd';
+import { DatabaseOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import './index.less';
+import _, { debounce } from 'lodash';
+import { useSelector } from 'react-redux';
 import { bindTags, unbindTags, moveTargetBusi, updateTargetNote, deleteTargets, getTargetTags } from '@/services/monObjectManage';
 import { RootState } from '@/store/common';
-import DataTable from '@/components/Dantd/components/data-table';
-import { Button, Dropdown, Menu, Modal, Tag, Form, Input, Alert, Select, Tooltip, message, Space } from 'antd';
-import { BusiGroupItem, CommonStoreState } from '@/store/commonInterface';
-import { useSelector } from 'react-redux';
+import { CommonStoreState } from '@/store/commonInterface';
+import PageLayout from '@/components/pageLayout';
+import LeftTree from '@/components/LeftTree';
 import { getBusiGroups } from '@/services/common';
-import { debounce } from 'lodash';
-import ColumnSelect from '@/components/ColumnSelect';
+import List from './List';
+import './index.less';
 
 enum OperateType {
   BindTag = 'bindTag',
@@ -340,137 +339,11 @@ const OperationModal: React.FC<OperateionModalProps> = ({ operateType, setOperat
 
 const MonObjectManage: React.FC = () => {
   const { t } = useTranslation();
-  const tableRef = useRef({
-    handleReload() {},
-  });
-  const isAddTagToQueryInput = useRef(false);
-  const [tableQueryContent, setTableQueryContent] = useState<string>('');
   const [operateType, setOperateType] = useState<OperateType>(OperateType.None);
-  const [curClusters, setCurClusters] = useState<string[]>([]);
   const [curBusiId, setCurBusiId] = useState<number>(-2);
   const [selectedRowKeys, setSelectedRowKeys] = useState<(string | number)[]>([]);
   const [selectedIdents, setSelectedIdents] = useState<string[]>([]);
-
-  const columns = [
-    {
-      title: '集群',
-      dataIndex: 'cluster',
-      width: 100,
-      fixed: 'left' as const,
-    },
-    {
-      title: '标识',
-      dataIndex: 'ident',
-      width: 140,
-    },
-    {
-      title: '标签',
-      dataIndex: 'tags',
-      ellipsis: {
-        showTitle: false,
-      },
-      render(tagArr) {
-        const content =
-          tagArr &&
-          tagArr.map((item) => (
-            <Tag
-              color='purple'
-              key={item}
-              onClick={(e) => {
-                if (!tableQueryContent.includes(item)) {
-                  isAddTagToQueryInput.current = true;
-                  setTableQueryContent(tableQueryContent ? `${tableQueryContent.trim()} ${item}` : item);
-                }
-              }}
-            >
-              {item}
-            </Tag>
-          ));
-        return (
-          tagArr && (
-            <Tooltip title={content} placement='topLeft' getPopupContainer={() => document.body} overlayClassName='mon-manage-table-tooltip'>
-              {content}
-            </Tooltip>
-          )
-        );
-      },
-    },
-    {
-      title: '业务组',
-      dataIndex: 'group_obj',
-      render(groupObj: BusiGroupItem | null) {
-        return groupObj ? groupObj.name : '未归组';
-      },
-    },
-    {
-      title: '备注',
-      dataIndex: 'note',
-      ellipsis: {
-        showTitle: false,
-      },
-      render(note) {
-        return (
-          <Tooltip title={note} placement='topLeft' getPopupContainer={() => document.body}>
-            {note}
-          </Tooltip>
-        );
-      },
-    },
-  ];
-
-  function renderLeftHeader() {
-    return (
-      <div className='table-operate-box'>
-        <Space>
-          <ColumnSelect noLeftPadding onClusterChange={(e) => setCurClusters(e)} />
-          <Input
-            className='search-input'
-            prefix={<SearchOutlined />}
-            placeholder='模糊搜索表格内容(多个关键词请用空格分隔)'
-            value={tableQueryContent}
-            onChange={(e) => setTableQueryContent(e.target.value)}
-            onPressEnter={(e) => tableRef.current.handleReload()}
-          />
-        </Space>
-        <Dropdown
-          trigger={['click']}
-          overlay={
-            <Menu
-              onClick={({ key }) => {
-                showOperationModal(key as OperateType);
-              }}
-            >
-              <Menu.Item key={OperateType.BindTag}>绑定标签</Menu.Item>
-              <Menu.Item key={OperateType.UnbindTag}>解绑标签</Menu.Item>
-              <Menu.Item key={OperateType.UpdateBusi}>修改业务组</Menu.Item>
-              <Menu.Item key={OperateType.RemoveBusi}>移出业务组</Menu.Item>
-              <Menu.Item key={OperateType.UpdateNote}>修改备注</Menu.Item>
-              <Menu.Item key={OperateType.Delete}>批量删除</Menu.Item>
-            </Menu>
-          }
-        >
-          <Button>
-            批量操作 <DownOutlined />
-          </Button>
-        </Dropdown>
-      </div>
-    );
-  }
-
-  function showOperationModal(curOperateType: OperateType) {
-    setOperateType(curOperateType);
-  }
-
-  useEffect(() => {
-    tableRef.current.handleReload();
-  }, [curBusiId, curClusters]);
-
-  useEffect(() => {
-    if (isAddTagToQueryInput.current) {
-      tableRef.current.handleReload();
-      isAddTagToQueryInput.current = false;
-    }
-  }, [tableQueryContent]);
+  const [refreshFlag, setRefreshFlag] = useState(_.uniqueId('refreshFlag_'));
 
   return (
     <PageLayout icon={<DatabaseOutlined />} title={t('对象列表')} hideCluster>
@@ -486,50 +359,26 @@ const MonObjectManage: React.FC = () => {
           }}
         />
         <div className='table-area'>
-          {curBusiId !== -2 && (
-            <DataTable
-              ref={tableRef}
-              antProps={{
-                rowKey: 'id',
-                rowSelection: {
-                  selectedRowKeys: selectedRowKeys,
-                  onChange(selectedRowKeys, selectedRows: targetProps[]) {
-                    setSelectedRowKeys(selectedRowKeys);
-                    setSelectedIdents(selectedRows ? selectedRows.map(({ ident }) => ident) : []);
-                  },
-                },
-                // scroll: { x: 800, y: 'calc(100vh - 252px)' },
-              }}
-              url='/api/n9e/targets'
-              customQueryCallback={(data) =>
-                Object.assign(
-                  data,
-                  tableQueryContent ? { query: tableQueryContent } : {},
-                  curBusiId !== -1 ? { bgid: curBusiId } : {},
-                  curClusters.length ? { clusters: curClusters.join(',') } : {},
-                )
-              }
-              pageParams={{
-                curPageName: 'p',
-                pageSizeName: 'limit',
-                pageSize: 30,
-                pageSizeOptions: ['30', '100', '200', '500'],
-              }}
-              apiCallback={({ dat: { list: data, total } }) => ({
-                data,
-                total,
-              })}
-              columns={columns}
-              reloadBtnType='btn'
-              reloadBtnPos='left'
-              filterType='flex'
-              leftHeader={renderLeftHeader()}
-            />
-          )}
+          <List
+            curBusiId={curBusiId}
+            selectedIdents={selectedIdents}
+            setSelectedIdents={setSelectedIdents}
+            selectedRowKeys={selectedRowKeys}
+            setSelectedRowKeys={setSelectedRowKeys}
+            refreshFlag={refreshFlag}
+            setRefreshFlag={setRefreshFlag}
+            setOperateType={setOperateType}
+          />
         </div>
       </div>
-
-      <OperationModal operateType={operateType} setOperateType={setOperateType} idents={selectedIdents} reloadList={tableRef.current.handleReload} />
+      <OperationModal
+        operateType={operateType}
+        setOperateType={setOperateType}
+        idents={selectedIdents}
+        reloadList={() => {
+          setRefreshFlag(_.uniqueId('refreshFlag_'));
+        }}
+      />
     </PageLayout>
   );
 };

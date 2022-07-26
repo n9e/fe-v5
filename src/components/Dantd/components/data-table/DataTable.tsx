@@ -15,23 +15,10 @@
  *
  */
 //@ts-nocheck
-import React, {
-  useCallback,
-  useRef,
-  useMemo,
-  useReducer,
-  useState,
-  useEffect,
-  useImperativeHandle,
-} from 'react';
+import React, { useCallback, useRef, useMemo, useReducer, useState, useEffect, useImperativeHandle } from 'react';
 import request from '@/utils/request';
 import { Tooltip, Table, Input, Row, Col, Button, ConfigProvider } from 'antd';
-import {
-  FilterOutlined,
-  SearchOutlined,
-  CloseOutlined,
-  ReloadOutlined,
-} from '@ant-design/icons';
+import { FilterOutlined, SearchOutlined, CloseOutlined, ReloadOutlined } from '@ant-design/icons';
 import { ConfigProviderProps } from 'antd/es/config-provider';
 import queryString from 'query-string';
 import classNames from 'classnames';
@@ -63,12 +50,7 @@ export interface ITableColumnProps<T> extends ColumnProps<T> {
   apiSearch?: {
     name: string;
   }; // 使用组件提供的搜索
-  searchRender?: (
-    value: React.ReactText,
-    row: T,
-    index: number,
-    highlightNode: React.ReactNode,
-  ) => React.ReactNode; // （apiSearch 未开启时，无效）search 功能可以高亮被搜索的信息，但是会覆盖 render 方法。如果你希望保持search的所有功能，并自定义 render 方法，请使用 searchRender 代替。
+  searchRender?: (value: React.ReactText, row: T, index: number, highlightNode: React.ReactNode) => React.ReactNode; // （apiSearch 未开启时，无效）search 功能可以高亮被搜索的信息，但是会覆盖 render 方法。如果你希望保持search的所有功能，并自定义 render 方法，请使用 searchRender 代替。
 }
 
 interface IPageParamsProps extends PaginationProps {
@@ -154,10 +136,7 @@ interface IColumnsReducerState {
 
 type TSorterReducerAction = { type: 'update'; value: any } | { type: 'clear' };
 
-function columnsReducer(
-  state: IColumnsReducerState,
-  action: TColumnsReducerAction,
-) {
+function columnsReducer(state: IColumnsReducerState, action: TColumnsReducerAction) {
   switch (action.type) {
     case 'update':
       return {
@@ -261,9 +240,7 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
   const [searchQuery, setSearchQuery] = useState();
   const rowSelection = props.rowSelection;
 
-  const selectRowNum = rowSelection
-    ? rowSelection.selectedRowKeys && rowSelection.selectedRowKeys.length
-    : -1;
+  const selectRowNum = rowSelection ? rowSelection.selectedRowKeys && rowSelection.selectedRowKeys.length : -1;
 
   const sorterNames = {
     ascend: t('table.sort.ascend'),
@@ -277,31 +254,19 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
   // 是否展示长条搜索区
   const showFullSearch = showSearch && searchPos === 'full';
   // 搜索按钮展示的位置
-  const showReloadBtn2SearchRight =
-    searchPos === 'full' && showReloadBtn && reloadBtnPos === 'right';
-  const showReloadBtn2FilterRight =
-    (!showSearch || searchPos !== 'full') &&
-    showReloadBtn &&
-    reloadBtnPos === 'right';
+  const showReloadBtn2SearchRight = searchPos === 'full' && showReloadBtn && reloadBtnPos === 'right';
+  const showReloadBtn2FilterRight = (!showSearch || searchPos !== 'full') && showReloadBtn && reloadBtnPos === 'right';
   const showReloadBtn2FilterLeft = showReloadBtn && reloadBtnPos === 'left';
-  const searchPlaceholder = searchParams
-    ? searchParams.placeholder
-    : t('table.search.placeholder');
+  const searchPlaceholder = searchParams ? searchParams.placeholder : t('table.search.placeholder');
   const [paginationState, setPagination] = useState({
     current: 1,
     pageSize: 10,
     total: 0,
     ...pageParams,
   });
-  const [columnsState, columnsDispatch] = useReducer(
-    columnsReducer,
-    columnsMap,
-  );
+  const [columnsState, columnsDispatch] = useReducer(columnsReducer, columnsMap);
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
-  const debouncedQueryFormValues = useDebounce(
-    JSON.stringify(queryFormValues),
-    300,
-  );
+  const debouncedQueryFormValues = useDebounce(JSON.stringify(queryFormValues), 300);
   const pageStr = JSON.stringify({
     pageSize: paginationState.pageSize,
     current: paginationState.current,
@@ -335,11 +300,7 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
 
     if (props.onSearch) {
       // 使用用户自定义的search回调
-      props.onSearch(
-        debouncedSearchQuery
-          ? debouncedSearchQuery.trim()
-          : debouncedSearchQuery,
-      );
+      props.onSearch(debouncedSearchQuery ? debouncedSearchQuery.trim() : debouncedSearchQuery);
     }
 
     fetchData(fetchParams);
@@ -352,10 +313,7 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
       return;
     }
 
-    if (
-      !queryFormColumns ||
-      (queryFormValues && Object.keys(queryFormValues).length === 0)
-    ) {
+    if (!queryFormColumns || (queryFormValues && Object.keys(queryFormValues).length === 0)) {
       return;
     }
     let fetchParams = getAllFetchParams();
@@ -421,16 +379,13 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
         fetchParams[columnItem.dataIndex] = params[columnItem.dataIndex];
       }
       if (columnItem.apiSearch && params[columnItem.apiSearch.name]) {
-        fetchParams[columnItem.apiSearch.name] =
-          params[columnItem.apiSearch.name];
+        fetchParams[columnItem.apiSearch.name] = params[columnItem.apiSearch.name];
       }
       if (columnItem.apiFilter && params[columnItem.apiFilter.name]) {
-        fetchParams[columnItem.apiFilter.name] =
-          params[columnItem.apiFilter.name];
+        fetchParams[columnItem.apiFilter.name] = params[columnItem.apiFilter.name];
       }
       if (columnItem.apiSorter && params[columnItem.apiSorter.name]) {
-        fetchParams[columnItem.apiSorter.name] =
-          params[columnItem.apiSorter.name];
+        fetchParams[columnItem.apiSorter.name] = params[columnItem.apiSorter.name];
       }
     });
 
@@ -438,11 +393,7 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
       fetchParams[searchParams.apiName] = params[searchParams.apiName];
     }
 
-    if (
-      !!queryFormColumns &&
-      queryFormValues &&
-      Object.keys(queryFormValues).length > 0
-    ) {
+    if (!!queryFormColumns && queryFormValues && Object.keys(queryFormValues).length > 0) {
       fetchParams = {
         ...queryFormValues,
         ...fetchParams,
@@ -471,9 +422,7 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
       transportOptions.data = fetchParams;
     }
     const res = request(fetchUrl, transportOptions);
-    props.rowSelection &&
-      props.rowSelection.onChange &&
-      props.rowSelection.onChange([]);
+    props.rowSelection && props.rowSelection.onChange && props.rowSelection.onChange([]);
     if ((res.status < 200 || res.status >= 300) && props.apiErrorCallback) {
       props.apiErrorCallback(res);
       setLoading(false);
@@ -544,44 +493,31 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
     checkRightHeader(filters, sorter);
   };
 
-  const handleFilterSearch = useCallback(
-    (
-      selectedKeys: React.ReactText[] | undefined,
-      confirm: (() => void) | undefined,
-      dataIndex: string | number,
-    ) => {
-      if (confirm) {
-        confirm();
-      }
-      if (selectedKeys && dataIndex) {
-        columnsDispatch({
-          type: 'update',
-          dataIndex,
-          updateType: 'search',
-          value: selectedKeys[0],
-        });
-      }
-    },
-    [],
-  );
+  const handleFilterSearch = useCallback((selectedKeys: React.ReactText[] | undefined, confirm: (() => void) | undefined, dataIndex: string | number) => {
+    if (confirm) {
+      confirm();
+    }
+    if (selectedKeys && dataIndex) {
+      columnsDispatch({
+        type: 'update',
+        dataIndex,
+        updateType: 'search',
+        value: selectedKeys[0],
+      });
+    }
+  }, []);
 
-  const handleFilterSearchReset = useCallback(
-    (
-      clearFilters: ((selectedKeys: string[]) => void) | undefined,
-      dataIndex: string | number | undefined,
-    ) => {
-      if (clearFilters) {
-        clearFilters([]);
-      }
-      if (dataIndex) {
-        columnsDispatch({
-          type: 'update',
-          dataIndex,
-        });
-      }
-    },
-    [],
-  );
+  const handleFilterSearchReset = useCallback((clearFilters: ((selectedKeys: string[]) => void) | undefined, dataIndex: string | number | undefined) => {
+    if (clearFilters) {
+      clearFilters([]);
+    }
+    if (dataIndex) {
+      columnsDispatch({
+        type: 'update',
+        dataIndex,
+      });
+    }
+  }, []);
 
   const handleFilterClear = (columnValue: IColumnsReducerValue) => {
     columnsDispatch({
@@ -610,10 +546,7 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
       dataIndex: columnValue.dataIndex,
     });
 
-    if (
-      clearFiltersRef.current[columnValue.dataIndex] &&
-      clearFiltersRef.current[columnValue.dataIndex].clearFilters
-    ) {
+    if (clearFiltersRef.current[columnValue.dataIndex] && clearFiltersRef.current[columnValue.dataIndex].clearFilters) {
       clearFiltersRef.current[columnValue.dataIndex].clearFilters([]);
     }
 
@@ -695,8 +628,7 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
 
     // columns sort
     if (sorterState && sorterState.order) {
-      fetchParams[sorterState.column.apiSorter.name] =
-        sorterState.column.apiSorter[sorterState.order];
+      fetchParams[sorterState.column.apiSorter.name] = sorterState.column.apiSorter[sorterState.order];
     }
 
     Object.values(columnsState).forEach((column: any) => {
@@ -704,23 +636,16 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
       const filterVal = column.value;
       // columns filter
       if (column.apiFilter && filterVal) {
-        let filterName = columnsMap[filterKey].apiFilter
-          ? columnsMap[filterKey].apiFilter.name
-          : filterKey;
+        let filterName = columnsMap[filterKey].apiFilter ? columnsMap[filterKey].apiFilter.name : filterKey;
         fetchParams[filterName] = filterVal;
         if (column.apiFilter.callback) {
-          fetchParams[filterName] =
-            columnsMap[filterKey].apiFilter.callback(filterVal);
+          fetchParams[filterName] = columnsMap[filterKey].apiFilter.callback(filterVal);
         }
       }
       // columns search
       if (column.apiSearch && filterVal) {
-        const filterName = columnsMap[filterKey].apiSearch
-          ? columnsMap[filterKey].apiSearch.name
-          : filterKey;
-        fetchParams[filterName] = Array.isArray(filterVal)
-          ? filterVal[0]
-          : filterVal;
+        const filterName = columnsMap[filterKey].apiSearch ? columnsMap[filterKey].apiSearch.name : filterKey;
+        fetchParams[filterName] = Array.isArray(filterVal) ? filterVal[0] : filterVal;
       }
     });
 
@@ -730,10 +655,7 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
     }
 
     // queryform
-    if (
-      queryFormColumns ||
-      (queryFormValues && Object.keys(queryFormValues).length > 0)
-    ) {
+    if (queryFormColumns || (queryFormValues && Object.keys(queryFormValues).length > 0)) {
       fetchParams = {
         ...queryFormValues,
         ...fetchParams,
@@ -773,11 +695,7 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
       });
     } else {
       isFilter = Object.values(checkFilters).some((columnItem: any) => {
-        return !!(
-          columnItem.type === 'filter' &&
-          columnItem.value &&
-          columnItem.value.length > 0
-        );
+        return !!(columnItem.type === 'filter' && columnItem.value && columnItem.value.length > 0);
       });
     }
     const isSorter = !!checkSorter.column;
@@ -791,11 +709,7 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
   });
 
   const isFilter = Object.values(columnsState).some((columnItem: any) => {
-    return !!(
-      columnItem.type === 'filter' &&
-      columnItem.value &&
-      columnItem.value.length > 0
-    );
+    return !!(columnItem.type === 'filter' && columnItem.value && columnItem.value.length > 0);
   });
 
   useImperativeHandle(ref, () => ({
@@ -815,14 +729,12 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
       // filter
       if (currentItem.apiFilter) {
         currentItem.filterIcon = () => <FilterOutlined />;
-        currentItem.filteredValue =
-          columnsState[columnItem.dataIndex as string].value;
+        currentItem.filteredValue = columnsState[columnItem.dataIndex as string].value;
       }
 
       // // sort
       if (currentItem.apiSorter) {
-        currentItem.sortOrder =
-          sorterState.columnKey === currentItem.dataIndex && sorterState.order;
+        currentItem.sortOrder = sorterState.columnKey === currentItem.dataIndex && sorterState.order;
       }
 
       // Search
@@ -830,16 +742,9 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
         currentItem.filterIcon = () => <SearchOutlined />;
 
         currentItem.onFilterDropdownVisibleChange = (visible: boolean) => {
-          if (
-            visible &&
-            filterSearchInputRef.current &&
-            filterSearchInputRef.current.select
-          ) {
+          if (visible && filterSearchInputRef.current && filterSearchInputRef.current.select) {
             setTimeout(() => {
-              if (
-                filterSearchInputRef.current &&
-                filterSearchInputRef.current.select
-              ) {
+              if (filterSearchInputRef.current && filterSearchInputRef.current.select) {
                 filterSearchInputRef.current.select();
               }
               return null;
@@ -847,12 +752,7 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
           }
         };
 
-        currentItem.filterDropdown = ({
-          setSelectedKeys,
-          selectedKeys,
-          confirm,
-          clearFilters,
-        }) => {
+        currentItem.filterDropdown = ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => {
           clearFiltersRef.current[currentItem.dataIndex as string] = {
             clearFilters,
           };
@@ -869,30 +769,16 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
                 value={selectedKeys && selectedKeys[0]}
                 onChange={(e) => {
                   if (setSelectedKeys) {
-                    return setSelectedKeys(
-                      e.target.value ? [e.target.value] : [],
-                    );
+                    return setSelectedKeys(e.target.value ? [e.target.value] : []);
                   }
                   return [];
                 }}
-                onPressEnter={() =>
-                  handleFilterSearch(
-                    selectedKeys,
-                    confirm,
-                    currentItem.dataIndex as string,
-                  )
-                }
+                onPressEnter={() => handleFilterSearch(selectedKeys, confirm, currentItem.dataIndex as string)}
                 style={{ width: 188, marginBottom: 8, display: 'block' }}
               />
               <Button
                 type='primary'
-                onClick={() =>
-                  handleFilterSearch(
-                    selectedKeys,
-                    confirm,
-                    currentItem.dataIndex as string,
-                  )
-                }
+                onClick={() => handleFilterSearch(selectedKeys, confirm, currentItem.dataIndex as string)}
                 icon='search'
                 size='small'
                 data-testid='search-btn-ok'
@@ -900,13 +786,7 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
               >
                 {t('table.filter.search.btn.ok')}
               </Button>
-              <Button
-                onClick={() =>
-                  handleFilterSearchReset(clearFilters, currentItem.dataIndex)
-                }
-                size='small'
-                style={{ width: 90 }}
-              >
+              <Button onClick={() => handleFilterSearchReset(clearFilters, currentItem.dataIndex)} size='small' style={{ width: 90 }}>
                 {t('table.filter.search.btn.cancel')}
               </Button>
             </div>
@@ -915,24 +795,17 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
 
         let searchWords: any[] = [];
 
-        const tmpStateValue =
-          columnsState[currentItem.dataIndex as string].value;
+        const tmpStateValue = columnsState[currentItem.dataIndex as string].value;
         if (typeof tmpStateValue === 'string') {
           searchWords = [tmpStateValue];
         }
 
-        if (
-          Array.isArray(tmpStateValue) &&
-          typeof tmpStateValue[0] === 'string'
-        ) {
+        if (Array.isArray(tmpStateValue) && typeof tmpStateValue[0] === 'string') {
           searchWords = [tmpStateValue[0]];
         }
 
         currentItem.onFilter = (value, record: any) => {
-          return record[currentItem.dataIndex as string]
-            .toString()
-            .toLowerCase()
-            .includes(value.toLowerCase());
+          return record[currentItem.dataIndex as string].toString().toLowerCase().includes(value.toLowerCase());
         };
 
         if (!currentItem.render) {
@@ -942,22 +815,10 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
                 value,
                 row,
                 index,
-                <Highlighter
-                  highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-                  searchWords={searchWords}
-                  autoEscape
-                  textToHighlight={String(value)}
-                />,
+                <Highlighter highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }} searchWords={searchWords} autoEscape textToHighlight={String(value)} />,
               );
             } else {
-              return (
-                <Highlighter
-                  highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-                  searchWords={searchWords}
-                  autoEscape
-                  textToHighlight={String(value)}
-                />
-              );
+              return <Highlighter highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }} searchWords={searchWords} autoEscape textToHighlight={String(value)} />;
             }
           };
         }
@@ -984,92 +845,68 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
           </b>
         </div>
         {(isSearch || isFilter) &&
-          Object.values(columnsState as IColumnsReducerState).map(
-            (columnValue) => {
-              if (columnValue.type === 'search' && columnValue.value) {
-                return (
-                  <div
-                    key={`search-header-${columnValue.dataIndex}`}
-                    className={`${params.headerClsPrefix}-item`}
+          Object.values(columnsState as IColumnsReducerState).map((columnValue) => {
+            if (columnValue.type === 'search' && columnValue.value) {
+              return (
+                <div key={`search-header-${columnValue.dataIndex}`} className={`${params.headerClsPrefix}-item`}>
+                  <Tooltip
+                    title={
+                      <span>
+                        {columnValue.title}
+                        {':'}&nbsp;
+                        {columnValue.value}
+                      </span>
+                    }
                   >
-                    <Tooltip
-                      title={
-                        <span>
-                          {columnValue.title}
-                          {':'}&nbsp;
-                          {columnValue.value}
-                        </span>
-                      }
-                    >
-                      <Button
-                        size='small'
-                        className='table-header-item-btn'
-                        onClick={() => handleFilterSearchClear(columnValue)}
-                      >
-                        <span className='table-header-item-btn-content'>
-                          {columnValue.title}
-                          {':'}&nbsp;
-                          {columnValue.value}
-                        </span>
-                        <CloseOutlined />
-                      </Button>
-                    </Tooltip>
-                  </div>
-                );
-              }
+                    <Button size='small' className='table-header-item-btn' onClick={() => handleFilterSearchClear(columnValue)}>
+                      <span className='table-header-item-btn-content'>
+                        {columnValue.title}
+                        {':'}&nbsp;
+                        {columnValue.value}
+                      </span>
+                      <CloseOutlined />
+                    </Button>
+                  </Tooltip>
+                </div>
+              );
+            }
 
-              if (
-                columnValue.type === 'filter' &&
-                columnValue.value &&
-                columnValue.value.length > 0
-              ) {
-                const mappings = columnsMap[columnValue.dataIndex]
-                  ? columnsMap[columnValue.dataIndex].filters
-                  : [];
-                const mapping = mappings.reduce((acc, cur) => {
-                  return {
-                    ...acc,
-                    [cur.value]: [cur.text],
-                  };
-                }, {});
-                const newValues = columnValue.value.map((valItem) => {
-                  return mapping && mapping[valItem]
-                    ? mapping[valItem]
-                    : valItem;
-                });
-                return (
-                  <div
-                    key={`search-header-${columnValue.dataIndex}`}
-                    className={`${params.headerClsPrefix}-item`}
+            if (columnValue.type === 'filter' && columnValue.value && columnValue.value.length > 0) {
+              const mappings = columnsMap[columnValue.dataIndex] ? columnsMap[columnValue.dataIndex].filters : [];
+              const mapping = mappings.reduce((acc, cur) => {
+                return {
+                  ...acc,
+                  [cur.value]: [cur.text],
+                };
+              }, {});
+              const newValues = columnValue.value.map((valItem) => {
+                return mapping && mapping[valItem] ? mapping[valItem] : valItem;
+              });
+              return (
+                <div key={`search-header-${columnValue.dataIndex}`} className={`${params.headerClsPrefix}-item`}>
+                  <Tooltip
+                    title={
+                      <span>
+                        {columnValue.title}
+                        {':'}&nbsp;
+                        {newValues.join(',')}
+                      </span>
+                    }
                   >
-                    <Tooltip
-                      title={
-                        <span>
-                          {columnValue.title}
-                          {':'}&nbsp;
-                          {newValues.join(',')}
-                        </span>
-                      }
-                    >
-                      <Button
-                        size='small'
-                        className='table-header-item-btn'
-                        onClick={() => handleFilterClear(columnValue)}
-                      >
-                        <span className='table-header-item-btn-content'>
-                          {columnValue.title}
-                          {':'}&nbsp;
-                          {newValues.join(',')}
-                        </span>
-                        <CloseOutlined />
-                      </Button>
-                    </Tooltip>
-                  </div>
-                );
-              }
-              return null;
-            },
-          )}
+                    <Button size='small' className='table-header-item-btn' onClick={() => handleFilterClear(columnValue)}>
+                      <span className='table-header-item-btn-content'>
+                        {columnValue.title}
+                        {':'}&nbsp;
+                        {newValues.join(',')}
+                      </span>
+                      <CloseOutlined />
+                    </Button>
+                  </Tooltip>
+                </div>
+              );
+            }
+            return null;
+          })}
         {sorterState.columnKey && sorterState.column && (
           <div className={`${params.headerClsPrefix}-item`}>
             <Tooltip
@@ -1080,11 +917,7 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
                 </span>
               }
             >
-              <Button
-                size='small'
-                className='table-header-item-btn'
-                onClick={handleSortClear}
-              >
+              <Button size='small' className='table-header-item-btn' onClick={handleSortClear}>
                 <span className='table-header-item-btn-content'>
                   {columnsMap[sorterState.columnKey].title}
                   {`: ${sorterNames[sorterState.order as TSorterNames]}`}
@@ -1095,12 +928,7 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
           </div>
         )}
         <div className={`${params.headerClsPrefix}-item`}>
-          <Button
-            size='small'
-            type='link'
-            data-testid='btn-clearall'
-            onClick={handleClearAll}
-          >
+          <Button size='small' type='link' data-testid='btn-clearall' onClick={handleClearAll}>
             {t('table.filter.header.btn.clear')}
           </Button>
         </div>
@@ -1113,16 +941,8 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
       <Tooltip placement='topLeft' title={searchPlaceholder}>
         <Input
           data-testid='search-input'
-          prefix={
-            reloadBtnPos === 'right' && (
-              <SearchOutlined style={{ color: 'rgba(0,0,0,.25)' }} />
-            )
-          }
-          suffix={
-            reloadBtnPos === 'left' && (
-              <SearchOutlined style={{ color: 'rgba(0,0,0,.25)' }} />
-            )
-          }
+          prefix={reloadBtnPos === 'right' && <SearchOutlined style={{ color: 'rgba(0,0,0,.25)' }} />}
+          suffix={reloadBtnPos === 'left' && <SearchOutlined style={{ color: 'rgba(0,0,0,.25)' }} />}
           allowClear={true}
           value={searchQuery}
           onChange={handleSearchChange}
@@ -1141,14 +961,7 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
         [`${prefixCls}-header-loadbtn-right`]: reloadBtnPos === 'right',
         [`${prefixCls}-header-loadbtn-left`]: reloadBtnPos === 'left',
       });
-      return (
-        <ReloadOutlined
-          onClick={handleReload}
-          spin={loading}
-          className={reloadBtnCls}
-          type='reload'
-        />
-      );
+      return <ReloadOutlined onClick={handleReload} spin={loading} className={reloadBtnCls} type='reload' />;
     }
 
     if (reloadBtnType === 'btn') {
@@ -1158,15 +971,7 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
         [`${prefixCls}-header-loadbtn-right`]: reloadBtnPos === 'right',
         [`${prefixCls}-header-loadbtn-left`]: reloadBtnPos === 'left',
       });
-      return (
-        <Button
-          className={reloadBtnCls}
-          loading={loading}
-          icon={<ReloadOutlined />}
-          data-testid='reload-btn'
-          onClick={handleReload}
-        />
-      );
+      return <Button className={reloadBtnCls} loading={loading} icon={<ReloadOutlined />} data-testid='reload-btn' onClick={handleReload} />;
     }
   };
 
@@ -1176,11 +981,7 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
         {queryFormColumns && (
           <div className={tableQueryCls}>
             <QueryForm
-              onChange={
-                isQuerySearchOnChange
-                  ? handleQueryFormChange
-                  : handleQueryFormInit
-              }
+              onChange={isQuerySearchOnChange ? handleQueryFormChange : handleQueryFormInit}
               onReset={handleQueryFormReset}
               onSearch={handleQuerySearch}
               columns={queryFormColumns}
@@ -1193,10 +994,7 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
         <div className={tableBodyCls}>
           {!!props.tableTitle && <h3> {props.tableTitle} </h3>}
           {props.customHeader && (
-            <div
-              data-testid='custom-header'
-              className={`${prefixCls}-header-custom`}
-            >
+            <div data-testid='custom-header' className={`${prefixCls}-header-custom`}>
               {props.customHeader}
             </div>
           )}
@@ -1222,14 +1020,7 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
           {filterType === 'none' && searchPos !== 'right' && (
             <Row className={`${prefixCls}-header-filter`}>
               {showReloadBtn2FilterLeft && renderReloadBtn()}
-              <Col
-                data-testid='left-header'
-                className={classNames(
-                  `${prefixCls}-header-filter-left`,
-                  props.leftHeader !== undefined &&
-                    `${prefixCls}-header-filter-left-minh`,
-                )}
-              >
+              <Col data-testid='left-header' className={classNames(`${prefixCls}-header-filter-left`, props.leftHeader !== undefined && `${prefixCls}-header-filter-left-minh`)}>
                 {props.leftHeader}
               </Col>
               {showReloadBtn2FilterRight && renderReloadBtn()}
@@ -1239,21 +1030,13 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
             <Row className={`${prefixCls}-header-filter`}>
               <Col
                 data-testid='left-header'
-                className={classNames(
-                  `${prefixCls}-header-filter-left`,
-                  props.leftHeader !== undefined &&
-                    `${prefixCls}-header-filter-left-minh`,
-                )}
+                className={classNames(`${prefixCls}-header-filter-left`, props.leftHeader !== undefined && `${prefixCls}-header-filter-left-minh`)}
                 span={14}
               >
                 {showReloadBtn2FilterLeft && renderReloadBtn()}
                 {props.leftHeader}
               </Col>
-              <Col
-                data-testid='right-header'
-                className={`${prefixCls}-header-filter-right`}
-                span={10}
-              >
+              <Col data-testid='right-header' className={`${prefixCls}-header-filter-right`} span={10}>
                 {renderSearch()}
               </Col>
               {showReloadBtn2FilterRight && renderReloadBtn()}
@@ -1262,11 +1045,7 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
           {filterType === 'line' && (
             <Row className={`${prefixCls}-header-filter`}>
               {showReloadBtn2FilterLeft && renderReloadBtn()}
-              <Col
-                data-testid='right-header'
-                className={`${prefixCls}-header-filter-line`}
-                span={24}
-              >
+              <Col data-testid='right-header' className={`${prefixCls}-header-filter-line`} span={24}>
                 {showRightHeader &&
                   renderRightHeader({
                     headerClsPrefix: `${prefixCls}-header-filter-line`,
@@ -1280,20 +1059,12 @@ function DataTable<T>(props: IDataTableProps<T>, ref: any) {
               {showReloadBtn2FilterLeft && renderReloadBtn()}
               <Col
                 data-testid='left-header'
-                className={classNames(
-                  `${prefixCls}-header-filter-left`,
-                  props.leftHeader !== undefined &&
-                    `${prefixCls}-header-filter-left-minh`,
-                )}
+                className={classNames(`${prefixCls}-header-filter-left`, props.leftHeader !== undefined && `${prefixCls}-header-filter-left-minh`)}
                 span={12}
               >
                 {props.leftHeader}
               </Col>
-              <Col
-                data-testid='right-header'
-                className={`${prefixCls}-header-filter-right`}
-                span={12}
-              >
+              <Col data-testid='right-header' className={`${prefixCls}-header-filter-right`} span={12}>
                 {showRightHeader &&
                   renderRightHeader({
                     headerClsPrefix: `${prefixCls}-header-filter-right`,
