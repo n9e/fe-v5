@@ -88,7 +88,7 @@ function index(props: IProps) {
     stat: () => <Stat {...subProps} containerRef={ref} themeMode={themeMode} />,
     table: () => <Table {...subProps} />,
     pie: () => <Pie {...subProps} themeMode={themeMode} />,
-    hexbin: () => <Hexbin {...subProps} />,
+    hexbin: () => <Hexbin {...subProps} themeMode={themeMode} />,
     barGauge: () => <BarGauge {...subProps} themeMode={themeMode} />,
     text: () => <Text {...subProps} />,
   };

@@ -28,10 +28,11 @@ import './style.less';
 interface HoneyCombProps {
   values: IPanel;
   series: any[];
+  themeMode?: 'dark';
 }
 
 const Hexbin: FunctionComponent<HoneyCombProps> = (props) => {
-  const { values, series } = props;
+  const { values, series, themeMode } = props;
   const { custom = {}, options } = values;
   const { calc, colorRange = [], reverseColorOrder = false, colorDomainAuto, colorDomain } = custom as IHexbinStyles;
   const groupEl = useRef<SVGGElement>(null);
@@ -58,6 +59,7 @@ const Hexbin: FunctionComponent<HoneyCombProps> = (props) => {
         width: svgSize?.width,
         height: svgSize?.height,
         parentGroupEl: groupEl.current,
+        themeMode,
       };
       const data = _.map(calculatedValues, (item) => {
         return {
