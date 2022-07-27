@@ -23,7 +23,7 @@ const getValueAndToNumber = (value: any[]) => {
 };
 
 export const getSerieTextObj = (value: number | string | null | undefined, standardOptions?: any, valueMappings?: IValueMapping[]) => {
-  const { util, decimals } = standardOptions || {};
+  const { unit, decimals } = standardOptions || {};
   const matchedValueMapping = _.find(valueMappings, (item) => {
     const { type, match } = item;
     if (value === null || value === '' || value === undefined) {
@@ -52,13 +52,17 @@ export const getSerieTextObj = (value: number | string | null | undefined, stand
       return false;
     }
   });
+  const valueObj = valueFormatter({ unit, decimals }, value);
+  const newValue = matchedValueMapping?.result?.text ? matchedValueMapping?.result?.text : valueObj.value;
   return {
-    text: matchedValueMapping?.result?.text ? matchedValueMapping?.result?.text : valueFormatter({ util, decimals }, value),
+    value: newValue,
+    unit: valueObj.unit,
     color: matchedValueMapping?.result?.color,
+    text: newValue + valueObj.unit,
   };
 };
 
-const getCalculatedValuesBySeries = (series: any[], calc: string, { util, decimals }, valueMappings?: IValueMapping[]) => {
+const getCalculatedValuesBySeries = (series: any[], calc: string, { unit, decimals }, valueMappings?: IValueMapping[]) => {
   const values = _.map(series, (serie) => {
     const results = {
       lastNotNull: () => _.get(_.last(_.filter(serie.data, (item) => item[1] !== null)), 1),
@@ -81,13 +85,13 @@ const getCalculatedValuesBySeries = (series: any[], calc: string, { util, decima
         refId: serie.refId,
       },
       stat: _.toNumber(stat),
-      ...getSerieTextObj(stat, { util, decimals }, valueMappings),
+      ...getSerieTextObj(stat, { unit, decimals }, valueMappings),
     };
   });
   return values;
 };
 
-export const getLegendValues = (series: any[], { util, decimals }, hexPalette: string[]) => {
+export const getLegendValues = (series: any[], { unit, decimals }, hexPalette: string[]) => {
   const values = _.map(series, (serie, idx) => {
     const results = {
       max: getValueAndToNumber(_.maxBy(serie.data, (item) => _.toNumber(item[1]))),
@@ -103,11 +107,11 @@ export const getLegendValues = (series: any[], { util, decimals }, hexPalette: s
       offset: serie.offset,
       color: hexPalette[idx % hexPalette.length],
       disabled: serie.visible === false ? true : undefined,
-      max: valueFormatter({ util, decimals }, results.max),
-      min: valueFormatter({ util, decimals }, results.min),
-      avg: valueFormatter({ util, decimals }, results.avg),
-      sum: valueFormatter({ util, decimals }, results.sum),
-      last: valueFormatter({ util, decimals }, results.last),
+      max: valueFormatter({ unit, decimals }, results.max),
+      min: valueFormatter({ unit, decimals }, results.min),
+      avg: valueFormatter({ unit, decimals }, results.avg),
+      sum: valueFormatter({ unit, decimals }, results.sum),
+      last: valueFormatter({ unit, decimals }, results.last),
     };
   });
   return values;

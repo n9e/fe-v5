@@ -21,13 +21,13 @@ import { Modal, Form, Input, Space, Button, Table, Select, Tooltip, Switch, Tabs
 import { PlusCircleOutlined, MinusCircleOutlined, CaretDownOutlined } from '@ant-design/icons';
 import ModalHOC, { ModalWrapProps } from '@/components/ModalHOC';
 import { getLabels, getLabelValues, addMetricView, updateMetricView } from '@/services/metricViews';
-import { Range } from '@/components/DateRangePicker';
+import { IRawTimeRange } from '@/components/TimeRangePicker';
 import { getFiltersStr } from './utils';
 
 interface IProps {
   action: 'add' | 'edit';
   initialValues: any;
-  range: Range;
+  range: IRawTimeRange;
   admin: boolean;
 }
 

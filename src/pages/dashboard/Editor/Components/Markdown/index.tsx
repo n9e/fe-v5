@@ -22,11 +22,12 @@ import rehypeRaw from 'rehype-raw';
 import './index.less';
 interface IMarkDownPros {
   content: string;
+  style?: any;
 }
 
 // https://github.com/vitejs/vite/issues/3592 bug solve 记录
-const Markdown: React.FC<IMarkDownPros> = ({ content }) => (
-  <div className='markdown-wrapper'>
+const Markdown: React.FC<IMarkDownPros> = ({ content, style = {} }) => (
+  <div className='markdown-wrapper' style={style}>
     <ReactMarkdown remarkPlugins={[gfm]} children={content} rehypePlugins={[rehypeRaw]} />
   </div>
 );

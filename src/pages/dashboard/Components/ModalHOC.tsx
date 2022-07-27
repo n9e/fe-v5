@@ -17,6 +17,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import _ from 'lodash';
+import { BrowserRouter as Router } from 'react-router-dom';
 
 export interface ModalWrapProps {
   title?: string | React.ReactNode;
@@ -40,7 +41,12 @@ export default function ModalHOC(Component: any) {
     }
 
     function render(props: any) {
-      ReactDOM.render(<Component {...props} />, div);
+      ReactDOM.render(
+        <Router>
+          <Component {...props} />
+        </Router>,
+        div,
+      );
     }
 
     render({ ...config, visible: true, destroy });

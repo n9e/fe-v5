@@ -14,27 +14,32 @@
  * limitations under the License.
  *
  */
-import React, { useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import _ from 'lodash';
+import classNames from 'classnames';
 import { useInViewport } from 'ahooks';
 import { Dropdown, Menu, Tooltip } from 'antd';
-import { InfoOutlined, DownOutlined, LinkOutlined, SettingOutlined, ShareAltOutlined, DeleteOutlined, CopyOutlined, SyncOutlined } from '@ant-design/icons';
-import { Range } from '@/components/DateRangePicker';
+import { InfoCircleOutlined, MoreOutlined, LinkOutlined, SettingOutlined, ShareAltOutlined, DeleteOutlined, CopyOutlined, SyncOutlined } from '@ant-design/icons';
+import { IRawTimeRange } from '@/components/TimeRangePicker';
 import Timeseries from './Timeseries';
 import Stat from './Stat';
 import Table from './Table';
 import Pie from './Pie';
 import Hexbin from './Hexbin';
+import BarGauge from './BarGauge';
+import Text from './Text';
 import { IVariable } from '../../VariableConfig/definition';
 import Markdown from '../../Editor/Components/Markdown';
 import usePrometheus from '../datasource/usePrometheus';
 import { IPanel } from '../../types';
+import { getStepByTimeAndStep } from '../../utils';
 import './style.less';
 
 interface IProps {
+  themeMode?: 'dark';
   dashboardId: string;
   id?: string;
-  time: Range;
+  time: IRawTimeRange;
   step: number | null;
   type: string;
   values: IPanel;
@@ -47,7 +52,9 @@ interface IProps {
 }
 
 function index(props: IProps) {
-  const { dashboardId, id, time, step, type, variableConfig, isPreview, onCloneClick, onShareClick, onEditClick, onDeleteClick } = props;
+  const { themeMode, dashboardId, id, step, type, variableConfig, isPreview, onCloneClick, onShareClick, onEditClick, onDeleteClick } = props;
+  const [time, setTime] = useState(props.time);
+  const [visible, setVisible] = useState(false);
   const values = _.cloneDeep(props.values);
   const ref = useRef<HTMLDivElement>(null);
   const [inViewPort] = useInViewport(ref);
@@ -61,7 +68,13 @@ function index(props: IProps) {
     inViewPort: isPreview || inViewPort,
   });
   const tipsVisible = values.description || !_.isEmpty(values.links);
+
+  useEffect(() => {
+    setTime(props.time);
+  }, [JSON.stringify(props.time)]);
+
   if (_.isEmpty(values)) return null;
+
   // TODO: 如果 hexbin 的 colorRange 为 string 时转成成 array
   if (typeof _.get(values, 'custom.colorRange') === 'string') {
     _.set(values, 'custom.colorRange', _.split(_.get(values, 'custom.colorRange'), ','));
@@ -71,29 +84,38 @@ function index(props: IProps) {
     series,
   };
   const RendererCptMap = {
-    timeseries: () => <Timeseries {...subProps} />,
-    stat: () => <Stat {...subProps} />,
+    timeseries: () => <Timeseries {...subProps} themeMode={themeMode} />,
+    stat: () => <Stat {...subProps} containerRef={ref} themeMode={themeMode} />,
     table: () => <Table {...subProps} />,
-    pie: () => <Pie {...subProps} />,
-    hexbin: () => <Hexbin {...subProps} />,
+    pie: () => <Pie {...subProps} themeMode={themeMode} />,
+    hexbin: () => <Hexbin {...subProps} themeMode={themeMode} />,
+    barGauge: () => <BarGauge {...subProps} themeMode={themeMode} />,
+    text: () => <Text {...subProps} />,
   };
 
   return (
-    <div className='renderer-container' ref={ref}>
+    <div
+      className={classNames({
+        'renderer-container': true,
+        'renderer-container-no-title': !values.name,
+      })}
+      ref={ref}
+    >
       <div className='renderer-header graph-header dashboards-panels-item-drag-handle'>
-        {tipsVisible ? (
-          <Tooltip
-            placement='rightTop'
-            overlayInnerStyle={{
-              width: 300,
-            }}
-            title={
-              <div>
-                <Markdown content={values.description} />
+        <div className='renderer-header-desc'>
+          {tipsVisible ? (
+            <Tooltip
+              placement='top'
+              overlayInnerStyle={{
+                width: 300,
+              }}
+              getPopupContainer={() => ref.current!}
+              title={
                 <div>
+                  <Markdown content={values.description} />
                   {_.map(values.links, (link, i) => {
                     return (
-                      <div key={i} style={{ marginTop: 8 }}>
+                      <div key={i}>
                         <a href={link.url} target={link.targetBlank ? '_blank' : '_self'}>
                           {link.title}
                         </a>
@@ -101,60 +123,102 @@ function index(props: IProps) {
                     );
                   })}
                 </div>
-              </div>
-            }
-          >
-            <div className='renderer-header-desc'>
-              <span className='renderer-header-info-corner-inner' />
-              {values.description ? <InfoOutlined /> : <LinkOutlined />}
-            </div>
-          </Tooltip>
-        ) : null}
-        <div className='renderer-header-content'>
-          {!isPreview ? (
-            <Dropdown
-              trigger={['click']}
-              placement='bottomCenter'
-              overlayStyle={{
-                minWidth: '100px',
-              }}
-              overlay={
-                <Menu>
-                  {!isPreview ? (
-                    <>
-                      <Menu.Item onClick={onEditClick} key='0'>
-                        <SettingOutlined style={{ marginRight: 8 }} />
-                        编辑
-                      </Menu.Item>
-                      <Menu.Item onClick={onCloneClick} key='1'>
-                        <CopyOutlined style={{ marginRight: 8 }} />
-                        克隆
-                      </Menu.Item>
-                      <Menu.Item onClick={onShareClick} key='2'>
-                        <ShareAltOutlined style={{ marginRight: 8 }} />
-                        分享
-                      </Menu.Item>
-                      <Menu.Item onClick={onDeleteClick} key='3'>
-                        <DeleteOutlined style={{ marginRight: 8 }} />
-                        删除
-                      </Menu.Item>
-                    </>
-                  ) : null}
-                </Menu>
               }
             >
-              <div className='renderer-header-title'>
-                {values.name}
-                <DownOutlined className='renderer-header-arrow' />
-              </div>
-            </Dropdown>
-          ) : (
+              <div className='renderer-header-desc'>{values.description ? <InfoCircleOutlined /> : <LinkOutlined />}</div>
+            </Tooltip>
+          ) : null}
+        </div>
+        <div className='renderer-header-content'>
+          <Tooltip title={values.name} getPopupContainer={() => ref.current!}>
             <div className='renderer-header-title'>{values.name}</div>
+          </Tooltip>
+        </div>
+        <div className='renderer-header-loading'>
+          {loading ? (
+            <SyncOutlined spin />
+          ) : (
+            !isPreview && (
+              <Dropdown
+                trigger={['click']}
+                placement='bottomCenter'
+                getPopupContainer={() => ref.current!}
+                overlayStyle={{
+                  minWidth: '100px',
+                }}
+                visible={visible}
+                onVisibleChange={(visible) => {
+                  setVisible(visible);
+                }}
+                overlay={
+                  <Menu>
+                    <Menu.Item
+                      onClick={() => {
+                        setVisible(true);
+                        setTime({
+                          ...time,
+                          refreshFlag: _.uniqueId('refreshFlag_ '),
+                        });
+                      }}
+                      key='0'
+                    >
+                      <Tooltip title={`刷新间隔小于 step(${getStepByTimeAndStep(time, step)}s) 将不会更新数据`} placement='left'>
+                        <div>
+                          <SyncOutlined style={{ marginRight: 8 }} />
+                          刷新
+                        </div>
+                      </Tooltip>
+                    </Menu.Item>
+                    <Menu.Item
+                      onClick={() => {
+                        setVisible(false);
+                        if (onEditClick) onEditClick();
+                      }}
+                      key='1'
+                    >
+                      <SettingOutlined style={{ marginRight: 8 }} />
+                      编辑
+                    </Menu.Item>
+                    <Menu.Item
+                      onClick={() => {
+                        setVisible(false);
+                        if (onCloneClick) onCloneClick();
+                      }}
+                      key='2'
+                    >
+                      <CopyOutlined style={{ marginRight: 8 }} />
+                      克隆
+                    </Menu.Item>
+                    <Menu.Item
+                      onClick={() => {
+                        setVisible(false);
+                        if (onShareClick) onShareClick();
+                      }}
+                      key='3'
+                    >
+                      <ShareAltOutlined style={{ marginRight: 8 }} />
+                      分享
+                    </Menu.Item>
+                    <Menu.Item
+                      onClick={() => {
+                        setVisible(false);
+                        if (onDeleteClick) onDeleteClick();
+                      }}
+                      key='4'
+                    >
+                      <DeleteOutlined style={{ marginRight: 8 }} />
+                      删除
+                    </Menu.Item>
+                  </Menu>
+                }
+              >
+                <MoreOutlined className='renderer-header-more' />
+              </Dropdown>
+            )
           )}
         </div>
-        <div className='renderer-header-loading'>{loading && <SyncOutlined spin />}</div>
       </div>
-      <div className='renderer-body' style={{ height: `calc(100% - 36px)` }}>
+      <div className='renderer-body' style={{ height: values.name ? `calc(100% - 47px)` : '100%' }}>
         {RendererCptMap[type] ? RendererCptMap[type]() : <div className='unknown-type'>{`无效的图表类型 ${type}`}</div>}
       </div>
     </div>

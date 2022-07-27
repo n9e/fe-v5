@@ -16,9 +16,8 @@
  */
 import React, { useState, useEffect, useRef, useImperativeHandle } from 'react';
 import { Dropdown, Button, Menu, Tooltip } from 'antd';
-import { DownOutlined, SyncOutlined } from '@ant-design/icons';
+import { DownOutlined, UpOutlined, SyncOutlined } from '@ant-design/icons';
 import _ from 'lodash';
-import { Range, formatPickerDate } from '@/components/DateRangePicker';
 import './style.less';
 
 const refreshMap = {
@@ -35,20 +34,15 @@ const refreshMap = {
 };
 
 interface IProps {
-  range: Range;
-  step: number | null;
+  tooltip?: string;
   onRefresh: () => void;
 }
 
-const intervalSecondsCache = _.toNumber(window.localStorage.getItem('refresh-interval-seconds'));
-
 function Refresh(props: IProps, ref) {
-  const { range, step } = props;
+  const intervalSecondsCache = _.toNumber(window.localStorage.getItem('event-interval-seconds'));
   const [intervalSeconds, setIntervalSeconds] = useState(intervalSecondsCache);
+  const [visible, setVisible] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout>();
-  let { start, end } = formatPickerDate(range);
-  let _step = step;
-  if (!step) _step = Math.max(Math.floor((end - start) / 240), 1);
 
   useEffect(() => {
     if (intervalRef.current) {
@@ -59,7 +53,7 @@ function Refresh(props: IProps, ref) {
         props.onRefresh();
       }, intervalSeconds * 1000);
     }
-  }, [intervalSeconds]);
+  }, [intervalSeconds, props.onRefresh]);
 
   useEffect(() => {
     return () => {
@@ -72,22 +66,27 @@ function Refresh(props: IProps, ref) {
   useImperativeHandle(ref, () => ({
     closeRefresh() {
       setIntervalSeconds(0);
-      window.localStorage.setItem('refresh-interval-seconds', '0');
+      window.localStorage.setItem('event-interval-seconds', '0');
     },
   }));
 
   return (
-    <div className='refresh-container'>
-      <Tooltip title={`刷新间隔小于 step(${_step}s) 将不会更新数据`}>
+    <div className='auto-refresh-container'>
+      <Tooltip title={props.tooltip}>
         <Button className='refresh-btn' icon={<SyncOutlined />} onClick={props.onRefresh} />
       </Tooltip>
       <Dropdown
         trigger={['click']}
+        visible={visible}
+        onVisibleChange={(visible) => {
+          setVisible(visible);
+        }}
         overlay={
           <Menu
             onClick={(e) => {
               setIntervalSeconds(_.toNumber(e.key));
-              window.localStorage.setItem('refresh-interval-seconds', _.toString(e.key));
+              window.localStorage.setItem('event-interval-seconds', e.key);
+              setVisible(false);
             }}
           >
             {_.map(refreshMap, (text, value) => {
@@ -96,8 +95,16 @@ function Refresh(props: IProps, ref) {
           </Menu>
         }
       >
-        <Button>
-          {refreshMap[intervalSeconds]} <DownOutlined />
+        <Button
+          onClick={() => {
+            setVisible(!visible);
+          }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
+          {refreshMap[intervalSeconds]} {visible ? <UpOutlined /> : <DownOutlined style={{ fontSize: 12 }} />}
         </Button>
       </Dropdown>
     </div>

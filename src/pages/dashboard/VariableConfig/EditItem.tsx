@@ -18,7 +18,7 @@ import React from 'react';
 import { Modal, Form, Input, Button, Row, Col, Switch, Select } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { DeleteOutlined, PlusOutlined, ArrowUpOutlined, ArrowDownOutlined, CopyOutlined, QuestionCircleOutlined } from '@ant-design/icons';
-import { Range } from '@/components/DateRangePicker';
+import { IRawTimeRange } from '@/components/TimeRangePicker';
 import { IVariable } from './definition';
 import { convertExpressionToQuery, replaceExpressionVars, stringToRegex, setVaraiableSelected } from './constant';
 
@@ -26,7 +26,7 @@ interface Props {
   id: string;
   visible: boolean;
   value?: IVariable[];
-  range: Range;
+  range: IRawTimeRange;
   onChange: (v?: IVariable[]) => void;
 }
 export default function EditItem(props: Props) {

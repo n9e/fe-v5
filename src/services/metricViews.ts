@@ -15,13 +15,14 @@
  *
  */
 import _ from 'lodash';
+import moment from 'moment';
 import request from '@/utils/request';
 import { RequestMethod } from '@/store/common';
-import { Range, formatPickerDate } from '@/components/DateRangePicker';
+import { IRawTimeRange, parseRange, timeRangeUnix } from '@/components/TimeRangePicker';
 
-export const getLabelValues = function (label: string, range: Range, match?: string) {
+export const getLabelValues = function (label: string, range: IRawTimeRange, match?: string) {
   const params = {
-    ...formatPickerDate(range),
+    ...timeRangeUnix(range),
   };
   if (match) {
     params['match[]'] = match;
@@ -34,9 +35,9 @@ export const getLabelValues = function (label: string, range: Range, match?: str
   });
 };
 
-export const getLabels = function (match: string, range: Range) {
+export const getLabels = function (match: string, range: IRawTimeRange) {
   const params = {
-    ...formatPickerDate(range),
+    ...timeRangeUnix(range),
   };
   if (match) {
     params['match[]'] = match;
@@ -49,11 +50,11 @@ export const getLabels = function (match: string, range: Range) {
   });
 };
 
-export const getMetricValues = function (match: string, range: Range) {
+export const getMetricValues = function (match: string, range: IRawTimeRange) {
   return request('/api/n9e/prometheus/api/v1/label/__name__/values', {
     method: RequestMethod.Get,
     params: {
-      ...formatPickerDate(range),
+      ...timeRangeUnix(range),
       'match[]': match,
     },
   }).then((res) => {
@@ -108,7 +109,7 @@ export const getExprs = (params) => {
 export const getQueryRange = function (params: {
   metric: string;
   match: string;
-  range: Range;
+  range: IRawTimeRange;
   step?: number;
   calcFunc: string;
   comparison: string[];
@@ -116,7 +117,7 @@ export const getQueryRange = function (params: {
   aggrGroups: string[];
 }) {
   const { metric, match, range, step, calcFunc, comparison, aggrFunc, aggrGroups } = params;
-  let { start, end } = formatPickerDate(range);
+  let { start, end } = timeRangeUnix(range);
   let _step = step;
   if (!step) _step = Math.max(Math.floor((end - start) / 240), 1);
   const exprs = getExprs({
@@ -210,9 +211,9 @@ export const getMetricsDesc = function (data) {
   });
 };
 
-export const getQueryRangeSingleMetric = function (params: { metric: string; match: string; range: Range; calcFunc: string }) {
+export const getQueryRangeSingleMetric = function (params: { metric: string; match: string; range: IRawTimeRange; calcFunc: string }) {
   const { metric, match, range, calcFunc } = params;
-  let { start, end } = formatPickerDate(range);
+  let { start, end } = timeRangeUnix(range);
   const step = Math.max(Math.floor((end - start) / 240), 1);
   const query = `${calcFunc}(${metric}${match}) by (ident)`;
   return request('/api/n9e/prometheus/api/v1/query_range', {

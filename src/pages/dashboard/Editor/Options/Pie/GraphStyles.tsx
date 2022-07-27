@@ -54,9 +54,14 @@ export default function GraphStyles() {
               </Select>
             </Form.Item>
           </Col>
-          <Col span={12}>
+          <Col span={9}>
             <Form.Item label='最多展示块数' name={[...namePrefix, 'max']} tooltip='超过的块数则合并展示为其他'>
               <InputNumber style={{ width: '100%' }} />
+            </Form.Item>
+          </Col>
+          <Col span={3}>
+            <Form.Item label='环图模式' name={[...namePrefix, 'donut']} valuePropName='checked'>
+              <Switch />
             </Form.Item>
           </Col>
           <Col span={12}>

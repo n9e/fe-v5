@@ -14,12 +14,17 @@
  * limitations under the License.
  *
  */
-export interface Variable {
-  name: string;
-  definition: string;
-  reg?: string;
-  // selected?: string | string[];
-  multi: boolean;
-  allOption: boolean;
-  options?: string[];
+import React from 'react';
+import GraphStyles from './GraphStyles';
+import StandardOptions from '../../Fields/StandardOptions';
+import ValueMappings from '../../Fields/ValueMappings';
+
+export default function Timeseries() {
+  return (
+    <>
+      <GraphStyles />
+      <ValueMappings />
+      <StandardOptions />
+    </>
+  );
 }

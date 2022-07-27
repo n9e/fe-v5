@@ -4,6 +4,10 @@
   }
 }
 
+.dashboard-detail-header, .theme-dark .dashboard-detail-content {
+  font-family: PingFangSC-Regular, PingFang SC;
+}
+
 .dashboard-detail-header {
   display: flex;
   height: 51px;
@@ -45,12 +49,11 @@
 .dashboard-detail-content {
   display: flex;
   flex-direction: column;
-  font-family: verdana, Microsoft YaHei, Consolas, Deja Vu Sans Mono, Bitstream Vera Sans Mono;
-  background: #f6f5f6 !important;
-  max-height: 100%;
+  height: 100%;
   padding: 10px 0px;
+  background-color: #f9f9f9 !important; // 覆盖 pageLayout 上面约定的样式
+  box-shadow: unset !important;
   .variable-area {
-    // background: @colorWhite;
     display: flex;
     .date-picker-area {
       display: flex;
@@ -69,6 +72,7 @@
   .dashboards-panels {
     flex: 1;
     overflow: auto;
+    overflow-x: hidden;
     background-color: unset !important;
   }
 
@@ -95,6 +99,48 @@
         text-align: center;
       }
     }
+  }
+
+  .react-grid-item > .react-resizable-handle::after{
+    border-right: 2px solid #E3E4E6;
+    border-bottom: 2px solid #E3E4E6;
+  }
+
+  .scroll-container {
+    .ant-table-scroll-horizontal {
+      .ant-table-body::-webkit-scrollbar {
+        height: 10px;
+        width: 4px;
+      }
+      .ant-table-body::-webkit-scrollbar-corner {
+        background-color: transparent;
+      }
+      .ant-table-body::-webkit-scrollbar-thumb {
+        border-radius: 10px;
+        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+        background: rgba(0,0,0,0.5);;
+      }
+      .ant-table-body::-webkit-scrollbar-track {
+        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+        background: unset;
+      }
+    }
+  }
+  .scroll-container::-webkit-scrollbar {
+    height: 10px;
+    width: 4px;
+  }
+  .scroll-container::-webkit-scrollbar-corner {
+    background-color: transparent;
+  }
+  .scroll-container::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background: #ccc;
+  }
+  .scroll-container::-webkit-scrollbar-track {
+    border-radius: 10px;
+    background: unset;
   }
 }
 

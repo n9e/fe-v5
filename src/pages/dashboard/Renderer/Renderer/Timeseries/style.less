@@ -12,25 +12,51 @@
     padding: 0 !important;
   }
 }
+.renderer-timeseries-legend-container {
+  position: relative;
+  height: 100%;
+}
 .renderer-timeseries-legend-list {
   overflow-y: auto;
-  height: 100%;
+  overflow-x: hidden;
+  height: calc(100% - 32px);
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   column-gap: 20px;
   align-content: flex-start;
   padding: 0 10px 10px 10px;
+  margin: 16px;
   cursor: pointer;
   user-select: none;
+  background: #F9F9F9;
+  & > div {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
   & > div.disabled {
     color: #24292e80
+  }
+}
+.renderer-timeseries-legend-list-placement-right {
+  & > div {
+    width: 100%;
   }
 }
 .renderer-timeseries-legend-color-symbol {
   display: inline-block;
   height: 6px;
-  width: 20px;
-  border-radius: 2px;
+  width: 6px;
+  border-radius: 6px;
   margin-right: 5px;
+}
+.renderer-timeseries-legend-toggle {
+  position: absolute;
+  top: 0;
+  left: -1px;
+  background: #F9F9F9;
+  width: 16px;
+  text-align: center;
+  cursor: pointer;
 }

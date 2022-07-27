@@ -17,6 +17,7 @@
 import React from 'react';
 import { Switch, Route, useLocation, Redirect } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
+import querystring from 'query-string';
 import { RootState, accountStoreState } from '@/store/accountInterface';
 import NotFound from '@/pages/NotFound';
 import Page403 from '@/pages/NotFound/Page403';
@@ -98,8 +99,17 @@ export default function Content() {
     }
   }
 
+  // 大盘在全屏和暗黑主题下需要定义个 dark 样式名
+  let themeClassName = '';
+  if (location.pathname.indexOf('/dashboard') === 0) {
+    const query = querystring.parse(location.search);
+    if (query?.viewMode === 'fullscreen' && query?.themeMode === 'dark') {
+      themeClassName = 'theme-dark';
+    }
+  }
+
   return (
-    <div className='content'>
+    <div className={`content ${themeClassName}`}>
       <Switch>
         <Route path='/demo' component={Demo} />
         <Route path='/login' component={Login} exact />

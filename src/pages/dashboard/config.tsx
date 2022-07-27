@@ -17,24 +17,8 @@
 import React from 'react';
 import Icon from '@ant-design/icons';
 
-export const hexPalette = [
-  '#3399CC',
-  '#CC9933',
-  '#9966CC',
-  '#66CC66',
-  '#CC3333',
-  '#99CCCC',
-  '#CCCC66',
-  '#CC99CC',
-  '#99CC99',
-  '#CC6666',
-  '#336699',
-  '#996633',
-  '#993399',
-  '#339966',
-  '#993333',
-];
-
+export const statHexPalette = ['#634CD9', '#3FC453', '#FF6A00', '#FF656B'];
+export const hexPalette = ['#9B5CE6', '#2E85FF', '#55BCAC', '#FAB34F', '#49DBFF', '#E65CCB'];
 export const AddPanelSvg = () => (
   <svg viewBox='0 0 1024 1024' version='1.1' xmlns='http://www.w3.org/2000/svg' width='1em' height='1em'>
     <path

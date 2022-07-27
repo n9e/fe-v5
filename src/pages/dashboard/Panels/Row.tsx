@@ -16,7 +16,7 @@
  */
 import React, { useState } from 'react';
 import { Space, Modal, Button, Input } from 'antd';
-import { RightOutlined, DownOutlined, HolderOutlined, SettingOutlined, DeleteOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { CaretRightOutlined, CaretDownOutlined, HolderOutlined, SettingOutlined, DeleteOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { AddPanelIcon } from '../config';
 
 interface IProps {
@@ -42,8 +42,8 @@ export default function Row(props: IProps) {
           onToggle();
         }}
       >
-        {row.collapsed ? <DownOutlined /> : <RightOutlined />}
-        <span style={{ paddingLeft: 6 }}>{name}</span>
+        <span style={{ paddingRight: 6 }}>{name}</span>
+        {row.collapsed ? <CaretDownOutlined /> : <CaretRightOutlined />}
       </div>
       <Space>
         <AddPanelIcon

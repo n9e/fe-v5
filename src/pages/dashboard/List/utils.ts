@@ -41,8 +41,15 @@ export function getImportDataVersionIsValid(data: any): string | undefined {
   let dataClone = _.cloneDeep(data);
   const configs = _.get(dataClone, 'configs');
   if (!configs) return undefined;
-  const version = _.get(configs, 'version');
-  if (!version) return undefined;
+  let version = _.get(configs, 'version');
+  if (!version) {
+    // 历史某个版本没有设置版本号
+    if (_.get(configs, 'panels')) {
+      version = '2.0.0';
+    } else {
+      return undefined;
+    }
+  }
   return semver.valid(version);
 }
 

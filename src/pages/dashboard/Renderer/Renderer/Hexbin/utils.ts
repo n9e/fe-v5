@@ -30,26 +30,28 @@ export function bestFitElemCountPerRow(bucketLen, width, height) {
   return countPerRow;
 }
 
-export function getTextSizeForWidthAndHeight(
-  text: string,
-  width: number,
-  height: number,
-) {
+export function getTextSizeForWidthAndHeight(text: string, width: number, height: number) {
   const minFontPx = 6;
-  const maxFontPx  = 24;
-  let w = getTextWidth(text, getFontStr({
-    ...defaultFont,
-    fontSize: maxFontPx + 'px',
-  }));
+  const maxFontPx = 24;
+  let w = getTextWidth(
+    text,
+    getFontStr({
+      ...defaultFont,
+      fontSize: maxFontPx + 'px',
+    }),
+  );
   width = width * 0.95;
   if (w <= width && maxFontPx <= height) {
     return maxFontPx;
   }
   for (let fontSize = maxFontPx; fontSize >= minFontPx; fontSize--) {
-    w = getTextWidth(text, getFontStr({
-      ...defaultFont,
-      fontSize: fontSize + 'px',
-    }));
+    w = getTextWidth(
+      text,
+      getFontStr({
+        ...defaultFont,
+        fontSize: fontSize + 'px',
+      }),
+    );
     if (w < width && fontSize <= height) {
       return Math.ceil(fontSize);
     }
@@ -68,8 +70,8 @@ export const getFontStr = (font = defaultFont) => {
 };
 
 export function getTextWidth(text: string, font = getFontStr()) {
-  const canvas = document.createElement("canvas");
-  const context = canvas.getContext("2d") as CanvasRenderingContext2D;
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d') as CanvasRenderingContext2D;
   context.font = font;
   const metrics = context.measureText(text);
   return metrics.width;
@@ -83,13 +85,13 @@ export function getCanvasFontSize(el = document.body) {
   const fontWeight = getCssStyle(el, 'font-weight') || defaultFont.fontWeight;
   const fontSize = getCssStyle(el, 'font-size') || defaultFont.fontSize;
   const fontFamily = getCssStyle(el, 'font-family') || defaultFont.fontFamily;
-  
+
   return `${fontWeight} ${fontSize} ${fontFamily}`;
 }
 
 export function getColorScaleLinearDomain(calculatedValues: any[], colorDomainAuto: boolean, colorDomain: number[]) {
   if (!colorDomainAuto && colorDomain?.length) {
-    return [colorDomain[0], (colorDomain[0] + colorDomain[1]) / 2 ,colorDomain[1]];
+    return [colorDomain[0], (colorDomain[0] + colorDomain[1]) / 2, colorDomain[1]];
   }
   const min = _.get(_.minBy(calculatedValues, 'stat'), 'stat');
   const max = _.get(_.maxBy(calculatedValues, 'stat'), 'stat');

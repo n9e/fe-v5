@@ -22,13 +22,13 @@ import { PlusSquareOutlined, SearchOutlined, EditOutlined, DeleteOutlined, Expor
 import { useSelector } from 'react-redux';
 import { RootState as AccountRootState, accountStoreState } from '@/store/accountInterface';
 import { getList, deleteMetricView } from '@/services/metricViews';
-import { Range } from '@/components/DateRangePicker';
+import { IRawTimeRange } from '@/components/TimeRangePicker';
 import { IMatch } from '../types';
 import Form from './Form';
 import Export from './Export';
 
 interface IProps {
-  range: Range;
+  range: IRawTimeRange;
   onSelect: (item: IMatch) => void;
 }
 

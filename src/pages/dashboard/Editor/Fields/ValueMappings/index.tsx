@@ -39,6 +39,9 @@ export default function index(props: IProps) {
               onClick={() => {
                 add({
                   type: 'special',
+                  result: {
+                    color: '#000000',
+                  },
                 });
               }}
             >

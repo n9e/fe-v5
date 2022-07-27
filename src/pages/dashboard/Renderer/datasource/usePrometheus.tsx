@@ -16,8 +16,10 @@
  */
 import React, { useState, useEffect, useRef } from 'react';
 import _ from 'lodash';
+import moment from 'moment';
 import * as api from '@/components/Graph/api';
-import { Range, formatPickerDate } from '@/components/DateRangePicker';
+import { formatPickerDate } from '@/components/DateRangePicker'; // TODO: 兼容旧版本
+import { IRawTimeRange, parseRange } from '@/components/TimeRangePicker';
 import { ITarget } from '../../types';
 import { replaceExpressionVars, getVaraiableSelected } from '../../VariableConfig/constant';
 import { IVariable } from '../../VariableConfig/definition';
@@ -28,7 +30,7 @@ import { fetchHistoryBatch } from "@/components/Graph/api";
 interface IProps {
   id?: string;
   dashboardId: string;
-  time: Range;
+  time: IRawTimeRange;
   step: number | null;
   targets: ITarget[];
   variableConfig?: IVariable[];
@@ -48,6 +50,9 @@ const getSerieName = (metric: Object, expr: string) => {
     name += ` ${key}: ${value}`;
   });
   return _.trim(name);
+};
+const getDefaultStepByStartAndEnd = (start: number, end: number) => {
+  return Math.max(Math.floor((end - start) / 240), 1);
 };
 
 export default function usePrometheus(props: IProps) {
@@ -70,13 +75,25 @@ export default function usePrometheus(props: IProps) {
     let signalKey = `${id}`;
     _.forEach(targets, (target) => {
       if (target.time) {
-        const { start: _start, end: _end } = formatPickerDate(target.time);
-        start = _start;
-        end = _end;
+        // TODO: 兼容旧版本
+        if (target.time.unit) {
+          const { start: _start, end: _end } = formatPickerDate(target.time);
+          start = _start;
+          end = _end;
+        } else {
+          const parsedRange = parseRange(target.time);
+          start = moment(parsedRange.start).unix();
+          end = moment(parsedRange.end).unix();
+        }
+        step = getDefaultStepByStartAndEnd(start, end);
+        if (target.step) {
+          step = target.step;
+        }
       }
-      if (target.step) {
-        step = target.step;
-      }
+
+      start = start - (start % step!);
+      end = end - (end % step!);
+
       const realExpr = variableConfig ? replaceExpressionVars(target.expr, variableConfig, variableConfig.length, dashboardId) : target.expr;
       if (realExpr) {
         batchParams.push({
@@ -117,9 +134,11 @@ export default function usePrometheus(props: IProps) {
   };
 
   useEffect(() => {
-    let { start, end } = formatPickerDate(time);
+    const parsedRange = parseRange(time);
+    let start = moment(parsedRange.start).unix();
+    let end = moment(parsedRange.end).unix();
     let _step = step;
-    if (!step) _step = Math.max(Math.floor((end - start) / 240), 1); // TODO: 这个默认 step 不知道是基于什么计算的，并且是一个对用户透明可能存在理解问题
+    if (!step) _step = getDefaultStepByStartAndEnd(start, end);
     start = start - (start % _step!);
     end = end - (end % _step!);
     setTimes({

@@ -20,7 +20,12 @@ import { utilValMap } from '../config';
 import * as byteConverter from './byteConverter';
 
 function timeFormatter(val, type: 'seconds' | 'milliseconds', decimals) {
-  if (typeof val !== 'number') return val;
+  if (typeof val !== 'number')
+    return {
+      value: val,
+      unit: '',
+      text: val,
+    };
   const timeMap = [
     {
       unit: 'year',
@@ -68,18 +73,26 @@ function timeFormatter(val, type: 'seconds' | 'milliseconds', decimals) {
       unit = 's';
     }
   }
-  return _.round(newVal, decimals) + unit;
+  return {
+    value: _.round(newVal, decimals),
+    unit,
+    text: _.round(newVal, decimals) + unit,
+  };
 }
 
-const valueFormatter = ({ util, decimals = 3 }, val) => {
+const valueFormatter = ({ unit, decimals = 3 }, val) => {
   if (val === null || val === '' || val === undefined) {
-    return '';
+    return {
+      value: '',
+      unit: '',
+      text: '',
+    };
   }
   if (typeof val !== 'number') {
     val = _.toNumber(val);
   }
-  if (util) {
-    const utilValObj = utilValMap[util];
+  if (unit) {
+    const utilValObj = utilValMap[unit];
     if (utilValObj) {
       const { type, base } = utilValObj;
       return byteConverter.format(val, {
@@ -88,28 +101,52 @@ const valueFormatter = ({ util, decimals = 3 }, val) => {
         decimals,
       });
     }
-    if (util === 'none') {
-      return _.round(val, decimals);
+    if (unit === 'none') {
+      return {
+        value: _.round(val, decimals),
+        unit: '',
+        text: _.round(val, decimals),
+      };
     }
-    if (util === 'percent') {
-      return _.round(val, decimals) + '%';
+    if (unit === 'percent') {
+      return {
+        value: _.round(val, decimals),
+        unit: '%',
+        text: _.round(val, decimals) + '%',
+      };
     }
-    if (util === 'percentUnit') {
-      return _.round(val * 100, decimals) + '%';
+    if (unit === 'percentUnit') {
+      return {
+        value: _.round(val * 100, decimals),
+        unit: '%',
+        text: _.round(val * 100, decimals) + '%',
+      };
     }
-    if (util === 'humantimeSeconds') {
-      return moment.duration(val, 'seconds').humanize();
+    if (unit === 'humantimeSeconds') {
+      return {
+        value: moment.duration(val, 'seconds').humanize(),
+        unit: '',
+        text: moment.duration(val, 'seconds').humanize(),
+      };
     }
-    if (util === 'humantimeMilliseconds') {
-      return moment.duration(val, 'milliseconds').humanize();
+    if (unit === 'humantimeMilliseconds') {
+      return {
+        value: moment.duration(val, 'milliseconds').humanize(),
+        unit: '',
+        text: moment.duration(val, 'milliseconds').humanize(),
+      };
     }
-    if (util === 'seconds') {
-      return timeFormatter(val, util, decimals);
+    if (unit === 'seconds') {
+      return timeFormatter(val, unit, decimals);
     }
-    if (util === 'milliseconds') {
-      return timeFormatter(val, util, decimals);
+    if (unit === 'milliseconds') {
+      return timeFormatter(val, unit, decimals);
     }
-    return _.round(val, decimals);
+    return {
+      value: _.round(val, decimals),
+      unit: '',
+      text: _.round(val, decimals),
+    };
   }
   // 默认返回 SI 不带基础单位
   return byteConverter.format(val, {

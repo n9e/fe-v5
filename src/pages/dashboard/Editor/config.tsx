@@ -38,6 +38,14 @@ export const visualizations = [
     type: 'hexbin',
     name: '蜂窝图',
   },
+  {
+    type: 'barGauge',
+    name: '排行榜',
+  },
+  {
+    type: 'text',
+    name: '文字卡片',
+  },
 ];
 
 export const IRefreshMap = {
@@ -104,7 +112,9 @@ export const defaultCustomValuesMap = {
   timeseries: {
     drawStyle: 'lines',
     lineInterpolation: 'smooth',
+    lineWidth: 1,
     fillOpacity: 0.5,
+    gradientMode: 'none',
     stack: 'off',
   },
   stat: {
@@ -133,6 +143,21 @@ export const defaultCustomValuesMap = {
     colorDomainAuto: true,
     colorDomain: [],
     reverseColorOrder: false,
+  },
+  barGauge: {
+    calc: 'lastNotNull',
+    baseColor: '#FF656B',
+    displayMode: 'basic',
+    serieWidth: 20,
+    sortOrder: 'desc',
+  },
+  text: {
+    textSize: 12,
+    textColor: '#000000',
+    bgColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    content: '',
   },
 };
 

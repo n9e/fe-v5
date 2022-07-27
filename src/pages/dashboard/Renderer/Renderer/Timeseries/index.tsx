@@ -17,6 +17,8 @@
 import React, { useRef, useEffect, useState } from 'react';
 import _ from 'lodash';
 import { Table, Tooltip } from 'antd';
+import classNames from 'classnames';
+import { VerticalRightOutlined, VerticalLeftOutlined } from '@ant-design/icons';
 import { useSize } from 'ahooks';
 import TsGraph from '@fc-plot/ts-graph';
 import '@fc-plot/ts-graph/dist/index.css';
@@ -32,11 +34,13 @@ interface IProps {
   tableHeight?: string;
   values: IPanel;
   series: any[];
+  themeMode?: 'dark';
 }
 
 export default function index(props: IProps) {
-  const { values, series, inDashboard = true, chartHeight = '200px', tableHeight = '200px' } = props;
+  const { values, series, inDashboard = true, chartHeight = '200px', tableHeight = '200px', themeMode = '' } = props;
   const { custom, options = {} } = values;
+  const { lineWidth = 1, gradientMode = 'none' } = custom;
   const [seriesData, setSeriesData] = useState(series);
   const [activeLegend, setActiveLegend] = useState('');
   const chartEleRef = useRef<HTMLDivElement>(null);
@@ -47,6 +51,7 @@ export default function index(props: IProps) {
   const placement = options.legend?.placement || 'bottom';
   const hasLegend = displayMode !== 'hidden';
   const [legendData, setLegendData] = useState([]);
+  const [isExpanded, setIsExpanded] = useState(false);
   let _chartHeight = hasLegend ? '70%' : '100%';
   let _tableHeight = hasLegend ? '30%' : '0px';
 
@@ -66,7 +71,6 @@ export default function index(props: IProps) {
         chartRef.current.destroy();
       }
       chartRef.current = new TsGraph({
-        colors: hexPalette,
         timestamp: 'X',
         xkey: 0,
         ykey: 1,
@@ -75,11 +79,9 @@ export default function index(props: IProps) {
         chart: {
           renderTo: chartEleRef.current,
           height: chartEleRef.current.clientHeight,
+          colors: hexPalette,
         },
         series: [],
-        line: {
-          width: 1,
-        },
       });
     }
     if (hasLegend) {
@@ -87,7 +89,7 @@ export default function index(props: IProps) {
         getLegendValues(
           seriesData,
           {
-            util: options?.standardOptions?.util,
+            unit: options?.standardOptions?.util,
             decimals: options?.standardOptions?.decimals,
           },
           hexPalette,
@@ -112,8 +114,14 @@ export default function index(props: IProps) {
       chartRef.current.update({
         type: custom.drawStyle === 'lines' ? 'line' : 'bar',
         series: seriesData,
+        line: {
+          width: lineWidth,
+        },
         area: {
+          ...chartRef.current.options.area,
           opacity: custom.fillOpacity,
+          gradientMode,
+          gradientOpacityStopColor: themeMode === 'dark' ? 'rgba(0,0,0,0)' : 'rgba(255,255,255,0)',
         },
         stack: {
           enabled: custom.stack === 'noraml',
@@ -129,26 +137,33 @@ export default function index(props: IProps) {
           pointValueformatter: (val) => {
             return valueFormatter(
               {
-                util: options?.standardOptions?.util,
+                unit: options?.standardOptions?.util,
                 decimals: options?.standardOptions?.decimals,
               },
               val,
-            );
+            ).text;
           },
+        },
+        xAxis: {
+          ...chartRef.current.options.xAxis,
+          lineColor: themeMode === 'dark' ? 'rgba(255,255,255,0.2)' : '#ccc',
+          tickColor: themeMode === 'dark' ? 'rgba(255,255,255,0.2)' : '#ccc',
         },
         yAxis: {
           ...chartRef.current.options.yAxis,
           min: options?.standardOptions?.min,
           max: options?.standardOptions?.max,
           plotLines: options?.thresholds?.steps,
+          backgroundColor: themeMode === 'dark' ? '#2A2D3C' : '#fff',
+          gridLineColor: themeMode === 'dark' ? 'rgba(255,255,255,0.05)' : '#efefef',
           tickValueFormatter: (val) => {
             return valueFormatter(
               {
-                util: options?.standardOptions?.util,
+                unit: options?.standardOptions?.util,
                 decimals: options?.standardOptions?.decimals,
               },
               val,
-            );
+            ).text;
           },
         },
       });
@@ -158,7 +173,7 @@ export default function index(props: IProps) {
         getLegendValues(
           seriesData,
           {
-            util: options?.standardOptions?.util,
+            unit: options?.standardOptions?.util,
             decimals: options?.standardOptions?.decimals,
           },
           hexPalette,
@@ -167,7 +182,7 @@ export default function index(props: IProps) {
     } else {
       setLegendData([]);
     }
-  }, [JSON.stringify(seriesData), JSON.stringify(custom), JSON.stringify(options)]);
+  }, [JSON.stringify(seriesData), JSON.stringify(custom), JSON.stringify(options), themeMode]);
 
   useEffect(() => {
     // TODO: 这里布局变化了，但是 fc-plot 没有自动 resize，所以这里需要手动 resize
@@ -183,13 +198,18 @@ export default function index(props: IProps) {
         display: placement === 'right' ? 'flex' : 'block',
       }}
     >
-      <div ref={chartEleRef} style={{ height: _chartHeight, width: placement === 'right' ? '60%' : '100%' }} />
+      <div ref={chartEleRef} style={{ height: _chartHeight, width: placement === 'right' ? (isExpanded ? 0 : '60%') : '100%' }} />
       {hasLegend && (
-        <div className='renderer-timeseries-legend-table' style={{ [inDashboard ? 'height' : 'maxHeight']: _tableHeight, overflow: 'hidden' }} ref={legendEleRef}>
+        <div
+          className='renderer-timeseries-legend-table'
+          style={{ [inDashboard ? 'height' : 'maxHeight']: _tableHeight, width: placement === 'right' ? (isExpanded ? '100%' : '40%') : '100%', overflow: 'hidden' }}
+          ref={legendEleRef}
+        >
           {displayMode === 'table' && (
             <Table
               rowKey='id'
               size='small'
+              className='scroll-container-table'
               scroll={{ x: 650, y: legendEleSize?.height || 100 - 46 }}
               columns={[
                 {
@@ -228,22 +248,42 @@ export default function index(props: IProps) {
                 {
                   title: 'Max',
                   dataIndex: 'max',
+                  sorter: (a, b) => a.max.value - b.max.value,
+                  render: (text) => {
+                    return text.text;
+                  },
                 },
                 {
                   title: 'Min',
                   dataIndex: 'min',
+                  sorter: (a, b) => a.min.value - b.min.value,
+                  render: (text) => {
+                    return text.text;
+                  },
                 },
                 {
                   title: 'Avg',
                   dataIndex: 'avg',
+                  sorter: (a, b) => a.avg.value - b.avg.value,
+                  render: (text) => {
+                    return text.text;
+                  },
                 },
                 {
                   title: 'Sum',
                   dataIndex: 'sum',
+                  sorter: (a, b) => a.sum.value - b.sum.value,
+                  render: (text) => {
+                    return text.text;
+                  },
                 },
                 {
                   title: 'Last',
                   dataIndex: 'last',
+                  sorter: (a, b) => a.last.value - b.last.value,
+                  render: (text) => {
+                    return text.text;
+                  },
                 },
               ]}
               dataSource={legendData}
@@ -253,30 +293,48 @@ export default function index(props: IProps) {
               pagination={false}
             />
           )}
-          {displayMode === 'list' && (
-            <div className='renderer-timeseries-legend-list'>
-              {_.map(legendData, (item) => {
-                return (
-                  <div
-                    key={item.id}
-                    onClick={() => {
-                      setActiveLegend(activeLegend !== item.id ? item.id : '');
-                      setSeriesData(
-                        _.map(seriesData, (subItem) => {
-                          return {
-                            ...subItem,
-                            visible: activeLegend === item.id ? true : item.id === subItem.id,
-                          };
-                        }),
-                      );
-                    }}
-                    className={item.disabled ? 'disabled' : ''}
-                  >
-                    <span className='renderer-timeseries-legend-color-symbol' style={{ backgroundColor: item.color }} />
-                    {item.name}
-                  </div>
-                );
-              })}
+          {displayMode === 'list' && !_.isEmpty(legendData) && (
+            <div className='renderer-timeseries-legend-container'>
+              <div
+                className={classNames({
+                  'renderer-timeseries-legend-list': true,
+                  'renderer-timeseries-legend-list-placement-right': placement === 'right',
+                  'scroll-container': true,
+                })}
+              >
+                {_.map(legendData, (item) => {
+                  return (
+                    <div
+                      key={item.id}
+                      onClick={() => {
+                        setActiveLegend(activeLegend !== item.id ? item.id : '');
+                        setSeriesData(
+                          _.map(seriesData, (subItem) => {
+                            return {
+                              ...subItem,
+                              visible: activeLegend === item.id ? true : item.id === subItem.id,
+                            };
+                          }),
+                        );
+                      }}
+                      className={item.disabled ? 'disabled' : ''}
+                    >
+                      <span className='renderer-timeseries-legend-color-symbol' style={{ backgroundColor: item.color }} />
+                      {item.name}
+                    </div>
+                  );
+                })}
+              </div>
+              {placement === 'right' && (
+                <div
+                  className='renderer-timeseries-legend-toggle'
+                  onClick={() => {
+                    setIsExpanded(!isExpanded);
+                  }}
+                >
+                  {isExpanded ? <VerticalLeftOutlined /> : <VerticalRightOutlined />}
+                </div>
+              )}
             </div>
           )}
         </div>

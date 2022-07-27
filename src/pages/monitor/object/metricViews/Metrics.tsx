@@ -18,17 +18,16 @@ import React, { useState, useEffect } from 'react';
 import _ from 'lodash';
 import { Input, Card, Row, Col, Space, Button, Tooltip } from 'antd';
 import { SearchOutlined, SyncOutlined } from '@ant-design/icons';
-import DateRangePicker from '@/components/DateRangePicker';
-import Graph from './Graph';
+import TimeRangePicker, { IRawTimeRange } from '@/components/TimeRangePicker';
 import Resolution from '@/components/Resolution';
-import { Range } from '@/components/DateRangePicker';
 import { getMetricValues, getMetricsDesc } from '@/services/metricViews';
+import Graph from './Graph';
 import { IMatch } from '../types';
 import { getMatchStr } from './utils';
 
 interface IProps {
-  range: Range;
-  setRange: (range: Range) => void;
+  range: IRawTimeRange;
+  setRange: (range: IRawTimeRange) => void;
   match: IMatch;
 }
 
@@ -156,7 +155,7 @@ export default function Metrics(props: IProps) {
               <Row style={{ padding: '10px 0' }}>
                 <Col span={8}>
                   <Space>
-                    <DateRangePicker
+                    <TimeRangePicker
                       value={range}
                       onChange={(e) => {
                         setRange(e);

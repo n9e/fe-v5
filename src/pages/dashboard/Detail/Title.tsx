@@ -15,19 +15,17 @@
  *
  */
 import React, { useState, useRef } from 'react';
-import { useHistory } from 'react-router-dom';
-import { useThrottleFn } from 'ahooks';
-import moment from 'moment';
+import { useHistory, useLocation } from 'react-router-dom';
+import querystring from 'query-string';
 import _ from 'lodash';
-import { Input, Button, Space, Dropdown, Menu } from 'antd';
+import { Input, Button, Space, Dropdown, Menu, Switch } from 'antd';
 import { RollbackOutlined, EditOutlined, DownOutlined } from '@ant-design/icons';
 import { updateDashboard } from '@/services/dashboardV2';
-import DateRangePicker from '@/components/DateRangePicker';
 import Resolution from '@/components/Resolution';
-import { Range } from '@/components/DateRangePicker';
-import Refresh from '../Components/Refresh';
+import { TimeRangePickerWithRefresh, IRawTimeRange } from '@/components/TimeRangePicker';
 import { AddPanelIcon } from '../config';
 import { visualizations } from '../Editor/config';
+import { getStepByTimeAndStep } from '../utils';
 
 interface IProps {
   curCluster: string;
@@ -36,8 +34,8 @@ interface IProps {
   dashboard: any;
   setDashboard: (dashboard: any) => void;
   refresh: (bool?: boolean) => void;
-  range: Range;
-  setRange: (range: Range) => void;
+  range: IRawTimeRange;
+  setRange: (range: IRawTimeRange) => void;
   step: number | null;
   setStep: (step: number | null) => void;
   refreshRef: any;
@@ -48,6 +46,9 @@ export default function Title(props: IProps) {
   const { curCluster, clusters, setCurCluster, dashboard, setDashboard, refresh, range, setRange, step, setStep, refreshRef, onAddPanel } = props;
   const { id, name } = dashboard;
   const history = useHistory();
+  const location = useLocation();
+  const query = querystring.parse(location.search);
+  const { viewMode, themeMode } = query;
   const [titleEditing, setTitleEditing] = useState(false);
   const titleRef = useRef<any>(null);
   const handleModifyTitle = async (newName) => {
@@ -56,26 +57,6 @@ export default function Title(props: IProps) {
       setTitleEditing(false);
     });
   };
-  const { run } = useThrottleFn(
-    () => {
-      if ('start' in range && range.start && range.end) {
-        const diff = range.end - range.start;
-        const now = moment().unix();
-        setRange({
-          end: now,
-          start: now - diff,
-        });
-      } else if ('unit' in range && range.unit) {
-        const newRefreshFlag = _.uniqueId('refreshFlag_');
-        setRange({
-          ...range,
-          refreshFlag: newRefreshFlag,
-        });
-      }
-      refresh(false);
-    },
-    { wait: 1000 },
-  );
 
   return (
     <div className='dashboard-detail-header'>
@@ -168,14 +149,43 @@ export default function Title(props: IProps) {
               </Button>
             </Dropdown>
           </div>
-          <DateRangePicker
-            value={range}
-            onChange={(val) => {
-              setRange(val);
-            }}
-          />
+          <TimeRangePickerWithRefresh refreshTooltip={`刷新间隔小于 step(${getStepByTimeAndStep(range, step)}s) 将不会更新数据`} value={range} onChange={setRange} />
           <Resolution onChange={(v) => setStep(v)} initialValue={step} />
-          <Refresh range={range} step={step} onRefresh={run} ref={refreshRef} />
+          <Button
+            onClick={() => {
+              const newQuery = _.omit(query, ['viewMode', 'themeMode']);
+              if (!viewMode) {
+                newQuery.viewMode = 'fullscreen';
+              }
+              history.replace({
+                pathname: location.pathname,
+                search: querystring.stringify(newQuery),
+              });
+              // TODO: 解决大盘 layout resize 问题
+              setTimeout(() => {
+                window.dispatchEvent(new Event('resize'));
+              }, 500);
+            }}
+          >
+            {viewMode === 'fullscreen' ? '关闭全屏' : '全屏'}
+          </Button>
+          {viewMode === 'fullscreen' && (
+            <Switch
+              checkedChildren='dark'
+              unCheckedChildren='light'
+              checked={themeMode === 'dark'}
+              onChange={(checked) => {
+                const newQuery = _.omit(query, ['themeMode']);
+                if (checked) {
+                  newQuery.themeMode = 'dark';
+                }
+                history.replace({
+                  pathname: location.pathname,
+                  search: querystring.stringify(newQuery),
+                });
+              }}
+            />
+          )}
         </Space>
       </div>
     </div>
