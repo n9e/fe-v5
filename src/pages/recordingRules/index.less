@@ -1,0 +1,143 @@
+
+.strategy-form {
+  padding: 18px;
+  .anticon-question-circle {
+    color: @colorBlue;
+  }
+}
+
+.strategy-content {
+  display: flex;
+  flex-direction: row;
+  padding: @basePadding;
+  overflow-x: auto;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.trigger-condition-preview {
+  width: 70px;
+  .ant-tooltip-inner {
+    text-align: center;
+  }
+}
+
+.strategy-table-content {
+  flex: 1;
+  padding: 10px;
+  width: calc(100% - 370px);
+  overflow: auto;
+  .strategy-table-title {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    background: @colorGray6;
+    padding: 8px 24px;
+    margin-bottom: 15px;
+    border: 1px solid #e0dee2;
+    &-label {
+      color: @fontColorLevel1;
+      font-size: @baseFontSizeSmall;
+      font-weight: bold;
+      display: inline;
+    }
+    &-sub {
+      margin-top: 8px;
+      &-item {
+        font-size: @baseFontSizeTiny;
+      }
+    }
+  }
+  .strategy-table-search {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0;
+    &-left {
+      &-refresh {
+        margin-right: 8px;
+      }
+    }
+    &-right {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+    
+  }
+}
+
+.control-icon-normal {
+  line-height: 32px;
+}
+
+.control-icon-high {
+  line-height: 120px;
+}
+.Promeql-content {
+  .ant-form-item-control-input-content {
+    // position: relative;
+    // .ant-form-item {
+    //   width: 1124px;
+    // }
+
+    .promql-editor {
+      max-width: 96%;
+    }
+    .Promeql-icon-btn {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+    }
+  }
+}
+.bottom-content {
+  position: sticky;
+  padding: 1px 0;
+  bottom: 0;
+  background: @colorWhite;
+  border-top: 0.5px solid #eee;
+  button {
+    margin-right: 8px;
+  }
+}
+.my-drawer {
+  .ant-drawer-content-wrapper {
+    min-width: 850px;
+  }
+  .ant-drawer-body {
+    display: flex;
+    flex-direction: column;
+  }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    .header-left {
+      padding-left: 8px;
+      display: flex;
+    }
+  }
+  .chart-list {
+    margin-top: 20px;
+    width: 800px;
+    display: flex;
+    justify-content: center;
+    .ant-Row {
+      width: 100%;
+    }
+    .holder {
+      width: 100%;
+      height: 100px;
+      justify-content: center;
+      align-items: center;
+      display: flex;
+      border: 2px solid #e0dee2;
+      margin: 10px;
+      background: #fff;
+      color: #1890ff;
+      & > span {
+        margin-left: 5px;
+      }
+    }
+  }
+}

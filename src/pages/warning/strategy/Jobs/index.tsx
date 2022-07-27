@@ -166,6 +166,7 @@ export default function Jobs() {
               {
                 title: '操作',
                 render: (record) => {
+                  if (record.status === 2) return null;
                   return (
                     <a
                       onClick={() => {

@@ -54,7 +54,7 @@ request.interceptors.response.use(
         .clone()
         .json()
         .then((data) => {
-          if (response.url.includes('/api/v1/')) {
+          if (response.url.includes('/api/v1/') || response.url.includes('/api/v2')) {
             if (status === 200 && !data.error) {
               return { ...data, success: true };
             } else if (data.error) {
@@ -90,7 +90,7 @@ request.interceptors.response.use(
         });
     }
     // 兼容异常处理
-    if (status === 500 && response.url.includes('/api/v1')) {
+    if (status === 500 && (response.url.includes('/api/v1') || response.url.includes('/api/v2'))) {
       return response
         .clone()
         .json()
@@ -133,7 +133,7 @@ request.interceptors.response.use(
       }
       // } else if (status === 404) {
       //   location.href = '/404';
-    } else if (status === 403 && response.url.includes('/api/v1')) {
+    } else if (status === 403 && (response.url.includes('/api/v1') || response.url.includes('/api/v2'))) {
       return response
         .clone()
         .json()
@@ -162,7 +162,7 @@ request.interceptors.response.use(
                 return data;
               }
             }
-            if (response.url.includes('/api/v1')) {
+            if (response.url.includes('/api/v1') || response.url.includes('/api/v2')) {
               throw {
                 // TODO: 后端服务异常后可能返回的错误数据也不是一个正常的结构，后面得考虑下怎么处理
                 name: data.error ? data.error.name : JSON.stringify(data),

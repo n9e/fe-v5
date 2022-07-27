@@ -39,6 +39,22 @@ export const fetchHistory = (params?, signalKey?) => {
   });
 };
 
+export const fetchHistoryBatch = (data,signalKey) => {
+  const controller = new AbortController();
+  const { signal } = controller;
+  if (signalKey && signals[signalKey] && signals[signalKey].abort) {
+    signals[signalKey].abort();
+  }
+  signals[signalKey] = controller;
+  return request(`/api/n9e/query-range-batch`, {
+    method: RequestMethod.Post,
+    data,
+    signal
+  }).finally(() => {
+    delete signals[signalKey];
+  });
+};
+
 export const fetchAggrGroups = (params?) => {
   return request(`/api/n9e/prometheus/api/v1/labels`, {
     method: RequestMethod.Get,

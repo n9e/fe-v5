@@ -304,6 +304,7 @@ const EventDetailPage: React.FC = () => {
                     type='primary'
                     onClick={() => {
                       history.push('/alert-mutes/add', {
+                        group_id: eventDetail.group_id,
                         cluster: eventDetail.cluster,
                         tags: eventDetail.tags
                           ? eventDetail.tags.map((tag) => {

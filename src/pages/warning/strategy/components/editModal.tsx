@@ -26,6 +26,7 @@ import { CommonStoreState } from '@/store/commonInterface';
 import { getTeamInfoList, getNotifiesList } from '@/services/manage';
 import { SwitchWithLabel } from './SwitchWithLabel';
 import { debounce } from 'lodash';
+import { ClusterAll } from './operateForm';
 const layout = {
   labelCol: {
     span: 3,
@@ -248,6 +249,9 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
         case 'callbacks':
           data.callbacks = values.callbacks.map((item) => item.url);
           break;
+        case 'cluster':
+          data.cluster = values.cluster.join(' ');
+          break;
         case 'notify_recovered':
           data.notify_recovered = values.notify_recovered ? 1 : 0;
           break;
@@ -266,6 +270,12 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
       });
       editModalFinish(true, data);
     });
+  };
+
+  const handleClusterChange = (v: string[]) => {
+    if (v.includes(ClusterAll)) {
+      form.setFieldsValue({ cluster: [ClusterAll] });
+    }
   };
 
   const editModalClose = () => {
@@ -297,7 +307,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
             enable_status: true, // true:立即启用 false:禁用
             notify_recovered: 1, // 1:启用
             enable_time: [moment('00:00', 'HH:mm'), moment('23:59', 'HH:mm')],
-            cluster: clusterList[0] || 'Default', // 生效集群
+            cluster: clusterList || ['Default'], // 生效集群
             enable_days_of_week: ['1', '2', '3', '4', '5', '6', '0'],
             field: 'cluster',
           }}
@@ -359,7 +369,10 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                         },
                       ]}
                     >
-                      <Select suffixIcon={<CaretDownOutlined />}>
+                      <Select suffixIcon={<CaretDownOutlined />} mode='multiple' onChange={handleClusterChange}>
+                        <Option value={ClusterAll} key={ClusterAll}>
+                          {ClusterAll}
+                        </Option>
                         {clusterList?.map((item) => (
                           <Option value={item} key={item}>
                             {item}
@@ -569,7 +582,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                   <>
                     <Form.Item label={t('改为：')}>
                       <Space>
-                      <Form.Item
+                        <Form.Item
                           style={{ marginBottom: 0 }}
                           name='notify_max_number'
                           initialValue={0}

@@ -30,7 +30,7 @@ import { CommonStoreState } from '@/store/commonInterface';
 import TagItem from './tagItem';
 import { timeLensDefault } from '../../const';
 import '../index.less';
-
+import { ClusterAll } from '../../strategy/components/operateForm';
 const { Option } = Select;
 const { TextArea } = Input;
 
@@ -111,6 +111,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) 
       form.setFieldsValue({
         tags: tags || [{}],
         cluster: tagsObj.cluster,
+        busiGroup: tagsObj.group_id,
       });
     }
   }, [tagsObj]);
@@ -138,6 +139,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) 
     });
     const params = {
       ...values,
+      cluster: values.cluster.join(' '),
       btime: moment(values.btime).unix(),
       etime: moment(values.etime).unix(),
       tags,
@@ -151,6 +153,11 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) 
       .finally(() => {
         setBtnLoading(false);
       });
+  };
+  const handleClusterChange = (v: string[]) => {
+    if (v.includes(ClusterAll)) {
+      form.setFieldsValue({ cluster: [ClusterAll] });
+    }
   };
   const onFinishFailed = () => {
     setBtnLoading(false);
@@ -215,7 +222,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) 
         ...detail,
         btime: detail?.btime ? moment(detail.btime * 1000) : moment(btimeDefault),
         etime: detail?.etime ? moment(detail.etime * 1000) : moment(etimeDefault),
-        cluster: clusterList[0] || 'Default',
+        cluster: detail.cluster ? detail.cluster.split(' ') : clusterList || ['Default'], // 生效集群
       }}
     >
       <Card>
@@ -239,7 +246,10 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) 
             },
           ]}
         >
-          <Select suffixIcon={<CaretDownOutlined />}>
+          <Select suffixIcon={<CaretDownOutlined />} mode='multiple' onChange={handleClusterChange}>
+            <Option value={ClusterAll} key={ClusterAll}>
+              {ClusterAll}
+            </Option>
             {clusterList?.map((item) => (
               <Option value={item} key={item}>
                 {item}

@@ -60,12 +60,15 @@ const TagItem: React.FC<Itag> = ({ field, remove, form }) => {
               <Option value='=='>==</Option>
               <Option value='=~'>=~</Option>
               <Option value='in'>in</Option>
+              <Option value='not in'>not in</Option>
+              <Option value='!='>!=</Option>
+              <Option value='!~'>!~</Option>
             </Select>
           </Form.Item>
         </Col>
         <Col span={15}>
           <Form.Item style={{ marginBottom: 0 }} name={[field.name, 'value']} fieldKey={[field.name, 'value']} rules={[{ required: true, message: t('value不能为空') }]}>
-            {funcCur == 'in' ? (
+            {['not in', 'in'].includes(funcCur) ? (
               <Select mode='tags' open={false} style={{ width: '100%' }} placeholder={t(valuePlaceholder)} tokenSeparators={[' ']}></Select>
             ) : (
               <Input className='ant-input' placeholder={t(valuePlaceholder)} />

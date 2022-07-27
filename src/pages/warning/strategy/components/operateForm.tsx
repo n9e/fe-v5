@@ -31,20 +31,14 @@ import PromQLInput from '@/components/PromQLInput';
 import AdvancedWrap from '@/components/AdvancedWrap';
 import { SwitchWithLabel } from './SwitchWithLabel';
 import AbnormalDetection from './AbnormalDetection';
-
+export const ClusterAll = '$all';
 const { Option } = Select;
 const layout = {
   labelCol: {
     span: 3,
   },
   wrapperCol: {
-    span: 21,
-  },
-};
-
-const tailLayout = {
-  wrapperCol: {
-    offset: 3,
+    span: 24,
   },
 };
 
@@ -165,7 +159,8 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
         message.warning('请先校验指标');
         return;
       }
-      const res = await prometheusQuery({ query: values.prom_ql }, values.cluster);
+      const cluster = values.cluster.includes(ClusterAll) && clusterList.length > 0 ? clusterList[0] : values.cluster[0] || '';
+      const res = await prometheusQuery({ query: values.prom_ql }, cluster);
       if (res.error) {
         notification.error({
           message: res.error,
@@ -181,6 +176,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
         notify_recovered: values.notify_recovered ? 1 : 0,
         enable_in_bg: values.enable_in_bg ? 1 : 0,
         callbacks,
+        cluster: values.cluster.join(' '),
       };
       let reqBody,
         method = 'Post';
@@ -218,6 +214,11 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
   };
 
   const debounceFetcher = useCallback(debounce(getGroups, 800), []);
+  const handleClusterChange = (v: string[]) => {
+    if (v.includes(ClusterAll)) {
+      form.setFieldsValue({ cluster: [ClusterAll] });
+    }
+  };
   return (
     <div className='operate_con'>
       <Form
@@ -232,9 +233,9 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
           severity: 2,
           disabled: 0, // 0:立即启用 1:禁用  待修改
           // notify_recovered: 1, // 1:启用
-          cluster: clusterList[0] || 'Default', // 生效集群
           enable_days_of_week: ['1', '2', '3', '4', '5', '6', '0'],
           ...detail,
+          cluster: detail.cluster ? detail.cluster.split(' ') : clusterList || ['Default'], // 生效集群
           enable_in_bg: detail?.enable_in_bg === 1,
           enable_time: detail?.enable_stime ? [moment(detail.enable_stime, 'HH:mm'), moment(detail.enable_etime, 'HH:mm')] : [moment('00:00', 'HH:mm'), moment('23:59', 'HH:mm')],
           enable_status: detail?.disabled === undefined ? true : !detail?.disabled,
@@ -298,7 +299,10 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                 },
               ]}
             >
-              <Select suffixIcon={<CaretDownOutlined />}>
+              <Select suffixIcon={<CaretDownOutlined />} mode='multiple' onChange={handleClusterChange}>
+                <Option value={ClusterAll} key={ClusterAll}>
+                  {ClusterAll}
+                </Option>
                 {clusterList?.map((item) => (
                   <Option value={item} key={item}>
                     {item}
@@ -310,16 +314,17 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
               <AbnormalDetection form={form} />
             </AdvancedWrap>
             <Form.Item noStyle shouldUpdate={(prevValues, curValues) => prevValues.cluster !== curValues.cluster}>
-              {() => {
+              {({ getFieldValue }) => {
                 return (
                   <Form.Item label='PromQL' className={'Promeql-content'} required style={{ marginBottom: 0 }}>
                     <AdvancedWrap>
                       {(isAvanced) => {
+                        const cluster = form.getFieldValue('cluster').includes(ClusterAll) && clusterList.length > 0 ? clusterList[0] : form.getFieldValue('cluster')[0] || '';
                         return (
                           <Input.Group compact>
                             <Form.Item
                               style={{
-                                width: isAvanced ? 'calc(100% - 80px)' : '100%',
+                                width: isAvanced && getFieldValue('algorithm') === 'holtwinters' ? 'calc(100% - 80px)' : '100%',
                               }}
                               name='prom_ql'
                               validateTrigger={['onBlur']}
@@ -329,7 +334,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                               <PromQLInput
                                 url='/api/n9e/prometheus'
                                 headers={{
-                                  'X-Cluster': form.getFieldValue('cluster'),
+                                  'X-Cluster': cluster,
                                   Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
                                 }}
                                 onChange={() => {
@@ -337,7 +342,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                                 }}
                               />
                             </Form.Item>
-                            {isAvanced && (
+                            {isAvanced && getFieldValue('algorithm') === 'holtwinters' && (
                               <Button
                                 onClick={() => {
                                   const values = form.getFieldsValue();
@@ -455,7 +460,6 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
             </Form.Item>
             <Form.Item
               name='enable_time'
-              {...tailLayout}
               rules={[
                 {
                   required: true,
