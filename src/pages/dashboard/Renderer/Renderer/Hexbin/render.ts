@@ -110,8 +110,8 @@ function renderHoneyComb(svgGroup, data, { width, height, fontAutoScale = true, 
     }
   }
 
-  const valueWithLabelTextAlignment = textAreaHeight / 2 / 2 + activeValueFontSize / 2;
-  const labelWithValueTextAlignment = -(textAreaHeight / 2 / 2) + activeLabelFontSize / 2;
+  const valueWithLabelTextAlignment = textAreaHeight / 2 / 2;
+  const labelWithValueTextAlignment = -(textAreaHeight / 2 / 2);
 
   svgGroup.attr('width', width).attr('height', height).attr('transform', `translate(${translateX},${translateY})`);
 
