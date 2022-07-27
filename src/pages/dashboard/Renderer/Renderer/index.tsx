@@ -218,7 +218,7 @@ function index(props: IProps) {
           )}
         </div>
       </div>
-      <div className='renderer-body' style={{ height: values.name ? `calc(100% - 35px)` : '100%' }}>
+      <div className='renderer-body' style={{ height: values.name ? `calc(100% - 47px)` : '100%' }}>
         {RendererCptMap[type] ? RendererCptMap[type]() : <div className='unknown-type'>{`无效的图表类型 ${type}`}</div>}
       </div>
     </div>

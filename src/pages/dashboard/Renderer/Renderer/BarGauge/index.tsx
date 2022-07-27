@@ -121,8 +121,8 @@ export default function BarGauge(props: IProps) {
   const curMaxValue = maxValue !== undefined ? maxValue : _.maxBy(calculatedValues, 'value')?.value || 0;
 
   return (
-    <div className='renderer-stat-container'>
-      <div className='renderer-bar-gauge-container scroll-container'>
+    <div className='renderer-bar-gauge-container'>
+      <div className='renderer-bar-gauge scroll-container'>
         {_.map(calculatedValues, (item) => {
           return <Item key={item.name} item={item} custom={custom} themeMode={themeMode} maxValue={curMaxValue} />;
         })}
