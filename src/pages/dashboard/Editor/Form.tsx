@@ -69,20 +69,21 @@ export default function FormCpt(props) {
         >
           <Col flex={1} style={{ minWidth: 100 }}>
             <div style={{ marginBottom: 10 }}>{render(variableConfigWithOptions)}</div>
-            <div style={{ height: 'calc(100% - 310px)', overflowY: 'auto' }}>
-              <div style={{ marginBottom: 10 }}>
-                <VariableConfig
-                  onChange={(value, bool, withOptions) => {
-                    setVariableConfigWithOptions(withOptions || []);
-                  }}
-                  value={variableConfigWithOptions}
-                  editable={false}
-                  cluster={cluster}
-                  range={range}
-                  id={id}
-                />
-              </div>
-              {type !== 'text' && (
+            {type !== 'text' && (
+              <div style={{ height: 'calc(100% - 310px)', overflowY: 'auto' }}>
+                <div style={{ marginBottom: 10 }}>
+                  <VariableConfig
+                    onChange={(value, bool, withOptions) => {
+                      setVariableConfigWithOptions(withOptions || []);
+                    }}
+                    value={variableConfigWithOptions}
+                    editable={false}
+                    cluster={cluster}
+                    range={range}
+                    id={id}
+                  />
+                </div>
+
                 <Form.List name='targets'>
                   {(fields, { add, remove }, { errors }) => {
                     return (
@@ -212,8 +213,8 @@ export default function FormCpt(props) {
                     );
                   }}
                 </Form.List>
-              )}
-            </div>
+              </div>
+            )}
           </Col>
           <Col flex='600px' style={{ overflowY: 'auto' }}>
             <Collapse>
