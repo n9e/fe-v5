@@ -85,7 +85,7 @@ function index(props: IProps) {
             }
           }
           setData(result);
-          onChange(value, false, _.isEmpty(result) ? undefined : result);
+          onChange(value, false, result);
         })();
       } catch (e) {
         console.log(e);
