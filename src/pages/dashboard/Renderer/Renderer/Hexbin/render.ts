@@ -180,7 +180,7 @@ function renderHoneyComb(svgGroup, data, { width, height, fontAutoScale = true, 
     .attr('alignment-baseline', 'central')
     .style('pointer-events', 'none')
     .style('font-size', activeLabelFontSize + 'px')
-    .style('fill', themeMode === 'dark' ? 'white' : 'black')
+    .style('fill', 'black')
     .each(function (this, d) {
       d.bbox = this.getBBox();
     });
@@ -201,7 +201,7 @@ function renderHoneyComb(svgGroup, data, { width, height, fontAutoScale = true, 
     .attr('text-anchor', 'middle')
     .attr('alignment-baseline', 'central')
     .style('font-size', activeValueFontSize + 'px')
-    .style('fill', themeMode === 'dark' ? 'white' : 'black')
+    .style('fill', 'black')
     .style('pointer-events', 'none')
     .each(function (this, d) {
       d.bbox = this.getBBox();
