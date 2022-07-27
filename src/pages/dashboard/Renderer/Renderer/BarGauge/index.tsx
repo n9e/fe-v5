@@ -124,7 +124,7 @@ export default function BarGauge(props: IProps) {
     <div className='renderer-bar-gauge-container'>
       <div className='renderer-bar-gauge scroll-container'>
         {_.map(calculatedValues, (item) => {
-          return <Item key={item.name} item={item} custom={custom} themeMode={themeMode} maxValue={curMaxValue} />;
+          return <Item key={item.id} item={item} custom={custom} themeMode={themeMode} maxValue={curMaxValue} />;
         })}
       </div>
     </div>
