@@ -1,6 +1,6 @@
 {
   "name": "n9e-fe",
-  "version": "5.6.0",
+  "version": "5.7.0",
   "scripts": {
     "dev": "vite --port 8765 --host",
     "build": "tsc && vite build",
