@@ -17,7 +17,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import _ from 'lodash';
 import moment from 'moment';
-import * as api from '@/components/Graph/api';
 import { formatPickerDate } from '@/components/DateRangePicker'; // TODO: 兼容旧版本
 import { IRawTimeRange, parseRange } from '@/components/TimeRangePicker';
 import { ITarget } from '../../types';
