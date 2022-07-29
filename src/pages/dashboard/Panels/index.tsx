@@ -222,6 +222,7 @@ function index(props: IProps) {
                       variableConfigWithOptions: variableConfig,
                       cluster: curCluster,
                       id: item.id,
+                      time: range,
                       initialValues: {
                         type: 'timeseries',
                         targets: [
