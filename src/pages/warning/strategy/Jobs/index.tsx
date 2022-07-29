@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Progress, Row, Col, Table, Input, Space } from 'antd';
+import { Progress, Row, Col, Table, Input, Space, Empty } from 'antd';
 import { SearchOutlined, LoadingOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import PageLayout from '@/components/pageLayout';
@@ -89,17 +89,7 @@ export default function Jobs() {
                       strokeColor={typeMap[key].border}
                       strokeWidth={12}
                       trailColor='#FFFFFF'
-                      format={(percent) => {
-                        // if (key === 'total') {
-                        //   return <div>{percent}</div>;
-                        // }
-                        // if (key === 'success' || key === 'fail') {
-                        //   return (
-                        //     <div>
-                        //       {percent} / {data.total}
-                        //     </div>
-                        //   );
-                        // }
+                      format={() => {
                         return null;
                       }}
                     />
@@ -184,12 +174,17 @@ export default function Jobs() {
               },
             ]}
             locale={{
-              emptyText: (
-                <div style={{ padding: '20px 0' }}>
-                  <LoadingOutlined style={{ fontSize: 24 }} />
-                  <div>曲线模型训练中</div>
-                </div>
-              ),
+              emptyText: () => {
+                if (data.total === 0 || (data.total !== 0 && data.training !== 0)) {
+                  return (
+                    <div style={{ padding: '20px 0' }}>
+                      <LoadingOutlined style={{ fontSize: 24 }} />
+                      <div>曲线模型训练中</div>
+                    </div>
+                  );
+                }
+                return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />;
+              },
             }}
           />
         </div>
