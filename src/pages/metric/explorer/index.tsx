@@ -14,24 +14,16 @@
  * limitations under the License.
  *
  */
-import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useState } from 'react';
 import { Button, Card } from 'antd';
-import { LineChartOutlined, PlusOutlined } from '@ant-design/icons';
+import { LineChartOutlined, PlusOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import PageLayout from '@/components/pageLayout';
-import { RootState as CommonRootState } from '@/store/common';
-import { CommonStoreState } from '@/store/commonInterface';
 import { generateID } from '@/utils';
-import { getMetrics } from '@/services/warning';
 import PromGraph from '@/components/PromGraph';
 import './index.less';
 
 type PanelMeta = { id: string; defaultPromQL?: string };
-
-interface PanelListProps {
-  metrics: string[];
-}
 
 function getUrlParamsByName(name) {
   let reg = new RegExp(`.*?${name}=([^&]*)`),
@@ -43,7 +35,7 @@ function getUrlParamsByName(name) {
   return '';
 }
 
-const PanelList: React.FC<PanelListProps> = ({ metrics }) => {
+const PanelList: React.FC = () => {
   const [panelList, setPanelList] = useState<PanelMeta[]>([{ id: generateID(), defaultPromQL: decodeURIComponent(getUrlParamsByName('promql')) }]);
   // 添加一个查询面板
   function addPanel() {
@@ -64,8 +56,16 @@ const PanelList: React.FC<PanelListProps> = ({ metrics }) => {
     <>
       {panelList.map(({ id, defaultPromQL = '' }) => {
         return (
-          <Card key={id} bodyStyle={{ padding: 16 }} style={{ marginBottom: 16 }}>
+          <Card key={id} bodyStyle={{ padding: 16 }} className='panel'>
             <PromGraph url='/api/n9e/prometheus' promQL={defaultPromQL} datasourceIdRequired={false} />
+            <span
+              className='remove-panel-btn'
+              onClick={() => {
+                removePanel(id);
+              }}
+            >
+              <CloseCircleOutlined />
+            </span>
           </Card>
         );
       })}
@@ -80,21 +80,7 @@ const PanelList: React.FC<PanelListProps> = ({ metrics }) => {
 };
 
 const MetricExplorerPage: React.FC = () => {
-  const [metrics, setMetrics] = useState<string[]>([]);
-  const { clusters } = useSelector<CommonRootState, CommonStoreState>((state) => state.common);
   const [rerenderFlag, setRerenderFlag] = useState(_.uniqueId('rerenderFlag_'));
-
-  useEffect(() => {
-    if (clusters.length) {
-      getMetrics()
-        .then((res) => {
-          setMetrics(res.data || []);
-        })
-        .catch(() => {
-          setMetrics([]);
-        });
-    }
-  }, [clusters, rerenderFlag]);
 
   return (
     <PageLayout
@@ -106,7 +92,7 @@ const MetricExplorerPage: React.FC = () => {
       }}
     >
       <div className='prometheus-page' key={rerenderFlag}>
-        <PanelList metrics={metrics} />
+        <PanelList />
       </div>
     </PageLayout>
   );
