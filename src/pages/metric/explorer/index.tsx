@@ -14,18 +14,18 @@
  * limitations under the License.
  *
  */
-import PageLayout from '@/components/pageLayout';
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { Button, Card } from 'antd';
 import { LineChartOutlined, PlusOutlined } from '@ant-design/icons';
-import { useSelector, useDispatch } from 'react-redux';
+import _ from 'lodash';
+import PageLayout from '@/components/pageLayout';
 import { RootState as CommonRootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
-import { Button } from 'antd';
-import _ from 'lodash';
-import React, { useEffect, useState } from 'react';
-import './index.less';
 import { generateID } from '@/utils';
 import { getMetrics } from '@/services/warning';
-import Panel from './panel';
+import PromGraph from '@/components/PromGraph';
+import './index.less';
 
 type PanelMeta = { id: string; defaultPromQL?: string };
 
@@ -62,9 +62,13 @@ const PanelList: React.FC<PanelListProps> = ({ metrics }) => {
 
   return (
     <>
-      {panelList.map(({ id, defaultPromQL = '' }) => (
-        <Panel key={id} metrics={metrics} defaultPromQL={defaultPromQL} removePanel={() => removePanel(id)} />
-      ))}
+      {panelList.map(({ id, defaultPromQL = '' }) => {
+        return (
+          <Card key={id} bodyStyle={{ padding: 16 }} style={{ marginBottom: 16 }}>
+            <PromGraph url='/api/n9e/prometheus' promQL={defaultPromQL} datasourceIdRequired={false} />
+          </Card>
+        );
+      })}
       <div className='add-prometheus-panel'>
         <Button size='large' onClick={addPanel}>
           <PlusOutlined />
