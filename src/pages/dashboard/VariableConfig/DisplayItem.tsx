@@ -45,6 +45,7 @@ export default function DisplayItem(props: IProps) {
             style={{
               width: '180px',
             }}
+            maxTagCount='responsive'
             onChange={(v) => {
               let val = v;
               if (multi && allOption && val.includes('all')) {
