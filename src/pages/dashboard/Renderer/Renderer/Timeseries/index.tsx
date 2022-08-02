@@ -153,7 +153,12 @@ export default function index(props: IProps) {
           ...chartRef.current.options.yAxis,
           min: options?.standardOptions?.min,
           max: options?.standardOptions?.max,
-          plotLines: options?.thresholds?.steps,
+          plotLines: _.map(options?.thresholds?.steps, (item) => {
+            return {
+              ...item,
+              shadowColor: themeMode === 'dark' ? 'rgba(255,255,255,0.2)' : '#fff',
+            };
+          }),
           backgroundColor: themeMode === 'dark' ? '#2A2D3C' : '#fff',
           gridLineColor: themeMode === 'dark' ? 'rgba(255,255,255,0.05)' : '#efefef',
           tickValueFormatter: (val) => {

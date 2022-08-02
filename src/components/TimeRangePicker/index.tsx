@@ -76,9 +76,9 @@ const setAbsoluteHistoryCache = (range, dateFormat) => {
 
 export default function index(props: IProps) {
   const absoluteHistoryCache = getAbsoluteHistoryCache();
-  const { value, onChange = () => {}, dateFormat = 'YYYY-MM-DD HH:mm', placeholder, allowClear = false, onClear = () => {} } = props;
+  const { value, onChange = () => {}, dateFormat = 'YYYY-MM-DD HH:mm', placeholder = '请选择时间', allowClear = false, onClear = () => {} } = props;
   const [visible, setVisible] = useState(false);
-  const [range, setRange] = useState<IRawTimeRange>(defaultRange);
+  const [range, setRange] = useState<IRawTimeRange>();
   const [label, setLabel] = useState<string>('');
   const [searchValue, setSearchValue] = useState('');
   const [rangeStatus, setRangeStatus] = useState<{
@@ -93,7 +93,7 @@ export default function index(props: IProps) {
       start: '开始时间',
       end: '结束时间',
     };
-    const val = moment(range[key], true);
+    const val = moment(range ? range[key] : undefined, true);
     return (
       <div className='mb10'>
         <span>{labelMap[key]}</span>
@@ -115,14 +115,14 @@ export default function index(props: IProps) {
                 }}
                 disabledDate={(current: Moment) => {
                   if (key === 'start') {
-                    return current && current.valueOf() > moment(range.end, true).valueOf();
+                    return current && current.valueOf() > moment(range?.end, true).valueOf();
                   }
-                  return current && current.valueOf() < moment(range.start, true).valueOf();
+                  return current && current.valueOf() < moment(range?.start, true).valueOf();
                 }}
                 value={val.isValid() ? val : undefined}
                 onChange={(value) => {
                   const newRange = {
-                    ...range,
+                    ...(range || {}),
                     [key]: value,
                   };
                   if (key === 'start' && !moment.isMoment(newRange.end)) {
@@ -131,7 +131,7 @@ export default function index(props: IProps) {
                   if (key === 'end' && !moment.isMoment(newRange.start)) {
                     newRange.start = moment(newRange.end).startOf('day');
                   }
-                  setRange(newRange);
+                  setRange(newRange as IRawTimeRange);
                   setAbsoluteHistoryCache(newRange, dateFormat);
                 }}
               />
@@ -142,7 +142,7 @@ export default function index(props: IProps) {
           <Input
             style={{ width: 'calc(100% - 32px)' }}
             className={rangeStatus[key] === 'invalid' ? 'ant-input-status-error' : ''}
-            value={valueAsString(range[key], dateFormat)}
+            value={range ? valueAsString(range[key], dateFormat) : undefined}
             onChange={(e) => {
               const val = e.target.value;
               setRangeStatus({
@@ -151,22 +151,22 @@ export default function index(props: IProps) {
               });
               if (isValid(val)) {
                 const newRange = {
-                  ...range,
+                  ...(range || {}),
                   [key]: isMathString(val) ? val : moment(val),
                 };
-                setRange(newRange);
+                setRange(newRange as IRawTimeRange);
               } else {
                 setRange({
-                  ...range,
+                  ...(range || {}),
                   [key]: val,
-                });
+                } as IRawTimeRange);
               }
             }}
             onBlur={(e) => {
               const val = e.target.value;
               const otherKey = key === 'start' ? 'end' : 'start';
               // 必须是绝对时间才缓存
-              if (!isMathString(val) && moment.isMoment(range[otherKey])) {
+              if (range && !isMathString(val) && moment.isMoment(range[otherKey])) {
                 setAbsoluteHistoryCache(
                   {
                     ...range,
@@ -187,9 +187,6 @@ export default function index(props: IProps) {
     if (value) {
       setRange(value);
       setLabel(describeTimeRange(value, dateFormat));
-    } else {
-      setRange(defaultRange);
-      setLabel(describeTimeRange(defaultRange, dateFormat));
     }
   }, [JSON.stringify(value), visible]);
 
@@ -249,7 +246,7 @@ export default function index(props: IProps) {
                             <li
                               key={item.display}
                               className={classNames({
-                                active: item.start === range.start && item.end === range.end,
+                                active: item.start === range?.start && item.end === range?.end,
                               })}
                               onClick={() => {
                                 const newValue = {
@@ -277,7 +274,7 @@ export default function index(props: IProps) {
                 type='primary'
                 onClick={() => {
                   if (rangeStatus.start !== 'invalid' && rangeStatus.end !== 'invalid') {
-                    onChange(range);
+                    onChange(range as IRawTimeRange);
                     setVisible(false);
                   }
                 }}
@@ -298,7 +295,7 @@ export default function index(props: IProps) {
           style={props.style}
           className={classNames({
             'flashcat-timeRangePicker-target': true,
-            'flashcat-timeRangePicker-target-allowClear': allowClear,
+            'flashcat-timeRangePicker-target-allowClear': allowClear && label,
           })}
           onClick={() => {
             setVisible(!visible);
@@ -311,6 +308,8 @@ export default function index(props: IProps) {
               onClick={(e) => {
                 e.nativeEvent.stopImmediatePropagation();
                 e.stopPropagation();
+                setRange(undefined);
+                setLabel('');
                 onClear();
               }}
             />

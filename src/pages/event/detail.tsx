@@ -25,13 +25,13 @@ import PageLayout from '@/components/pageLayout';
 import { getAlertEventsById, getHistoryEventsById, getBrainData } from '@/services/warning';
 import { priorityColor } from '@/utils/constant';
 import PromQLInput from '@/components/PromQLInput';
-import DateRangePicker from '@/components/DateRangePicker';
+import { TimeRangePickerWithRefresh, IRawTimeRange, parseRange } from '@/components/TimeRangePicker';
 import Resolution from '@/components/Resolution';
-import { Range, formatPickerDate } from '@/components/DateRangePicker';
 import { deleteAlertEventsModal } from '.';
-import Graph from './Graph';
 import { RootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
+import { getStepByTimeAndStep } from '@/pages/dashboard/utils';
+import Graph from './Graph';
 import './detail.less';
 
 const { Paragraph } = Typography;
@@ -229,10 +229,9 @@ const EventDetailPage: React.FC = () => {
       },
     },
   ]);
-  const [range, setRange] = useState<Range>({
-    num: 1,
-    unit: 'hour',
-    description: '',
+  const [range, setRange] = useState<IRawTimeRange>({
+    start: 'now-1h',
+    end: 'now',
   });
   const [step, setStep] = useState<number | null>(15);
   const [series, setSeries] = useState<any[]>([]);
@@ -246,7 +245,9 @@ const EventDetailPage: React.FC = () => {
 
   useEffect(() => {
     if (eventDetail && eventDetail.rule_algo) {
-      let { start, end } = formatPickerDate(range);
+      const parsedRange = parseRange(range);
+      const start = moment(parsedRange.start).unix();
+      const end = moment(parsedRange.end).unix();
       let _step = step;
       if (!step) _step = Math.max(Math.floor((end - start) / 240), 1);
       getBrainData({
@@ -346,7 +347,7 @@ const EventDetailPage: React.FC = () => {
                 {eventDetail.rule_algo && (
                   <div>
                     <Space>
-                      <DateRangePicker value={range} onChange={setRange} />
+                      <TimeRangePickerWithRefresh value={range} onChange={setRange} refreshTooltip={`刷新间隔小于 step(${getStepByTimeAndStep(range, step)}s) 将不会更新数据`} />
                       <Resolution value={step} onChange={(v) => setStep(v)} initialValue={step} />
                     </Space>
                     <Graph series={series} />

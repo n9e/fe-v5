@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Drawer, Space } from 'antd';
 import _ from 'lodash';
+import moment from 'moment';
 import { getBrainData } from '@/services/warning';
-import DateRangePicker from '@/components/DateRangePicker';
 import Resolution from '@/components/Resolution';
-import { Range, formatPickerDate } from '@/components/DateRangePicker';
 import Graph from '@/pages/event/Graph';
 import PromQLInput from '@/components/PromQLInput';
+import { TimeRangePickerWithRefresh, IRawTimeRange, parseRange } from '@/components/TimeRangePicker';
+import { getStepByTimeAndStep } from '@/pages/dashboard/utils';
 
 interface IProps {
   rid: string;
@@ -24,16 +25,17 @@ const serieColorMap = {
 
 export default function GraphCpt(props: IProps) {
   const { rid, uuid, promql, visible, setVisible } = props;
-  const [range, setRange] = useState<Range>({
-    num: 1,
-    unit: 'hour',
-    description: '',
+  const [range, setRange] = useState<IRawTimeRange>({
+    start: 'now-1h',
+    end: 'now',
   });
   const [step, setStep] = useState<number | null>(15);
   const [series, setSeries] = useState<any[]>([]);
 
   useEffect(() => {
-    let { start, end } = formatPickerDate(range);
+    const parsedRange = parseRange(range);
+    const start = moment(parsedRange.start).unix();
+    const end = moment(parsedRange.end).unix();
     let _step = step;
     if (!step) _step = Math.max(Math.floor((end - start) / 240), 1);
     if (rid && uuid) {
@@ -103,7 +105,7 @@ export default function GraphCpt(props: IProps) {
         >
           <PromQLInput readonly url='/api/n9e/prometheus' value={promql} />
           <Space>
-            <DateRangePicker value={range} onChange={setRange} />
+            <TimeRangePickerWithRefresh value={range} onChange={setRange} refreshTooltip={`刷新间隔小于 step(${getStepByTimeAndStep(range, step)}s) 将不会更新数据`} />
             <Resolution value={step} onChange={(v) => setStep(v)} initialValue={step} />
           </Space>
         </div>

@@ -68,7 +68,7 @@ function index(props: IProps) {
               const regFilterOptions = _.filter(options, (i) => !!i && (!item.reg || !stringToRegex(item.reg) || (stringToRegex(item.reg) as RegExp).test(i)));
               result[idx] = item;
               result[idx].fullDefinition = definition;
-              result[idx].options = regFilterOptions;
+              result[idx].options = _.sortBy(regFilterOptions);
               // 当大盘变量值为空时，设置默认值
               const selected = getVaraiableSelected(item.name, id);
               if (selected === null) {
