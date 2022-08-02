@@ -157,7 +157,7 @@ export default function Metrics(props: IProps) {
                   <Space>
                     <TimeRangePicker
                       value={range}
-                      onChange={(e) => {
+                      onChange={(e: IRawTimeRange) => {
                         setRange(e);
                       }}
                     />
