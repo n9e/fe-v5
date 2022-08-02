@@ -17,7 +17,6 @@
 import React, { Component, ReactNode } from 'react';
 import { Button, Checkbox, Dropdown, Menu, Popover, Select, Spin } from 'antd';
 import { DownOutlined, SyncOutlined, SettingOutlined, ShareAltOutlined } from '@ant-design/icons';
-import moment from 'moment';
 import _ from 'lodash';
 import '@d3-charts/ts-graph/dist/index.css';
 import * as config from '../config';
@@ -29,7 +28,6 @@ import GraphChart from './Graph';
 import { Range, formatPickerDate } from '@/components/DateRangePicker';
 import { SetTmpChartData } from '@/services/metric';
 import { ChartType } from '@/components/D3Charts/src/interface';
-import { QueryStats } from '@/pages/metric/explorer/QueryStatsView';
 
 export interface GraphDataProps {
   step: number | null;
@@ -72,7 +70,7 @@ interface GraphProps {
   defaultOffsets?: string[];
   highLevelConfig?: Partial<HighLevelConfigType>;
   onErrorOccured?: (errorArr: ErrorInfoType[]) => void;
-  onRequestCompleted?: (requestInfo: QueryStats) => void;
+  onRequestCompleted?: (requestInfo: any) => void;
 }
 
 interface GraphState {
@@ -93,7 +91,7 @@ interface GraphState {
     formatUnit: 1024 | 1000 | 'humantime';
   };
   onErrorOccured?: (errorArr: ErrorInfoType[]) => void;
-  onRequestCompleted?: (requestInfo: QueryStats) => void;
+  onRequestCompleted?: (requestInfo: any) => void;
 }
 
 const formatUnitInfoMap = {
