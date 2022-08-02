@@ -21,10 +21,12 @@ import { v4 as uuidv4 } from 'uuid';
 import { Modal } from 'antd';
 import { useLocation } from 'react-router-dom';
 import querystring from 'query-string';
+import { useSelector } from 'react-redux';
 import RGL, { WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
+import { RootState as AccountRootState, accountStoreState } from '@/store/accountInterface';
 import { IRawTimeRange } from '@/components/TimeRangePicker';
-import { updateDashboardConfigs } from '@/services/dashboardV2';
+import { updateDashboardConfigs as updateDashboardConfigsFunc } from '@/services/dashboardV2';
 import { Dashboard } from '@/store/dashboardInterface';
 import {
   buildLayout,
@@ -58,6 +60,7 @@ interface IProps {
 const ReactGridLayout = WidthProvider(RGL);
 
 function index(props: IProps) {
+  const { profile } = useSelector<AccountRootState, accountStoreState>((state) => state.account);
   const location = useLocation();
   const { themeMode } = querystring.parse(location.search);
   const { curCluster, dashboard, range, step, variableConfig, panels, setPanels, onShareClick, onUpdated } = props;
@@ -68,6 +71,14 @@ function index(props: IProps) {
     cols: 24,
     useCSSTransforms: false,
     draggableHandle: '.dashboards-panels-item-drag-handle',
+  };
+  const updateDashboardConfigs = (dashboardId, options) => {
+    const roles = _.get(profile, 'roles', []);
+    const isAuthorized = !_.some(roles, (item) => item === 'Guest');
+    if (isAuthorized) {
+      return updateDashboardConfigsFunc(dashboardId, options);
+    }
+    return Promise.reject();
   };
 
   return (
