@@ -57,7 +57,7 @@ const PanelList: React.FC = () => {
       {panelList.map(({ id, defaultPromQL = '' }) => {
         return (
           <Card key={id} bodyStyle={{ padding: 16 }} className='panel'>
-            <PromGraph url='/api/n9e/prometheus' promQL={defaultPromQL} datasourceIdRequired={false} />
+            <PromGraph url='/api/n9e/prometheus' promQL={defaultPromQL} datasourceIdRequired={false} graphOperates={{ enabled: true }} globalOperates={{ enabled: true }} />
             <span
               className='remove-panel-btn'
               onClick={() => {

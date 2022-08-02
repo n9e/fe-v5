@@ -41,9 +41,10 @@ interface CMExpressionInputProps {
   onChange?: (expr?: string) => void;
   executeQuery?: (expr?: string) => void;
   validateTrigger?: string[];
+  completeEnabled?: boolean;
 }
 
-const ExpressionInput = ({ url, headers, value, onChange, executeQuery, readonly = false, validateTrigger = ['onChange', 'onBlur'] }: CMExpressionInputProps, ref) => {
+const ExpressionInput = ({ url, headers, value, onChange, executeQuery, readonly = false, validateTrigger = ['onChange', 'onBlur'], completeEnabled = true }: CMExpressionInputProps, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const executeQueryCallback = useRef(executeQuery);
@@ -57,7 +58,7 @@ const ExpressionInput = ({ url, headers, value, onChange, executeQuery, readonly
     promqlExtension
       .activateCompletion(true)
       .activateLinter(true)
-      .setComplete({
+      .setComplete(completeEnabled ? {
         remote: {
           url,
           fetchFn: (resource, options = {}) => {
@@ -76,7 +77,7 @@ const ExpressionInput = ({ url, headers, value, onChange, executeQuery, readonly
             });
           },
         },
-      });
+      } : undefined);
 
     // Create or reconfigure the editor.
     const view = viewRef.current;
@@ -157,7 +158,7 @@ const ExpressionInput = ({ url, headers, value, onChange, executeQuery, readonly
 
       view.focus();
     }
-  }, [onChange, JSON.stringify(headers)]);
+  }, [onChange, JSON.stringify(headers), completeEnabled]);
 
   useEffect(() => {
     if (realValue.current !== value) {

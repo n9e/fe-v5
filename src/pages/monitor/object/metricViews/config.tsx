@@ -29,7 +29,7 @@ export const HexbinSvg = () => (
 
 export const HexbinIcon = (props) => <Icon component={HexbinSvg} {...props} />;
 
-export const utils = [
+export const units = [
   {
     label: 'none',
     value: 'none',

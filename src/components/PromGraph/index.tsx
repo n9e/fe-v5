@@ -18,7 +18,7 @@
  * 类似 prometheus graph 的组件
  */
 import React, { useState, useRef, useEffect } from 'react';
-import { Input, Tabs, Button, Alert } from 'antd';
+import { Input, Tabs, Button, Alert, Checkbox } from 'antd';
 import { GlobalOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import moment from 'moment';
@@ -38,12 +38,32 @@ interface IProps {
   type?: 'table' | 'graph';
   defaultTime?: IRawTimeRange | number;
   promQL?: string;
+  graphOperates?: {
+    enabled: boolean;
+  };
+  globalOperates?: {
+    enabled: boolean;
+  }
 }
 
 const TabPane = Tabs.TabPane;
 
 export default function index(props: IProps) {
-  const { url = '/api/v1/datasource/prometheus', datasourceId, datasourceIdRequired, promQL, contentMaxHeight = 300, type = 'table', defaultTime } = props;
+  const {
+    url = '/api/v1/datasource/prometheus',
+    datasourceId,
+    datasourceIdRequired,
+    promQL,
+    contentMaxHeight = 300,
+    type = 'table',
+    defaultTime,
+    graphOperates = {
+      enabled: false,
+    },
+    globalOperates = {
+      enabled: false,
+    }
+  } = props;
   const [value, setValue] = useState<string | undefined>(promQL); // for promQLInput
   const [promql, setPromql] = useState<string | undefined>(promQL);
   const [queryStats, setQueryStats] = useState<QueryStats | null>(null);
@@ -53,6 +73,7 @@ export default function index(props: IProps) {
   const [range, setRange] = useState<IRawTimeRange>({ start: 'now-1h', end: 'now' }); // for graph
   const [step, setStep] = useState<number>(); // for graph
   const [metricsExplorerVisible, setMetricsExplorerVisible] = useState(false);
+  const [completeEnabled, setCompleteEnabled] = useState(true);
   const promQLInputRef = useRef<any>(null);
 
   useEffect(() => {
@@ -77,6 +98,16 @@ export default function index(props: IProps) {
 
   return (
     <div className='prom-graph-container'>
+      {
+        globalOperates.enabled && (
+          <div className='prom-graph-global-operate'>
+            <Checkbox checked={completeEnabled} onChange={(e) => {
+              setCompleteEnabled(e.target.checked);
+            }}>Enable autocomplete</Checkbox>
+          </div>
+        )
+      }
+      
       <div className='prom-graph-expression-input'>
         <Input.Group>
           <span className='ant-input-group-addon'>PromQL</span>
@@ -99,6 +130,7 @@ export default function index(props: IProps) {
               executeQuery={(val) => {
                 setPromql(val);
               }}
+              completeEnabled={completeEnabled}
             />
             <span className='ant-input-suffix'>
               <GlobalOutlined
@@ -168,6 +200,7 @@ export default function index(props: IProps) {
             setRange={setRange}
             step={step}
             setStep={setStep}
+            graphOperates={graphOperates}
           />
         </TabPane>
       </Tabs>

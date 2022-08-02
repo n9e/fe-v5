@@ -18,7 +18,7 @@ import React from 'react';
 import _ from 'lodash';
 import { Menu, Dropdown, Switch, Row, Col, InputNumber } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
-import { utils } from '../config';
+import { units } from '../config';
 import ColorRangeMenu from '../../../../dashboard/Components/ColorRangeMenu';
 import { colors } from '../../../../dashboard/Components/ColorRangeMenu/config';
 
@@ -32,11 +32,11 @@ export default function GraphStandardOptions(props: IProps) {
   const precisionMenu = (
     <Menu
       onClick={(e) => {
-        setHighLevelConfig({ ...highLevelConfig, util: e.key });
+        setHighLevelConfig({ ...highLevelConfig, unit: e.key });
       }}
-      selectedKeys={[highLevelConfig.util]}
+      selectedKeys={[highLevelConfig.unit]}
     >
-      {_.map(utils, (item) => {
+      {_.map(units, (item) => {
         return <Menu.Item key={item.value}>{item.label}</Menu.Item>;
       })}
     </Menu>
@@ -129,7 +129,7 @@ export default function GraphStandardOptions(props: IProps) {
         Value format with:{' '}
         <Dropdown overlay={precisionMenu}>
           <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
-            {_.get(_.find(utils, { value: highLevelConfig.util }), 'label')} <DownOutlined />
+            {_.get(_.find(units, { value: highLevelConfig.unit }), 'label')} <DownOutlined />
           </a>
         </Dropdown>
       </div>

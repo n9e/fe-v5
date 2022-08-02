@@ -14,14 +14,16 @@
  * limitations under the License.
  *
  */
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import moment from 'moment';
 import _ from 'lodash';
-import { Space, InputNumber, Radio } from 'antd';
-import { LineChartOutlined, AreaChartOutlined } from '@ant-design/icons';
-import TsGraph from '@fc-plot/ts-graph';
-import '@fc-plot/ts-graph/dist/index.css';
+import { Space, InputNumber, Radio, Button, Popover } from 'antd';
+import { LineChartOutlined, AreaChartOutlined, SettingOutlined, ShareAltOutlined } from '@ant-design/icons';
 import TimeRangePicker, { IRawTimeRange, parseRange } from '@/components/TimeRangePicker';
+import LineGraphStandardOptions from '@/pages/monitor/object/metricViews/graphStandardOptions/Line';
+import { colors } from '@/pages/dashboard/Components/ColorRangeMenu/config';
+import Timeseries from '@/pages/dashboard/Renderer/Renderer/Timeseries';
+import { setTmpChartData } from '@/services/metricViews';
 import { getPromData } from './services';
 import { QueryStats } from './QueryStatsView';
 
@@ -37,6 +39,9 @@ interface IProps {
   setRange: (range: IRawTimeRange) => void;
   step?: number;
   setStep: (step?: number) => void;
+  graphOperates: {
+    enabled: boolean;
+  };
 }
 
 enum ChartType {
@@ -56,11 +61,40 @@ const getSerieName = (metric: any) => {
 };
 
 export default function Graph(props: IProps) {
-  const { url, datasourceId, datasourceIdRequired, promql, setQueryStats, setErrorContent, contentMaxHeight, range, setRange, step, setStep } = props;
-  const [data, setData] = useState();
+  const { url, datasourceId, datasourceIdRequired, promql, setQueryStats, setErrorContent, contentMaxHeight, range, setRange, step, setStep, graphOperates } = props;
+  const [data, setData] = useState([]);
+  const [highLevelConfig, setHighLevelConfig] = useState({
+    shared: true,
+    sharedSortDirection: 'desc',
+    legend: true,
+    unit: 'none',
+    colorRange: colors[0].value,
+    reverseColorOrder: false,
+    colorDomainAuto: true,
+    colorDomain: [],
+    chartheight: 300,
+  });
   const [chartType, setChartType] = useState<ChartType>(ChartType.Line);
-  const eleRef = useRef<HTMLDivElement>(null);
-  const chartRef = useRef<TsGraph>(null);
+  const lineGraphProps = {
+    custom: {
+      drawStyle: 'lines',
+      fillOpacity: chartType === ChartType.Line ? 0 : 0.5,
+      stack: chartType === ChartType.Line ? 'hidden' : 'noraml',
+      lineInterpolation: 'smooth',
+    },
+    options: {
+      legend: {
+        displayMode: highLevelConfig.legend ? 'table' : 'hidden',
+      },
+      tooltip: {
+        mode: highLevelConfig.shared ? 'all' : 'single',
+        sort: highLevelConfig.sharedSortDirection,
+      },
+      standardOptions: {
+        util: highLevelConfig.unit,
+      },
+    },
+  };
 
   useEffect(() => {
     if (datasourceIdRequired ? datasourceId && promql : promql) {
@@ -101,50 +135,6 @@ export default function Graph(props: IProps) {
     }
   }, [JSON.stringify(range), step, datasourceId, promql]);
 
-  useEffect(() => {
-    return () => {
-      if (chartRef.current && typeof chartRef.current.destroy === 'function') {
-        chartRef.current.destroy();
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!_.isEmpty(data) && eleRef.current) {
-      if (!chartRef.current) {
-        chartRef.current = new TsGraph({
-          timestamp: 'X',
-          xkey: '0',
-          ykey: '1',
-          ykeyFormatter: (value) => Number(value),
-          chart: {
-            renderTo: eleRef.current,
-          },
-          line: {
-            width: 1,
-          },
-          area: {
-            opacity: chartType === 'stackArea' ? 0.5 : 0,
-          },
-          stack: {
-            enabled: chartType === 'stackArea',
-          },
-          series: _.cloneDeep(data),
-        });
-      } else {
-        chartRef.current.update({
-          series: _.cloneDeep(data),
-          area: {
-            opacity: chartType === 'stackArea' ? 0.5 : 0,
-          },
-          stack: {
-            enabled: chartType === 'stackArea',
-          },
-        });
-      }
-    }
-  }, [JSON.stringify(data), chartType]);
-
   return (
     <div className='prom-graph-graph-container'>
       <div className='prom-graph-graph-controls'>
@@ -175,9 +165,55 @@ export default function Graph(props: IProps) {
             optionType='button'
             buttonStyle='solid'
           />
+          {graphOperates.enabled && (
+            <>
+              <Popover
+                placement='left'
+                content={<LineGraphStandardOptions highLevelConfig={highLevelConfig} setHighLevelConfig={setHighLevelConfig} />}
+                trigger='click'
+                autoAdjustOverflow={false}
+                getPopupContainer={() => document.body}
+              >
+                <Button icon={<SettingOutlined />} />
+              </Popover>
+              <Button
+                icon={
+                  <ShareAltOutlined
+                    onClick={() => {
+                      const curCluster = localStorage.getItem('curCluster');
+                      const dataProps = {
+                        type: 'timeseries',
+                        version: '2.0.0',
+                        name: promql,
+                        step,
+                        range,
+                        ...lineGraphProps,
+                        targets: [
+                          {
+                            expr: promql,
+                          },
+                        ],
+                      };
+                      setTmpChartData([
+                        {
+                          configs: JSON.stringify({
+                            curCluster,
+                            dataProps,
+                          }),
+                        },
+                      ]).then((res) => {
+                        const ids = res.dat;
+                        window.open('/chart/' + ids);
+                      });
+                    }}
+                  />
+                }
+              />
+            </>
+          )}
         </Space>
       </div>
-      <div style={{ height: contentMaxHeight }} ref={eleRef} />
+      <Timeseries inDashboard={false} values={lineGraphProps as any} series={data} />
     </div>
   );
 }
