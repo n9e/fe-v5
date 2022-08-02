@@ -29,6 +29,7 @@ import './style.less';
 interface IProps {
   values: IPanel;
   series: any[];
+  themeMode?: 'dark';
 }
 
 const getColumnsKeys = (data: any[]) => {
@@ -49,7 +50,7 @@ export default function Stat(props: IProps) {
   const eleRef = useRef<HTMLDivElement>(null);
   const size = useSize(eleRef);
   const { dispatch } = useContext(Context);
-  const { values, series } = props;
+  const { values, series, themeMode } = props;
   const { custom, options, overrides } = values;
   const { showHeader, calc, aggrDimension, displayMode, columns, sortColumn, sortOrder, colorMode = 'value' } = custom;
   const [calculatedValues, setCalculatedValues] = React.useState([]);
@@ -109,7 +110,7 @@ export default function Stat(props: IProps) {
         let textObj = {
           value: text,
           unit: '',
-          color: record.color || '#000',
+          color: record.color || themeMode === 'dark' ? '#fff' : '#000',
         };
         const overrideProps = getOverridePropertiesByName(overrides, record.fields.refId);
         if (!_.isEmpty(overrideProps)) {
