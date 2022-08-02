@@ -36,7 +36,7 @@ interface IProps {
   style?: object;
   value?: IRawTimeRange;
   dateFormat?: string;
-  onChange?: (value?: IRawTimeRange) => void;
+  onChange?: (value: IRawTimeRange) => void;
   placeholder?: string;
   allowClear?: boolean;
   onClear?: () => void;
@@ -274,7 +274,7 @@ export default function index(props: IProps) {
                 type='primary'
                 onClick={() => {
                   if (rangeStatus.start !== 'invalid' && rangeStatus.end !== 'invalid') {
-                    onChange(range);
+                    onChange(range as IRawTimeRange);
                     setVisible(false);
                   }
                 }}
