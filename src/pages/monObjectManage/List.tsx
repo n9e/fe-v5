@@ -88,7 +88,6 @@ export default function List(props: IProps) {
         </span>
       ),
       dataIndex: 'ident',
-      width: 140,
     },
     {
       title: '标签',
