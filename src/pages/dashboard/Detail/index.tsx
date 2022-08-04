@@ -196,7 +196,7 @@ export default function DetailV2() {
         <div className='dashboard-detail-content'>
           <div className='dashboard-detail-content-header'>
             <div className='variable-area'>
-              <VariableConfig onChange={handleVariableChange} value={variableConfig} cluster={curCluster} range={range} id={id} onOpenFire={stopAutoRefresh} />
+              {variableConfig && <VariableConfig onChange={handleVariableChange} value={variableConfig} cluster={curCluster} range={range} id={id} onOpenFire={stopAutoRefresh} />}
             </div>
             <DashboardLinks
               value={dashboardLinks}
