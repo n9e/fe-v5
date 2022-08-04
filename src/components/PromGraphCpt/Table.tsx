@@ -19,7 +19,7 @@ import moment from 'moment';
 import _ from 'lodash';
 import { Input, DatePicker, List } from 'antd';
 import { getPromData } from './services';
-import { QueryStats } from './QueryStatsView';
+import { QueryStats } from './components/QueryStatsView';
 
 interface IProps {
   url: string;

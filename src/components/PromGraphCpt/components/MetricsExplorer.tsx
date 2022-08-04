@@ -17,7 +17,7 @@
 import React, { useEffect, useState } from 'react';
 import { SearchOutlined } from '@ant-design/icons';
 import { Input, Modal } from 'antd';
-import { getPromData } from './services';
+import { getPromData } from '../services';
 
 interface MetricsExplorer {
   url: string;

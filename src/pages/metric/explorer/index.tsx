@@ -20,7 +20,7 @@ import { LineChartOutlined, PlusOutlined, CloseCircleOutlined } from '@ant-desig
 import _ from 'lodash';
 import PageLayout from '@/components/pageLayout';
 import { generateID } from '@/utils';
-import PromGraph from '@/components/PromGraph';
+import PromGraph from '@/components/PromGraphCpt';
 import './index.less';
 
 type PanelMeta = { id: string; defaultPromQL?: string };

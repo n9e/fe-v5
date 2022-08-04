@@ -20,12 +20,10 @@ import _ from 'lodash';
 import { Space, InputNumber, Radio, Button, Popover } from 'antd';
 import { LineChartOutlined, AreaChartOutlined, SettingOutlined, ShareAltOutlined } from '@ant-design/icons';
 import TimeRangePicker, { IRawTimeRange, parseRange } from '@/components/TimeRangePicker';
-import LineGraphStandardOptions from '@/pages/monitor/object/metricViews/graphStandardOptions/Line';
-import { colors } from '@/pages/dashboard/Components/ColorRangeMenu/config';
+import LineGraphStandardOptions from './components/GraphStandardOptions';
 import Timeseries from '@/pages/dashboard/Renderer/Renderer/Timeseries';
-import { setTmpChartData } from '@/services/metricViews';
-import { getPromData } from './services';
-import { QueryStats } from './QueryStatsView';
+import { getPromData, setTmpChartData } from './services';
+import { QueryStats } from './components/QueryStatsView';
 
 interface IProps {
   url: string;
@@ -68,7 +66,6 @@ export default function Graph(props: IProps) {
     sharedSortDirection: 'desc',
     legend: true,
     unit: 'none',
-    colorRange: colors[0].value,
     reverseColorOrder: false,
     colorDomainAuto: true,
     colorDomain: [],

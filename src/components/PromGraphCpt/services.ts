@@ -26,3 +26,10 @@ export const getPromData = (url: string, params, headers) => {
     silence: true,
   }).then((res) => res.data);
 };
+
+export const setTmpChartData = function (data: { configs: string }[]) {
+  return request(`/api/n9e/share-charts`, {
+    method: RequestMethod.Post,
+    data,
+  });
+};

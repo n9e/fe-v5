@@ -26,8 +26,8 @@ import { IRawTimeRange, parseRange } from '@/components/TimeRangePicker';
 import PromQLInput from '../PromQLInput';
 import Table from './Table';
 import Graph from './Graph';
-import QueryStatsView, { QueryStats } from './QueryStatsView';
-import MetricsExplorer from './MetricsExplorer';
+import QueryStatsView, { QueryStats } from './components/QueryStatsView';
+import MetricsExplorer from './components/MetricsExplorer';
 import './style.less';
 
 interface IProps {
@@ -43,7 +43,7 @@ interface IProps {
   };
   globalOperates?: {
     enabled: boolean;
-  }
+  };
 }
 
 const TabPane = Tabs.TabPane;
@@ -62,7 +62,7 @@ export default function index(props: IProps) {
     },
     globalOperates = {
       enabled: false,
-    }
+    },
   } = props;
   const [value, setValue] = useState<string | undefined>(promQL); // for promQLInput
   const [promql, setPromql] = useState<string | undefined>(promQL);
@@ -98,16 +98,19 @@ export default function index(props: IProps) {
 
   return (
     <div className='prom-graph-container'>
-      {
-        globalOperates.enabled && (
-          <div className='prom-graph-global-operate'>
-            <Checkbox checked={completeEnabled} onChange={(e) => {
+      {globalOperates.enabled && (
+        <div className='prom-graph-global-operate'>
+          <Checkbox
+            checked={completeEnabled}
+            onChange={(e) => {
               setCompleteEnabled(e.target.checked);
-            }}>Enable autocomplete</Checkbox>
-          </div>
-        )
-      }
-      
+            }}
+          >
+            Enable autocomplete
+          </Checkbox>
+        </div>
+      )}
+
       <div className='prom-graph-expression-input'>
         <Input.Group>
           <span className='ant-input-group-addon'>PromQL</span>
