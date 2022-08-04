@@ -26,7 +26,7 @@ const QueryStatsView: FC<QueryStats> = (props) => {
   const { loadTime, resolution, resultSeries } = props;
 
   return (
-    <div className="query-stats">
+    <div className='query-stats'>
       <span>
         Load time: {loadTime}ms &ensp;{resolution && `Resolution: ${resolution}s `}&ensp;Result series: {resultSeries}
       </span>
