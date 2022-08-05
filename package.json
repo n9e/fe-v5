@@ -5,6 +5,7 @@
     "dev": "vite --port 8765 --host",
     "build": "tsc && vite build",
     "build:advanced": "tsc && vite build --mode advanced",
+    "build:enhanced": "tsc && vite build --mode enhanced",
     "serve": "vite preview"
   },
   "dependencies": {
