@@ -58,7 +58,7 @@ export default function EditItem(props: Props) {
   };
 
   return (
-    <Modal title={t('大盘变量')} width={950} visible={visible} onOk={handleOk} onCancel={onCancel} wrapClassName='variable-modal'>
+    <Modal title={t('大盘变量')} width={1200} visible={visible} onOk={handleOk} onCancel={onCancel} wrapClassName='variable-modal'>
       <Form
         autoComplete='off'
         preserve={false}
@@ -77,10 +77,11 @@ export default function EditItem(props: Props) {
               onClick={() => window.open('https://grafana.com/docs/grafana/latest/datasources/prometheus/#query-variable', '_blank')}
             />
           </Col>
-          <Col span={4}>{t('筛值正则')}</Col>
-          <Col span={2}>{t('Multi')}</Col>
+          <Col span={3}>{t('筛值正则')}</Col>
+          <Col span={1}>{t('Multi')}</Col>
           <Col span={2}>{t('All Option')}</Col>
-          <Col span={4}>{t('操作')}</Col>
+          <Col span={3}>{t('All Value')}</Col>
+          <Col span={3}>{t('操作')}</Col>
         </Row>
         <Form.List name='var'>
           {(fields, { add, remove, move }) => (
@@ -142,7 +143,7 @@ export default function EditItem(props: Props) {
                       }}
                     </Form.Item>
                   </Col>
-                  <Col span={4}>
+                  <Col span={3}>
                     <Form.Item shouldUpdate noStyle>
                       {({ getFieldValue }) => {
                         const type = getFieldValue(['var', fieldKey, 'type']);
@@ -162,7 +163,7 @@ export default function EditItem(props: Props) {
                       }}
                     </Form.Item>
                   </Col>
-                  <Col span={2}>
+                  <Col span={1}>
                     <Form.Item shouldUpdate noStyle>
                       {({ getFieldValue }) => {
                         const type = getFieldValue(['var', fieldKey, 'type']);
@@ -192,7 +193,22 @@ export default function EditItem(props: Props) {
                       }}
                     </Form.Item>
                   </Col>
-                  <Col span={4}>
+                  <Col span={3}>
+                    <Form.Item shouldUpdate noStyle>
+                      {({ getFieldValue }) => {
+                        const type = getFieldValue(['var', fieldKey, 'type']);
+                        if (type === 'query' && form.getFieldValue(['var', name, 'multi']) && form.getFieldValue(['var', name, 'allOption'])) {
+                          return (
+                            <Form.Item {...restField} name={[name, 'allValue']} fieldKey={[fieldKey, 'allValue']}>
+                              <Input placeholder='.*' />
+                            </Form.Item>
+                          );
+                        }
+                        return null;
+                      }}
+                    </Form.Item>
+                  </Col>
+                  <Col span={3}>
                     <Button type='link' size='small' onClick={() => move(name, name + 1)} disabled={name === fields.length - 1}>
                       <ArrowDownOutlined />
                     </Button>
