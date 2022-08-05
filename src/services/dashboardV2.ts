@@ -167,3 +167,11 @@ export const getBuiltinDashboard = function (name: string) {
     return res.dat;
   });
 };
+
+export const getDashboardPure = function (id: string) {
+  return request(`/api/n9e/board/${id}/pure`, {
+    method: RequestMethod.Get,
+  }).then((res) => {
+    return res.dat;
+  });
+};

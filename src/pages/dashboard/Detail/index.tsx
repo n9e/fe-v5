@@ -16,6 +16,7 @@
  */
 import React, { useState, useRef, useEffect } from 'react';
 import _ from 'lodash';
+import { useInterval } from 'ahooks';
 import { v4 as uuidv4 } from 'uuid';
 import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -24,7 +25,7 @@ import { IRawTimeRange } from '@/components/TimeRangePicker';
 import { Dashboard } from '@/store/dashboardInterface';
 import { RootState as CommonRootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
-import { getDashboard, updateDashboardConfigs } from '@/services/dashboardV2';
+import { getDashboard, updateDashboardConfigs, getDashboardPure } from '@/services/dashboardV2';
 import { SetTmpChartData } from '@/services/metric';
 import VariableConfig, { IVariable } from '../VariableConfig';
 import { replaceExpressionVars } from '../VariableConfig/constant';
@@ -82,6 +83,7 @@ export default function DetailV2() {
   const [panels, setPanels] = useState<any[]>([]);
   const [range, setRange] = useState<IRawTimeRange>(getDefaultDashboardTime());
   const [step, setStep] = useState<number | null>(null);
+  const updateAtRef = useRef();
   const refresh = () => {
     getDashboard(id).then((res) => {
       setDashboard(res);
@@ -122,6 +124,12 @@ export default function DetailV2() {
   useEffect(() => {
     refresh();
   }, [id]);
+
+  useInterval(() => {
+    getDashboardPure(id).then((res) => {
+      setUpdateAt(res.update_at);
+    });
+  }, 2000);
 
   return (
     <PageLayout
