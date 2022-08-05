@@ -40,6 +40,7 @@ import { sortPanelsByGridLayout, panelsMergeToConfigs, updatePanelsInsertNewPane
 import './style.less';
 import './dark.antd.less';
 import './dark.less';
+import { Alert, message } from 'antd';
 
 interface URLParam {
   id: string;
@@ -83,7 +84,8 @@ export default function DetailV2() {
   const [panels, setPanels] = useState<any[]>([]);
   const [range, setRange] = useState<IRawTimeRange>(getDefaultDashboardTime());
   const [step, setStep] = useState<number | null>(null);
-  const updateAtRef = useRef();
+  const [editable, setEditable] = useState(true);
+  let updateAtRef;
   const refresh = () => {
     getDashboard(id).then((res) => {
       setDashboard(res);
@@ -127,7 +129,10 @@ export default function DetailV2() {
 
   useInterval(() => {
     getDashboardPure(id).then((res) => {
-      setUpdateAt(res.update_at);
+      updateAtRef = res.update_at;
+      if (updateAtRef > dashboard.update_at) {
+        if (editable) setEditable(false);
+      }
     });
   }, 2000);
 
@@ -202,6 +207,11 @@ export default function DetailV2() {
     >
       <div>
         <div className='dashboard-detail-content'>
+          {!editable && (
+            <div style={{ padding: '5px 10px' }}>
+              <Alert type='warning' message='大盘已经被别人修改，为避免相互覆盖，请刷新大盘查看最新配置和数据' />
+            </div>
+          )}
           <div className='dashboard-detail-content-header'>
             <div className='variable-area'>
               {variableConfig && <VariableConfig onChange={handleVariableChange} value={variableConfig} cluster={curCluster} range={range} id={id} onOpenFire={stopAutoRefresh} />}
@@ -220,6 +230,7 @@ export default function DetailV2() {
           </div>
           {variableConfigWithOptions && (
             <Panels
+              editable={editable}
               panels={panels}
               setPanels={setPanels}
               curCluster={curCluster}

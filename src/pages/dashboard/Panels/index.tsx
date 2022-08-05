@@ -18,7 +18,7 @@ import React, { useRef } from 'react';
 import _ from 'lodash';
 import semver from 'semver';
 import { v4 as uuidv4 } from 'uuid';
-import { Modal } from 'antd';
+import { message, Modal } from 'antd';
 import { useLocation } from 'react-router-dom';
 import querystring from 'query-string';
 import { useSelector } from 'react-redux';
@@ -46,6 +46,7 @@ import editor from '../Editor';
 import './style.less';
 
 interface IProps {
+  editable: boolean;
   curCluster: string;
   dashboard: Dashboard;
   range: IRawTimeRange;
@@ -63,7 +64,7 @@ function index(props: IProps) {
   const { profile } = useSelector<AccountRootState, accountStoreState>((state) => state.account);
   const location = useLocation();
   const { themeMode } = querystring.parse(location.search);
-  const { curCluster, dashboard, range, step, variableConfig, panels, setPanels, onShareClick, onUpdated } = props;
+  const { editable, curCluster, dashboard, range, step, variableConfig, panels, setPanels, onShareClick, onUpdated } = props;
   const layoutInitialized = useRef(false);
   const allowUpdateDashboardConfigs = useRef(false);
   const reactGridLayoutDefaultProps = {
@@ -75,7 +76,10 @@ function index(props: IProps) {
   const updateDashboardConfigs = (dashboardId, options) => {
     const roles = _.get(profile, 'roles', []);
     const isAuthorized = !_.some(roles, (item) => item === 'Guest');
-    if (isAuthorized) {
+    if (!editable) {
+      message.warning('大盘已经被别人修改，为避免相互覆盖，请刷新大盘查看最新配置和数据');
+    }
+    if (isAuthorized && editable) {
       return updateDashboardConfigsFunc(dashboardId, options);
     }
     return Promise.reject();
