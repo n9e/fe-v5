@@ -349,7 +349,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                                   if (values.prom_ql) {
                                     setIsChecked(true);
                                     checkBrainPromql({
-                                      cluster: values.cluster,
+                                      cluster: _.join(values.cluster, ''),
                                       algorithm: values.algorithm,
                                       algo_params: values.algo_params,
                                       prom_ql: values.prom_ql,
