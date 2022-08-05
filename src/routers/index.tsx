@@ -60,9 +60,9 @@ import TaskDetail from '@/pages/task/detail';
 import Version from '@/pages/help/version';
 import Contact from '@/pages/help/contact';
 import Migrate from '@/pages/help/migrate';
-import RecordingRule from '@/pages/recordingRules'
-import RecordingRuleAdd from '@/pages/recordingRules/add'
-import RecordingRuleEdit from '@/pages/recordingRules/edit'
+import RecordingRule from '@/pages/recordingRules';
+import RecordingRuleAdd from '@/pages/recordingRules/add';
+import RecordingRuleEdit from '@/pages/recordingRules/edit';
 import { dynamicPackages, Entry } from '@/utils';
 
 const Packages = dynamicPackages();
@@ -122,6 +122,7 @@ export default function Content() {
         <Route path='/account/profile/:tab' component={Profile} />
 
         <Route path='/dashboard/:id' exact component={DashboardDetail} />
+        <Route path='/dashboards/:id' exact component={DashboardDetail} />
         <Route path='/dashboards' component={Dashboard} />
         <Route path='/chart/:ids' component={Chart} />
         <Route path='/indicator' component={IndicatorPage} />
