@@ -16,6 +16,7 @@
  */
 import React, { useState, useRef, useEffect } from 'react';
 import _ from 'lodash';
+import { useInterval } from 'ahooks';
 import { v4 as uuidv4 } from 'uuid';
 import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -24,7 +25,7 @@ import { IRawTimeRange } from '@/components/TimeRangePicker';
 import { Dashboard } from '@/store/dashboardInterface';
 import { RootState as CommonRootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
-import { getDashboard, updateDashboardConfigs } from '@/services/dashboardV2';
+import { getDashboard, updateDashboardConfigs, getDashboardPure } from '@/services/dashboardV2';
 import { SetTmpChartData } from '@/services/metric';
 import VariableConfig, { IVariable } from '../VariableConfig';
 import { replaceExpressionVars } from '../VariableConfig/constant';
@@ -39,6 +40,7 @@ import { sortPanelsByGridLayout, panelsMergeToConfigs, updatePanelsInsertNewPane
 import './style.less';
 import './dark.antd.less';
 import './dark.less';
+import { Alert, message } from 'antd';
 
 interface URLParam {
   id: string;
@@ -82,6 +84,8 @@ export default function DetailV2() {
   const [panels, setPanels] = useState<any[]>([]);
   const [range, setRange] = useState<IRawTimeRange>(getDefaultDashboardTime());
   const [step, setStep] = useState<number | null>(null);
+  const [editable, setEditable] = useState(true);
+  let updateAtRef;
   const refresh = () => {
     getDashboard(id).then((res) => {
       setDashboard(res);
@@ -122,6 +126,15 @@ export default function DetailV2() {
   useEffect(() => {
     refresh();
   }, [id]);
+
+  useInterval(() => {
+    getDashboardPure(id).then((res) => {
+      updateAtRef = res.update_at;
+      if (updateAtRef > dashboard.update_at) {
+        if (editable) setEditable(false);
+      }
+    });
+  }, 2000);
 
   return (
     <PageLayout
@@ -194,6 +207,11 @@ export default function DetailV2() {
     >
       <div>
         <div className='dashboard-detail-content'>
+          {!editable && (
+            <div style={{ padding: '5px 10px' }}>
+              <Alert type='warning' message='大盘已经被别人修改，为避免相互覆盖，请刷新大盘查看最新配置和数据' />
+            </div>
+          )}
           <div className='dashboard-detail-content-header'>
             <div className='variable-area'>
               {variableConfig && <VariableConfig onChange={handleVariableChange} value={variableConfig} cluster={curCluster} range={range} id={id} onOpenFire={stopAutoRefresh} />}
@@ -212,6 +230,7 @@ export default function DetailV2() {
           </div>
           {variableConfigWithOptions && (
             <Panels
+              editable={editable}
               panels={panels}
               setPanels={setPanels}
               curCluster={curCluster}
