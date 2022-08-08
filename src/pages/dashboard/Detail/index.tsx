@@ -21,6 +21,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { useParams, useLocation } from 'react-router-dom';
 import queryString from 'query-string';
 import { useSelector } from 'react-redux';
+import { Alert } from 'antd';
 import PageLayout from '@/components/pageLayout';
 import { IRawTimeRange } from '@/components/TimeRangePicker';
 import { Dashboard } from '@/store/dashboardInterface';
@@ -41,7 +42,6 @@ import { sortPanelsByGridLayout, panelsMergeToConfigs, updatePanelsInsertNewPane
 import './style.less';
 import './dark.antd.less';
 import './dark.less';
-import { Alert, message } from 'antd';
 
 interface URLParam {
   id: string;

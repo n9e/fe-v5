@@ -43,15 +43,32 @@ export function getStepByTimeAndStep(time: IRawTimeRange, step: number | null) {
 function convertVariablesGrafanaToN9E(templates: any) {
   return _.chain(templates.list)
     .filter((item) => {
-      // 2.0.0 版本只支持 query 类型的变量
-      return item.type === 'query';
+      // 2.0.0 版本只支持 query / custom / textbox 类型的变量
+      return item.type === 'query' || item.type === 'custom' || item.type === 'textbox';
     })
     .map((item) => {
+      if (item.type === 'query') {
+        return {
+          type: 'query',
+          name: item.name,
+          definition: item.definition || _.get(item, 'query.query'),
+          allOption: item.includeAll,
+          multi: item.multi,
+        };
+      } else if (item.type === 'custom') {
+        return {
+          type: 'query',
+          name: item.name,
+          definition: item.query,
+          allValue: item.allValue,
+          allOption: item.includeAll,
+          multi: item.multi,
+        };
+      }
       return {
+        type: 'textbox',
         name: item.name,
-        definition: item.definition || _.get(item, 'query.query'),
-        allOption: item.includeAll,
-        multi: item.multi,
+        defaultValue: item.query,
       };
     })
     .value();
@@ -97,7 +114,9 @@ function convertOptionsGrafanaToN9E(panel: any) {
     thresholds: {
       mode: config.thresholds?.mode, // mode 目前是不支持的
       style: 'line', // 目前只有固定的 line 风格，但是这个只用于折线图
-      steps: config.thresholds?.steps,
+      steps: _.filter(config.thresholds?.steps, (item) => {
+        return item.value !== null;
+      }),
     },
     standardOptions: {
       util: unitMap[config.unit] ? unitMap[config.unit] : 'none',
@@ -223,7 +242,7 @@ function convertPanlesGrafanaToN9E(panels: any) {
           .map((item) => {
             return {
               refId: item.refId,
-              expr: _.replace(item.expr, '$__rate_interval', '5m'), // TODO: 目前不支持 $__rate_interval 暂时统一替换为 5m
+              expr: _.replace(_.replace(item.expr, '$__rate_interval', '5m'), '$__interval', '5m'), // TODO: 目前不支持 $__rate_interval 暂时统一替换为 5m
               legend: item.legendFormat,
             };
           })
