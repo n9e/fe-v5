@@ -166,6 +166,20 @@ function convertStatGrafanaToN9E(panel: any) {
   };
 }
 
+function convertBarGaugeGrafanaToN9E(panel: any) {
+  return {
+    version: '2.0.0',
+    calc: _.get(panel, 'options.reduceOptions.calcs[0]'),
+  };
+}
+
+function convertTextGrafanaToN9E(panel: any) {
+  return {
+    version: '2.0.0',
+    content: _.get(panel, 'options.content'),
+  };
+}
+
 function convertPanlesGrafanaToN9E(panels: any) {
   const chartsMap = {
     graph: {
@@ -196,6 +210,14 @@ function convertPanlesGrafanaToN9E(panels: any) {
     stat: {
       type: 'stat',
       fn: convertStatGrafanaToN9E,
+    },
+    bargauge: {
+      type: 'barGauge',
+      fn: convertBarGaugeGrafanaToN9E,
+    },
+    text: {
+      type: 'text',
+      fn: convertTextGrafanaToN9E,
     },
   };
   return _.chain(panels)

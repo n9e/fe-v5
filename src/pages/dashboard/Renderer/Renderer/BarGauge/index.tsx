@@ -19,7 +19,7 @@ import { Tooltip } from 'antd';
 import _ from 'lodash';
 import Color from 'color';
 import { useSize } from 'ahooks';
-import { IPanel } from '../../../types';
+import { IPanel, IBarGaugeStyles } from '../../../types';
 import getCalculatedValuesBySeries from '../../utils/getCalculatedValuesBySeries';
 import './style.less';
 
@@ -31,7 +31,7 @@ interface IProps {
 
 function Item(props) {
   const { item, custom, themeMode, maxValue } = props;
-  const { baseColor = '#FF656B', displayMode = 'basic', serieWidth = 20 } = custom;
+  const { baseColor = '#FF656B', displayMode = 'basic', serieWidth = 20 } = custom as IBarGaugeStyles;
   const color = item.color ? item.color : baseColor;
   const bgRef = useRef(null);
   const bgSize = useSize(bgRef);
