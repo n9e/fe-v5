@@ -18,7 +18,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import _ from 'lodash';
 import { useInterval } from 'ahooks';
 import { v4 as uuidv4 } from 'uuid';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
+import queryString from 'query-string';
 import { useSelector } from 'react-redux';
 import PageLayout from '@/components/pageLayout';
 import { IRawTimeRange } from '@/components/TimeRangePicker';
@@ -64,6 +65,11 @@ const getDefaultDashboardTime = () => {
 };
 
 export default function DetailV2() {
+  const { search } = useLocation();
+  const locationQuery = queryString.parse(search);
+  if (_.get(locationQuery, '__cluster')) {
+    localStorage.setItem('curCluster', _.get(locationQuery, '__cluster'));
+  }
   const localCluster = localStorage.getItem('curCluster');
   const { id } = useParams<URLParam>();
   const refreshRef = useRef<{ closeRefresh: Function }>();
