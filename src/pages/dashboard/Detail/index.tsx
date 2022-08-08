@@ -21,6 +21,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { useParams, useLocation } from 'react-router-dom';
 import queryString from 'query-string';
 import { useSelector } from 'react-redux';
+import { Alert } from 'antd';
 import PageLayout from '@/components/pageLayout';
 import { IRawTimeRange } from '@/components/TimeRangePicker';
 import { Dashboard } from '@/store/dashboardInterface';
@@ -41,7 +42,6 @@ import { sortPanelsByGridLayout, panelsMergeToConfigs, updatePanelsInsertNewPane
 import './style.less';
 import './dark.antd.less';
 import './dark.less';
-import { Alert, message } from 'antd';
 
 interface URLParam {
   id: string;
@@ -91,9 +91,10 @@ export default function DetailV2() {
   const [range, setRange] = useState<IRawTimeRange>(getDefaultDashboardTime());
   const [step, setStep] = useState<number | null>(null);
   const [editable, setEditable] = useState(true);
-  let updateAtRef;
+  let updateAtRef = useRef<number>();
   const refresh = () => {
     getDashboard(id).then((res) => {
+      updateAtRef.current = res.update_at;
       setDashboard(res);
       if (res.configs) {
         const configs = JSONParse(res.configs);
@@ -115,7 +116,8 @@ export default function DetailV2() {
     });
   };
   const handleUpdateDashboardConfigs = (id, configs) => {
-    updateDashboardConfigs(id, configs).then(() => {
+    updateDashboardConfigs(id, configs).then((res) => {
+      updateAtRef.current = res.update_at;
       refresh();
     });
   };
@@ -135,8 +137,7 @@ export default function DetailV2() {
 
   useInterval(() => {
     getDashboardPure(id).then((res) => {
-      updateAtRef = res.update_at;
-      if (updateAtRef > dashboard.update_at) {
+      if (updateAtRef.current && res.update_at > updateAtRef.current) {
         if (editable) setEditable(false);
       }
     });
@@ -271,7 +272,8 @@ export default function DetailV2() {
                   window.open('/chart/' + ids);
                 });
               }}
-              onUpdated={() => {
+              onUpdated={(res) => {
+                updateAtRef.current = res.update_at;
                 refresh();
               }}
             />

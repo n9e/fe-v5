@@ -55,7 +55,7 @@ interface IProps {
   panels: any[];
   setPanels: (panels: any[]) => void;
   onShareClick: (panel: any) => void;
-  onUpdated: () => void;
+  onUpdated: (res: any) => void;
 }
 
 const ReactGridLayout = WidthProvider(RGL);
@@ -99,8 +99,8 @@ function index(props: IProps) {
                 allowUpdateDashboardConfigs.current = false;
                 updateDashboardConfigs(dashboard.id, {
                   configs: panelsMergeToConfigs(dashboard.configs, newPanels),
-                }).then(() => {
-                  onUpdated();
+                }).then((res) => {
+                  onUpdated(res);
                 });
               }
             }
@@ -112,8 +112,8 @@ function index(props: IProps) {
           if (!_.isEqual(panels, newPanels)) {
             updateDashboardConfigs(dashboard.id, {
               configs: panelsMergeToConfigs(dashboard.configs, newPanels),
-            }).then(() => {
-              onUpdated();
+            }).then((res) => {
+              onUpdated(res);
             });
           }
         }}
@@ -122,8 +122,8 @@ function index(props: IProps) {
           if (!_.isEqual(panels, newPanels)) {
             updateDashboardConfigs(dashboard.id, {
               configs: panelsMergeToConfigs(dashboard.configs, newPanels),
-            }).then(() => {
-              onUpdated();
+            }).then((res) => {
+              onUpdated(res);
             });
           }
         }}
@@ -175,8 +175,8 @@ function index(props: IProps) {
                           setPanels(newPanels);
                           updateDashboardConfigs(dashboard.id, {
                             configs: panelsMergeToConfigs(dashboard.configs, newPanels),
-                          }).then(() => {
-                            onUpdated();
+                          }).then((res) => {
+                            onUpdated(res);
                           });
                         },
                       });
@@ -190,8 +190,8 @@ function index(props: IProps) {
                           setPanels(newPanels);
                           updateDashboardConfigs(dashboard.id, {
                             configs: panelsMergeToConfigs(dashboard.configs, newPanels),
-                          }).then(() => {
-                            onUpdated();
+                          }).then((res) => {
+                            onUpdated(res);
                           });
                         },
                       });
@@ -208,8 +208,8 @@ function index(props: IProps) {
                           setPanels(newPanels);
                           updateDashboardConfigs(dashboard.id, {
                             configs: panelsMergeToConfigs(dashboard.configs, newPanels),
-                          }).then(() => {
-                            onUpdated();
+                          }).then((res) => {
+                            onUpdated(res);
                           });
                         }}
                       >
@@ -227,8 +227,8 @@ function index(props: IProps) {
                     setPanels(newPanels);
                     updateDashboardConfigs(dashboard.id, {
                       configs: panelsMergeToConfigs(dashboard.configs, newPanels),
-                    }).then(() => {
-                      onUpdated();
+                    }).then((res) => {
+                      onUpdated(res);
                     });
                   }}
                   onAddClick={() => {
@@ -252,8 +252,8 @@ function index(props: IProps) {
                         setPanels(newPanels);
                         updateDashboardConfigs(dashboard.id, {
                           configs: panelsMergeToConfigs(dashboard.configs, newPanels),
-                        }).then(() => {
-                          onUpdated();
+                        }).then((res) => {
+                          onUpdated(res);
                         });
                       },
                     });
@@ -263,8 +263,8 @@ function index(props: IProps) {
                     setPanels(newPanels);
                     updateDashboardConfigs(dashboard.id, {
                       configs: panelsMergeToConfigs(dashboard.configs, newPanels),
-                    }).then(() => {
-                      onUpdated();
+                    }).then((res) => {
+                      onUpdated(res);
                     });
                   }}
                   onDeleteClick={(mode: 'self' | 'withPanels') => {
@@ -280,8 +280,8 @@ function index(props: IProps) {
                     setPanels(newPanels);
                     updateDashboardConfigs(dashboard.id, {
                       configs: panelsMergeToConfigs(dashboard.configs, newPanels),
-                    }).then(() => {
-                      onUpdated();
+                    }).then((res) => {
+                      onUpdated(res);
                     });
                   }}
                 />
