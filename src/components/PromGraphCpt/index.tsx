@@ -70,6 +70,7 @@ export default function index(props: IProps) {
   const [errorContent, setErrorContent] = useState('');
   const [tabActiveKey, setTabActiveKey] = useState(type);
   const [timestamp, setTimestamp] = useState<number>(); // for table
+  const [refreshFlag, setRefreshFlag] = useState(_.uniqueId('refreshFlag_')); // for table
   const [range, setRange] = useState<IRawTimeRange>({ start: 'now-1h', end: 'now' }); // for graph
   const [step, setStep] = useState<number>(); // for graph
   const [metricsExplorerVisible, setMetricsExplorerVisible] = useState(false);
@@ -113,7 +114,6 @@ export default function index(props: IProps) {
 
       <div className='prom-graph-expression-input'>
         <Input.Group>
-          <span className='ant-input-group-addon'>PromQL</span>
           <span className='ant-input-affix-wrapper'>
             <PromQLInput
               ref={promQLInputRef}
@@ -155,7 +155,7 @@ export default function index(props: IProps) {
             <Button
               type='primary'
               onClick={() => {
-                console.log('value', value);
+                setRefreshFlag(_.uniqueId('refreshFlag_'));
                 setPromql(value);
               }}
             >
@@ -188,6 +188,7 @@ export default function index(props: IProps) {
             setErrorContent={setErrorContent}
             timestamp={timestamp}
             setTimestamp={setTimestamp}
+            refreshFlag={refreshFlag}
           />
         </TabPane>
         <TabPane tab='Graph' key='graph'>

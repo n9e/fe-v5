@@ -44,7 +44,10 @@ interface CMExpressionInputProps {
   completeEnabled?: boolean;
 }
 
-const ExpressionInput = ({ url, headers, value, onChange, executeQuery, readonly = false, validateTrigger = ['onChange', 'onBlur'], completeEnabled = true }: CMExpressionInputProps, ref) => {
+const ExpressionInput = (
+  { url, headers, value, onChange, executeQuery, readonly = false, validateTrigger = ['onChange', 'onBlur'], completeEnabled = true }: CMExpressionInputProps,
+  ref,
+) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const executeQueryCallback = useRef(executeQuery);
@@ -58,26 +61,30 @@ const ExpressionInput = ({ url, headers, value, onChange, executeQuery, readonly
     promqlExtension
       .activateCompletion(true)
       .activateLinter(true)
-      .setComplete(completeEnabled ? {
-        remote: {
-          url,
-          fetchFn: (resource, options = {}) => {
-            const params = options.body?.toString();
-            const search = params ? `?${params}` : '';
-            return fetch(resource + search, {
-              method: 'Get',
-              headers: new Headers(
-                headers
-                  ? {
-                      ...defaultHeaders,
-                      ...headers,
-                    }
-                  : defaultHeaders,
-              ),
-            });
-          },
-        },
-      } : undefined);
+      .setComplete(
+        completeEnabled
+          ? {
+              remote: {
+                url,
+                fetchFn: (resource, options = {}) => {
+                  const params = options.body?.toString();
+                  const search = params ? `?${params}` : '';
+                  return fetch(resource + search, {
+                    method: 'Get',
+                    headers: new Headers(
+                      headers
+                        ? {
+                            ...defaultHeaders,
+                            ...headers,
+                          }
+                        : defaultHeaders,
+                    ),
+                  });
+                },
+              },
+            }
+          : undefined,
+      );
 
     // Create or reconfigure the editor.
     const view = viewRef.current;
@@ -102,7 +109,7 @@ const ExpressionInput = ({ url, headers, value, onChange, executeQuery, readonly
           promqlHighlighter,
           EditorView.lineWrapping,
           keymap.of([...closeBracketsKeymap, ...defaultKeymap, ...historyKeymap, ...commentKeymap, ...completionKeymap, ...lintKeymap]),
-          placeholder('Expression (press Shift+Enter for newlines)'),
+          placeholder('Input promql to query. Press Shift+Enter for newlines'),
           promqlExtension.asExtension(),
           EditorView.editable.of(!readonly),
           keymap.of([

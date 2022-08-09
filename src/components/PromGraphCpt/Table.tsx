@@ -31,6 +31,7 @@ interface IProps {
   contentMaxHeight: number;
   timestamp?: number;
   setTimestamp: (timestamp?: number) => void;
+  refreshFlag: string;
 }
 type ResultType = 'matrix' | 'vector' | 'scalar' | 'string';
 
@@ -73,7 +74,7 @@ function getListItemValue(resultType, record) {
 }
 
 export default function Table(props: IProps) {
-  const { url, datasourceId, datasourceIdRequired, promql, setQueryStats, setErrorContent, contentMaxHeight, timestamp, setTimestamp } = props;
+  const { url, datasourceId, datasourceIdRequired, promql, setQueryStats, setErrorContent, contentMaxHeight, timestamp, setTimestamp, refreshFlag } = props;
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState<{
     resultType: ResultType;
@@ -143,7 +144,7 @@ export default function Table(props: IProps) {
           setIsLoading(false);
         });
     }
-  }, [timestamp, datasourceId, promql]);
+  }, [timestamp, datasourceId, promql, refreshFlag]);
 
   return (
     <div className='prom-graph-table-container'>
