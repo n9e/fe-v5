@@ -44,6 +44,7 @@ export default function GraphStyles() {
         <Col span={6}>
           <Form.Item label='左右对齐' name={[...namePrefix, 'justifyContent']}>
             <Select>
+              <Select.Option value='unset'>不设置</Select.Option>
               <Select.Option value='flexStart'>左对齐</Select.Option>
               <Select.Option value='center'>居中对齐</Select.Option>
               <Select.Option value='flexEnd'>右对齐</Select.Option>
@@ -53,6 +54,7 @@ export default function GraphStyles() {
         <Col span={6}>
           <Form.Item label='上下对齐' name={[...namePrefix, 'alignItems']}>
             <Select>
+              <Select.Option value='unset'>不设置</Select.Option>
               <Select.Option value='flexStart'>上对齐</Select.Option>
               <Select.Option value='center'>居中对齐</Select.Option>
               <Select.Option value='flexEnd'>下对齐</Select.Option>
