@@ -139,6 +139,8 @@ export default function DetailV2() {
     getDashboardPure(id).then((res) => {
       if (updateAtRef.current && res.update_at > updateAtRef.current) {
         if (editable) setEditable(false);
+      } else {
+        setEditable(true);
       }
     });
   }, 2000);
