@@ -115,22 +115,7 @@ export default function EditItem(props: Props) {
                         const type = getFieldValue(['var', fieldKey, 'type']);
                         if (type === 'query') {
                           return (
-                            <Form.Item
-                              {...restField}
-                              name={[name, 'definition']}
-                              fieldKey={[fieldKey, 'definition']}
-                              rules={[
-                                { required: true, message: t('请输入变量定义') },
-                                {
-                                  validator(_, value) {
-                                    if (/^\s*label_values.+,\s*\$.+/.test(value)) {
-                                      return Promise.reject(new Error('label_values表达式的label不允许使用变量'));
-                                    }
-                                    return Promise.resolve();
-                                  },
-                                },
-                              ]}
-                            >
+                            <Form.Item {...restField} name={[name, 'definition']} fieldKey={[fieldKey, 'definition']} rules={[{ required: true, message: t('请输入变量定义') }]}>
                               <Input onBlur={(v) => handleBlur(name)} />
                             </Form.Item>
                           );
