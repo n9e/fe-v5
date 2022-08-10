@@ -40,6 +40,8 @@ interface IProps {
   placeholder?: string;
   allowClear?: boolean;
   onClear?: () => void;
+  label?: React.ReactElement;
+  extraFooter?: (fn: Function) => React.ReactElement;
 }
 
 const defaultRange = {
@@ -76,7 +78,7 @@ const setAbsoluteHistoryCache = (range, dateFormat) => {
 
 export default function index(props: IProps) {
   const absoluteHistoryCache = getAbsoluteHistoryCache();
-  const { value, onChange = () => {}, dateFormat = 'YYYY-MM-DD HH:mm', placeholder = '请选择时间', allowClear = false, onClear = () => {} } = props;
+  const { value, onChange = () => {}, dateFormat = 'YYYY-MM-DD HH:mm', placeholder = '请选择时间', allowClear = false, onClear = () => {}, extraFooter } = props;
   const [visible, setVisible] = useState(false);
   const [range, setRange] = useState<IRawTimeRange>();
   const [label, setLabel] = useState<string>('');
@@ -281,6 +283,7 @@ export default function index(props: IProps) {
               >
                 确定
               </Button>
+              {extraFooter && extraFooter(setVisible)}
             </div>
           </>
         }
@@ -301,19 +304,21 @@ export default function index(props: IProps) {
             setVisible(!visible);
           }}
         >
-          {label || placeholder}
-          <span className='flashcat-timeRangePicker-target-icon'>
-            {visible ? <UpOutlined /> : <DownOutlined />}
-            <CloseCircleOutlined
-              onClick={(e) => {
-                e.nativeEvent.stopImmediatePropagation();
-                e.stopPropagation();
-                setRange(undefined);
-                setLabel('');
-                onClear();
-              }}
-            />
-          </span>
+          {props.label || label || placeholder}
+          {!props.label && (
+            <span className='flashcat-timeRangePicker-target-icon'>
+              {visible ? <UpOutlined /> : <DownOutlined />}
+              <CloseCircleOutlined
+                onClick={(e) => {
+                  e.nativeEvent.stopImmediatePropagation();
+                  e.stopPropagation();
+                  setRange(undefined);
+                  setLabel('');
+                  onClear();
+                }}
+              />
+            </span>
+          )}
         </Button>
       </Popover>
     </>
@@ -321,4 +326,4 @@ export default function index(props: IProps) {
 }
 
 export type { IRawTimeRange } from './types';
-export { TimeRangePickerWithRefresh, parseRange, parse, isMathString, timeRangeUnix };
+export { TimeRangePickerWithRefresh, parseRange, parse, isMathString, timeRangeUnix, describeTimeRange };
