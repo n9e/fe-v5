@@ -229,7 +229,6 @@ export default function List(props: IProps) {
       },
     },
   ];
-  const queryRef = useRef<any>();
   const featchData = ({ current, pageSize }): Promise<any> => {
     const query = {
       query: tableQueryContent,
@@ -238,19 +237,11 @@ export default function List(props: IProps) {
       limit: pageSize,
       p: current,
     };
-    // 点击排序后默认会被触发请求，由于这里只需要对当前页面数据排序，所以对 query 进行比较没有变化的话就不重复发生一些相同的请求
-    if (!_.isEqual(queryRef.current, query)) {
-      queryRef.current = query;
-      return getMonObjectList(query).then((res) => {
-        return {
-          total: res.dat.total,
-          list: res.dat.list,
-        };
-      });
-    }
-    return Promise.resolve({
-      total: tableProps.pagination.total,
-      list: tableProps.dataSource,
+    return getMonObjectList(query).then((res) => {
+      return {
+        total: res.dat.total,
+        list: res.dat.list,
+      };
     });
   };
   const showTotal = (total: number) => {
