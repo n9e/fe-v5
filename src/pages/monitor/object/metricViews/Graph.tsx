@@ -56,7 +56,7 @@ export default function Graph(props: IProps) {
     shared: true,
     sharedSortDirection: 'desc',
     legend: true,
-    util: 'none',
+    unit: 'none',
     colorRange: colors[0].value,
     reverseColorOrder: false,
     colorDomainAuto: true,
@@ -81,7 +81,7 @@ export default function Graph(props: IProps) {
         sort: highLevelConfig.sharedSortDirection,
       },
       standardOptions: {
-        util: highLevelConfig.util,
+        util: highLevelConfig.unit,
       },
     },
   };
@@ -95,7 +95,7 @@ export default function Graph(props: IProps) {
     },
     options: {
       standardOptions: {
-        util: highLevelConfig.util,
+        util: highLevelConfig.unit,
       },
     },
   };

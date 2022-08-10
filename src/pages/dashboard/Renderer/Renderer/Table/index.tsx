@@ -110,7 +110,7 @@ export default function Stat(props: IProps) {
         let textObj = {
           value: text,
           unit: '',
-          color: record.color || themeMode === 'dark' ? '#fff' : '#000',
+          color: record.color || (themeMode === 'dark' ? '#fff' : '#000'),
         };
         const overrideProps = getOverridePropertiesByName(overrides, record.fields.refId);
         if (!_.isEmpty(overrideProps)) {
@@ -152,7 +152,7 @@ export default function Stat(props: IProps) {
             const textObj = {
               value: record?.value,
               unit: record?.unit,
-              color: record?.color || '#000',
+              color: record.color || (themeMode === 'dark' ? '#fff' : '#000'),
             };
             return (
               <div
@@ -211,7 +211,7 @@ export default function Stat(props: IProps) {
           let textObj = {
             value: text?.text,
             unit: '',
-            color: text?.color || '#000',
+            color: text.color || (themeMode === 'dark' ? '#fff' : '#000'),
           };
           const overrideProps = getOverridePropertiesByName(overrides, name);
           if (!_.isEmpty(overrideProps)) {

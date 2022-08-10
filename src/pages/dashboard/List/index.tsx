@@ -81,7 +81,7 @@ export default function index() {
                   className: 'name-column',
                   render: (text: string, record: DashboardType) => {
                     return (
-                      <div className='table-active-text' onClick={() => history.push(`/dashboard/${record.id}`)}>
+                      <div className='table-active-text' onClick={() => history.push(`/dashboards/${record.id}`)}>
                         {text}
                       </div>
                     );

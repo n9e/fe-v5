@@ -14,15 +14,24 @@
  * limitations under the License.
  *
  */
-export interface IVariable {
-  name: string;
-  definition: string;
-  fullDefinition?: string; // 转换变量后的完整表达式
-  reg?: string;
-  multi?: boolean;
-  allOption?: boolean;
-  allValue?: string;
-  options?: string[];
-  type?: 'query' | 'textbox';
-  defaultValue?: string; // textbox 的默认值
+import React, { FC } from 'react';
+
+export interface QueryStats {
+  loadTime: number;
+  resolution?: number;
+  resultSeries: number;
 }
+
+const QueryStatsView: FC<QueryStats> = (props) => {
+  const { loadTime, resolution, resultSeries } = props;
+
+  return (
+    <div className='query-stats'>
+      <span>
+        Load time: {loadTime}ms &ensp;{resolution && `Resolution: ${resolution}s `}&ensp;Result series: {resultSeries}
+      </span>
+    </div>
+  );
+};
+
+export default QueryStatsView;

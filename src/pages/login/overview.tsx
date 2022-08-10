@@ -14,24 +14,8 @@
  * limitations under the License.
  *
  */
-import React, { FC } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
-export interface QueryStats {
-  loadTime: number;
-  resolution?: number;
-  resultSeries: number;
+export default function Overview() {
+  return <div className='login-warp'></div>;
 }
-
-const QueryStatsView: FC<QueryStats> = (props) => {
-  const { loadTime, resolution, resultSeries } = props;
-
-  return (
-    <div className="query-stats">
-      <span>
-        Load time: {loadTime}ms &ensp;{resolution && `Resolution: ${resolution}s `}&ensp;Result series: {resultSeries}
-      </span>
-    </div>
-  );
-};
-
-export default QueryStatsView;

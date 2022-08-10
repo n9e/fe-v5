@@ -1,10 +1,11 @@
 {
   "name": "n9e-fe",
-  "version": "5.7.2",
+  "version": "5.9.0",
   "scripts": {
     "dev": "vite --port 8765 --host",
     "build": "tsc && vite build",
     "build:advanced": "tsc && vite build --mode advanced",
+    "build:enhanced": "tsc && vite build --mode enhanced",
     "serve": "vite preview"
   },
   "dependencies": {

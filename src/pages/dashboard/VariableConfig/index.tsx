@@ -35,13 +35,6 @@ interface IProps {
   onChange: (data: IVariable[], needSave: boolean, options?: IVariable[]) => void;
   onOpenFire?: () => void;
 }
-function attachVariable2Url(key, value) {
-  const { protocol, host, pathname, search } = window.location;
-  var searchObj = new URLSearchParams(search);
-  searchObj.set(key, value);
-  var newurl = `${protocol}//${host}${pathname}?${searchObj.toString()}`;
-  window.history.replaceState({ path: newurl }, '', newurl);
-}
 
 function index(props: IProps) {
   const { id, cluster, editable = true, range, onChange, onOpenFire } = props;

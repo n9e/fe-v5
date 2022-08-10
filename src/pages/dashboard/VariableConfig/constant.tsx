@@ -223,17 +223,21 @@ export const replaceExpressionVars = (expression: string, formData: IVariable[],
   if (vars && vars.length > 0) {
     for (let i = 0; i < limit; i++) {
       if (formData[i]) {
-        const { name, options, reg } = formData[i];
+        const { name, options, reg, allValue } = formData[i];
         const selected = getVaraiableSelected(name, id);
 
         if (vars.includes('$' + name) && selected) {
           if (Array.isArray(selected)) {
             if (selected.includes('all') && options) {
-              newExpression = replaceAllPolyfill(
-                newExpression,
-                '$' + name,
-                `(${(options as string[]).filter((i) => !reg || !stringToRegex(reg) || (stringToRegex(reg) as RegExp).test(i)).join('|')})`,
-              );
+              if (allValue) {
+                newExpression = replaceAllPolyfill(newExpression, '$' + name, allValue);
+              } else {
+                newExpression = replaceAllPolyfill(
+                  newExpression,
+                  '$' + name,
+                  `(${(options as string[]).filter((i) => !reg || !stringToRegex(reg) || (stringToRegex(reg) as RegExp).test(i)).join('|')})`,
+                );
+              }
             } else {
               newExpression = replaceAllPolyfill(newExpression, '$' + name, `(${(selected as string[]).join('|')})`);
             }

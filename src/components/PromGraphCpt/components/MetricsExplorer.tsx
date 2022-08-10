@@ -14,18 +14,22 @@
  * limitations under the License.
  *
  */
+import React, { useEffect, useState } from 'react';
 import { SearchOutlined } from '@ant-design/icons';
 import { Input, Modal } from 'antd';
-import React, { useEffect, useState } from 'react';
+import { getPromData } from '../services';
 
 interface MetricsExplorer {
+  url: string;
+  datasourceId?: number;
+  datasourceIdRequired?: boolean;
   show: boolean;
   updateShow(show: boolean): void;
-  metrics: string[];
   insertAtCursor(query: string): void;
 }
 
-const MetricsExplorer: React.FC<MetricsExplorer> = ({ show, updateShow, metrics, insertAtCursor }) => {
+const MetricsExplorer: React.FC<MetricsExplorer> = ({ url, datasourceId, datasourceIdRequired, show, updateShow, insertAtCursor }) => {
+  const [metrics, setMetrics] = useState<string[]>([]);
   const [filteredMetrics, setFilteredMetrics] = useState<string[]>(metrics);
 
   function checkMetric(value: string) {
@@ -34,13 +38,17 @@ const MetricsExplorer: React.FC<MetricsExplorer> = ({ show, updateShow, metrics,
   }
 
   useEffect(() => {
-    setFilteredMetrics(metrics);
-  }, [metrics]);
+    if (show) {
+      getPromData(`${url}/api/v1/label/__name__/values`, {}, datasourceIdRequired ? { 'X-Data-Source-Id': datasourceId } : {}).then((res) => {
+        setMetrics(res);
+        setFilteredMetrics(res);
+      });
+    }
+  }, [show]);
 
   return (
-    <Modal className='metrics-explorer-modal' width={540} visible={show} title='Metrics Explorer' footer={null} onCancel={() => updateShow(false)}>
+    <Modal className='prom-graph-metrics-explorer-modal' width={540} visible={show} title='Metrics Explorer' footer={null} onCancel={() => updateShow(false)} getContainer={false}>
       <Input
-        className='left-area-group-search'
         prefix={<SearchOutlined />}
         onPressEnter={(e) => {
           e.preventDefault();
@@ -48,9 +56,9 @@ const MetricsExplorer: React.FC<MetricsExplorer> = ({ show, updateShow, metrics,
           setFilteredMetrics(metrics.filter((metric) => metric.includes(value)));
         }}
       />
-      <div className='metric-list' onClick={(e) => checkMetric((e.target as HTMLElement).innerText)}>
+      <div className='prom-graph-metrics-explorer-list' onClick={(e) => checkMetric((e.target as HTMLElement).innerText)}>
         {filteredMetrics.map((metric) => (
-          <div className='metric-list-item' key={metric}>
+          <div className='prom-graph-metrics-explorer-list-item' key={metric}>
             {metric}
           </div>
         ))}

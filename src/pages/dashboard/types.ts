@@ -32,7 +32,7 @@ export interface ITarget {
   step?: number; // 固定时间间隔
 }
 
-export type IType = 'row' | 'timeseries' | 'stat' | 'table' | 'pie' | 'hexbin';
+export type IType = 'row' | 'timeseries' | 'stat' | 'table' | 'pie' | 'hexbin' | 'barGauge';
 
 export interface IValueMapping {
   match: {
@@ -95,7 +95,7 @@ export interface ILink {
 }
 
 export interface ITimeseriesStyles {
-  version: string; // 时序图组件使用的版本
+  version: string;
   drawStyle: 'lines' | 'bars';
   lineInterpolation: 'linear' | 'smooth';
   fillOpacity: number;
@@ -103,7 +103,7 @@ export interface ITimeseriesStyles {
 }
 
 export interface IStatStyles {
-  version: string; // 时序图组件使用的版本
+  version: string;
   textMode: 'valueAndName' | 'value';
   textSize: {
     title: number;
@@ -114,7 +114,7 @@ export interface IStatStyles {
 }
 
 export interface ITableStyles {
-  version: string; // 时序图组件使用的版本
+  version: string;
   showHeader: boolean;
   colorMode: 'value' | 'background';
   calc: string;
@@ -124,18 +124,40 @@ export interface ITableStyles {
 }
 
 export interface IHexbinStyles {
-  version: string; // 时序图组件使用的版本
+  version: string;
   calc: string;
   colorRange: string[]; // 三个颜色值
   colorDomainAuto: boolean;
   colorDomain: number[]; // 自定义 [min, max]
   reverseColorOrder: boolean;
 }
+
 export interface IPieStyles {
-  version: string; // 时序图组件使用的版本
+  version: string;
   calc: string;
   legengPosition: string;
 }
+
+export interface IBarGaugeStyles {
+  version: string;
+  displayMode: 'basic';
+  calc: string;
+  maxValue: number;
+  baseColor: string;
+  serieWidth: number;
+  sortOrder: 'none' | 'asc' | 'desc';
+}
+
+export interface ITextStyles {
+  version: string;
+  textColor: string;
+  bgColor: string;
+  textSize: number;
+  justifyContent: 'unset' | 'flexStart' | 'center' | 'flexEnd';
+  alignItems: 'unset' | 'flexStart' | 'center' | 'flexEnd';
+  content: string;
+}
+
 export interface IRow {
   id: string;
   type: 'row';

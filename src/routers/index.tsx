@@ -22,6 +22,7 @@ import { RootState, accountStoreState } from '@/store/accountInterface';
 import NotFound from '@/pages/NotFound';
 import Page403 from '@/pages/NotFound/Page403';
 import Login from '@/pages/login';
+import Overview from '@/pages/login/overview';
 import LoginCallback from '@/pages/loginCallback';
 import Strategy from '@/pages/warning/strategy';
 import Profile from '@/pages/account/profile';
@@ -60,9 +61,9 @@ import TaskDetail from '@/pages/task/detail';
 import Version from '@/pages/help/version';
 import Contact from '@/pages/help/contact';
 import Migrate from '@/pages/help/migrate';
-import RecordingRule from '@/pages/recordingRules'
-import RecordingRuleAdd from '@/pages/recordingRules/add'
-import RecordingRuleEdit from '@/pages/recordingRules/edit'
+import RecordingRule from '@/pages/recordingRules';
+import RecordingRuleAdd from '@/pages/recordingRules/add';
+import RecordingRuleEdit from '@/pages/recordingRules/edit';
 import { dynamicPackages, Entry } from '@/utils';
 
 const Packages = dynamicPackages();
@@ -112,6 +113,7 @@ export default function Content() {
     <div className={`content ${themeClassName}`}>
       <Switch>
         <Route path='/demo' component={Demo} />
+        <Route path='/overview' component={Overview} />
         <Route path='/login' component={Login} exact />
         <Route path='/callback' component={LoginCallback} exact />
         <Route path='/metric/explorer' component={Explore} exact />
@@ -122,6 +124,7 @@ export default function Content() {
         <Route path='/account/profile/:tab' component={Profile} />
 
         <Route path='/dashboard/:id' exact component={DashboardDetail} />
+        <Route path='/dashboards/:id' exact component={DashboardDetail} />
         <Route path='/dashboards' component={Dashboard} />
         <Route path='/chart/:ids' component={Chart} />
         <Route path='/indicator' component={IndicatorPage} />

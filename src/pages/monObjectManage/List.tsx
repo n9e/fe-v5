@@ -42,6 +42,10 @@ interface IProps {
   setOperateType: (operateType: OperateType) => void;
 }
 
+const GREEN_COLOR = '#3FC453';
+const YELLOW_COLOR = '#FF9919';
+const RED_COLOR = '#FF656B';
+
 export default function List(props: IProps) {
   const { t, i18n } = useTranslation();
   const { curBusiId, setSelectedIdents, selectedRowKeys, setSelectedRowKeys, refreshFlag, setRefreshFlag, setOperateType } = props;
@@ -88,7 +92,6 @@ export default function List(props: IProps) {
         </span>
       ),
       dataIndex: 'ident',
-      width: 140,
     },
     {
       title: '标签',
@@ -130,6 +133,88 @@ export default function List(props: IProps) {
       },
     },
     {
+      title: '状态',
+      width: 100,
+      dataIndex: 'target_up',
+      sorter: (a, b) => a.target_up - b.target_up,
+      render(text) {
+        if (text > 0) {
+          return (
+            <div
+              className='table-td-fullBG'
+              style={{
+                backgroundColor: GREEN_COLOR,
+              }}
+            >
+              UP
+            </div>
+          );
+        } else if (text < 1) {
+          return (
+            <div
+              className='table-td-fullBG'
+              style={{
+                backgroundColor: RED_COLOR,
+              }}
+            >
+              DOWN
+            </div>
+          );
+        }
+        return null;
+      },
+    },
+    {
+      title: '负载',
+      width: 100,
+      dataIndex: 'load_per_core',
+      sorter: (a, b) => a.load_per_core - b.load_per_core,
+      render(text) {
+        let backgroundColor = GREEN_COLOR;
+        if (text > 2) {
+          backgroundColor = YELLOW_COLOR;
+        }
+        if (text > 4) {
+          backgroundColor = RED_COLOR;
+        }
+        return (
+          <div
+            className='table-td-fullBG'
+            style={{
+              backgroundColor: backgroundColor,
+            }}
+          >
+            {_.floor(text, 1)}
+          </div>
+        );
+      },
+    },
+    {
+      title: '内存',
+      width: 100,
+      dataIndex: 'mem_util',
+      sorter: (a, b) => a.mem_util - b.mem_util,
+      render(text) {
+        let backgroundColor = GREEN_COLOR;
+        if (text > 70) {
+          backgroundColor = YELLOW_COLOR;
+        }
+        if (text > 85) {
+          backgroundColor = RED_COLOR;
+        }
+        return (
+          <div
+            className='table-td-fullBG'
+            style={{
+              backgroundColor: backgroundColor,
+            }}
+          >
+            {_.floor(text, 1)}%
+          </div>
+        );
+      },
+    },
+    {
       title: '备注',
       dataIndex: 'note',
       ellipsis: {
@@ -144,6 +229,7 @@ export default function List(props: IProps) {
       },
     },
   ];
+  const queryRef = useRef<any>();
   const featchData = ({ current, pageSize }): Promise<any> => {
     const query = {
       query: tableQueryContent,
@@ -152,11 +238,19 @@ export default function List(props: IProps) {
       limit: pageSize,
       p: current,
     };
-    return getMonObjectList(query).then((res) => {
-      return {
-        total: res.dat.total,
-        list: res.dat.list,
-      };
+    // 点击排序后默认会被触发请求，由于这里只需要对当前页面数据排序，所以对 query 进行比较没有变化的话就不重复发生一些相同的请求
+    if (!_.isEqual(queryRef.current, query)) {
+      queryRef.current = query;
+      return getMonObjectList(query).then((res) => {
+        return {
+          total: res.dat.total,
+          list: res.dat.list,
+        };
+      });
+    }
+    return Promise.resolve({
+      total: tableProps.pagination.total,
+      list: tableProps.dataSource,
     });
   };
   const showTotal = (total: number) => {

@@ -14,15 +14,22 @@
  * limitations under the License.
  *
  */
-export interface IVariable {
-  name: string;
-  definition: string;
-  fullDefinition?: string; // 转换变量后的完整表达式
-  reg?: string;
-  multi?: boolean;
-  allOption?: boolean;
-  allValue?: string;
-  options?: string[];
-  type?: 'query' | 'textbox';
-  defaultValue?: string; // textbox 的默认值
-}
+import _ from 'lodash';
+import request from '@/utils/request';
+import { RequestMethod } from '@/store/common';
+
+export const getPromData = (url: string, params, headers) => {
+  return request(url, {
+    method: RequestMethod.Get,
+    params,
+    headers,
+    silence: true,
+  }).then((res) => res.data);
+};
+
+export const setTmpChartData = function (data: { configs: string }[]) {
+  return request(`/api/n9e/share-charts`, {
+    method: RequestMethod.Post,
+    data,
+  });
+};
