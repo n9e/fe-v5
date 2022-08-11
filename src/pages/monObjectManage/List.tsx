@@ -165,7 +165,7 @@ export default function List(props: IProps) {
       },
     },
     {
-      title: '负载',
+      title: '单核负载',
       width: 100,
       dataIndex: 'load_per_core',
       sorter: (a, b) => a.load_per_core - b.load_per_core,
@@ -200,6 +200,32 @@ export default function List(props: IProps) {
           backgroundColor = YELLOW_COLOR;
         }
         if (text > 85) {
+          backgroundColor = RED_COLOR;
+        }
+        return (
+          <div
+            className='table-td-fullBG'
+            style={{
+              backgroundColor: backgroundColor,
+            }}
+          >
+            {_.floor(text, 1)}%
+          </div>
+        );
+      },
+    },
+    {
+      title: '根分区',
+      width: 100,
+      dataIndex: 'disk_util',
+      sorter: (a, b) => a.disk_util - b.disk_util,
+      render(text) {
+        if (text === undefined) return '';
+        let backgroundColor = GREEN_COLOR;
+        if (text > 85) {
+          backgroundColor = YELLOW_COLOR;
+        }
+        if (text > 95) {
           backgroundColor = RED_COLOR;
         }
         return (
