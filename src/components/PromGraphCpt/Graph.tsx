@@ -114,7 +114,9 @@ export default function Graph(props: IProps) {
         .then((res) => {
           const series = _.map(res?.result, (item) => {
             return {
+              id: _.uniqueId('series_'),
               name: getSerieName(item.metric),
+              metric: item.metric,
               data: item.values,
             };
           });

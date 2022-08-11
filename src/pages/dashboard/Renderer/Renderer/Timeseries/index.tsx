@@ -296,6 +296,24 @@ export default function index(props: IProps) {
                 emptyText: '暂无数据',
               }}
               pagination={false}
+              rowClassName={(record) => {
+                return record.disabled ? 'disabled' : '';
+              }}
+              onRow={(record) => {
+                return {
+                  onClick: () => {
+                    setActiveLegend(activeLegend !== record.id ? record.id : '');
+                    setSeriesData(
+                      _.map(seriesData, (subItem) => {
+                        return {
+                          ...subItem,
+                          visible: activeLegend === record.id ? true : record.id === subItem.id,
+                        };
+                      }),
+                    );
+                  },
+                };
+              }}
             />
           )}
           {displayMode === 'list' && !_.isEmpty(legendData) && (
