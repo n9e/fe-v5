@@ -80,7 +80,7 @@ function timeFormatter(val, type: 'seconds' | 'milliseconds', decimals) {
   };
 }
 
-const valueFormatter = ({ unit, decimals = 3 }, val) => {
+const valueFormatter = ({ unit, decimals = 3, dateFormat = 'YYYY-MM-DD HH:mm:ss' }, val) => {
   if (val === null || val === '' || val === undefined) {
     return {
       value: '',
@@ -141,6 +141,20 @@ const valueFormatter = ({ unit, decimals = 3 }, val) => {
     }
     if (unit === 'milliseconds') {
       return timeFormatter(val, unit, decimals);
+    }
+    if (unit === 'datetimeSeconds') {
+      return {
+        value: moment.unix(val).format(dateFormat),
+        unit: '',
+        text: moment.unix(val).format(dateFormat),
+      };
+    }
+    if (unit === 'datetimeMilliseconds') {
+      return {
+        value: moment(val).format(dateFormat),
+        unit: '',
+        text: moment(val).format(dateFormat),
+      };
     }
     return {
       value: _.round(val, decimals),

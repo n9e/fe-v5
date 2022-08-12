@@ -73,6 +73,7 @@ export default function Stat(props: IProps) {
       {
         unit: options?.standardOptions?.util,
         decimals: options?.standardOptions?.decimals,
+        dateFormat: options?.standardOptions?.dateFormat,
       },
       options?.valueMappings,
     );
