@@ -14,6 +14,10 @@
  * limitations under the License.
  *
  */
+/**
+ * 时间选择器组件
+ * 时间范围默认值：如果开启了本地缓存，需要调用 getDefaultValue(localKey: string, defaultValue: IRawTimeRange) 来获取真实的默认值
+ */
 import React from 'react';
 import TimeRangePicker from './TimeRangePicker';
 import { IRawTimeRange } from './types';
