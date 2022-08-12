@@ -26,6 +26,7 @@ import { TimeRangePickerWithRefresh, IRawTimeRange } from '@/components/TimeRang
 import { AddPanelIcon } from '../config';
 import { visualizations } from '../Editor/config';
 import { getStepByTimeAndStep } from '../utils';
+import { dashboardTimeCacheKey } from './index';
 
 interface IProps {
   curCluster: string;
@@ -149,7 +150,13 @@ export default function Title(props: IProps) {
               </Button>
             </Dropdown>
           </div>
-          <TimeRangePickerWithRefresh refreshTooltip={`刷新间隔小于 step(${getStepByTimeAndStep(range, step)}s) 将不会更新数据`} value={range} onChange={setRange} />
+          <TimeRangePickerWithRefresh
+            localKey={dashboardTimeCacheKey}
+            dateFormat='YYYY-MM-DD HH:mm:ss'
+            refreshTooltip={`刷新间隔小于 step(${getStepByTimeAndStep(range, step)}s) 将不会更新数据`}
+            value={range}
+            onChange={setRange}
+          />
           <Resolution onChange={(v) => setStep(v)} initialValue={step} />
           <Button
             onClick={() => {

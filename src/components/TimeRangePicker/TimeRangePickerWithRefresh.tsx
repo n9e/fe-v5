@@ -17,22 +17,18 @@
 import React from 'react';
 import { Space } from 'antd';
 import _ from 'lodash';
-import AutoRefresh from '@/components/AutoRefresh';
-import TimeRangePicker from './index';
-import { IRawTimeRange } from './types';
+import AutoRefresh from './AutoRefresh';
+import TimeRangePicker from './TimeRangePicker';
+import { ITimeRangePickerWithRefreshProps } from './types';
+import { valueAsString } from './utils';
 
-interface IProps {
-  style?: object;
-  value?: IRawTimeRange;
-  onChange?: (value: IRawTimeRange) => void;
-  refreshTooltip?: string;
-}
+export default function TimeRangePickerWithRefresh(props: ITimeRangePickerWithRefreshProps) {
+  const { value, onChange, style, refreshTooltip, dateFormat = 'YYYY-MM-DD HH:mm', localKey } = props;
 
-export default function TimeRangePickerWithRefresh(props: IProps) {
-  const { value, onChange, style, refreshTooltip } = props;
   return (
     <Space style={style}>
       <AutoRefresh
+        localKey={localKey && `${localKey}_refresh`}
         tooltip={refreshTooltip}
         onRefresh={() => {
           if (value && onChange) {
@@ -43,7 +39,23 @@ export default function TimeRangePickerWithRefresh(props: IProps) {
           }
         }}
       />
-      <TimeRangePicker value={value} onChange={onChange} />
+      <TimeRangePicker
+        {..._.omit(props, ['style'])}
+        onChange={(val) => {
+          if (localKey) {
+            localStorage.setItem(
+              localKey,
+              JSON.stringify({
+                start: valueAsString(val.start, dateFormat),
+                end: valueAsString(val.end, dateFormat),
+              }),
+            );
+          }
+          if (onChange) {
+            onChange(val);
+          }
+        }}
+      />
     </Space>
   );
 }
