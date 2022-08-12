@@ -23,7 +23,7 @@ import queryString from 'query-string';
 import { useSelector } from 'react-redux';
 import { Alert } from 'antd';
 import PageLayout from '@/components/pageLayout';
-import { IRawTimeRange } from '@/components/TimeRangePicker';
+import { IRawTimeRange, getDefaultValue } from '@/components/TimeRangePicker';
 import { Dashboard } from '@/store/dashboardInterface';
 import { RootState as CommonRootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
@@ -47,22 +47,7 @@ interface URLParam {
   id: string;
 }
 
-const dashboardTimeCacheKey = 'dashboard-timeRangePicker-value';
-const getDefaultDashboardTime = () => {
-  const defaultTime = {
-    start: 'now-1h',
-    end: 'now',
-  };
-  const cache = localStorage.getItem(dashboardTimeCacheKey);
-  if (cache) {
-    try {
-      return JSON.parse(cache);
-    } catch (e) {
-      return defaultTime;
-    }
-  }
-  return defaultTime;
-};
+export const dashboardTimeCacheKey = 'dashboard-timeRangePicker-value';
 
 export default function DetailV2() {
   const { search } = useLocation();
@@ -88,7 +73,12 @@ export default function DetailV2() {
   const [variableConfigWithOptions, setVariableConfigWithOptions] = useState<IVariable[]>();
   const [dashboardLinks, setDashboardLinks] = useState<ILink[]>();
   const [panels, setPanels] = useState<any[]>([]);
-  const [range, setRange] = useState<IRawTimeRange>(getDefaultDashboardTime());
+  const [range, setRange] = useState<IRawTimeRange>(
+    getDefaultValue(dashboardTimeCacheKey, {
+      start: 'now-1h',
+      end: 'now',
+    }),
+  );
   const [step, setStep] = useState<number | null>(null);
   const [editable, setEditable] = useState(true);
   let updateAtRef = useRef<number>();
@@ -162,7 +152,6 @@ export default function DetailV2() {
           }}
           range={range}
           setRange={(v) => {
-            localStorage.setItem(dashboardTimeCacheKey, JSON.stringify(v));
             setRange(v);
           }}
           step={step}

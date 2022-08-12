@@ -58,3 +58,20 @@ export interface IRawTimeRange {
   end: string | Moment;
   refreshFlag?: string; // 用于自动刷新场景
 }
+
+export interface ITimeRangePickerProps {
+  style?: object;
+  localKey?: string;
+  value?: IRawTimeRange;
+  dateFormat?: string;
+  onChange?: (value: IRawTimeRange) => void;
+  placeholder?: string;
+  allowClear?: boolean;
+  onClear?: () => void;
+  label?: React.ReactElement;
+  extraFooter?: (fn: Function) => React.ReactElement;
+}
+
+export interface ITimeRangePickerWithRefreshProps extends ITimeRangePickerProps {
+  refreshTooltip?: string;
+}

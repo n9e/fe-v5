@@ -36,10 +36,11 @@ const refreshMap = {
 interface IProps {
   tooltip?: string;
   onRefresh: () => void;
+  localKey?: string;
 }
 
 function Refresh(props: IProps, ref) {
-  const intervalSecondsCache = _.toNumber(window.localStorage.getItem('event-interval-seconds'));
+  const intervalSecondsCache = props.localKey ? _.toNumber(window.localStorage.getItem(props.localKey)) : 0;
   const [intervalSeconds, setIntervalSeconds] = useState(intervalSecondsCache);
   const [visible, setVisible] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout>();
@@ -66,7 +67,7 @@ function Refresh(props: IProps, ref) {
   useImperativeHandle(ref, () => ({
     closeRefresh() {
       setIntervalSeconds(0);
-      window.localStorage.setItem('event-interval-seconds', '0');
+      props.localKey && window.localStorage.setItem(props.localKey, '0');
     },
   }));
 
@@ -85,7 +86,7 @@ function Refresh(props: IProps, ref) {
           <Menu
             onClick={(e) => {
               setIntervalSeconds(_.toNumber(e.key));
-              window.localStorage.setItem('event-interval-seconds', e.key);
+              props.localKey && window.localStorage.setItem(props.localKey, e.key);
               setVisible(false);
             }}
           >
