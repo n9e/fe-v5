@@ -126,13 +126,15 @@ export default function DetailV2() {
   }, [id]);
 
   useInterval(() => {
-    getDashboardPure(id).then((res) => {
-      if (updateAtRef.current && res.update_at > updateAtRef.current) {
-        if (editable) setEditable(false);
-      } else {
-        setEditable(true);
-      }
-    });
+    if (import.meta.env.PROD) {
+      getDashboardPure(id).then((res) => {
+        if (updateAtRef.current && res.update_at > updateAtRef.current) {
+          if (editable) setEditable(false);
+        } else {
+          setEditable(true);
+        }
+      });
+    }
   }, 2000);
 
   return (
