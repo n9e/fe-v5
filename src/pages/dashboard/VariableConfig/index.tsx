@@ -36,6 +36,13 @@ interface IProps {
   onOpenFire?: () => void;
 }
 
+function includes(source, target) {
+  if (_.isArray(target)) {
+    return _.intersection(source, target);
+  }
+  return _.includes(source, target);
+}
+
 function index(props: IProps) {
   const { id, cluster, editable = true, range, onChange, onOpenFire } = props;
   const [editing, setEditing] = useState<boolean>(false);
@@ -65,7 +72,7 @@ function index(props: IProps) {
               // 当大盘变量值为空时，设置默认值
               // 如果已选项不在待选项里也视做空值处理
               const selected = getVaraiableSelected(item.name, id);
-              if (selected === null || (selected && !_.includes(regFilterOptions, selected))) {
+              if (selected === null || (selected && !_.isEmpty(regFilterOptions) && !includes(regFilterOptions, selected))) {
                 const head = regFilterOptions?.[0];
                 const defaultVal = item.multi ? (head ? [head] : []) : head;
                 setVaraiableSelected(item.name, defaultVal, id, true);
