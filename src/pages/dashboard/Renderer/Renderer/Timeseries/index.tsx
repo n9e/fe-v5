@@ -80,6 +80,7 @@ export default function index(props: IProps) {
           renderTo: chartEleRef.current,
           height: chartEleRef.current.clientHeight,
           colors: hexPalette,
+          marginTop: 0,
         },
         series: [],
       });
