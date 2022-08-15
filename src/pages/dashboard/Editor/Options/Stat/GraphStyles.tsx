@@ -14,17 +14,20 @@
  * limitations under the License.
  *
  */
-import React from 'react';
+import React, { useContext } from 'react';
 import { Form, Radio, Select, Row, Col, InputNumber } from 'antd';
 import { CaretDownOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { Panel } from '../../Components/Collapse';
 import { calcsOptions } from '../../config';
+import { Context } from '../../../Context';
 
 const colSpans = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
 export default function GraphStyles() {
   const namePrefix = ['custom'];
+  const { state } = useContext(Context);
+  const fields = _.concat(state?.metric, 'Value');
 
   return (
     <Panel header='图表样式'>
@@ -48,7 +51,7 @@ export default function GraphStyles() {
           </Col>
         </Row>
         <Row gutter={10}>
-          <Col span={12}>
+          <Col span={8}>
             <Form.Item label='取值计算' name={[...namePrefix, 'calc']}>
               <Select suffixIcon={<CaretDownOutlined />}>
                 {_.map(calcsOptions, (item, key) => {
@@ -61,7 +64,20 @@ export default function GraphStyles() {
               </Select>
             </Form.Item>
           </Col>
-          <Col span={12}>
+          <Col span={8}>
+            <Form.Item label='值字段' name={[...namePrefix, 'valueField']}>
+              <Select suffixIcon={<CaretDownOutlined />}>
+                {_.map(fields, (item) => {
+                  return (
+                    <Select.Option key={item} value={item}>
+                      {item}
+                    </Select.Option>
+                  );
+                })}
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col span={8}>
             <Form.Item label='每行最多显示' name={[...namePrefix, 'colSpan']}>
               <Select suffixIcon={<CaretDownOutlined />}>
                 {_.map(colSpans, (item) => {

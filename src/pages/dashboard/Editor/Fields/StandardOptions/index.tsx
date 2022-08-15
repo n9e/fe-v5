@@ -35,7 +35,7 @@ export default function index(props: IProps) {
       <>
         <Form.Item shouldUpdate>
           {({ getFieldValue }) => {
-            const unit = getFieldValue([...namePrefix, 'util']);
+            const unit = getFieldValue([...namePrefix, 'util']) || '';
             return (
               <Row gutter={10}>
                 <Col span={unit.indexOf('datetime') > -1 ? 12 : 24}>

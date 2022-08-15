@@ -121,6 +121,7 @@ export const defaultCustomValuesMap = {
     textMode: 'valueAndName',
     colorMode: 'value',
     calc: 'lastNotNull',
+    valueField: 'Value',
     colSpan: 1,
     textSize: {},
   },
