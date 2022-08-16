@@ -22,6 +22,7 @@ const formatToTable = (series: any[], rowBy: string, colBy: string) => {
   });
   const newSeries = _.map(rows, (val, key) => {
     const item: any = {
+      id: _.uniqueId('series_'),
       [rowBy]: key,
     };
     const subGrouped = _.groupBy(val, (item) => {
@@ -40,6 +41,6 @@ const formatToTable = (series: any[], rowBy: string, colBy: string) => {
     return item;
   });
   return newSeries;
-}
+};
 
 export default formatToTable;

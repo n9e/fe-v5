@@ -24,7 +24,6 @@ import { IVariable } from './definition';
 import DisplayItem from './DisplayItem';
 import EditItem from './EditItem';
 import './index.less';
-export type { IVariable } from './definition';
 
 interface IProps {
   id: string;
@@ -147,4 +146,6 @@ function index(props: IProps) {
   );
 }
 
+export type { IVariable } from './definition';
+export { replaceExpressionVars } from './constant';
 export default React.memo(index);

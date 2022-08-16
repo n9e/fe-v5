@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Modal, Form, Select, Space, Button } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
 import _ from 'lodash';
@@ -22,53 +22,54 @@ import { v4 as uuidv4 } from 'uuid';
 import { useTranslation } from 'react-i18next';
 import TimeRangePicker, { IRawTimeRange } from '@/components/TimeRangePicker';
 import Resolution from '@/components/Resolution';
-import ModalHOC, { ModalWrapProps } from '../Components/ModalHOC';
 import { visualizations, defaultValues, defaultCustomValuesMap } from './config';
-import Renderer from '../Renderer/Renderer';
 import { IVariable } from '../VariableConfig';
 import FormCpt from './Form';
 import { IPanel } from '../types';
-import { Reducer } from '../Context';
 
 interface IProps {
+  mode: string;
+  visible: boolean;
+  setVisible: (visible: boolean) => void;
   initialValues: IPanel | null;
   variableConfigWithOptions?: IVariable[];
   cluster: string;
   id: string;
   time: IRawTimeRange;
-  onOK: (formData: any) => void;
+  onOK: (formData: any, mode: string) => void;
 }
 
-function index(props: ModalWrapProps & IProps) {
+function index(props: IProps) {
   const { t } = useTranslation();
-  const { visible, variableConfigWithOptions, cluster, id, time } = props;
+  const formRef = useRef<any>();
+  const { mode, visible, setVisible, variableConfigWithOptions, cluster, id, time } = props;
   const initialValues = _.cloneDeep(props.initialValues);
-  const [chartForm] = Form.useForm();
   const [range, setRange] = useState<IRawTimeRange>(time);
   const defaultType = _.get(initialValues, 'type') || defaultValues.type;
   const [type, setType] = useState<string>(defaultType);
   const [step, setStep] = useState<number | null>(null);
-  const [changedFlag, setChangedFlag] = useState<string>(_.uniqueId('xxx_'));
-  const [values, setValues] = useState<any>(chartForm.getFieldsValue());
   const handleAddChart = async () => {
-    return chartForm.validateFields().then(async (values) => {
-      // TODO: 渲染 hexbin 图时，colorRange 需要从 string 转换为 array
-      if (type === 'hexbin') {
-        _.set(values, 'custom.colorRange', _.split(values.custom.colorRange, ','));
-      }
-      let formData = Object.assign(values, {
-        version: '2.0.0',
-        type,
-        layout: initialValues?.layout,
+    if (formRef.current && formRef.current.getFormInstance) {
+      const formInstance = formRef.current.getFormInstance();
+      formInstance.validateFields().then(async (values) => {
+        // TODO: 渲染 hexbin 图时，colorRange 需要从 string 转换为 array
+        if (type === 'hexbin') {
+          _.set(values, 'custom.colorRange', _.split(values.custom.colorRange, ','));
+        }
+        let formData = Object.assign(values, {
+          version: '2.0.0',
+          type,
+          layout: initialValues?.layout,
+        });
+        if (initialValues && initialValues.id) {
+          formData.id = initialValues.id;
+        } else {
+          formData.id = uuidv4();
+        }
+        props.onOK(formData, mode);
+        setVisible(false);
       });
-      if (initialValues && initialValues.id) {
-        formData.id = initialValues.id;
-      } else {
-        formData.id = uuidv4();
-      }
-      props.onOK(formData);
-      props.destroy();
-    });
+    }
   };
 
   // TODO: 渲染 hexbin 配置时，colorRange 需要从 array 转换为 string
@@ -79,8 +80,8 @@ function index(props: ModalWrapProps & IProps) {
   }
 
   useEffect(() => {
-    setValues(chartForm.getFieldsValue());
-  }, [changedFlag]);
+    setType(_.get(initialValues, 'type') || defaultValues.type);
+  }, [JSON.stringify(initialValues)]);
 
   return (
     <Modal
@@ -94,13 +95,12 @@ function index(props: ModalWrapProps & IProps) {
               value={type}
               onChange={(val) => {
                 setType(val);
-                chartForm.setFieldsValue({
-                  custom: defaultCustomValuesMap[val],
-                });
-                // TODO: setFieldsValue 可能是个异步的，无法立刻拿到最新的 values，后面需要翻下 antd.form 组件源码
-                setTimeout(() => {
-                  setChangedFlag(_.uniqueId('xxx_'));
-                }, 100);
+                if (formRef.current && formRef.current.getFormInstance) {
+                  const formInstance = formRef.current.getFormInstance();
+                  formInstance.setFieldsValue({
+                    custom: defaultCustomValuesMap[val],
+                  });
+                }
               }}
             >
               {_.map(visualizations, (item) => {
@@ -122,7 +122,7 @@ function index(props: ModalWrapProps & IProps) {
             <CloseOutlined
               style={{ fontSize: 18 }}
               onClick={() => {
-                props.destroy();
+                setVisible(false);
               }}
             />
           </Space>
@@ -131,11 +131,12 @@ function index(props: ModalWrapProps & IProps) {
       style={{ top: 10, padding: 0 }}
       visible={visible}
       closable={false}
+      destroyOnClose
       footer={[
         <Button
           key='cancel'
           onClick={() => {
-            props.destroy();
+            setVisible(false);
           }}
         >
           取消
@@ -151,33 +152,26 @@ function index(props: ModalWrapProps & IProps) {
         </Button>,
       ]}
       onCancel={() => {
-        props.destroy();
+        setVisible(false);
       }}
       bodyStyle={{
         padding: '10px 24px 24px 24px',
       }}
     >
-      <Reducer>
+      {!_.isEmpty(initialValues) && (
         <FormCpt
-          chartForm={chartForm}
-          setChangedFlag={setChangedFlag}
+          ref={formRef}
           initialValues={initialValues}
           type={type}
           variableConfigWithOptions={variableConfigWithOptions}
           cluster={cluster}
           range={range}
           id={id}
-          render={(innerVariableConfig) => {
-            return (
-              <div style={{ height: 300 }}>
-                <Renderer dashboardId={id} time={range} step={step} type={type} values={values} variableConfig={innerVariableConfig} isPreview />
-              </div>
-            );
-          }}
+          step={step}
         />
-      </Reducer>
+      )}
     </Modal>
   );
 }
 
-export default ModalHOC(index);
+export default index;

@@ -20,14 +20,14 @@ import { CaretDownOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { Panel } from '../../Components/Collapse';
 import { calcsOptions } from '../../config';
-import { Context } from '../../../Context';
+import { DetailContext } from '../../../DetailContext';
 
 const colSpans = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
 export default function GraphStyles() {
   const namePrefix = ['custom'];
-  const { state } = useContext(Context);
-  const fields = _.concat(state?.metric, 'Value');
+  const { state } = useContext(DetailContext);
+  const fields = _.compact(_.concat(state?.metric, 'Value'));
 
   return (
     <Panel header='图表样式'>

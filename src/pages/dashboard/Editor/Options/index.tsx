@@ -24,7 +24,7 @@ import Hexbin from './Hexbin';
 import BarGauge from './BarGauge';
 import Text from './Text';
 
-export default function index({ type, targets, chartForm }) {
+export default function index({ type, targets, chartForm, variableConfigWithOptions }) {
   const OptionsCptMap = {
     timeseries: <Timeseries />,
     stat: <Stat />,
@@ -32,7 +32,7 @@ export default function index({ type, targets, chartForm }) {
     pie: <Pie />,
     hexbin: <Hexbin />,
     barGauge: <BarGauge />,
-    text: <Text />,
+    text: <Text variableConfigWithOptions={variableConfigWithOptions} />,
   };
   return OptionsCptMap[type] || `无效的图表类型 ${type}`;
 }

@@ -23,7 +23,7 @@ import getCalculatedValuesBySeries, { getSerieTextObj } from '../../utils/getCal
 import getOverridePropertiesByName from '../../utils/getOverridePropertiesByName';
 import localeCompare from '../../utils/localeCompare';
 import formatToTable from '../../utils/formatToTable';
-import { Context } from '../../../Context';
+import { DetailContext } from '../../../DetailContext';
 import './style.less';
 
 interface IProps {
@@ -49,7 +49,7 @@ const getSortOrder = (key, sortObj) => {
 export default function Stat(props: IProps) {
   const eleRef = useRef<HTMLDivElement>(null);
   const size = useSize(eleRef);
-  const { dispatch } = useContext(Context);
+  const { dispatch } = useContext(DetailContext);
   const { values, series, themeMode } = props;
   const { custom, options, overrides } = values;
   const { showHeader, calc, aggrDimension, displayMode, columns, sortColumn, sortOrder, colorMode = 'value' } = custom;
@@ -216,7 +216,14 @@ export default function Stat(props: IProps) {
           };
           const overrideProps = getOverridePropertiesByName(overrides, name);
           if (!_.isEmpty(overrideProps)) {
-            textObj = getSerieTextObj(text?.stat, overrideProps?.standardOptions, overrideProps?.valueMappings);
+            textObj = getSerieTextObj(
+              text?.stat,
+              {
+                ...(overrideProps?.standardOptions || {}),
+                unit: overrideProps?.standardOptions?.util, // TODO: 兼容性问题，后续需要修改
+              },
+              overrideProps?.valueMappings,
+            );
           }
           return (
             <div

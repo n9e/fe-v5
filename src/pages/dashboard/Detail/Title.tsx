@@ -26,7 +26,7 @@ import { TimeRangePickerWithRefresh, IRawTimeRange } from '@/components/TimeRang
 import { AddPanelIcon } from '../config';
 import { visualizations } from '../Editor/config';
 import { getStepByTimeAndStep } from '../utils';
-import { dashboardTimeCacheKey } from './index';
+import { dashboardTimeCacheKey } from './Detail';
 
 interface IProps {
   curCluster: string;

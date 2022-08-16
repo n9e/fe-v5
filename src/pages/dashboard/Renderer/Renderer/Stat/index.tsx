@@ -21,7 +21,7 @@ import { useSize } from 'ahooks';
 import { IPanel } from '../../../types';
 import { statHexPalette } from '../../../config';
 import getCalculatedValuesBySeries from '../../utils/getCalculatedValuesBySeries';
-import { Context } from '../../../Context';
+import { DetailContext } from '../../../DetailContext';
 import './style.less';
 
 interface IProps {
@@ -108,7 +108,7 @@ const getColumnsKeys = (data: any[]) => {
 };
 
 export default function Stat(props: IProps) {
-  const { dispatch } = useContext(Context);
+  const { dispatch } = useContext(DetailContext);
   const { values, series, containerRef, themeMode } = props;
   const { custom, options } = values;
   const { calc, textMode, colorMode, colSpan, textSize, valueField } = custom;

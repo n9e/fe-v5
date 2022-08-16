@@ -28,7 +28,7 @@ interface IProps {
 const { Option, OptGroup } = Select;
 
 export default function index(props: IProps) {
-  const { namePrefix = ['options', 'standardOptions'] } = props;
+  const { preNamePrefix = [], namePrefix = ['options', 'standardOptions'] } = props;
 
   return (
     <Panel header='高级设置'>
@@ -91,8 +91,8 @@ export default function index(props: IProps) {
                 </Col>
                 {unit.indexOf('datetime') > -1 && (
                   <Col span={12}>
-                    <Form.Item label='时间格式化' name={[...namePrefix, 'dateFormat']} initialValue='YYYY-MM-DD HH:mm:ss'>
-                      <Input style={{ width: '100%' }} />
+                    <Form.Item label='时间格式化' name={[...preNamePrefix, ...namePrefix, 'dateFormat']}>
+                      <Input style={{ width: '100%' }} placeholder='YYYY-MM-DD HH:mm:ss' />
                     </Form.Item>
                   </Col>
                 )}
@@ -102,17 +102,17 @@ export default function index(props: IProps) {
         </Form.Item>
         <Row gutter={10}>
           <Col span={8}>
-            <Form.Item label='最小值' name={[...namePrefix, 'min']}>
+            <Form.Item label='最小值' name={[...preNamePrefix, ...namePrefix, 'min']}>
               <InputNumber placeholder='auto' style={{ width: '100%' }} />
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item label='最大值' name={[...namePrefix, 'max']}>
+            <Form.Item label='最大值' name={[...preNamePrefix, ...namePrefix, 'max']}>
               <InputNumber placeholder='auto' style={{ width: '100%' }} />
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item label='小数点' name={[...namePrefix, 'decimals']}>
+            <Form.Item label='小数点' name={[...preNamePrefix, ...namePrefix, 'decimals']}>
               <InputNumber placeholder='auto' style={{ width: '100%' }} />
             </Form.Item>
           </Col>

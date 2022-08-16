@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-import React, { useEffect, useState } from 'react';
-import { Form, Input, Row, Col, Button, Space, Switch, Tooltip } from 'antd';
+import React, { useEffect, useState, useImperativeHandle, forwardRef } from 'react';
+import { Form, Input, Row, Col, Button, Space, Switch, Tooltip, Mentions } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import moment from 'moment';
@@ -27,11 +27,13 @@ import Options from './Options';
 import Collapse, { Panel } from './Components/Collapse';
 import VariableConfig, { IVariable } from '../VariableConfig';
 import getFirstUnusedLetter from '../Renderer/utils/getFirstUnusedLetter';
+import Renderer from '../Renderer/Renderer';
 
 const alphabet = 'ABCDEFGHIGKLMNOPQRSTUVWXYZ'.split('');
 
-export default function FormCpt(props) {
-  const { chartForm, setChangedFlag, initialValues, type, cluster, render, range, id } = props;
+function FormCpt(props, ref) {
+  const [chartForm] = Form.useForm();
+  const { initialValues, type, cluster, range, id, step } = props;
   const [variableConfigWithOptions, setVariableConfigWithOptions] = useState<IVariable[]>(props.variableConfigWithOptions);
 
   defaultValues.custom = defaultCustomValuesMap[_.get(initialValues, 'type') || defaultValues.type];
@@ -42,19 +44,18 @@ export default function FormCpt(props) {
     }
   });
 
+  useImperativeHandle(ref, () => ({
+    getFormInstance: () => {
+      return chartForm;
+    },
+  }));
+
   useEffect(() => {
     setVariableConfigWithOptions(props.variableConfigWithOptions);
   }, [JSON.stringify(props.variableConfigWithOptions)]);
 
   return (
-    <Form
-      layout='vertical'
-      form={chartForm}
-      initialValues={_.merge({}, defaultValues, initialValues)}
-      onValuesChange={() => {
-        setChangedFlag(_.uniqueId('xxx_'));
-      }}
-    >
+    <Form preserve={false} layout='vertical' form={chartForm} initialValues={_.merge({}, defaultValues, initialValues)}>
       <div
         style={{
           height: 'calc(100vh - 173px)',
@@ -68,7 +69,13 @@ export default function FormCpt(props) {
           }}
         >
           <Col flex={1} style={{ minWidth: 100 }}>
-            <div style={{ marginBottom: 10 }}>{render(variableConfigWithOptions)}</div>
+            <div style={{ marginBottom: 10, height: 300 }}>
+              <Form.Item shouldUpdate noStyle>
+                {({ getFieldsValue }) => {
+                  return <Renderer dashboardId={id} time={range} step={step} type={type} values={getFieldsValue()} variableConfig={variableConfigWithOptions} isPreview />;
+                }}
+              </Form.Item>
+            </div>
             {type !== 'text' && (
               <div style={{ height: 'calc(100% - 310px)', overflowY: 'auto' }}>
                 <div style={{ marginBottom: 10 }}>
@@ -130,6 +137,7 @@ export default function FormCpt(props) {
                                     style={{ flex: 1 }}
                                   >
                                     <PromQLInput
+                                      trigger={['onBlur']}
                                       validateTrigger={['onBlur']}
                                       url='/api/n9e/prometheus'
                                       headers={{
@@ -221,7 +229,15 @@ export default function FormCpt(props) {
               <Panel header='面板配置'>
                 <>
                   <Form.Item label={'标题'} name='name'>
-                    <Input />
+                    <Mentions prefix='$' split=''>
+                      {_.map(variableConfigWithOptions, (item) => {
+                        return (
+                          <Mentions.Option key={item.name} value={item.name}>
+                            {item.name}
+                          </Mentions.Option>
+                        );
+                      })}
+                    </Mentions>
                   </Form.Item>
                   <Form.Item label={'下钻链接'}>
                     <Form.List name={'links'}>
@@ -253,7 +269,15 @@ export default function FormCpt(props) {
                                     },
                                   ]}
                                 >
-                                  <Input placeholder='链接名称' />
+                                  <Mentions prefix='$' split='' placeholder='链接名称'>
+                                    {_.map(variableConfigWithOptions, (item) => {
+                                      return (
+                                        <Mentions.Option key={item.name} value={item.name}>
+                                          {item.name}
+                                        </Mentions.Option>
+                                      );
+                                    })}
+                                  </Mentions>
                                 </Form.Item>
                                 <Form.Item
                                   {...restField}
@@ -265,7 +289,15 @@ export default function FormCpt(props) {
                                     },
                                   ]}
                                 >
-                                  <Input style={{ width: 260 }} placeholder='链接地址' />
+                                  <Mentions prefix='$' split='' style={{ width: 260 }} placeholder='链接地址'>
+                                    {_.map(variableConfigWithOptions, (item) => {
+                                      return (
+                                        <Mentions.Option key={item.name} value={item.name}>
+                                          {item.name}
+                                        </Mentions.Option>
+                                      );
+                                    })}
+                                  </Mentions>
                                 </Form.Item>
                                 <Tooltip title='是否新窗口打开'>
                                   <Form.Item {...restField} name={[name, 'targetBlank']} valuePropName='checked'>
@@ -285,14 +317,22 @@ export default function FormCpt(props) {
                       )}
                     </Form.List>
                     <Form.Item label='备注' name='description'>
-                      <Input.TextArea placeholder='支持 markdown' />
+                      <Mentions prefix='$' split='' rows={3} placeholder='支持 markdown'>
+                        {_.map(variableConfigWithOptions, (item) => {
+                          return (
+                            <Mentions.Option key={item.name} value={item.name}>
+                              {item.name}
+                            </Mentions.Option>
+                          );
+                        })}
+                      </Mentions>
                     </Form.Item>
                   </Form.Item>
                 </>
               </Panel>
               <Form.Item shouldUpdate={(prevValues, curValues) => !_.isEqual(prevValues.targets, curValues.targets)}>
                 {({ getFieldValue }) => {
-                  return <Options type={type} targets={getFieldValue('targets')} chartForm={chartForm} />;
+                  return <Options type={type} targets={getFieldValue('targets')} chartForm={chartForm} variableConfigWithOptions={variableConfigWithOptions} />;
                 }}
               </Form.Item>
             </Collapse>
@@ -302,3 +342,5 @@ export default function FormCpt(props) {
     </Form>
   );
 }
+
+export default forwardRef(FormCpt);
