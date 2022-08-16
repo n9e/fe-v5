@@ -42,10 +42,21 @@ interface CMExpressionInputProps {
   executeQuery?: (expr?: string) => void;
   validateTrigger?: string[];
   completeEnabled?: boolean;
+  trigger?: ('onBlur' | 'onEnter')[]; // 触发 onChang 的事件
 }
 
 const ExpressionInput = (
-  { url, headers, value, onChange, executeQuery, readonly = false, validateTrigger = ['onChange', 'onBlur'], completeEnabled = true }: CMExpressionInputProps,
+  {
+    url,
+    headers,
+    value,
+    onChange,
+    executeQuery,
+    readonly = false,
+    validateTrigger = ['onChange', 'onBlur'],
+    completeEnabled = true,
+    trigger = ['onBlur', 'onEnter'],
+  }: CMExpressionInputProps,
   ref,
 ) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -187,18 +198,16 @@ const ExpressionInput = (
     <div
       className={classNames({ 'ant-input': true, readonly: readonly, 'promql-input': true })}
       onBlur={() => {
-        if (typeof onChange === 'function') {
+        if (typeof onChange === 'function' && _.includes(trigger, 'onBlur')) {
           if (realValue.current !== value) {
             onChange(realValue.current);
           }
         }
       }}
       onKeyDown={(e) => {
-        if (e.code === 'Enter') {
-          if (typeof onChange === 'function') {
-            if (realValue.current !== value) {
-              onChange(realValue.current);
-            }
+        if (e.code === 'Enter' && typeof onChange === 'function' && _.includes(trigger, 'onEnter')) {
+          if (realValue.current !== value) {
+            onChange(realValue.current);
           }
         }
       }}

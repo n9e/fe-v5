@@ -131,6 +131,7 @@ export default function index(props: IProps) {
               value={value}
               onChange={setValue}
               executeQuery={(val) => {
+                console.log(val);
                 setPromql(val);
               }}
               completeEnabled={completeEnabled}
