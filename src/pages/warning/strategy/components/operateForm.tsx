@@ -31,6 +31,7 @@ import PromQLInput from '@/components/PromQLInput';
 import AdvancedWrap from '@/components/AdvancedWrap';
 import { SwitchWithLabel } from './SwitchWithLabel';
 import AbnormalDetection from './AbnormalDetection';
+import ElasticsearchSettings from './ElasticsearchSettings';
 export const ClusterAll = '$all';
 const { Option } = Select;
 const layout = {
@@ -222,10 +223,8 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
   return (
     <div className='operate_con'>
       <Form
-        {...layout}
         form={form}
         className='strategy-form'
-        // layout={refresh ? 'horizontal' : 'horizontal'}
         layout='vertical'
         initialValues={{
           prom_eval_interval: 15,
@@ -250,29 +249,35 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
       >
         <Space direction='vertical' style={{ width: '100%' }}>
           <Card title={t('基本配置')}>
-            <Form.Item
-              label={t('规则标题：')}
-              name='name'
-              rules={[
-                {
-                  required: true,
-                  message: t('规则标题不能为空'),
-                },
-              ]}
-            >
-              <Input placeholder={t('请输入规则标题')} />
-            </Form.Item>
-            <Form.Item
-              label={t('规则备注：')}
-              name='note'
-              rules={[
-                {
-                  required: false,
-                },
-              ]}
-            >
-              <Input placeholder={t('请输入规则备注')} />
-            </Form.Item>
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item
+                  label={t('规则标题：')}
+                  name='name'
+                  rules={[
+                    {
+                      required: true,
+                      message: t('规则标题不能为空'),
+                    },
+                  ]}
+                >
+                  <Input placeholder={t('请输入规则标题')} />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item
+                  label={t('规则备注：')}
+                  name='note'
+                  rules={[
+                    {
+                      required: false,
+                    },
+                  ]}
+                >
+                  <Input placeholder={t('请输入规则备注')} />
+                </Form.Item>
+              </Col>
+            </Row>
             <Form.Item
               label={t('告警级别')}
               name='severity'
@@ -289,27 +294,50 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                 <Radio value={3}>{t('三级报警')}</Radio>
               </Radio.Group>
             </Form.Item>
-            <Form.Item
-              label={t('生效集群')}
-              name='cluster'
-              rules={[
-                {
-                  required: true,
-                  message: t('生效集群不能为空'),
-                },
-              ]}
-            >
-              <Select suffixIcon={<CaretDownOutlined />} mode='multiple' onChange={handleClusterChange}>
-                <Option value={ClusterAll} key={ClusterAll}>
-                  {ClusterAll}
-                </Option>
-                {clusterList?.map((item) => (
-                  <Option value={item} key={item}>
-                    {item}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item
+                  label={t('数据源类型')}
+                  name='cate'
+                  rules={[
+                    {
+                      required: true,
+                      message: t('生效集群不能为空'),
+                    },
+                  ]}
+                  initialValue='es'
+                >
+                  <Select suffixIcon={<CaretDownOutlined />}>
+                    <Option value='prometheus'>prometheus</Option>
+                    <Option value='es'>es</Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item
+                  label={t('生效集群')}
+                  name='cluster'
+                  rules={[
+                    {
+                      required: true,
+                      message: t('生效集群不能为空'),
+                    },
+                  ]}
+                >
+                  <Select suffixIcon={<CaretDownOutlined />} mode='multiple' onChange={handleClusterChange}>
+                    <Option value={ClusterAll} key={ClusterAll}>
+                      {ClusterAll}
+                    </Option>
+                    {clusterList?.map((item) => (
+                      <Option value={item} key={item}>
+                        {item}
+                      </Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+            </Row>
+            <ElasticsearchSettings />
             <AdvancedWrap>
               <AbnormalDetection form={form} />
             </AdvancedWrap>

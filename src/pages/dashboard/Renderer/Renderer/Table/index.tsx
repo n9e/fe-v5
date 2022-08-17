@@ -211,7 +211,7 @@ export default function Stat(props: IProps) {
           let textObj = {
             value: text?.text,
             unit: '',
-            color: text.color || (themeMode === 'dark' ? '#fff' : '#000'),
+            color: text?.color || (themeMode === 'dark' ? '#fff' : '#000'),
           };
           const overrideProps = getOverridePropertiesByName(overrides, name);
           if (!_.isEmpty(overrideProps)) {
