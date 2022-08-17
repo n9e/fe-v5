@@ -136,7 +136,7 @@ export default function Title(props: IProps) {
                       onClick={(_) => {
                         setCurCluster(cluster);
                         localStorage.setItem('curCluster', cluster);
-                        refresh(true);
+                        refresh();
                       }}
                     >
                       {cluster}

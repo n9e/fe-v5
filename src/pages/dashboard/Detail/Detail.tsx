@@ -88,8 +88,9 @@ export default function DetailV2() {
     id: '',
     initialValues: {} as any,
   });
+  const [forceRenderKey, setForceRender] = useState(_.uniqueId('forceRenderKey_'));
   let updateAtRef = useRef<number>();
-  const refresh = () => {
+  const refresh = (cbk?: () => void) => {
     getDashboard(id).then((res) => {
       updateAtRef.current = res.update_at;
       setDashboard(res);
@@ -109,6 +110,9 @@ export default function DetailV2() {
         );
         setDashboardLinks(configs.links);
         setPanels(sortPanelsByGridLayout(configs.panels));
+        if (cbk) {
+          cbk();
+        }
       }
     });
   };
@@ -164,11 +168,14 @@ export default function DetailV2() {
           setCurCluster={setCurCluster}
           dashboard={dashboard}
           setDashboard={setDashboard}
-          refresh={(flag) => {
+          refresh={() => {
             // 集群修改需要刷新数据
-            if (flag) {
-              refresh();
-            }
+            refresh(() => {
+              // TODO: cluster 和 vars 目前没办法做到同步，暂时用定时器处理
+              setTimeout(() => {
+                setForceRender(_.uniqueId('forceRenderKey_'));
+              }, 500);
+            });
           }}
           range={range}
           setRange={(v) => {
@@ -208,30 +215,6 @@ export default function DetailV2() {
                   custom: defaultCustomValuesMap[type],
                 },
               });
-              // editor({
-              //   visible: true,
-              //   variableConfigWithOptions,
-              //   cluster: curCluster,
-              //   id,
-              //   time: range,
-              //   initialValues: {
-              //     type,
-              //     targets: [
-              //       {
-              //         refId: 'A',
-              //         expr: '',
-              //       },
-              //     ],
-              //     custom: defaultCustomValuesMap[type],
-              //   },
-              //   onOK: (values) => {
-              //     const newPanels = updatePanelsInsertNewPanelToGlobal(panels, values, 'chart');
-              //     setPanels(newPanels);
-              //     handleUpdateDashboardConfigs(dashboard.id, {
-              //       configs: panelsMergeToConfigs(dashboard.configs, newPanels),
-              //     });
-              //   },
-              // });
             }
           }}
         />
@@ -262,6 +245,7 @@ export default function DetailV2() {
           </div>
           {variableConfigWithOptions && (
             <Panels
+              key={forceRenderKey}
               editable={editable}
               panels={panels}
               setPanels={setPanels}
