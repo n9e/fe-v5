@@ -4,9 +4,11 @@ import { PlusCircleOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import Rule from './Rule';
 import { ops, functions } from './configs';
 
-export default function index() {
+export const severityMap = ['一级告警', '二级告警', '三级告警'];
+
+export default function index({ form }) {
   return (
-    <Form.Item shouldUpdate>
+    <Form.Item shouldUpdate noStyle>
       {({ getFieldValue }) => {
         const queryValues = getFieldValue(['query', 'values']);
         return (
@@ -43,18 +45,33 @@ export default function index() {
                               padding: 16,
                             }}
                           >
-                            <Rule restField={restField} name={name} queryValues={queryValues} />
+                            <Rule restField={restField} name={name} queryValues={queryValues} form={form} />
+                            <Input.Group>
+                              <span className='ant-input-group-addon'>触发</span>
+                              <Form.Item name={[name, 'severity']} noStyle>
+                                <Select style={{ width: '100%' }}>
+                                  <Select.Option value={1}>一级告警</Select.Option>
+                                  <Select.Option value={2}>二级告警</Select.Option>
+                                  <Select.Option value={3}>三级告警</Select.Option>
+                                </Select>
+                              </Form.Item>
+                            </Input.Group>
+                            <Form.Item name={[name, 'rule_op']} noStyle hidden>
+                              <div />
+                            </Form.Item>
                           </div>
                         </Col>
-                        <Col flex='40px' style={{ display: 'flex', alignItems: 'center' }}>
-                          <div
-                            onClick={() => {
-                              remove(name);
-                            }}
-                          >
-                            <MinusCircleOutlined style={{ cursor: 'pointer' }} />
-                          </div>
-                        </Col>
+                        {fields.length > 1 && (
+                          <Col flex='40px' style={{ display: 'flex', alignItems: 'center' }}>
+                            <div
+                              onClick={() => {
+                                remove(name);
+                              }}
+                            >
+                              <MinusCircleOutlined style={{ cursor: 'pointer' }} />
+                            </div>
+                          </Col>
+                        )}
                       </Row>
                     </div>
                   );

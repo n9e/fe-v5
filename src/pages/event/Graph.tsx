@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import _ from 'lodash';
-import Timeseries from '../dashboard/Renderer/Renderer/Timeseries';
+import Timeseries from '@/pages/dashboard/Renderer/Renderer/Timeseries';
 
 interface IProps {
   series: any[];

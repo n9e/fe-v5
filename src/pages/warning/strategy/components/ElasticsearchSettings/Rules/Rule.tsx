@@ -4,20 +4,23 @@ import { PlusCircleOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { ops, functions } from './configs';
 
-export default function Rule({ restField, name, queryValues }) {
+export default function Rule({ restField, name, queryValues, form }) {
+  const [ruleOp, setRuleOp] = React.useState('AND');
   function renderQueryAndFunc(subName) {
     return (
       <Input.Group>
         <span className='ant-input-group-addon'>
-          <Select>
-            {_.map(queryValues, (item) => {
-              return (
-                <Select.Option key={item.ref} value={item.ref}>
-                  {item.ref}
-                </Select.Option>
-              );
-            })}
-          </Select>
+          <Form.Item noStyle {...restField} name={[subName, 'value']}>
+            <Select>
+              {_.map(queryValues, (item) => {
+                return (
+                  <Select.Option key={item.ref} value={item.ref}>
+                    {item.ref}
+                  </Select.Option>
+                );
+              })}
+            </Select>
+          </Form.Item>
         </span>
         <Form.Item noStyle {...restField} name={[subName, 'func']}>
           <Select style={{ width: '100%' }}>
@@ -36,7 +39,7 @@ export default function Rule({ restField, name, queryValues }) {
   function renderOp(subName) {
     return (
       <Form.Item noStyle {...restField} name={[subName, 'op']}>
-        <Select>
+        <Select style={{ width: '100%' }}>
           {_.map(ops, (item) => {
             return (
               <Select.Option key={item} value={item}>
@@ -51,14 +54,25 @@ export default function Rule({ restField, name, queryValues }) {
   function renderThreshold(subName) {
     return (
       <Form.Item noStyle {...restField} name={[subName, 'threshold']}>
-        <InputNumber style={{ width: '100%' }} />
+        <InputNumber style={{ width: '100%' }} placeholder='阈值' />
       </Form.Item>
     );
   }
   function renderRuleOp() {
     return (
-      <Form.Item noStyle name={['rule_op']}>
-        <Select>
+      <Form.Item noStyle>
+        <Select
+          value={ruleOp}
+          onChange={(val) => {
+            setRuleOp(val);
+            form.setFields([
+              {
+                name: ['query', 'rules', name, 'rule_op'],
+                value: val,
+              },
+            ]);
+          }}
+        >
           <Select.Option value='AND'>AND</Select.Option>
           <Select.Option value='OR'>OR</Select.Option>
         </Select>
@@ -72,7 +86,7 @@ export default function Rule({ restField, name, queryValues }) {
           <div>
             {fields.map(({ key, name: subName }, index) => {
               return (
-                <Row gutter={16} key={key} style={{ marginBottom: index < fields.length - 1 ? 16 : 0 }}>
+                <Row gutter={16} key={key} style={{ marginBottom: 16 }}>
                   <Col flex='auto'>
                     <Form.Item shouldUpdate noStyle>
                       {({ getFieldValue }) => {
@@ -100,10 +114,12 @@ export default function Rule({ restField, name, queryValues }) {
                                     <InputNumber style={{ width: '100%' }} />
                                   </Form.Item>
                                   <span className='ant-input-group-addon'>
-                                    <Select defaultValue='min'>
-                                      <Select.Option value='min'>分</Select.Option>
-                                      <Select.Option value='hour'>小时</Select.Option>
-                                    </Select>
+                                    <Form.Item name={[subName, 'compare_time_unit']} noStyle initialValue='min'>
+                                      <Select>
+                                        <Select.Option value='min'>分</Select.Option>
+                                        <Select.Option value='hour'>小时</Select.Option>
+                                      </Select>
+                                    </Form.Item>
                                   </span>
                                 </Input.Group>
                               </Col>

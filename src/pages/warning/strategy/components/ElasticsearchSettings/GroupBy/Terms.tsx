@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import { Row, Col, Form, Select, Button, Input, InputNumber } from 'antd';
+import { Row, Col, Form, Select, Button, Input, InputNumber, AutoComplete } from 'antd';
 import { VerticalRightOutlined, VerticalLeftOutlined } from '@ant-design/icons';
+import _ from 'lodash';
 import { groupByCates } from './configs';
 
-export default function Terms({ restField, name }) {
+export default function Terms({ restField, name, fieldsOptions }) {
   const [expanded, setExpanded] = useState(false);
+  const [search, setSearch] = useState('');
+
   return (
     <Row gutter={16}>
       <Col flex='auto'>
@@ -21,9 +24,21 @@ export default function Terms({ restField, name }) {
             </Form.Item>
           </Col>
           <Col span={expanded ? 6 : 12}>
-            <Form.Item {...restField} name={[name, 'field']} noStyle>
-              <Input placeholder='Field key' />
-            </Form.Item>
+            <Input.Group>
+              <span className='ant-input-group-addon'>Field key</span>
+              <Form.Item {...restField} name={[name, 'field']} noStyle>
+                <AutoComplete
+                  options={_.filter(fieldsOptions, (item) => {
+                    if (search) {
+                      return item.value.includes(search);
+                    }
+                    return true;
+                  })}
+                  style={{ width: '100%' }}
+                  onSearch={setSearch}
+                />
+              </Form.Item>
+            </Input.Group>
           </Col>
           {expanded && (
             <>

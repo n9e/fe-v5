@@ -25,6 +25,7 @@ export function getCommonClusters() {
       method: RequestMethod.Post,
       data: {
         category: 'timeseries',
+        plugin_type: 'prometheus',
         p: 1,
         limit: 100,
       },
@@ -39,6 +40,34 @@ export function getCommonClusters() {
       };
     });
   }
+  return request(`/api/n9e/clusters`, {
+    method: RequestMethod.Get,
+  });
+}
+
+// 获取es集群信息
+export function getCommonESClusters() {
+  if (import.meta.env.VITE_IS_ADVANCED === 'true') {
+    return request(`/api/v1/datasource/list`, {
+      method: RequestMethod.Post,
+      data: {
+        category: 'timeseries',
+        plugin_type: 'elasticsearch',
+        p: 1,
+        limit: 100,
+      },
+    }).then((res) => {
+      return {
+        dat: _.map(
+          _.filter(res.data.items, (item) => {
+            return item.plugin_type === 'elasticsearch';
+          }),
+          'name',
+        ),
+      };
+    });
+  }
+  // TODO: n9e 暂时没有 es 集群接口
   return request(`/api/n9e/clusters`, {
     method: RequestMethod.Get,
   });

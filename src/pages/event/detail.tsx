@@ -22,39 +22,21 @@ import { useSelector } from 'react-redux';
 import { Button, Card, Col, message, Row, Space, Spin, Tag, Typography } from 'antd';
 import { PlayCircleOutlined } from '@ant-design/icons';
 import PageLayout from '@/components/pageLayout';
-import { getAlertEventsById, getHistoryEventsById, getBrainData } from '@/services/warning';
+import { getAlertEventsById, getHistoryEventsById } from '@/services/warning';
 import { priorityColor } from '@/utils/constant';
 import PromQLInput from '@/components/PromQLInput';
-import { TimeRangePickerWithRefresh, IRawTimeRange, parseRange } from '@/components/TimeRangePicker';
-import Resolution from '@/components/Resolution';
 import { deleteAlertEventsModal } from '.';
 import { RootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
-import { getStepByTimeAndStep } from '@/pages/dashboard/utils';
-import Graph from './Graph';
+import { parseValues } from '@/pages/warning/strategy/components/utils';
+import { severityMap } from '@/pages/warning/strategy/components/ElasticSearchSettings/Rules';
+import Preview from './Preview';
 import './detail.less';
 
 const { Paragraph } = Typography;
-const getUUIDByTags = (tags: string[]) => {
-  let uuid = '';
-  _.forEach(tags, (tag) => {
-    const arr = _.split(tag, 'uuid=');
-    if (arr[1]) {
-      uuid = arr[1];
-    }
-  });
-  return uuid;
-};
-const serieColorMap = {
-  origin: '#573BA7',
-  upper_bound: '#1A94FF',
-  lower_bound: '#2ACA96',
-  anomaly: 'red',
-};
 const EventDetailPage: React.FC = () => {
   const { busiId, eventId } = useParams<{ busiId: string; eventId: string }>();
   const { busiGroups } = useSelector<RootState, CommonStoreState>((state) => state.common);
-  useEffect(() => {}, [busiGroups]);
   const handleNavToWarningList = (id) => {
     if (busiGroups.find((item) => item.id === id)) {
       history.push(`/alert-rules?id=${id}`);
@@ -63,9 +45,11 @@ const EventDetailPage: React.FC = () => {
     }
   };
   const history = useHistory();
-  const [isHistory, setIsHistory] = useState<boolean>(history.location.pathname.includes('alert-his-events'));
+  const isHistory = history.location.pathname.includes('alert-his-events');
   const [eventDetail, setEventDetail] = useState<any>();
-  const [descriptionInfo, setDescriptionInfo] = useState([
+  if (eventDetail) eventDetail.cate = eventDetail.cate || 'prometheus'; // TODO: 兼容历史的告警事件
+  const parsedEventDetail = parseValues(eventDetail);
+  const descriptionInfo = [
     {
       label: '规则标题',
       key: 'rule_name',
@@ -150,7 +134,11 @@ const EventDetailPage: React.FC = () => {
         return '阈值告警';
       },
     },
-    {
+    eventDetail?.cate === 'elasticsearch' && {
+      label: '数据源类型',
+      key: 'cate',
+    },
+    eventDetail?.cate === 'prometheus' && {
       label: 'PromQL',
       key: 'prom_ql',
       render(promql) {
@@ -172,6 +160,105 @@ const EventDetailPage: React.FC = () => {
             </Col>
           </Row>
         );
+      },
+    },
+    eventDetail?.cate === 'elasticsearch' && {
+      label: '索引',
+      key: 'query',
+      render(query) {
+        return query?.index;
+      },
+    },
+    eventDetail?.cate === 'elasticsearch' && {
+      label: '过滤项',
+      key: 'query',
+      render(query) {
+        return query?.filter || '无';
+      },
+    },
+    eventDetail?.cate === 'elasticsearch' && {
+      label: '数值提取',
+      key: 'query',
+      render(query) {
+        return _.map(query?.values, (item) => {
+          return (
+            <div key={item.ref}>
+              <span className='pr16'>名称: {item.ref}</span>
+              <span className='pr16'>函数: {item.func}</span>
+              {item.func !== 'count' && <span>字段名: {item.field}</span>}
+            </div>
+          );
+        });
+      },
+    },
+    eventDetail?.cate === 'elasticsearch' && {
+      label: 'Group By',
+      key: 'query',
+      render(query) {
+        return _.map(query?.group_by, (item, idx) => {
+          return (
+            <div key={idx} style={{ backgroundColor: '#fafafa', padding: 8 }}>
+              <span className='pr16'>类型: {item.cate}</span>
+              {item.cate === 'filters' &&
+                _.map(item.params, (param, subIdx) => {
+                  return (
+                    <div key={subIdx}>
+                      <span className='pr16'>查询条件：{param.query}</span>
+                      <span className='pr16'>别名：{param.alias}</span>
+                    </div>
+                  );
+                })}
+              {item.cate === 'terms' ? (
+                <>
+                  <span className='pr16'>字段名: {item.field}</span>
+                  <span className='pr16'>匹配个数: {item.interval || '无'}</span>
+                  <span className='pr16'>文档最小值: {item.min_value === undefined ? '无' : item.min_value}</span>
+                </>
+              ) : (
+                <>
+                  <span className='pr16'>字段名: {item.field}</span>
+                  <span className='pr16'>步长: {item.interval || '无'}</span>
+                  <span className='pr16'>最小值: {item.min_value === undefined ? '无' : item.min_value}</span>
+                </>
+              )}
+            </div>
+          );
+        });
+      },
+    },
+    eventDetail?.cate === 'elasticsearch' && {
+      label: '日期',
+      key: 'query',
+      render(query) {
+        return (
+          <>
+            <span className='pr16'>日期字段: {query?.date_field}</span>
+            <span className='pr16'>
+              时间间隔: {query?.interval} {query?.interval_unit}
+            </span>
+          </>
+        );
+      },
+    },
+    eventDetail?.cate === 'elasticsearch' && {
+      label: '提取值',
+      key: 'query',
+      render(query) {
+        return _.map(query?.rules, (item, idx) => {
+          return (
+            <div key={idx} style={{ backgroundColor: '#fafafa', padding: 8 }}>
+              {_.map(item.rule, (rule, subIdx) => {
+                return (
+                  <div key={`${idx} ${subIdx}`}>
+                    <span className='pr16'>
+                      {rule.value}: {rule.func} {rule.op} {rule.threshold} {subIdx < item.rule.length - 1 ? item.rule_op : ''} 触发{severityMap[item.severity]}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        });
       },
     },
     {
@@ -228,13 +315,7 @@ const EventDetailPage: React.FC = () => {
         );
       },
     },
-  ]);
-  const [range, setRange] = useState<IRawTimeRange>({
-    start: 'now-1h',
-    end: 'now',
-  });
-  const [step, setStep] = useState<number | null>(15);
-  const [series, setSeries] = useState<any[]>([]);
+  ];
 
   useEffect(() => {
     const requestPromise = isHistory ? getHistoryEventsById(busiId, eventId) : getAlertEventsById(busiId, eventId);
@@ -242,54 +323,6 @@ const EventDetailPage: React.FC = () => {
       setEventDetail(res.dat);
     });
   }, [busiId, eventId]);
-
-  useEffect(() => {
-    if (eventDetail && eventDetail.rule_algo) {
-      const parsedRange = parseRange(range);
-      const start = moment(parsedRange.start).unix();
-      const end = moment(parsedRange.end).unix();
-      let _step = step;
-      if (!step) _step = Math.max(Math.floor((end - start) / 240), 1);
-      getBrainData({
-        rid: eventDetail.rule_id,
-        uuid: getUUIDByTags(eventDetail.tags),
-        start,
-        end,
-        step: _step,
-      }).then((res) => {
-        const dat = _.map(
-          _.filter(res.data, (item) => {
-            return item.metric.value_type !== 'predict';
-          }),
-          (item) => {
-            const type = item.metric.value_type;
-            return {
-              name: `${type}`,
-              data: item.values,
-              color: serieColorMap[type],
-              lineDash: type === 'origin' || type === 'anomaly' ? [] : [4, 4],
-            };
-          },
-        );
-        const newSeries: any[] = [];
-        const origin = _.cloneDeep(_.find(dat, { name: 'origin' }));
-        const lower = _.find(dat, { name: 'lower_bound' });
-        const upper = _.find(dat, { name: 'upper_bound' });
-
-        newSeries.push({
-          name: 'lower_upper_bound',
-          data: _.map(lower.data, (dataItem, idx) => {
-            return [...dataItem, upper.data[idx][1]];
-          }),
-          color: '#ddd',
-          opacity: 0.5,
-        });
-
-        newSeries.push(origin);
-        setSeries(newSeries);
-      });
-    }
-  }, [JSON.stringify(eventDetail), JSON.stringify(range), step]);
 
   return (
     <PageLayout title='告警详情' showBack hideCluster>
@@ -306,6 +339,7 @@ const EventDetailPage: React.FC = () => {
                     onClick={() => {
                       history.push('/alert-mutes/add', {
                         group_id: eventDetail.group_id,
+                        cate: eventDetail.cate,
                         cluster: eventDetail.cluster,
                         tags: eventDetail.tags
                           ? eventDetail.tags.map((tag) => {
@@ -344,24 +378,17 @@ const EventDetailPage: React.FC = () => {
           >
             {eventDetail && (
               <div>
-                {eventDetail.rule_algo && (
-                  <div>
-                    <Space>
-                      <TimeRangePickerWithRefresh value={range} onChange={setRange} refreshTooltip={`刷新间隔小于 step(${getStepByTimeAndStep(range, step)}s) 将不会更新数据`} />
-                      <Resolution value={step} onChange={(v) => setStep(v)} initialValue={step} />
-                    </Space>
-                    <Graph series={series} />
-                  </div>
-                )}
+                {parsedEventDetail.rule_algo || parsedEventDetail.cate === 'elasticsearch' ? <Preview data={parsedEventDetail} /> : null}
                 {descriptionInfo
-                  .filter((item) => {
-                    return eventDetail.is_recovered ? true : item.key !== 'recover_time';
+                  .filter((item: any) => {
+                    if (!item) return false;
+                    return parsedEventDetail.is_recovered ? true : item.key !== 'recover_time';
                   })
-                  .map(({ label, key, render }, i) => {
+                  .map(({ label, key, render }: any, i) => {
                     return (
                       <div className='desc-row' key={key + i}>
                         <div className='desc-label'>{label}：</div>
-                        <div className='desc-content'>{render ? render(eventDetail[key], eventDetail) : eventDetail[key]}</div>
+                        <div className='desc-content'>{render ? render(parsedEventDetail[key], parsedEventDetail) : parsedEventDetail[key]}</div>
                       </div>
                     );
                   })}
