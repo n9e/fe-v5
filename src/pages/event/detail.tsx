@@ -211,8 +211,8 @@ const EventDetailPage: React.FC = () => {
               {item.cate === 'terms' ? (
                 <>
                   <span className='pr16'>字段名: {item.field}</span>
-                  <span className='pr16'>匹配个数: {item.interval || '无'}</span>
-                  <span className='pr16'>文档最小值: {item.min_value === undefined ? '无' : item.min_value}</span>
+                  <span className='pr16'>匹配个数: {item.interval || 0}</span>
+                  <span className='pr16'>文档最小值: {item.min_value === undefined ? 0 : item.min_value}</span>
                 </>
               ) : (
                 <>

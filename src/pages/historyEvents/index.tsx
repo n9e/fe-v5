@@ -21,7 +21,7 @@ import { useTranslation } from 'react-i18next';
 import LeftTree from '@/components/LeftTree';
 import DataTable from '@/components/Dantd/components/data-table';
 import moment from 'moment';
-import { Button, Input, Modal, Tag, Tooltip } from 'antd';
+import { Button, Input, Modal, Tag, Select } from 'antd';
 import DateRangePicker, { RelativeRange } from '@/components/DateRangePicker';
 import { priorityColor } from '@/utils/constant';
 import { useHistory } from 'react-router';
@@ -47,6 +47,7 @@ const Event: React.FC = () => {
   const [curClusterItems, setCurClusterItems] = useState<string[]>([]);
   const isAddTagToQueryInput = useRef(false);
   const [curBusiId, setCurBusiId] = useState<number>(-1);
+  const [cate, setCate] = useState<string>('prometheus');
   const DateRangeItems: RelativeRange[] = useMemo(
     () => [
       { num: 6, unit: 'hours', description: t('hours') },
@@ -128,6 +129,16 @@ const Event: React.FC = () => {
               }
             }}
           />
+          <Select
+            value={cate}
+            onChange={(val) => {
+              setCate(val);
+            }}
+            style={{ marginLeft: 8 }}
+          >
+            <Select.Option value='prometheus'>Prometheus</Select.Option>
+            <Select.Option value='elasticsearch'>ElasticSearch</Select.Option>
+          </Select>
           <ColumnSelect
             onSeverityChange={(e) => setHisSeverity(e)}
             onEventTypeChange={(e) => setHisEventType(e)}
@@ -164,7 +175,7 @@ const Event: React.FC = () => {
 
   useEffect(() => {
     tableRef.current.handleReload();
-  }, [curClusterItems, hisSeverity, hisHourRange, hisEventType, curBusiId]);
+  }, [curClusterItems, hisSeverity, hisHourRange, hisEventType, curBusiId, cate]);
 
   return (
     <PageLayout icon={<AlertOutlined />} title={t('历史告警')} hideCluster>
@@ -189,6 +200,7 @@ const Event: React.FC = () => {
                 hisQueryContent ? { query: hisQueryContent } : {},
                 hisEventType !== undefined ? { is_recovered: hisEventType } : {},
                 { bgid: curBusiId },
+                { cate },
               )
             }
             pageParams={{
