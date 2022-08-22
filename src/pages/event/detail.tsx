@@ -29,7 +29,7 @@ import { deleteAlertEventsModal } from '.';
 import { RootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
 import { parseValues } from '@/pages/warning/strategy/components/utils';
-import { severityMap } from '@/pages/warning/strategy/components/ElasticSearchSettings/Rules';
+import { severityMap } from '@/pages/warning/strategy/components/ElasticsearchSettings/Rules';
 import Preview from './Preview';
 import './detail.less';
 
