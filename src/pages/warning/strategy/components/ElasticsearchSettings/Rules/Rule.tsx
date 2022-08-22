@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Form, Row, Col, Input, Space, Select, InputNumber } from 'antd';
 import { PlusCircleOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash';
-import { ops, functions } from './configs';
+import { ops, functions, functionsNameMap } from './configs';
 
 export default function Rule({ restField, name, queryValues, form, defaultRuleOp }) {
   const [ruleOp, setRuleOp] = useState(defaultRuleOp || 'AND');
@@ -32,7 +32,7 @@ export default function Rule({ restField, name, queryValues, form, defaultRuleOp
             {_.map(functions, (item) => {
               return (
                 <Select.Option key={item} value={item}>
-                  {item}
+                  {functionsNameMap[item]}
                 </Select.Option>
               );
             })}

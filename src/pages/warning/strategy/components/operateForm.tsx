@@ -375,37 +375,59 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
             </Form.Item>
             <Row gutter={16}>
               <Col span={12}>
-                <Form.Item
-                  name='prom_eval_interval'
-                  label={t('执行频率（秒）')}
-                  tooltip={t(`每隔${form.getFieldValue('prom_eval_interval')}秒，把PromQL作为查询条件，去查询后端存储，如果查到了数据就表示当次有监控数据触发了规则`)}
-                  initialValue={60}
-                  rules={[
-                    {
-                      required: true,
-                      message: t('执行频率不能为空'),
-                    },
-                  ]}
-                >
-                  <InputNumber min={1} style={{ width: '100%' }} />
+                <Form.Item shouldUpdate={(prevValues, curValues) => prevValues.cate !== curValues.cate} noStyle>
+                  {({ getFieldValue }) => {
+                    const cate = getFieldValue('cate');
+                    return (
+                      <Form.Item
+                        name='prom_eval_interval'
+                        label={t('执行频率（秒）')}
+                        tooltip={
+                          cate === 'prometheus'
+                            ? t(`每隔${form.getFieldValue('prom_eval_interval')}秒，把PromQL作为查询条件，去查询后端存储，如果查到了数据就表示当次有监控数据触发了规则`)
+                            : '每隔15秒，去查询后端存储'
+                        }
+                        initialValue={60}
+                        rules={[
+                          {
+                            required: true,
+                            message: t('执行频率不能为空'),
+                          },
+                        ]}
+                      >
+                        <InputNumber min={1} style={{ width: '100%' }} />
+                      </Form.Item>
+                    );
+                  }}
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item
-                  name='prom_for_duration'
-                  label={t('持续时长（秒）')}
-                  tooltip={t(
-                    `通常持续时长大于执行频率，在持续时长内按照执行频率多次执行PromQL查询，每次都触发才生成告警；如果持续时长置为0，表示只要有一次PromQL查询触发阈值，就生成告警`,
-                  )}
-                  initialValue={60}
-                  rules={[
-                    {
-                      required: true,
-                      message: t('持续时长不能为空'),
-                    },
-                  ]}
-                >
-                  <InputNumber min={0} style={{ width: '100%' }} />
+                <Form.Item shouldUpdate={(prevValues, curValues) => prevValues.cate !== curValues.cate} noStyle>
+                  {({ getFieldValue }) => {
+                    const cate = getFieldValue('cate');
+                    return (
+                      <Form.Item
+                        name='prom_for_duration'
+                        label={t('持续时长（秒）')}
+                        tooltip={
+                          cate === 'prometheus'
+                            ? t(
+                                `通常持续时长大于执行频率，在持续时长内按照执行频率多次执行PromQL查询，每次都触发才生成告警；如果持续时长置为0，表示只要有一次PromQL查询触发阈值，就生成告警`,
+                              )
+                            : '通常持续时长大于执行频率，在持续时长内按照执行频率多次执行查询，每次都触发才生成告警；如果持续时长置为0，表示只要有一次查询的数据满足告警条件，就生成告警'
+                        }
+                        initialValue={60}
+                        rules={[
+                          {
+                            required: true,
+                            message: t('持续时长不能为空'),
+                          },
+                        ]}
+                      >
+                        <InputNumber min={0} style={{ width: '100%' }} />
+                      </Form.Item>
+                    );
+                  }}
                 </Form.Item>
               </Col>
             </Row>
@@ -462,9 +484,17 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                 }}
               />
             </Form.Item>
-            {/* <Form.Item label={t('仅在本业务组生效')} name='enable_in_bg' valuePropName='checked'>
-              <SwitchWithLabel label='根据告警事件中的ident归属关系判断' />
-            </Form.Item> */}
+            <Form.Item shouldUpdate={(prevValues, curValues) => prevValues.cate !== curValues.cate} noStyle>
+              {({ getFieldValue }) => {
+                if (getFieldValue('cate') === 'prometheus') {
+                  return (
+                    <Form.Item label={t('仅在本业务组生效')} name='enable_in_bg' valuePropName='checked'>
+                      <SwitchWithLabel label='根据告警事件中的ident归属关系判断' />
+                    </Form.Item>
+                  );
+                }
+              }}
+            </Form.Item>
           </Card>
           <Card title={t('通知配置')}>
             <Form.Item label={t('通知媒介')} name='notify_channels'>

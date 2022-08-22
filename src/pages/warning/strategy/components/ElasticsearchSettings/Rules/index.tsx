@@ -16,7 +16,7 @@ export default function index({ form }) {
             {(fields, { add, remove }) => (
               <div>
                 <div style={{ marginBottom: 8 }}>
-                  提取值{' '}
+                  告警条件{' '}
                   <PlusCircleOutlined
                     style={{ cursor: 'pointer' }}
                     onClick={() => {

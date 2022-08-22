@@ -241,7 +241,7 @@ const EventDetailPage: React.FC = () => {
       },
     },
     eventDetail?.cate === 'elasticsearch' && {
-      label: '提取值',
+      label: '告警条件',
       key: 'query',
       render(query) {
         return _.map(query?.rules, (item, idx) => {
