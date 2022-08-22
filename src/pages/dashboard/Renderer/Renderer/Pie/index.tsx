@@ -37,6 +37,7 @@ export default function Pie(props: IProps) {
     {
       unit: options?.standardOptions?.util,
       decimals: options?.standardOptions?.decimals,
+      dateFormat: options?.standardOptions?.dateFormat,
     },
     options?.valueMappings,
   );

@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import _ from 'lodash';
 import semver from 'semver';
 import { v4 as uuidv4 } from 'uuid';
@@ -42,7 +42,7 @@ import {
 } from './utils';
 import Renderer from '../Renderer/Renderer/index';
 import Row from './Row';
-import editor from '../Editor';
+import Editor from '../Editor';
 import './style.less';
 
 interface IProps {
@@ -84,6 +84,12 @@ function index(props: IProps) {
     }
     return Promise.reject();
   };
+  const [editorData, setEditorData] = useState({
+    mode: 'add',
+    visible: false,
+    id: '',
+    initialValues: {} as any,
+  });
 
   return (
     <div className='dashboards-panels scroll-container'>
@@ -160,24 +166,13 @@ function index(props: IProps) {
                       onShareClick(item);
                     }}
                     onEditClick={() => {
-                      editor({
+                      setEditorData({
+                        mode: 'edit',
                         visible: true,
-                        variableConfigWithOptions: variableConfig,
-                        cluster: curCluster,
                         id: item.id,
-                        time: range,
                         initialValues: {
                           ...item,
                           id: item.id,
-                        },
-                        onOK: (values) => {
-                          const newPanels = updatePanelsWithNewPanel(panels, values);
-                          setPanels(newPanels);
-                          updateDashboardConfigs(dashboard.id, {
-                            configs: panelsMergeToConfigs(dashboard.configs, newPanels),
-                          }).then((res) => {
-                            onUpdated(res);
-                          });
                         },
                       });
                     }}
@@ -232,12 +227,10 @@ function index(props: IProps) {
                     });
                   }}
                   onAddClick={() => {
-                    editor({
+                    setEditorData({
+                      mode: 'add',
                       visible: true,
-                      variableConfigWithOptions: variableConfig,
-                      cluster: curCluster,
                       id: item.id,
-                      time: range,
                       initialValues: {
                         type: 'timeseries',
                         targets: [
@@ -246,15 +239,6 @@ function index(props: IProps) {
                             expr: '',
                           },
                         ],
-                      },
-                      onOK: (values) => {
-                        const newPanels = updatePanelsInsertNewPanelToRow(panels, item.id, values);
-                        setPanels(newPanels);
-                        updateDashboardConfigs(dashboard.id, {
-                          configs: panelsMergeToConfigs(dashboard.configs, newPanels),
-                        }).then((res) => {
-                          onUpdated(res);
-                        });
                       },
                     });
                   }}
@@ -290,6 +274,30 @@ function index(props: IProps) {
           );
         })}
       </ReactGridLayout>
+      <Editor
+        mode={editorData.mode}
+        visible={editorData.visible}
+        setVisible={(visible) => {
+          setEditorData({
+            ...editorData,
+            visible,
+          });
+        }}
+        variableConfigWithOptions={variableConfig}
+        cluster={curCluster}
+        id={editorData.id}
+        time={range}
+        initialValues={editorData.initialValues}
+        onOK={(values, mode) => {
+          const newPanels = mode === 'edit' ? updatePanelsWithNewPanel(panels, values) : updatePanelsInsertNewPanelToRow(panels, editorData.id, values);
+          setPanels(newPanels);
+          updateDashboardConfigs(dashboard.id, {
+            configs: panelsMergeToConfigs(dashboard.configs, newPanels),
+          }).then((res) => {
+            onUpdated(res);
+          });
+        }}
+      />
     </div>
   );
 }

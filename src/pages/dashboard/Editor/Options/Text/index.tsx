@@ -17,10 +17,10 @@
 import React from 'react';
 import GraphStyles from './GraphStyles';
 
-export default function Timeseries() {
+export default function Timeseries({ variableConfigWithOptions }) {
   return (
     <>
-      <GraphStyles />
+      <GraphStyles variableConfigWithOptions={variableConfigWithOptions} />
     </>
   );
 }

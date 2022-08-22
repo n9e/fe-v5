@@ -62,6 +62,7 @@ export default function DisplayItem(props: IProps) {
             }}
             defaultActiveFirstOption={false}
             showSearch
+            dropdownMatchSelectWidth={false}
             value={selected}
             dropdownClassName='overflow-586'
           >
@@ -72,7 +73,7 @@ export default function DisplayItem(props: IProps) {
             )}
             {options &&
               options.map((value) => (
-                <Select.Option key={value} value={value}>
+                <Select.Option key={value} value={value} style={{ maxWidth: 500 }}>
                   {value}
                 </Select.Option>
               ))}

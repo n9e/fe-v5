@@ -20,11 +20,11 @@ import { CaretDownOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { Panel } from '../../Components/Collapse';
 import { calcsOptions } from '../../config';
-import { Context } from '../../../Context';
+import { DetailContext } from '../../../DetailContext';
 
 export default function GraphStyles({ chartForm }) {
   const namePrefix = ['custom'];
-  const { state } = useContext(Context);
+  const { state } = useContext(DetailContext);
 
   return (
     <Panel header='图表样式'>

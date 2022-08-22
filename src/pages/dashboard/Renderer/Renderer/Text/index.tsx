@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import Color from 'color';
 import { IPanel, ITextStyles } from '../../../types';
 import Markdown from '../../../Editor/Components/Markdown';
+import { replaceFieldWithVariable } from '../../../VariableConfig/constant';
+import { DetailContext } from '../../../DetailContext';
 
 interface IProps {
   values: IPanel;
@@ -10,9 +12,12 @@ interface IProps {
 }
 
 export default function index(props: IProps) {
+  const { state } = useContext(DetailContext);
   const { values } = props;
   const { custom } = values;
-  const { content, textColor, bgColor, textSize, justifyContent, alignItems } = custom as ITextStyles;
+  const { textColor, bgColor, textSize, justifyContent, alignItems } = custom as ITextStyles;
+  const content = replaceFieldWithVariable(custom.content, state.dashboardId, state.variableConfigWithOptions);
+
   return (
     <Markdown
       content={content}

@@ -26,7 +26,7 @@ import { TimeRangePickerWithRefresh, IRawTimeRange } from '@/components/TimeRang
 import { AddPanelIcon } from '../config';
 import { visualizations } from '../Editor/config';
 import { getStepByTimeAndStep } from '../utils';
-import { dashboardTimeCacheKey } from './index';
+import { dashboardTimeCacheKey } from './Detail';
 
 interface IProps {
   curCluster: string;
@@ -136,7 +136,7 @@ export default function Title(props: IProps) {
                       onClick={(_) => {
                         setCurCluster(cluster);
                         localStorage.setItem('curCluster', cluster);
-                        refresh(true);
+                        refresh();
                       }}
                     >
                       {cluster}

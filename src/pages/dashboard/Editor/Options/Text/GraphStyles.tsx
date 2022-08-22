@@ -15,12 +15,12 @@
  *
  */
 import React from 'react';
-import { Form, Input, Row, Col, Select, InputNumber } from 'antd';
+import { Form, Input, Row, Col, Select, InputNumber, Mentions } from 'antd';
 import _ from 'lodash';
 import { Panel } from '../../Components/Collapse';
 import ColorPicker from '../../../Components/ColorPicker';
 
-export default function GraphStyles() {
+export default function GraphStyles({ variableConfigWithOptions }) {
   const namePrefix = ['custom'];
 
   return (
@@ -62,8 +62,26 @@ export default function GraphStyles() {
           </Form.Item>
         </Col>
       </Row>
-      <Form.Item label='内容' tooltip='支持 Markdown 和 HTML' name={[...namePrefix, 'content']}>
-        <Input.TextArea placeholder='支持 Markdown 和 HTML' />
+      <Form.Item
+        label='内容'
+        tooltip={
+          <div>
+            <div>默认简单模式，可通过上方设置简单配置卡片样式</div>
+            <div>支持 Markdown 和 HTML</div>
+            <div>如输入 Markdown 或 HTML 建议关闭上方的对齐设置</div>
+          </div>
+        }
+        name={[...namePrefix, 'content']}
+      >
+        <Mentions prefix='$' rows={3} placeholder='支持 Markdown 和 HTML'>
+          {_.map(variableConfigWithOptions, (item) => {
+            return (
+              <Mentions.Option key={item.name} value={item.name}>
+                {item.name}
+              </Mentions.Option>
+            );
+          })}
+        </Mentions>
       </Form.Item>
     </Panel>
   );

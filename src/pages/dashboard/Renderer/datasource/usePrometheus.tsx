@@ -110,7 +110,7 @@ export default function usePrometheus(props: IProps) {
       setLoading(true);
       fetchHistoryBatch({ queries: batchParams }, signalKey)
         .then((res) => {
-          for (let i = 0; i < res.dat.length; i++) {
+          for (let i = 0; i < res.dat?.length; i++) {
             var item = {
               result: res.dat[i],
               expr: exprs[i],

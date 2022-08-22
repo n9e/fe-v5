@@ -217,37 +217,70 @@ export function getVaraiableSelected(name: string, id: string) {
   return v ? JSON.parse(v) : '';
 }
 
-export const replaceExpressionVars = (expression: string, formData: IVariable[], limit: number, id: string) => {
-  var newExpression = expression;
-  const vars = newExpression ? newExpression.match(/\$[0-9a-zA-Z_]+/g) : [];
+export const replaceExpressionVarsSpecifyRule = (
+  params: {
+    expression: string;
+    formData: IVariable[];
+    limit: number;
+    id: string;
+  },
+  rule: {
+    regex: string;
+    getPlaceholder: (expression: string) => string;
+  },
+) => {
+  const { expression, formData, limit, id } = params;
+  const { regex, getPlaceholder } = rule;
+  let newExpression = expression;
+  const vars = newExpression ? newExpression.match(new RegExp(regex, 'g')) : [];
   if (vars && vars.length > 0) {
     for (let i = 0; i < limit; i++) {
       if (formData[i]) {
         const { name, options, reg, allValue } = formData[i];
+        const placeholder = getPlaceholder(name);
         const selected = getVaraiableSelected(name, id);
 
-        if (vars.includes('$' + name) && selected) {
+        if (vars.includes(placeholder) && selected) {
           if (Array.isArray(selected)) {
             if (selected.includes('all') && options) {
               if (allValue) {
-                newExpression = replaceAllPolyfill(newExpression, '$' + name, allValue);
+                newExpression = replaceAllPolyfill(newExpression, placeholder, allValue);
               } else {
                 newExpression = replaceAllPolyfill(
                   newExpression,
-                  '$' + name,
+                  placeholder,
                   `(${(options as string[]).filter((i) => !reg || !stringToRegex(reg) || (stringToRegex(reg) as RegExp).test(i)).join('|')})`,
                 );
               }
             } else {
-              newExpression = replaceAllPolyfill(newExpression, '$' + name, `(${(selected as string[]).join('|')})`);
+              newExpression = replaceAllPolyfill(newExpression, placeholder, `(${(selected as string[]).join('|')})`);
             }
           } else if (typeof selected === 'string') {
-            newExpression = replaceAllPolyfill(newExpression, '$' + name, selected as string);
+            newExpression = replaceAllPolyfill(newExpression, placeholder, selected as string);
           }
         }
       }
     }
   }
+  return newExpression;
+};
+
+export const replaceExpressionVars = (expression: string, formData: IVariable[], limit: number, id: string) => {
+  let newExpression = expression;
+  newExpression = replaceExpressionVarsSpecifyRule(
+    { expression: newExpression, formData, limit, id },
+    {
+      regex: '\\$[0-9a-zA-Z_]+',
+      getPlaceholder: (expression: string) => `$${expression}`,
+    },
+  );
+  newExpression = replaceExpressionVarsSpecifyRule(
+    { expression: newExpression, formData, limit, id },
+    {
+      regex: '\\${[0-9a-zA-Z_]+}',
+      getPlaceholder: (expression: string) => '${' + expression + '}',
+    },
+  );
   return newExpression;
 };
 
@@ -280,4 +313,11 @@ export function stringToRegex(str: string): RegExp | false {
   } else {
     return false;
   }
+}
+
+export function replaceFieldWithVariable(value: string, dashboardId?: string, variableConfig?: IVariable[]) {
+  if (!dashboardId || !variableConfig) {
+    return value;
+  }
+  return replaceExpressionVars(value, variableConfig, variableConfig.length, dashboardId);
 }

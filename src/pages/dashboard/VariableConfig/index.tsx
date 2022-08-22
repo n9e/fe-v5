@@ -24,7 +24,6 @@ import { IVariable } from './definition';
 import DisplayItem from './DisplayItem';
 import EditItem from './EditItem';
 import './index.less';
-export type { IVariable } from './definition';
 
 interface IProps {
   id: string;
@@ -34,6 +33,13 @@ interface IProps {
   range: IRawTimeRange;
   onChange: (data: IVariable[], needSave: boolean, options?: IVariable[]) => void;
   onOpenFire?: () => void;
+}
+
+function includes(source, target) {
+  if (_.isArray(target)) {
+    return _.intersection(source, target);
+  }
+  return _.includes(source, target);
 }
 
 function index(props: IProps) {
@@ -63,8 +69,9 @@ function index(props: IProps) {
               result[idx].fullDefinition = definition;
               result[idx].options = _.sortBy(regFilterOptions);
               // 当大盘变量值为空时，设置默认值
+              // 如果已选项不在待选项里也视做空值处理
               const selected = getVaraiableSelected(item.name, id);
-              if (selected === null) {
+              if (selected === null || (selected && !_.isEmpty(regFilterOptions) && !includes(regFilterOptions, selected))) {
                 const head = regFilterOptions?.[0];
                 const defaultVal = item.multi ? (head ? [head] : []) : head;
                 setVaraiableSelected(item.name, defaultVal, id, true);
@@ -139,4 +146,6 @@ function index(props: IProps) {
   );
 }
 
+export type { IVariable } from './definition';
+export { replaceExpressionVars } from './constant';
 export default React.memo(index);
