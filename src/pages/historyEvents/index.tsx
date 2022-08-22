@@ -47,7 +47,7 @@ const Event: React.FC = () => {
   const [curClusterItems, setCurClusterItems] = useState<string[]>([]);
   const isAddTagToQueryInput = useRef(false);
   const [curBusiId, setCurBusiId] = useState<number>(-1);
-  const [cate, setCate] = useState<string>('prometheus');
+  const [cate, setCate] = useState<string>();
   const DateRangeItems: RelativeRange[] = useMemo(
     () => [
       { num: 6, unit: 'hours', description: t('hours') },
@@ -135,7 +135,9 @@ const Event: React.FC = () => {
               onChange={(val) => {
                 setCate(val);
               }}
-              style={{ marginLeft: 8 }}
+              style={{ marginLeft: 8, width: 120 }}
+              placeholder='数据源类型'
+              allowClear
             >
               <Select.Option value='prometheus'>Prometheus</Select.Option>
               <Select.Option value='elasticsearch'>ElasticSearch</Select.Option>
