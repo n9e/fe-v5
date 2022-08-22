@@ -1,15 +1,14 @@
 import React from 'react';
 import { Form, Select } from 'antd';
 import { CaretDownOutlined } from '@ant-design/icons';
-import { isAdvanced, isEnhanced } from '@/components/AdvancedWrap';
 
 const typeNameMap = {
   prometheus: 'Prometheus',
   elasticsearch: 'ElasticSearch',
 };
 
-export default function index({ form }) {
-  const options = isAdvanced || isEnhanced ? ['prometheus', 'elasticsearch'] : ['prometheus'];
+export default function index({ visible, form }) {
+  const options = visible ? ['prometheus', 'elasticsearch'] : ['prometheus'];
   return (
     <Form.Item label='数据源类型' name='cate' initialValue='prometheus'>
       <Select

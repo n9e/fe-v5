@@ -35,6 +35,7 @@ export default function index({ form }) {
                   />
                 </div>
                 {fields.map(({ key, name, ...restField }) => {
+                  const ruleOp = getFieldValue(['query', 'rules', name, 'rule_op']);
                   return (
                     <div key={key} style={{ marginBottom: 16 }}>
                       <Row gutter={16}>
@@ -45,7 +46,7 @@ export default function index({ form }) {
                               padding: 16,
                             }}
                           >
-                            <Rule restField={restField} name={name} queryValues={queryValues} form={form} />
+                            <Rule restField={restField} name={name} queryValues={queryValues} form={form} defaultRuleOp={ruleOp} />
                             <Input.Group>
                               <span className='ant-input-group-addon'>触发</span>
                               <Form.Item name={[name, 'severity']} noStyle>

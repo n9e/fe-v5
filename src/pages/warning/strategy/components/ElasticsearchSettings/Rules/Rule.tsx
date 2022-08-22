@@ -1,11 +1,16 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Row, Col, Input, Space, Select, InputNumber } from 'antd';
 import { PlusCircleOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { ops, functions } from './configs';
 
-export default function Rule({ restField, name, queryValues, form }) {
-  const [ruleOp, setRuleOp] = React.useState('AND');
+export default function Rule({ restField, name, queryValues, form, defaultRuleOp }) {
+  const [ruleOp, setRuleOp] = useState(defaultRuleOp || 'AND');
+
+  useEffect(() => {
+    setRuleOp(defaultRuleOp || 'AND');
+  }, [defaultRuleOp]);
+
   function renderQueryAndFunc(subName) {
     return (
       <Input.Group>

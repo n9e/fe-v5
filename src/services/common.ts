@@ -20,7 +20,7 @@ import { RequestMethod } from '@/store/common';
 
 // 获取集群信息
 export function getCommonClusters() {
-  if (import.meta.env.VITE_IS_ADVANCED === 'true') {
+  if (import.meta.env.VITE_IS_COMMON_DS === 'true') {
     return request(`/api/v1/datasource/list`, {
       method: RequestMethod.Post,
       data: {
@@ -47,7 +47,7 @@ export function getCommonClusters() {
 
 // 获取es集群信息
 export function getCommonESClusters() {
-  if (import.meta.env.VITE_IS_ADVANCED === 'true') {
+  if (import.meta.env.VITE_IS_COMMON_DS === 'true') {
     return request(`/api/v1/datasource/list`, {
       method: RequestMethod.Post,
       data: {

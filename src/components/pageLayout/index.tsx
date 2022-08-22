@@ -151,7 +151,7 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, introI
                   </Dropdown>
                 </div>
               )}
-              <AdvancedWrap>
+              <AdvancedWrap var='VITE_IS_ALERT_AI'>
                 <License />
               </AdvancedWrap>
 

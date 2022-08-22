@@ -27,6 +27,7 @@ import { getBusiGroups } from '@/services/common';
 import { shieldItem } from '@/store/warningInterface';
 import { RootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
+import AdvancedWrap from '@/components/AdvancedWrap';
 import TagItem from './tagItem';
 import { timeLensDefault } from '../../const';
 import CateSelect from './CateSelect';
@@ -225,7 +226,11 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) 
           </Select>
         </Form.Item>
 
-        <CateSelect form={form} />
+        <AdvancedWrap var='VITE_IS_ALERT_ES_DS'>
+          {(visible) => {
+            return <CateSelect form={form} visible={visible} />;
+          }}
+        </AdvancedWrap>
         <Form.Item shouldUpdate={(prevValues, curValues) => prevValues.cate !== curValues.cate} noStyle>
           {({ getFieldValue }) => {
             return <ClusterSelect form={form} cate={getFieldValue('cate')} />;

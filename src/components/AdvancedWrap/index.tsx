@@ -1,14 +1,12 @@
 import React from 'react';
 
 interface IProps {
+  var?: string;
   children: React.ReactNode | Function;
 }
 
-export const isAdvanced = import.meta.env.VITE_IS_ADVANCED === 'true';
-export const isEnhanced = import.meta.env.VITE_IS_ENHANCED === 'true';
-
 export default function index(props: IProps) {
-  if (isAdvanced || isEnhanced) {
+  if (props.var && import.meta.env[props.var] === 'true') {
     if (typeof props.children === 'function') {
       return <div>{props.children(true)}</div>;
     }

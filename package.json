@@ -2,10 +2,10 @@
   "name": "n9e-fe",
   "version": "5.9.1",
   "scripts": {
-    "dev": "vite --port 8765 --host --mode advanced",
+    "dev": "vite --port 8765 --host",
+    "dev:advanced": "vite --port 8765 --host --mode advanced",
     "build": "tsc && vite build",
-    "build:advanced": "tsc && vite build --mode advanced",
-    "build:enhanced": "tsc && vite build --mode enhanced",
+    "build:advanced": "node comb_feats ${npm_config_custom_options} && tsc && vite build --mode advanced",
     "serve": "vite preview"
   },
   "dependencies": {
@@ -77,6 +77,7 @@
     "babel-traverse": "^6.26.0",
     "babel-types": "^6.26.0",
     "better-babel-generator": "^6.26.1",
+    "dotenv": "^16.0.1",
     "less": "^4.1.1",
     "less-loader": "^8.1.1",
     "lint-staged": "^11.0.0",

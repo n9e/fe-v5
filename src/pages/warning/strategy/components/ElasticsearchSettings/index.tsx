@@ -1,5 +1,6 @@
 import React from 'react';
-import { Form, Row, Col, Input, AutoComplete } from 'antd';
+import { Form, Row, Col, Input } from 'antd';
+import { QuestionCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import Values from './Values';
 import GroupBy from './GroupBy';
@@ -24,7 +25,17 @@ export default function index({ form }) {
                   </Form.Item>
                 </Col>
                 <Col span={12}>
-                  <Form.Item label='过滤项' name={['query', 'filter']}>
+                  <Form.Item
+                    label={
+                      <span>
+                        过滤条件{' '}
+                        <a href='https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html#query-string-syntax ' target='_blank'>
+                          <QuestionCircleOutlined />
+                        </a>
+                      </span>
+                    }
+                    name={['query', 'filter']}
+                  >
                     <Input />
                   </Form.Item>
                 </Col>

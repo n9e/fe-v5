@@ -129,16 +129,18 @@ const Event: React.FC = () => {
               }
             }}
           />
-          <Select
-            value={cate}
-            onChange={(val) => {
-              setCate(val);
-            }}
-            style={{ marginLeft: 8 }}
-          >
-            <Select.Option value='prometheus'>Prometheus</Select.Option>
-            <Select.Option value='elasticsearch'>ElasticSearch</Select.Option>
-          </Select>
+          {import.meta.env.VITE_IS_ALERT_ES_DS && (
+            <Select
+              value={cate}
+              onChange={(val) => {
+                setCate(val);
+              }}
+              style={{ marginLeft: 8 }}
+            >
+              <Select.Option value='prometheus'>Prometheus</Select.Option>
+              <Select.Option value='elasticsearch'>ElasticSearch</Select.Option>
+            </Select>
+          )}
           <ColumnSelect
             onSeverityChange={(e) => setHisSeverity(e)}
             onEventTypeChange={(e) => setHisEventType(e)}

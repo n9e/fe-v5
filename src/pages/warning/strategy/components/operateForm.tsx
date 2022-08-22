@@ -278,7 +278,11 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
             </Form.Item>
             <Row gutter={16}>
               <Col span={12}>
-                <CateSelect form={form} />
+                <AdvancedWrap var='VITE_IS_ALERT_ES_DS'>
+                  {(visible) => {
+                    return <CateSelect form={form} visible={visible} />;
+                  }}
+                </AdvancedWrap>
               </Col>
               <Col span={12}>
                 <Form.Item shouldUpdate={(prevValues, curValues) => prevValues.cate !== curValues.cate} noStyle>
@@ -294,22 +298,22 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                 if (getFieldValue('cate') === 'prometheus') {
                   return (
                     <>
-                      <AdvancedWrap>
+                      <AdvancedWrap var='VITE_IS_ALERT_AI'>
                         <AbnormalDetection form={form} />
                       </AdvancedWrap>
                       <Form.Item noStyle shouldUpdate={(prevValues, curValues) => prevValues.cluster !== curValues.cluster}>
                         {({ getFieldValue }) => {
                           return (
                             <Form.Item label='PromQL' className={'Promeql-content'} required style={{ marginBottom: 0 }}>
-                              <AdvancedWrap>
-                                {(isAvanced) => {
+                              <AdvancedWrap var='VITE_IS_ALERT_AI'>
+                                {(visible) => {
                                   const cluster =
                                     form.getFieldValue('cluster').includes(ClusterAll) && clusterList.length > 0 ? clusterList[0] : form.getFieldValue('cluster')[0] || '';
                                   return (
                                     <Input.Group compact>
                                       <Form.Item
                                         style={{
-                                          width: isAvanced && getFieldValue('algorithm') === 'holtwinters' ? 'calc(100% - 80px)' : '100%',
+                                          width: visible && getFieldValue('algorithm') === 'holtwinters' ? 'calc(100% - 80px)' : '100%',
                                         }}
                                         name='prom_ql'
                                         validateTrigger={['onBlur']}
@@ -327,7 +331,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                                           }}
                                         />
                                       </Form.Item>
-                                      {isAvanced && getFieldValue('algorithm') === 'holtwinters' && (
+                                      {visible && getFieldValue('algorithm') === 'holtwinters' && (
                                         <Button
                                           onClick={() => {
                                             const values = form.getFieldsValue();
@@ -458,9 +462,9 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                 }}
               />
             </Form.Item>
-            <Form.Item label={t('仅在本业务组生效')} name='enable_in_bg' valuePropName='checked'>
+            {/* <Form.Item label={t('仅在本业务组生效')} name='enable_in_bg' valuePropName='checked'>
               <SwitchWithLabel label='根据告警事件中的ident归属关系判断' />
-            </Form.Item>
+            </Form.Item> */}
           </Card>
           <Card title={t('通知配置')}>
             <Form.Item label={t('通知媒介')} name='notify_channels'>
