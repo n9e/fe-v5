@@ -18,21 +18,18 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import PageLayout from '@/components/pageLayout';
 import { AlertOutlined, SearchOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import LeftTree from '@/components/LeftTree';
 import DataTable from '@/components/Dantd/components/data-table';
 import moment from 'moment';
-import { Button, Input, Modal, Tag, Select } from 'antd';
+import { Input, Tag, Select } from 'antd';
 import DateRangePicker, { RelativeRange } from '@/components/DateRangePicker';
-import { priorityColor } from '@/utils/constant';
 import { useHistory } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/common';
 import { eventStoreState } from '@/store/eventInterface';
-import { CommonStoreState } from '@/store/commonInterface';
-import BlankBusinessPlaceholder from '@/components/BlankBusinessPlaceholder';
 import ColumnSelect from '@/components/ColumnSelect';
-import '../event/index.less';
+import ClusterSelect from './ClusterSelect';
 import { SeverityColor } from '../event';
+import '../event/index.less';
 
 const Event: React.FC = () => {
   const history = useHistory();
@@ -143,11 +140,11 @@ const Event: React.FC = () => {
               <Select.Option value='elasticsearch'>ElasticSearch</Select.Option>
             </Select>
           )}
+          <ClusterSelect cate={cate} onClusterChange={(e) => setCurClusterItems(e)} />
           <ColumnSelect
             onSeverityChange={(e) => setHisSeverity(e)}
             onEventTypeChange={(e) => setHisEventType(e)}
             onBusiGroupChange={(e) => setCurBusiId(typeof e === 'number' ? e : -1)}
-            onClusterChange={(e) => setCurClusterItems(e)}
           />
           <Input
             className='search-input'

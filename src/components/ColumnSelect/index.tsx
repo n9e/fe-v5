@@ -71,6 +71,7 @@ export default function ColumnSelect(props: Props) {
           filterOption={false}
           onSearch={handleSearch}
           getPopupContainer={() => document.body}
+          dropdownMatchSelectWidth={false}
           onFocus={() => {
             getBusiGroups('').then((res) => {
               setFilteredBusiGroups(res.dat || []);
