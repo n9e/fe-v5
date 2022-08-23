@@ -26,9 +26,10 @@ import { getFiltersStr } from './utils';
 
 interface IProps {
   action: 'add' | 'edit';
-  initialValues: any;
+  initialValues?: any;
   range: IRawTimeRange;
-  admin: boolean;
+  admin?: boolean;
+  onOk: Function;
 }
 
 const titleMap = {
@@ -39,7 +40,7 @@ const { TabPane } = Tabs;
 
 function FormCpt(props: ModalWrapProps & IProps) {
   const { t } = useTranslation();
-  const { action, visible, initialValues, destroy, range, onOk, admin } = props;
+  const { action, visible, initialValues={}, destroy, range, onOk, admin } = props;
   const [form] = Form.useForm();
   const [labels, setLabels] = useState<string[]>([]);
   const [filteredLabels, setFilteredLabels] = useState<string[]>([]);
@@ -317,4 +318,4 @@ function FormCpt(props: ModalWrapProps & IProps) {
   );
 }
 
-export default ModalHOC(FormCpt);
+export default ModalHOC<IProps>(FormCpt);
