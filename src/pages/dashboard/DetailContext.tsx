@@ -14,27 +14,52 @@
  * limitations under the License.
  *
  */
+/**
+ * 大盘详情的 context
+ */
 import React, { createContext, useReducer } from 'react';
+import { IVariable } from './VariableConfig';
 
-export const Context = createContext<any>({});
+type IMetric = {
+  [index: string]: string;
+};
 
-const reducer = (state, action) => {
+interface IState {
+  metric?: IMetric; // 当前选中的指标 meta TODO: 后面得改下名称
+  dashboardId?: string;
+  variableConfigWithOptions?: IVariable[];
+}
+
+interface IAction {
+  type: string;
+  payload: any;
+}
+
+export const DetailContext = createContext<any>({});
+
+const reducer = (state: IState, action: IAction) => {
   switch (action.type) {
     case 'updateMetric':
       return {
         ...state,
-        metric: action.payload,
+        metric: action.payload as IMetric,
+      };
+    case 'initDashboard':
+      const dashboardState = action.payload as IState;
+      return {
+        ...state,
+        ...dashboardState,
       };
     default:
       return state;
   }
 };
 
-const defaultData = {
-  metric: {},
+const defaultData: IState = {
+  variableConfigWithOptions: [],
 };
 
-export function Reducer(props) {
+export function DetailReducer(props) {
   const [state, dispatch] = useReducer(reducer, defaultData);
-  return <Context.Provider value={{ state, dispatch }}>{props.children}</Context.Provider>;
+  return <DetailContext.Provider value={{ state, dispatch }}>{props.children}</DetailContext.Provider>;
 }

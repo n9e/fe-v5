@@ -14,10 +14,13 @@
  * limitations under the License.
  *
  */
-import React, { useState } from 'react';
-import { Space, Modal, Button, Input } from 'antd';
+import React, { useState, useContext } from 'react';
+import { Space, Modal, Button, Mentions } from 'antd';
 import { CaretRightOutlined, CaretDownOutlined, HolderOutlined, SettingOutlined, DeleteOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import _ from 'lodash';
 import { AddPanelIcon } from '../config';
+import { DetailContext } from '../DetailContext';
+import { IVariable, replaceExpressionVars } from '../VariableConfig';
 
 interface IProps {
   name: string;
@@ -28,11 +31,19 @@ interface IProps {
   onDeleteClick: (mode: 'self' | 'withPanels') => void;
 }
 
+function replaceFieldWithVariable(value: string, dashboardId?: string, variableConfig?: IVariable[]) {
+  if (!dashboardId || !variableConfig) {
+    return value;
+  }
+  return replaceExpressionVars(value, variableConfig, variableConfig.length, dashboardId);
+}
+
 export default function Row(props: IProps) {
   const { name, row, onToggle, onAddClick, onEditClick, onDeleteClick } = props;
   const [editVisble, setEditVisble] = useState(false);
   const [newName, setNewName] = useState<string>();
   const [deleteVisible, setDeleteVisible] = useState(false);
+  const { state } = useContext(DetailContext);
 
   return (
     <div className='dashboards-panels-row'>
@@ -42,7 +53,7 @@ export default function Row(props: IProps) {
           onToggle();
         }}
       >
-        <span style={{ paddingRight: 6 }}>{name}</span>
+        <span style={{ paddingRight: 6 }}>{replaceFieldWithVariable(name, state.dashboardId, state.variableConfigWithOptions)}</span>
         {row.collapsed ? <CaretDownOutlined /> : <CaretRightOutlined />}
       </div>
       <Space>
@@ -80,10 +91,12 @@ export default function Row(props: IProps) {
       >
         <div>
           分组名称
-          <Input
+          <Mentions
+            prefix='$'
+            split=''
             value={newName}
-            onChange={(e) => {
-              setNewName(e.target.value);
+            onChange={(val) => {
+              setNewName(val);
             }}
             onPressEnter={() => {
               onEditClick({
@@ -92,7 +105,15 @@ export default function Row(props: IProps) {
               });
               setEditVisble(false);
             }}
-          />
+          >
+            {_.map(state.variableConfigWithOptions, (item) => {
+              return (
+                <Mentions.Option key={item.name} value={item.name}>
+                  {item.name}
+                </Mentions.Option>
+              );
+            })}
+          </Mentions>
         </div>
       </Modal>
       <Modal

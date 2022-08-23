@@ -29,6 +29,7 @@ import Hexbin from './Hexbin';
 import BarGauge from './BarGauge';
 import Text from './Text';
 import { IVariable } from '../../VariableConfig/definition';
+import { replaceExpressionVars } from '../../VariableConfig/constant';
 import Markdown from '../../Editor/Components/Markdown';
 import usePrometheus from '../datasource/usePrometheus';
 import { IPanel } from '../../types';
@@ -51,6 +52,13 @@ interface IProps {
   onDeleteClick?: () => void;
 }
 
+function replaceFieldWithVariable(dashboardId, value: string, variableConfig?: IVariable[]) {
+  if (!variableConfig) {
+    return value;
+  }
+  return replaceExpressionVars(value, variableConfig, variableConfig.length, dashboardId);
+}
+
 function index(props: IProps) {
   const { themeMode, dashboardId, id, step, type, variableConfig, isPreview, onCloneClick, onShareClick, onEditClick, onDeleteClick } = props;
   const [time, setTime] = useState(props.time);
@@ -67,7 +75,9 @@ function index(props: IProps) {
     variableConfig,
     inViewPort: isPreview || inViewPort,
   });
-  const tipsVisible = values.description || !_.isEmpty(values.links);
+  const name = replaceFieldWithVariable(dashboardId, values.name, variableConfig);
+  const description = replaceFieldWithVariable(dashboardId, values.description, variableConfig);
+  const tipsVisible = description || !_.isEmpty(values.links);
 
   useEffect(() => {
     setTime(props.time);
@@ -112,12 +122,12 @@ function index(props: IProps) {
               getPopupContainer={() => ref.current!}
               title={
                 <div>
-                  <Markdown content={values.description} />
+                  <Markdown content={description} />
                   {_.map(values.links, (link, i) => {
                     return (
                       <div key={i}>
-                        <a href={link.url} target={link.targetBlank ? '_blank' : '_self'}>
-                          {link.title}
+                        <a href={replaceFieldWithVariable(dashboardId, link.url, variableConfig)} target={link.targetBlank ? '_blank' : '_self'}>
+                          {replaceFieldWithVariable(dashboardId, link.title, variableConfig)}
                         </a>
                       </div>
                     );
@@ -125,13 +135,13 @@ function index(props: IProps) {
                 </div>
               }
             >
-              <div className='renderer-header-desc'>{values.description ? <InfoCircleOutlined /> : <LinkOutlined />}</div>
+              <div className='renderer-header-desc'>{description ? <InfoCircleOutlined /> : <LinkOutlined />}</div>
             </Tooltip>
           ) : null}
         </div>
         <div className='renderer-header-content'>
-          <Tooltip title={values.name} getPopupContainer={() => ref.current!}>
-            <div className='renderer-header-title'>{values.name}</div>
+          <Tooltip title={name} getPopupContainer={() => ref.current!}>
+            <div className='renderer-header-title'>{name}</div>
           </Tooltip>
         </div>
         <div className='renderer-header-loading'>

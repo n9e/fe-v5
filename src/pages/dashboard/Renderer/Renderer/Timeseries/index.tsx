@@ -80,6 +80,7 @@ export default function index(props: IProps) {
           renderTo: chartEleRef.current,
           height: chartEleRef.current.clientHeight,
           colors: hexPalette,
+          marginTop: 0,
         },
         series: [],
       });
@@ -91,6 +92,7 @@ export default function index(props: IProps) {
           {
             unit: options?.standardOptions?.util,
             decimals: options?.standardOptions?.decimals,
+            dateFormat: options?.standardOptions?.dateFormat,
           },
           hexPalette,
         ),
@@ -139,6 +141,7 @@ export default function index(props: IProps) {
               {
                 unit: options?.standardOptions?.util,
                 decimals: options?.standardOptions?.decimals,
+                dateFormat: options?.standardOptions?.dateFormat,
               },
               val,
             ).text;
@@ -166,6 +169,7 @@ export default function index(props: IProps) {
               {
                 unit: options?.standardOptions?.util,
                 decimals: options?.standardOptions?.decimals,
+                dateFormat: options?.standardOptions?.dateFormat,
               },
               val,
             ).text;
@@ -180,6 +184,7 @@ export default function index(props: IProps) {
           {
             unit: options?.standardOptions?.util,
             decimals: options?.standardOptions?.decimals,
+            dateFormat: options?.standardOptions?.dateFormat,
           },
           hexPalette,
         ),

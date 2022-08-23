@@ -65,6 +65,7 @@ export interface IOptions {
     min?: number;
     max?: number;
     decimals?: number;
+    dateFormat?: string;
   };
   legend?: {
     // TODO: 目前不支持这么复杂的自定义
