@@ -50,9 +50,7 @@ export default function List(props: IProps) {
   const { t, i18n } = useTranslation();
   const { curBusiId, setSelectedIdents, selectedRowKeys, setSelectedRowKeys, refreshFlag, setRefreshFlag, setOperateType } = props;
   const isAddTagToQueryInput = useRef(false);
-  const tableRef = useRef({
-    handleReload() {},
-  });
+  const [searchVal, setSearchVal] = useState('');
   const [tableQueryContent, setTableQueryContent] = useState<string>('');
   const [curClusters, setCurClusters] = useState<string[]>([]);
   const columns = [
@@ -293,9 +291,14 @@ export default function List(props: IProps) {
             className='search-input'
             prefix={<SearchOutlined />}
             placeholder='模糊搜索表格内容(多个关键词请用空格分隔)'
-            value={tableQueryContent}
-            onChange={(e) => setTableQueryContent(e.target.value)}
-            onPressEnter={(e) => tableRef.current.handleReload()}
+            value={searchVal}
+            onChange={(e) => setSearchVal(e.target.value)}
+            onPressEnter={() => {
+              setTableQueryContent(searchVal);
+            }}
+            onBlur={() => {
+              setTableQueryContent(searchVal);
+            }}
           />
         </Space>
         <Dropdown
