@@ -22,7 +22,7 @@ import DataTable from '@/components/Dantd/components/data-table';
 import moment from 'moment';
 import { Input, Tag, Select } from 'antd';
 import DateRangePicker, { RelativeRange } from '@/components/DateRangePicker';
-import { useHistory } from 'react-router';
+import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/common';
 import { eventStoreState } from '@/store/eventInterface';
@@ -32,7 +32,6 @@ import { SeverityColor } from '../event';
 import '../event/index.less';
 
 const Event: React.FC = () => {
-  const history = useHistory();
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const tableRef = useRef({
@@ -90,9 +89,14 @@ const Event: React.FC = () => {
         return (
           <>
             <div>
-              <a style={{ padding: 0 }} onClick={() => history.push(`/alert-his-events/${id}`)}>
+              <Link
+                to={{
+                  pathname: `/alert-his-events/${id}`,
+                }}
+                target='_blank'
+              >
                 {title}
-              </a>
+              </Link>
             </div>
             <div>
               <span className='event-tags'>{content}</span>
