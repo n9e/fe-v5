@@ -51,8 +51,8 @@ export function getCommonESClusters() {
     return request(`/api/v1/datasource/list`, {
       method: RequestMethod.Post,
       data: {
-        category: 'timeseries',
-        plugin_type: 'elasticsearch',
+        category: 'logging',
+        plugin_type: 'elasticsearch.logging',
         p: 1,
         limit: 100,
       },
@@ -60,7 +60,7 @@ export function getCommonESClusters() {
       return {
         dat: _.map(
           _.filter(res.data.items, (item) => {
-            return item.plugin_type === 'elasticsearch';
+            return item.plugin_type === 'elasticsearch.logging';
           }),
           'name',
         ),
