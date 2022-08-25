@@ -177,6 +177,10 @@ const SideMenu: FC = () => {
           key: '/help/migrate',
           title: t('管理员迁移'),
         },
+        {
+          key: '/help/servers',
+          title: t('告警引擎'),
+        },
       ],
     },
   ];
