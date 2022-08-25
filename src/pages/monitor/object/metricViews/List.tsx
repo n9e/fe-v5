@@ -76,7 +76,6 @@ export default function List(props: IProps) {
               Form({
                 admin: profile.admin,
                 action: 'add',
-                visible: true,
                 range: props.range,
                 onOk: (record) => {
                   localStorage.setItem('metric-view-id', record.id);
@@ -164,7 +163,6 @@ export default function List(props: IProps) {
                               Form({
                                 admin: profile.admin,
                                 action: 'edit',
-                                visible: true,
                                 range: props.range,
                                 initialValues,
                                 onOk: () => {
@@ -194,7 +192,6 @@ export default function List(props: IProps) {
                             <ExportOutlined
                               onClick={() => {
                                 Export({
-                                  visible: true,
                                   data: item.configs,
                                 });
                               }}
