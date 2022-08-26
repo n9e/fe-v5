@@ -61,6 +61,7 @@ import TaskDetail from '@/pages/task/detail';
 import Version from '@/pages/help/version';
 import Contact from '@/pages/help/contact';
 import Migrate from '@/pages/help/migrate';
+import Servers from '@/pages/help/servers';
 import RecordingRule from '@/pages/recordingRules';
 import RecordingRuleAdd from '@/pages/recordingRules/add';
 import RecordingRuleEdit from '@/pages/recordingRules/edit';
@@ -164,6 +165,7 @@ export default function Content() {
         <Route exact path='/help/version' component={Version} />
         <Route exact path='/help/contact' component={Contact} />
         <Route exact path='/help/migrate' component={Migrate} />
+        <Route exact path='/help/servers' component={Servers} />
 
         {lazyRoutes.map((route, i) => (
           <RouteWithSubRoutes key={i} {...route} />
