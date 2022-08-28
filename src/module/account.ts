@@ -16,7 +16,7 @@
  */
 import { IStore } from '@/store/common';
 import { accountStoreState } from '@/store/accountInterface';
-import { Login, GenCsrfToken } from '@/services/login';
+import { Login, GenCsrfToken, CasLogin } from '@/services/login';
 import { GetProfile, UpdateProfile } from '@/services/account';
 
 export const INCREMENT = 'INCREMENT';
@@ -80,6 +80,23 @@ const accountStore: IStore<accountStoreState> = {
     *updateProfile({ data }: { data: object }, { put, call, select }: any) {
       const { dat, err } = yield call(UpdateProfile, data);
       yield put({ type: SET_PROFILE, profile: data });
+      return err;
+    },
+    *casLogin(
+      { ticket }: {ticket, string},
+      { put, call }: any,
+    ){
+      const { dat, err } = yield call(CasLogin, ticket);
+      yield put({ type: SET_PROFILE, profile: dat.user });
+      const { access_token, refresh_token } = dat;
+      localStorage.setItem('access_token', access_token);
+      localStorage.setItem('refresh_token', refresh_token);
+      yield put({
+        type: 'common/getClusters',
+      });
+      yield put({
+        type: 'common/getBusiGroups',
+      });
       return err;
     },
   },

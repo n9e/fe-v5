@@ -25,6 +25,14 @@ export const Login = function (username: string, password: string) {
   });
 };
 
+// Cas登录
+export const CasLogin = function (ticket: string) {
+  return request(`/api/n9e/auth/cas-login`, {
+    method: RequestMethod.Post,
+    data: { ticket },
+  });
+};
+
 // 刷新accessToken
 export const UpdateAccessToken = function () {
   return request(`/api/n9e/auth/refresh`, {
@@ -63,8 +71,22 @@ export const getRedirectURL = function () {
   });
 };
 
+// 获取cas登录地址
+export const getCasRedirectURL = function () {
+  return request('/api/n9e/auth/cas-redirect', {
+    method: RequestMethod.Get,
+  });
+};
+
 export const authCallback = function (params) {
   return request('/api/n9e/auth/callback', {
+    method: RequestMethod.Get,
+    params,
+  });
+};
+
+export const authCasCallback = function (params) {
+  return request('/api/n9e/auth/cas-callback', {
     method: RequestMethod.Get,
     params,
   });

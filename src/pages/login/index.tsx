@@ -19,7 +19,7 @@ import { Form, Input, Button, Radio, message } from 'antd';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import { getRedirectURL } from '@/services/login';
+import { getRedirectURL, getCasRedirectURL } from '@/services/login';
 import './login.less';
 
 import { useTranslation } from 'react-i18next';
@@ -63,7 +63,7 @@ export default function Login() {
       <div className='login-panel'>
         <div className='login-main  integration'>
           <div className='login-title'>
-            <img src={'/image/logo-l.svg'} style={{ width: '120px' }} />
+            <img src={'/image/zd.png'} style={{ width: '160px' }} />
           </div>
           <Form form={form} layout='vertical' requiredMark={true}>
             <Form.Item
@@ -110,6 +110,19 @@ export default function Login() {
                 }}
               >
                 OIDC
+              </a>
+              <a className='login-type'
+                onClick={() => {
+                  getCasRedirectURL().then((res) => {
+                    if (res.dat) {
+                      window.location.href = res.dat;
+                    } else {
+                      message.warning('没有配置 CAS 登录地址！');
+                    }
+                  });
+                }}
+              >
+                CAS
               </a>
             </div>
           </Form>

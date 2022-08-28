@@ -64,6 +64,7 @@ import Migrate from '@/pages/help/migrate';
 import RecordingRule from '@/pages/recordingRules';
 import RecordingRuleAdd from '@/pages/recordingRules/add';
 import RecordingRuleEdit from '@/pages/recordingRules/edit';
+import CasLoginCallback from '@/pages/casLoginCallback';
 import { dynamicPackages, Entry } from '@/utils';
 
 const Packages = dynamicPackages();
@@ -87,13 +88,14 @@ export default function Content() {
   let { profile } = useSelector<RootState, accountStoreState>((state) => state.account);
   const location = useLocation();
   const dispatch = useDispatch();
-  if (!profile.id && location.pathname != '/login' && !location.pathname.startsWith('/callback')) {
+  if (!profile.id && location.pathname != '/login' && !location.pathname.startsWith('/callback') && !location.pathname.startsWith('/cascallback')) {
     dispatch({ type: 'common/getClusters' });
     if (
       !location.pathname.startsWith('/chart/') &&
       !location.pathname.startsWith('/alert-cur-events/') &&
       !location.pathname.startsWith('/alert-his-events/') &&
-      !location.pathname.startsWith('/callback')
+      !location.pathname.startsWith('/callback')&&
+      !location.pathname.startsWith('/cascallback')
     ) {
       dispatch({ type: 'account/getProfile' });
       dispatch({ type: 'common/getBusiGroups' });
@@ -116,6 +118,7 @@ export default function Content() {
         <Route path='/overview' component={Overview} />
         <Route path='/login' component={Login} exact />
         <Route path='/callback' component={LoginCallback} exact />
+        <Route path='/cascallback' component={CasLoginCallback} exact />
         <Route path='/metric/explorer' component={Explore} exact />
         <Route path='/object/explorer' component={ObjectExplore} exact />
         <Route path='/busi-groups' component={Business} />
