@@ -114,7 +114,14 @@ request.interceptors.response.use(
         });
     }
     if (status === 401) {
-      if (response.url.indexOf('/api/n9e/auth/refresh') > 0) {
+      if (response.url.indexOf('/api/n9e/prometheus/api/v1') > -1 || response.url.indexOf('/api/v1/datasource/prometheus') > -1) {
+        return response
+          .clone()
+          .json()
+          .then((data) => {
+             throw new Error(data.err ? data.err : data);
+          })
+      } else if (response.url.indexOf('/api/n9e/auth/refresh') > 0) {
         location.href = `/login${location.pathname != '/' ? '?redirect=' + location.pathname + location.search : ''}`;
       } else {
         localStorage.getItem('refresh_token')
