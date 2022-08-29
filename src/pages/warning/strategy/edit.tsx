@@ -44,7 +44,7 @@ const StrategyEdit: React.FC = () => {
   };
 
   return (
-    <PageLayout title={t('告警规则')} showBack hideCluster>
+    <PageLayout title={t('告警规则')} showBack backPath='/alert-rules' hideCluster>
       {curStrategy.id && <OperateForm detail={curStrategy} type={!isClone ? 1 : 2} />}
     </PageLayout>
   );
