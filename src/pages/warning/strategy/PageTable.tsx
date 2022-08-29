@@ -145,14 +145,15 @@ const PageTable: React.FC<Props> = ({ bgid }) => {
       dataIndex: 'name',
       render: (data, record) => {
         return (
-          <div
+          <Link
             className='table-active-text'
-            onClick={() => {
-              handleClickEdit(record.id);
+            to={{
+              pathname: `/alert-rules/edit/${record.id}`,
             }}
+            target='_blank'
           >
             {data}
-          </div>
+          </Link>
         );
       },
     },
@@ -227,14 +228,16 @@ const PageTable: React.FC<Props> = ({ bgid }) => {
       render: (data, record: any) => {
         return (
           <div className='table-operator-area'>
-            <div
+            <Link
               className='table-operator-area-normal'
-              onClick={() => {
-                handleClickEdit(record.id, true);
+              style={{ marginRight: 8 }}
+              to={{
+                pathname: `/alert-rules/edit/${record.id}?mode=clone`,
               }}
+              target='_blank'
             >
               {t('克隆')}
-            </div>
+            </Link>
             <div
               className='table-operator-area-warning'
               onClick={() => {

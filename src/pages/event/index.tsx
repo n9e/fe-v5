@@ -16,29 +16,26 @@
  */
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import PageLayout from '@/components/pageLayout';
-import { AlertOutlined, ExclamationCircleOutlined, SearchOutlined, DownOutlined, ReloadOutlined, AppstoreOutlined, UnorderedListOutlined } from '@ant-design/icons';
+import { AlertOutlined, ExclamationCircleOutlined, SearchOutlined, DownOutlined, AppstoreOutlined, UnorderedListOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import LeftTree from '@/components/LeftTree';
 import DataTable from '@/components/Dantd/components/data-table';
 import moment from 'moment';
-import { Button, Input, message, Modal, Tag, Tooltip, Menu, Dropdown, Radio } from 'antd';
-import DateRangePicker, { RelativeRange } from '@/components/DateRangePicker';
-import { priorityColor } from '@/utils/constant';
+import { Button, Input, message, Modal, Tag, Menu, Dropdown } from 'antd';
+
 import { useHistory } from 'react-router';
-import './index.less';
-import { deleteAlertEvents } from '@/services/warning';
+import { useInterval } from 'ahooks';
 import { useDispatch, useSelector } from 'react-redux';
+import DateRangePicker, { RelativeRange } from '@/components/DateRangePicker';
+import { deleteAlertEvents } from '@/services/warning';
 import { RootState } from '@/store/common';
 import { eventStoreState } from '@/store/eventInterface';
-import { CommonStoreState } from '@/store/commonInterface';
-import BlankBusinessPlaceholder from '@/components/BlankBusinessPlaceholder';
-import { useInterval } from 'ahooks';
-const { confirm } = Modal;
 import ColumnSelect from '@/components/ColumnSelect';
 import RefreshIcon from '@/components/RefreshIcon';
 import Card from './card';
-export const SeverityColor = ['red', 'orange', 'yellow', 'green'];
+import './index.less';
 
+const { confirm } = Modal;
+export const SeverityColor = ['red', 'orange', 'yellow', 'green'];
 export function deleteAlertEventsModal(busiId, ids: number[], onSuccess = () => {}) {
   confirm({
     title: '删除告警事件',
@@ -328,7 +325,6 @@ const Event: React.FC = () => {
                     setSelectedRowKeys(selectedRowKeys.map((key) => Number(key)));
                   },
                 },
-                // scroll: { x: 'max-content' },
               }}
               url={`/api/n9e/alert-cur-events/list`}
               customQueryCallback={(data) =>

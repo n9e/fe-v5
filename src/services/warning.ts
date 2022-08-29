@@ -404,3 +404,41 @@ export function getBrainLicense() {
     method: RequestMethod.Get,
   });
 }
+
+export function getDsQuery(params) {
+  return request('/api/n9e-plus/ds-query', {
+    method: RequestMethod.Post,
+    data: params,
+    headers: {
+      'X-Cluster': 'Default',
+    },
+  });
+}
+
+export function getIndices(params) {
+  return request('/api/n9e-plus/indices', {
+    method: RequestMethod.Post,
+    data: params,
+    headers: {
+      'X-Cluster': 'Default',
+    },
+  });
+}
+
+export function getFields(params) {
+  return request('/api/n9e-plus/fields', {
+    method: RequestMethod.Post,
+    data: params,
+    headers: {
+      'X-Cluster': 'Default',
+    },
+    silence: true,
+  });
+}
+
+export function getEventTSQuery(params) {
+  return request('/api/n9e-plus/event-ts-query', {
+    method: RequestMethod.Post,
+    data: params,
+  });
+}

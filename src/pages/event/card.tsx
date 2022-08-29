@@ -1,15 +1,14 @@
 import React, { useEffect, useState, useLayoutEffect, useRef, useImperativeHandle } from 'react';
 import { Button, Row, Col, Drawer, Tag, Table } from 'antd';
-import { ReloadOutlined } from '@ant-design/icons';
-import './index.less';
-import CardLeft from './cardLeft';
-import { getAlertCards, getCardDetail } from '@/services/warning';
-import { throttle } from 'lodash';
-import { SeverityColor, deleteAlertEventsModal } from './index';
-import moment from 'moment';
-import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router';
 import { ReactNode } from 'react-markdown/lib/react-markdown';
+import { throttle } from 'lodash';
+import moment from 'moment';
+import { useTranslation } from 'react-i18next';
+import { getAlertCards, getCardDetail } from '@/services/warning';
+import { SeverityColor, deleteAlertEventsModal } from './index';
+import CardLeft from './cardLeft';
+import './index.less';
 interface Props {
   filter: any;
   header: ReactNode;
