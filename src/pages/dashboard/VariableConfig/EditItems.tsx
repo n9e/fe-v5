@@ -32,14 +32,27 @@ interface IProps {
   onChange: (v?: IVariable[]) => void;
 }
 
+const titleMap = {
+  list: '大盘变量',
+  add: '添加大盘变量',
+  edit: '编辑大盘变量',
+};
+
 export default function EditItems(props: IProps) {
   const { visible, setVisible, onChange, value, range, id } = props;
   const [data, setData] = useState<IVariable[]>(value || []);
+  const [record, setRecord] = useState<IVariable>({
+    name: '',
+    type: 'query',
+    definition: '',
+  });
+  const [recordIndex, setRecordIndex] = useState<number>(-1);
+  const [mode, setMode] = useState<'list' | 'add' | 'edit'>('list');
 
   return (
     <Modal
-      title='大盘变量'
-      width={1200}
+      title={titleMap[mode]}
+      width={1000}
       visible={visible}
       onOk={() => {
         setVisible(false);
@@ -48,143 +61,154 @@ export default function EditItems(props: IProps) {
         setVisible(false);
       }}
       wrapClassName='variable-modal'
+      footer={null}
     >
-      <Table
-        rowKey={(record) => {
-          return `${record.type}${record.name}${record.definition}`;
-        }}
-        size='small'
-        dataSource={data}
-        columns={[
-          {
-            title: '变量名',
-            dataIndex: 'name',
-            render: (text, record, idx) => {
-              return (
-                <a
-                  onClick={() => {
-                    EditItem({
-                      id,
-                      range,
-                      index: idx,
-                      data: record,
-                      onChange: (val) => {
-                        const newData = _.map(data, (item, i) => {
-                          if (i === idx) {
-                            return val;
-                          }
-                          return item;
-                        });
+      {mode === 'list' ? (
+        <Table
+          rowKey={(record) => {
+            return `${record.type}${record.name}${record.definition}`;
+          }}
+          size='small'
+          dataSource={data}
+          columns={[
+            {
+              title: '变量名',
+              dataIndex: 'name',
+              render: (text, record, idx) => {
+                return (
+                  <a
+                    onClick={() => {
+                      setMode('edit');
+                      setRecordIndex(idx);
+                      setRecord(record);
+                    }}
+                  >
+                    {text}
+                  </a>
+                );
+              },
+            },
+            {
+              title: '变量类型',
+              dataIndex: 'type',
+            },
+            {
+              title: '变量定义',
+              dataIndex: 'definition',
+            },
+            {
+              title: '操作',
+              width: 200,
+              render: (_text, record, idx) => {
+                return (
+                  <Space>
+                    <Button
+                      type='link'
+                      size='small'
+                      onClick={() => {
+                        const newData = arrayMoveImmutable(data, idx, idx + 1);
                         setData(newData);
                         onChange(newData);
-                      },
-                    });
-                  }}
-                >
-                  {text}
-                </a>
-              );
+                      }}
+                      disabled={idx === data.length - 1}
+                    >
+                      <ArrowDownOutlined />
+                    </Button>
+                    <Button
+                      type='link'
+                      size='small'
+                      onClick={() => {
+                        const newData = arrayMoveImmutable(data, idx, idx - 1);
+                        setData(newData);
+                        onChange(newData);
+                      }}
+                      disabled={idx === 0}
+                    >
+                      <ArrowUpOutlined />
+                    </Button>
+                    <Button
+                      type='link'
+                      size='small'
+                      onClick={() => {
+                        const newData = [
+                          ...data,
+                          {
+                            ...record,
+                            name: 'copy_of_' + record.name,
+                          },
+                        ];
+                        setData(newData);
+                        onChange(newData);
+                      }}
+                    >
+                      <CopyOutlined />
+                    </Button>
+                    <Button
+                      type='link'
+                      size='small'
+                      onClick={() => {
+                        const newData = _.cloneDeep(data);
+                        newData.splice(idx, 1);
+                        setData(newData);
+                        onChange(newData);
+                      }}
+                    >
+                      <DeleteOutlined />
+                    </Button>
+                  </Space>
+                );
+              },
             },
-          },
-          {
-            title: '变量类型',
-            dataIndex: 'type',
-          },
-          {
-            title: '变量定义',
-            dataIndex: 'definition',
-          },
-          {
-            title: '操作',
-            width: 200,
-            render: (_text, record, idx) => {
-              return (
-                <Space>
-                  <Button
-                    type='link'
-                    size='small'
-                    onClick={() => {
-                      const newData = arrayMoveImmutable(data, idx, idx + 1);
-                      setData(newData);
-                      onChange(newData);
-                    }}
-                    disabled={idx === data.length - 1}
-                  >
-                    <ArrowDownOutlined />
-                  </Button>
-                  <Button
-                    type='link'
-                    size='small'
-                    onClick={() => {
-                      const newData = arrayMoveImmutable(data, idx, idx - 1);
-                      setData(newData);
-                      onChange(newData);
-                    }}
-                    disabled={idx === 0}
-                  >
-                    <ArrowUpOutlined />
-                  </Button>
-                  <Button
-                    type='link'
-                    size='small'
-                    onClick={() => {
-                      const newData = [
-                        ...data,
-                        {
-                          ...record,
-                          name: 'copy_of_' + record.name,
-                        },
-                      ];
-                      setData(newData);
-                      onChange(newData);
-                    }}
-                  >
-                    <CopyOutlined />
-                  </Button>
-                  <Button
-                    type='link'
-                    size='small'
-                    onClick={() => {
-                      const newData = _.cloneDeep(data);
-                      newData.splice(idx, 1);
-                      setData(newData);
-                      onChange(newData);
-                    }}
-                  >
-                    <DeleteOutlined />
-                  </Button>
-                </Space>
-              );
-            },
-          },
-        ]}
-        pagination={false}
-        footer={() => {
-          return (
-            <Button
-              onClick={() => {
-                EditItem({
-                  id,
-                  range,
-                  index: data.length,
-                  data: {
+          ]}
+          pagination={false}
+          footer={() => {
+            return (
+              <Button
+                type='primary'
+                onClick={() => {
+                  setMode('add');
+                  setRecordIndex(data.length);
+                  setRecord({
                     name: '',
                     type: 'query',
                     definition: '',
-                  },
-                  onChange: (val) => {
-                    const newData = [...data, val];
-                    setData(newData);
-                    onChange(newData);
-                  },
-                });
-              }}
-            >
-              新增变量
-            </Button>
-          );
-        }}
-      />
+                  });
+                }}
+              >
+                添加变量
+              </Button>
+            );
+          }}
+        />
+      ) : (
+        <EditItem
+          id={id}
+          range={range}
+          index={recordIndex}
+          data={record}
+          onOk={(val) => {
+            let newData = data;
+            if (mode === 'add') {
+              newData = [...data, val];
+            } else if (mode === 'edit') {
+              newData = _.map(data, (item, i) => {
+                if (i === recordIndex) {
+                  return val;
+                }
+                return item;
+              });
+            }
+            setData(newData);
+            onChange(newData);
+            setMode('list');
+            setRecordIndex(-1);
+          }}
+          onCancel={() => {
+            setMode('list');
+            setRecordIndex(-1);
+          }}
+        />
+      )}
     </Modal>
   );
 }

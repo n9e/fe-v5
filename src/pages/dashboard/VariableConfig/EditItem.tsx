@@ -15,10 +15,9 @@
  *
  */
 import React from 'react';
-import { Modal, Form, Input, Row, Col, Select, Switch } from 'antd';
+import { Form, Input, Row, Col, Select, Switch, Button, Space } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash';
-import ModalHOC, { ModalWrapProps } from '@/components/ModalHOC';
 import { IRawTimeRange } from '@/components/TimeRangePicker';
 import { IVariable } from './definition';
 import { convertExpressionToQuery, replaceExpressionVars, stringToRegex, setVaraiableSelected } from './constant';
@@ -28,7 +27,8 @@ interface IProps {
   range: IRawTimeRange;
   index: number;
   data: IVariable;
-  onChange: (val: IVariable) => void;
+  onOk: (val: IVariable) => void;
+  onCancel: () => void;
 }
 
 const typeOptions = [
@@ -50,8 +50,8 @@ const typeOptions = [
   },
 ];
 
-function EditItem(props: IProps & ModalWrapProps) {
-  const { visible, destroy, data, range, id, index, onChange } = props;
+function EditItem(props: IProps) {
+  const { data, range, id, index, onOk, onCancel } = props;
   const [form] = Form.useForm();
   // TODO: 不太清楚这里的逻辑是干嘛的，后面找时间看下
   const handleBlur = (val?: string) => {
@@ -70,139 +70,141 @@ function EditItem(props: IProps & ModalWrapProps) {
   };
 
   return (
-    <Modal
-      visible={visible}
-      onOk={() => {
-        form.validateFields().then((res) => {
-          onChange(res);
-          destroy();
-        });
-      }}
-      onCancel={() => {
-        destroy();
-      }}
-    >
-      <Form layout='vertical' autoComplete='off' preserve={false} form={form} initialValues={data}>
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item
-              label='变量名'
-              name='name'
-              rules={[
-                { required: true, message: '请输入变量名' },
-                { pattern: /^[0-9a-zA-Z_]+$/, message: '仅支持数字和字符下划线' },
-              ]}
+    <Form layout='vertical' autoComplete='off' preserve={false} form={form} initialValues={data}>
+      <Row gutter={16}>
+        <Col span={12}>
+          <Form.Item
+            label='变量名'
+            name='name'
+            rules={[
+              { required: true, message: '请输入变量名' },
+              { pattern: /^[0-9a-zA-Z_]+$/, message: '仅支持数字和字符下划线' },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+        </Col>
+        <Col span={12}>
+          <Form.Item label='变量类型' name='type' rules={[{ required: true, message: '请输入变量类型' }]}>
+            <Select
+              style={{ width: '100%' }}
+              onChange={() => {
+                form.setFieldsValue({
+                  definition: '',
+                  defaultValue: '',
+                });
+              }}
             >
-              <Input />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item label='变量类型' name='type' rules={[{ required: true, message: '请输入变量类型' }]}>
-              <Select
-                style={{ width: '100%' }}
-                onChange={() => {
-                  form.setFieldsValue({
-                    definition: '',
-                    defaultValue: '',
-                  });
-                }}
-              >
-                {_.map(typeOptions, (item) => {
-                  return (
-                    <Select.Option value={item.value} key={item.value}>
-                      {item.label}
-                    </Select.Option>
-                  );
-                })}
-              </Select>
-            </Form.Item>
-          </Col>
-        </Row>
-        <Form.Item shouldUpdate={(prevValues, curValues) => prevValues.type !== curValues.typ} noStyle>
-          {({ getFieldValue }) => {
-            const type = getFieldValue('type');
-            if (type === 'query') {
-              return (
-                <>
-                  <Form.Item
-                    label={
-                      <span>
-                        变量定义{' '}
-                        <QuestionCircleOutlined
-                          style={{ marginLeft: 5 }}
-                          onClick={() => window.open('https://grafana.com/docs/grafana/latest/datasources/prometheus/#query-variable', '_blank')}
-                        />
-                      </span>
-                    }
-                    name='definition'
-                    rules={[{ required: true, message: '请输入变量定义' }]}
-                  >
-                    <Input onBlur={(e) => handleBlur(e.target.value)} />
+              {_.map(typeOptions, (item) => {
+                return (
+                  <Select.Option value={item.value} key={item.value}>
+                    {item.label}
+                  </Select.Option>
+                );
+              })}
+            </Select>
+          </Form.Item>
+        </Col>
+      </Row>
+      <Form.Item shouldUpdate={(prevValues, curValues) => prevValues.type !== curValues.typ} noStyle>
+        {({ getFieldValue }) => {
+          const type = getFieldValue('type');
+          if (type === 'query') {
+            return (
+              <>
+                <Form.Item
+                  label={
+                    <span>
+                      变量定义{' '}
+                      <QuestionCircleOutlined
+                        style={{ marginLeft: 5 }}
+                        onClick={() => window.open('https://grafana.com/docs/grafana/latest/datasources/prometheus/#query-variable', '_blank')}
+                      />
+                    </span>
+                  }
+                  name='definition'
+                  rules={[{ required: true, message: '请输入变量定义' }]}
+                >
+                  <Input onBlur={(e) => handleBlur(e.target.value)} />
+                </Form.Item>
+                <Form.Item label='筛选正则' name='reg' rules={[{ pattern: new RegExp('^/(.*?)/(g?i?m?y?)$'), message: '格式不对' }]}>
+                  <Input placeholder='/*.hna/' onBlur={() => handleBlur()} />
+                </Form.Item>
+              </>
+            );
+          } else if (type === 'textbox') {
+            return (
+              <Form.Item label='默认值' name='defaultValue'>
+                <Input onBlur={() => handleBlur()} />
+              </Form.Item>
+            );
+          } else if (type === 'custom') {
+            return (
+              <Form.Item label='逗号分割的自定义值' name='definition' rules={[{ required: true, message: '请输入自定义值' }]}>
+                <Input onBlur={() => handleBlur()} placeholder='1,10' />
+              </Form.Item>
+            );
+          } else if (type === 'constant') {
+            return (
+              <Form.Item label='常量值' name='definition' tooltip='定义一个隐藏的常量值' rules={[{ required: true, message: '请输入常量值' }]}>
+                <Input onBlur={() => handleBlur()} />
+              </Form.Item>
+            );
+          }
+        }}
+      </Form.Item>
+      <Form.Item shouldUpdate={(prevValues, curValues) => prevValues.type !== curValues.typ} noStyle>
+        {({ getFieldValue }) => {
+          const type = getFieldValue('type');
+          if (type === 'query' || type === 'custom') {
+            return (
+              <Row gutter={16}>
+                <Col flex='70px'>
+                  <Form.Item label='多选' name='multi' valuePropName='checked'>
+                    <Switch />
                   </Form.Item>
-                  <Form.Item label='筛选正则' name='reg' rules={[{ pattern: new RegExp('^/(.*?)/(g?i?m?y?)$'), message: '格式不对' }]}>
-                    <Input placeholder='/*.hna/' onBlur={() => handleBlur()} />
+                </Col>
+                <Col flex='70px'>
+                  <Form.Item label='包含全选' name='allOption' valuePropName='checked'>
+                    <Switch />
                   </Form.Item>
-                </>
-              );
-            } else if (type === 'textbox') {
-              return (
-                <Form.Item label='默认值' name='defaultValue'>
-                  <Input onBlur={() => handleBlur()} />
-                </Form.Item>
-              );
-            } else if (type === 'custom') {
-              return (
-                <Form.Item label='逗号分割的自定义值' name='definition' rules={[{ required: true, message: '请输入自定义值' }]}>
-                  <Input onBlur={() => handleBlur()} placeholder='1,10' />
-                </Form.Item>
-              );
-            } else if (type === 'constant') {
-              return (
-                <Form.Item label='常量值' name='definition' tooltip='定义一个隐藏的常量值' rules={[{ required: true, message: '请输入常量值' }]}>
-                  <Input onBlur={() => handleBlur()} />
-                </Form.Item>
-              );
-            }
-          }}
-        </Form.Item>
-        <Form.Item shouldUpdate={(prevValues, curValues) => prevValues.type !== curValues.typ} noStyle>
-          {({ getFieldValue }) => {
-            const type = getFieldValue('type');
-            if (type === 'query' || type === 'custom') {
-              return (
-                <Row gutter={16}>
-                  <Col flex='70px'>
-                    <Form.Item label='多选' name='multi' valuePropName='checked'>
-                      <Switch />
-                    </Form.Item>
-                  </Col>
-                  <Col flex='70px'>
-                    <Form.Item label='包含全选' name='allOption' valuePropName='checked'>
-                      <Switch />
-                    </Form.Item>
-                  </Col>
-                  <Col flex='auto'>
-                    <Form.Item shouldUpdate={(prevValues, curValues) => prevValues.type !== curValues.typ} noStyle>
-                      {({ getFieldValue }) => {
-                        const allOption = getFieldValue('allOption');
-                        if (allOption) {
-                          return (
-                            <Form.Item label='自定义全选值' name='allValue'>
-                              <Input placeholder='.*' />
-                            </Form.Item>
-                          );
-                        }
-                      }}
-                    </Form.Item>
-                  </Col>
-                </Row>
-              );
-            }
-          }}
-        </Form.Item>
-      </Form>
-    </Modal>
+                </Col>
+                <Col flex='auto'>
+                  <Form.Item shouldUpdate={(prevValues, curValues) => prevValues.type !== curValues.typ} noStyle>
+                    {({ getFieldValue }) => {
+                      const allOption = getFieldValue('allOption');
+                      if (allOption) {
+                        return (
+                          <Form.Item label='自定义全选值' name='allValue'>
+                            <Input placeholder='.*' />
+                          </Form.Item>
+                        );
+                      }
+                    }}
+                  </Form.Item>
+                </Col>
+              </Row>
+            );
+          }
+        }}
+      </Form.Item>
+      <Form.Item>
+        <Space>
+          <Button
+            type='primary'
+            onClick={() => {
+              form.validateFields().then((res) => {
+                onOk(res);
+              });
+            }}
+          >
+            保存
+          </Button>
+          <Button onClick={onCancel}>取消</Button>
+        </Space>
+      </Form.Item>
+    </Form>
   );
 }
 
-export default ModalHOC(EditItem);
+export default EditItem;
