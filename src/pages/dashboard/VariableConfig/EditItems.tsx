@@ -95,6 +95,12 @@ export default function EditItems(props: IProps) {
             {
               title: '变量定义',
               dataIndex: 'definition',
+              render: (text, record) => {
+                if (record.type === 'textbox') {
+                  return record.defaultValue;
+                }
+                return text;
+              },
             },
             {
               title: '操作',
