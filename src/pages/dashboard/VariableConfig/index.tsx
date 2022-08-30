@@ -22,7 +22,7 @@ import { IRawTimeRange } from '@/components/TimeRangePicker';
 import { convertExpressionToQuery, replaceExpressionVars, getVaraiableSelected, setVaraiableSelected, stringToRegex } from './constant';
 import { IVariable } from './definition';
 import DisplayItem from './DisplayItem';
-import EditItem from './EditItem';
+import EditItems from './EditItems';
 import './index.less';
 
 interface IProps {
@@ -61,7 +61,7 @@ function index(props: IProps) {
         (async () => {
           for (let idx = 0; idx < value.length; idx++) {
             const item = _.cloneDeep(value[idx]);
-            if (item.type === 'query' && item.definition) {
+            if ((item.type === 'query' || item.type === 'custom') && item.definition) {
               const definition = idx > 0 ? replaceExpressionVars(item.definition, result, idx, id) : item.definition;
               const options = await convertExpressionToQuery(definition, range);
               const regFilterOptions = _.filter(options, (i) => !!i && (!item.reg || !stringToRegex(item.reg) || (stringToRegex(item.reg) as RegExp).test(i)));
@@ -82,6 +82,12 @@ function index(props: IProps) {
               if (selected === null) {
                 setVaraiableSelected(item.name, item.defaultValue, id, true);
               }
+            } else if (item.type === 'constant') {
+              result[idx] = item;
+              const selected = getVaraiableSelected(item.name, id);
+              if (selected === null) {
+                setVaraiableSelected(item.name, item.definition, id, true);
+              }
             }
           }
           setData(result);
@@ -96,18 +102,21 @@ function index(props: IProps) {
   return (
     <div className='tag-area'>
       <div className={classNames('tag-content', 'tag-content-close')}>
-        {_.map(data, (expression) => {
-          return (
-            <DisplayItem
-              key={expression.name}
-              id={id}
-              expression={expression}
-              onChange={() => {
-                setRefreshFlag(_.uniqueId('refreshFlag_'));
-              }}
-            />
-          );
-        })}
+        {_.map(
+          _.filter(data, (item) => item.type !== 'constant'),
+          (expression) => {
+            return (
+              <DisplayItem
+                key={expression.name}
+                id={id}
+                expression={expression}
+                onChange={() => {
+                  setRefreshFlag(_.uniqueId('refreshFlag_'));
+                }}
+              />
+            );
+          },
+        )}
         {editable && (
           <EditOutlined
             className='icon'
@@ -117,7 +126,7 @@ function index(props: IProps) {
             }}
           />
         )}
-        {(data ? data?.length === 0 : true) && editable && (
+        {(data ? _.filter(data, (item) => item.type != 'constant')?.length === 0 : true) && editable && (
           <div
             className='add-variable-tips'
             onClick={() => {
@@ -129,16 +138,16 @@ function index(props: IProps) {
           </div>
         )}
       </div>
-      <EditItem
+      <EditItems
         visible={editing}
+        setVisible={setEditing}
+        value={value}
         onChange={(v: IVariable[]) => {
           if (v) {
             onChange(v, true);
             setData(v);
           }
-          setEditing(false);
         }}
-        value={value}
         range={range}
         id={id}
       />

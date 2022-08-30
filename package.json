@@ -24,6 +24,7 @@
     "@y0c/react-datepicker": "^1.0.4",
     "ahooks": "3.1.5",
     "antd": "4.17.4",
+    "array-move": "^4.0.0",
     "better-babel-generator": "^6.26.1",
     "classnames": "^2.3.1",
     "codemirror-promql": "^0.19.0",

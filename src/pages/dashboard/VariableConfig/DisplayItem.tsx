@@ -39,7 +39,7 @@ export default function DisplayItem(props: IProps) {
     <div className='tag-content-close-item'>
       <Input.Group>
         <span className='ant-input-group-addon'>{name}</span>
-        {type === 'query' ? (
+        {type === 'query' || type === 'custom' ? (
           <Select
             mode={multi ? 'tags' : undefined}
             style={{
@@ -78,7 +78,8 @@ export default function DisplayItem(props: IProps) {
                 </Select.Option>
               ))}
           </Select>
-        ) : (
+        ) : null}
+        {type === 'textbox' ? (
           <Input
             value={selected}
             onBlur={(e) => {
@@ -98,7 +99,7 @@ export default function DisplayItem(props: IProps) {
               setSelected(val as any);
             }}
           />
-        )}
+        ) : null}
       </Input.Group>
     </div>
   );
