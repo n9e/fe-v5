@@ -208,14 +208,12 @@ function attachVariable2Url(key, value, id: string, vars?: IVariable[]) {
   const { protocol, host, pathname, search } = window.location;
   const query = queryString.parse(search);
   const varsValue = getVarsValue(id, vars);
-  const searchObj = new URLSearchParams();
-  // console.log(_.merge({}, varsValue, query, { [key]: value }));
-  // return;
-  // 目前变量在 url 里的结构被定义成了 key: stringify(value)
-  _.forEach(_.merge({}, varsValue, query, { [key]: value }), (val, key) => {
-    searchObj.set(key, val);
+  const newQuery = {};
+  _.forEach(_.merge({}, varsValue, query, { [key]: value }), (value, key) => {
+    const val = typeof value === 'string' ? value : JSON.stringify(value);
+    newQuery[key] = val;
   });
-  const newurl = `${protocol}//${host}${pathname}?${searchObj.toString()}`;
+  const newurl = `${protocol}//${host}${pathname}?${queryString.stringify(newQuery)}`;
   window.history.replaceState({ path: newurl }, '', newurl);
 }
 
@@ -241,7 +239,7 @@ export function setVaraiableSelected({
 export function getVaraiableSelected(name: string, id: string) {
   const { search } = window.location;
   var searchObj = new URLSearchParams(search);
-  let v = searchObj.get(name) || localStorage.getItem(`dashboard_${id}_${name}`);
+  let v: any = searchObj.get(name) || localStorage.getItem(`dashboard_${id}_${name}`);
   if (v === null) return null; // null 表示没有初始化过，空字符串表示值被设置成空
   try {
     v = JSON.parse(v);

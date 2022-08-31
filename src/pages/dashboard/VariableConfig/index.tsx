@@ -57,7 +57,7 @@ function index(props: IProps) {
 
   useEffect(() => {
     if (value) {
-      const result: IVariable[] = [];
+      let result: IVariable[] = [];
       try {
         (async () => {
           for (let idx = 0; idx < value.length; idx++) {
@@ -91,6 +91,13 @@ function index(props: IProps) {
               }
             }
           }
+          // 设置变量默认值，优先从 url 中获取，其次是 localStorage
+          result = _.map(result, (item) => {
+            return {
+              ...item,
+              value: getVaraiableSelected(item.name, id),
+            };
+          });
           setData(result);
           onChange(value, false, result);
         })();
@@ -103,14 +110,32 @@ function index(props: IProps) {
   return (
     <div className='tag-area'>
       <div className={classNames('tag-content', 'tag-content-close')}>
-        {_.map(dataWithoutConstant, (expression) => {
+        {_.map(dataWithoutConstant, (item) => {
           return (
             <DisplayItem
-              vars={dataWithoutConstant}
-              key={expression.name}
-              id={id}
-              expression={expression}
-              onChange={() => {
+              key={item.name}
+              expression={item}
+              value={item.value}
+              onChange={(val) => {
+                // 缓存变量值，更新 url 里的变量值
+                setVaraiableSelected({
+                  name: item.name,
+                  value: val,
+                  id,
+                  urlAttach: true,
+                  vars: dataWithoutConstant,
+                });
+                setData(
+                  _.map(data, (subItem) => {
+                    if (subItem.name === item.name) {
+                      return {
+                        ...item,
+                        value: val,
+                      };
+                    }
+                    return subItem;
+                  }),
+                );
                 setRefreshFlag(_.uniqueId('refreshFlag_'));
               }}
             />
