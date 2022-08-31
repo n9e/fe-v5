@@ -442,3 +442,9 @@ export function getEventTSQuery(params) {
     data: params,
   });
 }
+export function getEventLogQuery(params) {
+  return request('/api/n9e-plus/event-log-query', {
+    method: RequestMethod.Post,
+    data: params,
+  });
+}

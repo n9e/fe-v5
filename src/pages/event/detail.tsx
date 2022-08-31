@@ -31,6 +31,7 @@ import { CommonStoreState } from '@/store/commonInterface';
 import { parseValues } from '@/pages/warning/strategy/components/utils';
 import { severityMap } from '@/pages/warning/strategy/components/ElasticsearchSettings/Rules';
 import Preview from './Preview';
+import LogsDetail from './LogsDetail';
 import './detail.less';
 
 const { Paragraph } = Typography;
@@ -47,6 +48,7 @@ const EventDetailPage: React.FC = () => {
   const history = useHistory();
   const isHistory = history.location.pathname.includes('alert-his-events');
   const [eventDetail, setEventDetail] = useState<any>();
+  const [logsDetailVisible, setLogsDetailVisible] = useState<boolean>(false);
   if (eventDetail) eventDetail.cate = eventDetail.cate || 'prometheus'; // TODO: 兼容历史的告警事件
   const parsedEventDetail = parseValues(eventDetail);
   const descriptionInfo = [
@@ -116,7 +118,26 @@ const EventDetailPage: React.FC = () => {
         return moment(time * 1000).format('YYYY-MM-DD HH:mm:ss');
       },
     },
-    { label: '触发时值', key: 'trigger_value' },
+    {
+      label: '触发时值',
+      key: 'trigger_value',
+      render(val) {
+        return (
+          <span>
+            {val}
+            <Button
+              size='small'
+              style={{ marginLeft: 16 }}
+              onClick={() => {
+                setLogsDetailVisible(true);
+              }}
+            >
+              日志详情
+            </Button>
+          </span>
+        );
+      },
+    },
     {
       label: '恢复时间',
       key: 'recover_time',
@@ -397,6 +418,13 @@ const EventDetailPage: React.FC = () => {
           </Card>
         </Spin>
       </div>
+      <LogsDetail
+        id={eventId}
+        visible={logsDetailVisible}
+        onClose={() => {
+          setLogsDetailVisible(false);
+        }}
+      />
     </PageLayout>
   );
 };
