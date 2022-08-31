@@ -16,6 +16,8 @@
  */
 import React, { createContext } from 'react';
 import moment from 'moment';
+import _ from 'lodash';
+import queryString from 'query-string';
 import { resourceGroupItem } from '@/store/businessInterface';
 import { favoriteFrom } from '@/store/common';
 import { getLabelNames, getMetricSeries, getLabelValues, getMetric, getQueryResult } from '@/services/dashboard';
@@ -162,7 +164,7 @@ export const convertExpressionToQuery = (expression: string, range: IRawTimeRang
       let metricsAndLabel = expression.substring('label_values('.length, expression.length - 1).split(',');
       const label = metricsAndLabel.pop();
       const metric = metricsAndLabel.join(', ');
-      return getMetricSeries({ 'match[]': metric.trim(), start, end }).then((res) => Array.from(new Set(res.data.map((item) => item[label!.trim()]))));
+      return getMetricSeries({ 'match[]': metric.trim(), start, end }).then((res) => Array.from(new Set(_.map(res.data, (item) => item[label!.trim()]))));
     } else {
       const label = expression.substring('label_values('.length, expression.length - 1);
       return getLabelValues(label, { start, end }).then((res) => res.data);
@@ -194,27 +196,57 @@ const replaceAllPolyfill = (str, substr, newSubstr): string => {
   return result;
 };
 
-function attachVariable2Url(key, value) {
+function getVarsValue(id: string, vars?: IVariable[]) {
+  const varsValue = {};
+  _.forEach(vars, (item) => {
+    varsValue[item.name] = getVaraiableSelected(item.name, id);
+  });
+  return varsValue;
+}
+
+function attachVariable2Url(key, value, id: string, vars?: IVariable[]) {
   const { protocol, host, pathname, search } = window.location;
-  var searchObj = new URLSearchParams(search);
-  searchObj.set(key, value);
-  var newurl = `${protocol}//${host}${pathname}?${searchObj.toString()}`;
+  const query = queryString.parse(search);
+  const varsValue = getVarsValue(id, vars);
+  const searchObj = new URLSearchParams();
+  // console.log(_.merge({}, varsValue, query, { [key]: value }));
+  // return;
+  // 目前变量在 url 里的结构被定义成了 key: stringify(value)
+  _.forEach(_.merge({}, varsValue, query, { [key]: value }), (val, key) => {
+    searchObj.set(key, val);
+  });
+  const newurl = `${protocol}//${host}${pathname}?${searchObj.toString()}`;
   window.history.replaceState({ path: newurl }, '', newurl);
 }
 
 // TODO: 现在通过 localStorage 来维护变量值，并且是通过大盘 id 和变量名作为 key，这个 key 可能会重复，后续需要把变量名改成 uuid
-export function setVaraiableSelected(name: string, value: string | string[], id: string, urlAttach = false) {
+export function setVaraiableSelected({
+  name,
+  value,
+  id,
+  urlAttach = false,
+  vars,
+}: {
+  name: string;
+  value: string | string[];
+  id: string;
+  urlAttach?: boolean;
+  vars?: IVariable[];
+}) {
   if (value === undefined) return;
   localStorage.setItem(`dashboard_${id}_${name}`, JSON.stringify(value));
-  urlAttach && attachVariable2Url(name, JSON.stringify(value));
+  urlAttach && attachVariable2Url(name, JSON.stringify(value), id, vars);
 }
 
 export function getVaraiableSelected(name: string, id: string) {
   const { search } = window.location;
   var searchObj = new URLSearchParams(search);
-  const v = searchObj.get(name) || localStorage.getItem(`dashboard_${id}_${name}`);
+  let v = searchObj.get(name) || localStorage.getItem(`dashboard_${id}_${name}`);
   if (v === null) return null; // null 表示没有初始化过，空字符串表示值被设置成空
-  return v ? JSON.parse(v) : '';
+  try {
+    v = JSON.parse(v);
+  } catch (e) {}
+  return v || '';
 }
 
 export const replaceExpressionVarsSpecifyRule = (

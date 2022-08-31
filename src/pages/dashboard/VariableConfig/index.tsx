@@ -46,6 +46,7 @@ function index(props: IProps) {
   const { id, cluster, editable = true, range, onChange, onOpenFire } = props;
   const [editing, setEditing] = useState<boolean>(false);
   const [data, setData] = useState<IVariable[]>([]);
+  const dataWithoutConstant = _.filter(data, (item) => item.type !== 'constant');
   const [refreshFlag, setRefreshFlag] = useState<string>(_.uniqueId('refreshFlag_'));
   const value = _.map(props.value, (item) => {
     return {
@@ -74,19 +75,19 @@ function index(props: IProps) {
               if (selected === null || (selected && !_.isEmpty(regFilterOptions) && !includes(regFilterOptions, selected))) {
                 const head = regFilterOptions?.[0];
                 const defaultVal = item.multi ? (head ? [head] : []) : head;
-                setVaraiableSelected(item.name, defaultVal, id, true);
+                setVaraiableSelected({ name: item.name, value: defaultVal, id, urlAttach: true });
               }
             } else if (item.type === 'textbox') {
               result[idx] = item;
               const selected = getVaraiableSelected(item.name, id);
               if (selected === null) {
-                setVaraiableSelected(item.name, item.defaultValue, id, true);
+                setVaraiableSelected({ name: item.name, value: item.defaultValue, id, urlAttach: true });
               }
             } else if (item.type === 'constant') {
               result[idx] = item;
               const selected = getVaraiableSelected(item.name, id);
               if (selected === null) {
-                setVaraiableSelected(item.name, item.definition, id, true);
+                setVaraiableSelected({ name: item.name, value: item.definition, id, urlAttach: true });
               }
             }
           }
@@ -102,21 +103,19 @@ function index(props: IProps) {
   return (
     <div className='tag-area'>
       <div className={classNames('tag-content', 'tag-content-close')}>
-        {_.map(
-          _.filter(data, (item) => item.type !== 'constant'),
-          (expression) => {
-            return (
-              <DisplayItem
-                key={expression.name}
-                id={id}
-                expression={expression}
-                onChange={() => {
-                  setRefreshFlag(_.uniqueId('refreshFlag_'));
-                }}
-              />
-            );
-          },
-        )}
+        {_.map(dataWithoutConstant, (expression) => {
+          return (
+            <DisplayItem
+              vars={dataWithoutConstant}
+              key={expression.name}
+              id={id}
+              expression={expression}
+              onChange={() => {
+                setRefreshFlag(_.uniqueId('refreshFlag_'));
+              }}
+            />
+          );
+        })}
         {editable && (
           <EditOutlined
             className='icon'

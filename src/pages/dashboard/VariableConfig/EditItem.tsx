@@ -63,7 +63,7 @@ function EditItem(props: IProps) {
       convertExpressionToQuery(newExpression, range).then((res) => {
         const regFilterRes = res.filter((i) => !reg || !stringToRegex(reg) || (stringToRegex(reg) as RegExp).test(i));
         if (regFilterRes.length > 0) {
-          setVaraiableSelected(formData.var[index].name, regFilterRes[0], id);
+          setVaraiableSelected({ name: formData.var[index].name, value: regFilterRes[0], id });
         }
       });
     }

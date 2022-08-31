@@ -21,13 +21,14 @@ import { IVariable } from './definition';
 import { getVaraiableSelected, setVaraiableSelected } from './constant';
 
 interface IProps {
+  vars: IVariable[];
   id: string;
   expression: IVariable;
   onChange: () => void; // 目前只为了外层更新变量 options
 }
 
 export default function DisplayItem(props: IProps) {
-  const { id, expression, onChange } = props;
+  const { vars, id, expression, onChange } = props;
   const { name, multi, allOption, options, type } = expression;
   const [selected, setSelected] = useState<string[]>(getVaraiableSelected(name, id));
 
@@ -56,7 +57,13 @@ export default function DisplayItem(props: IProps) {
                   val.splice(allIndex, 1);
                 }
               }
-              setVaraiableSelected(name, val, id, true);
+              setVaraiableSelected({
+                name,
+                value: val,
+                id,
+                urlAttach: true,
+                vars,
+              });
               setSelected(val);
               onChange();
             }}
@@ -84,13 +91,13 @@ export default function DisplayItem(props: IProps) {
             value={selected}
             onBlur={(e) => {
               let val = e.target.value;
-              setVaraiableSelected(name, val, id, true);
+              setVaraiableSelected({ name, value: val, id, urlAttach: true, vars });
               onChange();
             }}
             onKeyDown={(e: any) => {
               if (e.code === 'Enter') {
                 let val = e.target.value;
-                setVaraiableSelected(name, val, id, true);
+                setVaraiableSelected({ name, value: val, id, urlAttach: true, vars });
                 onChange();
               }
             }}
