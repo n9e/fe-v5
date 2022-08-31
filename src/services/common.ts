@@ -48,22 +48,15 @@ export function getCommonClusters() {
 // 获取es集群信息
 export function getCommonESClusters() {
   if (import.meta.env.VITE_IS_COMMON_DS === 'true') {
-    return request(`/api/v1/datasource/list`, {
+    return request(`/api/v1/datasource/timeseries/elasticsearch/list`, {
       method: RequestMethod.Post,
       data: {
-        category: 'logging',
-        plugin_type: 'elasticsearch.logging',
         p: 1,
         limit: 100,
       },
     }).then((res) => {
       return {
-        dat: _.map(
-          _.filter(res.data.items, (item) => {
-            return item.plugin_type === 'elasticsearch.logging';
-          }),
-          'name',
-        ),
+        dat: _.map(res.data.items, 'name'),
       };
     });
   }
