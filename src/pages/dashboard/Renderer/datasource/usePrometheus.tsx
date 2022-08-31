@@ -20,7 +20,7 @@ import moment from 'moment';
 import { formatPickerDate } from '@/components/DateRangePicker'; // TODO: 兼容旧版本
 import { IRawTimeRange, parseRange } from '@/components/TimeRangePicker';
 import { ITarget } from '../../types';
-import { replaceExpressionVars, getVaraiableSelected } from '../../VariableConfig/constant';
+import { replaceExpressionVars } from '../../VariableConfig/constant';
 import { IVariable } from '../../VariableConfig/definition';
 import replaceExpressionBracket from '../utils/replaceExpressionBracket';
 import { completeBreakpoints } from './utils';
@@ -43,7 +43,7 @@ interface QueryMetricItem {
   query: string;
 }
 
-const getSerieName = (metric: Object, expr: string) => {
+const getSerieName = (metric: Object) => {
   let name = metric['__name__'] || '';
   _.forEach(_.omit(metric, '__name__'), (value, key) => {
     name += ` ${key}: ${value}`;
@@ -58,9 +58,7 @@ export default function usePrometheus(props: IProps) {
   const { id, dashboardId, time, step, targets, variableConfig, inViewPort } = props;
   const [series, setSeries] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const cachedVariableValues = _.map(variableConfig, (item) => {
-    return getVaraiableSelected(item.name, dashboardId);
-  });
+  const cachedVariableValues = _.map(variableConfig, 'value');
   const flag = useRef(false);
   const [times, setTimes] = useState<any>({});
 
@@ -121,7 +119,7 @@ export default function usePrometheus(props: IProps) {
               _series.push({
                 id: _.uniqueId('series_'),
                 refId: item.refId,
-                name: target?.legend ? replaceExpressionBracket(target?.legend, serie.metric) : getSerieName(serie.metric, item.expr),
+                name: target?.legend ? replaceExpressionBracket(target?.legend, serie.metric) : getSerieName(serie.metric),
                 metric: serie.metric,
                 expr: item.expr,
                 data: completeBreakpoints(step, serie.values),
@@ -171,7 +169,7 @@ export default function usePrometheus(props: IProps) {
       const target = _.find(targets, (t) => t.expr === item.expr);
       return {
         ...item,
-        name: target?.legend ? replaceExpressionBracket(target?.legend, item.metric) : getSerieName(item.metric, item.expr),
+        name: target?.legend ? replaceExpressionBracket(target?.legend, item.metric) : getSerieName(item.metric),
       };
     });
     setSeries(_series);

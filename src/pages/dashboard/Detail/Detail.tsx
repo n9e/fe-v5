@@ -125,7 +125,9 @@ export default function DetailV2() {
   const handleVariableChange = (value, b, valueWithOptions) => {
     const dashboardConfigs: any = JSONParse(dashboard.configs);
     dashboardConfigs.var = value;
+    // 更新变量配置
     b && handleUpdateDashboardConfigs(id, { configs: JSON.stringify(dashboardConfigs) });
+    // 更新变量配置状态
     if (valueWithOptions) {
       setVariableConfigWithOptions(valueWithOptions);
       if (dispatch) {

@@ -46,6 +46,7 @@ function index(props: IProps) {
   const { id, cluster, editable = true, range, onChange, onOpenFire } = props;
   const [editing, setEditing] = useState<boolean>(false);
   const [data, setData] = useState<IVariable[]>([]);
+  const dataWithoutConstant = _.filter(data, (item) => item.type !== 'constant');
   const [refreshFlag, setRefreshFlag] = useState<string>(_.uniqueId('refreshFlag_'));
   const value = _.map(props.value, (item) => {
     return {
@@ -56,7 +57,7 @@ function index(props: IProps) {
 
   useEffect(() => {
     if (value) {
-      const result: IVariable[] = [];
+      let result: IVariable[] = [];
       try {
         (async () => {
           for (let idx = 0; idx < value.length; idx++) {
@@ -74,22 +75,29 @@ function index(props: IProps) {
               if (selected === null || (selected && !_.isEmpty(regFilterOptions) && !includes(regFilterOptions, selected))) {
                 const head = regFilterOptions?.[0];
                 const defaultVal = item.multi ? (head ? [head] : []) : head;
-                setVaraiableSelected(item.name, defaultVal, id, true);
+                setVaraiableSelected({ name: item.name, value: defaultVal, id, urlAttach: true });
               }
             } else if (item.type === 'textbox') {
               result[idx] = item;
               const selected = getVaraiableSelected(item.name, id);
               if (selected === null) {
-                setVaraiableSelected(item.name, item.defaultValue, id, true);
+                setVaraiableSelected({ name: item.name, value: item.defaultValue, id, urlAttach: true });
               }
             } else if (item.type === 'constant') {
               result[idx] = item;
               const selected = getVaraiableSelected(item.name, id);
               if (selected === null) {
-                setVaraiableSelected(item.name, item.definition, id, true);
+                setVaraiableSelected({ name: item.name, value: item.definition, id, urlAttach: true });
               }
             }
           }
+          // 设置变量默认值，优先从 url 中获取，其次是 localStorage
+          result = _.map(result, (item) => {
+            return {
+              ...item,
+              value: getVaraiableSelected(item.name, id),
+            };
+          });
           setData(result);
           onChange(value, false, result);
         })();
@@ -102,21 +110,37 @@ function index(props: IProps) {
   return (
     <div className='tag-area'>
       <div className={classNames('tag-content', 'tag-content-close')}>
-        {_.map(
-          _.filter(data, (item) => item.type !== 'constant'),
-          (expression) => {
-            return (
-              <DisplayItem
-                key={expression.name}
-                id={id}
-                expression={expression}
-                onChange={() => {
-                  setRefreshFlag(_.uniqueId('refreshFlag_'));
-                }}
-              />
-            );
-          },
-        )}
+        {_.map(dataWithoutConstant, (item) => {
+          return (
+            <DisplayItem
+              key={item.name}
+              expression={item}
+              value={item.value}
+              onChange={(val) => {
+                // 缓存变量值，更新 url 里的变量值
+                setVaraiableSelected({
+                  name: item.name,
+                  value: val,
+                  id,
+                  urlAttach: true,
+                  vars: dataWithoutConstant,
+                });
+                setData(
+                  _.map(data, (subItem) => {
+                    if (subItem.name === item.name) {
+                      return {
+                        ...item,
+                        value: val,
+                      };
+                    }
+                    return subItem;
+                  }),
+                );
+                setRefreshFlag(_.uniqueId('refreshFlag_'));
+              }}
+            />
+          );
+        })}
         {editable && (
           <EditOutlined
             className='icon'
