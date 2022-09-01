@@ -60,6 +60,7 @@ export interface IThresholds {
 export interface IOptions {
   valueMappings?: IValueMapping[];
   thresholds?: IThresholds;
+  xThresholds?: IThresholds;
   standardOptions?: {
     util?: string;
     min?: number;

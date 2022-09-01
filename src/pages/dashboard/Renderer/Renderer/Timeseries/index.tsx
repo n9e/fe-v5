@@ -35,10 +35,11 @@ interface IProps {
   values: IPanel;
   series: any[];
   themeMode?: 'dark';
+  onClick?: (event: any, datetime: Date, value: number) => void;
 }
 
 export default function index(props: IProps) {
-  const { values, series, inDashboard = true, chartHeight = '200px', tableHeight = '200px', themeMode = '' } = props;
+  const { values, series, inDashboard = true, chartHeight = '200px', tableHeight = '200px', themeMode = '', onClick } = props;
   const { custom, options = {} } = values;
   const { lineWidth = 1, gradientMode = 'none' } = custom;
   const [seriesData, setSeriesData] = useState(series);
@@ -83,6 +84,9 @@ export default function index(props: IProps) {
           marginTop: 0,
         },
         series: [],
+        onClick: (event, datetime, value) => {
+          if (onClick) onClick(event, datetime, value);
+        },
       });
     }
     if (hasLegend) {
@@ -149,6 +153,7 @@ export default function index(props: IProps) {
         },
         xAxis: {
           ...chartRef.current.options.xAxis,
+          plotLines: options?.xThresholds?.steps,
           lineColor: themeMode === 'dark' ? 'rgba(255,255,255,0.2)' : '#ccc',
           tickColor: themeMode === 'dark' ? 'rgba(255,255,255,0.2)' : '#ccc',
         },

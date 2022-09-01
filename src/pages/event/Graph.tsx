@@ -20,10 +20,12 @@ import Timeseries from '@/pages/dashboard/Renderer/Renderer/Timeseries';
 
 interface IProps {
   series: any[];
+  xThresholds?: number[];
+  onClick?: (event: any, datetime: Date, value: number) => void;
 }
 
 export default function Graph(props: IProps) {
-  const { series } = props;
+  const { series, xThresholds } = props;
   const graphProps = {
     custom: {
       drawStyle: 'lines',
@@ -38,12 +40,20 @@ export default function Graph(props: IProps) {
       tooltip: {
         mode: 'all',
       },
+      xThresholds: {
+        steps: _.map(xThresholds, (threshold) => {
+          return {
+            value: threshold,
+            color: 'red',
+          };
+        }),
+      },
     },
   };
 
   return (
     <div style={{ height: 200 }}>
-      <Timeseries values={graphProps as any} series={series} />
+      <Timeseries values={graphProps as any} series={series} onClick={props.onClick} />
     </div>
   );
 }

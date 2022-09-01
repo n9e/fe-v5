@@ -48,7 +48,6 @@ const EventDetailPage: React.FC = () => {
   const history = useHistory();
   const isHistory = history.location.pathname.includes('alert-his-events');
   const [eventDetail, setEventDetail] = useState<any>();
-  const [logsDetailVisible, setLogsDetailVisible] = useState<boolean>(false);
   if (eventDetail) eventDetail.cate = eventDetail.cate || 'prometheus'; // TODO: 兼容历史的告警事件
   const parsedEventDetail = parseValues(eventDetail);
   const descriptionInfo = [
@@ -125,15 +124,21 @@ const EventDetailPage: React.FC = () => {
         return (
           <span>
             {val}
-            <Button
-              size='small'
-              style={{ marginLeft: 16 }}
-              onClick={() => {
-                setLogsDetailVisible(true);
-              }}
-            >
-              日志详情
-            </Button>
+            {eventDetail?.cate === 'elasticsearch' && (
+              <Button
+                size='small'
+                style={{ marginLeft: 16 }}
+                onClick={() => {
+                  LogsDetail({
+                    id: eventId,
+                    start: eventDetail.trigger_time - 2 * eventDetail.prom_eval_interval,
+                    end: eventDetail.trigger_time + eventDetail.prom_eval_interval,
+                  });
+                }}
+              >
+                日志详情
+              </Button>
+            )}
           </span>
         );
       },
@@ -399,7 +404,19 @@ const EventDetailPage: React.FC = () => {
           >
             {eventDetail && (
               <div>
-                {parsedEventDetail.rule_algo || parsedEventDetail.cate === 'elasticsearch' ? <Preview data={parsedEventDetail} /> : null}
+                {parsedEventDetail.rule_algo || parsedEventDetail.cate === 'elasticsearch' ? (
+                  <Preview
+                    data={parsedEventDetail}
+                    triggerTime={eventDetail.trigger_time}
+                    onClick={(event, datetime) => {
+                      LogsDetail({
+                        id: eventId,
+                        start: moment(datetime).unix() - 2 * eventDetail.prom_eval_interval,
+                        end: moment(datetime).unix() + eventDetail.prom_eval_interval,
+                      });
+                    }}
+                  />
+                ) : null}
                 {descriptionInfo
                   .filter((item: any) => {
                     if (!item) return false;
@@ -418,13 +435,6 @@ const EventDetailPage: React.FC = () => {
           </Card>
         </Spin>
       </div>
-      <LogsDetail
-        id={eventId}
-        visible={logsDetailVisible}
-        onClose={() => {
-          setLogsDetailVisible(false);
-        }}
-      />
     </PageLayout>
   );
 };

@@ -9,39 +9,39 @@ import { json } from '@codemirror/lang-json';
 import { defaultHighlightStyle } from '@codemirror/highlight';
 import TimeRangePicker, { IRawTimeRange, parseRange } from '@/components/TimeRangePicker';
 import { getEventLogQuery } from '@/services/warning';
+import ModalHOC, { ModalWrapProps } from '@/pages/dashboard/Components/ModalHOC';
 import './style.less';
 
 interface IProps {
-  visible: boolean;
-  onClose: () => void;
   id: string;
+  start: number;
+  end: number;
 }
 
 interface IJSON {
   [key: string]: string | IJSON;
 }
 
-function JSONParse(val) {
-  let json: IJSON = {};
-  try {
-    json = JSON.parse(val);
-  } catch (e) {}
-  return json;
+function localeCompareFunc(a, b) {
+  return a.localeCompare(b);
 }
 
-export default function index(props: IProps) {
-  const { id, visible, onClose } = props;
+function index(props: IProps & ModalWrapProps) {
+  const { id, start, end, visible, destroy } = props;
   const [range, setRange] = useState<IRawTimeRange>({
-    start: 'now-1h',
-    end: 'now',
+    start: moment.unix(start),
+    end: moment.unix(end),
   });
   const [limit, setLimit] = useState(10);
   const [fields, setFields] = useState<string[]>([]);
   const [selectedFields, setSelectedFields] = useState<string[]>();
   const [data, setData] = useState<
     {
-      raw: string;
-      parsed: IJSON;
+      id: string;
+      fields: {
+        [key: string]: string[];
+      };
+      json: IJSON;
     }[]
   >([]);
 
@@ -57,26 +57,24 @@ export default function index(props: IProps) {
     }).then((res) => {
       let allFields: string[] = [];
       const newData = _.map(res.dat, (item) => {
-        const json = JSONParse(item);
-        const keys = _.keys(json);
+        const keys = _.keys(item.fields);
         allFields = _.union(_.concat(allFields, keys));
         return {
           id: _.uniqueId(),
-          raw: item,
-          parsed: json,
+          fields: item.fields,
+          json: item._source,
         };
       });
       setFields(allFields);
-      setSelectedFields(allFields.slice(0, 5));
       setData(newData);
     });
   }, [id, JSON.stringify(range), limit]);
 
   return (
-    <Drawer title='日志详情' width={960} placement='right' onClose={onClose} visible={visible}>
+    <Drawer title='日志详情' width={960} placement='right' onClose={destroy} visible={visible}>
       <div style={{ marginBottom: 10 }}>
         <Space>
-          <TimeRangePicker value={range} onChange={setRange} />
+          <TimeRangePicker dateFormat='YYYY-MM-DD HH:mm:ss' value={range} onChange={setRange} />
           <Input.Group>
             <span className='ant-input-group-addon'>结果数</span>
             <Select
@@ -84,6 +82,7 @@ export default function index(props: IProps) {
               onChange={(val) => {
                 setLimit(val);
               }}
+              style={{ minWidth: 60 }}
             >
               <Select.Option value={10}>10</Select.Option>
               <Select.Option value={20}>20</Select.Option>
@@ -100,43 +99,63 @@ export default function index(props: IProps) {
               onChange={(val) => {
                 setSelectedFields(val);
               }}
-              style={{ minWidth: 200 }}
+              style={{ minWidth: 410 }}
+              maxTagCount='responsive'
             >
               {fields.map((item) => {
-                return <Select.Option value={item}>{item}</Select.Option>;
+                return (
+                  <Select.Option key={item} value={item}>
+                    {item}
+                  </Select.Option>
+                );
               })}
             </Select>
           </Input.Group>
         </Space>
       </div>
       <Table
+        size='small'
         className='event-logs-table'
+        tableLayout='fixed'
         rowKey='id'
-        showHeader={false}
-        columns={[
-          {
-            dataIndex: 'parsed',
-            render(text) {
-              return (
-                <div style={{ height: 100, overflow: 'hidden', textOverflow: 'ellipsis', wordBreak: 'break-all' }}>
-                  {_.map(text, (val, key) => {
+        columns={
+          _.isEmpty(selectedFields)
+            ? [
+                {
+                  title: 'Document',
+                  dataIndex: 'fields',
+                  render(text) {
                     return (
-                      <span key={key}>
-                        <span>{key}:</span> {typeof val === 'object' ? JSON.stringify(val) : val}
-                      </span>
+                      <dl className='event-logs-row'>
+                        {_.map(text, (val, key) => {
+                          return (
+                            <React.Fragment key={key}>
+                              <dt>{key}:</dt> <dd>{_.join(val, ',')}</dd>
+                            </React.Fragment>
+                          );
+                        })}
+                      </dl>
                     );
-                  })}
-                </div>
-              );
-            },
-          },
-        ]}
+                  },
+                },
+              ]
+            : _.map(selectedFields, (item) => {
+                return {
+                  title: item,
+                  dataIndex: 'fields',
+                  render(fields) {
+                    return _.join(fields[item], ',');
+                  },
+                  sorter: (a, b) => localeCompareFunc(_.join(_.get(a, `fields[${item}]`, '')), _.join(_.get(b, `fields[${item}]`, ''))),
+                };
+              })
+        }
         dataSource={data}
         expandable={{
           expandedRowRender: (record) => {
             let value = '';
             try {
-              value = JSON.stringify(record.parsed, null, 4);
+              value = JSON.stringify(record.json, null, 4);
             } catch (e) {
               console.error(e);
               value = '无法解析';
@@ -171,3 +190,5 @@ export default function index(props: IProps) {
     </Drawer>
   );
 }
+
+export default ModalHOC(index);
