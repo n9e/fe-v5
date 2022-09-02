@@ -31,7 +31,7 @@ import { getLegendValues } from '../../utils/getCalculatedValuesBySeries';
 import './style.less';
 
 interface IProps {
-  time: IRawTimeRange;
+  time?: IRawTimeRange;
   inDashboard?: boolean;
   chartHeight?: string;
   tableHeight?: string;
@@ -58,9 +58,6 @@ export default function index(props: IProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   let _chartHeight = hasLegend ? '70%' : '100%';
   let _tableHeight = hasLegend ? '30%' : '0px';
-  const parsedRange = parseRange(time);
-  const start = moment(parsedRange.start).unix();
-  const end = moment(parsedRange.end).unix();
 
   if (!inDashboard) {
     _chartHeight = chartHeight;
@@ -122,6 +119,13 @@ export default function index(props: IProps) {
   }, [JSON.stringify(series)]);
 
   useEffect(() => {
+    let xAxisDamin = {};
+    if (time) {
+      const parsedRange = parseRange(time);
+      const start = moment(parsedRange.start).unix();
+      const end = moment(parsedRange.end).unix();
+      xAxisDamin = { min: start, max: end };
+    }
     if (chartRef.current) {
       chartRef.current.update({
         type: custom.drawStyle === 'lines' ? 'line' : 'bar',
@@ -159,8 +163,7 @@ export default function index(props: IProps) {
         },
         xAxis: {
           ...chartRef.current.options.xAxis,
-          min: start,
-          max: end,
+          ...xAxisDamin,
           plotLines: options?.xThresholds?.steps,
           lineColor: themeMode === 'dark' ? 'rgba(255,255,255,0.2)' : '#ccc',
           tickColor: themeMode === 'dark' ? 'rgba(255,255,255,0.2)' : '#ccc',
