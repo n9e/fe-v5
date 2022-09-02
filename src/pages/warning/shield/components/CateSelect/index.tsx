@@ -4,7 +4,7 @@ import { CaretDownOutlined } from '@ant-design/icons';
 
 const typeNameMap = {
   prometheus: 'Prometheus',
-  elasticsearch: 'ElasticSearch',
+  elasticsearch: 'Elasticsearch',
 };
 
 export default function index({ visible, form }) {

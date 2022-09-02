@@ -3,7 +3,7 @@ import { Form, AutoComplete } from 'antd';
 import _ from 'lodash';
 import { getIndices } from '@/services/warning';
 
-export default function IndexSelect({ cate, cluster }) {
+export default function IndexSelect({ prefixName = [], cate, cluster }: any) {
   const [options, setOptions] = useState([]);
   const [search, setSearch] = useState('');
 
@@ -36,7 +36,7 @@ export default function IndexSelect({ cate, cluster }) {
           <br />
         </div>
       }
-      name={['query', 'index']}
+      name={[...prefixName, 'query', 'index']}
       rules={[
         {
           required: true,

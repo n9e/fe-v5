@@ -402,6 +402,7 @@ export const getBrainJobs = function (id) {
 export function getBrainLicense() {
   return request('/api/fc-brain/license', {
     method: RequestMethod.Get,
+    silence: true,
   });
 }
 
@@ -442,6 +443,7 @@ export function getEventTSQuery(params) {
     data: params,
   });
 }
+
 export function getEventLogQuery(params) {
   return request('/api/n9e-plus/event-log-query', {
     method: RequestMethod.Post,

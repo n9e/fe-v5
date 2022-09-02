@@ -8,7 +8,15 @@ import Filters from './Filters';
 import Terms from './Terms';
 import Histgram from './Histgram';
 
-export default function index({ cate, cluster, index }) {
+interface IProps {
+  prefixFields?: string[]; // 前缀字段名
+  prefixNameField?: string[]; // 列表字段名
+  cate: string;
+  cluster: string[];
+  index: string;
+}
+
+export default function index({ prefixFields = [], prefixNameField = [], cate, cluster, index }: IProps) {
   const [fieldsOptions, setFieldsOptions] = useState([]);
   const { run } = useDebounceFn(
     () => {
@@ -34,7 +42,7 @@ export default function index({ cate, cluster, index }) {
   }, [cate, _.join(cluster), index]);
 
   return (
-    <Form.List name={['query', 'group_by']}>
+    <Form.List name={[...prefixNameField, 'query', 'group_by']}>
       {(fields, { add, remove }) => (
         <div>
           <div style={{ marginBottom: 8 }}>
@@ -59,7 +67,7 @@ export default function index({ cate, cluster, index }) {
               <div key={key} style={{ marginBottom: 16 }}>
                 <Form.Item shouldUpdate noStyle>
                   {({ getFieldValue }) => {
-                    const cate = getFieldValue(['query', 'group_by', name, 'cate']);
+                    const cate = getFieldValue([...prefixFields, ...prefixNameField, 'query', 'group_by', name, 'cate']);
                     return (
                       <Row gutter={16}>
                         <Col flex='auto'>

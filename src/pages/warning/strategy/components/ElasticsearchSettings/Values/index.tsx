@@ -5,10 +5,19 @@ import _ from 'lodash';
 import { useDebounceFn } from 'ahooks';
 import { getFields } from '@/services/warning';
 
+interface IProps {
+  prefixFields?: string[]; // 前缀字段名
+  prefixNameField?: string[]; // 列表字段名
+  cate: string;
+  cluster: string[];
+  index: string;
+  valueRefVisible?: boolean;
+}
+
 const alphabet = 'ABCDEFGHIGKLMNOPQRSTUVWXYZ'.split('');
 const functions = ['count', 'avg', 'sum', 'max', 'min', 'p90', 'p95', 'p99'];
 
-export default function index({ cate, cluster, index }) {
+export default function index({ prefixFields = [], prefixNameField = [], cate, cluster, index, valueRefVisible = true }: IProps) {
   const [search, setSearch] = useState('');
   const [fieldsOptions, setFieldsOptions] = useState([]);
   const { run } = useDebounceFn(
@@ -35,7 +44,7 @@ export default function index({ cate, cluster, index }) {
   }, [cate, _.join(cluster), index]);
 
   return (
-    <Form.List name={['query', 'values']}>
+    <Form.List name={[...prefixNameField, 'query', 'values']}>
       {(fields, { add, remove }) => (
         <div>
           <div style={{ marginBottom: 8 }}>
@@ -59,14 +68,14 @@ export default function index({ cate, cluster, index }) {
                 </Form.Item>
                 <Form.Item shouldUpdate noStyle>
                   {({ getFieldValue }) => {
-                    const func = getFieldValue(['query', 'values', name, 'func']);
+                    const func = getFieldValue([...prefixFields, ...prefixNameField, 'query', 'values', name, 'func']);
                     return (
                       <Row gutter={16}>
                         <Col flex='auto'>
                           <Row gutter={16}>
                             <Col span={func === 'count' ? 24 : 12}>
                               <Input.Group>
-                                <span className='ant-input-group-addon'>{alphabet[index]}</span>
+                                {valueRefVisible && <span className='ant-input-group-addon'>{alphabet[index]}</span>}
                                 <Form.Item name={[name, 'func']} noStyle>
                                   <Select style={{ width: '100%' }}>
                                     {functions.map((func) => (

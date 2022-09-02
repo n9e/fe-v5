@@ -175,6 +175,8 @@ export interface IPanel {
   links?: ILink[];
   description: string;
   layout: IGridPos;
+  datasourceCate?: string; // 5.11.0 新增支持配置数据源类型，默认是 prometheus
+  datasourceName?: number;
   targets: ITarget[];
   type: IType;
   options: IOptions;

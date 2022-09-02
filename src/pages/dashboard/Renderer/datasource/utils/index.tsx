@@ -18,3 +18,11 @@ export function completeBreakpoints(step, data) {
   });
   return result;
 }
+
+export const getSerieName = (metric: Object) => {
+  let name = metric['__name__'] || '';
+  _.forEach(_.omit(metric, '__name__'), (value, key) => {
+    name += ` ${key}: ${value}`;
+  });
+  return _.trim(name);
+};

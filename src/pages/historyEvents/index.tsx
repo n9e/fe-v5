@@ -141,7 +141,7 @@ const Event: React.FC = () => {
               allowClear
             >
               <Select.Option value='prometheus'>Prometheus</Select.Option>
-              <Select.Option value='elasticsearch'>ElasticSearch</Select.Option>
+              <Select.Option value='elasticsearch'>Elasticsearch</Select.Option>
             </Select>
           )}
           <ClusterSelect cate={cate} onClusterChange={(e) => setCurClusterItems(e)} />
