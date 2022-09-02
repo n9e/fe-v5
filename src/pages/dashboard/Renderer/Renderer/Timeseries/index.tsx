@@ -16,12 +16,14 @@
  */
 import React, { useRef, useEffect, useState } from 'react';
 import _ from 'lodash';
+import moment from 'moment';
 import { Table, Tooltip } from 'antd';
 import classNames from 'classnames';
 import { VerticalRightOutlined, VerticalLeftOutlined } from '@ant-design/icons';
 import { useSize } from 'ahooks';
 import TsGraph from '@fc-plot/ts-graph';
 import '@fc-plot/ts-graph/dist/index.css';
+import { IRawTimeRange, parseRange } from '@/components/TimeRangePicker';
 import { IPanel } from '../../../types';
 import { hexPalette } from '../../../config';
 import valueFormatter from '../../utils/valueFormatter';
@@ -29,6 +31,7 @@ import { getLegendValues } from '../../utils/getCalculatedValuesBySeries';
 import './style.less';
 
 interface IProps {
+  time: IRawTimeRange;
   inDashboard?: boolean;
   chartHeight?: string;
   tableHeight?: string;
@@ -39,7 +42,7 @@ interface IProps {
 }
 
 export default function index(props: IProps) {
-  const { values, series, inDashboard = true, chartHeight = '200px', tableHeight = '200px', themeMode = '', onClick } = props;
+  const { time, values, series, inDashboard = true, chartHeight = '200px', tableHeight = '200px', themeMode = '', onClick } = props;
   const { custom, options = {} } = values;
   const { lineWidth = 1, gradientMode = 'none' } = custom;
   const [seriesData, setSeriesData] = useState(series);
@@ -55,6 +58,9 @@ export default function index(props: IProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   let _chartHeight = hasLegend ? '70%' : '100%';
   let _tableHeight = hasLegend ? '30%' : '0px';
+  const parsedRange = parseRange(time);
+  const start = moment(parsedRange.start).unix();
+  const end = moment(parsedRange.end).unix();
 
   if (!inDashboard) {
     _chartHeight = chartHeight;
@@ -153,6 +159,8 @@ export default function index(props: IProps) {
         },
         xAxis: {
           ...chartRef.current.options.xAxis,
+          min: start,
+          max: end,
           plotLines: options?.xThresholds?.steps,
           lineColor: themeMode === 'dark' ? 'rgba(255,255,255,0.2)' : '#ccc',
           tickColor: themeMode === 'dark' ? 'rgba(255,255,255,0.2)' : '#ccc',

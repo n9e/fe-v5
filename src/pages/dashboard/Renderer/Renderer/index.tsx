@@ -96,7 +96,7 @@ function index(props: IProps) {
     series,
   };
   const RendererCptMap = {
-    timeseries: () => <Timeseries {...subProps} themeMode={themeMode} />,
+    timeseries: () => <Timeseries {...subProps} themeMode={themeMode} time={time} />,
     stat: () => <Stat {...subProps} containerRef={ref} themeMode={themeMode} />,
     table: () => <Table {...subProps} themeMode={themeMode} />,
     pie: () => <Pie {...subProps} themeMode={themeMode} />,
