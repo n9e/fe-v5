@@ -31,6 +31,7 @@ import { CommonStoreState } from '@/store/commonInterface';
 import { parseValues } from '@/pages/warning/strategy/components/utils';
 import { severityMap } from '@/pages/warning/strategy/components/ElasticsearchSettings/Rules';
 import Preview from './Preview';
+import LogsDetail from './LogsDetail';
 import './detail.less';
 
 const { Paragraph } = Typography;
@@ -116,7 +117,32 @@ const EventDetailPage: React.FC = () => {
         return moment(time * 1000).format('YYYY-MM-DD HH:mm:ss');
       },
     },
-    { label: '触发时值', key: 'trigger_value' },
+    {
+      label: '触发时值',
+      key: 'trigger_value',
+      render(val) {
+        return (
+          <span>
+            {val}
+            {eventDetail?.cate === 'elasticsearch' && (
+              <Button
+                size='small'
+                style={{ marginLeft: 16 }}
+                onClick={() => {
+                  LogsDetail({
+                    id: eventId,
+                    start: eventDetail.trigger_time - 2 * eventDetail.prom_eval_interval,
+                    end: eventDetail.trigger_time + eventDetail.prom_eval_interval,
+                  });
+                }}
+              >
+                日志详情
+              </Button>
+            )}
+          </span>
+        );
+      },
+    },
     {
       label: '恢复时间',
       key: 'recover_time',
@@ -378,7 +404,19 @@ const EventDetailPage: React.FC = () => {
           >
             {eventDetail && (
               <div>
-                {parsedEventDetail.rule_algo || parsedEventDetail.cate === 'elasticsearch' ? <Preview data={parsedEventDetail} /> : null}
+                {parsedEventDetail.rule_algo || parsedEventDetail.cate === 'elasticsearch' ? (
+                  <Preview
+                    data={parsedEventDetail}
+                    triggerTime={eventDetail.trigger_time}
+                    onClick={(event, datetime) => {
+                      LogsDetail({
+                        id: eventId,
+                        start: moment(datetime).unix() - 2 * eventDetail.prom_eval_interval,
+                        end: moment(datetime).unix() + eventDetail.prom_eval_interval,
+                      });
+                    }}
+                  />
+                ) : null}
                 {descriptionInfo
                   .filter((item: any) => {
                     if (!item) return false;

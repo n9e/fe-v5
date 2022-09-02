@@ -13,7 +13,7 @@ const getSerieName = (metric: Object) => {
   return _.trim(name);
 };
 
-export default function AlgoGraph({ eventId, range }) {
+export default function AlgoGraph({ eventId, range, triggerTime, onClick }) {
   const [series, setSeries] = useState<any[]>([]);
 
   useEffect(() => {
@@ -38,7 +38,7 @@ export default function AlgoGraph({ eventId, range }) {
   }, [eventId, JSON.stringify(range)]);
   return (
     <div>
-      <Graph series={series} />
+      <Graph series={series} xThresholds={[triggerTime]} onClick={onClick} />
     </div>
   );
 }
