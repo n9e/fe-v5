@@ -70,6 +70,7 @@ const Shield: React.FC = () => {
             <div
                 className='table-active-text'
                 onClick={() => {
+                  // @ts-ignore
                   handleClickEdit(mute.id);
                 }}
             >
@@ -146,6 +147,7 @@ const Shield: React.FC = () => {
               checked={disabled === strategyStatus.Enable}
               size='small'
               onChange={() => {
+                // @ts-ignore
                 const { id, disabled } = record;
                 updateShields(
                     {
