@@ -16,14 +16,14 @@
  */
 import React, { useState, useEffect } from 'react';
 import PageLayout from '@/components/pageLayout';
-import { Button, Input, Table, Tooltip, Tag, message, Modal } from 'antd';
+import {Button, Input, Table, Tooltip, Tag, message, Modal, Switch} from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store/common';
-import { getShieldList, deleteShields } from '@/services/shield';
+import {getShieldList, deleteShields, updateShields} from '@/services/shield';
 import { CloseCircleOutlined, ExclamationCircleOutlined, SearchOutlined } from '@ant-design/icons';
-import { useHistory } from 'react-router-dom';
+import {Link, useHistory} from 'react-router-dom';
 import { CommonStoreState } from '@/store/commonInterface';
-import { shieldItem } from '@/store/warningInterface';
+import {shieldItem, strategyStatus} from '@/store/warningInterface';
 import { ColumnsType } from 'antd/lib/table';
 import dayjs from 'dayjs';
 import LeftTree from '@/components/LeftTree';
@@ -59,6 +59,22 @@ const Shield: React.FC = () => {
             array.map((tag: string, index: number) => {
               return <ColorTag text={tag} key={index}></ColorTag>;
             })) || <div></div>
+        );
+      },
+    },
+    {
+      title: t('名称'),
+      dataIndex: 'name',
+      render: (data, mute) => {
+        return (
+            <div
+                className='table-active-text'
+                onClick={() => {
+                  handleClickEdit(mute.id);
+                }}
+            >
+              {data}
+            </div>
         );
       },
     },
@@ -121,6 +137,30 @@ const Shield: React.FC = () => {
           </div>
         );
       },
+    },
+    {
+      title: t('启用'),
+      dataIndex: 'disabled',
+      render: (disabled, record) => (
+          <Switch
+              checked={disabled === strategyStatus.Enable}
+              size='small'
+              onChange={() => {
+                const { id, disabled } = record;
+                updateShields(
+                    {
+                      ids: [id],
+                      fields: {
+                        disabled: !disabled ? 1 : 0,
+                      },
+                    },
+                    curBusiItem.id,
+                ).then(() => {
+                  refreshList();
+                });
+              }}
+          />
+      ),
     },
     // {
     //   title: t('创建人'),
@@ -221,6 +261,10 @@ const Shield: React.FC = () => {
 
   const refreshList = () => {
     getList();
+  };
+
+  const handleClickEdit = (id, isClone = false) => {
+    curBusiItem?.id && history.push(`/alert-mutes/edit/${id}${isClone ? '?mode=clone' : ''}`);
   };
 
   const onSearchQuery = (e) => {
