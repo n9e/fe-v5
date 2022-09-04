@@ -63,8 +63,8 @@ const Shield: React.FC = () => {
       },
     },
     {
-      title: t('名称'),
-      dataIndex: 'name',
+      title: t('规则备注'),
+      dataIndex: 'note',
       render: (data, mute) => {
         return (
             <div

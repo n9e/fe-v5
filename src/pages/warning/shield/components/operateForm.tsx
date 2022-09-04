@@ -225,16 +225,16 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) 
     >
       <Card>
         <Form.Item
-            label={t('规则标题：')}
-            name='name'
+            label={t('规则备注：')}
+            name='note'
             rules={[
               {
                 required: true,
-                message: t('规则标题不能为空'),
+                message: t('规则备注不能为空'),
               },
             ]}
         >
-          <Input placeholder={t('请输入规则标题')} />
+          <Input placeholder={t('请输入规则备注')} />
         </Form.Item>
 
         <Form.Item label={t('业务组：')} name='busiGroup'>

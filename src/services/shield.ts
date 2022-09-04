@@ -38,7 +38,7 @@ export const deleteShields = function (data: {ids: number[]}, busiId: number) {
 };
 
 export const editShield = function (data: any[], busiId: number, shiedId: number) {
-  return request(`/api/n9e/busi-group/${busiId}/alert-mutes/${shiedId}`, {
+  return request(`/api/n9e/busi-group/${busiId}/alert-mute/${shiedId}`, {
     method: RequestMethod.Put,
     data: data,
   });
