@@ -16,13 +16,14 @@
  */
 import _ from 'lodash';
 import valueFormatter from './valueFormatter';
-import { IValueMapping } from '../../types';
+import { statHexPalette } from '../../config';
+import { IValueMapping, IThresholds } from '../../types';
 
 const getValueAndToNumber = (value: any[]) => {
   return _.toNumber(_.get(value, 1, NaN));
 };
 
-export const getSerieTextObj = (value: number | string | null | undefined, standardOptions?: any, valueMappings?: IValueMapping[]) => {
+export const getSerieTextObj = (value: number | string | null | undefined, standardOptions?: any, valueMappings?: IValueMapping[], thresholds?: IThresholds) => {
   const { unit, decimals, dateFormat } = standardOptions || {};
   const matchedValueMapping = _.find(valueMappings, (item) => {
     const { type, match } = item;
@@ -52,17 +53,27 @@ export const getSerieTextObj = (value: number | string | null | undefined, stand
       return false;
     }
   });
+  let matchedThresholdsColor = statHexPalette[0];
+  _.forEach(thresholds?.steps, (item) => {
+    if (item.value && value) {
+      value = _.toNumber(value) as number;
+      if (value >= item.value) {
+        matchedThresholdsColor = item.color;
+        return false;
+      }
+    }
+  });
   const valueObj = valueFormatter({ unit, decimals, dateFormat }, value);
   const newValue = matchedValueMapping?.result?.text ? matchedValueMapping?.result?.text : valueObj.value;
   return {
     value: newValue,
     unit: valueObj.unit,
-    color: matchedValueMapping?.result?.color,
+    color: matchedValueMapping?.result?.color || matchedThresholdsColor,
     text: newValue + valueObj.unit,
   };
 };
 
-const getCalculatedValuesBySeries = (series: any[], calc: string, { unit, decimals, dateFormat }, valueMappings?: IValueMapping[]) => {
+const getCalculatedValuesBySeries = (series: any[], calc: string, { unit, decimals, dateFormat }, valueMappings?: IValueMapping[], thresholds?: IThresholds) => {
   const values = _.map(series, (serie) => {
     const results = {
       lastNotNull: () => _.get(_.last(_.filter(serie.data, (item) => item[1] !== null)), 1),
@@ -85,7 +96,7 @@ const getCalculatedValuesBySeries = (series: any[], calc: string, { unit, decima
         refId: serie.refId,
       },
       stat: _.toNumber(stat),
-      ...getSerieTextObj(stat, { unit, decimals, dateFormat }, valueMappings),
+      ...getSerieTextObj(stat, { unit, decimals, dateFormat }, valueMappings, thresholds),
     };
   });
   return values;

@@ -120,10 +120,8 @@ function convertOptionsGrafanaToN9E(panel: any) {
     valueMappings: config?.mappings, // TODO: 待验证
     thresholds: {
       mode: config.thresholds?.mode, // mode 目前是不支持的
-      style: 'line', // 目前只有固定的 line 风格，但是这个只用于折线图
-      steps: _.filter(config.thresholds?.steps, (item) => {
-        return item.value !== null;
-      }),
+      style: config.custom?.thresholdsStyle?.mode || 'line', // 目前只有固定的 line 风格，但是这个只用于折线图
+      steps: config.thresholds?.steps,
     },
     standardOptions: {
       util: unitMap[config.unit] ? unitMap[config.unit] : 'none',

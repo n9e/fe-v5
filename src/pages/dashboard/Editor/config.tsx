@@ -103,6 +103,15 @@ export const defaultValues = {
     legend: {
       displayMode: 'hidden',
     },
+    thresholds: {
+      steps: [
+        {
+          color: '#634CD9',
+          value: null,
+          type: 'base',
+        },
+      ],
+    },
   },
   custom: {},
   overrides: [{}],

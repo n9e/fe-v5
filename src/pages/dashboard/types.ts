@@ -51,6 +51,7 @@ export interface IThresholds {
   steps: {
     color: string;
     value: number;
+    type?: 'base';
   }[];
   // mode: 'absolute' | 'percent'; 目前不支持
   style: 'line'; // 目前只支持 line

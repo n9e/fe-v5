@@ -46,7 +46,7 @@ function StatItem(props) {
   const { item, idx, colSpan, textMode, colorMode, textSize, isFullSizeBackground, themeMode, valueField = 'Value' } = props;
   const headerFontSize = textSize?.title ? textSize?.title : eleSize?.width! / _.toString(item.name).length || MIN_SIZE;
   let statFontSize = textSize?.value ? textSize?.value : (eleSize?.width! - item.unit.length * UNIT_SIZE - UNIT_PADDING) / _.toString(item.value).length || MIN_SIZE;
-  const color = item.color ? item.color : statHexPalette[idx % statHexPalette.length];
+  const color = item.color;
   const backgroundColor = colorMode === 'background' ? color : 'transparent';
 
   if (statFontSize > eleSize?.height! - 20) {
@@ -121,6 +121,7 @@ export default function Stat(props: IProps) {
       dateFormat: options?.standardOptions?.dateFormat,
     },
     options?.valueMappings,
+    options?.thresholds,
   );
   const [isFullSizeBackground, setIsFullSizeBackground] = useState(false);
 

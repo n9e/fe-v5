@@ -29,35 +29,55 @@ export default function index() {
       <Form.List name={[...namePrefix, 'steps']}>
         {(fields, { add, remove }) => (
           <>
-            <Button
-              style={{ width: '100%', marginBottom: 10 }}
-              onClick={() => {
-                add({
-                  value: 0,
-                });
-              }}
-            >
-              添加
-            </Button>
             {fields.map(({ key, name, ...restField }) => {
               return (
                 <Input.Group key={key} compact style={{ marginBottom: 5 }}>
                   <Form.Item noStyle {...restField} name={[name, 'color']}>
                     <ColorPicker />
                   </Form.Item>
-                  <Form.Item noStyle {...restField} name={[name, 'value']}>
-                    <InputNumber style={{ width: 430 }} />
-                  </Form.Item>
-                  <Button
-                    style={{ width: 50 }}
-                    icon={<DeleteOutlined />}
-                    onClick={() => {
-                      remove(name);
+                  <Form.Item shouldUpdate noStyle>
+                    {({ getFieldValue }) => {
+                      const type = getFieldValue([...namePrefix, 'steps', name, 'type']);
+                      const width = type === 'base' ? 'calc(100% - 32px)' : 'calc(100% - 82px)';
+                      console.log(name, type);
+                      return (
+                        <>
+                          <Form.Item noStyle {...restField} name={[name, 'type']} hidden>
+                            <div />
+                          </Form.Item>
+                          <Form.Item noStyle {...restField} name={[name, 'value']}>
+                            <InputNumber style={{ width }} disabled={type === 'base'} placeholder={type} />
+                          </Form.Item>
+                          {type === 'base' ? null : (
+                            <Button
+                              style={{ width: 50 }}
+                              icon={<DeleteOutlined />}
+                              onClick={() => {
+                                remove(name);
+                              }}
+                            />
+                          )}
+                        </>
+                      );
                     }}
-                  />
+                  </Form.Item>
                 </Input.Group>
               );
             })}
+            <Button
+              style={{ width: '100%' }}
+              onClick={() => {
+                add(
+                  {
+                    value: 0,
+                    type: '', // 只是为了不让合并默认值的时候被覆盖
+                  },
+                  0,
+                );
+              }}
+            >
+              添加
+            </Button>
           </>
         )}
       </Form.List>
