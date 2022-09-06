@@ -29,7 +29,7 @@ import { debounce } from 'lodash';
 import { ClusterAll } from './operateForm';
 const layout = {
   labelCol: {
-    span: 3,
+    span: 4,
   },
   wrapperCol: {
     span: 20,
@@ -235,9 +235,8 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
       const data = { ...values };
       switch (values.field) {
         case 'enable_time':
-          data.enable_stime = values.enable_time[0].format('HH:mm');
-          data.enable_etime = values.enable_time[1].format('HH:mm');
-          delete data.enable_time;
+          data.enable_stime = values.enable_stime.format('HH:mm');
+          data.enable_etime = values.enable_etime.format('HH:mm');
           break;
         case 'disabled':
           data.disabled = !values.enable_status ? 1 : 0;
@@ -306,7 +305,8 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
             disabled: 0, // 0:立即启用 1:禁用
             enable_status: true, // true:立即启用 false:禁用
             notify_recovered: 1, // 1:启用
-            enable_time: [moment('00:00', 'HH:mm'), moment('23:59', 'HH:mm')],
+            enable_stime: moment('00:00', 'HH:mm'),
+            enable_etime: moment('23:59', 'HH:mm'),
             cluster: clusterList || ['Default'], // 生效集群
             enable_days_of_week: ['1', '2', '3', '4', '5', '6', '0'],
             field: 'cluster',
@@ -654,24 +654,28 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                       <Select mode='tags'>{enableDaysOfWeekOptions}</Select>
                     </Form.Item>
                     <Form.Item
-                      name='enable_time'
-                      {...tailLayout}
+                      name='enable_stime'
+                      label='开始时间'
                       rules={[
                         {
-                          required: false,
-                          message: t('生效时间不能为空'),
+                          required: true,
+                          message: t('开始时间不能为空'),
                         },
                       ]}
                     >
-                      <TimePicker.RangePicker
-                        format='HH:mm'
-                        onChange={(val, val2) => {
-                          form.setFieldsValue({
-                            enable_stime: val2[0],
-                            enable_etime: val2[1],
-                          });
-                        }}
-                      />
+                      <TimePicker format='HH:mm' />
+                    </Form.Item>
+                    <Form.Item
+                      name='enable_etime'
+                      label='结束时间'
+                      rules={[
+                        {
+                          required: true,
+                          message: t('结束时间不能为空'),
+                        },
+                      ]}
+                    >
+                      <TimePicker format='HH:mm' />
                     </Form.Item>
                   </>
                 );

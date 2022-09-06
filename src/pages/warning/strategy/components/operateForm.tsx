@@ -161,8 +161,8 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
       const callbacks = values.callbacks.map((item) => item.url);
       const data = {
         ...values,
-        enable_stime: values.enable_time[0].format('HH:mm'),
-        enable_etime: values.enable_time[1].format('HH:mm'),
+        enable_stime: values.enable_stime.format('HH:mm'),
+        enable_etime: values.enable_etime.format('HH:mm'),
         disabled: !values.enable_status ? 1 : 0,
         notify_recovered: values.notify_recovered ? 1 : 0,
         enable_in_bg: values.enable_in_bg ? 1 : 0,
@@ -219,7 +219,8 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
           ...parseValues(detail),
           cluster: detail.cluster ? detail.cluster.split(' ') : ['$all'], // 生效集群
           enable_in_bg: detail?.enable_in_bg === 1,
-          enable_time: detail?.enable_stime ? [moment(detail.enable_stime, 'HH:mm'), moment(detail.enable_etime, 'HH:mm')] : [moment('00:00', 'HH:mm'), moment('23:59', 'HH:mm')],
+          enable_stime: detail?.enable_stime ? moment(detail.enable_stime, 'HH:mm') : moment('00:00', 'HH:mm'),
+          enable_etime: detail?.enable_etime ? moment(detail.enable_etime, 'HH:mm') : moment('23:59', 'HH:mm'),
           enable_status: detail?.disabled === undefined ? true : !detail?.disabled,
           notify_recovered: detail?.notify_recovered === 1 || detail?.notify_recovered === undefined ? true : false, // 1:启用 0:禁用
           callbacks: !_.isEmpty(detail?.callbacks)
@@ -453,37 +454,45 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
             >
               <Switch />
             </Form.Item>
-            <Form.Item
-              label={t('生效时间')}
-              name='enable_days_of_week'
-              rules={[
-                {
-                  required: true,
-                  message: t('生效时间不能为空'),
-                },
-              ]}
-            >
-              <Select mode='tags'>{enableDaysOfWeekOptions}</Select>
-            </Form.Item>
-            <Form.Item
-              name='enable_time'
-              rules={[
-                {
-                  required: true,
-                  message: t('生效时间不能为空'),
-                },
-              ]}
-            >
-              <TimePicker.RangePicker
-                format='HH:mm'
-                onChange={(val, val2) => {
-                  form.setFieldsValue({
-                    enable_stime: val2[0],
-                    enable_etime: val2[1],
-                  });
-                }}
-              />
-            </Form.Item>
+
+            <Space>
+              <Form.Item
+                label={t('生效时间')}
+                name='enable_days_of_week'
+                rules={[
+                  {
+                    required: true,
+                    message: t('生效时间不能为空'),
+                  },
+                ]}
+              >
+                <Select mode='tags'>{enableDaysOfWeekOptions}</Select>
+              </Form.Item>
+              <Form.Item
+                name='enable_stime'
+                label='开始时间'
+                rules={[
+                  {
+                    required: true,
+                    message: t('开始时间不能为空'),
+                  },
+                ]}
+              >
+                <TimePicker format='HH:mm' />
+              </Form.Item>
+              <Form.Item
+                name='enable_etime'
+                label='结束时间'
+                rules={[
+                  {
+                    required: true,
+                    message: t('结束时间不能为空'),
+                  },
+                ]}
+              >
+                <TimePicker format='HH:mm' />
+              </Form.Item>
+            </Space>
             <Form.Item shouldUpdate={(prevValues, curValues) => prevValues.cate !== curValues.cate} noStyle>
               {({ getFieldValue }) => {
                 if (getFieldValue('cate') === 'prometheus') {
