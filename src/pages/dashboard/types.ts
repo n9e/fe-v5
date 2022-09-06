@@ -132,6 +132,7 @@ export interface ITableStyles {
 
 export interface IHexbinStyles {
   version: string;
+  textMode: 'valueAndName' | 'name' | 'value';
   calc: string;
   colorRange: string[]; // 三个颜色值
   colorDomainAuto: boolean;

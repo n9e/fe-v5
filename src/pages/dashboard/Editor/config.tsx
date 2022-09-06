@@ -151,6 +151,7 @@ export const defaultCustomValuesMap = {
     displayMode: 'seriesToRows',
   },
   hexbin: {
+    textMode: 'valueAndName',
     calc: 'lastNotNull',
     colorRange: _.join(colors[0].value, ','),
     colorDomainAuto: true,

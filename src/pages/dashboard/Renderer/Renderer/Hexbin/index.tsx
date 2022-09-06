@@ -34,7 +34,7 @@ interface HoneyCombProps {
 const Hexbin: FunctionComponent<HoneyCombProps> = (props) => {
   const { values, series, themeMode } = props;
   const { custom = {}, options } = values;
-  const { calc, colorRange = [], reverseColorOrder = false, colorDomainAuto, colorDomain } = custom as IHexbinStyles;
+  const { calc, colorRange = [], reverseColorOrder = false, colorDomainAuto, colorDomain, textMode = 'valueAndName' } = custom as IHexbinStyles;
   const groupEl = useRef<SVGGElement>(null);
   const svgEl = useRef<HTMLDivElement>(null);
   const svgSize = useSize(svgEl);
@@ -61,6 +61,7 @@ const Hexbin: FunctionComponent<HoneyCombProps> = (props) => {
         height: svgSize?.height,
         parentGroupEl: groupEl.current,
         themeMode,
+        textMode,
       };
       const data = _.map(calculatedValues, (item) => {
         return {

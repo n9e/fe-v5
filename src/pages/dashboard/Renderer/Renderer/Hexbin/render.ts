@@ -54,7 +54,7 @@ const div = select('body')
   .attr('class', 'hexbin-tooltip')
   .style('opacity', 0);
 
-function renderHoneyComb(svgGroup, data, { width, height, fontAutoScale = true, fontSize = 12, themeMode }) {
+function renderHoneyComb(svgGroup, data, { width, height, fontAutoScale = true, fontSize = 12, themeMode, textMode }) {
   const t = transition().duration(750);
   const { columns: mapColumns, rows: mapRows } = getMapColumnsAndRows(width, height, data.length);
   const hexRadius = Math.floor(min([width / ((mapColumns + 0.5) * Math.sqrt(3)), height / ((mapRows + 1 / 3) * 1.5), width / 7]));
@@ -118,6 +118,7 @@ function renderHoneyComb(svgGroup, data, { width, height, fontAutoScale = true, 
 
   const hexagons = svgGroup.selectAll('.hexagon').data(hexbinPoints);
 
+  // 六边形
   hexagons
     .enter()
     .append(function () {
@@ -160,56 +161,62 @@ function renderHoneyComb(svgGroup, data, { width, height, fontAutoScale = true, 
       return 'M' + d.x + ',' + d.y + hexbin.hexagon([hexRadius - 3]);
     });
 
-  hexagons
-    .enter()
-    .append('text')
-    .attr('x', function (d) {
-      return d.x;
-    })
-    .attr('y', function (d) {
-      return d.y + labelWithValueTextAlignment;
-    })
-    .text(function (_d, i) {
-      let name = data[i]?.name;
-      if (isShowEllipses) {
-        name = name.substring(0, numOfChars) + '...';
+  if (textMode === 'valueAndName' || textMode === 'name') {
+    // 指标名
+    hexagons
+      .enter()
+      .append('text')
+      .attr('x', function (d) {
+        return d.x;
+      })
+      .attr('y', function (d) {
+        return d.y + (textMode === 'valueAndName' ? labelWithValueTextAlignment : 0);
+      })
+      .text(function (_d, i) {
+        let name = data[i]?.name;
+        if (isShowEllipses) {
+          name = name.substring(0, numOfChars) + '...';
+          return name;
+        }
         return name;
-      }
-      return name;
-    })
-    .attr('text-anchor', 'middle')
-    .attr('alignment-baseline', 'central')
-    .style('pointer-events', 'none')
-    .style('font-size', activeLabelFontSize + 'px')
-    .style('fill', 'black')
-    .each(function (this, d) {
-      d.bbox = this.getBBox();
-    });
+      })
+      .attr('text-anchor', 'middle')
+      .attr('alignment-baseline', 'central')
+      .style('pointer-events', 'none')
+      .style('font-size', activeLabelFontSize + 'px')
+      .style('fill', 'black')
+      .each(function (this, d) {
+        d.bbox = this.getBBox();
+      });
+  }
 
-  hexagons
-    .enter()
-    .append('text')
-    .attr('x', function (d) {
-      return d.x;
-    })
-    .attr('y', function (d) {
-      return d.y + valueWithLabelTextAlignment;
-    })
-    .text(function (_d, i) {
-      const value = data[i]?.value;
-      return value;
-    })
-    .attr('text-anchor', 'middle')
-    .attr('alignment-baseline', 'central')
-    .style('font-size', activeValueFontSize + 'px')
-    .style('fill', 'black')
-    .style('pointer-events', 'none')
-    .each(function (this, d) {
-      d.bbox = this.getBBox();
-    });
+  if (textMode === 'valueAndName' || textMode === 'value') {
+    // 指标值
+    hexagons
+      .enter()
+      .append('text')
+      .attr('x', function (d) {
+        return d.x;
+      })
+      .attr('y', function (d) {
+        return d.y + (textMode === 'valueAndName' ? valueWithLabelTextAlignment : 0);
+      })
+      .text(function (_d, i) {
+        const value = data[i]?.value;
+        return value;
+      })
+      .attr('text-anchor', 'middle')
+      .attr('alignment-baseline', 'central')
+      .style('font-size', activeValueFontSize + 'px')
+      .style('fill', 'black')
+      .style('pointer-events', 'none')
+      .each(function (this, d) {
+        d.bbox = this.getBBox();
+      });
+  }
 }
 
-export function renderFn(data, { width, height, parentGroupEl, themeMode }) {
+export function renderFn(data, { width, height, parentGroupEl, themeMode, textMode }) {
   const parentGroup = select(parentGroupEl).attr('width', width).attr('height', height);
   const countPerRow = bestFitElemCountPerRow(1, width, height);
   const unitWidth = Math.floor(width / countPerRow);
@@ -220,5 +227,6 @@ export function renderFn(data, { width, height, parentGroupEl, themeMode }) {
     width: unitWidth,
     height: unitHeight,
     themeMode,
+    textMode,
   });
 }
