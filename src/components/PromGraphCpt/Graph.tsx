@@ -40,6 +40,7 @@ interface IProps {
   graphOperates: {
     enabled: boolean;
   };
+  refreshFlag: string;
 }
 
 enum ChartType {
@@ -59,7 +60,7 @@ const getSerieName = (metric: any) => {
 };
 
 export default function Graph(props: IProps) {
-  const { url, datasourceId, datasourceIdRequired, promql, setQueryStats, setErrorContent, contentMaxHeight, range, setRange, step, setStep, graphOperates } = props;
+  const { url, datasourceId, datasourceIdRequired, promql, setQueryStats, setErrorContent, contentMaxHeight, range, setRange, step, setStep, graphOperates, refreshFlag } = props;
   const [data, setData] = useState([]);
   const [highLevelConfig, setHighLevelConfig] = useState({
     shared: true,
@@ -132,7 +133,7 @@ export default function Graph(props: IProps) {
           setErrorContent(`Error executing query: ${msg}`);
         });
     }
-  }, [JSON.stringify(range), step, datasourceId, promql]);
+  }, [JSON.stringify(range), step, datasourceId, promql, refreshFlag]);
 
   return (
     <div className='prom-graph-graph-container'>
