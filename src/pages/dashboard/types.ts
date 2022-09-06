@@ -103,6 +103,10 @@ export interface ITimeseriesStyles {
   lineInterpolation: 'linear' | 'smooth';
   fillOpacity: number;
   stack: 'off' | 'noraml'; // off 关闭；normal 开启，此结构未后期其他模式预留
+  scaleDistribution: {
+    type: 'linear' | 'log';
+    log?: 10 | 2;
+  };
 }
 
 export interface IStatStyles {

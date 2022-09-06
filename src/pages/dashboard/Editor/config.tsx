@@ -125,6 +125,9 @@ export const defaultCustomValuesMap = {
     fillOpacity: 0.5,
     gradientMode: 'none',
     stack: 'off',
+    scaleDistribution: {
+      type: 'linear',
+    },
   },
   stat: {
     textMode: 'valueAndName',
