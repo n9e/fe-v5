@@ -53,7 +53,11 @@ export const getSerieTextObj = (value: number | string | null | undefined, stand
       return false;
     }
   });
-  let matchedThresholdsColor = statHexPalette[0];
+  let matchedThresholdsColor;
+  if (thresholds?.steps) {
+    const baseColor = _.get(_.find(thresholds?.steps, { type: 'base' }), 'color');
+    matchedThresholdsColor = baseColor;
+  }
   _.forEach(thresholds?.steps, (item) => {
     if (item.value && value) {
       value = _.toNumber(value) as number;
