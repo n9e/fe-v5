@@ -39,7 +39,6 @@ export default function index() {
                     {({ getFieldValue }) => {
                       const type = getFieldValue([...namePrefix, 'steps', name, 'type']);
                       const width = type === 'base' ? 'calc(100% - 32px)' : 'calc(100% - 82px)';
-                      console.log(name, type);
                       return (
                         <>
                           <Form.Item noStyle {...restField} name={[name, 'type']} hidden>

@@ -36,14 +36,14 @@ interface IProps {
 const UNIT_SIZE = 12;
 const MIN_SIZE = 12;
 const UNIT_PADDING = 4;
-const getTextColor = (color, colorMode, isFullSizeBackground, themeMode) => {
+const getTextColor = (color, colorMode) => {
   return colorMode === 'value' ? color : '#fff';
 };
 
 function StatItem(props) {
   const ele = useRef(null);
   const eleSize = useSize(ele);
-  const { item, idx, colSpan, textMode, colorMode, textSize, isFullSizeBackground, themeMode, valueField = 'Value' } = props;
+  const { item, colSpan, textMode, colorMode, textSize, isFullSizeBackground, valueField = 'Value' } = props;
   const headerFontSize = textSize?.title ? textSize?.title : eleSize?.width! / _.toString(item.name).length || MIN_SIZE;
   let statFontSize = textSize?.value ? textSize?.value : (eleSize?.width! - item.unit.length * UNIT_SIZE - UNIT_PADDING) / _.toString(item.value).length || MIN_SIZE;
   const color = item.color;
@@ -78,7 +78,7 @@ function StatItem(props) {
         <div
           className='renderer-stat-value'
           style={{
-            color: getTextColor(color, colorMode, isFullSizeBackground, themeMode),
+            color: getTextColor(color, colorMode),
             fontSize: statFontSize > 100 ? 100 : statFontSize,
           }}
         >
@@ -133,16 +133,21 @@ export default function Stat(props: IProps) {
         payload: getColumnsKeys(calculatedValues),
       });
     }
-    if (calculatedValues.length === 1 && colorMode === 'background' && containerRef.current) {
-      const head = _.head(calculatedValues);
-      const color = head.color ? head.color : statHexPalette[0];
-      const colorObject = d3.color(color);
-      containerRef.current.style.border = `1px solid ${colorObject + ''}`;
-      containerRef.current.style.backgroundColor = colorObject + '';
-      containerRef.current.style.color = '#fff';
-      setIsFullSizeBackground(true);
-    } else {
-      setIsFullSizeBackground(false);
+    if (containerRef.current) {
+      if (calculatedValues.length === 1 && colorMode === 'background') {
+        const head = _.head(calculatedValues);
+        const color = head.color ? head.color : statHexPalette[0];
+        const colorObject = d3.color(color);
+        containerRef.current.style.border = `1px solid ${colorObject + ''}`;
+        containerRef.current.style.backgroundColor = colorObject + '';
+        containerRef.current.style.color = '#fff';
+        setIsFullSizeBackground(true);
+      } else {
+        containerRef.current.style.border = `0 none`;
+        containerRef.current.style.backgroundColor = 'unset';
+        containerRef.current.style.color = 'unset';
+        setIsFullSizeBackground(false);
+      }
     }
   }, [JSON.stringify(calculatedValues), colorMode]);
 
