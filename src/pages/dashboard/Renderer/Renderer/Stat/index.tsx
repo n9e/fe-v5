@@ -27,7 +27,7 @@ import './style.less';
 interface IProps {
   values: IPanel;
   series: any[];
-  containerRef: {
+  bodyWrapRef: {
     current: HTMLDivElement | null;
   };
   themeMode?: 'dark';
@@ -109,7 +109,7 @@ const getColumnsKeys = (data: any[]) => {
 
 export default function Stat(props: IProps) {
   const { dispatch } = useContext(DetailContext);
-  const { values, series, containerRef, themeMode } = props;
+  const { values, series, bodyWrapRef } = props;
   const { custom, options } = values;
   const { calc, textMode, colorMode, colSpan, textSize, valueField } = custom;
   const calculatedValues = getCalculatedValuesBySeries(
@@ -133,19 +133,19 @@ export default function Stat(props: IProps) {
         payload: getColumnsKeys(calculatedValues),
       });
     }
-    if (containerRef.current) {
+    if (bodyWrapRef.current) {
       if (calculatedValues.length === 1 && colorMode === 'background') {
         const head = _.head(calculatedValues);
         const color = head.color ? head.color : statHexPalette[0];
         const colorObject = d3.color(color);
-        containerRef.current.style.border = `1px solid ${colorObject + ''}`;
-        containerRef.current.style.backgroundColor = colorObject + '';
-        containerRef.current.style.color = '#fff';
+        bodyWrapRef.current.style.border = `1px solid ${colorObject + ''}`;
+        bodyWrapRef.current.style.backgroundColor = colorObject + '';
+        bodyWrapRef.current.style.color = '#fff';
         setIsFullSizeBackground(true);
       } else {
-        containerRef.current.style.border = `0 none`;
-        containerRef.current.style.backgroundColor = 'unset';
-        containerRef.current.style.color = 'unset';
+        bodyWrapRef.current.style.border = `0 none`;
+        bodyWrapRef.current.style.backgroundColor = 'unset';
+        bodyWrapRef.current.style.color = 'unset';
         setIsFullSizeBackground(false);
       }
     }
@@ -165,7 +165,6 @@ export default function Stat(props: IProps) {
               colorMode={colorMode}
               textSize={textSize}
               isFullSizeBackground={isFullSizeBackground}
-              themeMode={themeMode}
               valueField={valueField}
             />
           );
