@@ -36,3 +36,18 @@ export const deleteShields = function (data: {ids: number[]}, busiId: number) {
     data
   });
 };
+
+export const editShield = function (data: any[], busiId: number, shiedId: number) {
+  return request(`/api/n9e/busi-group/${busiId}/alert-mute/${shiedId}`, {
+    method: RequestMethod.Put,
+    data: data,
+  });
+};
+
+export const updateShields = function (data: { ids: React.Key[]; fields: any }, busiId: number) {
+  return request(`/api/n9e/busi-group/${busiId}/alert-mutes/fields`, {
+    method: RequestMethod.Put,
+    data: data,
+  });
+};
+
