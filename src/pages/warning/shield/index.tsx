@@ -15,26 +15,27 @@
  *
  */
 import React, { useState, useEffect } from 'react';
-import PageLayout from '@/components/pageLayout';
-import {Button, Input, Table, Tooltip, Tag, message, Modal, Switch} from 'antd';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '@/store/common';
-import {getShieldList, deleteShields, updateShields} from '@/services/shield';
-import { CloseCircleOutlined, ExclamationCircleOutlined, SearchOutlined } from '@ant-design/icons';
-import {Link, useHistory} from 'react-router-dom';
-import { CommonStoreState } from '@/store/commonInterface';
-import {shieldItem, strategyStatus} from '@/store/warningInterface';
+import { Button, Input, Table, Tooltip, message, Modal, Switch } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
+import { CloseCircleOutlined, ExclamationCircleOutlined, SearchOutlined } from '@ant-design/icons';
+import { useSelector, useDispatch } from 'react-redux';
 import dayjs from 'dayjs';
+import { useTranslation } from 'react-i18next';
+import { useHistory } from 'react-router-dom';
+import PageLayout from '@/components/pageLayout';
+import { RootState } from '@/store/common';
+import { getShieldList, deleteShields, updateShields } from '@/services/shield';
+import { CommonStoreState } from '@/store/commonInterface';
+import { shieldItem, strategyStatus } from '@/store/warningInterface';
 import LeftTree from '@/components/LeftTree';
 import RefreshIcon from '@/components/RefreshIcon';
 import BlankBusinessPlaceholder from '@/components/BlankBusinessPlaceholder';
+import ColumnSelect from '@/components/ColumnSelect';
+import ColorTag from '@/components/ColorTag';
 import { pageSizeOptionsDefault } from '../const';
 import './index.less';
-import ColorTag from '@/components/ColorTag';
-import { useTranslation } from 'react-i18next';
+
 const { confirm } = Modal;
-import ColumnSelect from '@/components/ColumnSelect';
 
 const Shield: React.FC = () => {
   const { t } = useTranslation();
@@ -65,17 +66,20 @@ const Shield: React.FC = () => {
     {
       title: t('规则备注'),
       dataIndex: 'note',
-      render: (data, mute) => {
+      render: (data, record: any) => {
         return (
-            <div
-                className='table-active-text'
-                onClick={() => {
-                  // @ts-ignore
-                  handleClickEdit(mute.id);
-                }}
-            >
-              {data}
-            </div>
+          <div
+            className='table-active-text'
+            onClick={() => {
+              dispatch({
+                type: 'shield/setCurShieldData',
+                data: record,
+              });
+              handleClickEdit(record.id);
+            }}
+          >
+            {data}
+          </div>
         );
       },
     },
@@ -88,8 +92,6 @@ const Shield: React.FC = () => {
             {text
               ? text.map((tag, index) => {
                   return tag ? (
-                    // <ColorTag text={`${tag.key} ${tag.func} ${tag.func === 'in' ? tag.value.split(' ').join(', ') : tag.value}`} key={index}>
-                    // </ColorTag>
                     <div key={index} style={{ lineHeight: '16px' }}>{`${tag.key} ${tag.func} ${tag.func === 'in' ? tag.value.split(' ').join(', ') : tag.value}`}</div>
                   ) : null;
                 })
@@ -143,32 +145,27 @@ const Shield: React.FC = () => {
       title: t('启用'),
       dataIndex: 'disabled',
       render: (disabled, record) => (
-          <Switch
-              checked={disabled === strategyStatus.Enable}
-              size='small'
-              onChange={() => {
-                // @ts-ignore
-                const { id, disabled } = record;
-                updateShields(
-                    {
-                      ids: [id],
-                      fields: {
-                        disabled: !disabled ? 1 : 0,
-                      },
-                    },
-                    curBusiItem.id,
-                ).then(() => {
-                  refreshList();
-                });
-              }}
-          />
+        <Switch
+          checked={disabled === strategyStatus.Enable}
+          size='small'
+          onChange={() => {
+            // @ts-ignore
+            const { id, disabled } = record;
+            updateShields(
+              {
+                ids: [id],
+                fields: {
+                  disabled: !disabled ? 1 : 0,
+                },
+              },
+              curBusiItem.id,
+            ).then(() => {
+              refreshList();
+            });
+          }}
+        />
       ),
     },
-    // {
-    //   title: t('创建人'),
-    //   ellipsis: true,
-    //   dataIndex: 'create_by',
-    // },
     {
       title: t('操作'),
       width: '98px',
@@ -287,7 +284,6 @@ const Shield: React.FC = () => {
       <div className='shield-content'>
         <LeftTree
           busiGroup={{
-            // showNotGroupItem: true,
             onChange: busiChange,
           }}
         ></LeftTree>
@@ -319,7 +315,6 @@ const Shield: React.FC = () => {
             </div>
             <Table
               rowKey='id'
-              // sticky
               pagination={{
                 total: currentShieldData.length,
                 showQuickJumper: true,

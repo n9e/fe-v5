@@ -22,7 +22,7 @@ import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import _ from 'lodash';
 import moment from 'moment';
-import {addShield, editShield} from '@/services/shield';
+import { addShield, editShield } from '@/services/shield';
 import { getBusiGroups } from '@/services/common';
 import { shieldItem } from '@/store/warningInterface';
 import { RootState } from '@/store/common';
@@ -160,7 +160,6 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) 
         history.push('/alert-mutes');
       });
     }
-
   };
   const timeLenChange = (val: string) => {
     setTimeLen(val);
@@ -225,14 +224,14 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) 
     >
       <Card>
         <Form.Item
-            label={t('规则备注：')}
-            name='note'
-            rules={[
-              {
-                required: true,
-                message: t('规则备注不能为空'),
-              },
-            ]}
+          label={t('规则备注：')}
+          name='note'
+          rules={[
+            {
+              required: true,
+              message: t('规则备注不能为空'),
+            },
+          ]}
         >
           <Input placeholder={t('请输入规则备注')} />
         </Form.Item>
@@ -318,7 +317,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) 
         <Form.Item {...tailLayout}>
           <Space>
             <Button type='primary' htmlType='submit'>
-              {type === 1 ? t('编辑') : type===2? t('克隆'):t('创建')}
+              {type === 1 ? t('编辑') : type === 2 ? t('克隆') : t('创建')}
             </Button>
             <Button onClick={() => window.history.back()}>{t('取消')}</Button>
           </Space>
