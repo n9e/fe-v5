@@ -86,7 +86,7 @@ export default function index({ chartForm }) {
       </AdvancedWrap>
       <Form.Item shouldUpdate={(prev, curr) => prev.datasourceCate !== curr.datasourceCate} noStyle>
         {({ getFieldValue }) => {
-          const cate = getFieldValue('datasourceCate');
+          const cate = getFieldValue('datasourceCate') || 'prometheus';
           if (cate === 'prometheus') {
             return <Prometheus chartForm={chartForm} />;
           }
