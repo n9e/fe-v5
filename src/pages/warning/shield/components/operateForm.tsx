@@ -22,7 +22,7 @@ import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import _ from 'lodash';
 import moment from 'moment';
-import { addShield } from '@/services/shield';
+import { addShield, editShield } from '@/services/shield';
 import { getBusiGroups } from '@/services/common';
 import { shieldItem } from '@/store/warningInterface';
 import { RootState } from '@/store/common';
@@ -44,7 +44,7 @@ interface ItagsObj {
 interface Props {
   detail?: shieldItem;
   tagsObj?: ItagsObj;
-  type?: number; // 1:创建; 2:克隆
+  type?: number; // 1:创建; 2:克隆 3:编辑
 }
 
 const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) => {
@@ -149,10 +149,17 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) 
       tags,
     };
     const curBusiItemId = form.getFieldValue('busiGroup');
-    addShield(params, curBusiItemId).then((_) => {
-      message.success(t('新建告警屏蔽成功'));
-      history.push('/alert-mutes');
-    });
+    if (type == 1) {
+      editShield(params, curBusiItemId, detail.id).then((_) => {
+        message.success(t('编辑告警屏蔽成功'));
+        history.push('/alert-mutes');
+      });
+    } else {
+      addShield(params, curBusiItemId).then((_) => {
+        message.success(t('新建告警屏蔽成功'));
+        history.push('/alert-mutes');
+      });
+    }
   };
   const timeLenChange = (val: string) => {
     setTimeLen(val);
@@ -216,6 +223,19 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) 
       }}
     >
       <Card>
+        <Form.Item
+          label={t('规则备注：')}
+          name='note'
+          rules={[
+            {
+              required: true,
+              message: t('规则备注不能为空'),
+            },
+          ]}
+        >
+          <Input placeholder={t('请输入规则备注')} />
+        </Form.Item>
+
         <Form.Item label={t('业务组：')} name='busiGroup'>
           <Select showSearch filterOption={false} suffixIcon={<CaretDownOutlined />} onSearch={debounceFetcher} notFoundContent={fetching ? <Spin size='small' /> : null}>
             {_.map(filteredBusiGroups, (item) => (
@@ -297,7 +317,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) 
         <Form.Item {...tailLayout}>
           <Space>
             <Button type='primary' htmlType='submit'>
-              {type === 2 ? t('克隆') : t('创建')}
+              {type === 1 ? t('编辑') : type === 2 ? t('克隆') : t('创建')}
             </Button>
             <Button onClick={() => window.history.back()}>{t('取消')}</Button>
           </Space>
