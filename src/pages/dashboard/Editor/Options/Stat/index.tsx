@@ -18,6 +18,7 @@ import React from 'react';
 import GraphStyles from './GraphStyles';
 import StandardOptions from '../../Fields/StandardOptions';
 import ValueMappings from '../../Fields/ValueMappings';
+import Thresholds from '../../Fields/Thresholds';
 
 export default function Timeseries() {
   return (
@@ -25,6 +26,7 @@ export default function Timeseries() {
       <GraphStyles />
       <ValueMappings />
       <StandardOptions />
+      <Thresholds />
     </>
   );
 }

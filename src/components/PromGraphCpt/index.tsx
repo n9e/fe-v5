@@ -206,6 +206,7 @@ export default function index(props: IProps) {
             step={step}
             setStep={setStep}
             graphOperates={graphOperates}
+            refreshFlag={refreshFlag}
           />
         </TabPane>
       </Tabs>

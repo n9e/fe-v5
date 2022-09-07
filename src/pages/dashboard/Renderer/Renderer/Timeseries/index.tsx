@@ -44,7 +44,7 @@ interface IProps {
 export default function index(props: IProps) {
   const { time, values, series, inDashboard = true, chartHeight = '200px', tableHeight = '200px', themeMode = '', onClick } = props;
   const { custom, options = {} } = values;
-  const { lineWidth = 1, gradientMode = 'none' } = custom;
+  const { lineWidth = 1, gradientMode = 'none', scaleDistribution } = custom;
   const [seriesData, setSeriesData] = useState(series);
   const [activeLegend, setActiveLegend] = useState('');
   const chartEleRef = useRef<HTMLDivElement>(null);
@@ -172,12 +172,18 @@ export default function index(props: IProps) {
           ...chartRef.current.options.yAxis,
           min: options?.standardOptions?.min,
           max: options?.standardOptions?.max,
-          plotLines: _.map(options?.thresholds?.steps, (item) => {
-            return {
-              ...item,
-              shadowColor: themeMode === 'dark' ? 'rgba(255,255,255,0.2)' : '#fff',
-            };
-          }),
+          scale: scaleDistribution,
+          plotLines: _.map(
+            _.filter(options?.thresholds?.steps, (item) => {
+              return item.value !== null; // 过滤掉 base 值
+            }),
+            (item) => {
+              return {
+                ...item,
+                shadowColor: themeMode === 'dark' ? 'rgba(255,255,255,0.2)' : '#fff',
+              };
+            },
+          ),
           backgroundColor: themeMode === 'dark' ? '#2A2D3C' : '#fff',
           gridLineColor: themeMode === 'dark' ? 'rgba(255,255,255,0.05)' : '#efefef',
           tickValueFormatter: (val) => {
