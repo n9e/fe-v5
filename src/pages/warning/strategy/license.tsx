@@ -20,7 +20,7 @@ export default function License() {
     });
   }, []);
   if (!days) return null;
-  if (!visible) return null;
+  if (!visible || days>30) return null;
   return (
     <div style={{ marginRight: 20 }}>
       <Tooltip
