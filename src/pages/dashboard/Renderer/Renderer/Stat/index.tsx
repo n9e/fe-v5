@@ -27,7 +27,7 @@ import './style.less';
 interface IProps {
   values: IPanel;
   series: any[];
-  containerRef: {
+  bodyWrapRef: {
     current: HTMLDivElement | null;
   };
   themeMode?: 'dark';
@@ -36,17 +36,17 @@ interface IProps {
 const UNIT_SIZE = 12;
 const MIN_SIZE = 12;
 const UNIT_PADDING = 4;
-const getTextColor = (color, colorMode, isFullSizeBackground, themeMode) => {
+const getTextColor = (color, colorMode) => {
   return colorMode === 'value' ? color : '#fff';
 };
 
 function StatItem(props) {
   const ele = useRef(null);
   const eleSize = useSize(ele);
-  const { item, idx, colSpan, textMode, colorMode, textSize, isFullSizeBackground, themeMode, valueField = 'Value' } = props;
+  const { item, colSpan, textMode, colorMode, textSize, isFullSizeBackground, valueField = 'Value' } = props;
   const headerFontSize = textSize?.title ? textSize?.title : eleSize?.width! / _.toString(item.name).length || MIN_SIZE;
   let statFontSize = textSize?.value ? textSize?.value : (eleSize?.width! - item.unit.length * UNIT_SIZE - UNIT_PADDING) / _.toString(item.value).length || MIN_SIZE;
-  const color = item.color ? item.color : statHexPalette[idx % statHexPalette.length];
+  const color = item.color;
   const backgroundColor = colorMode === 'background' ? color : 'transparent';
 
   if (statFontSize > eleSize?.height! - 20) {
@@ -78,7 +78,7 @@ function StatItem(props) {
         <div
           className='renderer-stat-value'
           style={{
-            color: getTextColor(color, colorMode, isFullSizeBackground, themeMode),
+            color: getTextColor(color, colorMode),
             fontSize: statFontSize > 100 ? 100 : statFontSize,
           }}
         >
@@ -109,7 +109,7 @@ const getColumnsKeys = (data: any[]) => {
 
 export default function Stat(props: IProps) {
   const { dispatch } = useContext(DetailContext);
-  const { values, series, containerRef, themeMode } = props;
+  const { values, series, bodyWrapRef } = props;
   const { custom, options } = values;
   const { calc, textMode, colorMode, colSpan, textSize, valueField } = custom;
   const calculatedValues = getCalculatedValuesBySeries(
@@ -121,6 +121,7 @@ export default function Stat(props: IProps) {
       dateFormat: options?.standardOptions?.dateFormat,
     },
     options?.valueMappings,
+    options?.thresholds,
   );
   const [isFullSizeBackground, setIsFullSizeBackground] = useState(false);
 
@@ -132,16 +133,21 @@ export default function Stat(props: IProps) {
         payload: getColumnsKeys(calculatedValues),
       });
     }
-    if (calculatedValues.length === 1 && colorMode === 'background' && containerRef.current) {
-      const head = _.head(calculatedValues);
-      const color = head.color ? head.color : statHexPalette[0];
-      const colorObject = d3.color(color);
-      containerRef.current.style.border = `1px solid ${colorObject + ''}`;
-      containerRef.current.style.backgroundColor = colorObject + '';
-      containerRef.current.style.color = '#fff';
-      setIsFullSizeBackground(true);
-    } else {
-      setIsFullSizeBackground(false);
+    if (bodyWrapRef.current) {
+      if (calculatedValues.length === 1 && colorMode === 'background') {
+        const head = _.head(calculatedValues);
+        const color = head.color ? head.color : statHexPalette[0];
+        const colorObject = d3.color(color);
+        bodyWrapRef.current.style.border = `1px solid ${colorObject + ''}`;
+        bodyWrapRef.current.style.backgroundColor = colorObject + '';
+        bodyWrapRef.current.style.color = '#fff';
+        setIsFullSizeBackground(true);
+      } else {
+        bodyWrapRef.current.style.border = `0 none`;
+        bodyWrapRef.current.style.backgroundColor = 'unset';
+        bodyWrapRef.current.style.color = 'unset';
+        setIsFullSizeBackground(false);
+      }
     }
   }, [JSON.stringify(calculatedValues), colorMode]);
 
@@ -159,7 +165,6 @@ export default function Stat(props: IProps) {
               colorMode={colorMode}
               textSize={textSize}
               isFullSizeBackground={isFullSizeBackground}
-              themeMode={themeMode}
               valueField={valueField}
             />
           );

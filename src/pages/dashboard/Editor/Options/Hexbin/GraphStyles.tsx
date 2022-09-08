@@ -32,24 +32,17 @@ export default function GraphStyles() {
   return (
     <Panel header='图表样式'>
       <>
-        {/* <Row gutter={10}>
+        <Row gutter={10}>
           <Col span={12}>
             <Form.Item label='显示内容' name={[...namePrefix, 'textMode']}>
               <Radio.Group buttonStyle='solid'>
                 <Radio.Button value='valueAndName'>名称和值</Radio.Button>
+                <Radio.Button value='name'>名称</Radio.Button>
                 <Radio.Button value='value'>值</Radio.Button>
               </Radio.Group>
             </Form.Item>
           </Col>
-          <Col span={12}>
-            <Form.Item label='颜色模式' name={[...namePrefix, 'colorMode']}>
-              <Radio.Group buttonStyle='solid'>
-                <Radio.Button value='value'>值</Radio.Button>
-                <Radio.Button value='background'>背景</Radio.Button>
-              </Radio.Group>
-            </Form.Item>
-          </Col>
-        </Row> */}
+        </Row>
         <Row gutter={10}>
           <Col span={10}>
             <Form.Item label='取值计算' name={[...namePrefix, 'calc']}>

@@ -43,8 +43,8 @@ export function getStepByTimeAndStep(time: IRawTimeRange, step: number | null) {
 function convertVariablesGrafanaToN9E(templates: any) {
   return _.chain(templates.list)
     .filter((item) => {
-      // 2.0.0 版本只支持 query / custom / textbox 类型的变量
-      return item.type === 'query' || item.type === 'custom' || item.type === 'textbox';
+      // 2.0.0 版本只支持 query / custom / textbox / constant 类型的变量
+      return item.type === 'query' || item.type === 'custom' || item.type === 'textbox' || item.type === 'constant';
     })
     .map((item) => {
       if (item.type === 'query') {
@@ -52,17 +52,24 @@ function convertVariablesGrafanaToN9E(templates: any) {
           type: 'query',
           name: item.name,
           definition: item.definition || _.get(item, 'query.query'),
+          allValue: item.allValue,
           allOption: item.includeAll,
           multi: item.multi,
         };
       } else if (item.type === 'custom') {
         return {
-          type: 'query',
+          type: 'custom',
           name: item.name,
-          definition: item.query,
+          default: item.query,
           allValue: item.allValue,
           allOption: item.includeAll,
           multi: item.multi,
+        };
+      } else if (item.type === 'constant') {
+        return {
+          type: 'constant',
+          name: item.name,
+          definition: item.query,
         };
       }
       return {
@@ -113,10 +120,8 @@ function convertOptionsGrafanaToN9E(panel: any) {
     valueMappings: config?.mappings, // TODO: 待验证
     thresholds: {
       mode: config.thresholds?.mode, // mode 目前是不支持的
-      style: 'line', // 目前只有固定的 line 风格，但是这个只用于折线图
-      steps: _.filter(config.thresholds?.steps, (item) => {
-        return item.value !== null;
-      }),
+      style: config.custom?.thresholdsStyle?.mode || 'line', // 目前只有固定的 line 风格，但是这个只用于折线图
+      steps: config.thresholds?.steps,
     },
     standardOptions: {
       util: unitMap[config.unit] ? unitMap[config.unit] : 'none',

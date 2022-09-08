@@ -24,7 +24,10 @@ import './index.less';
 const AddShield: React.FC = () => {
   const { t } = useTranslation();
   const location = useLocation();
-  const [tags, setTags] = useState<any>(location.state);
+  let tags: any = location.state || {};
+  if (tags) {
+    tags.cate = tags.cate || 'prometheus';
+  }
 
   return (
     <PageLayout title={t('告警屏蔽')} showBack hideCluster>

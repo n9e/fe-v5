@@ -105,7 +105,7 @@ export default function Stat(props: IProps) {
       sorter: (a, b) => {
         return a.stat - b.stat;
       },
-      sortOrder: getSortOrder('value', sortObj),
+      sortOrder: getSortOrder('text', sortObj),
       className: 'renderer-table-td-content-value-container',
       render: (text, record) => {
         let textObj = {
@@ -206,7 +206,7 @@ export default function Stat(props: IProps) {
         sorter: (a, b) => {
           return _.get(a[name], 'stat') - _.get(b[name], 'stat');
         },
-        sortOrder: getSortOrder('value', sortObj),
+        sortOrder: getSortOrder(name, sortObj),
         className: 'renderer-table-td-content-value-container',
         render: (text) => {
           let textObj = {

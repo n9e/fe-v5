@@ -31,7 +31,7 @@ import Text from './Text';
 import { IVariable } from '../../VariableConfig/definition';
 import { replaceExpressionVars } from '../../VariableConfig/constant';
 import Markdown from '../../Editor/Components/Markdown';
-import usePrometheus from '../datasource/usePrometheus';
+import useQuery from '../datasource/useQuery';
 import { IPanel } from '../../types';
 import { getStepByTimeAndStep } from '../../utils';
 import './style.less';
@@ -65,8 +65,9 @@ function index(props: IProps) {
   const [visible, setVisible] = useState(false);
   const values = _.cloneDeep(props.values);
   const ref = useRef<HTMLDivElement>(null);
+  const bodyWrapRef = useRef<HTMLDivElement>(null);
   const [inViewPort] = useInViewport(ref);
-  const { series, loading } = usePrometheus({
+  const { series, loading } = useQuery({
     id,
     dashboardId,
     time,
@@ -74,6 +75,8 @@ function index(props: IProps) {
     targets: values.targets,
     variableConfig,
     inViewPort: isPreview || inViewPort,
+    datasourceCate: values.datasourceCate || 'prometheus',
+    datasourceName: values.datasourceName,
   });
   const name = replaceFieldWithVariable(dashboardId, values.name, variableConfig);
   const description = replaceFieldWithVariable(dashboardId, values.description, variableConfig);
@@ -94,8 +97,8 @@ function index(props: IProps) {
     series,
   };
   const RendererCptMap = {
-    timeseries: () => <Timeseries {...subProps} themeMode={themeMode} />,
-    stat: () => <Stat {...subProps} containerRef={ref} themeMode={themeMode} />,
+    timeseries: () => <Timeseries {...subProps} themeMode={themeMode} time={time} />,
+    stat: () => <Stat {...subProps} bodyWrapRef={bodyWrapRef} themeMode={themeMode} />,
     table: () => <Table {...subProps} themeMode={themeMode} />,
     pie: () => <Pie {...subProps} themeMode={themeMode} />,
     hexbin: () => <Hexbin {...subProps} themeMode={themeMode} />,
@@ -111,125 +114,131 @@ function index(props: IProps) {
       })}
       ref={ref}
     >
-      <div className='renderer-header graph-header dashboards-panels-item-drag-handle'>
-        <div className='renderer-header-desc'>
-          {tipsVisible ? (
-            <Tooltip
-              placement='top'
-              overlayInnerStyle={{
-                width: 300,
-              }}
-              getPopupContainer={() => ref.current!}
-              title={
-                <div>
-                  <Markdown content={description} />
-                  {_.map(values.links, (link, i) => {
-                    return (
-                      <div key={i}>
-                        <a href={replaceFieldWithVariable(dashboardId, link.url, variableConfig)} target={link.targetBlank ? '_blank' : '_self'}>
-                          {replaceFieldWithVariable(dashboardId, link.title, variableConfig)}
-                        </a>
-                      </div>
-                    );
-                  })}
-                </div>
-              }
-            >
-              <div className='renderer-header-desc'>{description ? <InfoCircleOutlined /> : <LinkOutlined />}</div>
-            </Tooltip>
-          ) : null}
-        </div>
-        <div className='renderer-header-content'>
-          <Tooltip title={name} getPopupContainer={() => ref.current!}>
-            <div className='renderer-header-title'>{name}</div>
-          </Tooltip>
-        </div>
-        <div className='renderer-header-loading'>
-          {loading ? (
-            <SyncOutlined spin />
-          ) : (
-            !isPreview && (
-              <Dropdown
-                trigger={['click']}
-                placement='bottomCenter'
+      <div className='renderer-body-wrap' ref={bodyWrapRef}>
+        <div className='renderer-header graph-header dashboards-panels-item-drag-handle'>
+          <div className='renderer-header-desc'>
+            {tipsVisible ? (
+              <Tooltip
+                placement='top'
+                overlayInnerStyle={{
+                  width: 300,
+                }}
                 getPopupContainer={() => ref.current!}
-                overlayStyle={{
-                  minWidth: '100px',
-                }}
-                visible={visible}
-                onVisibleChange={(visible) => {
-                  setVisible(visible);
-                }}
-                overlay={
-                  <Menu>
-                    <Menu.Item
-                      onClick={() => {
-                        setVisible(true);
-                        setTime({
-                          ...time,
-                          refreshFlag: _.uniqueId('refreshFlag_ '),
-                        });
-                      }}
-                      key='0'
-                    >
-                      <Tooltip title={`刷新间隔小于 step(${getStepByTimeAndStep(time, step)}s) 将不会更新数据`} placement='left'>
-                        <div>
-                          <SyncOutlined style={{ marginRight: 8 }} />
-                          刷新
+                title={
+                  <div>
+                    <Markdown content={description} />
+                    {_.map(values.links, (link, i) => {
+                      return (
+                        <div key={i}>
+                          <a href={replaceFieldWithVariable(dashboardId, link.url, variableConfig)} target={link.targetBlank ? '_blank' : '_self'}>
+                            {replaceFieldWithVariable(dashboardId, link.title, variableConfig)}
+                          </a>
                         </div>
-                      </Tooltip>
-                    </Menu.Item>
-                    <Menu.Item
-                      onClick={() => {
-                        setVisible(false);
-                        if (onEditClick) onEditClick();
-                      }}
-                      key='1'
-                    >
-                      <SettingOutlined style={{ marginRight: 8 }} />
-                      编辑
-                    </Menu.Item>
-                    <Menu.Item
-                      onClick={() => {
-                        setVisible(false);
-                        if (onCloneClick) onCloneClick();
-                      }}
-                      key='2'
-                    >
-                      <CopyOutlined style={{ marginRight: 8 }} />
-                      克隆
-                    </Menu.Item>
-                    <Menu.Item
-                      onClick={() => {
-                        setVisible(false);
-                        if (onShareClick) onShareClick();
-                      }}
-                      key='3'
-                    >
-                      <ShareAltOutlined style={{ marginRight: 8 }} />
-                      分享
-                    </Menu.Item>
-                    <Menu.Item
-                      onClick={() => {
-                        setVisible(false);
-                        if (onDeleteClick) onDeleteClick();
-                      }}
-                      key='4'
-                    >
-                      <DeleteOutlined style={{ marginRight: 8 }} />
-                      删除
-                    </Menu.Item>
-                  </Menu>
+                      );
+                    })}
+                  </div>
                 }
               >
-                <MoreOutlined className='renderer-header-more' />
-              </Dropdown>
-            )
+                <div className='renderer-header-desc'>{description ? <InfoCircleOutlined /> : <LinkOutlined />}</div>
+              </Tooltip>
+            ) : null}
+          </div>
+          <div className='renderer-header-content'>
+            <Tooltip title={name} getPopupContainer={() => ref.current!}>
+              <div className='renderer-header-title'>{name}</div>
+            </Tooltip>
+          </div>
+          <div className='renderer-header-loading'>
+            {loading ? (
+              <SyncOutlined spin />
+            ) : (
+              !isPreview && (
+                <Dropdown
+                  trigger={['click']}
+                  placement='bottomCenter'
+                  getPopupContainer={() => ref.current!}
+                  overlayStyle={{
+                    minWidth: '100px',
+                  }}
+                  visible={visible}
+                  onVisibleChange={(visible) => {
+                    setVisible(visible);
+                  }}
+                  overlay={
+                    <Menu>
+                      <Menu.Item
+                        onClick={() => {
+                          setVisible(true);
+                          setTime({
+                            ...time,
+                            refreshFlag: _.uniqueId('refreshFlag_ '),
+                          });
+                        }}
+                        key='0'
+                      >
+                        <Tooltip title={`刷新间隔小于 step(${getStepByTimeAndStep(time, step)}s) 将不会更新数据`} placement='left'>
+                          <div>
+                            <SyncOutlined style={{ marginRight: 8 }} />
+                            刷新
+                          </div>
+                        </Tooltip>
+                      </Menu.Item>
+                      <Menu.Item
+                        onClick={() => {
+                          setVisible(false);
+                          if (onEditClick) onEditClick();
+                        }}
+                        key='1'
+                      >
+                        <SettingOutlined style={{ marginRight: 8 }} />
+                        编辑
+                      </Menu.Item>
+                      <Menu.Item
+                        onClick={() => {
+                          setVisible(false);
+                          if (onCloneClick) onCloneClick();
+                        }}
+                        key='2'
+                      >
+                        <CopyOutlined style={{ marginRight: 8 }} />
+                        克隆
+                      </Menu.Item>
+                      <Menu.Item
+                        onClick={() => {
+                          setVisible(false);
+                          if (onShareClick) onShareClick();
+                        }}
+                        key='3'
+                      >
+                        <ShareAltOutlined style={{ marginRight: 8 }} />
+                        分享
+                      </Menu.Item>
+                      <Menu.Item
+                        onClick={() => {
+                          setVisible(false);
+                          if (onDeleteClick) onDeleteClick();
+                        }}
+                        key='4'
+                      >
+                        <DeleteOutlined style={{ marginRight: 8 }} />
+                        删除
+                      </Menu.Item>
+                    </Menu>
+                  }
+                >
+                  <MoreOutlined className='renderer-header-more' />
+                </Dropdown>
+              )
+            )}
+          </div>
+        </div>
+        <div className='renderer-body' style={{ height: values.name ? `calc(100% - 47px)` : '100%' }}>
+          {_.isEmpty(series) && type !== 'text' ? (
+            <div className='renderer-body-content-empty'>暂无数据</div>
+          ) : (
+            <>{RendererCptMap[type] ? RendererCptMap[type]() : <div className='unknown-type'>{`无效的图表类型 ${type}`}</div>}</>
           )}
         </div>
-      </div>
-      <div className='renderer-body' style={{ height: values.name ? `calc(100% - 47px)` : '100%' }}>
-        {RendererCptMap[type] ? RendererCptMap[type]() : <div className='unknown-type'>{`无效的图表类型 ${type}`}</div>}
       </div>
     </div>
   );

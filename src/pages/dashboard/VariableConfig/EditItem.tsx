@@ -15,216 +15,196 @@
  *
  */
 import React from 'react';
-import { Modal, Form, Input, Button, Row, Col, Switch, Select } from 'antd';
-import { useTranslation } from 'react-i18next';
-import { DeleteOutlined, PlusOutlined, ArrowUpOutlined, ArrowDownOutlined, CopyOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { Form, Input, Row, Col, Select, Switch, Button, Space } from 'antd';
+import { QuestionCircleOutlined } from '@ant-design/icons';
+import _ from 'lodash';
 import { IRawTimeRange } from '@/components/TimeRangePicker';
 import { IVariable } from './definition';
 import { convertExpressionToQuery, replaceExpressionVars, stringToRegex, setVaraiableSelected } from './constant';
 
-interface Props {
+interface IProps {
   id: string;
-  visible: boolean;
-  value?: IVariable[];
   range: IRawTimeRange;
-  onChange: (v?: IVariable[]) => void;
+  index: number;
+  data: IVariable;
+  onOk: (val: IVariable) => void;
+  onCancel: () => void;
 }
-export default function EditItem(props: Props) {
-  const { visible, onChange, value, range, id } = props;
-  const { t } = useTranslation();
-  const [form] = Form.useForm();
-  const handleOk = async () => {
-    await form.validateFields();
-    const v = form.getFieldsValue();
-    onChange(v.var);
-  };
-  const onCancel = () => {
-    onChange();
-  };
 
-  const handleBlur = (index) => {
-    const reg = form.getFieldValue(['var', index, 'reg']);
-    const expression = form.getFieldValue(['var', index, 'definition']);
+const typeOptions = [
+  {
+    label: 'Query',
+    value: 'query',
+  },
+  {
+    label: 'Custom',
+    value: 'custom',
+  },
+  {
+    label: 'Text box',
+    value: 'textbox',
+  },
+  {
+    label: 'Constant',
+    value: 'constant',
+  },
+];
+
+function EditItem(props: IProps) {
+  const { data, range, id, index, onOk, onCancel } = props;
+  const [form] = Form.useForm();
+  // TODO: 不太清楚这里的逻辑是干嘛的，后面找时间看下
+  const handleBlur = (val?: string) => {
+    const reg = data.reg;
+    const expression = val || data.definition;
     if ((!reg || new RegExp('^/(.*?)/(g?i?m?y?)$').test(reg)) && expression) {
       const formData = form.getFieldsValue();
       var newExpression = replaceExpressionVars(expression, formData, index, id);
       convertExpressionToQuery(newExpression, range).then((res) => {
         const regFilterRes = res.filter((i) => !reg || !stringToRegex(reg) || (stringToRegex(reg) as RegExp).test(i));
         if (regFilterRes.length > 0) {
-          setVaraiableSelected(formData.var[index].name, regFilterRes[0], id);
+          setVaraiableSelected({ name: formData.var[index].name, value: regFilterRes[0], id });
         }
       });
     }
   };
 
   return (
-    <Modal title={t('大盘变量')} width={1200} visible={visible} onOk={handleOk} onCancel={onCancel} wrapClassName='variable-modal'>
-      <Form
-        autoComplete='off'
-        preserve={false}
-        form={form}
-        initialValues={{
-          var: value,
+    <Form layout='vertical' autoComplete='off' preserve={false} form={form} initialValues={data}>
+      <Row gutter={16}>
+        <Col span={12}>
+          <Form.Item
+            label='变量名'
+            name='name'
+            rules={[
+              { required: true, message: '请输入变量名' },
+              { pattern: /^[0-9a-zA-Z_]+$/, message: '仅支持数字和字符下划线' },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+        </Col>
+        <Col span={12}>
+          <Form.Item label='变量类型' name='type' rules={[{ required: true, message: '请输入变量类型' }]}>
+            <Select
+              style={{ width: '100%' }}
+              onChange={() => {
+                form.setFieldsValue({
+                  definition: '',
+                  defaultValue: '',
+                });
+              }}
+            >
+              {_.map(typeOptions, (item) => {
+                return (
+                  <Select.Option value={item.value} key={item.value}>
+                    {item.label}
+                  </Select.Option>
+                );
+              })}
+            </Select>
+          </Form.Item>
+        </Col>
+      </Row>
+      <Form.Item shouldUpdate={(prevValues, curValues) => prevValues.type !== curValues.typ} noStyle>
+        {({ getFieldValue }) => {
+          const type = getFieldValue('type');
+          if (type === 'query') {
+            return (
+              <>
+                <Form.Item
+                  label={
+                    <span>
+                      变量定义{' '}
+                      <QuestionCircleOutlined
+                        style={{ marginLeft: 5 }}
+                        onClick={() => window.open('https://grafana.com/docs/grafana/latest/datasources/prometheus/#query-variable', '_blank')}
+                      />
+                    </span>
+                  }
+                  name='definition'
+                  rules={[{ required: true, message: '请输入变量定义' }]}
+                >
+                  <Input onBlur={(e) => handleBlur(e.target.value)} />
+                </Form.Item>
+                <Form.Item label='筛选正则' name='reg' rules={[{ pattern: new RegExp('^/(.*?)/(g?i?m?y?)$'), message: '格式不对' }]}>
+                  <Input placeholder='/*.hna/' onBlur={() => handleBlur()} />
+                </Form.Item>
+              </>
+            );
+          } else if (type === 'textbox') {
+            return (
+              <Form.Item label='默认值' name='defaultValue'>
+                <Input onBlur={() => handleBlur()} />
+              </Form.Item>
+            );
+          } else if (type === 'custom') {
+            return (
+              <Form.Item label='逗号分割的自定义值' name='definition' rules={[{ required: true, message: '请输入自定义值' }]}>
+                <Input onBlur={() => handleBlur()} placeholder='1,10' />
+              </Form.Item>
+            );
+          } else if (type === 'constant') {
+            return (
+              <Form.Item label='常量值' name='definition' tooltip='定义一个隐藏的常量值' rules={[{ required: true, message: '请输入常量值' }]}>
+                <Input onBlur={() => handleBlur()} />
+              </Form.Item>
+            );
+          }
         }}
-      >
-        <Row gutter={[6, 6]} className='tag-header'>
-          <Col span={3}>{t('类型')}</Col>
-          <Col span={4}>{t('变量名')}</Col>
-          <Col span={5}>
-            {t('变量定义')}
-            <QuestionCircleOutlined
-              style={{ marginLeft: 5 }}
-              onClick={() => window.open('https://grafana.com/docs/grafana/latest/datasources/prometheus/#query-variable', '_blank')}
-            />
-          </Col>
-          <Col span={3}>{t('筛值正则')}</Col>
-          <Col span={1}>{t('Multi')}</Col>
-          <Col span={2}>{t('All Option')}</Col>
-          <Col span={3}>{t('All Value')}</Col>
-          <Col span={3}>{t('操作')}</Col>
-        </Row>
-        <Form.List name='var'>
-          {(fields, { add, remove, move }) => (
-            <>
-              {fields.map(({ key, name, fieldKey, ...restField }) => (
-                <Row gutter={[6, 6]} className='tag-content-item' key={key}>
-                  <Col span={3}>
-                    <Form.Item {...restField} name={[name, 'type']} fieldKey={[fieldKey, 'type']} rules={[{ required: true, message: t('请选择变量类型') }]}>
-                      <Select style={{ width: '100%' }}>
-                        <Select.Option value='query'>Query</Select.Option>
-                        <Select.Option value='textbox'>Text box</Select.Option>
-                      </Select>
-                    </Form.Item>
-                  </Col>
-                  <Col span={4}>
-                    <Form.Item
-                      {...restField}
-                      name={[name, 'name']}
-                      fieldKey={[fieldKey, 'name']}
-                      rules={[
-                        { required: true, message: t('请输入变量名') },
-                        { pattern: /^[0-9a-zA-Z_]+$/, message: t('仅支持数字和字符下划线') },
-                      ]}
-                    >
-                      <Input />
-                    </Form.Item>
-                  </Col>
-                  <Col span={5}>
-                    <Form.Item shouldUpdate noStyle>
-                      {({ getFieldValue }) => {
-                        const type = getFieldValue(['var', fieldKey, 'type']);
-                        if (type === 'query') {
-                          return (
-                            <Form.Item {...restField} name={[name, 'definition']} fieldKey={[fieldKey, 'definition']} rules={[{ required: true, message: t('请输入变量定义') }]}>
-                              <Input onBlur={(v) => handleBlur(name)} />
-                            </Form.Item>
-                          );
-                        }
+      </Form.Item>
+      <Form.Item shouldUpdate={(prevValues, curValues) => prevValues.type !== curValues.typ} noStyle>
+        {({ getFieldValue }) => {
+          const type = getFieldValue('type');
+          if (type === 'query' || type === 'custom') {
+            return (
+              <Row gutter={16}>
+                <Col flex='70px'>
+                  <Form.Item label='多选' name='multi' valuePropName='checked'>
+                    <Switch />
+                  </Form.Item>
+                </Col>
+                <Col flex='70px'>
+                  <Form.Item label='包含全选' name='allOption' valuePropName='checked'>
+                    <Switch />
+                  </Form.Item>
+                </Col>
+                <Col flex='auto'>
+                  <Form.Item shouldUpdate={(prevValues, curValues) => prevValues.type !== curValues.typ} noStyle>
+                    {({ getFieldValue }) => {
+                      const allOption = getFieldValue('allOption');
+                      if (allOption) {
                         return (
-                          <Form.Item {...restField} name={[name, 'defaultValue']} fieldKey={[fieldKey, 'defaultValue']}>
-                            <Input onBlur={(v) => handleBlur(name)} placeholder='默认值' />
+                          <Form.Item label='自定义全选值' name='allValue'>
+                            <Input placeholder='.*' />
                           </Form.Item>
                         );
-                      }}
-                    </Form.Item>
-                  </Col>
-                  <Col span={3}>
-                    <Form.Item shouldUpdate noStyle>
-                      {({ getFieldValue }) => {
-                        const type = getFieldValue(['var', fieldKey, 'type']);
-                        if (type === 'query') {
-                          return (
-                            <Form.Item
-                              {...restField}
-                              name={[name, 'reg']}
-                              fieldKey={[fieldKey, 'reg']}
-                              rules={[{ pattern: new RegExp('^/(.*?)/(g?i?m?y?)$'), message: t('格式不对') }]}
-                            >
-                              <Input placeholder='/*.hna/' onBlur={(v) => handleBlur(name)} />
-                            </Form.Item>
-                          );
-                        }
-                        return null;
-                      }}
-                    </Form.Item>
-                  </Col>
-                  <Col span={1}>
-                    <Form.Item shouldUpdate noStyle>
-                      {({ getFieldValue }) => {
-                        const type = getFieldValue(['var', fieldKey, 'type']);
-                        if (type === 'query') {
-                          return (
-                            <Form.Item {...restField} name={[name, 'multi']} fieldKey={[fieldKey, 'multi']} valuePropName='checked'>
-                              <Switch />
-                            </Form.Item>
-                          );
-                        }
-                        return null;
-                      }}
-                    </Form.Item>
-                  </Col>
-                  <Col span={2}>
-                    <Form.Item shouldUpdate noStyle>
-                      {({ getFieldValue }) => {
-                        const type = getFieldValue(['var', fieldKey, 'type']);
-                        if (type === 'query' && form.getFieldValue(['var', name, 'multi'])) {
-                          return (
-                            <Form.Item {...restField} name={[name, 'allOption']} fieldKey={[fieldKey, 'allOption']} valuePropName='checked'>
-                              <Switch />
-                            </Form.Item>
-                          );
-                        }
-                        return null;
-                      }}
-                    </Form.Item>
-                  </Col>
-                  <Col span={3}>
-                    <Form.Item shouldUpdate noStyle>
-                      {({ getFieldValue }) => {
-                        const type = getFieldValue(['var', fieldKey, 'type']);
-                        if (type === 'query' && form.getFieldValue(['var', name, 'multi']) && form.getFieldValue(['var', name, 'allOption'])) {
-                          return (
-                            <Form.Item {...restField} name={[name, 'allValue']} fieldKey={[fieldKey, 'allValue']}>
-                              <Input placeholder='.*' />
-                            </Form.Item>
-                          );
-                        }
-                        return null;
-                      }}
-                    </Form.Item>
-                  </Col>
-                  <Col span={3}>
-                    <Button type='link' size='small' onClick={() => move(name, name + 1)} disabled={name === fields.length - 1}>
-                      <ArrowDownOutlined />
-                    </Button>
-                    <Button type='link' size='small' onClick={() => move(name, name - 1)} disabled={name === 0}>
-                      <ArrowUpOutlined />
-                    </Button>
-                    <Button
-                      type='link'
-                      size='small'
-                      onClick={() => {
-                        const v = form.getFieldValue(['var', name]);
-                        add({ ...v, name: 'copy_of_' + v.name });
-                      }}
-                    >
-                      <CopyOutlined />
-                    </Button>
-                    <Button type='link' size='small' onClick={() => remove(name)}>
-                      <DeleteOutlined />
-                    </Button>
-                  </Col>
-                </Row>
-              ))}
-              <Form.Item>
-                <Button type='dashed' onClick={() => add()} block icon={<PlusOutlined />}>
-                  {t('新增变量')}
-                </Button>
-              </Form.Item>
-            </>
-          )}
-        </Form.List>
-      </Form>
-    </Modal>
+                      }
+                    }}
+                  </Form.Item>
+                </Col>
+              </Row>
+            );
+          }
+        }}
+      </Form.Item>
+      <Form.Item>
+        <Space>
+          <Button
+            type='primary'
+            onClick={() => {
+              form.validateFields().then((res) => {
+                onOk(res);
+              });
+            }}
+          >
+            保存
+          </Button>
+          <Button onClick={onCancel}>取消</Button>
+        </Space>
+      </Form.Item>
+    </Form>
   );
 }
+
+export default EditItem;

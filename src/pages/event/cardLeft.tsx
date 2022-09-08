@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Input, Form, Modal, Switch, message } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusSquareOutlined, SearchOutlined } from '@ant-design/icons';
-import { getAggrAlerts, AddAggrAlerts, updateAggrAlerts, deleteAggrAlerts } from '@/services/warning';
 import { useSelector } from 'react-redux';
+import { getAggrAlerts, AddAggrAlerts, updateAggrAlerts, deleteAggrAlerts } from '@/services/warning';
 import { RootState as AccountRootState, accountStoreState } from '@/store/accountInterface';
 import './index.less';
 interface Props {
@@ -121,7 +121,6 @@ export default function CardLeft(props: Props) {
           <div className={alert.id === activeId ? 'card-menu-item is-active' : 'card-menu-item'} onClick={() => saveActiveId(alert.id)} key={alert.id}>
             <div className='label-area'>
               <div className='title'>{alert.name}</div>
-              {/* <div className='desc'>{alert.rule}</div> */}
             </div>
 
             {alert.cate === 1 || profile.admin ? (
@@ -166,7 +165,7 @@ export default function CardLeft(props: Props) {
             label='Name'
             name='name'
             rules={[
-              ({ getFieldValue }) => ({
+              () => ({
                 validator(_, value) {
                   if (!value || value.length === 0) {
                     return Promise.reject(new Error('请输入聚合规则名称'));
@@ -185,7 +184,7 @@ export default function CardLeft(props: Props) {
             label='Rule'
             name='rule'
             rules={[
-              ({ getFieldValue }) => ({
+              () => ({
                 validator(_, value) {
                   if (!value || value.length === 0) {
                     return Promise.reject(new Error('请输入Rule'));

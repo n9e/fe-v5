@@ -16,12 +16,14 @@
  */
 import React, { useRef, useEffect, useState } from 'react';
 import _ from 'lodash';
+import moment from 'moment';
 import { Table, Tooltip } from 'antd';
 import classNames from 'classnames';
 import { VerticalRightOutlined, VerticalLeftOutlined } from '@ant-design/icons';
 import { useSize } from 'ahooks';
 import TsGraph from '@fc-plot/ts-graph';
 import '@fc-plot/ts-graph/dist/index.css';
+import { IRawTimeRange, parseRange } from '@/components/TimeRangePicker';
 import { IPanel } from '../../../types';
 import { hexPalette } from '../../../config';
 import valueFormatter from '../../utils/valueFormatter';
@@ -29,18 +31,20 @@ import { getLegendValues } from '../../utils/getCalculatedValuesBySeries';
 import './style.less';
 
 interface IProps {
+  time?: IRawTimeRange;
   inDashboard?: boolean;
   chartHeight?: string;
   tableHeight?: string;
   values: IPanel;
   series: any[];
   themeMode?: 'dark';
+  onClick?: (event: any, datetime: Date, value: number) => void;
 }
 
 export default function index(props: IProps) {
-  const { values, series, inDashboard = true, chartHeight = '200px', tableHeight = '200px', themeMode = '' } = props;
+  const { time, values, series, inDashboard = true, chartHeight = '200px', tableHeight = '200px', themeMode = '', onClick } = props;
   const { custom, options = {} } = values;
-  const { lineWidth = 1, gradientMode = 'none' } = custom;
+  const { lineWidth = 1, gradientMode = 'none', scaleDistribution } = custom;
   const [seriesData, setSeriesData] = useState(series);
   const [activeLegend, setActiveLegend] = useState('');
   const chartEleRef = useRef<HTMLDivElement>(null);
@@ -83,6 +87,9 @@ export default function index(props: IProps) {
           marginTop: 0,
         },
         series: [],
+        onClick: (event, datetime, value) => {
+          if (onClick) onClick(event, datetime, value);
+        },
       });
     }
     if (hasLegend) {
@@ -112,6 +119,13 @@ export default function index(props: IProps) {
   }, [JSON.stringify(series)]);
 
   useEffect(() => {
+    let xAxisDamin = {};
+    if (time) {
+      const parsedRange = parseRange(time);
+      const start = moment(parsedRange.start).unix();
+      const end = moment(parsedRange.end).unix();
+      xAxisDamin = { min: start, max: end };
+    }
     if (chartRef.current) {
       chartRef.current.update({
         type: custom.drawStyle === 'lines' ? 'line' : 'bar',
@@ -149,6 +163,8 @@ export default function index(props: IProps) {
         },
         xAxis: {
           ...chartRef.current.options.xAxis,
+          ...xAxisDamin,
+          plotLines: options?.xThresholds?.steps,
           lineColor: themeMode === 'dark' ? 'rgba(255,255,255,0.2)' : '#ccc',
           tickColor: themeMode === 'dark' ? 'rgba(255,255,255,0.2)' : '#ccc',
         },
@@ -156,12 +172,18 @@ export default function index(props: IProps) {
           ...chartRef.current.options.yAxis,
           min: options?.standardOptions?.min,
           max: options?.standardOptions?.max,
-          plotLines: _.map(options?.thresholds?.steps, (item) => {
-            return {
-              ...item,
-              shadowColor: themeMode === 'dark' ? 'rgba(255,255,255,0.2)' : '#fff',
-            };
-          }),
+          scale: scaleDistribution,
+          plotLines: _.map(
+            _.filter(options?.thresholds?.steps, (item) => {
+              return item.value !== null; // 过滤掉 base 值
+            }),
+            (item) => {
+              return {
+                ...item,
+                shadowColor: themeMode === 'dark' ? 'rgba(255,255,255,0.2)' : '#fff',
+              };
+            },
+          ),
           backgroundColor: themeMode === 'dark' ? '#2A2D3C' : '#fff',
           gridLineColor: themeMode === 'dark' ? 'rgba(255,255,255,0.05)' : '#efefef',
           tickValueFormatter: (val) => {

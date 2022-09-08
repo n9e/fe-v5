@@ -36,11 +36,12 @@ interface IPageLayoutProps {
   rightArea?: ReactNode;
   customArea?: ReactNode;
   showBack?: Boolean;
+  backPath?: string;
   hideCluster?: Boolean;
   onChangeCluster?: (string) => void;
 }
 
-const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, introIcon, children, customArea, showBack, onChangeCluster, hideCluster = true }) => {
+const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, introIcon, children, customArea, showBack, backPath, onChangeCluster, hideCluster = true }) => {
   const { t, i18n } = useTranslation();
   const history = useHistory();
   const dispatch = useDispatch();
@@ -123,7 +124,15 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, introI
             <div className={'page-header-title'}>
               {showBack && (
                 <RollbackOutlined
-                  onClick={() => history.goBack()}
+                  onClick={() => {
+                    if (backPath) {
+                      history.push({
+                        pathname: backPath,
+                      });
+                    } else {
+                      history.goBack();
+                    }
+                  }}
                   style={{
                     marginRight: '5px',
                   }}
@@ -151,7 +160,7 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, introI
                   </Dropdown>
                 </div>
               )}
-              <AdvancedWrap>
+              <AdvancedWrap var='VITE_IS_ALERT_AI'>
                 <License />
               </AdvancedWrap>
 

@@ -103,6 +103,15 @@ export const defaultValues = {
     legend: {
       displayMode: 'hidden',
     },
+    thresholds: {
+      steps: [
+        {
+          color: '#634CD9',
+          value: null,
+          type: 'base',
+        },
+      ],
+    },
   },
   custom: {},
   overrides: [{}],
@@ -116,6 +125,9 @@ export const defaultCustomValuesMap = {
     fillOpacity: 0.5,
     gradientMode: 'none',
     stack: 'off',
+    scaleDistribution: {
+      type: 'linear',
+    },
   },
   stat: {
     textMode: 'valueAndName',
@@ -139,6 +151,7 @@ export const defaultCustomValuesMap = {
     displayMode: 'seriesToRows',
   },
   hexbin: {
+    textMode: 'valueAndName',
     calc: 'lastNotNull',
     colorRange: _.join(colors[0].value, ','),
     colorDomainAuto: true,

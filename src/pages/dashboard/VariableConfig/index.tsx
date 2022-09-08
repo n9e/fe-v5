@@ -22,7 +22,7 @@ import { IRawTimeRange } from '@/components/TimeRangePicker';
 import { convertExpressionToQuery, replaceExpressionVars, getVaraiableSelected, setVaraiableSelected, stringToRegex } from './constant';
 import { IVariable } from './definition';
 import DisplayItem from './DisplayItem';
-import EditItem from './EditItem';
+import EditItems from './EditItems';
 import './index.less';
 
 interface IProps {
@@ -46,6 +46,7 @@ function index(props: IProps) {
   const { id, cluster, editable = true, range, onChange, onOpenFire } = props;
   const [editing, setEditing] = useState<boolean>(false);
   const [data, setData] = useState<IVariable[]>([]);
+  const dataWithoutConstant = _.filter(data, (item) => item.type !== 'constant');
   const [refreshFlag, setRefreshFlag] = useState<string>(_.uniqueId('refreshFlag_'));
   const value = _.map(props.value, (item) => {
     return {
@@ -56,12 +57,12 @@ function index(props: IProps) {
 
   useEffect(() => {
     if (value) {
-      const result: IVariable[] = [];
+      let result: IVariable[] = [];
       try {
         (async () => {
           for (let idx = 0; idx < value.length; idx++) {
             const item = _.cloneDeep(value[idx]);
-            if (item.type === 'query' && item.definition) {
+            if ((item.type === 'query' || item.type === 'custom') && item.definition) {
               const definition = idx > 0 ? replaceExpressionVars(item.definition, result, idx, id) : item.definition;
               const options = await convertExpressionToQuery(definition, range);
               const regFilterOptions = _.filter(options, (i) => !!i && (!item.reg || !stringToRegex(item.reg) || (stringToRegex(item.reg) as RegExp).test(i)));
@@ -74,16 +75,29 @@ function index(props: IProps) {
               if (selected === null || (selected && !_.isEmpty(regFilterOptions) && !includes(regFilterOptions, selected))) {
                 const head = regFilterOptions?.[0];
                 const defaultVal = item.multi ? (head ? [head] : []) : head;
-                setVaraiableSelected(item.name, defaultVal, id, true);
+                setVaraiableSelected({ name: item.name, value: defaultVal, id, urlAttach: true });
               }
             } else if (item.type === 'textbox') {
               result[idx] = item;
               const selected = getVaraiableSelected(item.name, id);
               if (selected === null) {
-                setVaraiableSelected(item.name, item.defaultValue, id, true);
+                setVaraiableSelected({ name: item.name, value: item.defaultValue, id, urlAttach: true });
+              }
+            } else if (item.type === 'constant') {
+              result[idx] = item;
+              const selected = getVaraiableSelected(item.name, id);
+              if (selected === null) {
+                setVaraiableSelected({ name: item.name, value: item.definition, id, urlAttach: true });
               }
             }
           }
+          // 设置变量默认值，优先从 url 中获取，其次是 localStorage
+          result = _.map(result, (item) => {
+            return {
+              ...item,
+              value: getVaraiableSelected(item.name, id),
+            };
+          });
           setData(result);
           onChange(value, false, result);
         })();
@@ -96,13 +110,32 @@ function index(props: IProps) {
   return (
     <div className='tag-area'>
       <div className={classNames('tag-content', 'tag-content-close')}>
-        {_.map(data, (expression) => {
+        {_.map(dataWithoutConstant, (item) => {
           return (
             <DisplayItem
-              key={expression.name}
-              id={id}
-              expression={expression}
-              onChange={() => {
+              key={item.name}
+              expression={item}
+              value={item.value}
+              onChange={(val) => {
+                // 缓存变量值，更新 url 里的变量值
+                setVaraiableSelected({
+                  name: item.name,
+                  value: val,
+                  id,
+                  urlAttach: true,
+                  vars: dataWithoutConstant,
+                });
+                setData(
+                  _.map(data, (subItem) => {
+                    if (subItem.name === item.name) {
+                      return {
+                        ...item,
+                        value: val,
+                      };
+                    }
+                    return subItem;
+                  }),
+                );
                 setRefreshFlag(_.uniqueId('refreshFlag_'));
               }}
             />
@@ -117,7 +150,7 @@ function index(props: IProps) {
             }}
           />
         )}
-        {(data ? data?.length === 0 : true) && editable && (
+        {(data ? _.filter(data, (item) => item.type != 'constant')?.length === 0 : true) && editable && (
           <div
             className='add-variable-tips'
             onClick={() => {
@@ -129,16 +162,16 @@ function index(props: IProps) {
           </div>
         )}
       </div>
-      <EditItem
+      <EditItems
         visible={editing}
+        setVisible={setEditing}
+        value={value}
         onChange={(v: IVariable[]) => {
           if (v) {
             onChange(v, true);
             setData(v);
           }
-          setEditing(false);
         }}
-        value={value}
         range={range}
         id={id}
       />

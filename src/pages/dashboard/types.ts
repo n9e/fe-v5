@@ -51,6 +51,7 @@ export interface IThresholds {
   steps: {
     color: string;
     value: number;
+    type?: 'base';
   }[];
   // mode: 'absolute' | 'percent'; 目前不支持
   style: 'line'; // 目前只支持 line
@@ -60,6 +61,7 @@ export interface IThresholds {
 export interface IOptions {
   valueMappings?: IValueMapping[];
   thresholds?: IThresholds;
+  xThresholds?: IThresholds;
   standardOptions?: {
     util?: string;
     min?: number;
@@ -101,6 +103,10 @@ export interface ITimeseriesStyles {
   lineInterpolation: 'linear' | 'smooth';
   fillOpacity: number;
   stack: 'off' | 'noraml'; // off 关闭；normal 开启，此结构未后期其他模式预留
+  scaleDistribution: {
+    type: 'linear' | 'log';
+    log?: 10 | 2;
+  };
 }
 
 export interface IStatStyles {
@@ -126,6 +132,7 @@ export interface ITableStyles {
 
 export interface IHexbinStyles {
   version: string;
+  textMode: 'valueAndName' | 'name' | 'value';
   calc: string;
   colorRange: string[]; // 三个颜色值
   colorDomainAuto: boolean;
@@ -174,6 +181,8 @@ export interface IPanel {
   links?: ILink[];
   description: string;
   layout: IGridPos;
+  datasourceCate?: string; // 5.11.0 新增支持配置数据源类型，默认是 prometheus
+  datasourceName?: number;
   targets: ITarget[];
   type: IType;
   options: IOptions;

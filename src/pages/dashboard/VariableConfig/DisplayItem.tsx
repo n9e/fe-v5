@@ -18,28 +18,27 @@ import React, { useEffect, useState } from 'react';
 import { Select, Input } from 'antd';
 import _ from 'lodash';
 import { IVariable } from './definition';
-import { getVaraiableSelected, setVaraiableSelected } from './constant';
 
 interface IProps {
-  id: string;
   expression: IVariable;
-  onChange: () => void; // 目前只为了外层更新变量 options
+  value: string | string[];
+  onChange: (val: string | string[]) => void; // 目前只为了外层更新变量 options
 }
 
 export default function DisplayItem(props: IProps) {
-  const { id, expression, onChange } = props;
+  const { expression, value, onChange } = props;
   const { name, multi, allOption, options, type } = expression;
-  const [selected, setSelected] = useState<string[]>(getVaraiableSelected(name, id));
+  const [selected, setSelected] = useState<string | string[]>(value);
 
   useEffect(() => {
-    setSelected(getVaraiableSelected(name, id));
-  }, [JSON.stringify(getVaraiableSelected(name, id))]);
+    setSelected(value);
+  }, [JSON.stringify(value)]);
 
   return (
     <div className='tag-content-close-item'>
       <Input.Group>
         <span className='ant-input-group-addon'>{name}</span>
-        {type === 'query' ? (
+        {type === 'query' || type === 'custom' ? (
           <Select
             mode={multi ? 'tags' : undefined}
             style={{
@@ -52,13 +51,12 @@ export default function DisplayItem(props: IProps) {
                 val = ['all'];
               } else if (multi && !allOption) {
                 let allIndex = val.indexOf('all');
-                if (allIndex !== -1) {
+                if (allIndex !== -1 && typeof val === 'object') {
                   val.splice(allIndex, 1);
                 }
               }
-              setVaraiableSelected(name, val, id, true);
               setSelected(val);
-              onChange();
+              onChange(val);
             }}
             defaultActiveFirstOption={false}
             showSearch
@@ -78,19 +76,18 @@ export default function DisplayItem(props: IProps) {
                 </Select.Option>
               ))}
           </Select>
-        ) : (
+        ) : null}
+        {type === 'textbox' ? (
           <Input
             value={selected}
             onBlur={(e) => {
               let val = e.target.value;
-              setVaraiableSelected(name, val, id, true);
-              onChange();
+              onChange(val);
             }}
             onKeyDown={(e: any) => {
               if (e.code === 'Enter') {
                 let val = e.target.value;
-                setVaraiableSelected(name, val, id, true);
-                onChange();
+                onChange(val);
               }
             }}
             onChange={(e) => {
@@ -98,7 +95,7 @@ export default function DisplayItem(props: IProps) {
               setSelected(val as any);
             }}
           />
-        )}
+        ) : null}
       </Input.Group>
     </div>
   );

@@ -18,24 +18,20 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import PageLayout from '@/components/pageLayout';
 import { AlertOutlined, SearchOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import LeftTree from '@/components/LeftTree';
 import DataTable from '@/components/Dantd/components/data-table';
 import moment from 'moment';
-import { Button, Input, Modal, Tag, Tooltip } from 'antd';
+import { Input, Tag, Select } from 'antd';
 import DateRangePicker, { RelativeRange } from '@/components/DateRangePicker';
-import { priorityColor } from '@/utils/constant';
-import { useHistory } from 'react-router';
+import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/common';
 import { eventStoreState } from '@/store/eventInterface';
-import { CommonStoreState } from '@/store/commonInterface';
-import BlankBusinessPlaceholder from '@/components/BlankBusinessPlaceholder';
 import ColumnSelect from '@/components/ColumnSelect';
-import '../event/index.less';
+import ClusterSelect from './ClusterSelect';
 import { SeverityColor } from '../event';
+import '../event/index.less';
 
 const Event: React.FC = () => {
-  const history = useHistory();
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const tableRef = useRef({
@@ -47,6 +43,7 @@ const Event: React.FC = () => {
   const [curClusterItems, setCurClusterItems] = useState<string[]>([]);
   const isAddTagToQueryInput = useRef(false);
   const [curBusiId, setCurBusiId] = useState<number>(-1);
+  const [cate, setCate] = useState<string>();
   const DateRangeItems: RelativeRange[] = useMemo(
     () => [
       { num: 6, unit: 'hours', description: t('hours') },
@@ -92,9 +89,14 @@ const Event: React.FC = () => {
         return (
           <>
             <div>
-              <a style={{ padding: 0 }} onClick={() => history.push(`/alert-his-events/${id}`)}>
+              <Link
+                to={{
+                  pathname: `/alert-his-events/${id}`,
+                }}
+                target='_blank'
+              >
                 {title}
-              </a>
+              </Link>
             </div>
             <div>
               <span className='event-tags'>{content}</span>
@@ -128,11 +130,25 @@ const Event: React.FC = () => {
               }
             }}
           />
+          {import.meta.env.VITE_IS_ALERT_ES_DS && (
+            <Select
+              value={cate}
+              onChange={(val) => {
+                setCate(val);
+              }}
+              style={{ marginLeft: 8, width: 120 }}
+              placeholder='数据源类型'
+              allowClear
+            >
+              <Select.Option value='prometheus'>Prometheus</Select.Option>
+              <Select.Option value='elasticsearch'>Elasticsearch</Select.Option>
+            </Select>
+          )}
+          <ClusterSelect cate={cate} onClusterChange={(e) => setCurClusterItems(e)} />
           <ColumnSelect
             onSeverityChange={(e) => setHisSeverity(e)}
             onEventTypeChange={(e) => setHisEventType(e)}
             onBusiGroupChange={(e) => setCurBusiId(typeof e === 'number' ? e : -1)}
-            onClusterChange={(e) => setCurClusterItems(e)}
           />
           <Input
             className='search-input'
@@ -164,7 +180,7 @@ const Event: React.FC = () => {
 
   useEffect(() => {
     tableRef.current.handleReload();
-  }, [curClusterItems, hisSeverity, hisHourRange, hisEventType, curBusiId]);
+  }, [curClusterItems, hisSeverity, hisHourRange, hisEventType, curBusiId, cate]);
 
   return (
     <PageLayout icon={<AlertOutlined />} title={t('历史告警')} hideCluster>
@@ -189,6 +205,7 @@ const Event: React.FC = () => {
                 hisQueryContent ? { query: hisQueryContent } : {},
                 hisEventType !== undefined ? { is_recovered: hisEventType } : {},
                 { bgid: curBusiId },
+                { cate },
               )
             }
             pageParams={{

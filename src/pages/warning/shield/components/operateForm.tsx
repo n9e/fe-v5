@@ -15,22 +15,25 @@
  *
  */
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { Form, Input, Card, Select, Col, Button, Row, message, DatePicker, Tooltip, Spin } from 'antd';
+import { Form, Input, Card, Select, Col, Button, Row, message, DatePicker, Tooltip, Spin, Space } from 'antd';
 import { QuestionCircleFilled, PlusCircleOutlined, CaretDownOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import _ from 'lodash';
 import moment from 'moment';
-import { addShield } from '@/services/shield';
+import { addShield, editShield } from '@/services/shield';
 import { getBusiGroups } from '@/services/common';
 import { shieldItem } from '@/store/warningInterface';
 import { RootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
+import AdvancedWrap from '@/components/AdvancedWrap';
 import TagItem from './tagItem';
 import { timeLensDefault } from '../../const';
+import CateSelect from './CateSelect';
+import ClusterSelect from './ClusterSelect';
 import '../index.less';
-import { ClusterAll } from '../../strategy/components/operateForm';
+
 const { Option } = Select;
 const { TextArea } = Input;
 
@@ -41,14 +44,13 @@ interface ItagsObj {
 interface Props {
   detail?: shieldItem;
   tagsObj?: ItagsObj;
-  type?: number; // 1:创建; 2:克隆
+  type?: number; // 1:创建; 2:克隆 3:编辑
 }
 
 const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) => {
   const btimeDefault = new Date().getTime();
   const etimeDefault = new Date().getTime() + 1 * 60 * 60 * 1000; // 默认时长1h
-  const { t, i18n } = useTranslation();
-  const { clusters: clusterList } = useSelector<RootState, CommonStoreState>((state) => state.common);
+  const { t } = useTranslation();
   const layout = {
     labelCol: {
       span: 24,
@@ -65,10 +67,8 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) 
       span: 24,
     },
   };
-
   const [form] = Form.useForm(null as any);
   const history = useHistory();
-  const [btnLoading, setBtnLoading] = useState<boolean>(false);
   const [timeLen, setTimeLen] = useState('1h');
   const { curBusiItem, busiGroups } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const [filteredBusiGroups, setFilteredBusiGroups] = useState(busiGroups);
@@ -114,6 +114,11 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) 
         busiGroup: tagsObj.group_id,
       });
     }
+    if (tagsObj?.cate) {
+      form.setFieldsValue({
+        cate: tagsObj?.cate,
+      });
+    }
   }, [tagsObj]);
 
   const timeChange = () => {
@@ -130,7 +135,6 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) 
   };
 
   const onFinish = (values) => {
-    setBtnLoading(true);
     const tags = values?.tags?.map((item) => {
       return {
         ...item,
@@ -145,24 +149,18 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) 
       tags,
     };
     const curBusiItemId = form.getFieldValue('busiGroup');
-    addShield(params, curBusiItemId)
-      .then((_) => {
+    if (type == 1) {
+      editShield(params, curBusiItemId, detail.id).then((_) => {
+        message.success(t('编辑告警屏蔽成功'));
+        history.push('/alert-mutes');
+      });
+    } else {
+      addShield(params, curBusiItemId).then((_) => {
         message.success(t('新建告警屏蔽成功'));
         history.push('/alert-mutes');
-      })
-      .finally(() => {
-        setBtnLoading(false);
       });
-  };
-  const handleClusterChange = (v: string[]) => {
-    if (v.includes(ClusterAll)) {
-      form.setFieldsValue({ cluster: [ClusterAll] });
     }
   };
-  const onFinishFailed = () => {
-    setBtnLoading(false);
-  };
-
   const timeLenChange = (val: string) => {
     setTimeLen(val);
 
@@ -217,15 +215,27 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) 
       layout='vertical'
       className='operate-form'
       onFinish={onFinish}
-      onFinishFailed={onFinishFailed}
       initialValues={{
         ...detail,
         btime: detail?.btime ? moment(detail.btime * 1000) : moment(btimeDefault),
         etime: detail?.etime ? moment(detail.etime * 1000) : moment(etimeDefault),
-        cluster: detail.cluster ? detail.cluster.split(' ') : clusterList || ['Default'], // 生效集群
+        cluster: detail.cluster ? detail.cluster.split(' ') : ['$all'], // 生效集群
       }}
     >
       <Card>
+        <Form.Item
+          label={t('规则备注：')}
+          name='note'
+          rules={[
+            {
+              required: true,
+              message: t('规则备注不能为空'),
+            },
+          ]}
+        >
+          <Input placeholder={t('请输入规则备注')} />
+        </Form.Item>
+
         <Form.Item label={t('业务组：')} name='busiGroup'>
           <Select showSearch filterOption={false} suffixIcon={<CaretDownOutlined />} onSearch={debounceFetcher} notFoundContent={fetching ? <Spin size='small' /> : null}>
             {_.map(filteredBusiGroups, (item) => (
@@ -236,26 +246,15 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) 
           </Select>
         </Form.Item>
 
-        <Form.Item
-          label={t('生效集群：')}
-          name='cluster'
-          rules={[
-            {
-              required: true,
-              message: t('生效集群不能为空'),
-            },
-          ]}
-        >
-          <Select suffixIcon={<CaretDownOutlined />} mode='multiple' onChange={handleClusterChange}>
-            <Option value={ClusterAll} key={ClusterAll}>
-              {ClusterAll}
-            </Option>
-            {clusterList?.map((item) => (
-              <Option value={item} key={item}>
-                {item}
-              </Option>
-            ))}
-          </Select>
+        <AdvancedWrap var='VITE_IS_ALERT_ES_DS'>
+          {(visible) => {
+            return <CateSelect form={form} visible={visible} />;
+          }}
+        </AdvancedWrap>
+        <Form.Item shouldUpdate={(prevValues, curValues) => prevValues.cate !== curValues.cate} noStyle>
+          {({ getFieldValue }) => {
+            return <ClusterSelect form={form} cate={getFieldValue('cate')} />;
+          }}
         </Form.Item>
 
         <Row gutter={10}>
@@ -316,22 +315,12 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) 
           <TextArea rows={3} />
         </Form.Item>
         <Form.Item {...tailLayout}>
-          <Row gutter={[10, 10]}>
-            <Col span={1}>
-              <Button type='primary' htmlType='submit'>
-                {type === 2 ? t('克隆') : t('创建')}
-              </Button>
-            </Col>
-
-            <Col
-              span={1}
-              style={{
-                marginLeft: 40,
-              }}
-            >
-              <Button onClick={() => window.history.back()}>{t('取消')}</Button>
-            </Col>
-          </Row>
+          <Space>
+            <Button type='primary' htmlType='submit'>
+              {type === 1 ? t('编辑') : type === 2 ? t('克隆') : t('创建')}
+            </Button>
+            <Button onClick={() => window.history.back()}>{t('取消')}</Button>
+          </Space>
         </Form.Item>
       </Card>
     </Form>
