@@ -21,7 +21,11 @@ import { RequestMethod } from '@/store/common';
 // 获取集群信息
 export function getCommonClusters() {
   if (import.meta.env.VITE_IS_COMMON_DS === 'true') {
-    return request(`/api/v1/datasource/list`, {
+    let url = '/api/v1/datasource/list';
+    if (import.meta.env.VITE_IS_DS_SETTING === 'true') {
+      url = '/api/n9e-plus/datasource/list';
+    }
+    return request(url, {
       method: RequestMethod.Post,
       data: {
         category: 'timeseries',
@@ -48,11 +52,16 @@ export function getCommonClusters() {
 // 获取es集群信息
 export function getCommonESClusters() {
   if (import.meta.env.VITE_IS_COMMON_DS === 'true') {
-    return request(`/api/v1/datasource/timeseries/elasticsearch/list`, {
+    let url = '/api/v1/datasource/timeseries/elasticsearch/list';
+    if (import.meta.env.VITE_IS_DS_SETTING === 'true') {
+      url = '/api/n9e-plus/datasource/list';
+    }
+    return request(url, {
       method: RequestMethod.Post,
       data: {
         p: 1,
         limit: 100,
+        category: 'logging',
       },
     }).then((res) => {
       return {

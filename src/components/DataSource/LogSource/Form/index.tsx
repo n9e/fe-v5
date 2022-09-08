@@ -6,11 +6,10 @@ import PageLayout from '@/components/pageLayout';
 import BreadCrumb from '@/components/BreadCrumb';
 import { getDataSourceDetailById, getDataSourcePluginList, submitRequest } from '@/components/DataSource/LogSource/services';
 import './index.less';
-import Content from '@/Packages/Settings/pages/LogSource/Form/Content';
-import { ESsourceType } from '@/Packages/Settings/pages/LogSource';
-import { urlPrefix } from '@/Packages/Settings/pages/source';
 
-export default function FormCpt() {
+export const ESsourceType = ['elasticsearch', 'tencent-es', 'aliyun-es'];
+
+export default function FormCpt({ renderContent, backUrl = '/settings/source/log' }) {
   const history = useHistory();
   const { action, type, category, id } = useParams<{ action: string; type: string; category: string; id: string }>();
 
@@ -33,7 +32,7 @@ export default function FormCpt() {
     let pluginId = data?.plugin_id;
     if (!pluginId) {
       const result = await getDataSourcePluginList('logging');
-      pluginId = _.get(_.find(result, { type: `${type}.${category}` }), 'id');
+      pluginId = _.get(_.find(result, { type }), 'id'); // TODO: 这里跟 srm 有区别
     }
     return submitRequest({
       ...values,
@@ -45,7 +44,7 @@ export default function FormCpt() {
         message.success(action === 'add' ? '添加成功, 2s 后返回列表' : '更新成功, 2s 后返回列表');
         setTimeout(() => {
           history.push({
-            pathname: `/${urlPrefix}/source/log`,
+            pathname: backUrl,
           });
         }, 2000);
       })
@@ -71,7 +70,7 @@ export default function FormCpt() {
             crumbs={[
               {
                 text: '数据源管理',
-                link: `/${urlPrefix}/source/log`,
+                link: backUrl,
               },
               {
                 text: type!,
@@ -81,9 +80,7 @@ export default function FormCpt() {
         </div>
       }
     >
-      <div className='srm'>
-        {action === 'edit' && data === undefined ? <Spin spinning={true} /> : <Content data={data} type={type} onFinish={onFinish} submitLoading={submitLoading} />}
-      </div>
+      <div className='srm'>{action === 'edit' && data === undefined ? <Spin spinning={true} /> : renderContent(type, data, onFinish, submitLoading)}</div>
     </PageLayout>
   );
 }

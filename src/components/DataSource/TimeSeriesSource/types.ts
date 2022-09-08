@@ -1,5 +1,25 @@
-import { OracleSettingType } from '@/Packages/Settings/pages/TimeSeriesSource/Form/Oracle/types';
 import { FormInstance } from 'antd';
+
+export interface OracleshardType {
+  'oracle.addr': string;
+  'oracle.db'?: string | string[];
+  'oracle.password': string;
+  'oracle.user': string;
+  'oracle.is_encrypt': boolean;
+}
+
+export interface OracletableType {
+  'oracle.table.op': string;
+  'oracle.table.source': string;
+  'oracle.table.target': string;
+}
+
+export interface OracleSettingType {
+  'oracle.method': string;
+  'oracle.shards': OracleshardType[];
+  'oracle.tables': OracletableType[];
+}
+
 export interface IFromItemBaseProps {
   namePrefix: string[];
   type: string;

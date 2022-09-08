@@ -181,6 +181,14 @@ const SideMenu: FC = () => {
           key: '/help/servers',
           title: t('告警引擎'),
         },
+        ...[
+          import.meta.env.VITE_IS_DS_SETTING
+            ? {
+                key: '/help/source',
+                title: t('数据源管理'),
+              }
+            : {},
+        ],
       ],
     },
   ];

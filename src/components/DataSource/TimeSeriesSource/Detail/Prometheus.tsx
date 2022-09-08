@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Button, Row, Col } from 'antd';
+import React from 'react';
+import { Row, Col } from 'antd';
 import { DataSourceType } from '@/components/DataSource/TimeSeriesSource/types';
 
 interface Props {

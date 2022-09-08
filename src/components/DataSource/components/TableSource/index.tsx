@@ -9,7 +9,13 @@ import type { SortableContainerProps, SortEnd } from 'react-sortable-hoc';
 import { SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc';
 import { kafkaOffsetReset, setDatasourceDefault } from '@/components/DataSource/LogSource/services';
 import LogPopover from '../LogPopover';
-import { ESsourceType, IDefaultES } from '@/Packages/Settings/pages/LogSource';
+// import { ESsourceType, IDefaultES } from '@/Packages/Settings/pages/LogSource';
+export interface IDefaultES {
+  default_id: number;
+  system_id: number;
+}
+
+export const ESsourceType = ['elasticsearch', 'tencent-es', 'aliyun-es'];
 
 export interface IPropsType {
   pluginList?: {
@@ -17,7 +23,7 @@ export interface IPropsType {
     type: string;
     logo?: any;
   }[];
-  category: string;
+  category?: string; // TODO: n9e 暂时是获取所有的数据源
   nameClick: (val) => void;
   isDrag?: boolean;
   logName?: string;
@@ -68,7 +74,7 @@ const TableSource = (props: IPropsType) => {
             el.defaultSource = el.id === defaultES?.default_id;
           });
         }
-        setTableData(res.items);
+        setTableData(res.items || []);
         setDataTotal(res.total);
       })
       .finally(() => {

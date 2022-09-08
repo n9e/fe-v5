@@ -1,28 +1,25 @@
-import React, { useContext } from 'react';
-import { PlusSquareOutlined } from '@ant-design/icons';
+import React from 'react';
 import { Row, Col, Button } from 'antd';
 import { Link } from 'react-router-dom';
-import './index.less';
 import _ from 'lodash';
-import { urlPrefix } from '@/Packages/Settings/pages/source';
+import './index.less';
 
 interface Props {
   sourceMap: any;
-  type?: 'datasource' | 'eventsource' | 'logsource' | 'tracingSource';
+  urlPrefix?: string;
 }
 
 export default function SourceCard(props: Props) {
-  const { sourceMap, type = 'datasource' } = props;
+  const { sourceMap, urlPrefix = 'settings' } = props;
   return (
     <Row className='settings-datasource' gutter={[16, 16]}>
       {_.map(sourceMap, (item) => {
         return (
           <Col span={6} key={item.name}>
-            <Link to={`/${urlPrefix}/${type}/add/${item.type.includes('.') ? _.toLower(item.type).split('.').join('/') : _.toLower(item.type)}`}>
+            <Link to={`/${urlPrefix}/add/${item.category}/${item.type.includes('.') ? _.toLower(item.type).split('.').join('/') : _.toLower(item.type)}`}>
               <div className='settings-datasource-item'>
                 <div className='settings-datasource-item-meta'>
                   <div style={{ height: '45px', lineHeight: '45px' }}>{item.name !== '自定义事件' && item.logo}</div>
-                  {/* <div>{item.logo}</div> */}
                   <div className='settings-datasource-item-name' style={{ height: 20, margin: '8px 0' }}>
                     {item.name}
                   </div>

@@ -6,14 +6,12 @@ import PageLayout from '@/components/pageLayout';
 import BreadCrumb from '@/components/BreadCrumb';
 import { getDataSourceDetailById, getDataSourcePluginList, submitRequest } from '@/components/DataSource/TimeSeriesSource/services';
 import './index.less';
-import Content from '@/Packages/Settings/pages/TimeSeriesSource/Form/Content';
-import { urlPrefix } from '@/Packages/Settings/pages/source';
 
-export default function FormCpt() {
+export default function FormCpt({ renderContent, backUrl = '/settings/source/timeseries' }) {
   const history = useHistory();
-  const params = useParams<{ action: string; type: string }>();
+  const params = useParams<{ action: string; type: string; id: string }>();
   const { action } = params;
-  const id = action === 'edit' ? params.type : undefined;
+  const id = action === 'edit' ? params.id : undefined;
 
   const [type, setType] = useState(action === 'add' ? params.type : '');
   const [data, setData] = useState<any>();
@@ -40,19 +38,14 @@ export default function FormCpt() {
       is_enable: data ? undefined : true, // 新建默认启用
       is_test: true, // 是否测试
     })
-      .then((res) => {
-        if (res.test.success) {
-          message.success(action === 'add' ? '添加成功, 2s 后返回列表' : '更新成功, 2s 后返回列表');
-          setTimeout(() => {
-            history.push({
-              pathname: `/${urlPrefix}/source/timeseries`,
-            });
-          }, 2000);
-        } else {
-          notification.error({
-            message: res.test.message,
+      .then(() => {
+        // TODO: 这里不同于 srm，接口没有返回是否测试成功
+        message.success(action === 'add' ? '添加成功, 2s 后返回列表' : '更新成功, 2s 后返回列表');
+        setTimeout(() => {
+          history.push({
+            pathname: backUrl,
           });
-        }
+        }, 2000);
       })
       .finally(() => {
         setSubmitLoading(false);
@@ -77,7 +70,7 @@ export default function FormCpt() {
             crumbs={[
               {
                 text: '数据源管理',
-                link: `/${urlPrefix}/source/timeseries`,
+                link: backUrl,
               },
               {
                 text: type!,
@@ -87,9 +80,7 @@ export default function FormCpt() {
         </div>
       }
     >
-      <div className='srm'>
-        {action === 'edit' && data === undefined ? <Spin spinning={true} /> : <Content type={type} data={data} onFinish={onFinish} submitLoading={submitLoading} />}
-      </div>
+      <div className='srm'>{action === 'edit' && data === undefined ? <Spin spinning={true} /> : renderContent(type, data, onFinish, submitLoading)}</div>
     </PageLayout>
   );
 }

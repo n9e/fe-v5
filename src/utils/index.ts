@@ -18,6 +18,7 @@ import { message } from 'antd';
 import React, { ReactNode, Component } from 'react';
 import { IStore } from '@/store/common';
 import { useLocation } from 'react-router-dom';
+
 export const isPromise = (obj) => {
   return !!obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function';
 };
@@ -30,21 +31,6 @@ export const download = function (stringList: Array<string> | string, name: stri
   document.body.appendChild(element);
   element.click();
 };
-
-// export const copyToClipBoard = (text: string) => {
-//   const input = document.createElement('input');
-//   document.body.appendChild(input);
-//   input.setAttribute('value', text);
-//   input.select();
-//   try {
-//     if (document.execCommand('Copy')) {
-//       message.success('复制到剪贴板');
-//     }
-//   } catch (error) {
-//     message.error('复制失败');
-//   }
-//   document.body.removeChild(input);
-// };
 
 /**
  * 将文本添加到剪贴板
@@ -80,6 +66,8 @@ export const copyToClipBoard = (text: string, t, spliter?: string): boolean => {
   }
   return succeeded;
 };
+
+export const copy2ClipBoard = copyToClipBoard;
 
 export function formatTrim(s: string) {
   out: for (var n = s.length, i = 1, i0 = -1, i1; i < n; ++i) {

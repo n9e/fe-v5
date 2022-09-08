@@ -12,7 +12,11 @@ interface IResult {
   list: IItem[];
 }
 
-export const apiPrefix = '/api/v1/datasource';
+let apiPrefix = '/api/n9e-plus/datasource';
+
+if (import.meta.env.VITE_IS_DS_SETTING === 'true') {
+  apiPrefix = '/api/v1/datasource';
+}
 
 export const getDataSourcePluginList = (category: string = 'timeseries'): Promise<IResult> => {
   return request(`${apiPrefix}/plugin/list`, {
@@ -22,7 +26,7 @@ export const getDataSourcePluginList = (category: string = 'timeseries'): Promis
       limit: 100,
       category,
     },
-  }).then((res) => res.data.items);
+  }).then((res) => res.data.items || res.data);
 };
 
 export const getLogSourceList = ({ current, pageSize, category }) => {

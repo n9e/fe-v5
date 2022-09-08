@@ -25,6 +25,7 @@ export const sourceLogoMap = {
   zabbix: <img src={'/logos/zabbix_logo.svg'} alt='' className='prometheus_logo' width='94' />,
   mysql: <img src={'/logos/mysql_logo.svg'} alt='' className='prometheus_logo' width='89' />,
   kafka: <img src={'/logos/kafka_logo.svg'} alt='' className='prometheus_logo' width='37' />,
+  elasticsearch: <img src={'/logos/elasticSearch.svg'} alt='' className='prometheus_logo' width='46' />, // 兼容 n9e
   'elasticsearch.logging': <img src={'/logos/elasticSearch.svg'} alt='' className='prometheus_logo' width='46' />,
   'tencent-es.logging': <img src={'/logos/tencet-es.png'} alt='' className='prometheus_logo' width='61' />,
   'aliyun-es.logging': <img src={'/logos/aliyun-es.png'} alt='' className='prometheus_logo' width='61' />,
