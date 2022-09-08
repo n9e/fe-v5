@@ -12,10 +12,10 @@ interface IResult {
   list: IItem[];
 }
 
-let apiPrefix = '/api/n9e-plus/datasource';
+let apiPrefix = '/api/v1/datasource';
 
 if (import.meta.env.VITE_IS_DS_SETTING === 'true') {
-  apiPrefix = '/api/v1/datasource';
+  apiPrefix = '/api/n9e-plus/datasource';
 }
 
 export const getDataSourcePluginList = (category: string = 'timeseries'): Promise<IResult> => {
