@@ -146,7 +146,7 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, introI
             {/* <div className={'page-header-right-area'}>{rightArea}</div> */}
             <div className={'page-header-right-area'}>
               {introIcon}
-              {docFn && <a onClick={() => docFn()}>文档</a>}
+              {docFn && <a onClick={() => docFn()} style={{ marginRight: 20 }}>文档</a>}
               {!hideCluster && (
                 <div style={{ marginRight: 20 }}>
                   集群：
