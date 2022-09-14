@@ -29,6 +29,7 @@ import Profile from '@/pages/account/profile';
 import Dashboard from '@/pages/dashboard/List';
 import Chart from '@/pages/chart';
 import DashboardDetail from '@/pages/dashboard/Detail/index';
+import DashboardShare from '@/pages/dashboard/Share/index';
 import Groups from '@/pages/user/groups';
 import Users from '@/pages/user/users';
 import Business from '@/pages/user/business';
@@ -92,6 +93,7 @@ export default function Content() {
     dispatch({ type: 'common/getClusters' });
     if (
       !location.pathname.startsWith('/chart/') &&
+      !location.pathname.startsWith('/dashboards/share/') &&
       !location.pathname.startsWith('/alert-cur-events/') &&
       !location.pathname.startsWith('/alert-his-events/') &&
       !location.pathname.startsWith('/callback')
@@ -126,6 +128,7 @@ export default function Content() {
 
         <Route path='/dashboard/:id' exact component={DashboardDetail} />
         <Route path='/dashboards/:id' exact component={DashboardDetail} />
+        <Route path='/dashboards/share/:id' component={DashboardShare} />
         <Route path='/dashboards' component={Dashboard} />
         <Route path='/chart/:ids' component={Chart} />
         <Route path='/indicator' component={IndicatorPage} />

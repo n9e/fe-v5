@@ -53,6 +53,7 @@ interface IProps {
   step: number | null;
   variableConfig: any;
   panels: any[];
+  isPreview: boolean;
   setPanels: (panels: any[]) => void;
   onShareClick: (panel: any) => void;
   onUpdated: (res: any) => void;
@@ -64,7 +65,7 @@ function index(props: IProps) {
   const { profile } = useSelector<AccountRootState, accountStoreState>((state) => state.account);
   const location = useLocation();
   const { themeMode } = querystring.parse(location.search);
-  const { editable, curCluster, dashboard, range, step, variableConfig, panels, setPanels, onShareClick, onUpdated } = props;
+  const { editable, curCluster, dashboard, range, step, variableConfig, panels, isPreview, setPanels, onShareClick, onUpdated } = props;
   const layoutInitialized = useRef(false);
   const allowUpdateDashboardConfigs = useRef(false);
   const reactGridLayoutDefaultProps = {
@@ -141,6 +142,7 @@ function index(props: IProps) {
               {item.type !== 'row' ? (
                 semver.valid(item.version) ? (
                   <Renderer
+                    isPreview={isPreview}
                     themeMode={themeMode as 'dark'}
                     dashboardId={_.toString(dashboard.id)}
                     id={item.id}
