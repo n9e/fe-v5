@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-import React, { useState, useRef, useEffect, useContext } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import _ from 'lodash';
 import { useInterval } from 'ahooks';
 import { v4 as uuidv4 } from 'uuid';
@@ -39,7 +39,7 @@ import { JSONParse } from '../utils';
 import Editor from '../Editor';
 import { defaultCustomValuesMap } from '../Editor/config';
 import { sortPanelsByGridLayout, panelsMergeToConfigs, updatePanelsInsertNewPanelToGlobal } from '../Panels/utils';
-import { DetailContext } from '../DetailContext';
+import { useGlobalState } from '../globalState';
 import './style.less';
 import './dark.antd.less';
 import './dark.less';
@@ -51,7 +51,7 @@ interface URLParam {
 export const dashboardTimeCacheKey = 'dashboard-timeRangePicker-value';
 
 export default function DetailV2() {
-  const { dispatch } = useContext(DetailContext);
+  const [dashboardMeta, setDashboardMeta] = useGlobalState('dashboardMeta');
   const { search } = useLocation();
   const locationQuery = queryString.parse(search);
   if (_.get(locationQuery, '__cluster')) {
@@ -130,15 +130,10 @@ export default function DetailV2() {
     // 更新变量配置状态
     if (valueWithOptions) {
       setVariableConfigWithOptions(valueWithOptions);
-      if (dispatch) {
-        dispatch({
-          type: 'initDashboard',
-          payload: {
-            dashboardId: id,
-            variableConfigWithOptions: valueWithOptions,
-          },
-        });
-      }
+      setDashboardMeta({
+        dashboardId: id,
+        variableConfigWithOptions: valueWithOptions,
+      });
     }
   };
   const stopAutoRefresh = () => {

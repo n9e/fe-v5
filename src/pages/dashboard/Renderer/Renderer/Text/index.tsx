@@ -3,7 +3,7 @@ import Color from 'color';
 import { IPanel, ITextStyles } from '../../../types';
 import Markdown from '../../../Editor/Components/Markdown';
 import { replaceFieldWithVariable } from '../../../VariableConfig/constant';
-import { DetailContext } from '../../../DetailContext';
+import { useGlobalState } from '../../../globalState';
 
 interface IProps {
   values: IPanel;
@@ -12,11 +12,11 @@ interface IProps {
 }
 
 export default function index(props: IProps) {
-  const { state } = useContext(DetailContext);
+  const [dashboardMeta] = useGlobalState('dashboardMeta');
   const { values } = props;
   const { custom } = values;
   const { textColor, bgColor, textSize, justifyContent, alignItems } = custom as ITextStyles;
-  const content = replaceFieldWithVariable(custom.content, state.dashboardId, state.variableConfigWithOptions);
+  const content = replaceFieldWithVariable(custom.content, dashboardMeta.dashboardId, dashboardMeta.variableConfigWithOptions);
 
   return (
     <Markdown
