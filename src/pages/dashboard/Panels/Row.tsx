@@ -14,12 +14,12 @@
  * limitations under the License.
  *
  */
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { Space, Modal, Button, Mentions } from 'antd';
 import { CaretRightOutlined, CaretDownOutlined, HolderOutlined, SettingOutlined, DeleteOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { AddPanelIcon } from '../config';
-import { DetailContext } from '../DetailContext';
+import { useGlobalState } from '../globalState';
 import { IVariable, replaceExpressionVars } from '../VariableConfig';
 
 interface IProps {
@@ -43,7 +43,7 @@ export default function Row(props: IProps) {
   const [editVisble, setEditVisble] = useState(false);
   const [newName, setNewName] = useState<string>();
   const [deleteVisible, setDeleteVisible] = useState(false);
-  const { state } = useContext(DetailContext);
+  const [dashboardMeta] = useGlobalState('dashboardMeta');
 
   return (
     <div className='dashboards-panels-row'>
@@ -53,7 +53,7 @@ export default function Row(props: IProps) {
           onToggle();
         }}
       >
-        <span style={{ paddingRight: 6 }}>{replaceFieldWithVariable(name, state.dashboardId, state.variableConfigWithOptions)}</span>
+        <span style={{ paddingRight: 6 }}>{replaceFieldWithVariable(name, dashboardMeta.dashboardId, dashboardMeta.variableConfigWithOptions)}</span>
         {row.collapsed ? <CaretDownOutlined /> : <CaretRightOutlined />}
       </div>
       <Space>
@@ -106,7 +106,7 @@ export default function Row(props: IProps) {
               setEditVisble(false);
             }}
           >
-            {_.map(state.variableConfigWithOptions, (item) => {
+            {_.map(dashboardMeta.variableConfigWithOptions, (item) => {
               return (
                 <Mentions.Option key={item.name} value={item.name}>
                   {item.name}

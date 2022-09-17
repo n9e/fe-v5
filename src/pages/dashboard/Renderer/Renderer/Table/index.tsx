@@ -23,7 +23,7 @@ import getCalculatedValuesBySeries, { getSerieTextObj } from '../../utils/getCal
 import getOverridePropertiesByName from '../../utils/getOverridePropertiesByName';
 import localeCompare from '../../utils/localeCompare';
 import formatToTable from '../../utils/formatToTable';
-import { DetailContext } from '../../../DetailContext';
+import { useGlobalState } from '../../../globalState';
 import './style.less';
 
 interface IProps {
@@ -49,7 +49,6 @@ const getSortOrder = (key, sortObj) => {
 export default function Stat(props: IProps) {
   const eleRef = useRef<HTMLDivElement>(null);
   const size = useSize(eleRef);
-  const { dispatch } = useContext(DetailContext);
   const { values, series, themeMode } = props;
   const { custom, options, overrides } = values;
   const { showHeader, calc, aggrDimension, displayMode, columns, sortColumn, sortOrder, colorMode = 'value' } = custom;
@@ -58,6 +57,7 @@ export default function Stat(props: IProps) {
     sortColumn,
     sortOrder,
   });
+  const [tableFields, setTableFields] = useGlobalState('tableFields');
 
   useEffect(() => {
     setSortObj({
@@ -77,12 +77,7 @@ export default function Stat(props: IProps) {
       },
       options?.valueMappings,
     );
-    if (dispatch) {
-      dispatch({
-        type: 'updateMetric',
-        payload: getColumnsKeys(data),
-      });
-    }
+    setTableFields(getColumnsKeys(data));
     setCalculatedValues(data);
   }, [JSON.stringify(series), calc, JSON.stringify(options)]);
 

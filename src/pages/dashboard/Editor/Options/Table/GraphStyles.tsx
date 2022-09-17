@@ -20,11 +20,11 @@ import { CaretDownOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { Panel } from '../../Components/Collapse';
 import { calcsOptions } from '../../config';
-import { DetailContext } from '../../../DetailContext';
+import { useGlobalState } from '../../../globalState';
 
 export default function GraphStyles({ chartForm }) {
   const namePrefix = ['custom'];
-  const { state } = useContext(DetailContext);
+  const [tableFields] = useGlobalState('tableFields');
 
   return (
     <Panel header='图表样式'>
@@ -72,7 +72,7 @@ export default function GraphStyles({ chartForm }) {
                   <Col span={12}>
                     <Form.Item label='显示列' name={[...namePrefix, 'columns']}>
                       <Select mode='multiple' placeholder='默认全选' suffixIcon={<CaretDownOutlined />}>
-                        {_.map(_.concat(state.metric, 'value'), (item) => {
+                        {_.map(_.concat(tableFields, 'value'), (item) => {
                           return (
                             <Select.Option key={item} value={item}>
                               {item}
@@ -89,7 +89,7 @@ export default function GraphStyles({ chartForm }) {
                   <Col span={12}>
                     <Form.Item label='显示维度' name={[...namePrefix, 'aggrDimension']}>
                       <Select suffixIcon={<CaretDownOutlined />}>
-                        {_.map(state.metric, (item) => {
+                        {_.map(tableFields, (item) => {
                           return (
                             <Select.Option key={item} value={item}>
                               {item}
@@ -110,7 +110,7 @@ export default function GraphStyles({ chartForm }) {
             <Form.Item noStyle shouldUpdate>
               {({ getFieldValue }) => {
                 const displayMode = getFieldValue([...namePrefix, 'displayMode']);
-                const columns = getFieldValue([...namePrefix, 'columns']) ? getFieldValue([...namePrefix, 'columns']) : _.concat(state.metric, 'value');
+                const columns = getFieldValue([...namePrefix, 'columns']) ? getFieldValue([...namePrefix, 'columns']) : _.concat(tableFields, 'value');
                 const aggrDimension = getFieldValue([...namePrefix, 'aggrDimension']);
                 let keys: string[] = [];
                 if (displayMode === 'seriesToRows') {

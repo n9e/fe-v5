@@ -21,7 +21,7 @@ import { useSize } from 'ahooks';
 import { IPanel } from '../../../types';
 import { statHexPalette } from '../../../config';
 import getCalculatedValuesBySeries from '../../utils/getCalculatedValuesBySeries';
-import { DetailContext } from '../../../DetailContext';
+import { useGlobalState } from '../../../globalState';
 import './style.less';
 
 interface IProps {
@@ -108,7 +108,6 @@ const getColumnsKeys = (data: any[]) => {
 };
 
 export default function Stat(props: IProps) {
-  const { dispatch } = useContext(DetailContext);
   const { values, series, bodyWrapRef } = props;
   const { custom, options } = values;
   const { calc, textMode, colorMode, colSpan, textSize, valueField } = custom;
@@ -124,15 +123,11 @@ export default function Stat(props: IProps) {
     options?.thresholds,
   );
   const [isFullSizeBackground, setIsFullSizeBackground] = useState(false);
+  const [statFields, setStatFields] = useGlobalState('statFields');
 
   // 只有单个序列值且是背景色模式，则填充整个卡片的背景色
   useEffect(() => {
-    if (dispatch) {
-      dispatch({
-        type: 'updateMetric',
-        payload: getColumnsKeys(calculatedValues),
-      });
-    }
+    setStatFields(getColumnsKeys(calculatedValues));
     if (bodyWrapRef.current) {
       if (calculatedValues.length === 1 && colorMode === 'background') {
         const head = _.head(calculatedValues);

@@ -18,37 +18,38 @@ export default function Prometheus({ chartForm }) {
         return (
           <>
             <Collapse>
-              {_.map(fields, ({ name }, index) => {
+              {_.map(fields, (field, index) => {
                 return (
                   <Panel
                     header={
                       <Form.Item noStyle shouldUpdate>
                         {({ getFieldValue }) => {
-                          return getFieldValue(['targets', name, 'refId']) || alphabet[index];
+                          return getFieldValue(['targets', field.name, 'refId']) || alphabet[index];
                         }}
                       </Form.Item>
                     }
-                    key={index}
+                    key={field.key}
                     extra={
                       <div>
                         {fields.length > 1 ? (
                           <DeleteOutlined
                             style={{ marginLeft: 10 }}
                             onClick={() => {
-                              remove(name);
+                              remove(field.name);
                             }}
                           />
                         ) : null}
                       </div>
                     }
                   >
-                    <Form.Item noStyle name={[name, 'refId']}>
+                    <Form.Item noStyle {...field} name={[field.name, 'refId']}>
                       <div />
                     </Form.Item>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                       <Form.Item
                         label='PromQL'
-                        name={[name, 'expr']}
+                        {...field}
+                        name={[field.name, 'expr']}
                         validateTrigger={['onBlur']}
                         rules={[
                           {
@@ -72,7 +73,8 @@ export default function Prometheus({ chartForm }) {
                       <Col flex='auto'>
                         <Form.Item
                           label='Legend'
-                          name={[name, 'legend']}
+                          {...field}
+                          name={[field.name, 'legend']}
                           tooltip={{
                             getPopupContainer: () => document.body,
                             title:
@@ -85,7 +87,8 @@ export default function Prometheus({ chartForm }) {
                       <Col flex='116px'>
                         <Form.Item
                           label='时间选择'
-                          name={[name, 'time']}
+                          {...field}
+                          name={[field.name, 'time']}
                           tooltip={{
                             getPopupContainer: () => document.body,
                             title: '可指定时间范围，默认为大盘全局时间范围',
@@ -114,7 +117,8 @@ export default function Prometheus({ chartForm }) {
                       <Col flex='72px'>
                         <Form.Item
                           label='Step'
-                          name={[name, 'step']}
+                          {...field}
+                          name={[field.name, 'step']}
                           tooltip={{
                             getPopupContainer: () => document.body,
                             title: '可指定 step，默认为大盘全局 step',
