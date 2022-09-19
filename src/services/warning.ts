@@ -416,6 +416,16 @@ export function getDsQuery(params) {
   });
 }
 
+export function getLogQuery(params) {
+  return request('/api/n9e-plus/log-query', {
+    method: RequestMethod.Post,
+    data: params,
+    headers: {
+      'X-Cluster': 'Default',
+    },
+  });
+}
+
 export function getIndices(params) {
   return request('/api/n9e-plus/indices', {
     method: RequestMethod.Post,

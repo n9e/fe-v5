@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import moment from 'moment';
 import { IRawTimeRange, parseRange } from '@/components/TimeRangePicker';
-import { getDsQuery } from '@/services/warning';
+import { getLogQuery } from '@/services/warning';
 import { normalizeTime } from '@/pages/warning/strategy/components/utils';
 import { ITarget } from '../../types';
 import { getSerieName } from './utils';
@@ -15,7 +15,7 @@ interface IOptions {
   targets: ITarget[];
 }
 
-export default async function elasticSearchQuery(options: IOptions) {
+export default async function elasticSearchLogQuery(options: IOptions) {
   const { dashboardId, id, time, targets, datasourceCate, datasourceName } = options;
   if (!time.start) return;
   const parsedRange = parseRange(time);
@@ -39,7 +39,7 @@ export default async function elasticSearchQuery(options: IOptions) {
         });
       });
     });
-    const res = await getDsQuery({
+    const res = await getLogQuery({
       cate: datasourceCate,
       cluster: datasourceName,
       query: batchParams,
