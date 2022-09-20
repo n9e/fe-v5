@@ -5,7 +5,7 @@ export default function index({ prefixField = {}, prefixNameField = [] }: any) {
   return (
     <>
       <div style={{ marginBottom: 8 }}>时间颗粒度</div>
-      <Row gutter={16}>
+      <Row gutter={10}>
         <Col span={12}>
           <Form.Item {...prefixField} name={[...prefixNameField, 'query', 'date_field']}>
             <Input placeholder='日期字段 key' />

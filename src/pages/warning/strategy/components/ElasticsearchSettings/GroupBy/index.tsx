@@ -70,7 +70,7 @@ export default function index({ prefixField = {}, prefixFields = [], prefixNameF
                   {({ getFieldValue }) => {
                     const cate = getFieldValue([...prefixFields, ...prefixNameField, 'query', 'group_by', field.name, 'cate']);
                     return (
-                      <Row gutter={16}>
+                      <Row gutter={10}>
                         <Col flex='auto'>
                           <div
                             style={{

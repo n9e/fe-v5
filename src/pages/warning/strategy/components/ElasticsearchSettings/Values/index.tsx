@@ -69,9 +69,9 @@ export default function index({ prefixField = {}, prefixFields = [], prefixNameF
                   {({ getFieldValue }) => {
                     const func = getFieldValue([...prefixFields, ...prefixNameField, 'query', 'values', field.name, 'func']);
                     return (
-                      <Row gutter={16}>
+                      <Row gutter={10}>
                         <Col flex='auto'>
-                          <Row gutter={16}>
+                          <Row gutter={10}>
                             <Col span={func === 'count' ? 24 : 12}>
                               <Input.Group>
                                 {valueRefVisible && <span className='ant-input-group-addon'>{alphabet[index]}</span>}

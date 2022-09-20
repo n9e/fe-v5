@@ -1,13 +1,10 @@
 import React from 'react';
-import { Form, Row, Col, Input, Button } from 'antd';
+import { Form, Row, Col, Input, InputNumber, Button } from 'antd';
 import { DeleteOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import Collapse, { Panel } from '../Components/Collapse';
 import getFirstUnusedLetter from '../../Renderer/utils/getFirstUnusedLetter';
 import IndexSelect from '@/pages/warning/strategy/components/ElasticsearchSettings/IndexSelect';
-import Values from '@/pages/warning/strategy/components/ElasticsearchSettings/Values';
-import GroupBy from '@/pages/warning/strategy/components/ElasticsearchSettings/GroupBy';
-import Time from '@/pages/warning/strategy/components/ElasticsearchSettings/Time';
 
 const alphabet = 'ABCDEFGHIGKLMNOPQRSTUVWXYZ'.split('');
 
@@ -18,8 +15,8 @@ export default function Prometheus({ chartForm }) {
         return (
           <>
             <Collapse>
-              {_.map(fields, ({ name }, index) => {
-                const prefixName = ['targets', name];
+              {_.map(fields, (field, index) => {
+                const prefixName = ['targets', field.name];
                 return (
                   <Panel
                     header={
@@ -29,29 +26,27 @@ export default function Prometheus({ chartForm }) {
                         }}
                       </Form.Item>
                     }
-                    key={index}
+                    key={field.key}
                     extra={
                       <div>
                         {fields.length > 1 ? (
                           <DeleteOutlined
                             style={{ marginLeft: 10 }}
                             onClick={() => {
-                              remove(name);
+                              remove(field.name);
                             }}
                           />
                         ) : null}
                       </div>
                     }
                   >
-                    <Form.Item noStyle name={[name, 'refId']} hidden>
-                      <div />
-                    </Form.Item>
+                    <Form.Item noStyle {...field} name={[field.name, 'refId']} hidden />
                     <Row gutter={10}>
                       <Col span={12}>
                         <Form.Item shouldUpdate={(prevValues, curValues) => _.isEqual(prevValues.datasourceName, curValues.datasourceName)} noStyle>
                           {({ getFieldValue }) => {
                             const datasourceName = getFieldValue('datasourceName') ? [getFieldValue('datasourceName')] : [];
-                            return <IndexSelect prefixName={[name]} cate={getFieldValue('datasourceCate')} cluster={datasourceName} />;
+                            return <IndexSelect prefixField={field} prefixName={[field.name]} cate={getFieldValue('datasourceCate')} cluster={datasourceName} />;
                           }}
                         </Form.Item>
                       </Col>
@@ -65,42 +60,25 @@ export default function Prometheus({ chartForm }) {
                               </a>
                             </span>
                           }
-                          name={[name, 'query', 'filter']}
+                          {...field}
+                          name={[field.name, 'query', 'filter']}
                         >
                           <Input />
                         </Form.Item>
                       </Col>
                     </Row>
-                    <Form.Item
-                      shouldUpdate={(prevValues, curValues) => {
-                        return _.isEqual(prevValues.datasourceName, curValues.datasourceName);
-                      }}
-                      noStyle
-                    >
-                      {({ getFieldValue }) => {
-                        const datasourceName = getFieldValue('datasourceName') ? [getFieldValue('datasourceName')] : [];
-                        return (
-                          <>
-                            <Values
-                              prefixFields={['targets']}
-                              prefixNameField={[name]}
-                              cate={getFieldValue('datasourceCate')}
-                              cluster={datasourceName}
-                              index={getFieldValue([...prefixName, 'query', 'index'])}
-                              valueRefVisible={false}
-                            />
-                            <GroupBy
-                              prefixFields={['targets']}
-                              prefixNameField={[name]}
-                              cate={getFieldValue('datasourceCate')}
-                              cluster={datasourceName}
-                              index={getFieldValue([...prefixName, 'query', 'index'])}
-                            />
-                          </>
-                        );
-                      }}
-                    </Form.Item>
-                    <Time prefixNameField={[name]} />
+                    <Row gutter={10}>
+                      <Col span={12}>
+                        <Form.Item label='日期字段' {...field} name={[field.name, 'query', 'date_field']}>
+                          <Input placeholder='日期字段 key' />
+                        </Form.Item>
+                      </Col>
+                      <Col span={12}>
+                        <Form.Item label='日志条数' {...field} name={[field.name, 'query', 'limit']}>
+                          <InputNumber style={{ width: '100%' }} />
+                        </Form.Item>
+                      </Col>
+                    </Row>
                   </Panel>
                 );
               })}
@@ -112,11 +90,8 @@ export default function Prometheus({ chartForm }) {
               onClick={() => {
                 add({
                   query: {
-                    values: [
-                      {
-                        func: 'count',
-                      },
-                    ],
+                    date_field: '@timestamp',
+                    limit: 100,
                   },
                   refId: getFirstUnusedLetter(_.map(chartForm.getFieldValue('targets'), 'refId')),
                 });
