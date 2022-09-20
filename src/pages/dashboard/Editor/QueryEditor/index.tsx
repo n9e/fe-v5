@@ -2,7 +2,7 @@ import React from 'react';
 import { Space, Input, Form, Select } from 'antd';
 import AdvancedWrap from '@/components/AdvancedWrap';
 import Prometheus from './Prometheus';
-import ElasticSearch from './ElasticSearch';
+import Elasticsearch from './Elasticsearch';
 import ClusterSelect from './components/ClusterSelect';
 
 const cates = [
@@ -91,7 +91,7 @@ export default function index({ chartForm }) {
             return <Prometheus chartForm={chartForm} />;
           }
           if (cate === 'elasticsearch') {
-            return <ElasticSearch chartForm={chartForm} />;
+            return <Elasticsearch chartForm={chartForm} />;
           }
           return null;
         }}

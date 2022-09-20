@@ -18,8 +18,8 @@ export default function Prometheus({ chartForm }) {
         return (
           <>
             <Collapse>
-              {_.map(fields, (field, index) => {
-                const prefixName = ['targets', field.name];
+              {_.map(fields, ({ name }, index) => {
+                const prefixName = ['targets', name];
                 return (
                   <Panel
                     header={
@@ -36,14 +36,14 @@ export default function Prometheus({ chartForm }) {
                           <DeleteOutlined
                             style={{ marginLeft: 10 }}
                             onClick={() => {
-                              remove(field.name);
+                              remove(name);
                             }}
                           />
                         ) : null}
                       </div>
                     }
                   >
-                    <Form.Item noStyle name={[field.name, 'refId']} hidden>
+                    <Form.Item noStyle name={[name, 'refId']} hidden>
                       <div />
                     </Form.Item>
                     <Row gutter={10}>
@@ -51,7 +51,7 @@ export default function Prometheus({ chartForm }) {
                         <Form.Item shouldUpdate={(prevValues, curValues) => _.isEqual(prevValues.datasourceName, curValues.datasourceName)} noStyle>
                           {({ getFieldValue }) => {
                             const datasourceName = getFieldValue('datasourceName') ? [getFieldValue('datasourceName')] : [];
-                            return <IndexSelect prefixField={field} prefixName={[field.name]} cate={getFieldValue('datasourceCate')} cluster={datasourceName} />;
+                            return <IndexSelect prefixName={[name]} cate={getFieldValue('datasourceCate')} cluster={datasourceName} />;
                           }}
                         </Form.Item>
                       </Col>
@@ -65,8 +65,7 @@ export default function Prometheus({ chartForm }) {
                               </a>
                             </span>
                           }
-                          {...field}
-                          name={[field.name, 'query', 'filter']}
+                          name={[name, 'query', 'filter']}
                         >
                           <Input />
                         </Form.Item>
@@ -83,18 +82,16 @@ export default function Prometheus({ chartForm }) {
                         return (
                           <>
                             <Values
-                              prefixField={field}
                               prefixFields={['targets']}
-                              prefixNameField={[field.name]}
+                              prefixNameField={[name]}
                               cate={getFieldValue('datasourceCate')}
                               cluster={datasourceName}
                               index={getFieldValue([...prefixName, 'query', 'index'])}
                               valueRefVisible={false}
                             />
                             <GroupBy
-                              prefixField={field}
                               prefixFields={['targets']}
-                              prefixNameField={[field.name]}
+                              prefixNameField={[name]}
                               cate={getFieldValue('datasourceCate')}
                               cluster={datasourceName}
                               index={getFieldValue([...prefixName, 'query', 'index'])}
@@ -103,7 +100,7 @@ export default function Prometheus({ chartForm }) {
                         );
                       }}
                     </Form.Item>
-                    <Time prefixNameField={[field.name]} />
+                    <Time prefixNameField={[name]} />
                   </Panel>
                 );
               })}

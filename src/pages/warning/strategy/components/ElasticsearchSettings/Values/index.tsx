@@ -6,6 +6,7 @@ import { useDebounceFn } from 'ahooks';
 import { getFields } from '@/services/warning';
 
 interface IProps {
+  prefixField?: any;
   prefixFields?: string[]; // 前缀字段名
   prefixNameField?: string[]; // 列表字段名
   cate: string;
@@ -17,7 +18,7 @@ interface IProps {
 const alphabet = 'ABCDEFGHIGKLMNOPQRSTUVWXYZ'.split('');
 const functions = ['count', 'avg', 'sum', 'max', 'min', 'p90', 'p95', 'p99'];
 
-export default function index({ prefixFields = [], prefixNameField = [], cate, cluster, index, valueRefVisible = true }: IProps) {
+export default function index({ prefixField = {}, prefixFields = [], prefixNameField = [], cate, cluster, index, valueRefVisible = true }: IProps) {
   const [search, setSearch] = useState('');
   const [fieldsOptions, setFieldsOptions] = useState([]);
   const { run } = useDebounceFn(
@@ -44,7 +45,7 @@ export default function index({ prefixFields = [], prefixNameField = [], cate, c
   }, [cate, _.join(cluster), index]);
 
   return (
-    <Form.List name={[...prefixNameField, 'query', 'values']}>
+    <Form.List {...prefixField} name={[...prefixNameField, 'query', 'values']}>
       {(fields, { add, remove }) => (
         <div>
           <div style={{ marginBottom: 8 }}>
@@ -60,15 +61,13 @@ export default function index({ prefixFields = [], prefixNameField = [], cate, c
               }}
             />
           </div>
-          {fields.map(({ key, name }, index) => {
+          {fields.map((field, index) => {
             return (
-              <div key={key} style={{ marginBottom: 16 }}>
-                <Form.Item name={[name, 'ref']} hidden>
-                  <div />
-                </Form.Item>
+              <div key={field.key} style={{ marginBottom: 16 }}>
+                <Form.Item {...field} name={[field.name, 'ref']} hidden />
                 <Form.Item shouldUpdate noStyle>
                   {({ getFieldValue }) => {
-                    const func = getFieldValue([...prefixFields, ...prefixNameField, 'query', 'values', name, 'func']);
+                    const func = getFieldValue([...prefixFields, ...prefixNameField, 'query', 'values', field.name, 'func']);
                     return (
                       <Row gutter={16}>
                         <Col flex='auto'>
@@ -76,7 +75,7 @@ export default function index({ prefixFields = [], prefixNameField = [], cate, c
                             <Col span={func === 'count' ? 24 : 12}>
                               <Input.Group>
                                 {valueRefVisible && <span className='ant-input-group-addon'>{alphabet[index]}</span>}
-                                <Form.Item name={[name, 'func']} noStyle>
+                                <Form.Item {...field} name={[field.name, 'func']} noStyle>
                                   <Select style={{ width: '100%' }}>
                                     {functions.map((func) => (
                                       <Select.Option key={func} value={func}>
@@ -91,7 +90,7 @@ export default function index({ prefixFields = [], prefixNameField = [], cate, c
                               <Col span={12}>
                                 <Input.Group>
                                   <span className='ant-input-group-addon'>Field key</span>
-                                  <Form.Item name={[name, 'field']} noStyle>
+                                  <Form.Item {...field} name={[field.name, 'field']} noStyle>
                                     <AutoComplete
                                       options={_.filter(fieldsOptions, (item) => {
                                         if (search) {
@@ -118,7 +117,7 @@ export default function index({ prefixFields = [], prefixNameField = [], cate, c
                                 cursor: 'pointer',
                               }}
                               onClick={() => {
-                                remove(name);
+                                remove(field.name);
                               }}
                             >
                               <MinusCircleOutlined />

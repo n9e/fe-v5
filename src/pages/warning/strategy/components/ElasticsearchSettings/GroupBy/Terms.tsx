@@ -4,7 +4,7 @@ import { VerticalRightOutlined, VerticalLeftOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { groupByCates } from './configs';
 
-export default function Terms({ restField, name, fieldsOptions }) {
+export default function Terms({ prefixField, fieldsOptions }) {
   const [expanded, setExpanded] = useState(false);
   const [search, setSearch] = useState('');
 
@@ -13,7 +13,7 @@ export default function Terms({ restField, name, fieldsOptions }) {
       <Col flex='auto'>
         <Row gutter={16}>
           <Col span={expanded ? 6 : 12}>
-            <Form.Item {...restField} name={[name, 'cate']} noStyle>
+            <Form.Item {...prefixField} name={[prefixField.name, 'cate']} noStyle>
               <Select style={{ width: '100%' }}>
                 {groupByCates.map((func) => (
                   <Select.Option key={func} value={func}>
@@ -26,7 +26,7 @@ export default function Terms({ restField, name, fieldsOptions }) {
           <Col span={expanded ? 6 : 12}>
             <Input.Group>
               <span className='ant-input-group-addon'>Field key</span>
-              <Form.Item {...restField} name={[name, 'field']} noStyle>
+              <Form.Item {...prefixField} name={[prefixField.name, 'field']} noStyle>
                 <AutoComplete
                   options={_.filter(fieldsOptions, (item) => {
                     if (search) {
@@ -45,7 +45,7 @@ export default function Terms({ restField, name, fieldsOptions }) {
               <Col span={6}>
                 <Input.Group>
                   <span className='ant-input-group-addon'>匹配个数</span>
-                  <Form.Item {...restField} name={[name, 'size']} noStyle>
+                  <Form.Item {...prefixField} name={[prefixField.name, 'size']} noStyle>
                     <InputNumber style={{ width: '100%' }} />
                   </Form.Item>
                 </Input.Group>
@@ -53,7 +53,7 @@ export default function Terms({ restField, name, fieldsOptions }) {
               <Col span={6}>
                 <Input.Group>
                   <span className='ant-input-group-addon'>文档最小值</span>
-                  <Form.Item {...restField} name={[name, 'min_value']} noStyle>
+                  <Form.Item {...prefixField} name={[prefixField.name, 'min_value']} noStyle>
                     <InputNumber style={{ width: '100%' }} />
                   </Form.Item>
                 </Input.Group>

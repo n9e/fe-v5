@@ -3,10 +3,10 @@ import { Form, Select, Row, Col, Input, Space } from 'antd';
 import { PlusCircleOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import { groupByCates } from './configs';
 
-export default function Filters({ restField, name }) {
+export default function Filters({ prefixField }) {
   return (
     <>
-      <Form.Item {...restField} name={[name, 'cate']}>
+      <Form.Item {...prefixField} name={[prefixField.name, 'cate']}>
         <Select style={{ width: '100%' }}>
           {groupByCates.map((func) => (
             <Select.Option key={func} value={func}>
@@ -15,22 +15,22 @@ export default function Filters({ restField, name }) {
           ))}
         </Select>
       </Form.Item>
-      <Form.List {...restField} name={[name, 'params']}>
+      <Form.List {...prefixField} name={[prefixField.name, 'params']}>
         {(fields, { add, remove }) => {
           return (
             <div>
-              {fields.map(({ key, name }, index) => {
+              {fields.map((field, index) => {
                 return (
-                  <Row gutter={16} key={key} style={{ marginBottom: index < fields.length - 1 ? 16 : 0 }}>
+                  <Row gutter={16} key={field.key} style={{ marginBottom: index < fields.length - 1 ? 16 : 0 }}>
                     <Col flex='auto'>
                       <Row gutter={16}>
                         <Col flex={12}>
-                          <Form.Item name={[name, 'query']} noStyle>
+                          <Form.Item {...field} name={[field.name, 'query']} noStyle>
                             <Input addonBefore='Query' />
                           </Form.Item>
                         </Col>
                         <Col flex={12}>
-                          <Form.Item name={[name, 'alias']} noStyle>
+                          <Form.Item {...field} name={[field.name, 'alias']} noStyle>
                             <Input addonBefore='Alias' />
                           </Form.Item>
                         </Col>
@@ -55,7 +55,7 @@ export default function Filters({ restField, name }) {
                               cursor: 'pointer',
                             }}
                             onClick={() => {
-                              remove(name);
+                              remove(field.name);
                             }}
                           />
                         )}
