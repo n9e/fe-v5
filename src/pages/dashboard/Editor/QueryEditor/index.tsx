@@ -42,9 +42,9 @@ export default function index({ chartForm }) {
                         targets: [
                           {
                             refId: 'A',
-                            index: '',
-                            filters: '',
                             query: {
+                              index: '',
+                              filters: '',
                               values: [
                                 {
                                   func: 'count',

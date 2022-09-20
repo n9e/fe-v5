@@ -29,7 +29,7 @@ export default function Prometheus({ chartForm }) {
                         }}
                       </Form.Item>
                     }
-                    key={index}
+                    key={field.key}
                     extra={
                       <div>
                         {fields.length > 1 ? (
@@ -43,9 +43,7 @@ export default function Prometheus({ chartForm }) {
                       </div>
                     }
                   >
-                    <Form.Item noStyle name={[field.name, 'refId']} hidden>
-                      <div />
-                    </Form.Item>
+                    <Form.Item noStyle {...field} name={[field.name, 'refId']} hidden />
                     <Row gutter={10}>
                       <Col span={12}>
                         <Form.Item shouldUpdate={(prevValues, curValues) => _.isEqual(prevValues.datasourceName, curValues.datasourceName)} noStyle>
@@ -103,7 +101,7 @@ export default function Prometheus({ chartForm }) {
                         );
                       }}
                     </Form.Item>
-                    <Time prefixNameField={[field.name]} />
+                    <Time prefixField={field} prefixNameField={[field.name]} />
                   </Panel>
                 );
               })}
@@ -120,6 +118,9 @@ export default function Prometheus({ chartForm }) {
                         func: 'count',
                       },
                     ],
+                    date_field: '@timestamp',
+                    interval: 1,
+                    interval_unit: 'min',
                   },
                   refId: getFirstUnusedLetter(_.map(chartForm.getFieldValue('targets'), 'refId')),
                 });
