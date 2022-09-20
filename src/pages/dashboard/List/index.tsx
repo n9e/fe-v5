@@ -18,8 +18,8 @@
  * 大盘列表页面
  */
 import React, { useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
-import { Table, Tag, Modal, message } from 'antd';
+import { useHistory, Link } from 'react-router-dom';
+import { Table, Tag, Modal, Switch, message } from 'antd';
 import { FundViewOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import _ from 'lodash';
@@ -131,31 +131,46 @@ export default function index() {
                   dataIndex: 'create_by',
                 },
                 {
-                  title: '是否分享',
-                  width: 100,
-                  render: (text: string, record: DashboardType) => {
-                    let htm = <span>{record.public ? '是' : '否'}</span>
-                    if (record.public) {
-                      htm =
-                      <span>
-                        {htm}
-                        <span>（</span>
-                        <span
-                            style={{cursor: 'pointer'}}
-                            className='table-operator-area-normal'
-                            onClick={async () => {
-                              window.open('/dashboards/share/' + record.id);
+                  title: '公开',
+                  width: 120,
+                  dataIndex: 'public',
+                  render: (text: number, record: DashboardType) => {
+                    return (
+                      <div>
+                        <Switch
+                          checked={text === 1}
+                          onChange={() => {
+                            Modal.confirm({
+                              title: `确定${record.public ? '取消分享' : '分享'}大盘：${record.name}吗?`,
+                              onOk: async () => {
+                                await updateDashboardPublic(record.id, { public: record.public ? 0 : 1 });
+                                message.success(`${record.public ? '取消分享' : '分享'}大盘成功`);
+                                if (!record.public) {
+                                  window.open('/dashboards/share/' + record.id);
+                                }
+                                setRefreshKey(_.uniqueId('refreshKey_'));
+                              },
+                            });
+                          }}
+                        />
+                        {text === 1 && (
+                          <Link
+                            target='_blank'
+                            to={{
+                              pathname: '/dashboards/share/' + record.id,
                             }}
-                        >查看</span>
-                        <span>）</span>
-                      </span>
-                    }
-                    return <div>{htm}</div>
-                  }
+                            style={{ marginLeft: 10 }}
+                          >
+                            查看
+                          </Link>
+                        )}
+                      </div>
+                    );
+                  },
                 },
                 {
                   title: '操作',
-                  width: '220px',
+                  width: '180px',
                   render: (text: string, record: DashboardType) => (
                     <div className='table-operator-area'>
                       <div
@@ -175,26 +190,6 @@ export default function index() {
                         }}
                       >
                         编辑
-                      </div>
-                      <div
-                          className='table-operator-area-normal'
-                          onClick={async () => {
-                            Modal.confirm({
-                              title: `确定${record.public ? '取消分享' : '分享'}大盘：${record.name}吗?`,
-                              onOk: async () => {
-                                await updateDashboardPublic(record.id, {public: record.public ? 0 : 1});
-                                message.success(`${record.public ? '取消分享' : '分享'}大盘成功`);
-                                if (!record.public) {
-                                  window.open('/dashboards/share/' + record.id);
-                                }
-                                setRefreshKey(_.uniqueId('refreshKey_'));
-                              },
-
-                              onCancel() {},
-                            });
-                          }}
-                      >
-                        { record.public ? '取消分享' : '分享' }
                       </div>
                       <div
                         className='table-operator-area-normal'
