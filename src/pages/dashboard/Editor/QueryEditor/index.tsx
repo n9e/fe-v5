@@ -2,7 +2,7 @@ import React from 'react';
 import { Space, Input, Form, Select } from 'antd';
 import AdvancedWrap from '@/components/AdvancedWrap';
 import Prometheus from './Prometheus';
-import ElasticSearch from './ElasticSearch';
+import ElasticSearch from './Elasticsearch';
 import ClusterSelect from './components/ClusterSelect';
 
 const cates = [
