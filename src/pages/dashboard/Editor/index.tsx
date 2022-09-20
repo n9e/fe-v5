@@ -66,6 +66,8 @@ function index(props: IProps) {
         } else {
           formData.id = uuidv4();
         }
+        // TODO: antd Form.List remove 不知道为啥无法清空干净这里再过滤下
+        formData.targets = _.filter(formData.targets, (item) => item.refId);
         props.onOK(formData, mode);
         setVisible(false);
       });

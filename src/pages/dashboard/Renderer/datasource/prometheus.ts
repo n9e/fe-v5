@@ -24,7 +24,7 @@ const getDefaultStepByStartAndEnd = (start: number, end: number) => {
   return Math.max(Math.floor((end - start) / 240), 1);
 };
 
-export default async function query(options: IOptions) {
+export default async function prometheusQuery(options: IOptions) {
   const { dashboardId, id, time, step, targets, variableConfig } = options;
   if (!time.start) return;
   const parsedRange = parseRange(time);

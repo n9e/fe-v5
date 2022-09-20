@@ -2,7 +2,8 @@ import React from 'react';
 import { Space, Input, Form, Select } from 'antd';
 import AdvancedWrap from '@/components/AdvancedWrap';
 import Prometheus from './Prometheus';
-import ElasticSearch from './Elasticsearch';
+import Elasticsearch from './Elasticsearch';
+import ElasticsearchLog from './ElasticsearchLog';
 import ClusterSelect from './components/ClusterSelect';
 
 const cates = [
@@ -13,6 +14,10 @@ const cates = [
   {
     value: 'elasticsearch',
     label: 'Elasticsearch',
+  },
+  {
+    value: 'elasticsearch-log',
+    label: 'Elasticsearch Log',
   },
 ];
 
@@ -25,6 +30,7 @@ export default function index({ chartForm }) {
             <span className='ant-input-group-addon'>数据源类型</span>
             <Form.Item name='datasourceCate' noStyle initialValue='prometheus'>
               <Select
+                dropdownMatchSelectWidth={false}
                 style={{ minWidth: 70 }}
                 onChange={(val) => {
                   setTimeout(() => {
@@ -42,9 +48,9 @@ export default function index({ chartForm }) {
                         targets: [
                           {
                             refId: 'A',
-                            index: '',
-                            filters: '',
                             query: {
+                              index: '',
+                              filters: '',
                               values: [
                                 {
                                   func: 'count',
@@ -53,6 +59,18 @@ export default function index({ chartForm }) {
                               date_field: '@timestamp',
                               interval: 1,
                               interval_unit: 'min',
+                            },
+                          },
+                        ],
+                      });
+                    } else if (val === 'elasticsearch-log') {
+                      chartForm.setFieldsValue({
+                        targets: [
+                          {
+                            refId: 'A',
+                            query: {
+                              date_field: '@timestamp',
+                              limit: 10,
                             },
                           },
                         ],
@@ -71,7 +89,8 @@ export default function index({ chartForm }) {
           </Input.Group>
           <Form.Item shouldUpdate={(prev, curr) => prev.datasourceCate !== curr.datasourceCate} noStyle>
             {({ getFieldValue }) => {
-              if (getFieldValue('datasourceCate') === 'elasticsearch') {
+              const cate = getFieldValue('datasourceCate') || 'prometheus';
+              if (cate === 'elasticsearch' || cate === 'elasticsearch-log') {
                 return (
                   <Input.Group>
                     <span className='ant-input-group-addon'>集群</span>
@@ -91,7 +110,10 @@ export default function index({ chartForm }) {
             return <Prometheus chartForm={chartForm} />;
           }
           if (cate === 'elasticsearch') {
-            return <ElasticSearch chartForm={chartForm} />;
+            return <Elasticsearch chartForm={chartForm} />;
+          }
+          if (cate === 'elasticsearch-log') {
+            return <ElasticsearchLog chartForm={chartForm} />;
           }
           return null;
         }}

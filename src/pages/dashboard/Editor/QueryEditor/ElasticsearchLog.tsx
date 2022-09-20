@@ -1,13 +1,10 @@
 import React from 'react';
-import { Form, Row, Col, Input, Button } from 'antd';
+import { Form, Row, Col, Input, InputNumber, Button } from 'antd';
 import { DeleteOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import Collapse, { Panel } from '../Components/Collapse';
 import getFirstUnusedLetter from '../../Renderer/utils/getFirstUnusedLetter';
 import IndexSelect from '@/pages/warning/strategy/components/ElasticsearchSettings/IndexSelect';
-import Values from '@/pages/warning/strategy/components/ElasticsearchSettings/Values';
-import GroupBy from '@/pages/warning/strategy/components/ElasticsearchSettings/GroupBy';
-import Time from '@/pages/warning/strategy/components/ElasticsearchSettings/Time';
 
 const alphabet = 'ABCDEFGHIGKLMNOPQRSTUVWXYZ'.split('');
 
@@ -70,38 +67,18 @@ export default function Prometheus({ chartForm }) {
                         </Form.Item>
                       </Col>
                     </Row>
-                    <Form.Item
-                      shouldUpdate={(prevValues, curValues) => {
-                        return _.isEqual(prevValues.datasourceName, curValues.datasourceName);
-                      }}
-                      noStyle
-                    >
-                      {({ getFieldValue }) => {
-                        const datasourceName = getFieldValue('datasourceName') ? [getFieldValue('datasourceName')] : [];
-                        return (
-                          <>
-                            <Values
-                              prefixField={field}
-                              prefixFields={['targets']}
-                              prefixNameField={[field.name]}
-                              cate={getFieldValue('datasourceCate')}
-                              cluster={datasourceName}
-                              index={getFieldValue([...prefixName, 'query', 'index'])}
-                              valueRefVisible={false}
-                            />
-                            <GroupBy
-                              prefixField={field}
-                              prefixFields={['targets']}
-                              prefixNameField={[field.name]}
-                              cate={getFieldValue('datasourceCate')}
-                              cluster={datasourceName}
-                              index={getFieldValue([...prefixName, 'query', 'index'])}
-                            />
-                          </>
-                        );
-                      }}
-                    </Form.Item>
-                    <Time prefixField={field} prefixNameField={[field.name]} />
+                    <Row gutter={10}>
+                      <Col span={12}>
+                        <Form.Item label='日期字段' {...field} name={[field.name, 'query', 'date_field']}>
+                          <Input placeholder='日期字段 key' />
+                        </Form.Item>
+                      </Col>
+                      <Col span={12}>
+                        <Form.Item label='日志条数' {...field} name={[field.name, 'query', 'limit']}>
+                          <InputNumber style={{ width: '100%' }} />
+                        </Form.Item>
+                      </Col>
+                    </Row>
                   </Panel>
                 );
               })}
@@ -113,14 +90,8 @@ export default function Prometheus({ chartForm }) {
               onClick={() => {
                 add({
                   query: {
-                    values: [
-                      {
-                        func: 'count',
-                      },
-                    ],
                     date_field: '@timestamp',
-                    interval: 1,
-                    interval_unit: 'min',
+                    limit: 100,
                   },
                   refId: getFirstUnusedLetter(_.map(chartForm.getFieldValue('targets'), 'refId')),
                 });
