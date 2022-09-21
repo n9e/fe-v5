@@ -3,14 +3,14 @@ import { Row, Col, Form, Select, Button, Input, InputNumber } from 'antd';
 import { VerticalRightOutlined, VerticalLeftOutlined } from '@ant-design/icons';
 import { groupByCates } from './configs';
 
-export default function Terms({ restField, name }) {
+export default function Terms({ prefixField }) {
   const [expanded, setExpanded] = useState(false);
   return (
     <Row gutter={16}>
       <Col flex='auto'>
         <Row gutter={16}>
           <Col span={expanded ? 6 : 12}>
-            <Form.Item {...restField} name={[name, 'cate']} noStyle>
+            <Form.Item {...prefixField} name={[prefixField.name, 'cate']} noStyle>
               <Select style={{ width: '100%' }}>
                 {groupByCates.map((func) => (
                   <Select.Option key={func} value={func}>
@@ -21,7 +21,7 @@ export default function Terms({ restField, name }) {
             </Form.Item>
           </Col>
           <Col span={expanded ? 6 : 12}>
-            <Form.Item {...restField} name={[name, 'field']} noStyle>
+            <Form.Item {...prefixField} name={[prefixField.name, 'field']} noStyle>
               <Input placeholder='Field key' />
             </Form.Item>
           </Col>
@@ -30,7 +30,7 @@ export default function Terms({ restField, name }) {
               <Col span={6}>
                 <Input.Group>
                   <span className='ant-input-group-addon'>步长</span>
-                  <Form.Item {...restField} name={[name, 'size']} noStyle>
+                  <Form.Item {...prefixField} name={[prefixField.name, 'size']} noStyle>
                     <InputNumber style={{ width: '100%' }} />
                   </Form.Item>
                 </Input.Group>
@@ -38,7 +38,7 @@ export default function Terms({ restField, name }) {
               <Col span={6}>
                 <Input.Group>
                   <span className='ant-input-group-addon'>文档最小值</span>
-                  <Form.Item {...restField} name={[name, 'min_value']} noStyle>
+                  <Form.Item {...prefixField} name={[prefixField.name, 'min_value']} noStyle>
                     <InputNumber style={{ width: '100%' }} />
                   </Form.Item>
                 </Input.Group>

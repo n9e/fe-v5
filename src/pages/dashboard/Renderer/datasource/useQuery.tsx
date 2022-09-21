@@ -24,6 +24,7 @@ import replaceExpressionBracket from '../utils/replaceExpressionBracket';
 import { getSerieName } from './utils';
 import prometheusQuery from './prometheus';
 import elasticSearchQuery from './elasticSearch';
+import elasticSearchLogQuery from './elasticSearchLog';
 
 interface IProps {
   id?: string;
@@ -48,6 +49,7 @@ export default function usePrometheus(props: IProps) {
   const fetchQueryMap = {
     prometheus: prometheusQuery,
     elasticsearch: elasticSearchQuery,
+    'elasticsearch-log': elasticSearchLogQuery,
   };
   const fetchData = () => {
     if (!datasourceCate) return;

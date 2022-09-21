@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-import React, { useRef, useContext, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import _ from 'lodash';
 import { Table } from 'antd';
 import { useSize } from 'ahooks';
@@ -132,9 +132,10 @@ export default function Stat(props: IProps) {
     const columnsKeys = _.isEmpty(columns) ? _.concat(getColumnsKeys(calculatedValues), 'value') : columns;
     tableColumns = _.map(columnsKeys, (key) => {
       return {
-        title: key,
+        title: <span title={key}>{key}</span>,
         dataIndex: key,
         key: key,
+        ellipsis: true,
         sorter: (a, b) => {
           if (key === 'value') {
             return a.stat - b.stat;
@@ -163,7 +164,7 @@ export default function Stat(props: IProps) {
               </div>
             );
           }
-          return _.get(record.metric, key);
+          return <span title={_.get(record.metric, key)}>{_.get(record.metric, key)}</span>;
         },
       };
     });
@@ -251,7 +252,7 @@ export default function Stat(props: IProps) {
           showHeader={showHeader}
           dataSource={tableDataSource}
           columns={tableColumns}
-          scroll={{ y: realHeight }}
+          scroll={{ y: realHeight, x: _.get(size, 'height') - 10 }}
           bordered={false}
           pagination={false}
           onChange={(pagination, filters, sorter: any) => {

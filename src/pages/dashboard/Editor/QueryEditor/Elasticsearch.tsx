@@ -18,8 +18,8 @@ export default function Prometheus({ chartForm }) {
         return (
           <>
             <Collapse>
-              {_.map(fields, ({ name }, index) => {
-                const prefixName = ['targets', name];
+              {_.map(fields, (field, index) => {
+                const prefixName = ['targets', field.name];
                 return (
                   <Panel
                     header={
@@ -29,29 +29,27 @@ export default function Prometheus({ chartForm }) {
                         }}
                       </Form.Item>
                     }
-                    key={index}
+                    key={field.key}
                     extra={
                       <div>
                         {fields.length > 1 ? (
                           <DeleteOutlined
                             style={{ marginLeft: 10 }}
                             onClick={() => {
-                              remove(name);
+                              remove(field.name);
                             }}
                           />
                         ) : null}
                       </div>
                     }
                   >
-                    <Form.Item noStyle name={[name, 'refId']} hidden>
-                      <div />
-                    </Form.Item>
+                    <Form.Item noStyle {...field} name={[field.name, 'refId']} hidden />
                     <Row gutter={10}>
                       <Col span={12}>
                         <Form.Item shouldUpdate={(prevValues, curValues) => _.isEqual(prevValues.datasourceName, curValues.datasourceName)} noStyle>
                           {({ getFieldValue }) => {
                             const datasourceName = getFieldValue('datasourceName') ? [getFieldValue('datasourceName')] : [];
-                            return <IndexSelect prefixName={[name]} cate={getFieldValue('datasourceCate')} cluster={datasourceName} />;
+                            return <IndexSelect prefixField={field} prefixName={[field.name]} cate={getFieldValue('datasourceCate')} cluster={datasourceName} />;
                           }}
                         </Form.Item>
                       </Col>
@@ -65,7 +63,8 @@ export default function Prometheus({ chartForm }) {
                               </a>
                             </span>
                           }
-                          name={[name, 'query', 'filter']}
+                          {...field}
+                          name={[field.name, 'query', 'filter']}
                         >
                           <Input />
                         </Form.Item>
@@ -82,16 +81,18 @@ export default function Prometheus({ chartForm }) {
                         return (
                           <>
                             <Values
+                              prefixField={field}
                               prefixFields={['targets']}
-                              prefixNameField={[name]}
+                              prefixNameField={[field.name]}
                               cate={getFieldValue('datasourceCate')}
                               cluster={datasourceName}
                               index={getFieldValue([...prefixName, 'query', 'index'])}
                               valueRefVisible={false}
                             />
                             <GroupBy
+                              prefixField={field}
                               prefixFields={['targets']}
-                              prefixNameField={[name]}
+                              prefixNameField={[field.name]}
                               cate={getFieldValue('datasourceCate')}
                               cluster={datasourceName}
                               index={getFieldValue([...prefixName, 'query', 'index'])}
@@ -100,7 +101,7 @@ export default function Prometheus({ chartForm }) {
                         );
                       }}
                     </Form.Item>
-                    <Time prefixNameField={[name]} />
+                    <Time prefixField={field} prefixNameField={[field.name]} />
                   </Panel>
                 );
               })}
@@ -117,6 +118,9 @@ export default function Prometheus({ chartForm }) {
                         func: 'count',
                       },
                     ],
+                    date_field: '@timestamp',
+                    interval: 1,
+                    interval_unit: 'min',
                   },
                   refId: getFirstUnusedLetter(_.map(chartForm.getFieldValue('targets'), 'refId')),
                 });

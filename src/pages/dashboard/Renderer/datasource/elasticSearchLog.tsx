@@ -1,10 +1,8 @@
 import _ from 'lodash';
 import moment from 'moment';
 import { IRawTimeRange, parseRange } from '@/components/TimeRangePicker';
-import { getDsQuery } from '@/services/warning';
-import { normalizeTime } from '@/pages/warning/strategy/components/utils';
+import { getLogQuery } from '@/services/warning';
 import { ITarget } from '../../types';
-import { getSerieName } from './utils';
 
 interface IOptions {
   dashboardId: string;
@@ -15,7 +13,7 @@ interface IOptions {
   targets: ITarget[];
 }
 
-export default async function elasticSearchQuery(options: IOptions) {
+export default async function elasticSearchLogQuery(options: IOptions) {
   const { dashboardId, id, time, targets, datasourceCate, datasourceName } = options;
   if (!time.start) return;
   const parsedRange = parseRange(time);
@@ -26,30 +24,26 @@ export default async function elasticSearchQuery(options: IOptions) {
   if (targets && datasourceName) {
     _.forEach(targets, (target) => {
       const query = target.query || {};
-      _.forEach(query?.values, (value) => {
-        batchParams.push({
-          index: query.index,
-          filter: query.filter,
-          value,
-          group_by: query.group_by,
-          date_field: query.date_field,
-          interval: normalizeTime(query.interval, query.interval_unit),
-          start,
-          end,
-        });
+      batchParams.push({
+        index: query.index,
+        filter: query.filter,
+        date_field: query.date_field,
+        limit: query.limit,
+        start,
+        end,
       });
     });
-    const res = await getDsQuery({
+    const res = await getLogQuery({
       cate: datasourceCate,
       cluster: datasourceName,
       query: batchParams,
     });
     series = _.map(res.dat, (item) => {
       return {
-        id: _.uniqueId('series_'),
-        name: getSerieName(item.metric),
-        metric: item.metric,
-        data: item.values,
+        id: item._id,
+        name: item._index,
+        metric: item.fields,
+        data: [],
       };
     });
   }
