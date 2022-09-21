@@ -50,7 +50,7 @@ interface URLParam {
 
 export const dashboardTimeCacheKey = 'dashboard-timeRangePicker-value';
 
-export default function DetailV2() {
+export default function DetailV2({ isPreview = false }: { isPreview?: boolean }) {
   const [dashboardMeta, setDashboardMeta] = useGlobalState('dashboardMeta');
   const { search } = useLocation();
   const locationQuery = queryString.parse(search);
@@ -160,6 +160,7 @@ export default function DetailV2() {
     <PageLayout
       customArea={
         <Title
+          isPreview={isPreview}
           curCluster={curCluster}
           clusters={clusters}
           setCurCluster={setCurCluster}
@@ -226,23 +227,35 @@ export default function DetailV2() {
           )}
           <div className='dashboard-detail-content-header'>
             <div className='variable-area'>
-              {variableConfig && <VariableConfig onChange={handleVariableChange} value={variableConfig} cluster={curCluster} range={range} id={id} onOpenFire={stopAutoRefresh} />}
+              {variableConfig && (
+                <VariableConfig
+                  isPreview={isPreview}
+                  onChange={handleVariableChange}
+                  value={variableConfig}
+                  cluster={curCluster}
+                  range={range}
+                  id={id}
+                  onOpenFire={stopAutoRefresh}
+                />
+              )}
             </div>
-            <DashboardLinks
-              value={dashboardLinks}
-              onChange={(v) => {
-                const dashboardConfigs: any = JSONParse(dashboard.configs);
-                dashboardConfigs.links = v;
-                handleUpdateDashboardConfigs(id, {
-                  configs: JSON.stringify(dashboardConfigs),
-                });
-                setDashboardLinks(v);
-              }}
-            />
+            {!isPreview && (
+              <DashboardLinks
+                value={dashboardLinks}
+                onChange={(v) => {
+                  const dashboardConfigs: any = JSONParse(dashboard.configs);
+                  dashboardConfigs.links = v;
+                  handleUpdateDashboardConfigs(id, {
+                    configs: JSON.stringify(dashboardConfigs),
+                  });
+                  setDashboardLinks(v);
+                }}
+              />
+            )}
           </div>
           {variableConfigWithOptions && (
             <Panels
-              isPreview={false}
+              isPreview={isPreview}
               key={forceRenderKey}
               editable={editable}
               panels={panels}

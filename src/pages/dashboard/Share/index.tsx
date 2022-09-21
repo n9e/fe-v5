@@ -1,6 +1,6 @@
 import React from 'react';
-import Detail from './Detail';
+import Detail from '@/pages/dashboard/Detail/Detail';
 
-export default function index2() {
-  return <Detail />;
+export default function index() {
+  return <Detail isPreview />;
 }

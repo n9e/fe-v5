@@ -33,6 +33,7 @@ interface IProps {
   range: IRawTimeRange;
   onChange: (data: IVariable[], needSave: boolean, options?: IVariable[]) => void;
   onOpenFire?: () => void;
+  isPreview?: boolean;
 }
 
 function includes(source, target) {
@@ -43,7 +44,7 @@ function includes(source, target) {
 }
 
 function index(props: IProps) {
-  const { id, cluster, editable = true, range, onChange, onOpenFire } = props;
+  const { id, cluster, editable = true, range, onChange, onOpenFire, isPreview = false } = props;
   const [editing, setEditing] = useState<boolean>(false);
   const [data, setData] = useState<IVariable[]>([]);
   const dataWithoutConstant = _.filter(data, (item) => item.type !== 'constant');
@@ -141,7 +142,7 @@ function index(props: IProps) {
             />
           );
         })}
-        {editable && (
+        {editable && !isPreview ? (
           <EditOutlined
             className='icon'
             onClick={() => {
@@ -149,7 +150,7 @@ function index(props: IProps) {
               onOpenFire && onOpenFire();
             }}
           />
-        )}
+        ) : null}
         {(data ? _.filter(data, (item) => item.type != 'constant')?.length === 0 : true) && editable && (
           <div
             className='add-variable-tips'

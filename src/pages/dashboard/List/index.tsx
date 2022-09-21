@@ -23,6 +23,7 @@ import { Table, Tag, Modal, Switch, message } from 'antd';
 import { FundViewOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import _ from 'lodash';
+import queryString from 'query-string';
 import { Dashboard as DashboardType } from '@/store/dashboardInterface';
 import { getDashboards, cloneDashboard, removeDashboards, getDashboard, updateDashboardPublic } from '@/services/dashboardV2';
 import PageLayout from '@/components/pageLayout';
@@ -145,9 +146,6 @@ export default function index() {
                               onOk: async () => {
                                 await updateDashboardPublic(record.id, { public: record.public ? 0 : 1 });
                                 message.success(`${record.public ? '取消分享' : '分享'}大盘成功`);
-                                if (!record.public) {
-                                  window.open('/dashboards/share/' + record.id);
-                                }
                                 setRefreshKey(_.uniqueId('refreshKey_'));
                               },
                             });
@@ -157,7 +155,11 @@ export default function index() {
                           <Link
                             target='_blank'
                             to={{
-                              pathname: '/dashboards/share/' + record.id,
+                              pathname: `/dashboards/share/${record.id}`,
+                              search: queryString.stringify({
+                                __cluster: localStorage.getItem('curCluster'),
+                                viewMode: 'fullscreen',
+                              }),
                             }}
                             style={{ marginLeft: 10 }}
                           >
