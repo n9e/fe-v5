@@ -140,7 +140,7 @@ export default function Stat(props: IProps) {
           if (key === 'value') {
             return a.stat - b.stat;
           }
-          return localeCompare(a.name, b.name);
+          return localeCompare(_.toString(_.get(a.metric, key)), _.toString(_.get(b.metric, key)));
         },
         sortOrder: getSortOrder(key, sortObj),
         className: key === 'value' ? 'renderer-table-td-content-value-container' : '',
