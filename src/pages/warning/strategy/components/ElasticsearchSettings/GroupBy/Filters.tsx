@@ -1,16 +1,16 @@
 import React from 'react';
 import { Form, Select, Row, Col, Input, Space } from 'antd';
 import { PlusCircleOutlined, MinusCircleOutlined } from '@ant-design/icons';
-import { groupByCates } from './configs';
+import { groupByCates, groupByCatesMap } from './configs';
 
 export default function Filters({ prefixField }) {
   return (
     <>
       <Form.Item {...prefixField} name={[prefixField.name, 'cate']}>
-        <Select style={{ width: '100%' }}>
+        <Select style={{ width: '100%' }} optionLabelProp='value'>
           {groupByCates.map((func) => (
             <Select.Option key={func} value={func}>
-              {func}
+              {func} ({groupByCatesMap[func]})
             </Select.Option>
           ))}
         </Select>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Row, Col, Form, Select, Button, Input, InputNumber, AutoComplete } from 'antd';
 import { VerticalRightOutlined, VerticalLeftOutlined } from '@ant-design/icons';
 import _ from 'lodash';
-import { groupByCates } from './configs';
+import { groupByCates, groupByCatesMap } from './configs';
 
 export default function Terms({ prefixField, fieldsOptions }) {
   const [expanded, setExpanded] = useState(false);
@@ -14,10 +14,10 @@ export default function Terms({ prefixField, fieldsOptions }) {
         <Row gutter={16}>
           <Col span={expanded ? 6 : 12}>
             <Form.Item {...prefixField} name={[prefixField.name, 'cate']} noStyle>
-              <Select style={{ width: '100%' }}>
+              <Select style={{ width: '100%' }} optionLabelProp='value'>
                 {groupByCates.map((func) => (
                   <Select.Option key={func} value={func}>
-                    {func}
+                    {func} ({groupByCatesMap[func]})
                   </Select.Option>
                 ))}
               </Select>
