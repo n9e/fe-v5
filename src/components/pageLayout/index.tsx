@@ -39,9 +39,10 @@ interface IPageLayoutProps {
   backPath?: string;
   hideCluster?: Boolean;
   onChangeCluster?: (string) => void;
+  docFn?: Function;
 }
 
-const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, introIcon, children, customArea, showBack, backPath, onChangeCluster, hideCluster = true }) => {
+const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, introIcon, children, customArea, showBack, backPath, onChangeCluster, hideCluster = true, docFn }) => {
   const { t, i18n } = useTranslation();
   const history = useHistory();
   const dispatch = useDispatch();
@@ -145,11 +146,7 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, introI
             {/* <div className={'page-header-right-area'}>{rightArea}</div> */}
             <div className={'page-header-right-area'}>
               {introIcon}
-              {window.location.hostname !== 'demo.flashcat.cloud' && import.meta.env.VITE_DOC_LINK && (
-                <a href={import.meta.env.VITE_DOC_LINK as string} target='_blank' style={{ marginRight: 20 }}>
-                  文档
-                </a>
-              )}
+              {docFn && <a onClick={() => docFn()} style={{ marginRight: 20 }}>文档</a>}
               {!hideCluster && (
                 <div style={{ marginRight: 20 }}>
                   集群：
