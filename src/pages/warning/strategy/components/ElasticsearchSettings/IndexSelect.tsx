@@ -8,7 +8,7 @@ export default function IndexSelect({ prefixField = {}, prefixName = [], cate, c
   const [search, setSearch] = useState('');
 
   useEffect(() => {
-    if (cate === 'elasticsearch' && !_.isEmpty(cluster)) {
+    if ((cate === 'elasticsearch' || cate === 'elasticsearch-log') && !_.isEmpty(cluster)) {
       getIndices({ cate, cluster: _.join(cluster, ' ') }).then((res) => {
         setOptions(
           _.map(res.dat, (item) => {
