@@ -15,6 +15,7 @@
  *
  */
 import React, { useEffect, useState, useMemo } from 'react';
+import _ from 'lodash';
 import { useSelector } from 'react-redux';
 import { Tag, Button, Modal, message, Switch, Dropdown, Table, Tabs, Select, Space } from 'antd';
 import { getStrategyGroupSubList, updateAlertRules } from '@/services/warning';
@@ -78,7 +79,7 @@ const PageTable: React.FC<Props> = ({ bgid }) => {
     if (bgid) {
       getAlertRules();
     }
-  }, [bgid, severity, cate]);
+  }, [bgid, severity]);
 
   useEffect(() => {
     filterData();
@@ -89,9 +90,13 @@ const PageTable: React.FC<Props> = ({ bgid }) => {
       return;
     }
     setLoading(true);
-    const { success, dat } = await getStrategyGroupSubList({ id: bgid, cate });
+    const { success, dat } = await getStrategyGroupSubList({ id: bgid });
     if (success) {
-      setCurrentStrategyDataAll(dat.filter((item) => !severity || item.severity === severity) || []);
+      setCurrentStrategyDataAll(
+        dat.filter((item) => {
+          return !severity || item.severity === severity;
+        }) || [],
+      );
       setLoading(false);
     }
   };
@@ -422,7 +427,13 @@ const PageTable: React.FC<Props> = ({ bgid }) => {
           defaultPageSize: 30,
         }}
         loading={loading}
-        dataSource={currentStrategyData}
+        dataSource={_.filter(currentStrategyData, (item) => {
+          const curItemCate = item.cate || 'prometheus';
+          if (cate) {
+            return curItemCate === cate;
+          }
+          return true;
+        })}
         rowSelection={{
           selectedRowKeys: selectedRows.map((item) => item.id),
           onChange: (selectedRowKeys: React.Key[], selectedRows: strategyItem[]) => {
