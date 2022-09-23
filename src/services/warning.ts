@@ -64,9 +64,12 @@ export const updateStrategyGroup = function (data: Partial<strategyGroup> & { id
 };
 
 //// 获取策略列表
-export const getStrategyGroupSubList = function (params: { id: number }) {
+export const getStrategyGroupSubList = function (params: { id: number; cate?: string }) {
   return request(`/api/n9e/busi-group/${params.id}/alert-rules`, {
     method: RequestMethod.Get,
+    params: {
+      cate: params.cate,
+    },
   });
 };
 

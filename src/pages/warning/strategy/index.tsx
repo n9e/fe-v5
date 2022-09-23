@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import PageLayout from '@/components/pageLayout';
 import { useHistory } from 'react-router-dom';
 import LeftTree from '@/components/LeftTree';

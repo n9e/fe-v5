@@ -27,6 +27,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/common';
 import { eventStoreState } from '@/store/eventInterface';
 import ColumnSelect from '@/components/ColumnSelect';
+import AdvancedWrap from '@/components/AdvancedWrap';
 import ClusterSelect from './ClusterSelect';
 import { SeverityColor } from '../event';
 import '../event/index.less';
@@ -130,7 +131,7 @@ const Event: React.FC = () => {
               }
             }}
           />
-          {import.meta.env.VITE_IS_ALERT_ES_DS && (
+          <AdvancedWrap var='VITE_IS_ALERT_ES_DS'>
             <Select
               value={cate}
               onChange={(val) => {
@@ -143,7 +144,7 @@ const Event: React.FC = () => {
               <Select.Option value='prometheus'>Prometheus</Select.Option>
               <Select.Option value='elasticsearch'>Elasticsearch</Select.Option>
             </Select>
-          )}
+          </AdvancedWrap>
           <ClusterSelect cate={cate} onClusterChange={(e) => setCurClusterItems(e)} />
           <ColumnSelect
             onSeverityChange={(e) => setHisSeverity(e)}
