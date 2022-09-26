@@ -247,7 +247,6 @@ export default function index(props: IProps) {
                 {
                   title: `Series (${series.length})`,
                   dataIndex: 'name',
-                  width: 150,
                   ellipsis: {
                     showTitle: false,
                   },
@@ -272,7 +271,7 @@ export default function index(props: IProps) {
                       >
                         <span className='renderer-timeseries-legend-color-symbol' style={{ backgroundColor: record.color }} />
                         {record.offset && record.offset !== 'current' ? <span style={{ paddingRight: 5 }}>offfset {record.offset}</span> : ''}
-                        <span>{JSON.stringify(record.metric)}</span>
+                        <span>{_text}</span>
                       </Tooltip>
                     );
                   },
@@ -280,6 +279,7 @@ export default function index(props: IProps) {
                 {
                   title: 'Max',
                   dataIndex: 'max',
+                  width: 100,
                   sorter: (a, b) => a.max.value - b.max.value,
                   render: (text) => {
                     return text.text;
@@ -288,6 +288,7 @@ export default function index(props: IProps) {
                 {
                   title: 'Min',
                   dataIndex: 'min',
+                  width: 100,
                   sorter: (a, b) => a.min.value - b.min.value,
                   render: (text) => {
                     return text.text;
@@ -296,6 +297,7 @@ export default function index(props: IProps) {
                 {
                   title: 'Avg',
                   dataIndex: 'avg',
+                  width: 100,
                   sorter: (a, b) => a.avg.value - b.avg.value,
                   render: (text) => {
                     return text.text;
@@ -304,6 +306,7 @@ export default function index(props: IProps) {
                 {
                   title: 'Sum',
                   dataIndex: 'sum',
+                  width: 100,
                   sorter: (a, b) => a.sum.value - b.sum.value,
                   render: (text) => {
                     return text.text;
@@ -312,6 +315,7 @@ export default function index(props: IProps) {
                 {
                   title: 'Last',
                   dataIndex: 'last',
+                  width: 100,
                   sorter: (a, b) => a.last.value - b.last.value,
                   render: (text) => {
                     return text.text;
