@@ -117,7 +117,7 @@ export default function BarGauge(props: IProps) {
     options?.valueMappings,
   );
   if (sortOrder && sortOrder !== 'none') {
-    calculatedValues = _.orderBy(calculatedValues, ['value'], [sortOrder]);
+    calculatedValues = _.orderBy(calculatedValues, ['stat'], [sortOrder]);
   }
   const curMaxValue = maxValue !== undefined ? maxValue : _.maxBy(calculatedValues, 'value')?.value || 0;
 
