@@ -94,6 +94,14 @@ export const updateDashboardConfigs = function (id: string | number, data: { con
   });
 };
 
+// 更新大盘 - 只能更新 public
+export const updateDashboardPublic = function (id: string | number, data: { public: number }) {
+  return request(`/api/n9e/board/${id}/public`, {
+    method: RequestMethod.Put,
+    data,
+  });
+};
+
 // boards v2 api
 export const migrateDashboard = function (id: number, data: { name: string; tags: string; configs: string }) {
   return request(`/api/n9e/dashboard/${id}/migrate`, {

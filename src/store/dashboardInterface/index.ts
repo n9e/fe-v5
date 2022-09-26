@@ -23,6 +23,7 @@ export interface Dashboard {
   update_at: number;
   update_by: string;
   configs?: string;
+  public?: number;
 }
 
 export interface Group {

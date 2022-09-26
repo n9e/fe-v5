@@ -18,13 +18,14 @@
  * 大盘列表页面
  */
 import React, { useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
-import { Table, Tag, Modal, message } from 'antd';
+import { useHistory, Link } from 'react-router-dom';
+import { Table, Tag, Modal, Switch, message } from 'antd';
 import { FundViewOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import _ from 'lodash';
+import queryString from 'query-string';
 import { Dashboard as DashboardType } from '@/store/dashboardInterface';
-import { getDashboards, cloneDashboard, removeDashboards, getDashboard } from '@/services/dashboardV2';
+import { getDashboards, cloneDashboard, removeDashboards, getDashboard, updateDashboardPublic } from '@/services/dashboardV2';
 import PageLayout from '@/components/pageLayout';
 import LeftTree from '@/components/LeftTree';
 import BlankBusinessPlaceholder from '@/components/BlankBusinessPlaceholder';
@@ -131,8 +132,47 @@ export default function index() {
                   dataIndex: 'create_by',
                 },
                 {
+                  title: '公开',
+                  width: 120,
+                  dataIndex: 'public',
+                  render: (text: number, record: DashboardType) => {
+                    return (
+                      <div>
+                        <Switch
+                          checked={text === 1}
+                          onChange={() => {
+                            Modal.confirm({
+                              title: `确定${record.public ? '取消分享' : '分享'}大盘：${record.name}吗?`,
+                              onOk: async () => {
+                                await updateDashboardPublic(record.id, { public: record.public ? 0 : 1 });
+                                message.success(`${record.public ? '取消分享' : '分享'}大盘成功`);
+                                setRefreshKey(_.uniqueId('refreshKey_'));
+                              },
+                            });
+                          }}
+                        />
+                        {text === 1 && (
+                          <Link
+                            target='_blank'
+                            to={{
+                              pathname: `/dashboards/share/${record.id}`,
+                              search: queryString.stringify({
+                                __cluster: localStorage.getItem('curCluster'),
+                                viewMode: 'fullscreen',
+                              }),
+                            }}
+                            style={{ marginLeft: 10 }}
+                          >
+                            查看
+                          </Link>
+                        )}
+                      </div>
+                    );
+                  },
+                },
+                {
                   title: '操作',
-                  width: '160px',
+                  width: '180px',
                   render: (text: string, record: DashboardType) => (
                     <div className='table-operator-area'>
                       <div
