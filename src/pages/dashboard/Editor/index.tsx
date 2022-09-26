@@ -15,7 +15,7 @@
  *
  */
 import React, { useState, useEffect, useRef } from 'react';
-import { Modal, Form, Select, Space, Button } from 'antd';
+import { Modal, Select, Space, Button } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
@@ -26,6 +26,7 @@ import { visualizations, defaultValues, defaultCustomValuesMap } from './config'
 import { IVariable } from '../VariableConfig';
 import FormCpt from './Form';
 import { IPanel } from '../types';
+import { normalizeInitialValues } from './util';
 
 interface IProps {
   mode: string;
@@ -43,47 +44,44 @@ function index(props: IProps) {
   const { t } = useTranslation();
   const formRef = useRef<any>();
   const { mode, visible, setVisible, variableConfigWithOptions, cluster, id, time } = props;
-  const initialValues = _.cloneDeep(props.initialValues);
+  const [initialValues, setInitialValues] = useState<IPanel>(_.cloneDeep(props.initialValues));
   const [range, setRange] = useState<IRawTimeRange>(time);
-  const defaultType = _.get(initialValues, 'type') || defaultValues.type;
-  const [type, setType] = useState<string>(defaultType);
   const [step, setStep] = useState<number | null>(null);
   const handleAddChart = async () => {
     if (formRef.current && formRef.current.getFormInstance) {
       const formInstance = formRef.current.getFormInstance();
       formInstance.validateFields().then(async (values) => {
         // TODO: 渲染 hexbin 图时，colorRange 需要从 string 转换为 array
-        if (type === 'hexbin') {
+        if (values.type === 'hexbin') {
           _.set(values, 'custom.colorRange', _.split(values.custom.colorRange, ','));
         }
         let formData = Object.assign(values, {
           version: '2.0.0',
-          type,
-          layout: initialValues?.layout,
         });
-        if (initialValues && initialValues.id) {
-          formData.id = initialValues.id;
+        if (values && values.id) {
+          formData.id = values.id;
         } else {
           formData.id = uuidv4();
         }
-        // TODO: antd Form.List remove 不知道为啥无法清空干净这里再过滤下
-        formData.targets = _.filter(formData.targets, (item) => item.refId);
         props.onOK(formData, mode);
         setVisible(false);
       });
     }
   };
 
-  // TODO: 渲染 hexbin 配置时，colorRange 需要从 array 转换为 string
-  if (initialValues.type === 'hexbin' && initialValues?.custom?.colorRange) {
-    if (_.isArray(initialValues.custom.colorRange)) {
-      _.set(initialValues, 'custom.colorRange', _.join(initialValues.custom.colorRange, ','));
-    }
-  }
-
   useEffect(() => {
-    setType(_.get(initialValues, 'type') || defaultValues.type);
-  }, [JSON.stringify(initialValues)]);
+    const initialValuesCopy = _.cloneDeep(props.initialValues);
+    initialValuesCopy.type = initialValuesCopy.type || defaultValues.type;
+    // TODO: 渲染 hexbin 配置时，colorRange 需要从 array 转换为 string
+    if (initialValuesCopy.type === 'hexbin' && initialValuesCopy?.custom?.colorRange) {
+      if (_.isArray(initialValuesCopy.custom.colorRange)) {
+        _.set(initialValuesCopy, 'custom.colorRange', _.join(initialValuesCopy.custom.colorRange, ','));
+        setInitialValues(initialValuesCopy);
+      }
+    } else {
+      setInitialValues(initialValuesCopy);
+    }
+  }, [JSON.stringify(props.initialValues)]);
 
   return (
     <Modal
@@ -94,14 +92,15 @@ function index(props: IProps) {
           <Space style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', fontSize: 12, lineHeight: '20px' }}>
             <Select
               dropdownMatchSelectWidth={false}
-              value={type}
+              value={initialValues.type}
               onChange={(val) => {
-                setType(val);
                 if (formRef.current && formRef.current.getFormInstance) {
                   const formInstance = formRef.current.getFormInstance();
-                  formInstance.setFieldsValue({
-                    custom: defaultCustomValuesMap[val],
-                  });
+                  const values = formInstance.getFieldsValue();
+                  const valuesCopy = _.cloneDeep(values);
+                  _.set(valuesCopy, 'type', val);
+                  _.set(valuesCopy, 'custom', defaultCustomValuesMap[val]);
+                  setInitialValues(valuesCopy);
                 }
               }}
             >
@@ -163,13 +162,13 @@ function index(props: IProps) {
       {!_.isEmpty(initialValues) && (
         <FormCpt
           ref={formRef}
-          initialValues={initialValues}
-          type={type}
+          initialValues={normalizeInitialValues(initialValues)}
           variableConfigWithOptions={variableConfigWithOptions}
           cluster={cluster}
           range={range}
           id={id}
           step={step}
+          key={initialValues.type} // 每次切换图表类型，都重新渲染
         />
       )}
     </Modal>

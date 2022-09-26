@@ -148,7 +148,6 @@ function index(props: IProps) {
                     id={item.id}
                     time={range}
                     step={step}
-                    type={item.type}
                     values={item as any}
                     variableConfig={variableConfig}
                     onCloneClick={() => {

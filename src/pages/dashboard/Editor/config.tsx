@@ -92,6 +92,12 @@ export const calcsOptions = {
   },
 };
 
+export const defaultThreshold = {
+  color: '#634CD9',
+  value: null,
+  type: 'base',
+};
+
 export const defaultValues = {
   version: '1.0.0',
   type: 'timeseries',
@@ -104,13 +110,7 @@ export const defaultValues = {
       displayMode: 'hidden',
     },
     thresholds: {
-      steps: [
-        {
-          color: '#634CD9',
-          value: null,
-          type: 'base',
-        },
-      ],
+      steps: [defaultThreshold],
     },
   },
   custom: {},

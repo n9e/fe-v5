@@ -15,14 +15,13 @@
  *
  */
 import React, { useEffect, useState, useImperativeHandle, forwardRef } from 'react';
-import { Form, Input, Row, Col, Button, Space, Switch, Tooltip, Mentions } from 'antd';
+import { Form, Row, Col, Button, Space, Switch, Tooltip, Mentions } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { defaultValues, defaultCustomValuesMap } from './config';
 import Options from './Options';
 import Collapse, { Panel } from './Components/Collapse';
 import VariableConfig, { IVariable } from '../VariableConfig';
-import getFirstUnusedLetter from '../Renderer/utils/getFirstUnusedLetter';
 import Renderer from '../Renderer/Renderer';
 import QueryEditor from './QueryEditor';
 
@@ -30,10 +29,10 @@ const alphabet = 'ABCDEFGHIGKLMNOPQRSTUVWXYZ'.split('');
 
 function FormCpt(props, ref) {
   const [chartForm] = Form.useForm();
-  const { initialValues, type, cluster, range, id, step } = props;
+  const { initialValues, cluster, range, id, step } = props;
   const [variableConfigWithOptions, setVariableConfigWithOptions] = useState<IVariable[]>(props.variableConfigWithOptions);
 
-  defaultValues.custom = defaultCustomValuesMap[_.get(initialValues, 'type') || defaultValues.type];
+  defaultValues.custom = defaultCustomValuesMap[initialValues?.type || defaultValues.type];
 
   _.forEach(initialValues.targets, (item) => {
     if (_.get(item, 'time.unit')) {
@@ -52,7 +51,11 @@ function FormCpt(props, ref) {
   }, [JSON.stringify(props.variableConfigWithOptions)]);
 
   return (
-    <Form preserve={false} layout='vertical' form={chartForm} initialValues={_.merge({}, defaultValues, initialValues)}>
+    <Form layout='vertical' form={chartForm} initialValues={_.merge({}, defaultValues, initialValues)}>
+      <Form.Item name='type' hidden />
+      <Form.Item name='id' hidden />
+      <Form.Item name='layout' hidden />
+      <Form.Item name='version' hidden />
       <div
         style={{
           height: 'calc(100vh - 173px)',
@@ -69,27 +72,34 @@ function FormCpt(props, ref) {
             <div style={{ marginBottom: 10, height: 300 }}>
               <Form.Item shouldUpdate noStyle>
                 {({ getFieldsValue }) => {
-                  return <Renderer dashboardId={id} time={range} step={step} type={type} values={getFieldsValue()} variableConfig={variableConfigWithOptions} isPreview />;
+                  return <Renderer dashboardId={id} time={range} step={step} values={getFieldsValue()} variableConfig={variableConfigWithOptions} isPreview />;
                 }}
               </Form.Item>
             </div>
-            {type !== 'text' && (
-              <div style={{ height: 'calc(100% - 310px)', overflowY: 'auto' }}>
-                <div style={{ marginBottom: 10 }}>
-                  <VariableConfig
-                    onChange={(value, bool, withOptions) => {
-                      setVariableConfigWithOptions(withOptions || []);
-                    }}
-                    value={variableConfigWithOptions}
-                    editable={false}
-                    cluster={cluster}
-                    range={range}
-                    id={id}
-                  />
-                </div>
-                <QueryEditor chartForm={chartForm} />
-              </div>
-            )}
+            <Form.Item shouldUpdate={(prevValues, curValues) => prevValues.type !== curValues.type} noStyle>
+              {({ getFieldValue }) => {
+                const type = getFieldValue('type');
+                if (type !== 'text') {
+                  return (
+                    <div style={{ height: 'calc(100% - 310px)', overflowY: 'auto' }}>
+                      <div style={{ marginBottom: 10 }}>
+                        <VariableConfig
+                          onChange={(value, bool, withOptions) => {
+                            setVariableConfigWithOptions(withOptions || []);
+                          }}
+                          value={variableConfigWithOptions}
+                          editable={false}
+                          cluster={cluster}
+                          range={range}
+                          id={id}
+                        />
+                      </div>
+                      <QueryEditor chartForm={chartForm} />
+                    </div>
+                  );
+                }
+              }}
+            </Form.Item>
           </Col>
           <Col flex='600px' style={{ overflowY: 'auto' }}>
             <Collapse>
@@ -199,7 +209,7 @@ function FormCpt(props, ref) {
               </Panel>
               <Form.Item shouldUpdate={(prevValues, curValues) => !_.isEqual(prevValues.targets, curValues.targets)}>
                 {({ getFieldValue }) => {
-                  return <Options type={type} targets={getFieldValue('targets')} chartForm={chartForm} variableConfigWithOptions={variableConfigWithOptions} />;
+                  return <Options type={getFieldValue('type')} targets={getFieldValue('targets')} chartForm={chartForm} variableConfigWithOptions={variableConfigWithOptions} />;
                 }}
               </Form.Item>
             </Collapse>

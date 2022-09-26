@@ -42,7 +42,6 @@ interface IProps {
   id?: string;
   time: IRawTimeRange;
   step: number | null;
-  type: string;
   values: IPanel;
   variableConfig?: IVariable[];
   isPreview?: boolean; // 是否是预览，预览中不显示编辑和分享
@@ -60,7 +59,7 @@ function replaceFieldWithVariable(dashboardId, value: string, variableConfig?: I
 }
 
 function index(props: IProps) {
-  const { themeMode, dashboardId, id, step, type, variableConfig, isPreview, onCloneClick, onShareClick, onEditClick, onDeleteClick } = props;
+  const { themeMode, dashboardId, id, step, variableConfig, isPreview, onCloneClick, onShareClick, onEditClick, onDeleteClick } = props;
   const [time, setTime] = useState(props.time);
   const [visible, setVisible] = useState(false);
   const values = _.cloneDeep(props.values);
@@ -233,10 +232,10 @@ function index(props: IProps) {
           </div>
         </div>
         <div className='renderer-body' style={{ height: values.name ? `calc(100% - 47px)` : '100%' }}>
-          {_.isEmpty(series) && type !== 'text' ? (
+          {_.isEmpty(series) && values.type !== 'text' ? (
             <div className='renderer-body-content-empty'>暂无数据</div>
           ) : (
-            <>{RendererCptMap[type] ? RendererCptMap[type]() : <div className='unknown-type'>{`无效的图表类型 ${type}`}</div>}</>
+            <>{RendererCptMap[values.type] ? RendererCptMap[values.type]() : <div className='unknown-type'>{`无效的图表类型 ${values.type}`}</div>}</>
           )}
         </div>
       </div>
