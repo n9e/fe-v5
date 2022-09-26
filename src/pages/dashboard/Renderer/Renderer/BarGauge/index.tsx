@@ -38,7 +38,7 @@ function Item(props) {
   const textRef = useRef(null);
   const textSize = useSize(textRef);
   const getTextRight = () => {
-    if (bgSize?.width && textSize?.width) {
+    if (bgSize?.width !== undefined && textSize?.width !== undefined) {
       if (bgSize?.width < textSize?.width + 8) {
         return -textSize?.width - 8;
       }
@@ -81,7 +81,7 @@ function Item(props) {
               .alpha(displayMode === 'basic' ? 0.2 : 1)
               .rgb()
               .string(),
-            width: `${(item.value / maxValue) * 100}%`,
+            width: `${(item.stat / maxValue) * 100}%`,
           }}
         >
           {displayMode === 'basic' && (
@@ -117,9 +117,9 @@ export default function BarGauge(props: IProps) {
     options?.valueMappings,
   );
   if (sortOrder && sortOrder !== 'none') {
-    calculatedValues = _.orderBy(calculatedValues, ['value'], [sortOrder]);
+    calculatedValues = _.orderBy(calculatedValues, ['stat'], [sortOrder]);
   }
-  const curMaxValue = maxValue !== undefined ? maxValue : _.maxBy(calculatedValues, 'value')?.value || 0;
+  const curMaxValue = maxValue !== undefined ? maxValue : _.maxBy(calculatedValues, 'stat')?.stat || 0;
 
   return (
     <div className='renderer-bar-gauge-container'>

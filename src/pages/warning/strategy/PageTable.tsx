@@ -15,8 +15,9 @@
  *
  */
 import React, { useEffect, useState, useMemo } from 'react';
+import _ from 'lodash';
 import { useSelector } from 'react-redux';
-import { Tag, Button, Select, Modal, message, Switch, Dropdown, Table, Tabs } from 'antd';
+import { Tag, Button, Modal, message, Switch, Dropdown, Table, Tabs, Select, Space } from 'antd';
 import { getStrategyGroupSubList, updateAlertRules } from '@/services/warning';
 import SearchInput from '@/components/BaseSearchInput';
 import { useHistory, Link } from 'react-router-dom';
@@ -34,7 +35,7 @@ import { DownOutlined } from '@ant-design/icons';
 import ImportAndDownloadModal, { ModalStatus } from '@/components/ImportAndDownloadModal';
 import EditModal from './components/editModal';
 import ColumnSelect from '@/components/ColumnSelect';
-const { Option } = Select;
+import AdvancedWrap from '@/components/AdvancedWrap';
 const { confirm } = Modal;
 const { TabPane } = Tabs;
 
@@ -58,7 +59,7 @@ interface Props {
 const PageTable: React.FC<Props> = ({ bgid }) => {
   const [severity, setSeverity] = useState<number>();
   const [clusters, setClusters] = useState<string[]>([]);
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const history = useHistory();
   const [modalType, setModalType] = useState<ModalStatus>(ModalStatus.None);
   const [selectRowKeys, setSelectRowKeys] = useState<React.Key[]>([]);
@@ -72,6 +73,7 @@ const PageTable: React.FC<Props> = ({ bgid }) => {
   const [currentStrategyDataAll, setCurrentStrategyDataAll] = useState([]);
   const [currentStrategyData, setCurrentStrategyData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [cate, setCate] = useState<string>();
 
   useEffect(() => {
     if (bgid) {
@@ -90,7 +92,11 @@ const PageTable: React.FC<Props> = ({ bgid }) => {
     setLoading(true);
     const { success, dat } = await getStrategyGroupSubList({ id: bgid });
     if (success) {
-      setCurrentStrategyDataAll(dat.filter((item) => !severity || item.severity === severity) || []);
+      setCurrentStrategyDataAll(
+        dat.filter((item) => {
+          return !severity || item.severity === severity;
+        }) || [],
+      );
       setLoading(false);
     }
   };
@@ -109,10 +115,6 @@ const PageTable: React.FC<Props> = ({ bgid }) => {
 
   const goToAddWarningStrategy = () => {
     curBusiItem?.id && history.push(`/alert-rules/add/${curBusiItem.id}`);
-  };
-
-  const handleClickEdit = (id, isClone = false) => {
-    curBusiItem?.id && history.push(`/alert-rules/edit/${id}${isClone ? '?mode=clone' : ''}`);
   };
 
   const refreshList = () => {
@@ -369,16 +371,29 @@ const PageTable: React.FC<Props> = ({ bgid }) => {
   return (
     <div className='strategy-table-content'>
       <div className='strategy-table-search table-handle'>
-        <div className='strategy-table-search-left'>
+        <Space>
           <RefreshIcon
-            className='strategy-table-search-left-refresh'
             onClick={() => {
               refreshList();
             }}
           />
-          <ColumnSelect noLeftPadding noRightPadding={false} onSeverityChange={(e) => setSeverity(e)} onClusterChange={(e) => setClusters(e)} />
+          <AdvancedWrap var='VITE_IS_ALERT_ES_DS'>
+            <Select
+              value={cate}
+              onChange={(val) => {
+                setCate(val);
+              }}
+              style={{ width: 120 }}
+              placeholder='数据源类型'
+              allowClear
+            >
+              <Select.Option value='prometheus'>Prometheus</Select.Option>
+              <Select.Option value='elasticsearch'>Elasticsearch</Select.Option>
+            </Select>
+          </AdvancedWrap>
+          <ColumnSelect noLeftPadding noRightPadding onSeverityChange={(e) => setSeverity(e)} onClusterChange={(e) => setClusters(e)} />
           <SearchInput className={'searchInput'} placeholder={t('搜索名称或标签')} onSearch={setQuery} allowClear />
-        </div>
+        </Space>
         <div className='strategy-table-search-right'>
           <Button type='primary' onClick={goToAddWarningStrategy} className='strategy-table-search-right-create' ghost>
             {t('新增告警规则')}
@@ -412,7 +427,13 @@ const PageTable: React.FC<Props> = ({ bgid }) => {
           defaultPageSize: 30,
         }}
         loading={loading}
-        dataSource={currentStrategyData}
+        dataSource={_.filter(currentStrategyData, (item) => {
+          const curItemCate = item.cate || 'prometheus';
+          if (cate) {
+            return curItemCate === cate;
+          }
+          return true;
+        })}
         rowSelection={{
           selectedRowKeys: selectedRows.map((item) => item.id),
           onChange: (selectedRowKeys: React.Key[], selectedRows: strategyItem[]) => {
