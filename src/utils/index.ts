@@ -67,7 +67,33 @@ export const copyToClipBoard = (text: string, t, spliter?: string): boolean => {
   return succeeded;
 };
 
-export const copy2ClipBoard = copyToClipBoard;
+export const copy2ClipBoard = (text: string, silent = false): boolean => {
+  const fakeElem = document.createElement('textarea');
+  fakeElem.style.border = '0';
+  fakeElem.style.padding = '0';
+  fakeElem.style.margin = '0';
+  fakeElem.style.position = 'absolute';
+  fakeElem.style.left = '-9999px';
+  const yPosition = window.pageYOffset || document.documentElement.scrollTop;
+  fakeElem.style.top = `${yPosition}px`;
+  fakeElem.setAttribute('readonly', '');
+  fakeElem.value = text;
+
+  document.body.appendChild(fakeElem);
+  fakeElem.select();
+  let succeeded;
+  try {
+    succeeded = document.execCommand('copy');
+    !silent && message.success('复制到剪贴板');
+  } catch (err) {
+    message.error('复制失败');
+    succeeded = false;
+  }
+  if (succeeded) {
+    document.body.removeChild(fakeElem);
+  }
+  return succeeded;
+};
 
 export function formatTrim(s: string) {
   out: for (var n = s.length, i = 1, i0 = -1, i1; i < n; ++i) {
