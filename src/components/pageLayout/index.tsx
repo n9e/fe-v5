@@ -16,9 +16,9 @@
  */
 import React, { useState, ReactNode } from 'react';
 import './index.less';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { RollbackOutlined } from '@ant-design/icons';
+import Icon, { RollbackOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { RootState as AccountRootState, accountStoreState } from '@/store/accountInterface';
 import { RootState as CommonRootState } from '@/store/common';
@@ -146,7 +146,33 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, introI
             {/* <div className={'page-header-right-area'}>{rightArea}</div> */}
             <div className={'page-header-right-area'}>
               {introIcon}
-              {docFn && <a onClick={() => docFn()} style={{ marginRight: 20 }}>文档</a>}
+              {docFn && (
+                <a onClick={() => docFn()} style={{ marginRight: 20 }}>
+                  文档
+                </a>
+              )}
+              {/* 整合版本关闭文档链接 */}
+              {import.meta.env.VITE_IS_COMMON_DS !== 'true' && (
+                <div style={{ marginRight: 32, position: 'relative' }}>
+                  <a target='_blank' href='http://n9e.flashcat.cloud'>
+                    文档
+                  </a>
+                  <Icon
+                    style={{ fontSize: 16, position: 'absolute', top: -16, right: -28 }}
+                    component={() => {
+                      return (
+                        <svg viewBox='0 0 1024 1024' version='1.1' xmlns='http://www.w3.org/2000/svg' p-id='2548' width='32' height='32' fill='red'>
+                          <path
+                            d='M829.866667 313.6a64 64 0 0 1 64 64v213.333333a64 64 0 0 1-64 64H262.058667L168.32 746.666667v-106.666667h0.213333V377.6a64 64 0 0 1 64-64h597.333334z m-117.333334 78.293333H661.333333l-23.466666 138.56-19.2-136.533333h-51.2l34.133333 174.677333h68.266667l19.2-116.458666 17.066666 116.458666h68.266667l34.133333-174.677333h-51.2l-17.066666 138.538667-27.733334-140.544z m-151.466666 0h-125.866667v174.698667h125.866667v-36.138667h-78.933334v-38.165333h68.266667v-32.106667h-68.266667v-34.133333h78.933334v-34.133333z m-217.6 0h-70.4v174.698667H320v-128.512l32 128.512h70.4V391.893333h-46.933333v134.506667l-32-134.506667z'
+                            p-id='2549'
+                          ></path>
+                        </svg>
+                      );
+                    }}
+                  />
+                </div>
+              )}
+
               {!hideCluster && (
                 <div style={{ marginRight: 20 }}>
                   集群：

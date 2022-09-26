@@ -169,10 +169,10 @@ const SideMenu: FC = () => {
           key: '/help/version',
           title: t('系统版本'),
         },
-        {
-          key: '/help/contact',
-          title: t('联系我们'),
-        },
+        // {
+        //   key: '/help/contact',
+        //   title: t('联系我们'),
+        // },
         {
           key: '/help/migrate',
           title: t('管理员迁移'),
@@ -216,7 +216,7 @@ const SideMenu: FC = () => {
     }
   };
   const hideSideMenu = () => {
-    if (location.pathname === '/login' || location.pathname.startsWith('/chart/')  || location.pathname.startsWith('/dashboards/share/') || location.pathname === '/callback') {
+    if (location.pathname === '/login' || location.pathname.startsWith('/chart/') || location.pathname.startsWith('/dashboards/share/') || location.pathname === '/callback') {
       return true;
     }
     // 大盘全屏模式下也需要隐藏左侧菜单

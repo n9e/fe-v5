@@ -51,8 +51,8 @@ export default function version() {
           <ul style={{ paddingLeft: 10, marginBottom: 10 }}>
             <li style={{ display: 'flex', height: 20 }}>
               文档地址：
-              <a href='https://n9e.github.io/' target='_blank'>
-                https://n9e.github.io/
+              <a href='http://n9e.flashcat.cloud' target='_blank'>
+                http://n9e.flashcat.cloud
               </a>
             </li>
           </ul>
