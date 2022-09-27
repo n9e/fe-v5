@@ -42,7 +42,7 @@ export default function version() {
       }
       hideCluster
     >
-      <div style={{ padding: 10 }}>
+      <div>
         <ul style={{ padding: '20px 30px' }}>
           <li>前端版本：{pkgJson.version}</li>
           <li>后端版本：{backendVersion}</li>

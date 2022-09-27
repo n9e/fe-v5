@@ -32,7 +32,7 @@ export default function Migrate() {
       }
       hideCluster
     >
-      <div style={{ padding: 10 }}>
+      <div>
         <div style={{ padding: 20 }}>
           <Tabs defaultActiveKey='boards'>
             <TabPane tab='大盘迁移' key='boards'>

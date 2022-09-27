@@ -57,8 +57,8 @@
 
     & + div {
       overflow: auto;
-      padding: 10px;
-      // background: #eee; // 去掉夜莺之前的背景色
+      padding: 10px 4px 10px 10px; // 将原来 paddingRight 10px 拆开，以兼容出现滚动条的时候有距离右侧 6px 的间距
+      margin-right: 6px;
       height: 100%;
       &:not(.srm) > * {
         background: #fff;

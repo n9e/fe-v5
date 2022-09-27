@@ -111,7 +111,7 @@ export default function Migrate() {
       }
       hideCluster
     >
-      <div style={{ padding: 10 }}>
+      <div>
         <div style={{ padding: 20 }}>
           {profile.admin ? (
             <Table
