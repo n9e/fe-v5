@@ -54,8 +54,8 @@ export default function GraphStyles() {
           </Form.Item>
           <Form.Item label='连接空值' name={[...namePrefix, 'spanNulls']} initialValue={false}>
             <Radio.Group buttonStyle='solid'>
-              <Radio.Button value={false}>关闭</Radio.Button>
               <Radio.Button value={true}>开启</Radio.Button>
+              <Radio.Button value={false}>关闭</Radio.Button>
             </Radio.Group>
           </Form.Item>
         </Space>
