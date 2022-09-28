@@ -76,6 +76,7 @@ function index(props: IProps) {
     inViewPort: isPreview || inViewPort,
     datasourceCate: values.datasourceCate || 'prometheus',
     datasourceName: values.datasourceName,
+    spanNulls: values.custom?.spanNulls,
   });
   const name = replaceFieldWithVariable(dashboardId, values.name, variableConfig);
   const description = replaceFieldWithVariable(dashboardId, values.description, variableConfig);
