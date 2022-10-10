@@ -14,8 +14,22 @@
  * limitations under the License.
  *
  */
-export * as byteConverter from './byteConverter';
-export * as valueFormatter from './valueFormatter';
-export * as getCalculatedValuesBySeries from './getCalculatedValuesBySeries';
-export * as replaceExpressionBracket from './replaceExpressionBracket';
-export * as getTextWidth from './getTextWidth';
+import { IFieldConfig } from './types';
+
+const GAUGE_DEFAULT_MINIMUM = 0;
+const GAUGE_DEFAULT_MAXIMUM = 100;
+
+export const getFormattedThresholds = (field: IFieldConfig) => {
+  const min = GAUGE_DEFAULT_MINIMUM;
+  const max = GAUGE_DEFAULT_MAXIMUM;
+  const { steps } = field;
+  const thresholdsArray = steps.map(({ value, color, type }, index) => {
+    const nextStep = steps[index + 1];
+    return {
+      start: value ?? (type === 'base' ? min : max),
+      end: nextStep ? nextStep.value : max,
+      color,
+    };
+  });
+  return thresholdsArray;
+};

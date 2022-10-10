@@ -14,8 +14,19 @@
  * limitations under the License.
  *
  */
-export * as byteConverter from './byteConverter';
-export * as valueFormatter from './valueFormatter';
-export * as getCalculatedValuesBySeries from './getCalculatedValuesBySeries';
-export * as replaceExpressionBracket from './replaceExpressionBracket';
-export * as getTextWidth from './getTextWidth';
+import React from 'react';
+import GraphStyles from './GraphStyles';
+import StandardOptions from '../../Fields/StandardOptions';
+import ValueMappings from '../../Fields/ValueMappings';
+import Thresholds from '../../Fields/Thresholds';
+
+export default function Timeseries() {
+  return (
+    <>
+      <GraphStyles />
+      <ValueMappings />
+      <StandardOptions />
+      <Thresholds />
+    </>
+  );
+}

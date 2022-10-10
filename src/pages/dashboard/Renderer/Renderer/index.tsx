@@ -28,6 +28,7 @@ import Pie from './Pie';
 import Hexbin from './Hexbin';
 import BarGauge from './BarGauge';
 import Text from './Text';
+import Gauge from './Gauge';
 import { IVariable } from '../../VariableConfig/definition';
 import { replaceExpressionVars } from '../../VariableConfig/constant';
 import Markdown from '../../Editor/Components/Markdown';
@@ -104,6 +105,7 @@ function index(props: IProps) {
     hexbin: () => <Hexbin {...subProps} themeMode={themeMode} />,
     barGauge: () => <BarGauge {...subProps} themeMode={themeMode} />,
     text: () => <Text {...subProps} />,
+    gauge: () => <Gauge {...subProps} themeMode={themeMode} />,
   };
 
   return (

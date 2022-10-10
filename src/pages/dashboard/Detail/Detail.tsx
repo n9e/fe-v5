@@ -37,7 +37,7 @@ import Panels from '../Panels';
 import Title from './Title';
 import { JSONParse } from '../utils';
 import Editor from '../Editor';
-import { defaultCustomValuesMap } from '../Editor/config';
+import { defaultCustomValuesMap, defaultOptionsValuesMap } from '../Editor/config';
 import { sortPanelsByGridLayout, panelsMergeToConfigs, updatePanelsInsertNewPanelToGlobal } from '../Panels/utils';
 import { useGlobalState } from '../globalState';
 import './style.less';
@@ -211,6 +211,7 @@ export default function DetailV2({ isPreview = false }: { isPreview?: boolean })
                     },
                   ],
                   custom: defaultCustomValuesMap[type],
+                  options: defaultOptionsValuesMap[type],
                 },
               });
             }
