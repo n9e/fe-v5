@@ -282,7 +282,7 @@ export const replaceExpressionVarsSpecifyRule = (
         const placeholder = getPlaceholder(name);
         const selected = getVaraiableSelected(name, id);
 
-        if (vars.includes(placeholder) && selected) {
+        if (vars.includes(placeholder)) {
           if (Array.isArray(selected)) {
             if (selected.includes('all') && options) {
               if (allValue) {
