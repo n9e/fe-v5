@@ -19,7 +19,7 @@ import _ from 'lodash';
 import classNames from 'classnames';
 import { EditOutlined } from '@ant-design/icons';
 import { IRawTimeRange } from '@/components/TimeRangePicker';
-import { convertExpressionToQuery, replaceExpressionVars, getVaraiableSelected, setVaraiableSelected, stringToRegex } from './constant';
+import { convertExpressionToQuery, replaceExpressionVars, getVaraiableSelected, setVaraiableSelected, stringToRegex, filterOptionsByReg } from './constant';
 import { IVariable } from './definition';
 import DisplayItem from './DisplayItem';
 import EditItems from './EditItems';
@@ -65,8 +65,8 @@ function index(props: IProps) {
             const item = _.cloneDeep(value[idx]);
             if ((item.type === 'query' || item.type === 'custom') && item.definition) {
               const definition = idx > 0 ? replaceExpressionVars(item.definition, result, idx, id) : item.definition;
-              const options = await convertExpressionToQuery(definition, range);
-              const regFilterOptions = _.filter(options, (i) => !!i && (!item.reg || !stringToRegex(item.reg) || (stringToRegex(item.reg) as RegExp).test(i)));
+              const options = await convertExpressionToQuery(definition, range, item);
+              const regFilterOptions = filterOptionsByReg(options, item.reg);
               result[idx] = item;
               result[idx].fullDefinition = definition;
               result[idx].options = _.sortBy(regFilterOptions);
