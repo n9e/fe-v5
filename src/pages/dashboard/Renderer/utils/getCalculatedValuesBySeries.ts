@@ -58,15 +58,19 @@ export const getSerieTextObj = (value: number | string | null | undefined, stand
     const baseColor = _.get(_.find(thresholds?.steps, { type: 'base' }), 'color');
     matchedThresholdsColor = baseColor;
   }
-  _.forEach(thresholds?.steps, (item) => {
-    if (item.value && value) {
-      value = _.toNumber(value) as number;
-      if (value >= item.value) {
-        matchedThresholdsColor = item.color;
-        return false;
+  _.forEach(
+    _.sortBy(thresholds?.steps, (item) => {
+      return Number(item.value);
+    }),
+    (item) => {
+      if (item.value && value) {
+        value = _.toNumber(value) as number;
+        if (value >= item.value) {
+          matchedThresholdsColor = item.color;
+        }
       }
-    }
-  });
+    },
+  );
   const valueObj = valueFormatter({ unit, decimals, dateFormat }, value);
   const newValue = matchedValueMapping?.result?.text ? matchedValueMapping?.result?.text : valueObj.value;
   return {

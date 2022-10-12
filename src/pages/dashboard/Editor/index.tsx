@@ -22,7 +22,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { useTranslation } from 'react-i18next';
 import TimeRangePicker, { IRawTimeRange } from '@/components/TimeRangePicker';
 import Resolution from '@/components/Resolution';
-import { visualizations, defaultValues, defaultCustomValuesMap } from './config';
+import { visualizations, defaultValues, defaultCustomValuesMap, defaultOptionsValuesMap } from './config';
 import { IVariable } from '../VariableConfig';
 import FormCpt from './Form';
 import { IPanel } from '../types';
@@ -100,6 +100,7 @@ function index(props: IProps) {
                   const valuesCopy = _.cloneDeep(values);
                   _.set(valuesCopy, 'type', val);
                   _.set(valuesCopy, 'custom', defaultCustomValuesMap[val]);
+                  _.set(valuesCopy, 'options', defaultOptionsValuesMap[val]);
                   setInitialValues(valuesCopy);
                 }
               }}

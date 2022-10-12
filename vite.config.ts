@@ -126,7 +126,7 @@ export default defineConfig({
           'menu-item-font-size': '14px',
           'radio-button-checked-bg': '#EAE6F3',
           'form-item-margin-bottom': '18px',
-          'font-family': 'PingFangSC-Regular,microsoft yahei ui,microsoft yahei,simsun,"sans-serif"',
+          'font-family': 'Monda-Regular,PingFangSC-Regular,microsoft yahei ui,microsoft yahei,simsun,"sans-serif"',
           'text-color': '#262626',
           // 'component-background': '#f0f0f0',
           // 'modal-header-bg': '#fff',

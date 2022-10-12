@@ -107,6 +107,7 @@ export interface ITimeseriesStyles {
     type: 'linear' | 'log';
     log?: 10 | 2;
   };
+  spanNulls: boolean;
 }
 
 export interface IStatStyles {

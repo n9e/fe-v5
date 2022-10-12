@@ -153,7 +153,8 @@ export const TagFilterReducer = function (state, action) {
 
 // https://grafana.com/docs/grafana/latest/datasources/prometheus/#query-variable 根据文档解析表达式
 // 每一个promtheus接口都接受start和end参数来限制返回值
-export const convertExpressionToQuery = (expression: string, range: IRawTimeRange) => {
+export const convertExpressionToQuery = (expression: string, range: IRawTimeRange, item: IVariable) => {
+  const { type } = item;
   const parsedRange = parseRange(range);
   const start = moment(parsedRange.start).unix();
   const end = moment(parsedRange.end).unix();
@@ -175,6 +176,17 @@ export const convertExpressionToQuery = (expression: string, range: IRawTimeRang
   } else if (expression.startsWith('query_result(')) {
     const promql = expression.substring('query_result('.length, expression.length - 1);
     return getQueryResult({ query: promql, start, end }).then((res) =>
+      res.data.result.map(({ metric, value }) => {
+        const metricName = metric['__name__'];
+        const labels = Object.keys(metric)
+          .filter((ml) => ml !== '__name__')
+          .map((label) => `${label}="${metric[label]}"`);
+        const values = value.join(' ');
+        return `${metricName || ''} {${labels}} ${values}`;
+      }),
+    );
+  } else if (type === 'query') {
+    return getQueryResult({ query: expression, start, end }).then((res) =>
       res.data.result.map(({ metric, value }) => {
         const metricName = metric['__name__'];
         const labels = Object.keys(metric)
@@ -270,7 +282,7 @@ export const replaceExpressionVarsSpecifyRule = (
         const placeholder = getPlaceholder(name);
         const selected = getVaraiableSelected(name, id);
 
-        if (vars.includes(placeholder) && selected) {
+        if (vars.includes(placeholder)) {
           if (Array.isArray(selected)) {
             if (selected.includes('all') && options) {
               if (allValue) {
@@ -339,7 +351,11 @@ export function stringToRegex(str: string): RegExp | false {
   const match = str.match(new RegExp('^/(.*?)/(g?i?m?y?)$'));
 
   if (match) {
-    return new RegExp(match[1], match[2]);
+    try {
+      return new RegExp(match[1], match[2]);
+    } catch (e) {
+      return false;
+    }
   } else {
     return false;
   }
@@ -350,4 +366,27 @@ export function replaceFieldWithVariable(value: string, dashboardId?: string, va
     return value;
   }
   return replaceExpressionVars(value, variableConfig, variableConfig.length, dashboardId);
+}
+
+export function filterOptionsByReg(options, reg, formData: IVariable[], limit: number, id: string) {
+  reg = replaceExpressionVars(reg, formData, limit, id);
+  const regex = stringToRegex(reg);
+
+  if (reg && regex) {
+    const regFilterOptions: string[] = [];
+    _.forEach(options, (option) => {
+      if (!!option) {
+        const matchResult = option.match(regex);
+        if (matchResult && matchResult.length > 0) {
+          if (matchResult[1]) {
+            regFilterOptions.push(matchResult[1]);
+          } else {
+            regFilterOptions.push(option);
+          }
+        }
+      }
+    });
+    return _.union(regFilterOptions);
+  }
+  return options;
 }

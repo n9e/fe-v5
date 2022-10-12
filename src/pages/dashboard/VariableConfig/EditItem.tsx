@@ -20,7 +20,7 @@ import { QuestionCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { IRawTimeRange } from '@/components/TimeRangePicker';
 import { IVariable } from './definition';
-import { convertExpressionToQuery, replaceExpressionVars, stringToRegex, setVaraiableSelected } from './constant';
+import { convertExpressionToQuery, replaceExpressionVars, filterOptionsByReg, setVaraiableSelected } from './constant';
 
 interface IProps {
   id: string;
@@ -57,11 +57,11 @@ function EditItem(props: IProps) {
   const handleBlur = (val?: string) => {
     const reg = data.reg;
     const expression = val || data.definition;
-    if ((!reg || new RegExp('^/(.*?)/(g?i?m?y?)$').test(reg)) && expression) {
+    if ((!reg || new RegExp('^/(.*?)/(g?i?m?y?)$').test(reg)) && expression && data) {
       const formData = form.getFieldsValue();
       var newExpression = replaceExpressionVars(expression, formData, index, id);
-      convertExpressionToQuery(newExpression, range).then((res) => {
-        const regFilterRes = res.filter((i) => !reg || !stringToRegex(reg) || (stringToRegex(reg) as RegExp).test(i));
+      convertExpressionToQuery(newExpression, range, data).then((res) => {
+        const regFilterRes = filterOptionsByReg(res, reg, formData, index, id);
         if (regFilterRes.length > 0) {
           setVaraiableSelected({ name: formData.var[index].name, value: regFilterRes[0], id });
         }
@@ -127,7 +127,7 @@ function EditItem(props: IProps) {
                 >
                   <Input onBlur={(e) => handleBlur(e.target.value)} />
                 </Form.Item>
-                <Form.Item label='筛选正则' name='reg' rules={[{ pattern: new RegExp('^/(.*?)/(g?i?m?y?)$'), message: '格式不对' }]}>
+                <Form.Item label='正则' name='reg' tooltip='可选，可通过正则来过滤可选项，或提取值' rules={[{ pattern: new RegExp('^/(.*?)/(g?i?m?y?)$'), message: '格式不对' }]}>
                   <Input placeholder='/*.hna/' onBlur={() => handleBlur()} />
                 </Form.Item>
               </>

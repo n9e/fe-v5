@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-import React, { useEffect, useRef, useState, useContext } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import _ from 'lodash';
 import * as d3 from 'd3';
 import { useSize } from 'ahooks';

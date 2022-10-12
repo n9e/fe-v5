@@ -46,6 +46,10 @@ export const visualizations = [
     type: 'text',
     name: '文字卡片',
   },
+  {
+    type: 'gauge',
+    name: '仪表盘',
+  },
 ];
 
 export const IRefreshMap = {
@@ -98,21 +102,39 @@ export const defaultThreshold = {
   type: 'base',
 };
 
+export const gaugeDefaultThresholds = [
+  {
+    color: '#3FC453',
+    value: null,
+    type: 'base',
+  },
+  {
+    color: '#FF9919',
+    value: 60,
+  },
+  {
+    color: '#FF656B',
+    value: 80,
+  },
+];
+
+export const defaultOptionsValues = {
+  tooltip: {
+    mode: 'all',
+    sort: 'none',
+  },
+  legend: {
+    displayMode: 'hidden',
+  },
+  thresholds: {
+    steps: [defaultThreshold],
+  },
+};
+
 export const defaultValues = {
   version: '1.0.0',
   type: 'timeseries',
-  options: {
-    tooltip: {
-      mode: 'all',
-      sort: 'none',
-    },
-    legend: {
-      displayMode: 'hidden',
-    },
-    thresholds: {
-      steps: [defaultThreshold],
-    },
-  },
+  options: defaultOptionsValues,
   custom: {},
   overrides: [{}],
 };
@@ -172,6 +194,26 @@ export const defaultCustomValuesMap = {
     justifyContent: 'center',
     alignItems: 'center',
     content: '',
+  },
+  gauge: {
+    textMode: 'valueAndName',
+    calc: 'lastNotNull',
+  },
+};
+
+export const defaultOptionsValuesMap = {
+  timeseries: defaultOptionsValues,
+  stat: defaultOptionsValues,
+  pie: defaultOptionsValues,
+  table: defaultOptionsValues,
+  hexbin: defaultOptionsValues,
+  barGauge: defaultOptionsValues,
+  text: defaultOptionsValues,
+  gauge: {
+    ...defaultOptionsValues,
+    thresholds: {
+      steps: gaugeDefaultThresholds,
+    },
   },
 };
 

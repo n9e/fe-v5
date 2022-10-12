@@ -36,10 +36,11 @@ interface IProps {
   targets: ITarget[];
   variableConfig?: IVariable[];
   inViewPort?: boolean;
+  spanNulls?: boolean;
 }
 
 export default function usePrometheus(props: IProps) {
-  const { dashboardId, datasourceCate, time, step, targets, variableConfig, inViewPort } = props;
+  const { dashboardId, datasourceCate, time, step, targets, variableConfig, inViewPort, spanNulls } = props;
   const [series, setSeries] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const cachedVariableValues = _.map(variableConfig, (item) => {
@@ -70,7 +71,7 @@ export default function usePrometheus(props: IProps) {
     } else {
       flag.current = false;
     }
-  }, [JSON.stringify(targets), JSON.stringify(time), step, JSON.stringify(variableConfig), JSON.stringify(cachedVariableValues)]);
+  }, [JSON.stringify(targets), JSON.stringify(time), step, JSON.stringify(variableConfig), JSON.stringify(cachedVariableValues), spanNulls]);
 
   useEffect(() => {
     // 如果图表在可视区域内并且没有请求过数据，则请求数据
