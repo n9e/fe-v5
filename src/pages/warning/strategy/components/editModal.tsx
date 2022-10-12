@@ -246,7 +246,12 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
           data.enable_in_bg = values.enable_in_bg ? 1 : 0;
           break;
         case 'callbacks':
-          data.callbacks = values.callbacks.map((item) => item.url);
+          if (data.action === 'cover') {
+            delete data.action;
+            data.callbacks = values.callbacks.map((item) => item.url);
+          } else {
+            data.callbacks = values.callbacks;
+          }
           break;
         case 'cluster':
           data.cluster = values.cluster.join(' ');
@@ -606,27 +611,70 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
               case 'callbacks':
                 return (
                   <>
-                    <Form.Item label={t('改为：')}>
-                      <Form.List name='callbacks' initialValue={[{}]}>
-                        {(fields, { add, remove }, { errors }) => (
-                          <>
-                            {fields.map((field, index) => (
-                              <Row gutter={[10, 0]} key={field.key}>
-                                <Col span={22}>
-                                  <Form.Item name={[field.name, 'url']}>
-                                    <Input />
-                                  </Form.Item>
-                                </Col>
+                    <Form.Item name='action' label={t('模式：')} initialValue='cover'>
+                      <Radio.Group
+                        buttonStyle='solid'
+                        onChange={(e) => {
+                          if (e.target.value === 'cover') {
+                            form.setFieldsValue({
+                              callbacks: [
+                                {
+                                  url: '',
+                                },
+                              ],
+                            });
+                          } else {
+                            form.setFieldsValue({ callbacks: '' });
+                          }
+                        }}
+                      >
+                        <Radio.Button value='cover'>覆盖</Radio.Button>
+                        <Radio.Button value='callback_add'>新增</Radio.Button>
+                        <Radio.Button value='callback_del'>删除</Radio.Button>
+                      </Radio.Group>
+                    </Form.Item>
+                    <Form.Item shouldUpdate noStyle>
+                      {({ getFieldValue }) => {
+                        const action = getFieldValue('action');
+                        if (action === 'cover') {
+                          return (
+                            <Form.Item label={t('改为：')}>
+                              <Form.List name='callbacks' initialValue={[{}]}>
+                                {(fields, { add, remove }, { errors }) => (
+                                  <>
+                                    {fields.map((field, index) => (
+                                      <Row gutter={[10, 0]} key={field.key}>
+                                        <Col span={22}>
+                                          <Form.Item name={[field.name, 'url']}>
+                                            <Input />
+                                          </Form.Item>
+                                        </Col>
 
-                                <Col span={1}>
-                                  <MinusCircleOutlined className='control-icon-normal' onClick={() => remove(field.name)} />
-                                </Col>
-                              </Row>
-                            ))}
-                            <PlusCircleOutlined className='control-icon-normal' onClick={() => add()} />
-                          </>
-                        )}
-                      </Form.List>
+                                        <Col span={1}>
+                                          <MinusCircleOutlined className='control-icon-normal' onClick={() => remove(field.name)} />
+                                        </Col>
+                                      </Row>
+                                    ))}
+                                    <PlusCircleOutlined className='control-icon-normal' onClick={() => add()} />
+                                  </>
+                                )}
+                              </Form.List>
+                            </Form.Item>
+                          );
+                        } else if (action === 'callback_add') {
+                          return (
+                            <Form.Item name='callbacks' label={t('新增：')}>
+                              <Input />
+                            </Form.Item>
+                          );
+                        } else if (action === 'callback_del') {
+                          return (
+                            <Form.Item name='callbacks' label={t('删除：')}>
+                              <Input />
+                            </Form.Item>
+                          );
+                        }
+                      }}
                     </Form.Item>
                   </>
                 );

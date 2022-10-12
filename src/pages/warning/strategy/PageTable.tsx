@@ -349,10 +349,13 @@ const PageTable: React.FC<Props> = ({ bgid }) => {
 
   const editModalFinish = async (isOk, fieldsData?) => {
     if (isOk) {
+      const action = fieldsData.action;
+      delete fieldsData.action;
       const res = await updateAlertRules(
         {
           ids: selectRowKeys,
           fields: fieldsData,
+          action,
         },
         curBusiItem.id,
       );
