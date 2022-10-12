@@ -22,6 +22,7 @@ import { LineChartOutlined, AreaChartOutlined, SettingOutlined, ShareAltOutlined
 import TimeRangePicker, { IRawTimeRange, parseRange } from '@/components/TimeRangePicker';
 import LineGraphStandardOptions from './components/GraphStandardOptions';
 import Timeseries from '@/pages/dashboard/Renderer/Renderer/Timeseries';
+import { completeBreakpoints } from '@/pages/dashboard/Renderer/datasource/utils';
 import { getPromData, setTmpChartData } from './services';
 import { QueryStats } from './components/QueryStatsView';
 
@@ -118,7 +119,7 @@ export default function Graph(props: IProps) {
               id: _.uniqueId('series_'),
               name: getSerieName(item.metric),
               metric: item.metric,
-              data: item.values,
+              data: completeBreakpoints(realStep, item.values),
             };
           });
           setQueryStats({
@@ -126,6 +127,7 @@ export default function Graph(props: IProps) {
             resolution: step,
             resultSeries: series.length,
           });
+
           setData(series);
         })
         .catch((err) => {
