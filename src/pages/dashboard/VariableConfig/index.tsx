@@ -93,10 +93,10 @@ function index(props: IProps) {
             }
           }
           // 设置变量默认值，优先从 url 中获取，其次是 localStorage
-          result = _.map(result, (item) => {
+          result = _.map(_.compact(result), (item) => {
             return {
               ...item,
-              value: getVaraiableSelected(item.name, id),
+              value: getVaraiableSelected(item?.name, id),
             };
           });
           setData(result);

@@ -68,7 +68,7 @@ export default function index(props: Iprops) {
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height * 0.7}px`;
       context.translate((width * RATIO) / 2, (height * RATIO) / 2);
-      context.scale(RATIO, RATIO);
+      context.scale(RATIO * 0.95, RATIO * 0.95);
       const valueWidth = radius / 2;
       const thresholdFanWidth = valueWidth / 10 > 5 ? 5 : valueWidth / 10;
 

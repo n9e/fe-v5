@@ -33,3 +33,38 @@ export const getFormattedThresholds = (field: IFieldConfig) => {
   });
   return thresholdsArray;
 };
+
+// TODO: 待优化
+export function getMapColumnsAndRows(width: number, height: number, dataSize: number) {
+  let numColumns = 0;
+  let numRows = 0;
+  const squared = Math.sqrt(dataSize);
+  if (width > height) {
+    numColumns = Math.ceil((width / height) * squared * 0.6);
+    if (numColumns < 1) {
+      numColumns = 1;
+    } else if (numColumns > dataSize) {
+      numColumns = dataSize;
+    }
+
+    numRows = Math.ceil(dataSize / numColumns);
+    if (numRows < 1) {
+      numRows = 1;
+    }
+  } else {
+    numRows = Math.ceil((height / width) * squared * 0.6);
+    if (numRows < 1) {
+      numRows = 1;
+    } else if (numRows > dataSize) {
+      numRows = dataSize;
+    }
+    numColumns = Math.ceil(dataSize / numRows);
+    if (numColumns < 1) {
+      numColumns = 1;
+    }
+  }
+  return {
+    columns: numColumns,
+    rows: numRows,
+  };
+}

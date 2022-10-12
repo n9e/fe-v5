@@ -55,12 +55,13 @@ function convertVariablesGrafanaToN9E(templates: any) {
           allValue: item.allValue,
           allOption: item.includeAll,
           multi: item.multi,
+          reg: item.regex,
         };
       } else if (item.type === 'custom') {
         return {
           type: 'custom',
           name: item.name,
-          default: item.query,
+          definition: item.query,
           allValue: item.allValue,
           allOption: item.includeAll,
           multi: item.multi,
@@ -121,7 +122,12 @@ function convertOptionsGrafanaToN9E(panel: any) {
     thresholds: {
       mode: config.thresholds?.mode, // mode 目前是不支持的
       style: config.custom?.thresholdsStyle?.mode || 'line', // 目前只有固定的 line 风格，但是这个只用于折线图
-      steps: config.thresholds?.steps,
+      steps: _.map(config.thresholds?.steps, (step, idx) => {
+        return {
+          ...step,
+          type: step.value === null && idx === 0 ? 'base' : undefined, // 没有值并且是第一个，就是 base
+        };
+      }),
     },
     standardOptions: {
       util: unitMap[config.unit] ? unitMap[config.unit] : 'none',
@@ -162,7 +168,15 @@ function convertPieGrafanaToN9E(panel: any) {
 }
 
 function convertStatGrafanaToN9E(panel: any) {
-  // gauge and stat -> stat
+  return {
+    version: '2.0.0',
+    textMode: 'value',
+    calc: _.get(panel, 'options.reduceOptions.calcs[0]'),
+    colorMode: 'value',
+  };
+}
+
+function convertGaugeGrafanaToN9E(panel: any) {
   return {
     version: '2.0.0',
     textMode: 'value',
@@ -205,8 +219,8 @@ function convertPanlesGrafanaToN9E(panels: any) {
       fn: convertPieGrafanaToN9E,
     },
     gauge: {
-      type: 'stat',
-      fn: convertStatGrafanaToN9E,
+      type: 'gauge',
+      fn: convertGaugeGrafanaToN9E,
     },
     singlestat: {
       type: 'stat',

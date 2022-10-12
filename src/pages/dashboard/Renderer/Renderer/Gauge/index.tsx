@@ -21,6 +21,7 @@ import { IPanel } from '../../../types';
 import getCalculatedValuesBySeries from '../../utils/getCalculatedValuesBySeries';
 import { useGlobalState } from '../../../globalState';
 import Gauge from './Gauge';
+import { getMapColumnsAndRows } from './utils';
 import './style.less';
 
 interface IProps {
@@ -123,16 +124,26 @@ export default function Index(props: IProps) {
     options?.thresholds,
   );
   const [statFields, setStatFields] = useGlobalState('statFields');
+  const ele = useRef(null);
+  const eleSize = useSize(ele);
+  const [columnsAndRows, setColumnsAndRows] = React.useState({
+    columns: 1,
+    rows: 1,
+  });
 
   useEffect(() => {
     setStatFields(getColumnsKeys(calculatedValues));
-  }, [JSON.stringify(calculatedValues)]);
+    if (eleSize?.width) {
+      const result = getMapColumnsAndRows(eleSize?.width, eleSize?.height, calculatedValues.length);
+      setColumnsAndRows(result);
+    }
+  }, [JSON.stringify(calculatedValues), eleSize?.width]);
 
   return (
     <div className='renderer-gauge-container'>
-      <div className='renderer-gauge-container-box scroll-container'>
+      <div className='renderer-gauge-container-box scroll-container' ref={ele}>
         {_.map(calculatedValues, (item, idx) => {
-          return <GaugeItem key={item.name} item={item} idx={idx} textMode={textMode} themeMode={themeMode} thresholds={options.thresholds} />;
+          return <GaugeItem key={item.name} item={item} idx={idx} textMode={textMode} themeMode={themeMode} thresholds={options.thresholds} colSpan={columnsAndRows.columns} />;
         })}
       </div>
     </div>
