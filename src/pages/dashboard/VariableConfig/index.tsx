@@ -66,7 +66,7 @@ function index(props: IProps) {
             if ((item.type === 'query' || item.type === 'custom') && item.definition) {
               const definition = idx > 0 ? replaceExpressionVars(item.definition, result, idx, id) : item.definition;
               const options = await convertExpressionToQuery(definition, range, item);
-              const regFilterOptions = filterOptionsByReg(options, item.reg);
+              const regFilterOptions = filterOptionsByReg(options, item.reg, result, idx, id);
               result[idx] = item;
               result[idx].fullDefinition = definition;
               result[idx].options = _.sortBy(regFilterOptions);

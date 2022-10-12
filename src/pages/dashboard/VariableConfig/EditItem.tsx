@@ -61,7 +61,7 @@ function EditItem(props: IProps) {
       const formData = form.getFieldsValue();
       var newExpression = replaceExpressionVars(expression, formData, index, id);
       convertExpressionToQuery(newExpression, range, data).then((res) => {
-        const regFilterRes = filterOptionsByReg(res, reg);
+        const regFilterRes = filterOptionsByReg(res, reg, formData, index, id);
         if (regFilterRes.length > 0) {
           setVaraiableSelected({ name: formData.var[index].name, value: regFilterRes[0], id });
         }

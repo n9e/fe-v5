@@ -368,7 +368,8 @@ export function replaceFieldWithVariable(value: string, dashboardId?: string, va
   return replaceExpressionVars(value, variableConfig, variableConfig.length, dashboardId);
 }
 
-export function filterOptionsByReg(options, reg) {
+export function filterOptionsByReg(options, reg, formData: IVariable[], limit: number, id: string) {
+  reg = replaceExpressionVars(reg, formData, limit, id);
   const regex = stringToRegex(reg);
 
   if (reg && regex) {

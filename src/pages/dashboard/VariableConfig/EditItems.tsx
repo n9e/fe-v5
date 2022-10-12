@@ -59,6 +59,7 @@ export default function EditItems(props: IProps) {
       }}
       onCancel={() => {
         setVisible(false);
+        setMode('list');
       }}
       wrapClassName='variable-modal'
       footer={null}
