@@ -16,12 +16,13 @@
  */
 import React, { useEffect, useRef } from 'react';
 import _ from 'lodash';
+import { Tooltip } from 'antd';
 import { useSize } from 'ahooks';
 import { IPanel } from '../../../types';
 import getCalculatedValuesBySeries from '../../utils/getCalculatedValuesBySeries';
 import { useGlobalState } from '../../../globalState';
 import Gauge from './Gauge';
-import { getMapColumnsAndRows } from './utils';
+import { calculateGridDimensions } from '../../utils/squares';
 import './style.less';
 
 interface IProps {
@@ -30,7 +31,16 @@ interface IProps {
   themeMode?: 'dark';
 }
 
+interface IGrid {
+  height: number;
+  width: number;
+  widthOnLastRow: number;
+  xCount: number;
+  yCount: number;
+}
+
 const MIN_SIZE = 12;
+const ITEM_SPACIING = 8;
 
 function GaugeItemContent(props) {
   const { eleSize, realHeaderFontSize, item, themeMode, thresholds } = props;
@@ -75,25 +85,19 @@ function GaugeItemLabel(props) {
 function GaugeItem(props) {
   const ele = useRef(null);
   const eleSize = useSize(ele);
-  const { item, colSpan, textMode = 'valueAndName' } = props;
+  const { item, textMode = 'valueAndName', style } = props;
   const headerFontSize = eleSize?.width! / _.toString(item.name).length || MIN_SIZE;
   const realHeaderFontSize = headerFontSize > 24 ? 24 : headerFontSize;
 
   return (
-    <div
-      key={item.name}
-      className='renderer-gauge-item'
-      ref={ele}
-      style={{
-        width: `${100 / colSpan}%`,
-        flexBasis: `${100 / colSpan}%`,
-      }}
-    >
-      <div className='renderer-gauge-item-content'>
-        <GaugeItemContent {...props} eleSize={eleSize} realHeaderFontSize={realHeaderFontSize} />
-        {textMode === 'valueAndName' && <GaugeItemLabel eleSize={eleSize} realHeaderFontSize={realHeaderFontSize} name={item.name} />}
+    <Tooltip title={textMode === 'valueAndName' ? item.name : undefined}>
+      <div key={item.name} className='renderer-gauge-item' ref={ele} style={style}>
+        <div className='renderer-gauge-item-content'>
+          <GaugeItemContent {...props} eleSize={eleSize} realHeaderFontSize={realHeaderFontSize} />
+          {textMode === 'valueAndName' && <GaugeItemLabel eleSize={eleSize} realHeaderFontSize={realHeaderFontSize} name={item.name} />}
+        </div>
       </div>
-    </div>
+    </Tooltip>
   );
 }
 
@@ -126,25 +130,53 @@ export default function Index(props: IProps) {
   const [statFields, setStatFields] = useGlobalState('statFields');
   const ele = useRef(null);
   const eleSize = useSize(ele);
-  const [columnsAndRows, setColumnsAndRows] = React.useState({
-    columns: 1,
-    rows: 1,
-  });
+  const [grid, setGrid] = React.useState<IGrid>();
+  let xGrid = 0;
+  let yGrid = 0;
 
   useEffect(() => {
     setStatFields(getColumnsKeys(calculatedValues));
     if (eleSize?.width) {
-      const result = getMapColumnsAndRows(eleSize?.width, eleSize?.height, calculatedValues.length);
-      setColumnsAndRows(result);
+      const grid = calculateGridDimensions(eleSize.width, eleSize.height, ITEM_SPACIING, calculatedValues.length);
+      setGrid(grid);
     }
   }, [JSON.stringify(calculatedValues), eleSize?.width]);
 
   return (
     <div className='renderer-gauge-container'>
-      <div className='renderer-gauge-container-box scroll-container' ref={ele}>
-        {_.map(calculatedValues, (item, idx) => {
-          return <GaugeItem key={item.id} item={item} idx={idx} textMode={textMode} themeMode={themeMode} thresholds={options.thresholds} colSpan={columnsAndRows.columns} />;
-        })}
+      <div className='renderer-gauge-container-box scroll-container'>
+        <div ref={ele} className='renderer-gauge-container-box-content'>
+          {grid &&
+            _.map(calculatedValues, (item, idx) => {
+              const isLastRow = yGrid === grid.yCount - 1;
+              const itemWidth = isLastRow ? grid.widthOnLastRow : grid.width;
+              const itemHeight = grid.height;
+              const xPos = xGrid * itemWidth + ITEM_SPACIING * xGrid;
+              const yPos = yGrid * itemHeight + ITEM_SPACIING * yGrid;
+              xGrid++;
+              if (xGrid === grid.xCount) {
+                xGrid = 0;
+                yGrid++;
+              }
+              return (
+                <GaugeItem
+                  key={item.id}
+                  item={item}
+                  idx={idx}
+                  textMode={textMode}
+                  themeMode={themeMode}
+                  thresholds={options.thresholds}
+                  style={{
+                    position: 'absolute',
+                    left: xPos,
+                    top: yPos,
+                    width: `${itemWidth}px`,
+                    height: `${itemHeight}px`,
+                  }}
+                />
+              );
+            })}
+        </div>
       </div>
     </div>
   );
