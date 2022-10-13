@@ -176,7 +176,7 @@ export const convertExpressionToQuery = (expression: string, range: IRawTimeRang
   } else if (expression.startsWith('query_result(')) {
     const promql = expression.substring('query_result('.length, expression.length - 1);
     return getQueryResult({ query: promql, start, end }).then((res) =>
-      res.data.result.map(({ metric, value }) => {
+      _.map(res?.data?.result, ({ metric, value }) => {
         const metricName = metric['__name__'];
         const labels = Object.keys(metric)
           .filter((ml) => ml !== '__name__')
@@ -187,7 +187,7 @@ export const convertExpressionToQuery = (expression: string, range: IRawTimeRang
     );
   } else if (type === 'query') {
     return getQueryResult({ query: expression, start, end }).then((res) =>
-      res.data.result.map(({ metric, value }) => {
+      _.map(res?.data?.result, ({ metric, value }) => {
         const metricName = metric['__name__'];
         const labels = Object.keys(metric)
           .filter((ml) => ml !== '__name__')
