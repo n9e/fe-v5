@@ -143,7 +143,7 @@ export default function Index(props: IProps) {
     <div className='renderer-gauge-container'>
       <div className='renderer-gauge-container-box scroll-container' ref={ele}>
         {_.map(calculatedValues, (item, idx) => {
-          return <GaugeItem key={item.name} item={item} idx={idx} textMode={textMode} themeMode={themeMode} thresholds={options.thresholds} colSpan={columnsAndRows.columns} />;
+          return <GaugeItem key={item.id} item={item} idx={idx} textMode={textMode} themeMode={themeMode} thresholds={options.thresholds} colSpan={columnsAndRows.columns} />;
         })}
       </div>
     </div>

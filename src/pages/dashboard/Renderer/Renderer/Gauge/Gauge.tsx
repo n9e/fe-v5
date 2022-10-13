@@ -117,6 +117,16 @@ export default function index(props: Iprops) {
     }
   }, [props]);
 
+  useEffect(() => {
+    return () => {
+      if (canvasRef && canvasRef.current) {
+        const canvas = canvasRef.current! as HTMLCanvasElement;
+        const context = canvas.getContext('2d')!;
+        context.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    };
+  }, []);
+
   return (
     <div style={{ width, height: height * 0.7 }} className={props.className ? `d3-charts-solid-gauge ${props.className}` : 'd3-charts-solid-gauge'}>
       <canvas ref={canvasRef} />
@@ -129,7 +139,7 @@ export default function index(props: Iprops) {
       >
         <span
           style={{
-            fontSize: statFontSize,
+            fontSize: statFontSize < 0 ? 12 : statFontSize,
           }}
         >
           {formatedValue}
