@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+import _ from 'lodash';
 import { IFieldConfig } from './types';
 
 const GAUGE_DEFAULT_MINIMUM = 0;
@@ -23,8 +24,11 @@ export const getFormattedThresholds = (field: IFieldConfig) => {
   const min = GAUGE_DEFAULT_MINIMUM;
   const max = GAUGE_DEFAULT_MAXIMUM;
   const { steps } = field;
-  const thresholdsArray = steps.map(({ value, color, type }, index) => {
-    const nextStep = steps[index + 1];
+  const sorted = _.sortBy(steps, (item) => {
+    return Number(item.value);
+  });
+  const thresholdsArray = _.map(sorted, ({ value, color, type }, index) => {
+    const nextStep = sorted[index + 1];
     return {
       start: value ?? (type === 'base' ? min : max),
       end: nextStep ? nextStep.value : max,
