@@ -14,9 +14,12 @@
  * limitations under the License.
  *
  */
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import _ from 'lodash';
-import { Table } from 'antd';
+import { Table, Input, Space, Button } from 'antd';
+import { SearchOutlined, FilterOutlined } from '@ant-design/icons';
+import type { ColumnType } from 'antd/es/table';
+import type { FilterConfirmProps } from 'antd/es/table/interface';
 import { useSize } from 'ahooks';
 import { IPanel } from '../../../types';
 import getCalculatedValuesBySeries, { getSerieTextObj } from '../../utils/getCalculatedValuesBySeries';
@@ -52,8 +55,8 @@ export default function Stat(props: IProps) {
   const { values, series, themeMode } = props;
   const { custom, options, overrides } = values;
   const { showHeader, calc, aggrDimension, displayMode, columns, sortColumn, sortOrder, colorMode = 'value' } = custom;
-  const [calculatedValues, setCalculatedValues] = React.useState([]);
-  const [sortObj, setSortObj] = React.useState({
+  const [calculatedValues, setCalculatedValues] = useState([]);
+  const [sortObj, setSortObj] = useState({
     sortColumn,
     sortOrder,
   });
@@ -81,6 +84,47 @@ export default function Stat(props: IProps) {
     setCalculatedValues(data);
   }, [JSON.stringify(series), calc, JSON.stringify(options)]);
 
+  const searchInput = useRef<any>(null);
+  const handleSearch = (confirm: (param?: FilterConfirmProps) => void) => {
+    confirm();
+  };
+  const handleReset = (clearFilters: () => void, confirm: (param?: FilterConfirmProps) => void) => {
+    clearFilters();
+    confirm();
+  };
+  const getColumnSearchProps = (names: string[]): ColumnType<any> => ({
+    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+      <div style={{ padding: 8 }}>
+        <Input
+          ref={searchInput}
+          value={selectedKeys[0]}
+          onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+          onPressEnter={() => handleSearch(confirm)}
+          style={{ marginBottom: 8, display: 'block' }}
+        />
+        <Space>
+          <Button type='primary' onClick={() => handleSearch(confirm)} icon={<SearchOutlined />} size='small' style={{ width: 90 }}>
+            Search
+          </Button>
+          <Button onClick={() => clearFilters && handleReset(clearFilters, confirm)} size='small' style={{ width: 90 }}>
+            Reset
+          </Button>
+        </Space>
+      </div>
+    ),
+    filterIcon: (filtered: boolean) => <FilterOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+    onFilter: (value, record) => {
+      const fieldVal = _.get(record, names);
+      if (typeof fieldVal === 'string' || _.isArray(fieldVal)) {
+        return fieldVal
+          .toString()
+          .toLowerCase()
+          .includes((value as string).toLowerCase());
+      }
+      return true;
+    },
+  });
+
   let tableDataSource = calculatedValues;
   let tableColumns: any[] = [
     {
@@ -92,6 +136,7 @@ export default function Stat(props: IProps) {
       },
       sortOrder: getSortOrder('name', sortObj),
       render: (text) => <div className='renderer-table-td-content'>{text}</div>,
+      ...getColumnSearchProps(['name']),
     },
     {
       title: 'value',
@@ -125,6 +170,7 @@ export default function Stat(props: IProps) {
           </div>
         );
       },
+      ...getColumnSearchProps(['text']),
     },
   ];
 
@@ -166,6 +212,7 @@ export default function Stat(props: IProps) {
           }
           return <span title={_.get(record.metric, key)}>{_.get(record.metric, key)}</span>;
         },
+        ...getColumnSearchProps(['metric', key]),
       };
     });
   }
@@ -189,6 +236,7 @@ export default function Stat(props: IProps) {
         },
         sortOrder: getSortOrder(aggrDimension, sortObj),
         render: (text) => <div className='renderer-table-td-content'>{text}</div>,
+        ...getColumnSearchProps([aggrDimension]),
       },
     ];
     _.map(groupNames, (name) => {
@@ -234,6 +282,7 @@ export default function Stat(props: IProps) {
             </div>
           );
         },
+        ...getColumnSearchProps([name, 'text']),
       });
     });
   }

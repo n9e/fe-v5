@@ -187,6 +187,7 @@ export const updateAlertRules = function (
   data: {
     ids: React.Key[];
     fields: any;
+    action?: string;
   },
   busiId: number,
 ) {

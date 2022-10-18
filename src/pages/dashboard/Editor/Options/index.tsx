@@ -23,6 +23,7 @@ import Pie from './Pie';
 import Hexbin from './Hexbin';
 import BarGauge from './BarGauge';
 import Text from './Text';
+import Gauge from './Gauge';
 
 export default function index({ type, targets, chartForm, variableConfigWithOptions }) {
   const OptionsCptMap = {
@@ -33,6 +34,7 @@ export default function index({ type, targets, chartForm, variableConfigWithOpti
     hexbin: <Hexbin />,
     barGauge: <BarGauge />,
     text: <Text variableConfigWithOptions={variableConfigWithOptions} />,
+    gauge: <Gauge />,
   };
   return OptionsCptMap[type] || `无效的图表类型 ${type}`;
 }

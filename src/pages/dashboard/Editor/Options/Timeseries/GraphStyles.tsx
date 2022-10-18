@@ -52,6 +52,12 @@ export default function GraphStyles() {
               return null;
             }}
           </Form.Item>
+          <Form.Item label='连接空值' name={[...namePrefix, 'spanNulls']} initialValue={false}>
+            <Radio.Group buttonStyle='solid'>
+              <Radio.Button value={true}>开启</Radio.Button>
+              <Radio.Button value={false}>关闭</Radio.Button>
+            </Radio.Group>
+          </Form.Item>
         </Space>
         <Form.Item label='曲线宽度' name={[...namePrefix, 'lineWidth']}>
           <Slider min={0} max={10} step={1} />
