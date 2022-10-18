@@ -165,15 +165,25 @@ function EditItem(props: IProps) {
                   </Form.Item>
                 </Col>
                 <Col flex='70px'>
-                  <Form.Item label='包含全选' name='allOption' valuePropName='checked'>
-                    <Switch />
+                  <Form.Item shouldUpdate={(prevValues, curValues) => prevValues.multi !== curValues.multi} noStyle>
+                    {({ getFieldValue }) => {
+                      const multi = getFieldValue('multi');
+                      if (multi) {
+                        return (
+                          <Form.Item label='包含全选' name='allOption' valuePropName='checked'>
+                            <Switch />
+                          </Form.Item>
+                        );
+                      }
+                    }}
                   </Form.Item>
                 </Col>
                 <Col flex='auto'>
-                  <Form.Item shouldUpdate={(prevValues, curValues) => prevValues.type !== curValues.typ} noStyle>
+                  <Form.Item shouldUpdate noStyle>
                     {({ getFieldValue }) => {
+                      const multi = getFieldValue('multi');
                       const allOption = getFieldValue('allOption');
-                      if (allOption) {
+                      if (multi && allOption) {
                         return (
                           <Form.Item label='自定义全选值' name='allValue'>
                             <Input placeholder='.*' />

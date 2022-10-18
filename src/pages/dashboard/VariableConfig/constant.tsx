@@ -295,10 +295,15 @@ export const replaceExpressionVarsSpecifyRule = (
                 );
               }
             } else {
-              newExpression = replaceAllPolyfill(newExpression, placeholder, `(${(selected as string[]).join('|')})`);
+              const realSelected = _.size(selected) === 1 ? selected[0] : `(${(selected as string[]).join('|')})`;
+              newExpression = replaceAllPolyfill(newExpression, placeholder, realSelected);
             }
           } else if (typeof selected === 'string') {
-            newExpression = replaceAllPolyfill(newExpression, placeholder, selected as string);
+            if (selected === 'all' && allValue) {
+              newExpression = replaceAllPolyfill(newExpression, placeholder, allValue);
+            } else {
+              newExpression = replaceAllPolyfill(newExpression, placeholder, selected as string);
+            }
           }
         }
       }
