@@ -83,7 +83,7 @@ export const updateDashboard = function (id: string | number, data: { name: stri
   return request(`/api/n9e/board/${id}`, {
     method: RequestMethod.Put,
     data,
-  });
+  }).then((res) => res.dat);
 };
 
 // 更新大盘 - 只能更新 configs

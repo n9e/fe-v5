@@ -17,7 +17,10 @@
 import React from 'react';
 import { Input, Button, Dropdown, Modal, message } from 'antd';
 import { SearchOutlined, DownOutlined } from '@ant-design/icons';
+import { useSelector } from 'react-redux';
 import { removeDashboards } from '@/services/dashboardV2';
+import { RootState as CommonRootState } from '@/store/common';
+import { CommonStoreState } from '@/store/commonInterface';
 import FormCpt from './Form';
 import Import from './Import';
 
@@ -30,6 +33,7 @@ interface IProps {
 }
 
 export default function Header(props: IProps) {
+  const { clusters } = useSelector<CommonRootState, CommonStoreState>((state) => state.common);
   const { busiId, selectRowKeys, refreshList, searchVal, onSearchChange } = props;
 
   return (
@@ -54,6 +58,7 @@ export default function Header(props: IProps) {
                 mode: 'crate',
                 busiId,
                 refreshList,
+                clusters,
               });
             }}
             ghost

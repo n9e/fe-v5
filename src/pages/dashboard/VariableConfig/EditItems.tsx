@@ -24,6 +24,7 @@ import EditItem from './EditItem';
 import { IVariable } from './definition';
 
 interface IProps {
+  cluster: string;
   id: string;
   visible: boolean;
   setVisible: (visible: boolean) => void;
@@ -39,7 +40,7 @@ const titleMap = {
 };
 
 export default function EditItems(props: IProps) {
-  const { visible, setVisible, onChange, value, range, id } = props;
+  const { visible, setVisible, onChange, value, range, id, cluster } = props;
   const [data, setData] = useState<IVariable[]>(value || []);
   const [record, setRecord] = useState<IVariable>({
     name: '',
@@ -189,6 +190,7 @@ export default function EditItems(props: IProps) {
         />
       ) : (
         <EditItem
+          cluster={cluster}
           id={id}
           range={range}
           index={recordIndex}

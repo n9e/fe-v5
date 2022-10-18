@@ -23,6 +23,7 @@ import { IVariable } from './definition';
 import { convertExpressionToQuery, replaceExpressionVars, filterOptionsByReg, setVaraiableSelected } from './constant';
 
 interface IProps {
+  cluster: string;
   id: string;
   range: IRawTimeRange;
   index: number;
@@ -51,7 +52,7 @@ const typeOptions = [
 ];
 
 function EditItem(props: IProps) {
-  const { data, range, id, index, onOk, onCancel } = props;
+  const { cluster, data, range, id, index, onOk, onCancel } = props;
   const [form] = Form.useForm();
   // TODO: 不太清楚这里的逻辑是干嘛的，后面找时间看下
   const handleBlur = (val?: string) => {
@@ -60,7 +61,7 @@ function EditItem(props: IProps) {
     if ((!reg || new RegExp('^/(.*?)/(g?i?m?y?)$').test(reg)) && expression && data) {
       const formData = form.getFieldsValue();
       var newExpression = replaceExpressionVars(expression, formData, index, id);
-      convertExpressionToQuery(newExpression, range, data).then((res) => {
+      convertExpressionToQuery(newExpression, range, data, cluster).then((res) => {
         const regFilterRes = filterOptionsByReg(res, reg, formData, index, id);
         if (regFilterRes.length > 0) {
           setVaraiableSelected({ name: formData.var[index].name, value: regFilterRes[0], id });

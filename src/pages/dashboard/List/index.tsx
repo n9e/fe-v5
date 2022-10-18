@@ -23,12 +23,15 @@ import { Table, Tag, Modal, Switch, message } from 'antd';
 import { FundViewOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import _ from 'lodash';
+import { useSelector } from 'react-redux';
 import queryString from 'query-string';
 import { Dashboard as DashboardType } from '@/store/dashboardInterface';
 import { getDashboards, cloneDashboard, removeDashboards, getDashboard, updateDashboardPublic } from '@/services/dashboardV2';
 import PageLayout from '@/components/pageLayout';
 import LeftTree from '@/components/LeftTree';
 import BlankBusinessPlaceholder from '@/components/BlankBusinessPlaceholder';
+import { RootState as CommonRootState } from '@/store/common';
+import { CommonStoreState } from '@/store/commonInterface';
 import Header from './Header';
 import FormCpt from './Form';
 import Export from './Export';
@@ -36,6 +39,7 @@ import { exportDataStringify } from './utils';
 import './style.less';
 
 export default function index() {
+  const { clusters } = useSelector<CommonRootState, CommonStoreState>((state) => state.common);
   const history = useHistory();
   const [busiId, setBusiId] = useState<number>();
   const [list, setList] = useState([]);
@@ -188,6 +192,7 @@ export default function index() {
                             refreshList: () => {
                               setRefreshKey(_.uniqueId('refreshKey_'));
                             },
+                            clusters,
                           });
                         }}
                       >

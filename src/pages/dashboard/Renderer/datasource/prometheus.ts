@@ -19,6 +19,7 @@ interface IOptions {
   targets: ITarget[];
   variableConfig?: IVariable[];
   spanNulls?: boolean;
+  datasourceValue: string;
 }
 
 const getDefaultStepByStartAndEnd = (start: number, end: number) => {
@@ -26,7 +27,7 @@ const getDefaultStepByStartAndEnd = (start: number, end: number) => {
 };
 
 export default async function prometheusQuery(options: IOptions) {
-  const { dashboardId, id, time, step, targets, variableConfig, spanNulls } = options;
+  const { dashboardId, id, time, step, targets, variableConfig, spanNulls, datasourceValue } = options;
   if (!time.start) return;
   const parsedRange = parseRange(time);
   let start = moment(parsedRange.start).unix();
@@ -73,7 +74,7 @@ export default async function prometheusQuery(options: IOptions) {
         signalKey += `-${target.expr}`;
       }
     });
-    const res = await fetchHistoryBatch({ queries: batchParams }, signalKey);
+    const res = await fetchHistoryBatch({ queries: batchParams }, signalKey, datasourceValue);
     const dat = res.dat || [];
     for (let i = 0; i < dat?.length; i++) {
       var item = {

@@ -41,9 +41,26 @@ interface IProps {
   onClick?: (event: any, datetime: Date, value: number) => void;
 }
 
+function getStartAndEndByTargets(targets: any[]) {
+  let start = undefined as number | undefined;
+  let end = undefined as number | undefined;
+  _.forEach(targets, (target) => {
+    if (target.time) {
+      const { start: targetStart, end: targetEnd } = parseRange(target.time);
+      if (!start || targetStart?.unix()! < start) {
+        start = targetStart?.unix()!;
+      }
+      if (!end || targetEnd?.unix()! > end) {
+        end = targetEnd?.unix()!;
+      }
+    }
+  });
+  return { start, end };
+}
+
 export default function index(props: IProps) {
   const { time, values, series, inDashboard = true, chartHeight = '200px', tableHeight = '200px', themeMode = '', onClick } = props;
-  const { custom, options = {} } = values;
+  const { custom, options = {}, targets } = values;
   const { lineWidth = 1, gradientMode = 'none', scaleDistribution } = custom;
   const [seriesData, setSeriesData] = useState(series);
   const [activeLegend, setActiveLegend] = useState('');
@@ -122,8 +139,9 @@ export default function index(props: IProps) {
     let xAxisDamin = {};
     if (time) {
       const parsedRange = parseRange(time);
-      const start = moment(parsedRange.start).unix();
-      const end = moment(parsedRange.end).unix();
+      const startAndEnd = getStartAndEndByTargets(targets);
+      const start = startAndEnd.start || moment(parsedRange.start).unix();
+      const end = startAndEnd.end || moment(parsedRange.end).unix();
       xAxisDamin = { min: start, max: end };
     }
     if (chartRef.current) {

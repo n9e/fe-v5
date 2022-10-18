@@ -147,6 +147,7 @@ export default function Chart() {
                         },
                       },
                     })}
+                    datasourceValue={curCluster}
                     isPreview
                   />
                 </div>

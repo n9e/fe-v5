@@ -153,29 +153,29 @@ export const TagFilterReducer = function (state, action) {
 
 // https://grafana.com/docs/grafana/latest/datasources/prometheus/#query-variable 根据文档解析表达式
 // 每一个promtheus接口都接受start和end参数来限制返回值
-export const convertExpressionToQuery = (expression: string, range: IRawTimeRange, item: IVariable) => {
+export const convertExpressionToQuery = (expression: string, range: IRawTimeRange, item: IVariable, datasourceValue: string) => {
   const { type } = item;
   const parsedRange = parseRange(range);
   const start = moment(parsedRange.start).unix();
   const end = moment(parsedRange.end).unix();
   if (expression === 'label_names()') {
-    return getLabelNames({ start, end }).then((res) => res.data);
+    return getLabelNames({ start, end }, datasourceValue).then((res) => res.data);
   } else if (expression.startsWith('label_values(')) {
     if (expression.includes(',')) {
       let metricsAndLabel = expression.substring('label_values('.length, expression.length - 1).split(',');
       const label = metricsAndLabel.pop();
       const metric = metricsAndLabel.join(', ');
-      return getMetricSeries({ 'match[]': metric.trim(), start, end }).then((res) => Array.from(new Set(_.map(res.data, (item) => item[label!.trim()]))));
+      return getMetricSeries({ 'match[]': metric.trim(), start, end }, datasourceValue).then((res) => Array.from(new Set(_.map(res.data, (item) => item[label!.trim()]))));
     } else {
       const label = expression.substring('label_values('.length, expression.length - 1);
-      return getLabelValues(label, { start, end }).then((res) => res.data);
+      return getLabelValues(label, { start, end }, datasourceValue).then((res) => res.data);
     }
   } else if (expression.startsWith('metrics(')) {
     const metric = expression.substring('metrics('.length, expression.length - 1);
-    return getMetric({ start, end }).then((res) => res.data.filter((item) => item.includes(metric)));
+    return getMetric({ start, end }, datasourceValue).then((res) => res.data.filter((item) => item.includes(metric)));
   } else if (expression.startsWith('query_result(')) {
     const promql = expression.substring('query_result('.length, expression.length - 1);
-    return getQueryResult({ query: promql, start, end }).then((res) =>
+    return getQueryResult({ query: promql, start, end }, datasourceValue).then((res) =>
       _.map(res?.data?.result, ({ metric, value }) => {
         const metricName = metric['__name__'];
         const labels = Object.keys(metric)
@@ -186,7 +186,7 @@ export const convertExpressionToQuery = (expression: string, range: IRawTimeRang
       }),
     );
   } else if (type === 'query') {
-    return getQueryResult({ query: expression, start, end }).then((res) =>
+    return getQueryResult({ query: expression, start, end }, datasourceValue).then((res) =>
       _.map(res?.data?.result, ({ metric, value }) => {
         const metricName = metric['__name__'];
         const labels = Object.keys(metric)

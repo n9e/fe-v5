@@ -150,6 +150,7 @@ function index(props: IProps) {
                     step={step}
                     values={item as any}
                     variableConfig={variableConfig}
+                    datasourceValue={curCluster}
                     onCloneClick={() => {
                       const newPanels = updatePanelsInsertNewPanel(panels, {
                         ...item,

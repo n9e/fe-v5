@@ -39,7 +39,7 @@ export const fetchHistory = (params?, signalKey?) => {
   });
 };
 
-export const fetchHistoryBatch = (data, signalKey) => {
+export const fetchHistoryBatch = (data, signalKey, datasourceValue) => {
   const controller = new AbortController();
   const { signal } = controller;
   if (signalKey && signals[signalKey] && signals[signalKey].abort) {
@@ -50,6 +50,9 @@ export const fetchHistoryBatch = (data, signalKey) => {
     method: RequestMethod.Post,
     data,
     signal,
+    headers: {
+      'X-Cluster': datasourceValue,
+    },
   }).finally(() => {
     delete signals[signalKey];
   });

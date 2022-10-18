@@ -61,7 +61,6 @@ export default function DetailV2({ isPreview = false }: { isPreview?: boolean })
   const { id } = useParams<URLParam>();
   const refreshRef = useRef<{ closeRefresh: Function }>();
   const { clusters } = useSelector<CommonRootState, CommonStoreState>((state) => state.common);
-  const [curCluster, setCurCluster] = useState<string>(localCluster || clusters[0]);
   const [dashboard, setDashboard] = useState<Dashboard>({
     create_by: '',
     favorite: 0,
@@ -71,6 +70,7 @@ export default function DetailV2({ isPreview = false }: { isPreview?: boolean })
     update_at: 0,
     update_by: '',
   });
+  const [curCluster, setCurCluster] = useState<string>();
   const [variableConfig, setVariableConfig] = useState<IVariable[]>();
   const [variableConfigWithOptions, setVariableConfigWithOptions] = useState<IVariable[]>();
   const [dashboardLinks, setDashboardLinks] = useState<ILink[]>();
@@ -94,6 +94,10 @@ export default function DetailV2({ isPreview = false }: { isPreview?: boolean })
     getDashboard(id).then((res) => {
       updateAtRef.current = res.update_at;
       setDashboard(res);
+      if (!curCluster) {
+        const dashboardConfigs: any = JSONParse(res.configs);
+        setCurCluster(dashboardConfigs.datasourceValue || localCluster || clusters[0]);
+      }
       if (res.configs) {
         const configs = JSONParse(res.configs);
         // TODO: configs 中可能没有 var 属性会导致 VariableConfig 报错
@@ -155,6 +159,8 @@ export default function DetailV2({ isPreview = false }: { isPreview?: boolean })
       });
     }
   }, 2000);
+
+  if (!curCluster) return null;
 
   return (
     <PageLayout

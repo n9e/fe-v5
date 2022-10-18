@@ -199,38 +199,53 @@ export const getTemplateContent = function (type: 'alert_rule' | 'dashboard', na
   });
 };
 
-export const getLabelNames = function (data) {
+export const getLabelNames = function (data, datasourceValue: string) {
   return request(`/api/n9e/prometheus/api/v1/labels`, {
     method: RequestMethod.Get,
     params: { ...data },
+    headers: {
+      'X-Cluster': datasourceValue,
+    },
   });
 };
 
-export const getLabelValues = function (label, data) {
+export const getLabelValues = function (label, data, datasourceValue: string) {
   return request(`/api/n9e/prometheus/api/v1/label/${label}/values`, {
     method: RequestMethod.Get,
     params: { ...data },
+    headers: {
+      'X-Cluster': datasourceValue,
+    },
   });
 };
 
-export const getMetricSeries = function (data) {
+export const getMetricSeries = function (data, datasourceValue: string) {
   return request(`/api/n9e/prometheus/api/v1/series`, {
     method: RequestMethod.Get,
     params: { ...data },
+    headers: {
+      'X-Cluster': datasourceValue,
+    },
   });
 };
 
-export const getMetric = function (data = {}) {
+export const getMetric = function (data = {}, datasourceValue: string) {
   return request(`/api/n9e/prometheus/api/v1/label/__name__/values`, {
     method: RequestMethod.Get,
     params: { ...data },
+    headers: {
+      'X-Cluster': datasourceValue,
+    },
   });
 };
 
-export const getQueryResult = function (data) {
+export const getQueryResult = function (data, datasourceValue: string) {
   return request(`/api/n9e/prometheus/api/v1/query`, {
     method: RequestMethod.Get,
     params: { ...data },
+    headers: {
+      'X-Cluster': datasourceValue,
+    },
   });
 };
 
