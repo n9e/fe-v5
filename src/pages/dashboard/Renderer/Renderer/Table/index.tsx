@@ -92,7 +92,7 @@ export default function Stat(props: IProps) {
     clearFilters();
     confirm();
   };
-  const getColumnSearchProps = (dataIndex: string): ColumnType<any> => ({
+  const getColumnSearchProps = (names: string[]): ColumnType<any> => ({
     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
       <div style={{ padding: 8 }}>
         <Input
@@ -114,14 +114,14 @@ export default function Stat(props: IProps) {
     ),
     filterIcon: (filtered: boolean) => <FilterOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
     onFilter: (value, record) => {
-      let fieldVal = record[dataIndex];
-      if (typeof fieldVal === 'object') {
-        fieldVal = _.get(fieldVal, 'text', '');
+      const fieldVal = _.get(record, names);
+      if (typeof fieldVal === 'string' || _.isArray(fieldVal)) {
+        return fieldVal
+          .toString()
+          .toLowerCase()
+          .includes((value as string).toLowerCase());
       }
-      return fieldVal
-        .toString()
-        .toLowerCase()
-        .includes((value as string).toLowerCase());
+      return true;
     },
   });
 
@@ -136,7 +136,7 @@ export default function Stat(props: IProps) {
       },
       sortOrder: getSortOrder('name', sortObj),
       render: (text) => <div className='renderer-table-td-content'>{text}</div>,
-      ...getColumnSearchProps('name'),
+      ...getColumnSearchProps(['name']),
     },
     {
       title: 'value',
@@ -170,7 +170,7 @@ export default function Stat(props: IProps) {
           </div>
         );
       },
-      ...getColumnSearchProps('text'),
+      ...getColumnSearchProps(['text']),
     },
   ];
 
@@ -212,7 +212,7 @@ export default function Stat(props: IProps) {
           }
           return <span title={_.get(record.metric, key)}>{_.get(record.metric, key)}</span>;
         },
-        ...getColumnSearchProps(key),
+        ...getColumnSearchProps(['metric', key]),
       };
     });
   }
@@ -236,7 +236,7 @@ export default function Stat(props: IProps) {
         },
         sortOrder: getSortOrder(aggrDimension, sortObj),
         render: (text) => <div className='renderer-table-td-content'>{text}</div>,
-        ...getColumnSearchProps(aggrDimension),
+        ...getColumnSearchProps([aggrDimension]),
       },
     ];
     _.map(groupNames, (name) => {
@@ -282,7 +282,7 @@ export default function Stat(props: IProps) {
             </div>
           );
         },
-        ...getColumnSearchProps(name),
+        ...getColumnSearchProps([name, 'text']),
       });
     });
   }
