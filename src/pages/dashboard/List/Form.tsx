@@ -109,6 +109,9 @@ function FormCpt(props: IProps & ModalWrapProps) {
         <Form.Item
           label='大盘名称'
           name='name'
+          labelCol={{
+            span: 5,
+          }}
           wrapperCol={{
             span: 24,
           }}
@@ -122,6 +125,9 @@ function FormCpt(props: IProps & ModalWrapProps) {
           <Input />
         </Form.Item>
         <Form.Item
+          labelCol={{
+            span: 5,
+          }}
           wrapperCol={{
             span: 24,
           }}
@@ -137,10 +143,13 @@ function FormCpt(props: IProps & ModalWrapProps) {
           />
         </Form.Item>
         <Form.Item
+          labelCol={{
+            span: 5,
+          }}
           wrapperCol={{
             span: 24,
           }}
-          label='默认集群'
+          label='默认关联数据源'
           name='datasourceValue'
         >
           <Select>
