@@ -255,6 +255,6 @@ export const timeLensDefault = [
     value: '90d'
   },
   {
-    value: 'forever'
+    value: '99y'
   }
 ]

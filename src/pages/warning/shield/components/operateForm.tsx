@@ -121,16 +121,26 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) 
     }
   }, [tagsObj]);
 
+  useEffect(() => {
+    timeChange();
+  }, [detail]);
+
   const timeChange = () => {
     const btime = form.getFieldValue('btime');
     const etime = form.getFieldValue('etime');
     if (!!etime && !!btime) {
+      const y = Math.round(moment.duration(etime - btime).asYears());
       const d = Math.floor(moment.duration(etime - btime).asDays());
       const h = Math.floor(moment.duration(etime - btime).hours());
       const m = Math.floor(moment.duration(etime - btime).minutes());
       const s = Math.floor(moment.duration(etime - btime).seconds());
-      const timeLen = `${d ? `${d}d ` : ''}${h ? `${h}h ` : ''}${m ? `${m}m ` : ''}${s ? `${s}s` : ''}`;
-      setTimeLen(timeLen);
+      if (y > 0) {
+        const timeLen = `${y ? `${y}y ` : ''}`;
+        setTimeLen(timeLen);
+      } else {
+        const timeLen = `${d ? `${d}d ` : ''}${h ? `${h}h ` : ''}${m ? `${m}m ` : ''}${s ? `${s}s` : ''}`;
+        setTimeLen(timeLen);
+      }
     }
   };
 
@@ -163,18 +173,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) 
   };
   const timeLenChange = (val: string) => {
     setTimeLen(val);
-
     const time = new Date().getTime();
-    if (val === 'forever') {
-      const longTime = 7 * 24 * 3600 * 1000 * 10000;
-      form.setFieldsValue({
-        btime: moment(time),
-        etime: moment(time).add({
-          seconds: longTime,
-        }),
-      });
-      return;
-    }
     const unit = val.charAt(val.length - 1);
     const num = val.substr(0, val.length - 1);
     form.setFieldsValue({
