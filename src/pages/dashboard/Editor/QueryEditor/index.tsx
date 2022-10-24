@@ -24,10 +24,10 @@ const allCates = [
   },
 ];
 
-export default function index({ chartForm }) {
+export default function index({ chartForm, defaultDatasourceName }) {
   return (
     <div>
-      <Space style={{ marginBottom: 10 }}>
+      <Space align='start'>
         <Input.Group>
           <span className='ant-input-group-addon'>数据源类型</span>
           <AdvancedWrap
@@ -104,9 +104,18 @@ export default function index({ chartForm }) {
           {({ getFieldValue }) => {
             const cate = getFieldValue('datasourceCate') || 'prometheus';
             return (
-              <Input.Group>
-                <span className='ant-input-group-addon'>集群</span>
-                <ClusterSelect cate={cate} />
+              <Input.Group compact>
+                <span
+                  className='ant-input-group-addon'
+                  style={{
+                    width: 'max-content',
+                    height: 32,
+                    lineHeight: '32px',
+                  }}
+                >
+                  关联数据源
+                </span>
+                <ClusterSelect cate={cate} defaultDatasourceName={defaultDatasourceName} />
               </Input.Group>
             );
           }}

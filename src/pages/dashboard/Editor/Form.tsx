@@ -49,13 +49,7 @@ function FormCpt(props, ref) {
   }, [JSON.stringify(props.variableConfigWithOptions)]);
 
   return (
-    <Form
-      layout='vertical'
-      form={chartForm}
-      initialValues={_.merge({}, defaultValues, initialValues, {
-        datasourceName: initialValues.datasourceName || cluster,
-      })}
-    >
+    <Form layout='vertical' form={chartForm} initialValues={_.merge({}, defaultValues, initialValues)}>
       <Form.Item name='type' hidden />
       <Form.Item name='id' hidden />
       <Form.Item name='layout' hidden />
@@ -98,7 +92,7 @@ function FormCpt(props, ref) {
                           id={id}
                         />
                       </div>
-                      <QueryEditor chartForm={chartForm} />
+                      <QueryEditor chartForm={chartForm} defaultDatasourceName={cluster} />
                     </div>
                   );
                 }

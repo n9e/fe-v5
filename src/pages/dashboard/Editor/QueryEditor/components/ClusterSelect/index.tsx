@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Form, Select } from 'antd';
 import { getCommonESClusters, getCommonClusters } from '@/services/common';
 
-export default function index(props: { cate: string }) {
-  const { cate } = props;
+export default function index(props: { cate: string; defaultDatasourceName: string }) {
+  const { cate, defaultDatasourceName } = props;
   const [clusterList, setClusterList] = useState([]);
 
   useEffect(() => {
@@ -31,12 +31,12 @@ export default function index(props: { cate: string }) {
       name='datasourceName'
       rules={[
         {
-          required: true,
+          required: cate !== 'prometheus',
+          message: '请选择数据源',
         },
       ]}
-      noStyle
     >
-      <Select placeholder='选择集群' style={{ minWidth: 70 }} dropdownMatchSelectWidth={false}>
+      <Select placeholder={cate !== 'prometheus' ? '选择数据源' : defaultDatasourceName} style={{ minWidth: 70 }} dropdownMatchSelectWidth={false}>
         {clusterList?.map((item) => (
           <Select.Option value={item} key={item}>
             {item}
