@@ -25,8 +25,6 @@ import VariableConfig, { IVariable } from '../VariableConfig';
 import Renderer from '../Renderer/Renderer';
 import QueryEditor from './QueryEditor';
 
-const alphabet = 'ABCDEFGHIGKLMNOPQRSTUVWXYZ'.split('');
-
 function FormCpt(props, ref) {
   const [chartForm] = Form.useForm();
   const { initialValues, cluster, range, id, step } = props;
@@ -51,7 +49,13 @@ function FormCpt(props, ref) {
   }, [JSON.stringify(props.variableConfigWithOptions)]);
 
   return (
-    <Form layout='vertical' form={chartForm} initialValues={_.merge({}, defaultValues, initialValues)}>
+    <Form
+      layout='vertical'
+      form={chartForm}
+      initialValues={_.merge({}, defaultValues, initialValues, {
+        datasourceName: initialValues.datasourceName || cluster,
+      })}
+    >
       <Form.Item name='type' hidden />
       <Form.Item name='id' hidden />
       <Form.Item name='layout' hidden />
@@ -72,9 +76,7 @@ function FormCpt(props, ref) {
             <div style={{ marginBottom: 10, height: 300 }}>
               <Form.Item shouldUpdate noStyle>
                 {({ getFieldsValue }) => {
-                  return (
-                    <Renderer datasourceValue={cluster} dashboardId={id} time={range} step={step} values={getFieldsValue()} variableConfig={variableConfigWithOptions} isPreview />
-                  );
+                  return <Renderer dashboardId={id} time={range} step={step} values={getFieldsValue()} variableConfig={variableConfigWithOptions} isPreview />;
                 }}
               </Form.Item>
             </div>

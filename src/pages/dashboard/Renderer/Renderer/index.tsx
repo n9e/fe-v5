@@ -46,7 +46,6 @@ interface IProps {
   values: IPanel;
   variableConfig?: IVariable[];
   isPreview?: boolean; // 是否是预览，预览中不显示编辑和分享
-  datasourceValue: string;
   onCloneClick?: () => void;
   onShareClick?: () => void;
   onEditClick?: () => void;
@@ -61,7 +60,7 @@ function replaceFieldWithVariable(dashboardId, value: string, variableConfig?: I
 }
 
 function index(props: IProps) {
-  const { themeMode, dashboardId, id, step, variableConfig, isPreview, datasourceValue, onCloneClick, onShareClick, onEditClick, onDeleteClick } = props;
+  const { themeMode, dashboardId, id, step, variableConfig, isPreview, onCloneClick, onShareClick, onEditClick, onDeleteClick } = props;
   const [time, setTime] = useState(props.time);
   const [visible, setVisible] = useState(false);
   const values = _.cloneDeep(props.values);
@@ -75,7 +74,6 @@ function index(props: IProps) {
     step,
     targets: values.targets,
     variableConfig,
-    datasourceValue,
     inViewPort: isPreview || inViewPort,
     datasourceCate: values.datasourceCate || 'prometheus',
     datasourceName: values.datasourceName,

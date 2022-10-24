@@ -1,19 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Select } from 'antd';
-import { getCommonESClusters } from '@/services/common';
+import { getCommonESClusters, getCommonClusters } from '@/services/common';
 
-export default function index() {
+export default function index(props: { cate: string }) {
+  const { cate } = props;
   const [clusterList, setClusterList] = useState([]);
 
   useEffect(() => {
-    getCommonESClusters()
-      .then(({ dat }) => {
-        setClusterList(dat);
-      })
-      .catch(() => {
-        setClusterList([]);
-      });
-  }, []);
+    if (cate === 'elasticsearch') {
+      getCommonESClusters()
+        .then(({ dat }) => {
+          setClusterList(dat);
+        })
+        .catch(() => {
+          setClusterList([]);
+        });
+    } else {
+      getCommonClusters()
+        .then(({ dat }) => {
+          setClusterList(dat);
+        })
+        .catch(() => {
+          setClusterList([]);
+        });
+    }
+  }, [cate]);
 
   return (
     <Form.Item
