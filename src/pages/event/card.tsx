@@ -52,7 +52,7 @@ function Card(props: Props, ref) {
 
   const reloadCard = () => {
     if (!rule) return;
-    getAlertCards({ ...filter, rule }).then((res) => {
+    getAlertCards({ ...filter, rule: rule.trim() }).then((res) => {
       setCardList(res.dat);
     });
   };
