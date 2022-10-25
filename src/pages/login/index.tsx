@@ -19,7 +19,7 @@ import { Form, Input, Button, Radio, message } from 'antd';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import { getRedirectURL } from '@/services/login';
+import { getRedirectURL, getRedirectURLCAS } from '@/services/login';
 import './login.less';
 
 import { useTranslation } from 'react-i18next';
@@ -110,6 +110,24 @@ export default function Login() {
                 }}
               >
                 OIDC
+              </a>
+              &nbsp;&nbsp;
+              <a
+                onClick={() => {
+                  getRedirectURLCAS().then((res) => {
+                    if (res.dat) {
+                      console.log(res.dat)
+                      console.log(res.dat.redirect)
+                      console.log(res.dat.state)
+                      window.location.href = res.dat.redirect;
+                      localStorage.setItem('state', res.dat.state);
+                    } else {
+                      message.warning('没有配置 CAS 登录地址！');
+                    }
+                  });
+                }}
+              >
+                CAS
               </a>
             </div>
           </Form>

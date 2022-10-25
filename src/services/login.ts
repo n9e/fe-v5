@@ -69,3 +69,16 @@ export const authCallback = function (params) {
     params,
   });
 };
+
+export const getRedirectURLCAS = function () {
+  return request('/api/n9e/auth/redirect/cas', {
+    method: RequestMethod.Get,
+  });
+};
+
+export const authCallbackCAS = function (params) {
+  return request('/api/n9e/auth/callback/cas', {
+    method: RequestMethod.Get,
+    params,
+  });
+};
