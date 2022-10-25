@@ -27,6 +27,9 @@ export const spans: { [key: string]: { display: string; section?: number; displa
 };
 
 export const rangeOptions: ITimeOption[] = [
+  { start: 'now-1m', end: 'now', display: 'Last 1 minutes', displayZh: '最近 1 分钟' },
+  { start: 'now-2m', end: 'now', display: 'Last 2 minutes', displayZh: '最近 2 分钟' },
+  { start: 'now-3m', end: 'now', display: 'Last 3 minutes', displayZh: '最近 3 分钟' },
   { start: 'now-5m', end: 'now', display: 'Last 5 minutes', displayZh: '最近 5 分钟' },
   { start: 'now-15m', end: 'now', display: 'Last 15 minutes', displayZh: '最近 15 分钟' },
   { start: 'now-30m', end: 'now', display: 'Last 30 minutes', displayZh: '最近 30 分钟' },
