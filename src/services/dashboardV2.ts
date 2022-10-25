@@ -28,6 +28,7 @@ export const getDashboards = function (id: number | string) {
 
 interface Dashboard {
   name: string;
+  ident?: string;
   tags: string;
   configs?: string;
 }
@@ -79,7 +80,7 @@ export const getDashboard = function (id: string | number) {
 };
 
 // 更新大盘 - 只能更新 name 和 tags
-export const updateDashboard = function (id: string | number, data: { name: string; tags: string }) {
+export const updateDashboard = function (id: string | number, data: { name: string; ident?: string; tags: string }) {
   return request(`/api/n9e/board/${id}`, {
     method: RequestMethod.Put,
     data,
