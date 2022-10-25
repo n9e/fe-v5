@@ -53,12 +53,14 @@ function FormCpt(props: IProps & ModalWrapProps) {
       if (mode === 'edit') {
         result = await updateDashboard(initialValues.id, {
           name: values.name,
+          ident: values.ident,
           tags: _.join(values.tags, ' '),
         });
         message.success('编辑大盘成功');
       } else if (mode === 'crate') {
         result = await createDashboard(busiId, {
           name: values.name,
+          ident: values.ident,
           tags: _.join(values.tags, ' '),
           configs: JSON.stringify({
             var: [],
@@ -119,6 +121,24 @@ function FormCpt(props: IProps & ModalWrapProps) {
             {
               required: true,
               message: '请输入大盘名称',
+            },
+          ]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label='英文标识'
+          name='ident'
+          labelCol={{
+            span: 5,
+          }}
+          wrapperCol={{
+            span: 24,
+          }}
+          rules={[
+            {
+              pattern: /^[a-zA-Z0-9\-]*$/,
+              message: '请输入英文字母、数字、中划线',
             },
           ]}
         >

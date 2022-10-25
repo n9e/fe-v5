@@ -80,7 +80,7 @@ function index(props: IProps) {
     if (!editable) {
       message.warning('大盘已经被别人修改，为避免相互覆盖，请刷新大盘查看最新配置和数据');
     }
-    if (isAuthorized && editable) {
+    if (!_.isEmpty(roles) && isAuthorized && editable) {
       return updateDashboardConfigsFunc(dashboardId, options);
     }
     return Promise.reject();
@@ -148,9 +148,13 @@ function index(props: IProps) {
                     id={item.id}
                     time={range}
                     step={step}
-                    values={item as any}
+                    values={
+                      {
+                        ...item,
+                        datasourceName: item.datasourceName || curCluster,
+                      } as any
+                    }
                     variableConfig={variableConfig}
-                    datasourceValue={curCluster}
                     onCloneClick={() => {
                       const newPanels = updatePanelsInsertNewPanel(panels, {
                         ...item,

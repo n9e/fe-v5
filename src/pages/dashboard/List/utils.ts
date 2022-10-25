@@ -27,6 +27,7 @@ export function exportDataStringify(data: any) {
     {
       name: data.name,
       tags: data.tags,
+      ident: data.ident,
       configs: JSONParse(data.configs),
     },
     null,

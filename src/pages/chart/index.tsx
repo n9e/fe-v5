@@ -146,8 +146,8 @@ export default function Chart() {
                           displayMode: 'table',
                         },
                       },
+                      datasourceName: item.dataProps?.datasourceName || curCluster,
                     })}
-                    datasourceValue={curCluster}
                     isPreview
                   />
                 </div>
