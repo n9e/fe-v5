@@ -80,6 +80,7 @@ export default function CardLeft(props: Props) {
     setVisible(false);
     await getList();
     saveActiveId(editForm ? editForm.id : cur.dat.id);
+    editForm && onRefreshRule(values.rule + ' ');
   };
 
   const handleCancel = () => {
