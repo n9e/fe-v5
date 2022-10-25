@@ -106,7 +106,7 @@ export default function Prometheus({ chartForm }) {
                             onClear={() => {
                               const targets = chartForm.getFieldValue('targets');
                               const targetsClone = _.cloneDeep(targets);
-                              _.set(targetsClone, [name, 'time'], undefined);
+                              _.set(targetsClone, [field.name, 'time'], undefined);
                               chartForm.setFieldsValue({
                                 targets: targetsClone,
                               });
