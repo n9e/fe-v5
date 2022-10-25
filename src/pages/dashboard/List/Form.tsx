@@ -137,8 +137,8 @@ function FormCpt(props: IProps & ModalWrapProps) {
           }}
           rules={[
             {
-              pattern: /^[a-zA-Z]*$/,
-              message: '请输入英文字母',
+              pattern: /^[a-zA-Z0-9\-]*$/,
+              message: '请输入英文字母、数字、中划线',
             },
           ]}
         >
