@@ -21,6 +21,7 @@ import _ from 'lodash';
 import { useSelector } from 'react-redux';
 import { Button, Card, Col, message, Row, Space, Spin, Tag, Typography } from 'antd';
 import { PlayCircleOutlined } from '@ant-design/icons';
+import queryString from 'query-string';
 import PageLayout from '@/components/pageLayout';
 import { getAlertEventsById, getHistoryEventsById } from '@/services/warning';
 import { priorityColor } from '@/utils/constant';
@@ -178,7 +179,15 @@ const EventDetailPage: React.FC = () => {
                 className='run-btn'
                 type='link'
                 onClick={() => {
-                  window.open(`${location.origin}/metric/explorer?promql=${encodeURIComponent(promql)}`);
+                  history.push({
+                    pathname: '/metric/explorer',
+                    search: queryString.stringify({
+                      promql,
+                      mode: 'graph',
+                      start: moment.unix(eventDetail.trigger_time).subtract(30, 'minutes').unix(),
+                      end: moment.unix(eventDetail.trigger_time).add(30, 'minutes').unix(),
+                    }),
+                  });
                 }}
               >
                 <PlayCircleOutlined className='run-con' />
