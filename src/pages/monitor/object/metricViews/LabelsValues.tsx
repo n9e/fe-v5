@@ -206,7 +206,9 @@ export default function LabelsValues(props: IProps) {
                         if (item.label === dimensionLabel.label) {
                           return {
                             ...item,
-                            value: dimensionLabelValues,
+                            value: _.filter(dimensionLabelValues, (o) => {
+                              return _.includes(o, dimensionLabelsSearch[item.label]);
+                            }),
                           };
                         }
                         return item;
