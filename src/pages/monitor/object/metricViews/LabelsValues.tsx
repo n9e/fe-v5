@@ -206,9 +206,11 @@ export default function LabelsValues(props: IProps) {
                         if (item.label === dimensionLabel.label) {
                           return {
                             ...item,
-                            value: _.filter(dimensionLabelValues, (o) => {
-                              return _.includes(o, dimensionLabelsSearch[item.label]);
-                            }),
+                            value: dimensionLabelsSearch[item.label]
+                              ? _.filter(dimensionLabelValues, (o) => {
+                                  return _.includes(o, dimensionLabelsSearch[item.label]);
+                                })
+                              : dimensionLabelValues,
                           };
                         }
                         return item;
@@ -289,10 +291,7 @@ export default function LabelsValues(props: IProps) {
                                     value: _.compact(dimensionLabelValue),
                                   };
                                 }
-                                return {
-                                  ...item,
-                                  value: [],
-                                };
+                                return item;
                               });
                               onChange({
                                 ...value,
