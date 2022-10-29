@@ -82,3 +82,22 @@ export const authCallbackCAS = function (params) {
     params,
   });
 };
+
+export const getRedirectURLOAuth = function () {
+  return request('/api/n9e/auth/redirect/oauth', {
+    method: RequestMethod.Get,
+  });
+};
+
+export const authCallbackOAuth = function (params) {
+  return request('/api/n9e/auth/callback/oauth', {
+    method: RequestMethod.Get,
+    params,
+  });
+};
+
+export const getSsoConfig = function () {
+  return request('/api/n9e/auth/sso-config', {
+    method: RequestMethod.Get,
+  });
+};
