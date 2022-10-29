@@ -7,20 +7,16 @@ import { getBrainLicense } from '@/services/warning';
 export default function License() {
   const [days, setDays] = useState<any>();
   const [rules, setRules] = useState<any>();
-  const [visible, setVisible] = useState<boolean>(false);
   useEffect(() => {
     const now = moment().unix();
     getBrainLicense().then((res) => {
       setDays(_.round((res?.data?.expire - now) / 86400));
       setRules(res?.data?.rules_remaining);
-      if (res?.data?.show) {
-        setVisible(true);
-      }
       window.localStorage.setItem('license_rules_remaining', _.toString(res?.data?.rules_remaining));
     });
   }, []);
   if (!days) return null;
-  if (!visible || days>30) return null;
+  if (days > 30) return null;
   return (
     <div style={{ marginRight: 20 }}>
       <Tooltip
