@@ -1,10 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import _ from 'lodash';
-import { Row, Col, Space, Form, Input, AutoComplete, Tooltip, Button } from 'antd';
+import { Row, Col, Space, Form, Input, AutoComplete, Tooltip, Button, Table } from 'antd';
 import { FormInstance } from 'antd/lib/form/Form';
-import { QuestionCircleOutlined } from '@ant-design/icons';
+import { QuestionCircleOutlined, DownOutlined, RightOutlined } from '@ant-design/icons';
+import CodeMirror from '@uiw/react-codemirror';
+import { EditorView } from '@codemirror/view';
+import { json } from '@codemirror/lang-json';
+import { defaultHighlightStyle } from '@codemirror/highlight';
 import { getIndices, getLogsQuery } from '@/services/warning';
 import TimeRangePicker, { parseRange } from '@/components/TimeRangePicker';
+import Timeseries from '@/pages/dashboard/Renderer/Renderer/Timeseries';
+import FieldsList from './FieldsList';
+import metricQuery from './metricQuery';
 import './style.less';
 
 interface IProps {
@@ -12,12 +19,19 @@ interface IProps {
   form: FormInstance;
 }
 
+function localeCompareFunc(a, b) {
+  return a.localeCompare(b);
+}
+
 export default function index(props: IProps) {
   const { datasourceName, form } = props;
   const [indexOptions, setIndexOptions] = useState([]);
   const [indexSearch, setIndexSearch] = useState('');
-  const [fields, setFields] = useState<string[]>([]);
   const [data, setData] = useState();
+  const [series, setSeries] = useState<any[]>([]);
+  const [fieldsSearch, setFieldsSearch] = useState('');
+  const [fields, setFields] = useState<string[]>([]);
+  const [selectedFields, setSelectedFields] = useState<string[]>([]);
 
   useEffect(() => {
     if (!_.isEmpty(datasourceName)) {
@@ -34,7 +48,7 @@ export default function index(props: IProps) {
   }, [datasourceName]);
 
   return (
-    <div className='metric-explorer-es-discover-container'>
+    <div className='es-discover-container'>
       <Row gutter={8}>
         <Col span={7}>
           <Input.Group compact>
@@ -165,6 +179,14 @@ export default function index(props: IProps) {
                       setFields(allFields);
                       setData(newData);
                     });
+                    metricQuery({
+                      datasourceCate: 'elasticsearch',
+                      datasourceName: values.datasourceName,
+                      query: values.query,
+                    }).then((res) => {
+                      console.log(res);
+                      setSeries(res || []);
+                    });
                   });
                 }}
               >
@@ -174,18 +196,137 @@ export default function index(props: IProps) {
           </Space>
         </Col>
       </Row>
-      <div className='metric-explorer-es-discover-content'>
-        <div className='metric-explorer-es-discover-sidebar'>
-          <div>
-            <Input placeholder='搜索字段名' />
+      <div className='es-discover-content'>
+        <div className='es-discover-sidebar'>
+          <div className='es-discover-sidebar-title'>
+            <Input
+              placeholder='搜索字段'
+              value={fieldsSearch}
+              onChange={(e) => {
+                setFieldsSearch(e.target.value);
+              }}
+            />
           </div>
-          <div>
-            {_.map(fields, (item) => {
-              return <div key={item}>{item}</div>;
-            })}
+          <div className='es-discover-sidebar-content'>
+            <FieldsList
+              style={{ marginBottom: 10 }}
+              fieldsSearch={fieldsSearch}
+              fields={selectedFields}
+              type='selected'
+              onRemove={(field) => {
+                setSelectedFields(_.without(selectedFields, field));
+                setFields(_.concat(fields, field));
+              }}
+            />
+            <FieldsList
+              fields={fields}
+              fieldsSearch={fieldsSearch}
+              type='available'
+              onSelect={(field) => {
+                setSelectedFields(_.concat(selectedFields, field));
+                setFields(_.without(fields, field));
+              }}
+            />
           </div>
         </div>
-        <div className='metric-explorer-es-discover-main'></div>
+        <div className='es-discover-main'>
+          <div style={{ height: 150, padding: '10px 0' }}>
+            <Timeseries
+              series={series}
+              values={
+                {
+                  custom: {
+                    drawStyle: 'lines',
+                    lineInterpolation: 'smooth',
+                  },
+                  options: {
+                    legend: {
+                      displayMode: 'hidden',
+                    },
+                    tooltip: {
+                      mode: 'all',
+                    },
+                  },
+                } as any
+              }
+            />
+          </div>
+          <Table
+            size='small'
+            className='event-logs-table'
+            tableLayout='fixed'
+            rowKey='id'
+            columns={
+              _.isEmpty(selectedFields)
+                ? [
+                    {
+                      title: 'Document',
+                      dataIndex: 'fields',
+                      render(text) {
+                        return (
+                          <dl className='event-logs-row'>
+                            {_.map(text, (val, key) => {
+                              return (
+                                <React.Fragment key={key}>
+                                  <dt>{key}:</dt> <dd>{_.join(val, ',')}</dd>
+                                </React.Fragment>
+                              );
+                            })}
+                          </dl>
+                        );
+                      },
+                    },
+                  ]
+                : _.map(selectedFields, (item) => {
+                    return {
+                      title: item,
+                      dataIndex: 'fields',
+                      render(fields) {
+                        return _.join(fields[item], ',');
+                      },
+                      sorter: (a, b) => localeCompareFunc(_.join(_.get(a, `fields[${item}]`, '')), _.join(_.get(b, `fields[${item}]`, ''))),
+                    };
+                  })
+            }
+            dataSource={data}
+            expandable={{
+              expandedRowRender: (record) => {
+                let value = '';
+                try {
+                  value = JSON.stringify(record.json, null, 4);
+                } catch (e) {
+                  console.error(e);
+                  value = '无法解析';
+                }
+                return (
+                  <CodeMirror
+                    value={value}
+                    height='auto'
+                    theme='light'
+                    basicSetup={false}
+                    editable={false}
+                    extensions={[
+                      defaultHighlightStyle.fallback,
+                      json(),
+                      EditorView.lineWrapping,
+                      EditorView.theme({
+                        '&': {
+                          backgroundColor: '#F6F6F6 !important',
+                        },
+                        '&.cm-editor.cm-focused': {
+                          outline: 'unset',
+                        },
+                      }),
+                    ]}
+                  />
+                );
+              },
+              expandIcon: ({ expanded, onExpand, record }) =>
+                expanded ? <DownOutlined onClick={(e) => onExpand(record, e)} /> : <RightOutlined onClick={(e) => onExpand(record, e)} />,
+            }}
+            scroll={{ y: 302 }}
+          />
+        </div>
       </div>
     </div>
   );
