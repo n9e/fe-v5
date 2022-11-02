@@ -7,10 +7,10 @@ const versionList = [
   // { lebel: '2.x', value: '2.x' },
   // { lebel: '5.x', value: '5.x' },
   // { lebel: '5.6+', value: '5.6+' },
-  // { lebel: '6.0+', value: '6.0+' },
-  // { lebel: '7.0+', value: '7.0+' },
+  { lebel: '6.0+', value: '6.0+' },
+  { lebel: '7.0+', value: '7.0+' },
   // { lebel: '7.7+', value: '7.7+' },
-  { lebel: '7.10+', value: '7.10+' },
+  // { lebel: '7.10+', value: '7.10+' },
   // { lebel: '8.0+', value: '8.0+' },
 ];
 
@@ -21,7 +21,7 @@ export default function EsDetail({ namePrefix, type, max_shard }: IFromItemBaseP
       <div className='page-title' style={{ marginTop: '8px' }}>
         ES详情
       </div>
-      <Form.Item label='版本' name={[...namePrefix, 'es.version']} rules={[]} initialValue='7.10+'>
+      <Form.Item label='版本' name={[...namePrefix, 'es.version']} rules={[]} initialValue='7.0+'>
         <Select
           options={versionList}
           placeholder='请选择版本'
