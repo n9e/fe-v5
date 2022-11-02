@@ -139,7 +139,7 @@ export default function Login() {
                   getRedirectURLCAS().then((res) => {
                     if (res.dat) {
                       window.location.href = res.dat.redirect;
-                      localStorage.setItem('state', res.dat.state);
+                      localStorage.setItem('CAS_state', res.dat.state);
                     } else {
                       message.warning('没有配置 CAS 登录地址！');
                     }

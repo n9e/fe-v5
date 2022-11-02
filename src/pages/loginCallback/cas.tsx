@@ -36,7 +36,7 @@ export default function index() {
             localStorage.setItem('access_token', res.dat.access_token);
             localStorage.setItem('refresh_token', res.dat.refresh_token);
             window.location.href = res.dat.redirect;
-            localStorage.removeItem("state");
+            localStorage.removeItem("CAS_state");
           } else {
             console.log(res.dat);
           }
