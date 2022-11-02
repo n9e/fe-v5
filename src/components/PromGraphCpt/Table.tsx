@@ -25,6 +25,7 @@ interface IProps {
   url: string;
   datasourceId?: number;
   datasourceIdRequired?: boolean;
+  datasourceName?: string;
   promql?: string;
   setQueryStats: (stats: QueryStats) => void;
   setErrorContent: (content: string) => void;
@@ -74,7 +75,7 @@ function getListItemValue(resultType, record) {
 }
 
 export default function Table(props: IProps) {
-  const { url, datasourceId, datasourceIdRequired, promql, setQueryStats, setErrorContent, contentMaxHeight, timestamp, setTimestamp, refreshFlag } = props;
+  const { url, datasourceId, datasourceIdRequired, datasourceName, promql, setQueryStats, setErrorContent, contentMaxHeight, timestamp, setTimestamp, refreshFlag } = props;
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState<{
     resultType: ResultType;
@@ -98,7 +99,10 @@ export default function Table(props: IProps) {
           ? {
               'X-Data-Source-Id': datasourceId,
             }
-          : {},
+          : {
+              'X-Cluster': datasourceName || localStorage.getItem('curCluster') || 'DEFAULT',
+              Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
+            },
       )
         .then((res) => {
           const { resultType } = res;
@@ -144,7 +148,7 @@ export default function Table(props: IProps) {
           setIsLoading(false);
         });
     }
-  }, [timestamp, datasourceId, promql, refreshFlag]);
+  }, [timestamp, datasourceId, datasourceName, promql, refreshFlag]);
 
   return (
     <div className='prom-graph-table-container'>

@@ -461,3 +461,10 @@ export function getEventLogQuery(params) {
     data: params,
   });
 }
+
+export function getLogsQuery(params) {
+  return request('/api/n9e-plus/logs-query', {
+    method: RequestMethod.Post,
+    data: params,
+  });
+}
