@@ -27,7 +27,7 @@ export default function index() {
   useEffect(() => {
     authCallbackCAS({
       ticket: query.ticket,
-      state: localStorage.getItem("state"),
+      state: localStorage.getItem("CAS_state"),
       redirect: query.redirect || '/',
     })
       .then((res) => {
