@@ -24,6 +24,8 @@ import Page403 from '@/pages/NotFound/Page403';
 import Login from '@/pages/login';
 import Overview from '@/pages/login/overview';
 import LoginCallback from '@/pages/loginCallback';
+import LoginCallbackCAS from '@/pages/loginCallback/cas';
+import LoginCallbackOAuth from '@/pages/loginCallback/oauth';
 import Strategy from '@/pages/warning/strategy';
 import Profile from '@/pages/account/profile';
 import Dashboard from '@/pages/dashboard/List';
@@ -121,6 +123,8 @@ export default function Content() {
         <Route path='/overview' component={Overview} />
         <Route path='/login' component={Login} exact />
         <Route path='/callback' component={LoginCallback} exact />
+        <Route path='/callback/cas' component={LoginCallbackCAS} exact />
+        <Route path='/callback/oauth' component={LoginCallbackOAuth} exact />
         <Route path='/metric/explorer' component={Explore} exact />
         <Route path='/object/explorer' component={ObjectExplore} exact />
         <Route path='/busi-groups' component={Business} />
