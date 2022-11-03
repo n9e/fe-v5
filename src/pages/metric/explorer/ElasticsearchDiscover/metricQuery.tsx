@@ -1,22 +1,20 @@
 import _ from 'lodash';
-import moment from 'moment';
-import { parseRange } from '@/components/TimeRangePicker';
 import { getDsQuery } from '@/services/warning';
 import { getSerieName } from '@/pages/dashboard/Renderer/datasource/utils';
+import { normalizeTime } from '@/pages/warning/strategy/components/utils';
 
 interface IOptions {
   datasourceCate: string;
   datasourceName: string;
   query: any;
+  start: number;
+  end: number;
+  interval: number;
+  intervalUnit: 'second' | 'min' | 'hour';
 }
 
 export default async function metricQuery(options: IOptions) {
-  const { query, datasourceCate, datasourceName } = options;
-  const { range } = query;
-  if (!range.start) return;
-  const parsedRange = parseRange(range);
-  const start = moment(parsedRange.start).unix();
-  const end = moment(parsedRange.end).unix();
+  const { query, datasourceCate, datasourceName, start, end, interval, intervalUnit } = options;
   let series: any[] = [];
   const res = await getDsQuery({
     cate: datasourceCate,
@@ -26,7 +24,7 @@ export default async function metricQuery(options: IOptions) {
         index: query.index,
         filter: query.filter,
         date_field: query.date_field,
-        interval: 6000, // TODO: 需要把设置暴露出来吗？
+        interval: normalizeTime(interval, intervalUnit),
         value: {
           func: 'count',
         },

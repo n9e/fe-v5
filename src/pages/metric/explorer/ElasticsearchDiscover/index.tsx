@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import _ from 'lodash';
 import moment from 'moment';
-import { Row, Col, Space, Form, Input, AutoComplete, Tooltip, Button, Table, Empty, Spin } from 'antd';
+import { Space, Form, Input, AutoComplete, Tooltip, Button, Table, Empty, Spin, InputNumber, Select } from 'antd';
 import { FormInstance } from 'antd/lib/form/Form';
 import { QuestionCircleOutlined, DownOutlined, RightOutlined } from '@ant-design/icons';
 import CodeMirror from '@uiw/react-codemirror';
 import { EditorView } from '@codemirror/view';
 import { json } from '@codemirror/lang-json';
 import { defaultHighlightStyle } from '@codemirror/highlight';
+import { Column } from '@ant-design/plots';
 import { getIndices, getLogsQuery } from '@/services/warning';
 import TimeRangePicker, { parseRange } from '@/components/TimeRangePicker';
 import Timeseries from '@/pages/dashboard/Renderer/Renderer/Timeseries';
@@ -22,6 +23,7 @@ interface IProps {
 }
 
 const LOGS_LIMIT = 50;
+const TIME_FORMAT = 'YYYY.MM.DD HH:mm:ss';
 
 export default function index(props: IProps) {
   const { datasourceName, form } = props;
@@ -30,16 +32,43 @@ export default function index(props: IProps) {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any[]>([]);
   const [series, setSeries] = useState<any[]>([]);
+  const [displayTimes, setDisplayTimes] = useState('');
   const [fieldsSearch, setFieldsSearch] = useState('');
   const [fields, setFields] = useState<string[]>([]);
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
   const [isMore, setIsMore] = useState(true);
+  const [interval, setInterval] = useState(1);
+  const [intervalUnit, setIntervalUnit] = useState<'second' | 'min' | 'hour'>('min');
   const totalRef = useRef(0);
   const pageRef = useRef(1);
-
+  const timesRef =
+    useRef<{
+      start: number;
+      end: number;
+    }>();
+  const fetchSeries = (values) => {
+    if (timesRef.current) {
+      const { start, end } = timesRef.current;
+      metricQuery({
+        ...timesRef.current,
+        datasourceCate: 'elasticsearch',
+        datasourceName: values.datasourceName,
+        query: values.query,
+        interval,
+        intervalUnit,
+      }).then((res) => {
+        setDisplayTimes(`${moment.unix(start).format(TIME_FORMAT)} - ${moment.unix(end).format(TIME_FORMAT)}`);
+        setSeries(res || []);
+      });
+    }
+  };
   const fetchData = (page) => {
     form.validateFields().then((values) => {
       const { start, end } = parseRange(values.query.range);
+      timesRef.current = {
+        start: moment(start).unix(),
+        end: moment(end).unix(),
+      };
       if (page === 1) {
         setLoading(true);
       }
@@ -48,11 +77,10 @@ export default function index(props: IProps) {
         cluster: datasourceName,
         query: [
           {
+            ...timesRef.current,
             index: values.query.index,
             filter: values.query.filter,
             date_field: values.query.date_field,
-            start: moment(start).unix(), // 1660735739
-            end: moment(end).unix(), // 1660736039
             limit: LOGS_LIMIT,
             page,
           },
@@ -81,13 +109,7 @@ export default function index(props: IProps) {
           setLoading(false);
         });
       if (page === 1) {
-        metricQuery({
-          datasourceCate: 'elasticsearch',
-          datasourceName: values.datasourceName,
-          query: values.query,
-        }).then((res) => {
-          setSeries(res || []);
-        });
+        fetchSeries(values);
       }
     });
   };
@@ -106,85 +128,85 @@ export default function index(props: IProps) {
     }
   }, [datasourceName]);
 
+  useEffect(() => {
+    fetchSeries(form.getFieldsValue());
+  }, [interval, intervalUnit]);
+
   return (
     <div className='es-discover-container'>
-      <Row gutter={8}>
-        <Col span={7}>
-          <Input.Group compact>
-            <span
-              className='ant-input-group-addon'
-              style={{
-                width: 60,
-                height: 32,
-                lineHeight: '32px',
-              }}
+      <Space>
+        <Input.Group compact>
+          <span
+            className='ant-input-group-addon'
+            style={{
+              width: 60,
+              height: 32,
+              lineHeight: '32px',
+            }}
+          >
+            索引{' '}
+            <Tooltip
+              title={
+                <div>
+                  支持多种配置方式
+                  <br />
+                  1. 指定单个索引 gb 在 gb 索引中搜索所有的文档
+                  <br />
+                  2. 指定多个索引 gb,us 在 gb 和 us 索引中搜索所有的文档
+                  <br />
+                  3. 指定索引前缀 g*,u* 在任何以 g 或者 u 开头的索引中搜索所有的文档
+                  <br />
+                </div>
+              }
             >
-              索引{' '}
-              <Tooltip
-                title={
-                  <div>
-                    支持多种配置方式
-                    <br />
-                    1. 指定单个索引 gb 在 gb 索引中搜索所有的文档
-                    <br />
-                    2. 指定多个索引 gb,us 在 gb 和 us 索引中搜索所有的文档
-                    <br />
-                    3. 指定索引前缀 g*,u* 在任何以 g 或者 u 开头的索引中搜索所有的文档
-                    <br />
-                  </div>
+              <QuestionCircleOutlined />
+            </Tooltip>
+          </span>
+          <Form.Item
+            name={['query', 'index']}
+            rules={[
+              {
+                required: true,
+                message: '请输入索引',
+              },
+            ]}
+            validateTrigger='onBlur'
+            style={{ width: 190 }}
+          >
+            <AutoComplete
+              dropdownMatchSelectWidth={false}
+              style={{ minWidth: 100 }}
+              options={_.filter(indexOptions, (item) => {
+                if (indexSearch) {
+                  return item.value.includes(indexSearch);
                 }
-              >
-                <QuestionCircleOutlined />
-              </Tooltip>
-            </span>
-            <Form.Item
-              name={['query', 'index']}
-              rules={[
-                {
-                  required: true,
-                  message: '请输入索引',
-                },
-              ]}
-              validateTrigger='onBlur'
-              style={{ width: 'calc(100% - 60px)' }}
-            >
-              <AutoComplete
-                dropdownMatchSelectWidth={false}
-                style={{ minWidth: 100 }}
-                options={_.filter(indexOptions, (item) => {
-                  if (indexSearch) {
-                    return item.value.includes(indexSearch);
-                  }
-                  return true;
-                })}
-                onSearch={(val) => {
-                  setIndexSearch(val);
-                }}
-              />
-            </Form.Item>
-          </Input.Group>
-        </Col>
-        <Col span={7}>
-          <Input.Group compact>
-            <span
-              className='ant-input-group-addon'
-              style={{
-                width: 90,
-                height: 32,
-                lineHeight: '32px',
+                return true;
+              })}
+              onSearch={(val) => {
+                setIndexSearch(val);
               }}
-            >
-              过滤条件{' '}
-              <a href='https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html#query-string-syntax ' target='_blank'>
-                <QuestionCircleOutlined />
-              </a>
-            </span>
-            <Form.Item name={['query', 'filter']} style={{ width: 'calc(100% - 90px)' }}>
-              <Input style={{ minWidth: 100 }} />
-            </Form.Item>
-          </Input.Group>
-        </Col>
-        <Col span={10} style={{ display: 'flex' }}>
+            />
+          </Form.Item>
+        </Input.Group>
+        <Input.Group compact>
+          <span
+            className='ant-input-group-addon'
+            style={{
+              width: 90,
+              height: 32,
+              lineHeight: '32px',
+            }}
+          >
+            过滤条件{' '}
+            <a href='https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html#query-string-syntax ' target='_blank'>
+              <QuestionCircleOutlined />
+            </a>
+          </span>
+          <Form.Item name={['query', 'filter']} style={{ minWidth: 300 }}>
+            <Input />
+          </Form.Item>
+        </Input.Group>
+        <div style={{ display: 'flex' }}>
           <Space>
             <Input.Group compact>
               <span
@@ -215,8 +237,8 @@ export default function index(props: IProps) {
               </Button>
             </Form.Item>
           </Space>
-        </Col>
-      </Row>
+        </div>
+      </Space>
       <Spin spinning={loading}>
         {!_.isEmpty(data) ? (
           <div className='es-discover-content'>
@@ -228,6 +250,7 @@ export default function index(props: IProps) {
                   onChange={(e) => {
                     setFieldsSearch(e.target.value);
                   }}
+                  allowClear
                 />
               </div>
               <div className='es-discover-sidebar-content'>
@@ -253,26 +276,52 @@ export default function index(props: IProps) {
               </div>
             </div>
             <div className='es-discover-main'>
-              <div style={{ height: 150, padding: '10px 0' }}>
-                <Timeseries
-                  series={series}
-                  values={
-                    {
-                      custom: {
-                        drawStyle: 'lines',
-                        lineInterpolation: 'smooth',
-                      },
-                      options: {
-                        legend: {
-                          displayMode: 'hidden',
+              <div className='es-discover-chart'>
+                <div className='es-discover-chart-title'>
+                  <span>{displayTimes}</span>
+                  <span style={{ marginLeft: 10 }}>
+                    间隔:{' '}
+                    <InputNumber
+                      size='small'
+                      value={interval}
+                      min={1}
+                      onBlur={(e) => {
+                        const val = _.toNumber(e.target.value);
+                        if (val > 0) setInterval(val);
+                      }}
+                      onPressEnter={(e: any) => {
+                        const val = _.toNumber(e.target.value);
+                        if (val > 0) setInterval(val);
+                      }}
+                    />{' '}
+                    <Select size='small' style={{ width: 70 }} value={intervalUnit} onChange={(val) => setIntervalUnit(val)}>
+                      <Select.Option value='second'>秒</Select.Option>
+                      <Select.Option value='min'>分钟</Select.Option>
+                      <Select.Option value='hour'>小时</Select.Option>
+                    </Select>
+                  </span>
+                </div>
+                <div className='es-discover-chart-content'>
+                  <Timeseries
+                    series={series}
+                    values={
+                      {
+                        custom: {
+                          drawStyle: 'bar',
+                          lineInterpolation: 'smooth',
                         },
-                        tooltip: {
-                          mode: 'all',
+                        options: {
+                          legend: {
+                            displayMode: 'hidden',
+                          },
+                          tooltip: {
+                            mode: 'all',
+                          },
                         },
-                      },
-                    } as any
-                  }
-                />
+                      } as any
+                    }
+                  />
+                </div>
               </div>
               <div
                 onScrollCapture={() => {

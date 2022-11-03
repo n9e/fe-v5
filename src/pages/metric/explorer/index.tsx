@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Card, Space, Input, Form, Select } from 'antd';
 import { LineChartOutlined, PlusOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash';
@@ -22,7 +22,7 @@ import PageLayout from '@/components/pageLayout';
 import { generateID } from '@/utils';
 import PromGraph from '@/components/PromGraphCpt';
 import AdvancedWrap from '@/components/AdvancedWrap';
-import ClusterSelect from '@/pages/dashboard/Editor/QueryEditor/components/ClusterSelect';
+import { getCommonESClusters, getCommonClusters } from '@/services/common';
 import ElasticsearchDiscover from './ElasticsearchDiscover';
 import './index.less';
 
@@ -51,15 +51,56 @@ function getUrlParamsByName(name) {
   return '';
 }
 
+const getDefaultDatasourceName = (datasourceCate, datasourceList) => {
+  const localPrometheus = localStorage.getItem('curCluster');
+  const localElasticsearch = localStorage.getItem('datasource_es_name');
+  if (datasourceCate === 'prometheus') return localPrometheus || _.get(datasourceList, [datasourceCate, 0]);
+  if (datasourceCate === 'elasticsearch') return localElasticsearch || _.get(datasourceList, [datasourceCate, 0]);
+};
+
+const setDefaultDatasourceName = (datasourceCate, value) => {
+  if (datasourceCate === 'prometheus') {
+    localStorage.setItem('curCluster', value);
+  }
+  if (datasourceCate === 'elasticsearch') {
+    localStorage.setItem('datasource_es_name', value);
+  }
+};
+
 const Panel = ({ id, defaultPromQL, removePanel }: { id: string; defaultPromQL: string; removePanel: (id: string) => void }) => {
   const [form] = Form.useForm();
+  const [datasourceList, setDatasourceList] = useState<{
+    prometheus: string[];
+    elasticsearch: string[];
+  }>({
+    prometheus: [],
+    elasticsearch: [],
+  });
+
+  useEffect(() => {
+    const fetchDatasourceList = async () => {
+      const promList = await getCommonClusters().then((res) => res.dat);
+      const esList = await getCommonESClusters().then((res) => res.dat);
+      setDatasourceList({
+        prometheus: promList,
+        elasticsearch: esList,
+      });
+    };
+    fetchDatasourceList().catch(() => {
+      setDatasourceList({
+        prometheus: [],
+        elasticsearch: [],
+      });
+    });
+  }, []);
+
   return (
     <Card key={id} bodyStyle={{ padding: 16 }} className='panel'>
       <Form
         form={form}
         initialValues={{
           datasourceCate: 'prometheus',
-          datasourceName: 'Default',
+          datasourceName: getDefaultDatasourceName('prometheus', datasourceList),
         }}
       >
         <Space align='start'>
@@ -73,9 +114,9 @@ const Panel = ({ id, defaultPromQL, removePanel }: { id: string; defaultPromQL: 
                     <Select
                       dropdownMatchSelectWidth={false}
                       style={{ minWidth: 70 }}
-                      onChange={() => {
+                      onChange={(val) => {
                         form.setFieldsValue({
-                          datasourceName: undefined,
+                          datasourceName: getDefaultDatasourceName(val, datasourceList),
                         });
                       }}
                     >
@@ -105,7 +146,30 @@ const Panel = ({ id, defaultPromQL, removePanel }: { id: string; defaultPromQL: 
                   >
                     关联数据源
                   </span>
-                  <ClusterSelect cate={cate} />
+                  <Form.Item
+                    name='datasourceName'
+                    rules={[
+                      {
+                        required: cate !== 'prometheus',
+                        message: '请选择数据源',
+                      },
+                    ]}
+                  >
+                    <Select
+                      placeholder='选择数据源'
+                      style={{ minWidth: 70 }}
+                      dropdownMatchSelectWidth={false}
+                      onChange={(val: string) => {
+                        setDefaultDatasourceName(cate, val);
+                      }}
+                    >
+                      {_.map(datasourceList[cate], (item) => (
+                        <Select.Option value={item} key={item}>
+                          {item}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
                 </Input.Group>
               );
             }}
