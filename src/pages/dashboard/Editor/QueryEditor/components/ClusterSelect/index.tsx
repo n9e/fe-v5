@@ -7,7 +7,7 @@ export default function index(props: { cate: string; defaultDatasourceName: stri
   const [clusterList, setClusterList] = useState([]);
 
   useEffect(() => {
-    if (cate === 'elasticsearch') {
+    if (cate === 'elasticsearch' || cate === 'elasticsearch-log') {
       getCommonESClusters()
         .then(({ dat }) => {
           setClusterList(dat);
