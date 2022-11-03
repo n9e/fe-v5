@@ -67,35 +67,24 @@ const setDefaultDatasourceName = (datasourceCate, value) => {
   }
 };
 
-const Panel = ({ id, defaultPromQL, removePanel }: { id: string; defaultPromQL: string; removePanel: (id: string) => void }) => {
-  const [form] = Form.useForm();
-  const [datasourceList, setDatasourceList] = useState<{
+const Panel = ({
+  defaultPromQL,
+  removePanel,
+  datasourceList,
+  id,
+}: {
+  id: string;
+  datasourceList: {
     prometheus: string[];
     elasticsearch: string[];
-  }>({
-    prometheus: [],
-    elasticsearch: [],
-  });
-
-  useEffect(() => {
-    const fetchDatasourceList = async () => {
-      const promList = await getCommonClusters().then((res) => res.dat);
-      const esList = await getCommonESClusters().then((res) => res.dat);
-      setDatasourceList({
-        prometheus: promList,
-        elasticsearch: esList,
-      });
-    };
-    fetchDatasourceList().catch(() => {
-      setDatasourceList({
-        prometheus: [],
-        elasticsearch: [],
-      });
-    });
-  }, []);
+  };
+  defaultPromQL: string;
+  removePanel: (id: string) => void;
+}) => {
+  const [form] = Form.useForm();
 
   return (
-    <Card key={id} bodyStyle={{ padding: 16 }} className='panel'>
+    <Card bodyStyle={{ padding: 16 }} className='panel'>
       <Form
         form={form}
         initialValues={{
@@ -210,6 +199,31 @@ const Panel = ({ id, defaultPromQL, removePanel }: { id: string; defaultPromQL: 
 
 const PanelList = () => {
   const [panelList, setPanelList] = useState<PanelMeta[]>([{ id: generateID(), defaultPromQL: decodeURIComponent(getUrlParamsByName('promql')) }]);
+  const [datasourceList, setDatasourceList] = useState<{
+    prometheus: string[];
+    elasticsearch: string[];
+  }>({
+    prometheus: [],
+    elasticsearch: [],
+  });
+
+  useEffect(() => {
+    const fetchDatasourceList = async () => {
+      const promList = await getCommonClusters().then((res) => res.dat);
+      const esList = await getCommonESClusters().then((res) => res.dat);
+      setDatasourceList({
+        prometheus: promList,
+        elasticsearch: esList,
+      });
+    };
+    fetchDatasourceList().catch(() => {
+      setDatasourceList({
+        prometheus: [],
+        elasticsearch: [],
+      });
+    });
+  }, []);
+
   // 添加一个查询面板
   function addPanel() {
     setPanelList((a) => [
@@ -222,13 +236,13 @@ const PanelList = () => {
 
   // 删除指定查询面板
   function removePanel(id) {
-    setPanelList(panelList.reduce<PanelMeta[]>((acc, panel) => (panel.id !== id ? [...acc, { ...panel }] : acc), []));
+    setPanelList(_.filter(panelList, (item) => item.id !== id));
   }
 
   return (
     <>
       {panelList.map(({ id, defaultPromQL = '' }) => {
-        return <Panel id={id} removePanel={removePanel} defaultPromQL={defaultPromQL} />;
+        return <Panel key={id} id={id} removePanel={removePanel} defaultPromQL={defaultPromQL} datasourceList={datasourceList} />;
       })}
       <div className='add-prometheus-panel'>
         <Button size='large' onClick={addPanel}>
