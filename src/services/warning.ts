@@ -414,6 +414,7 @@ export function getDsQuery(params) {
     headers: {
       'X-Cluster': 'Default',
     },
+    silence: true,
   });
 }
 
@@ -424,6 +425,7 @@ export function getLogQuery(params) {
     headers: {
       'X-Cluster': 'Default',
     },
+    silence: true,
   });
 }
 
