@@ -54,7 +54,7 @@ request.interceptors.response.use(
         .clone()
         .json()
         .then((data) => {
-          if (response.url.includes('/api/v1/') || response.url.includes('/api/v2')) {
+          if (response.url.includes('/api/v1/') || response.url.includes('/api/v2') || response.url.includes('/api/n9e-plus')) {
             if (status === 200 && !data.error) {
               return { ...data, success: true };
             } else if (data.error) {
@@ -119,8 +119,8 @@ request.interceptors.response.use(
           .clone()
           .json()
           .then((data) => {
-             throw new Error(data.err ? data.err : data);
-          })
+            throw new Error(data.err ? data.err : data);
+          });
       } else if (response.url.indexOf('/api/n9e/auth/refresh') > 0) {
         location.href = `/login${location.pathname != '/' ? '?redirect=' + location.pathname + location.search : ''}`;
       } else {
