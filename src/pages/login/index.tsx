@@ -19,10 +19,15 @@ import { Form, Input, Button, Radio, message } from 'antd';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import { getRedirectURL } from '@/services/login';
+import { getSsoConfig, getRedirectURL, getRedirectURLCAS, getRedirectURLOAuth } from '@/services/login';
 import './login.less';
 
 import { useTranslation } from 'react-i18next';
+export interface DisplayName {
+  oidc: string;
+  cas: string;
+  oauth: string;
+}
 export default function Login() {
   const { t } = useTranslation();
   const [form] = Form.useForm();
@@ -30,6 +35,23 @@ export default function Login() {
   const location = useLocation();
   const redirect = location.search && new URLSearchParams(location.search).get('redirect');
   const dispatch = useDispatch();
+  const [displayName, setDis] = useState<DisplayName>({
+    oidc: 'OIDC',
+    cas: 'CAS',
+    oauth: 'OAuth',
+  });
+
+  useEffect(() => {
+    getSsoConfig().then((res) => {
+      if (res.dat) {
+        setDis({
+          oidc: res.dat.oidcDisplayName,
+          cas: res.dat.casDisplayName,
+          oauth: res.dat.oauthDisplayName,
+        });
+      }
+    });
+  }, []);
 
   const handleSubmit = async () => {
     try {
@@ -63,7 +85,7 @@ export default function Login() {
       <div className='login-panel'>
         <div className='login-main  integration'>
           <div className='login-title'>
-            <img src={'/image/logo-l.svg'} style={{ width: '120px' }} />
+            <img src={'/image/logo-dark.svg'} style={{ width: '120px' }} />
           </div>
           <Form form={form} layout='vertical' requiredMark={true}>
             <Form.Item
@@ -109,7 +131,36 @@ export default function Login() {
                   });
                 }}
               >
-                OIDC
+                {displayName.oidc}
+              </a>
+              &nbsp;&nbsp;
+              <a
+                onClick={() => {
+                  getRedirectURLCAS().then((res) => {
+                    if (res.dat) {
+                      window.location.href = res.dat.redirect;
+                      localStorage.setItem('CAS_state', res.dat.state);
+                    } else {
+                      message.warning('没有配置 CAS 登录地址！');
+                    }
+                  });
+                }}
+              >
+                {displayName.cas}
+              </a>
+              &nbsp;&nbsp;
+              <a
+                onClick={() => {
+                  getRedirectURLOAuth().then((res) => {
+                    if (res.dat) {
+                      window.location.href = res.dat;
+                    } else {
+                      message.warning('没有配置 OAuth 登录地址！');
+                    }
+                  });
+                }}
+              >
+                {displayName.oauth}
               </a>
             </div>
           </Form>
