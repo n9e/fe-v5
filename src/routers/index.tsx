@@ -94,7 +94,9 @@ export default function Content() {
   const location = useLocation();
   const dispatch = useDispatch();
   if (!profile.id && location.pathname != '/login' && !location.pathname.startsWith('/callback')) {
-    dispatch({ type: 'common/getClusters' });
+    if (!location.pathname.startsWith('/dashboards/share/')) {
+      dispatch({ type: 'common/getClusters' });
+    }
     if (
       !location.pathname.startsWith('/chart/') &&
       !location.pathname.startsWith('/dashboards/share/') &&
