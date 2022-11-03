@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import _ from 'lodash';
-import { Row, Col, Space, Form, Input, AutoComplete, Tooltip, Button, Table } from 'antd';
+import moment from 'moment';
+import { Row, Col, Space, Form, Input, AutoComplete, Tooltip, Button, Table, Empty, Spin } from 'antd';
 import { FormInstance } from 'antd/lib/form/Form';
 import { QuestionCircleOutlined, DownOutlined, RightOutlined } from '@ant-design/icons';
 import CodeMirror from '@uiw/react-codemirror';
@@ -12,6 +13,7 @@ import TimeRangePicker, { parseRange } from '@/components/TimeRangePicker';
 import Timeseries from '@/pages/dashboard/Renderer/Renderer/Timeseries';
 import FieldsList from './FieldsList';
 import metricQuery from './metricQuery';
+import { getColumnsFromFields } from './utils';
 import './style.less';
 
 interface IProps {
@@ -19,19 +21,76 @@ interface IProps {
   form: FormInstance;
 }
 
-function localeCompareFunc(a, b) {
-  return a.localeCompare(b);
-}
+const LOGS_LIMIT = 50;
 
 export default function index(props: IProps) {
   const { datasourceName, form } = props;
   const [indexOptions, setIndexOptions] = useState([]);
   const [indexSearch, setIndexSearch] = useState('');
-  const [data, setData] = useState();
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState<any[]>([]);
   const [series, setSeries] = useState<any[]>([]);
   const [fieldsSearch, setFieldsSearch] = useState('');
   const [fields, setFields] = useState<string[]>([]);
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
+  const [isMore, setIsMore] = useState(true);
+  const totalRef = useRef(0);
+  const pageRef = useRef(1);
+
+  const fetchData = (page) => {
+    form.validateFields().then((values) => {
+      const { start, end } = parseRange(values.query.range);
+      if (page === 1) {
+        setLoading(true);
+      }
+      getLogsQuery({
+        cate: 'elasticsearch',
+        cluster: datasourceName,
+        query: [
+          {
+            index: values.query.index,
+            filter: values.query.filter,
+            date_field: values.query.date_field,
+            start: moment(start).unix(), // 1660735739
+            end: moment(end).unix(), // 1660736039
+            limit: LOGS_LIMIT,
+            page,
+          },
+        ],
+      })
+        .then((res) => {
+          let allFields: string[] = [];
+          const newData = _.map(res.dat.list, (item) => {
+            const keys = _.keys(item.fields);
+            allFields = _.union(_.concat(allFields, keys));
+            return {
+              id: _.uniqueId(),
+              fields: item.fields,
+              json: item._source,
+            };
+          });
+          totalRef.current = res.dat.total;
+          setData(page === 1 ? newData : [...data, ...newData]);
+          if (page === 1) {
+            setFields(allFields);
+            const tableEleNodes = document.querySelectorAll(`.event-logs-table .ant-table-body`)[0];
+            tableEleNodes?.scrollTo(0, 0);
+          }
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+      if (page === 1) {
+        metricQuery({
+          datasourceCate: 'elasticsearch',
+          datasourceName: values.datasourceName,
+          query: values.query,
+        }).then((res) => {
+          setSeries(res || []);
+        });
+      }
+    });
+  };
 
   useEffect(() => {
     if (!_.isEmpty(datasourceName)) {
@@ -149,45 +208,7 @@ export default function index(props: IProps) {
               <Button
                 type='primary'
                 onClick={() => {
-                  form.validateFields().then((values) => {
-                    console.log('values', values);
-                    const { start, end } = parseRange(values.query.range);
-                    getLogsQuery({
-                      cate: 'elasticsearch',
-                      cluster: datasourceName,
-                      query: [
-                        {
-                          index: values.query.index,
-                          filter: values.query.filter,
-                          date_field: values.query.date_field,
-                          start: 1660735739,
-                          end: 1660736039,
-                        },
-                      ],
-                    }).then((res) => {
-                      console.log(res);
-                      let allFields: string[] = [];
-                      const newData = _.map(res.dat.list, (item) => {
-                        const keys = _.keys(item.fields);
-                        allFields = _.union(_.concat(allFields, keys));
-                        return {
-                          id: _.uniqueId(),
-                          fields: item.fields,
-                          json: item._source,
-                        };
-                      });
-                      setFields(allFields);
-                      setData(newData);
-                    });
-                    metricQuery({
-                      datasourceCate: 'elasticsearch',
-                      datasourceName: values.datasourceName,
-                      query: values.query,
-                    }).then((res) => {
-                      console.log(res);
-                      setSeries(res || []);
-                    });
-                  });
+                  fetchData(1);
                 }}
               >
                 查询
@@ -196,138 +217,142 @@ export default function index(props: IProps) {
           </Space>
         </Col>
       </Row>
-      <div className='es-discover-content'>
-        <div className='es-discover-sidebar'>
-          <div className='es-discover-sidebar-title'>
-            <Input
-              placeholder='搜索字段'
-              value={fieldsSearch}
-              onChange={(e) => {
-                setFieldsSearch(e.target.value);
-              }}
-            />
-          </div>
-          <div className='es-discover-sidebar-content'>
-            <FieldsList
-              style={{ marginBottom: 10 }}
-              fieldsSearch={fieldsSearch}
-              fields={selectedFields}
-              type='selected'
-              onRemove={(field) => {
-                setSelectedFields(_.without(selectedFields, field));
-                setFields(_.concat(fields, field));
-              }}
-            />
-            <FieldsList
-              fields={fields}
-              fieldsSearch={fieldsSearch}
-              type='available'
-              onSelect={(field) => {
-                setSelectedFields(_.concat(selectedFields, field));
-                setFields(_.without(fields, field));
-              }}
-            />
-          </div>
-        </div>
-        <div className='es-discover-main'>
-          <div style={{ height: 150, padding: '10px 0' }}>
-            <Timeseries
-              series={series}
-              values={
-                {
-                  custom: {
-                    drawStyle: 'lines',
-                    lineInterpolation: 'smooth',
-                  },
-                  options: {
-                    legend: {
-                      displayMode: 'hidden',
-                    },
-                    tooltip: {
-                      mode: 'all',
-                    },
-                  },
-                } as any
-              }
-            />
-          </div>
-          <Table
-            size='small'
-            className='event-logs-table'
-            tableLayout='fixed'
-            rowKey='id'
-            columns={
-              _.isEmpty(selectedFields)
-                ? [
+      <Spin spinning={loading}>
+        {!_.isEmpty(data) ? (
+          <div className='es-discover-content'>
+            <div className='es-discover-sidebar'>
+              <div className='es-discover-sidebar-title'>
+                <Input
+                  placeholder='搜索字段'
+                  value={fieldsSearch}
+                  onChange={(e) => {
+                    setFieldsSearch(e.target.value);
+                  }}
+                />
+              </div>
+              <div className='es-discover-sidebar-content'>
+                <FieldsList
+                  style={{ marginBottom: 10 }}
+                  fieldsSearch={fieldsSearch}
+                  fields={selectedFields}
+                  type='selected'
+                  onRemove={(field) => {
+                    setSelectedFields(_.without(selectedFields, field));
+                    setFields(_.concat(fields, field));
+                  }}
+                />
+                <FieldsList
+                  fields={fields}
+                  fieldsSearch={fieldsSearch}
+                  type='available'
+                  onSelect={(field) => {
+                    setSelectedFields(_.concat(selectedFields, field));
+                    setFields(_.without(fields, field));
+                  }}
+                />
+              </div>
+            </div>
+            <div className='es-discover-main'>
+              <div style={{ height: 150, padding: '10px 0' }}>
+                <Timeseries
+                  series={series}
+                  values={
                     {
-                      title: 'Document',
-                      dataIndex: 'fields',
-                      render(text) {
-                        return (
-                          <dl className='event-logs-row'>
-                            {_.map(text, (val, key) => {
-                              return (
-                                <React.Fragment key={key}>
-                                  <dt>{key}:</dt> <dd>{_.join(val, ',')}</dd>
-                                </React.Fragment>
-                              );
-                            })}
-                          </dl>
-                        );
+                      custom: {
+                        drawStyle: 'lines',
+                        lineInterpolation: 'smooth',
                       },
+                      options: {
+                        legend: {
+                          displayMode: 'hidden',
+                        },
+                        tooltip: {
+                          mode: 'all',
+                        },
+                      },
+                    } as any
+                  }
+                />
+              </div>
+              <div
+                onScrollCapture={() => {
+                  const tableEleNodes = document.querySelectorAll(`.event-logs-table .ant-table-body`)[0];
+                  if (Math.round(tableEleNodes?.scrollTop) + tableEleNodes?.clientHeight === tableEleNodes?.scrollHeight) {
+                    if (data.length > 500) {
+                      setIsMore(false);
+                      return false;
+                    }
+                    fetchData(pageRef.current + 1);
+                    pageRef.current = pageRef.current + 1;
+                  }
+                }}
+              >
+                <Table
+                  size='small'
+                  className='event-logs-table'
+                  tableLayout='fixed'
+                  rowKey='id'
+                  columns={getColumnsFromFields(selectedFields, form.getFieldValue(['query', 'date_field']))}
+                  dataSource={data}
+                  expandable={{
+                    expandedRowRender: (record) => {
+                      let value = '';
+                      try {
+                        value = JSON.stringify(record.json, null, 4);
+                      } catch (e) {
+                        console.error(e);
+                        value = '无法解析';
+                      }
+                      return (
+                        <CodeMirror
+                          value={value}
+                          height='auto'
+                          theme='light'
+                          basicSetup={false}
+                          editable={false}
+                          extensions={[
+                            defaultHighlightStyle.fallback,
+                            json(),
+                            EditorView.lineWrapping,
+                            EditorView.theme({
+                              '&': {
+                                backgroundColor: '#F6F6F6 !important',
+                              },
+                              '&.cm-editor.cm-focused': {
+                                outline: 'unset',
+                              },
+                            }),
+                          ]}
+                        />
+                      );
                     },
-                  ]
-                : _.map(selectedFields, (item) => {
-                    return {
-                      title: item,
-                      dataIndex: 'fields',
-                      render(fields) {
-                        return _.join(fields[item], ',');
-                      },
-                      sorter: (a, b) => localeCompareFunc(_.join(_.get(a, `fields[${item}]`, '')), _.join(_.get(b, `fields[${item}]`, ''))),
-                    };
-                  })
-            }
-            dataSource={data}
-            expandable={{
-              expandedRowRender: (record) => {
-                let value = '';
-                try {
-                  value = JSON.stringify(record.json, null, 4);
-                } catch (e) {
-                  console.error(e);
-                  value = '无法解析';
-                }
-                return (
-                  <CodeMirror
-                    value={value}
-                    height='auto'
-                    theme='light'
-                    basicSetup={false}
-                    editable={false}
-                    extensions={[
-                      defaultHighlightStyle.fallback,
-                      json(),
-                      EditorView.lineWrapping,
-                      EditorView.theme({
-                        '&': {
-                          backgroundColor: '#F6F6F6 !important',
-                        },
-                        '&.cm-editor.cm-focused': {
-                          outline: 'unset',
-                        },
-                      }),
-                    ]}
-                  />
-                );
-              },
-              expandIcon: ({ expanded, onExpand, record }) =>
-                expanded ? <DownOutlined onClick={(e) => onExpand(record, e)} /> : <RightOutlined onClick={(e) => onExpand(record, e)} />,
+                    expandIcon: ({ expanded, onExpand, record }) =>
+                      expanded ? <DownOutlined onClick={(e) => onExpand(record, e)} /> : <RightOutlined onClick={(e) => onExpand(record, e)} />,
+                  }}
+                  scroll={{ x: _.isEmpty(selectedFields) ? undefined : 'max-content', y: !isMore ? 312 - 35 : 312 }}
+                  pagination={false}
+                  footer={
+                    !isMore
+                      ? () => {
+                          return '只能查询您搜索匹配的前 500 个日志，请细化您的过滤条件。';
+                        }
+                      : undefined
+                  }
+                />
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
             }}
-            scroll={{ y: 302 }}
-          />
-        </div>
-      </div>
+          >
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+          </div>
+        )}
+      </Spin>
     </div>
   );
 }

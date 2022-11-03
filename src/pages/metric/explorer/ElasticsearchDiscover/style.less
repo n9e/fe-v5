@@ -28,11 +28,11 @@
   margin-bottom: 8px;
 }
 .es-discover-fields-item {
-  height: 24px;
-  line-height: 24px;
+  min-height: 24px;
   width: 250px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding-right: 10px;
   .es-discover-fields-item-oper {
     display: none;
@@ -44,8 +44,20 @@
     }
   }
 }
+.es-discover-fields-item-content {
+  width: calc(100% - 30px);
+  word-wrap: break-word;
+  word-break: normal;
+  line-height: 1.2;
+  padding: 4px 0;
+}
 .es-discover-main {
   width: calc(100% - 265px);
   flex-shrink: 0;
   border: 1px solid #d9d9d9;
+}
+.event-logs-table {
+  .ant-table {
+    margin-top: 0;
+  }
 }

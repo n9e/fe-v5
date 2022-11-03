@@ -15,8 +15,8 @@ export default async function metricQuery(options: IOptions) {
   const { range } = query;
   if (!range.start) return;
   const parsedRange = parseRange(range);
-  let start = moment(parsedRange.start).unix();
-  let end = moment(parsedRange.end).unix();
+  const start = moment(parsedRange.start).unix();
+  const end = moment(parsedRange.end).unix();
   let series: any[] = [];
   const res = await getDsQuery({
     cate: datasourceCate,
@@ -26,12 +26,12 @@ export default async function metricQuery(options: IOptions) {
         index: query.index,
         filter: query.filter,
         date_field: query.date_field,
-        interval: 10, // TODO: 需要把设置暴露出来吗？
+        interval: 6000, // TODO: 需要把设置暴露出来吗？
         value: {
           func: 'count',
         },
-        start: 1660735739,
-        end: 1660736039,
+        start: start, // 1660735739
+        end: end, // 1660736039
       },
     ],
   });

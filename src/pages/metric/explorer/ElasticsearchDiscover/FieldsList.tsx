@@ -56,7 +56,7 @@ export default function FieldsList(props: IProps) {
           _.map(filteredFields, (item) => {
             return (
               <div className='es-discover-fields-item' key={item}>
-                <span>{item}</span>
+                <span className='es-discover-fields-item-content'>{item}</span>
                 <span
                   className='es-discover-fields-item-oper'
                   onClick={() => {
