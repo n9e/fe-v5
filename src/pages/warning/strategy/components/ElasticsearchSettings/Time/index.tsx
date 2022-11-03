@@ -20,6 +20,7 @@ export default function index({ prefixField = {}, prefixNameField = [] }: any) {
             <span className='ant-input-group-addon'>
               <Form.Item {...prefixField} name={[...prefixNameField, 'query', 'interval_unit']} noStyle initialValue='min'>
                 <Select>
+                  <Select.Option value='second'>秒</Select.Option>
                   <Select.Option value='min'>分</Select.Option>
                   <Select.Option value='hour'>小时</Select.Option>
                 </Select>
