@@ -38,19 +38,19 @@ export default function Login() {
   const [displayName, setDis] = useState<DisplayName>({
     oidc: 'OIDC',
     cas: 'CAS',
-    oauth: 'OAuth' 
+    oauth: 'OAuth',
   });
 
   useEffect(() => {
     getSsoConfig().then((res) => {
-      if (res.dat){
+      if (res.dat) {
         setDis({
           oidc: res.dat.oidcDisplayName,
           cas: res.dat.casDisplayName,
           oauth: res.dat.oauthDisplayName,
-        })
-    }
-    })
+        });
+      }
+    });
   }, []);
 
   const handleSubmit = async () => {
@@ -85,7 +85,7 @@ export default function Login() {
       <div className='login-panel'>
         <div className='login-main  integration'>
           <div className='login-title'>
-            <img src={'/image/logo-l.svg'} style={{ width: '120px' }} />
+            <img src={'/image/logo-dark.svg'} style={{ width: '120px' }} />
           </div>
           <Form form={form} layout='vertical' requiredMark={true}>
             <Form.Item
@@ -160,7 +160,7 @@ export default function Login() {
                   });
                 }}
               >
-                {displayName.oauth} 
+                {displayName.oauth}
               </a>
             </div>
           </Form>
