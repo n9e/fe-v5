@@ -54,7 +54,7 @@ request.interceptors.response.use(
         .clone()
         .json()
         .then((data) => {
-          if (response.url.includes('/api/v1/') || response.url.includes('/api/v2') || response.url.includes('/api/n9e-plus')) {
+          if (response.url.includes('/api/v1/') || response.url.includes('/api/v2') || response.url.includes('/api/n9e-plus/datasource')) {
             if (status === 200 && !data.error) {
               return { ...data, success: true };
             } else if (data.error) {
