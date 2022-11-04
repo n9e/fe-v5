@@ -14,13 +14,15 @@
  * limitations under the License.
  *
  */
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useMemo } from 'react';
 import _ from 'lodash';
 import { Table, Input, Space, Button } from 'antd';
 import { SearchOutlined, FilterOutlined } from '@ant-design/icons';
 import type { ColumnType } from 'antd/es/table';
 import type { FilterConfirmProps } from 'antd/es/table/interface';
 import { useSize } from 'ahooks';
+import { useAntdResizableHeader } from '@minko-fe/use-antd-resizable-header';
+import '@minko-fe/use-antd-resizable-header/dist/style.css';
 import { IPanel } from '../../../types';
 import getCalculatedValuesBySeries, { getSerieTextObj } from '../../utils/getCalculatedValuesBySeries';
 import getOverridePropertiesByName from '../../utils/getOverridePropertiesByName';
@@ -131,6 +133,7 @@ export default function Stat(props: IProps) {
       title: 'name',
       dataIndex: 'name',
       key: 'name',
+      width: _.get(size, 'width') - 200,
       sorter: (a, b) => {
         return localeCompare(a.name, b.name);
       },
@@ -153,7 +156,7 @@ export default function Stat(props: IProps) {
           unit: '',
           color: record.color || (themeMode === 'dark' ? '#fff' : '#000'),
         };
-        const overrideProps = getOverridePropertiesByName(overrides, record.fields.refId);
+        const overrideProps = getOverridePropertiesByName(overrides, record.fields?.refId);
         if (!_.isEmpty(overrideProps)) {
           textObj = getSerieTextObj(record?.stat, overrideProps?.standardOptions, overrideProps?.valueMappings);
         }
@@ -176,12 +179,12 @@ export default function Stat(props: IProps) {
 
   if (displayMode === 'labelsOfSeriesToRows') {
     const columnsKeys = _.isEmpty(columns) ? _.concat(getColumnsKeys(calculatedValues), 'value') : columns;
-    tableColumns = _.map(columnsKeys, (key) => {
+    tableColumns = _.map(columnsKeys, (key, idx) => {
       return {
         title: <span title={key}>{key}</span>,
         dataIndex: key,
         key: key,
-        ellipsis: true,
+        width: idx < columnsKeys.length - 1 ? _.get(size, 'width') / columnsKeys.length : undefined,
         sorter: (a, b) => {
           if (key === 'value') {
             return a.stat - b.stat;
@@ -231,6 +234,7 @@ export default function Stat(props: IProps) {
         title: aggrDimension,
         dataIndex: aggrDimension,
         key: aggrDimension,
+        width: _.get(size, 'width') / (groupNames.length + 1),
         sorter: (a, b) => {
           return localeCompare(a[aggrDimension], b[aggrDimension]);
         },
@@ -239,7 +243,7 @@ export default function Stat(props: IProps) {
         ...getColumnSearchProps([aggrDimension]),
       },
     ];
-    _.map(groupNames, (name) => {
+    _.map(groupNames, (name, idx) => {
       const result = _.find(tableDataSource, (item) => {
         return item[name];
       });
@@ -247,6 +251,7 @@ export default function Stat(props: IProps) {
         title: result[name]?.name,
         dataIndex: name,
         key: name,
+        width: idx < groupNames.length - 1 ? _.get(size, 'width') / (groupNames.length + 1) : undefined,
         sorter: (a, b) => {
           return _.get(a[name], 'stat') - _.get(b[name], 'stat');
         },
@@ -291,6 +296,10 @@ export default function Stat(props: IProps) {
   const height = _.get(size, 'height') - headerHeight;
   const realHeight = isNaN(height) ? 0 : height;
 
+  const { components, resizableColumns, tableWidth, resetColumns } = useAntdResizableHeader({
+    columns: useMemo(() => tableColumns, [JSON.stringify(columns), displayMode, JSON.stringify(calculatedValues), sortObj, themeMode, aggrDimension, overrides, size]),
+  });
+
   return (
     <div className='renderer-table-container' ref={eleRef}>
       <div className='renderer-table-container-box'>
@@ -300,8 +309,8 @@ export default function Stat(props: IProps) {
           showSorterTooltip={false}
           showHeader={showHeader}
           dataSource={tableDataSource}
-          columns={tableColumns}
-          scroll={{ y: realHeight, x: _.get(size, 'height') - 10 }}
+          columns={resizableColumns}
+          scroll={{ y: realHeight, x: tableWidth }}
           bordered={false}
           pagination={false}
           onChange={(pagination, filters, sorter: any) => {
@@ -310,6 +319,7 @@ export default function Stat(props: IProps) {
               sortOrder: sorter.order,
             });
           }}
+          components={components}
         />
       </div>
     </div>
