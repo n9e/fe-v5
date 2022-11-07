@@ -75,7 +75,7 @@ export default function Title(props: IProps) {
         ) : (
           <div className='title'>{dashboard.name}</div>
         )}
-        {!titleEditing ? (
+        {/* {!titleEditing ? (
           !isPreview ? (
             <EditOutlined
               className='edit'
@@ -99,7 +99,7 @@ export default function Title(props: IProps) {
               保存
             </Button>
           </>
-        )}
+        )} */}
       </div>
       <div className='dashboard-detail-header-right'>
         <Space>
