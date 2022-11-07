@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "vite --port 8765 --host",
     "dev:advanced": "vite --port 8765 --host --mode advanced",
-    "build": "tsc && vite build",
+    "build": "tsc && cross-env NODE_OPTIONS=--max-old-space-size=4096 vite build",
     "build:advanced": "node comb_feats ${npm_config_custom_options} && tsc && vite build --mode advanced",
     "serve": "vite preview"
   },
@@ -83,6 +83,7 @@
     "babel-traverse": "^6.26.0",
     "babel-types": "^6.26.0",
     "better-babel-generator": "^6.26.1",
+    "cross-env": "^7.0.3",
     "dotenv": "^16.0.1",
     "less": "^4.1.1",
     "less-loader": "^8.1.1",
