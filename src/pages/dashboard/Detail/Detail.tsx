@@ -130,12 +130,12 @@ export default function DetailV2({ isPreview = false }: { isPreview?: boolean })
     const dashboardConfigs: any = JSONParse(dashboard.configs);
     dashboardConfigs.var = value;
     // 更新变量配置
-    b && handleUpdateDashboardConfigs(id, { configs: JSON.stringify(dashboardConfigs) });
+    b && handleUpdateDashboardConfigs(dashboard.id, { configs: JSON.stringify(dashboardConfigs) });
     // 更新变量配置状态
     if (valueWithOptions) {
       setVariableConfigWithOptions(valueWithOptions);
       setDashboardMeta({
-        dashboardId: id,
+        dashboardId: _.toString(dashboard.id),
         variableConfigWithOptions: valueWithOptions,
       });
     }
@@ -149,8 +149,8 @@ export default function DetailV2({ isPreview = false }: { isPreview?: boolean })
   }, [id]);
 
   useInterval(() => {
-    if (import.meta.env.PROD) {
-      getDashboardPure(id).then((res) => {
+    if (import.meta.env.PROD && dashboard.id) {
+      getDashboardPure(_.toString(dashboard.id)).then((res) => {
         if (updateAtRef.current && res.update_at > updateAtRef.current) {
           if (editable) setEditable(false);
         } else {
