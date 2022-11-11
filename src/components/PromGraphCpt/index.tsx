@@ -36,7 +36,9 @@ interface IProps {
   datasourceIdRequired?: boolean; // 如果不指定 datasourceId 则使用 X-Cluster 作为集群 key，否则 X-Data-Source-Id
   contentMaxHeight?: number;
   type?: 'table' | 'graph';
+  onTypeChange?: (type: 'table' | 'graph') => void;
   defaultTime?: IRawTimeRange | number;
+  onTimeChange?: (time: IRawTimeRange) => void; // 用于外部控制时间范围
   promQL?: string;
   graphOperates?: {
     enabled: boolean;
@@ -56,7 +58,9 @@ export default function index(props: IProps) {
     promQL,
     contentMaxHeight = 300,
     type = 'table',
+    onTypeChange,
     defaultTime,
+    onTimeChange,
     graphOperates = {
       enabled: false,
     },
@@ -90,7 +94,11 @@ export default function index(props: IProps) {
         setRange(defaultTime);
       }
     }
-  }, []);
+  }, [defaultTime]);
+
+  useEffect(() => {
+    setTabActiveKey(type);
+  }, [type]);
 
   useEffect(() => {
     setValue(promql);
@@ -131,7 +139,6 @@ export default function index(props: IProps) {
               value={value}
               onChange={setValue}
               executeQuery={(val) => {
-                console.log(val);
                 setPromql(val);
               }}
               completeEnabled={completeEnabled}
@@ -172,6 +179,7 @@ export default function index(props: IProps) {
         activeKey={tabActiveKey}
         onChange={(key: 'table' | 'graph') => {
           setTabActiveKey(key);
+          onTypeChange && onTypeChange(key);
           setErrorContent('');
           setQueryStats(null);
         }}
@@ -188,7 +196,16 @@ export default function index(props: IProps) {
             setQueryStats={setQueryStats}
             setErrorContent={setErrorContent}
             timestamp={timestamp}
-            setTimestamp={setTimestamp}
+            setTimestamp={(val) => {
+              setTimestamp(val);
+              if (val) {
+                onTimeChange &&
+                  onTimeChange({
+                    ...range,
+                    end: moment.unix(val),
+                  });
+              }
+            }}
             refreshFlag={refreshFlag}
           />
         </TabPane>
@@ -202,7 +219,10 @@ export default function index(props: IProps) {
             setQueryStats={setQueryStats}
             setErrorContent={setErrorContent}
             range={range}
-            setRange={setRange}
+            setRange={(newRange) => {
+              setRange(newRange);
+              onTimeChange && onTimeChange(newRange);
+            }}
             step={step}
             setStep={setStep}
             graphOperates={graphOperates}
