@@ -16,7 +16,18 @@ interface IProps {
 }
 
 const alphabet = 'ABCDEFGHIGKLMNOPQRSTUVWXYZ'.split('');
-const functions = ['count', 'avg', 'sum', 'max', 'min', 'p90', 'p95', 'p99'];
+const functions = ['count', 'avg', 'sum', 'max', 'min', 'p90', 'p95', 'p99', 'rawData'];
+const functionsLabelMap = {
+  count: 'count',
+  avg: 'avg',
+  sum: 'sum',
+  max: 'max',
+  min: 'min',
+  p90: 'p90',
+  p95: 'p95',
+  p99: 'p99',
+  rawData: 'raw data',
+};
 
 export default function index({ prefixField = {}, prefixFields = [], prefixNameField = [], cate, cluster, index, valueRefVisible = true }: IProps) {
   const [search, setSearch] = useState('');
@@ -48,25 +59,44 @@ export default function index({ prefixField = {}, prefixFields = [], prefixNameF
     <Form.List {...prefixField} name={[...prefixNameField, 'query', 'values']}>
       {(fields, { add, remove }) => (
         <div>
-          <div style={{ marginBottom: 8 }}>
-            数值提取{' '}
-            <PlusCircleOutlined
-              style={{ cursor: 'pointer' }}
-              onClick={() => {
-                add({
-                  ref: alphabet[fields.length],
-                  func: functions[0],
-                  field: undefined,
-                });
-              }}
-            />
-          </div>
+          <Form.Item
+            shouldUpdate={(prevValues, curValues) => {
+              const preQueryValues = _.get(prevValues, [...prefixFields, ...prefixNameField, 'query', 'values']);
+              const curQueryValues = _.get(curValues, [...prefixFields, ...prefixNameField, 'query', 'values']);
+              return !_.isEqual(preQueryValues, curQueryValues);
+            }}
+            noStyle
+          >
+            {({ getFieldValue }) => {
+              const targetQueryValues = getFieldValue([...prefixFields, ...prefixNameField, 'query', 'values']);
+              // 当提取日志原文时不可再添加 func
+              if (_.get(targetQueryValues, [0, 'func']) === 'rawData') {
+                return <div style={{ marginBottom: 8 }}>数值提取</div>;
+              }
+              return (
+                <div style={{ marginBottom: 8 }}>
+                  数值提取{' '}
+                  <PlusCircleOutlined
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => {
+                      add({
+                        ref: alphabet[fields.length],
+                        func: functions[0],
+                        field: undefined,
+                      });
+                    }}
+                  />
+                </div>
+              );
+            }}
+          </Form.Item>
+
           {fields.map((field, index) => {
             return (
               <div key={field.key} style={{ marginBottom: 16 }}>
                 <Form.Item {...field} name={[field.name, 'ref']} hidden />
                 <Form.Item shouldUpdate noStyle>
-                  {({ getFieldValue }) => {
+                  {({ getFieldValue, setFields }) => {
                     const func = getFieldValue([...prefixFields, ...prefixNameField, 'query', 'values', field.name, 'func']);
                     return (
                       <Row gutter={10}>
@@ -76,17 +106,37 @@ export default function index({ prefixField = {}, prefixFields = [], prefixNameF
                               <Input.Group>
                                 {valueRefVisible && <span className='ant-input-group-addon'>{alphabet[index]}</span>}
                                 <Form.Item {...field} name={[field.name, 'func']} noStyle>
-                                  <Select style={{ width: '100%' }}>
+                                  <Select
+                                    style={{ width: '100%' }}
+                                    onChange={(val) => {
+                                      if (val === 'rawData') {
+                                        setFields([
+                                          {
+                                            name: [...prefixFields, ...prefixNameField, 'query', 'values'],
+                                            value: [
+                                              {
+                                                func: 'rawData',
+                                              },
+                                            ],
+                                          },
+                                          {
+                                            name: [...prefixFields, ...prefixNameField, 'query', 'limit'],
+                                            value: 100,
+                                          },
+                                        ]);
+                                      }
+                                    }}
+                                  >
                                     {functions.map((func) => (
                                       <Select.Option key={func} value={func}>
-                                        {func}
+                                        {functionsLabelMap[func]}
                                       </Select.Option>
                                     ))}
                                   </Select>
                                 </Form.Item>
                               </Input.Group>
                             </Col>
-                            {func !== 'count' && (
+                            {func !== 'count' && func !== 'rawData' && (
                               <Col span={12}>
                                 <Input.Group>
                                   <span className='ant-input-group-addon'>Field key</span>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, Row, Col, Input, Button } from 'antd';
+import { Form, Row, Col, Input, Button, InputNumber } from 'antd';
 import { DeleteOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import Collapse, { Panel } from '../Components/Collapse';
@@ -72,7 +72,7 @@ export default function Prometheus({ chartForm }) {
                     </Row>
                     <Form.Item
                       shouldUpdate={(prevValues, curValues) => {
-                        return _.isEqual(prevValues.datasourceName, curValues.datasourceName);
+                        return !_.isEqual(prevValues.datasourceName, curValues.datasourceName);
                       }}
                       noStyle
                     >
@@ -89,19 +89,66 @@ export default function Prometheus({ chartForm }) {
                               index={getFieldValue([...prefixName, 'query', 'index'])}
                               valueRefVisible={false}
                             />
-                            <GroupBy
-                              prefixField={field}
-                              prefixFields={['targets']}
-                              prefixNameField={[field.name]}
-                              cate={getFieldValue('datasourceCate')}
-                              cluster={datasourceName}
-                              index={getFieldValue([...prefixName, 'query', 'index'])}
-                            />
+                            <Form.Item
+                              shouldUpdate={(prevValues, curValues) => {
+                                const preQueryValues = _.get(prevValues, [...prefixName, 'query', 'values']);
+                                const curQueryValues = _.get(curValues, [...prefixName, 'query', 'values']);
+                                return !_.isEqual(preQueryValues, curQueryValues);
+                              }}
+                              noStyle
+                            >
+                              {({ getFieldValue }) => {
+                                const targetQueryValues = getFieldValue([...prefixName, 'query', 'values']);
+                                // 当提取日志原文时不显示 groupBy 设置
+                                if (_.get(targetQueryValues, [0, 'func']) === 'rawData') {
+                                  return null;
+                                }
+                                return (
+                                  <GroupBy
+                                    prefixField={field}
+                                    prefixFields={['targets']}
+                                    prefixNameField={[field.name]}
+                                    cate={getFieldValue('datasourceCate')}
+                                    cluster={datasourceName}
+                                    index={getFieldValue([...prefixName, 'query', 'index'])}
+                                  />
+                                );
+                              }}
+                            </Form.Item>
                           </>
                         );
                       }}
                     </Form.Item>
-                    <Time prefixField={field} prefixNameField={[field.name]} />
+                    <Form.Item
+                      shouldUpdate={(prevValues, curValues) => {
+                        const preQueryValues = _.get(prevValues, [...prefixName, 'query', 'values']);
+                        const curQueryValues = _.get(curValues, [...prefixName, 'query', 'values']);
+                        return !_.isEqual(preQueryValues, curQueryValues);
+                      }}
+                      noStyle
+                    >
+                      {({ getFieldValue }) => {
+                        const targetQueryValues = getFieldValue([...prefixName, 'query', 'values']);
+                        // 当提取日志原文时不显示 groupBy 设置
+                        if (_.get(targetQueryValues, [0, 'func']) === 'rawData') {
+                          return (
+                            <Row gutter={10}>
+                              <Col span={12}>
+                                <Form.Item label='日期字段' {...field} name={[field.name, 'query', 'date_field']}>
+                                  <Input placeholder='日期字段 key' />
+                                </Form.Item>
+                              </Col>
+                              <Col span={12}>
+                                <Form.Item label='日志条数' {...field} name={[field.name, 'query', 'limit']}>
+                                  <InputNumber style={{ width: '100%' }} />
+                                </Form.Item>
+                              </Col>
+                            </Row>
+                          );
+                        }
+                        return <Time prefixField={field} prefixNameField={[field.name]} />;
+                      }}
+                    </Form.Item>
                   </Panel>
                 );
               })}
