@@ -19,7 +19,7 @@ export default function License() {
         const modal = Modal.error({ closable: false, maskClosable: false, title: 'License证书不存在或已过期，请联系Flashcat技术支持', className: 'license-off' });
         setTimeout(() => {
           modal.destroy();
-        }, 60000);
+        }, 10000);
       });
   }, []);
   if (!days) return null;
