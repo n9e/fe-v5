@@ -3,7 +3,7 @@ import { Input } from 'antd';
 
 interface IProps {
   children: React.ReactNode;
-  label: string;
+  label: React.ReactNode;
   labelWidth?: number;
   noStyle?: boolean;
 }
