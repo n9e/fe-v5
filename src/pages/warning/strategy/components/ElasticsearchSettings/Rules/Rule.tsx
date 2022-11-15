@@ -115,14 +115,27 @@ export default function Rule({ restField, name, queryValues, form, defaultRuleOp
                               <Col span={6}>
                                 <Input.Group>
                                   <span className='ant-input-group-addon'>相比</span>
-                                  <Form.Item name={[subName, 'compare_time']} noStyle>
-                                    <InputNumber style={{ width: '100%' }} />
+                                  <Form.Item shouldUpdate noStyle>
+                                    {({ getFieldValue }) => {
+                                      const compare_time_unit = getFieldValue(['query', 'rules', name, 'rule', subName, 'compare_time_unit']);
+                                      const maxMap = {
+                                        min: 59,
+                                        hour: 23,
+                                        day: undefined,
+                                      };
+                                      return (
+                                        <Form.Item name={[subName, 'compare_time']} noStyle>
+                                          <InputNumber style={{ width: '100%' }} min={1} max={maxMap[compare_time_unit]} />
+                                        </Form.Item>
+                                      );
+                                    }}
                                   </Form.Item>
                                   <span className='ant-input-group-addon'>
                                     <Form.Item name={[subName, 'compare_time_unit']} noStyle initialValue='min'>
                                       <Select>
                                         <Select.Option value='min'>分</Select.Option>
                                         <Select.Option value='hour'>小时</Select.Option>
+                                        <Select.Option value='day'>天</Select.Option>
                                       </Select>
                                     </Form.Item>
                                   </span>
