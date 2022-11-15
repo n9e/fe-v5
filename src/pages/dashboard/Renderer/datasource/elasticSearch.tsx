@@ -5,6 +5,8 @@ import { getDsQuery } from '@/services/warning';
 import { normalizeTime } from '@/pages/warning/strategy/components/utils';
 import { ITarget } from '../../types';
 import { getSerieName } from './utils';
+import { IVariable } from '../../VariableConfig/definition';
+import { replaceExpressionVars } from '../../VariableConfig/constant';
 
 interface IOptions {
   dashboardId: string;
@@ -13,10 +15,11 @@ interface IOptions {
   id?: string;
   time: IRawTimeRange;
   targets: ITarget[];
+  variableConfig?: IVariable[];
 }
 
 export default async function elasticSearchQuery(options: IOptions) {
-  const { dashboardId, id, time, targets, datasourceCate, datasourceName } = options;
+  const { dashboardId, id, time, targets, datasourceCate, datasourceName, variableConfig } = options;
   if (!time.start) return;
   const parsedRange = parseRange(time);
   let start = moment(parsedRange.start).unix();
@@ -27,9 +30,10 @@ export default async function elasticSearchQuery(options: IOptions) {
     _.forEach(targets, (target) => {
       const query = target.query || {};
       _.forEach(query?.values, (value) => {
+        const filter = variableConfig ? replaceExpressionVars(query.filter, variableConfig, variableConfig.length, dashboardId) : query.filter;
         batchParams.push({
           index: query.index,
-          filter: query.filter,
+          filter,
           value,
           group_by: query.group_by,
           date_field: query.date_field,
