@@ -14,7 +14,7 @@ interface IOptions {
 }
 
 export default async function elasticSearchLogQuery(options: IOptions) {
-  const { dashboardId, id, time, targets, datasourceCate, datasourceName } = options;
+  const { time, targets, datasourceCate, datasourceName } = options;
   if (!time.start) return;
   const parsedRange = parseRange(time);
   let start = moment(parsedRange.start).unix();
