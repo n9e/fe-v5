@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Form, Select } from 'antd';
 import { getCommonESClusters, getCommonClusters } from '@/services/common';
 
-export default function index(props: { cate: string; defaultDatasourceName: string }) {
-  const { cate, defaultDatasourceName } = props;
+export default function index(props: { cate: string; defaultDatasourceName?: string; name?: string | string[]; label?: React.ReactNode }) {
+  const { cate, defaultDatasourceName, name = 'datasourceName', label } = props;
   const [clusterList, setClusterList] = useState([]);
 
   useEffect(() => {
@@ -28,7 +28,8 @@ export default function index(props: { cate: string; defaultDatasourceName: stri
 
   return (
     <Form.Item
-      name='datasourceName'
+      label={label}
+      name={name}
       rules={[
         {
           required: cate !== 'prometheus',

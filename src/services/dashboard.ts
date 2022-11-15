@@ -269,3 +269,12 @@ export const migrateDashboard = function (id: number, data: { name: string; tags
     data,
   });
 };
+
+//
+
+export const getESVariableResult = function (data: { cate: string; cluster: string; index: string; query: any }) {
+  return request('/api/n9e-plus/es-variable', {
+    method: RequestMethod.Post,
+    data,
+  }).then((res) => res.dat);
+};
