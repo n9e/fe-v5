@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Form, Select } from 'antd';
 import { getCommonESClusters, getCommonClusters } from '@/services/common';
 
-export default function index(props: { cate: string; defaultDatasourceName: string }) {
+export default function index(props: { cate: string; defaultDatasourceName?: string }) {
   const { cate, defaultDatasourceName } = props;
   const [clusterList, setClusterList] = useState([]);
 

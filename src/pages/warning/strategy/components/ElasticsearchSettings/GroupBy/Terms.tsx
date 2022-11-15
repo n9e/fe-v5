@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Row, Col, Form, Select, Button, Input, InputNumber, AutoComplete } from 'antd';
 import { VerticalRightOutlined, VerticalLeftOutlined } from '@ant-design/icons';
+import InputGroupWithFormItem from '@/components/InputGroupWithFormItem';
 import _ from 'lodash';
 import { groupByCates, groupByCatesMap } from './configs';
 
@@ -14,7 +15,7 @@ export default function Terms({ prefixField, fieldsOptions }) {
         <Row gutter={16}>
           <Col span={expanded ? 6 : 12}>
             <Form.Item {...prefixField} name={[prefixField.name, 'cate']} noStyle>
-              <Select style={{ width: '100%' }} optionLabelProp='value'>
+              <Select style={{ width: '100%' }}>
                 {groupByCates.map((func) => (
                   <Select.Option key={func} value={func}>
                     {func} ({groupByCatesMap[func]})
@@ -24,9 +25,8 @@ export default function Terms({ prefixField, fieldsOptions }) {
             </Form.Item>
           </Col>
           <Col span={expanded ? 6 : 12}>
-            <Input.Group>
-              <span className='ant-input-group-addon'>Field key</span>
-              <Form.Item {...prefixField} name={[prefixField.name, 'field']} noStyle>
+            <InputGroupWithFormItem label='Field key' labelWidth={80}>
+              <Form.Item {...prefixField} name={[prefixField.name, 'field']} rules={[{ required: true, message: '必须填写 field key' }]}>
                 <AutoComplete
                   options={_.filter(fieldsOptions, (item) => {
                     if (search) {
@@ -38,7 +38,7 @@ export default function Terms({ prefixField, fieldsOptions }) {
                   onSearch={setSearch}
                 />
               </Form.Item>
-            </Input.Group>
+            </InputGroupWithFormItem>
           </Col>
           {expanded && (
             <>
