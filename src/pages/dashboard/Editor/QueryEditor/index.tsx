@@ -106,7 +106,7 @@ export default function index({ chartForm, defaultDatasourceName }) {
         {chartForm.getFieldValue('datasourceCate') === 'elasticsearch-log' && (
           <span className='ant-form-text'>
             <Tooltip title='请选择 elasticsearch 数据源类型，数据提取选择 raw data'>
-              <Alert showIcon style={{ lineHeight: 1.1 }} message='数据源类型 elasticsearch-log 已不再支持' type='warning' />
+              <Alert showIcon style={{ lineHeight: 1.1 }} message='数据源类型 elasticsearch-log 已废弃' type='warning' />
             </Tooltip>
           </span>
         )}
