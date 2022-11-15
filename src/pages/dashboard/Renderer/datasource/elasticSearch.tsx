@@ -5,6 +5,8 @@ import { getDsQuery, getLogQuery } from '@/services/warning';
 import { normalizeTime } from '@/pages/warning/strategy/components/utils';
 import { ITarget } from '../../types';
 import { getSerieName } from './utils';
+import { IVariable } from '../../VariableConfig/definition';
+import { replaceExpressionVars } from '../../VariableConfig/constant';
 
 interface IOptions {
   dashboardId: string;
@@ -13,6 +15,7 @@ interface IOptions {
   id?: string;
   time: IRawTimeRange;
   targets: ITarget[];
+  variableConfig?: IVariable[];
 }
 
 /**
@@ -27,7 +30,7 @@ function isRawDataQuery(target: ITarget) {
 }
 
 export default async function elasticSearchQuery(options: IOptions) {
-  const { time, targets, datasourceCate, datasourceName } = options;
+  const { dashboardId, time, targets, datasourceCate, datasourceName, variableConfig } = options;
   if (!time.start) return;
   const parsedRange = parseRange(time);
   let start = moment(parsedRange.start).unix();
@@ -39,10 +42,11 @@ export default async function elasticSearchQuery(options: IOptions) {
     _.forEach(targets, (target) => {
       const query = target.query || {};
       _.forEach(query?.values, (value) => {
+        const filter = variableConfig ? replaceExpressionVars(query.filter, variableConfig, variableConfig.length, dashboardId) : query.filter;
         if (isRawDataQuery(target)) {
           batchLogParams.push({
             index: query.index,
-            filter: query.filter,
+            filter,
             date_field: query.date_field,
             limit: query.limit,
             start,
@@ -51,7 +55,7 @@ export default async function elasticSearchQuery(options: IOptions) {
         } else {
           batchDsParams.push({
             index: query.index,
-            filter: query.filter,
+            filter,
             value,
             group_by: query.group_by,
             date_field: query.date_field,
