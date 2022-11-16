@@ -52,7 +52,7 @@ export default function index({ prefixField = {}, prefixFields = [], prefixNameF
               style={{ cursor: 'pointer' }}
               onClick={() => {
                 add({
-                  cate: 'filters',
+                  cate: 'terms',
                   params: [
                     {
                       alias: '',

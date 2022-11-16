@@ -414,6 +414,7 @@ export function getDsQuery(params) {
     headers: {
       'X-Cluster': 'Default',
     },
+    silence: true,
   });
 }
 
@@ -424,6 +425,7 @@ export function getLogQuery(params) {
     headers: {
       'X-Cluster': 'Default',
     },
+    silence: true,
   });
 }
 
@@ -457,6 +459,13 @@ export function getEventTSQuery(params) {
 
 export function getEventLogQuery(params) {
   return request('/api/n9e-plus/event-log-query', {
+    method: RequestMethod.Post,
+    data: params,
+  });
+}
+
+export function getLogsQuery(params) {
+  return request('/api/n9e-plus/logs-query', {
     method: RequestMethod.Post,
     data: params,
   });
