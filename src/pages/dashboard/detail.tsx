@@ -80,9 +80,7 @@ export default function DashboardDetail() {
     getChartGroup(busiId, id).then((res) => {
       let arr = res.dat || [];
       setChartGroup(
-        arr
-          .sort((a, b) => a - b)
-          .map((item) => {
+        arr.map((item) => {
             item.updateTime = Date.now(); // 前端拓展一个更新时间字段，用来主动刷新ChartGroup
             return item;
           }),
@@ -170,6 +168,14 @@ export default function DashboardDetail() {
   const handleDelChartGroup = async (id: number) => {
     await delChartGroup(busiId, id);
     message.success(t('删除分组成功'));
+    // 删除中间分组需要保证weight连续，对大于所删除的分组做weight-1更新
+    const tempGroup: Group[] = [];
+    chartGroup.map(i => {
+      if (i.weight > (chartGroup.filter(item => item.id === id))[0]?.weight) {
+        tempGroup.push({ ...i, weight: i.weight - 1 });
+      }
+    })
+    tempGroup?.length !== 0 && await updateChartGroup(busiId, tempGroup);
     init();
     setGroupModalVisible(false);
   };
