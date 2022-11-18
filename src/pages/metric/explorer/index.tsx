@@ -14,37 +14,21 @@
  * limitations under the License.
  *
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button, Card, Space, Input, Form, Select } from 'antd';
 import { LineChartOutlined, PlusOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash';
-import moment from 'moment';
-import { useLocation, useHistory } from 'react-router-dom';
-import queryString from 'query-string';
-import { IRawTimeRange, timeRangeUnix } from '@/components/TimeRangePicker';
 import PageLayout from '@/components/pageLayout';
 import { generateID } from '@/utils';
-import PromGraph from '@/components/PromGraphCpt';
 import AdvancedWrap from '@/components/AdvancedWrap';
 import { getCommonESClusters, getCommonClusters } from '@/services/common';
-import ElasticsearchDiscover from './ElasticsearchDiscover';
+import { datasourceCatesMap, DatasourceCateEnum } from '@/utils/constant';
+import Elasticsearch from './Elasticsearch';
+import Prometheus from './Prometheus';
+import AliyunSLS from './AliyunSLS';
 import './index.less';
 
 type PanelMeta = { id: string; defaultPromQL?: string };
-type IMode = 'table' | 'graph';
-
-const prometheusCate = {
-  value: 'prometheus',
-  label: 'Prometheus',
-};
-
-const allCates = [
-  prometheusCate,
-  {
-    value: 'elasticsearch',
-    label: 'Elasticsearch',
-  },
-];
 
 function getUrlParamsByName(name) {
   let reg = new RegExp(`.*?${name}=([^&]*)`),
@@ -87,25 +71,15 @@ const Panel = ({
   removePanel: (id: string) => void;
 }) => {
   const [form] = Form.useForm();
-  const history = useHistory();
-  const { search } = useLocation();
-  const query = queryString.parse(search);
-  let defaultTime: undefined | IRawTimeRange;
-
-  if (query.start && query.end) {
-    defaultTime = {
-      start: moment.unix(_.toNumber(query.start)),
-      end: moment.unix(_.toNumber(query.end)),
-    };
-  }
+  const headerExtraRef = useRef<HTMLDivElement>(null);
 
   return (
     <Card bodyStyle={{ padding: 16 }} className='panel'>
       <Form
         form={form}
         initialValues={{
-          datasourceCate: 'prometheus',
-          datasourceName: getDefaultDatasourceName('prometheus', datasourceList),
+          datasourceCate: DatasourceCateEnum.prometheus,
+          datasourceName: getDefaultDatasourceName(DatasourceCateEnum.prometheus, datasourceList),
         }}
       >
         <Space align='start'>
@@ -125,7 +99,7 @@ const Panel = ({
                         });
                       }}
                     >
-                      {_.map(isES ? allCates : [prometheusCate], (item) => (
+                      {_.map(isES ? datasourceCatesMap.all : datasourceCatesMap.normal, (item) => (
                         <Select.Option key={item.value} value={item.value}>
                           {item.label}
                         </Select.Option>
@@ -179,37 +153,18 @@ const Panel = ({
               );
             }}
           </Form.Item>
+          <div ref={headerExtraRef} />
         </Space>
         <Form.Item shouldUpdate={(prev, curr) => prev.datasourceCate !== curr.datasourceCate || prev.datasourceName !== curr.datasourceName} noStyle>
           {({ getFieldValue }) => {
             const datasourceCate = getFieldValue('datasourceCate');
             const datasourceName = getFieldValue('datasourceName');
-            if (datasourceCate === 'prometheus') {
-              return (
-                <PromGraph
-                  url='/api/n9e/prometheus'
-                  type={query.mode as IMode}
-                  onTypeChange={(newType) => {
-                    history.replace({
-                      pathname: '/metric/explorer',
-                      search: queryString.stringify({ ...query, mode: newType }),
-                    });
-                  }}
-                  defaultTime={defaultTime}
-                  onTimeChange={(newRange) => {
-                    history.replace({
-                      pathname: '/metric/explorer',
-                      search: queryString.stringify({ ...query, ...timeRangeUnix(newRange) }),
-                    });
-                  }}
-                  promQL={defaultPromQL}
-                  datasourceIdRequired={false}
-                  graphOperates={{ enabled: true }}
-                  globalOperates={{ enabled: true }}
-                />
-              );
-            } else if (datasourceCate === 'elasticsearch') {
-              return <ElasticsearchDiscover datasourceName={datasourceName} form={form} />;
+            if (datasourceCate === DatasourceCateEnum.prometheus) {
+              return <Prometheus defaultPromQL={defaultPromQL} />;
+            } else if (datasourceCate === DatasourceCateEnum.elasticsearch) {
+              return <Elasticsearch datasourceName={datasourceName} form={form} />;
+            } else if (datasourceCate === DatasourceCateEnum.aliyunSLS) {
+              return <AliyunSLS datasourceCate={DatasourceCateEnum.aliyunSLS} datasourceName={datasourceName} headerExtra={headerExtraRef.current} />;
             }
           }}
         </Form.Item>
