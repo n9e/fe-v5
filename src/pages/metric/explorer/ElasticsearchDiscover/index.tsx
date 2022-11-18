@@ -9,7 +9,7 @@ import { EditorView } from '@codemirror/view';
 import { json } from '@codemirror/lang-json';
 import { defaultHighlightStyle } from '@codemirror/highlight';
 import { Column } from '@ant-design/plots';
-import { getIndices, getLogsQuery } from '@/services/warning';
+import { getIndices, getLogsQuery, getFields } from '@/services/warning';
 import TimeRangePicker, { parseRange } from '@/components/TimeRangePicker';
 import Timeseries from '@/pages/dashboard/Renderer/Renderer/Timeseries';
 import FieldsList from './FieldsList';
@@ -87,10 +87,7 @@ export default function index(props: IProps) {
         ],
       })
         .then((res) => {
-          let allFields: string[] = [];
           const newData = _.map(res.dat.list, (item) => {
-            const keys = _.keys(item.fields);
-            allFields = _.union(_.concat(allFields, keys));
             return {
               id: _.uniqueId(),
               fields: item.fields,
@@ -100,7 +97,6 @@ export default function index(props: IProps) {
           totalRef.current = res.dat.total;
           setData(page === 1 ? newData : [...data, ...newData]);
           if (page === 1) {
-            setFields(allFields);
             const tableEleNodes = document.querySelectorAll(`.event-logs-table .ant-table-body`)[0];
             tableEleNodes?.scrollTo(0, 0);
           }
@@ -185,6 +181,14 @@ export default function index(props: IProps) {
               onSearch={(val) => {
                 setIndexSearch(val);
               }}
+              onBlur={(e: any) => {
+                const val = e.target.value;
+                if (!_.isEmpty(datasourceName) && val) {
+                  getFields({ cate: 'elasticsearch', cluster: datasourceName, index: val }).then((res) => {
+                    setFields(res.dat);
+                  });
+                }
+              }}
             />
           </Form.Item>
         </Input.Group>
@@ -220,7 +224,15 @@ export default function index(props: IProps) {
                 时间字段{' '}
               </span>
               <Form.Item name={['query', 'date_field']} initialValue='@timestamp' style={{ width: 'calc(100% - 90px)' }}>
-                <Input style={{ minWidth: 100 }} />
+                <Select dropdownMatchSelectWidth={false} style={{ width: 150 }} showSearch>
+                  {_.map(_.sortBy(_.concat(fields, selectedFields)), (item) => {
+                    return (
+                      <Select.Option key={item} value={item}>
+                        {item}
+                      </Select.Option>
+                    );
+                  })}
+                </Select>
               </Form.Item>
             </Input.Group>
             <Form.Item name={['query', 'range']} initialValue={{ start: 'now-1h', end: 'now' }}>
