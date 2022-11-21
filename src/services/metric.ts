@@ -142,16 +142,41 @@ export const getSLSMetrics = function (data: {
     offset: number;
     reverse: boolean;
     power_sql: boolean;
-    keys: {
-      valueKey: string;
-      labelKey: string;
-      timeKey: string;
-      timeFormat: string;
-    };
+    // keys?: {
+    //   valueKey: string;
+    //   labelKey: string;
+    //   timeKey: string;
+    //   timeFormat: string;
+    // };
   };
 }): Promise<{ dat: any }> {
   return request('/api/n9e-plus/sls-fields', {
     method: RequestMethod.Post,
     data,
   });
+};
+
+export const getHistogram = function (data: {
+  cate: string;
+  cluster: string;
+  query: {
+    project: string;
+    logstore: string;
+    from: number;
+    to: number;
+    lines: number;
+    offset: number;
+    reverse: boolean;
+    power_sql: boolean;
+  }[];
+}): Promise<{
+  dat: {
+    metric: string;
+    values: [number, number][];
+  }[];
+}> {
+  return request('/api/n9e-plus/histogram', {
+    method: RequestMethod.Post,
+    data,
+  }).then((res) => res.dat);
 };
