@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { AutoComplete, Tooltip } from 'antd';
+import { AutoComplete, Tooltip, Form } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { DatasourceCateEnum } from '@/utils/constant';
@@ -9,12 +9,10 @@ import InputGroupWithFormItem from '@/components/InputGroupWithFormItem';
 interface IProps {
   datasourceCate: DatasourceCateEnum.aliyunSLS;
   datasourceName: string;
-  onChange: (value: string) => void;
 }
 
 export default function ProjectSelect(props: IProps) {
-  const { datasourceCate, datasourceName, onChange } = props;
-  const [value, setValue] = useState('');
+  const { datasourceCate, datasourceName } = props;
   const [options, setOptions] = useState<{ label; value }[]>([]);
 
   useEffect(() => {
@@ -47,15 +45,19 @@ export default function ProjectSelect(props: IProps) {
       }
       labelWidth={70}
     >
-      <AutoComplete
-        options={options}
-        style={{ width: 180 }} // 只是为了跟下面搜索框对齐
-        value={value}
-        onChange={(val) => {
-          setValue(val);
-          onChange(val);
-        }}
-      />
+      <Form.Item
+        name={['query', 'project']}
+        rules={[
+          {
+            required: true,
+            message: '请输入项目',
+          },
+        ]}
+        // validateTrigger='onBlur'
+        style={{ width: 180 }}
+      >
+        <AutoComplete options={options} />
+      </Form.Item>
     </InputGroupWithFormItem>
   );
 }

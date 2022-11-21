@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Radio, Space, Input, Switch, Button, Tooltip, Spin, Empty, Table, Tag } from 'antd';
+import { Radio, Space, Input, Switch, Button, Tooltip, Spin, Empty, Table, Tag, Form } from 'antd';
 import { QuestionCircleOutlined, DownOutlined, RightOutlined } from '@ant-design/icons';
+import { FormInstance } from 'antd/lib/form/Form';
 import moment from 'moment';
 import _ from 'lodash';
 import { DatasourceCateEnum } from '@/utils/constant';
 import { getSLSFields, getSLSLogs, getHistogram } from '@/services/metric';
 import InputGroupWithFormItem from '@/components/InputGroupWithFormItem';
-import TimeRangePicker, { IRawTimeRange, parseRange } from '@/components/TimeRangePicker';
+import TimeRangePicker, { parseRange } from '@/components/TimeRangePicker';
 import Timeseries from '@/pages/dashboard/Renderer/Renderer/Timeseries';
 import ProjectSelect from './ProjectSelect';
 import LogstoreSelect from './LogstoreSelect';
@@ -19,6 +20,7 @@ interface IProps {
   datasourceCate: DatasourceCateEnum.aliyunSLS;
   datasourceName: string;
   headerExtra: HTMLDivElement | null;
+  form: FormInstance;
 }
 
 const ModeRadio = ({ mode, setMode }) => {
@@ -37,13 +39,8 @@ const ModeRadio = ({ mode, setMode }) => {
 };
 
 export default function index(props: IProps) {
-  const { datasourceCate, datasourceName = 'sls_test', headerExtra } = props;
+  const { datasourceCate, datasourceName = 'sls_test', headerExtra, form } = props;
   const [mode, setMode] = useState('timeSeries');
-  const [project, setProject] = useState('');
-  const [logstore, setLogstore] = useState('');
-  const [query, setQuery] = useState('');
-  const [power_sql, setPower_sql] = useState<boolean>(false);
-  const [range, setRange] = useState<IRawTimeRange>({ start: 'now-1h', end: 'now' });
   const [fields, setFields] = useState<string[]>([]);
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
   const [logs, setLogs] = useState<{ [index: string]: string }[]>([]);
@@ -70,9 +67,14 @@ export default function index(props: IProps) {
           <ModeRadio mode={mode} setMode={setMode} />
         </div>
       )}
-      <Space style={{ display: 'flex', marginBottom: 16 }}>
-        <ProjectSelect datasourceCate={datasourceCate} datasourceName={datasourceName} onChange={setProject} />
-        <LogstoreSelect datasourceCate={datasourceCate} datasourceName={datasourceName} project={project} onChange={setLogstore} />
+      <Space style={{ display: 'flex' }}>
+        <ProjectSelect datasourceCate={datasourceCate} datasourceName={datasourceName} />
+        <Form.Item shouldUpdate noStyle>
+          {({ getFieldValue }) => {
+            const project = getFieldValue(['query', 'project']);
+            return <LogstoreSelect datasourceCate={datasourceCate} datasourceName={datasourceName} project={project} />;
+          }}
+        </Form.Item>
         <InputGroupWithFormItem
           label={
             <span>
@@ -84,67 +86,68 @@ export default function index(props: IProps) {
           }
           labelWidth={90}
         >
-          <Input
-            value={query}
-            onChange={(e) => {
-              setQuery(e.target.value);
-            }}
-            style={{ width: 300 }}
-          />
+          <Form.Item name={['query', 'query']} style={{ width: 190 }}>
+            <Input />
+          </Form.Item>
         </InputGroupWithFormItem>
-        <Switch
-          checkedChildren='开启'
-          unCheckedChildren='关闭'
-          checked={power_sql}
-          onChange={(val) => {
-            setPower_sql(val);
-          }}
-        />
-        <TimeRangePicker value={range} />
-        <Button
-          type='primary'
-          onClick={() => {
-            const requestParams = {
-              cate: datasourceCate,
-              cluster: datasourceName,
-              query: [
-                {
-                  project,
-                  logstore,
-                  from: moment(parseRange(range).start).unix(),
-                  to: moment(parseRange(range).end).unix(),
-                  lines: 500,
-                  offset: 0,
-                  reverse: false,
-                  power_sql,
-                },
-              ],
-            };
-            getSLSFields(requestParams).then((res) => {
-              setFields(res);
-            });
-            setLoading(true);
-            getSLSLogs(requestParams)
-              .then((res) => {
-                setLogs(res.list);
-              })
-              .finally(() => {
-                setLoading(false);
+        <div style={{ display: 'flex', gap: 8 }}>
+          <div style={{ lineHeight: '32px' }}>SQL增强</div>
+          <Form.Item name={['query', 'power_sql']} valuePropName='checked'>
+            <Switch />
+          </Form.Item>
+        </div>
+        <Form.Item name={['query', 'range']} initialValue={{ start: 'now-1h', end: 'now' }}>
+          <TimeRangePicker />
+        </Form.Item>
+        <Form.Item>
+          <Button
+            type='primary'
+            onClick={() => {
+              form.validateFields().then((values) => {
+                const query = values.query;
+                const requestParams = {
+                  cate: datasourceCate,
+                  cluster: datasourceName,
+                  query: [
+                    {
+                      project: query.project,
+                      logstore: query.logstore,
+                      from: moment(parseRange(query.range).start).unix(),
+                      to: moment(parseRange(query.range).end).unix(),
+                      lines: 500,
+                      offset: 0,
+                      reverse: false,
+                      power_sql: query.power_sql,
+                    },
+                  ],
+                };
+                getSLSFields(requestParams).then((res) => {
+                  setFields(res);
+                });
+                setLoading(true);
+                getSLSLogs(requestParams)
+                  .then((res) => {
+                    setLogs(res.list);
+                  })
+                  .finally(() => {
+                    setLoading(false);
+                  });
+                getHistogram(requestParams).then((res) => {
+                  setHistogram(
+                    _.map(res, (item) => {
+                      return {
+                        metric: item.metric,
+                        data: item.values,
+                      };
+                    }),
+                  );
+                });
               });
-            getHistogram(requestParams).then((res) => {
-              setHistogram(
-                _.map(res, (item) => {
-                  return {
-                    metric: item.metric,
-                    data: item.values,
-                  };
-                }),
-              );
-            });
-          }}
-        >
-          查询
-        </Button>
+            }}
+          >
+            查询
+          </Button>
+        </Form.Item>
       </Space>
       <Spin spinning={loading}>
         {!_.isEmpty(logs) ? (
@@ -203,35 +206,6 @@ export default function index(props: IProps) {
                         })}
                       </div>
                     );
-                    // let value = '';
-                    // try {
-                    //   value = JSON.stringify(record.json, null, 4);
-                    // } catch (e) {
-                    //   console.error(e);
-                    //   value = '无法解析';
-                    // }
-                    // return (
-                    //   <CodeMirror
-                    //     value={value}
-                    //     height='auto'
-                    //     theme='light'
-                    //     basicSetup={false}
-                    //     editable={false}
-                    //     extensions={[
-                    //       defaultHighlightStyle.fallback,
-                    //       json(),
-                    //       EditorView.lineWrapping,
-                    //       EditorView.theme({
-                    //         '&': {
-                    //           backgroundColor: '#F6F6F6 !important',
-                    //         },
-                    //         '&.cm-editor.cm-focused': {
-                    //           outline: 'unset',
-                    //         },
-                    //       }),
-                    //     ]}
-                    //   />
-                    // );
                   },
                   expandIcon: ({ expanded, onExpand, record }) =>
                     expanded ? <DownOutlined onClick={(e) => onExpand(record, e)} /> : <RightOutlined onClick={(e) => onExpand(record, e)} />,

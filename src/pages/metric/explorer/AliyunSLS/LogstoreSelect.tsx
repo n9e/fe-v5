@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { AutoComplete, Tooltip } from 'antd';
+import { AutoComplete, Tooltip, Form } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { DatasourceCateEnum } from '@/utils/constant';
@@ -10,12 +10,10 @@ interface IProps {
   datasourceCate: DatasourceCateEnum.aliyunSLS;
   datasourceName: string;
   project?: string;
-  onChange: (value: string) => void;
 }
 
 export default function LogstoreSelect(props: IProps) {
-  const { datasourceCate, datasourceName, project, onChange } = props;
-  const [value, setValue] = useState('');
+  const { datasourceCate, datasourceName, project } = props;
   const [options, setOptions] = useState<{ label; value }[]>([]);
 
   useEffect(() => {
@@ -49,15 +47,19 @@ export default function LogstoreSelect(props: IProps) {
       }
       labelWidth={80}
     >
-      <AutoComplete
-        options={options}
-        style={{ width: 200 }}
-        value={value}
-        onChange={(val) => {
-          setValue(val);
-          onChange(val);
-        }}
-      />
+      <Form.Item
+        name={['query', 'logstore']}
+        rules={[
+          {
+            required: true,
+            message: '请输入日志库',
+          },
+        ]}
+        // validateTrigger='onBlur'
+        style={{ width: 190 }}
+      >
+        <AutoComplete options={options} />
+      </Form.Item>
     </InputGroupWithFormItem>
   );
 }

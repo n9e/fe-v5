@@ -127,12 +127,12 @@ const Panel = ({
                   </span>
                   <Form.Item
                     name='datasourceName'
-                    rules={[
-                      {
-                        required: cate !== 'prometheus',
-                        message: '请选择数据源',
-                      },
-                    ]}
+                    // rules={[
+                    //   {
+                    //     required: cate !== 'prometheus',
+                    //     message: '请选择数据源',
+                    //   },
+                    // ]}
                   >
                     <Select
                       placeholder='选择数据源'
@@ -164,7 +164,7 @@ const Panel = ({
             } else if (datasourceCate === DatasourceCateEnum.elasticsearch) {
               return <Elasticsearch datasourceName={datasourceName} form={form} />;
             } else if (datasourceCate === DatasourceCateEnum.aliyunSLS) {
-              return <AliyunSLS datasourceCate={DatasourceCateEnum.aliyunSLS} datasourceName={datasourceName} headerExtra={headerExtraRef.current} />;
+              return <AliyunSLS datasourceCate={DatasourceCateEnum.aliyunSLS} datasourceName={datasourceName} headerExtra={headerExtraRef.current} form={form} />;
             }
           }}
         </Form.Item>
