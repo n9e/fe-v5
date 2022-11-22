@@ -1,15 +1,12 @@
 import React from 'react';
-import { Form, Row, Col, Input, Button } from 'antd';
-import { DeleteOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { Form, Row, Col, Input, Button, Space, Switch, Radio } from 'antd';
+import { DeleteOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import Collapse, { Panel } from '../Components/Collapse';
 import getFirstUnusedLetter from '../../Renderer/utils/getFirstUnusedLetter';
-import IndexSelect from '@/pages/warning/strategy/components/ElasticsearchSettings/IndexSelect';
-import Values from '@/pages/warning/strategy/components/ElasticsearchSettings/Values';
-import GroupBy from '@/pages/warning/strategy/components/ElasticsearchSettings/GroupBy';
-import Time from '@/pages/warning/strategy/components/ElasticsearchSettings/Time';
 import ProjectSelect from '@/pages/metric/explorer/AliyunSLS/ProjectSelect';
 import LogstoreSelect from '@/pages/metric/explorer/AliyunSLS/LogstoreSelect';
+import AdvancedSettings from '@/pages/metric/explorer/AliyunSLS/AdvancedSettings';
 import { alphabet } from './config';
 
 export default function AliyunSLS({ chartForm }) {
@@ -45,71 +42,70 @@ export default function AliyunSLS({ chartForm }) {
                     }
                   >
                     <Form.Item noStyle {...field} name={[field.name, 'refId']} hidden />
-                    <Form.Item shouldUpdate={(prevValues, curValues) => _.isEqual(prevValues.datasourceName, curValues.datasourceName)} noStyle>
+                    <Form.Item
+                      shouldUpdate={(prevValues, curValues) =>
+                        !_.isEqual(prevValues.datasourceName, curValues.datasourceName) ||
+                        !_.isEqual(prevValues?.targets?.[field.name]?.query.project, curValues?.targets?.[field.name]?.query.project)
+                      }
+                      noStyle
+                    >
                       {({ getFieldValue }) => {
-                        const datasourceName = getFieldValue('datasourceName') ? [getFieldValue('datasourceName')] : [];
+                        const datasourceCate = getFieldValue('datasourceCate');
+                        const datasourceName = getFieldValue('datasourceName');
+                        const project = getFieldValue(['targets', field.name, 'query', 'project']);
                         return (
                           <Row gutter={10}>
-                            <Col span={12}></Col>
+                            <Col span={12}>
+                              <ProjectSelect datasourceCate={datasourceCate} datasourceName={datasourceName} prefixName={[field.name]} width='100%' layout='vertical' />
+                            </Col>
+                            <Col span={12}>
+                              <LogstoreSelect
+                                datasourceCate={datasourceCate}
+                                datasourceName={datasourceName}
+                                project={project}
+                                prefixName={[field.name]}
+                                width='100%'
+                                layout='vertical'
+                              />
+                            </Col>
                           </Row>
                         );
                       }}
                     </Form.Item>
                     <Row gutter={10}>
-                      <Col span={12}></Col>
-                      <Col span={12}>
-                        <Form.Item
-                          label={
-                            <span>
-                              过滤条件{' '}
-                              <a href='https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html#query-string-syntax ' target='_blank'>
-                                <QuestionCircleOutlined />
-                              </a>
-                            </span>
-                          }
-                          {...field}
-                          name={[field.name, 'query', 'filter']}
-                        >
+                      <Col flex='auto'>
+                        <Form.Item label='查询条件' name={[field.name, 'query', 'query']}>
                           <Input />
                         </Form.Item>
                       </Col>
+                      <Col flex='215px'>
+                        <Space>
+                          <Form.Item label='SQL增强' name={[field.name, 'query', 'power_sql']} valuePropName='checked'>
+                            <Switch />
+                          </Form.Item>
+                          <Form.Item label=' ' name={[field.name, 'query', 'mode']} initialValue='timeSeries'>
+                            <Radio.Group buttonStyle='solid'>
+                              <Radio.Button value='timeSeries'>时序值</Radio.Button>
+                              <Radio.Button value='raw'>日志原文</Radio.Button>
+                            </Radio.Group>
+                          </Form.Item>
+                        </Space>
+                      </Col>
                     </Row>
                     <Form.Item
-                      shouldUpdate={(prevValues, curValues) => {
-                        return _.isEqual(prevValues.datasourceName, curValues.datasourceName);
-                      }}
+                      shouldUpdate={(prevValues, curValues) => !_.isEqual(prevValues?.targets?.[field.name]?.query.mode, curValues?.targets?.[field.name]?.query.mode)}
                       noStyle
                     >
                       {({ getFieldValue }) => {
-                        const datasourceName = getFieldValue('datasourceName') ? [getFieldValue('datasourceName')] : [];
-                        return (
-                          <>
-                            <Values
-                              prefixField={field}
-                              prefixFields={['targets']}
-                              prefixNameField={[field.name]}
-                              cate={getFieldValue('datasourceCate')}
-                              cluster={datasourceName}
-                              index={getFieldValue([...prefixName, 'query', 'index'])}
-                              valueRefVisible={false}
-                            />
-                            <GroupBy
-                              prefixField={field}
-                              prefixFields={['targets']}
-                              prefixNameField={[field.name]}
-                              cate={getFieldValue('datasourceCate')}
-                              cluster={datasourceName}
-                              index={getFieldValue([...prefixName, 'query', 'index'])}
-                            />
-                          </>
-                        );
+                        const mode = getFieldValue(['targets', field.name, 'query', 'mode']);
+                        if (mode === 'timeSeries') {
+                          return <AdvancedSettings prefixName={[field.name]} />;
+                        }
                       }}
                     </Form.Item>
-                    <Time prefixField={field} prefixNameField={[field.name]} />
                   </Panel>
                 );
               })}
-
               <Form.ErrorList errors={errors} />
             </Collapse>
             <Button

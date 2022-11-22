@@ -11,11 +11,21 @@ interface IProps {
   datasourceName: string;
   project?: string;
   prefixName?: string[];
+  width?: number | string;
+  layout?: 'horizontal' | 'vertical';
 }
 
 export default function LogstoreSelect(props: IProps) {
-  const { datasourceCate, datasourceName, project, prefixName = [] } = props;
+  const { datasourceCate, datasourceName, project, prefixName = [], width = 190, layout = 'horizontal' } = props;
   const [options, setOptions] = useState<{ label; value }[]>([]);
+  const label = (
+    <span>
+      日志库{' '}
+      <Tooltip title=''>
+        <QuestionCircleOutlined />
+      </Tooltip>
+    </span>
+  );
 
   useEffect(() => {
     if (datasourceName && project) {
@@ -36,18 +46,26 @@ export default function LogstoreSelect(props: IProps) {
     }
   }, [datasourceName, project]);
 
+  if (layout === 'vertical') {
+    return (
+      <Form.Item
+        label={label}
+        name={[...prefixName, 'query', 'logstore']}
+        rules={[
+          {
+            required: true,
+            message: '请输入日志库',
+          },
+        ]}
+        style={{ width }}
+      >
+        <AutoComplete options={options} />
+      </Form.Item>
+    );
+  }
+
   return (
-    <InputGroupWithFormItem
-      label={
-        <span>
-          日志库{' '}
-          <Tooltip title=''>
-            <QuestionCircleOutlined />
-          </Tooltip>
-        </span>
-      }
-      labelWidth={80}
-    >
+    <InputGroupWithFormItem label={label} labelWidth={80}>
       <Form.Item
         name={[...prefixName, 'query', 'logstore']}
         rules={[
@@ -56,8 +74,7 @@ export default function LogstoreSelect(props: IProps) {
             message: '请输入日志库',
           },
         ]}
-        // validateTrigger='onBlur'
-        style={{ width: 190 }}
+        style={{ width }}
       >
         <AutoComplete options={options} />
       </Form.Item>

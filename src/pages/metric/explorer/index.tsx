@@ -21,7 +21,7 @@ import _ from 'lodash';
 import PageLayout from '@/components/pageLayout';
 import { generateID } from '@/utils';
 import AdvancedWrap from '@/components/AdvancedWrap';
-import { getCommonESClusters, getCommonClusters } from '@/services/common';
+import { getCommonESClusters, getCommonClusters, getCommonSLSClusters } from '@/services/common';
 import { datasourceCatesMap, DatasourceCateEnum } from '@/utils/constant';
 import Elasticsearch from './Elasticsearch';
 import Prometheus from './Prometheus';
@@ -66,6 +66,7 @@ const Panel = ({
   datasourceList: {
     prometheus: string[];
     elasticsearch: string[];
+    'aliyun-sls': string[];
   };
   defaultPromQL: string;
   removePanel: (id: string) => void;
@@ -127,12 +128,12 @@ const Panel = ({
                   </span>
                   <Form.Item
                     name='datasourceName'
-                    // rules={[
-                    //   {
-                    //     required: cate !== 'prometheus',
-                    //     message: '请选择数据源',
-                    //   },
-                    // ]}
+                    rules={[
+                      {
+                        required: cate !== 'prometheus',
+                        message: '请选择数据源',
+                      },
+                    ]}
                   >
                     <Select
                       placeholder='选择数据源'
@@ -186,24 +187,29 @@ const PanelList = () => {
   const [datasourceList, setDatasourceList] = useState<{
     prometheus: string[];
     elasticsearch: string[];
+    'aliyun-sls': string[];
   }>({
     prometheus: [],
     elasticsearch: [],
+    'aliyun-sls': [],
   });
 
   useEffect(() => {
     const fetchDatasourceList = async () => {
       const promList = await getCommonClusters().then((res) => res.dat);
       const esList = await getCommonESClusters().then((res) => res.dat);
+      const slsList = await getCommonSLSClusters().then((res) => res.dat);
       setDatasourceList({
         prometheus: promList,
         elasticsearch: esList,
+        'aliyun-sls': slsList,
       });
     };
     fetchDatasourceList().catch(() => {
       setDatasourceList({
         prometheus: [],
         elasticsearch: [],
+        'aliyun-sls': [],
       });
     });
   }, []);

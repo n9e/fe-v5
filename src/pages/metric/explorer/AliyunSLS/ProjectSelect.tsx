@@ -10,11 +10,21 @@ interface IProps {
   datasourceCate: DatasourceCateEnum.aliyunSLS;
   datasourceName: string;
   prefixName?: string[];
+  width?: number | string;
+  layout?: 'horizontal' | 'vertical';
 }
 
 export default function ProjectSelect(props: IProps) {
-  const { datasourceCate, datasourceName, prefixName = [] } = props;
+  const { datasourceCate, datasourceName, prefixName = [], width = 180, layout = 'horizontal' } = props;
   const [options, setOptions] = useState<{ label; value }[]>([]);
+  const label = (
+    <span>
+      项目{' '}
+      <Tooltip title=''>
+        <QuestionCircleOutlined />
+      </Tooltip>
+    </span>
+  );
 
   useEffect(() => {
     if (datasourceName) {
@@ -34,18 +44,25 @@ export default function ProjectSelect(props: IProps) {
     }
   }, [datasourceName]);
 
+  if (layout === 'vertical') {
+    return (
+      <Form.Item
+        label={label}
+        name={[...prefixName, 'query', 'project']}
+        rules={[
+          {
+            required: true,
+            message: '请输入项目',
+          },
+        ]}
+        style={{ width }}
+      >
+        <AutoComplete options={options} />
+      </Form.Item>
+    );
+  }
   return (
-    <InputGroupWithFormItem
-      label={
-        <span>
-          项目{' '}
-          <Tooltip title=''>
-            <QuestionCircleOutlined />
-          </Tooltip>
-        </span>
-      }
-      labelWidth={70}
-    >
+    <InputGroupWithFormItem label={label} labelWidth={70}>
       <Form.Item
         name={[...prefixName, 'query', 'project']}
         rules={[
@@ -54,8 +71,7 @@ export default function ProjectSelect(props: IProps) {
             message: '请输入项目',
           },
         ]}
-        // validateTrigger='onBlur'
-        style={{ width: 180 }}
+        style={{ width }}
       >
         <AutoComplete options={options} />
       </Form.Item>

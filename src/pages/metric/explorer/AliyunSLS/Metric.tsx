@@ -1,15 +1,15 @@
 import React, { useState, forwardRef, useImperativeHandle } from 'react';
-import { Space, Form, Select, Input } from 'antd';
-import { DownOutlined, RightOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import moment from 'moment';
+import { Spin, Empty } from 'antd';
 import { getDsQuery } from '@/services/metric';
-import InputGroupWithFormItem from '@/components/InputGroupWithFormItem';
 import { parseRange } from '@/components/TimeRangePicker';
+import Timeseries from '@/pages/dashboard/Renderer/Renderer/Timeseries';
+import AdvancedSettings from './AdvancedSettings';
 
 function Metric(props, ref) {
-  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [series, setSeries] = useState([]);
 
   useImperativeHandle(ref, () => ({
     fetchData: (datasourceCate, datasourceName, values) => {
@@ -32,51 +32,60 @@ function Metric(props, ref) {
           },
         ],
       };
-      // setLoading(true);
-      console.log('requestParams', requestParams, values);
-      getDsQuery(requestParams).then((res) => {
-        console.log(res);
-      });
+      setLoading(true);
+      getDsQuery(requestParams)
+        .then((res) => {
+          setSeries(
+            _.map(res, (item) => {
+              return {
+                metric: item.metric,
+                data: item.values,
+              };
+            }),
+          );
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     },
   }));
 
   return (
-    <div>
-      <div>
-        <span
-          onClick={() => {
-            setOpen(!open);
+    <>
+      <AdvancedSettings />
+      {!_.isEmpty(series) ? (
+        <Spin spinning={loading}>
+          <Timeseries
+            series={series}
+            values={
+              {
+                custom: {
+                  drawStyle: 'lines',
+                  lineInterpolation: 'smooth',
+                },
+                options: {
+                  legend: {
+                    displayMode: 'table',
+                  },
+                  tooltip: {
+                    mode: 'all',
+                  },
+                },
+              } as any
+            }
+          />
+        </Spin>
+      ) : (
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
           }}
-          style={{ cursor: 'pointer' }}
         >
-          {open ? <DownOutlined /> : <RightOutlined />} 辅助配置
-        </span>
-      </div>
-      <div style={{ display: open ? 'block' : 'none' }}>
-        <Space>
-          <InputGroupWithFormItem label={<span>ValueKey</span>} labelWidth={80}>
-            <Form.Item name={['query', 'keys', 'valueKey']} style={{ width: 190 }} initialValue='PV'>
-              <Input />
-            </Form.Item>
-          </InputGroupWithFormItem>
-          <InputGroupWithFormItem label={<span>LabelKey</span>} labelWidth={80}>
-            <Form.Item name={['query', 'keys', 'labelKey']} style={{ width: 190 }} initialValue=''>
-              <Input />
-            </Form.Item>
-          </InputGroupWithFormItem>
-          <InputGroupWithFormItem label={<span>TimeKey</span>} labelWidth={80}>
-            <Form.Item name={['query', 'keys', 'timeKey']} style={{ width: 190 }} initialValue='Time'>
-              <Input />
-            </Form.Item>
-          </InputGroupWithFormItem>
-          <InputGroupWithFormItem label={<span>TimeFormat</span>} labelWidth={95}>
-            <Form.Item name={['query', 'keys', 'timeFormat']} style={{ width: 190 }} initialValue='%H:%i:%s'>
-              <Input />
-            </Form.Item>
-          </InputGroupWithFormItem>
-        </Space>
-      </div>
-    </div>
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+        </div>
+      )}
+    </>
   );
 }
 

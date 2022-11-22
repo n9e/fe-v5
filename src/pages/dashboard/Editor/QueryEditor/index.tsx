@@ -23,6 +23,10 @@ const allCates = [
     value: 'elasticsearch-log',
     label: 'Elasticsearch Log',
   },
+  {
+    value: 'aliyun-sls',
+    label: '阿里云SLS',
+  },
 ];
 
 export default function index({ chartForm, defaultDatasourceName }) {

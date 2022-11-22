@@ -36,7 +36,7 @@ const ModeRadio = ({ mode, setMode }) => {
 };
 
 export default function index(props: IProps) {
-  const { datasourceCate, datasourceName = 'sls_test', headerExtra, form } = props;
+  const { datasourceCate, datasourceName, headerExtra, form } = props;
   const [mode, setMode] = useState('timeSeries');
   const rawRef = useRef<any>();
   const metricRef = useRef<any>();
