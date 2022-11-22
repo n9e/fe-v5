@@ -9,10 +9,11 @@ import InputGroupWithFormItem from '@/components/InputGroupWithFormItem';
 interface IProps {
   datasourceCate: DatasourceCateEnum.aliyunSLS;
   datasourceName: string;
+  prefixName?: string[];
 }
 
 export default function ProjectSelect(props: IProps) {
-  const { datasourceCate, datasourceName } = props;
+  const { datasourceCate, datasourceName, prefixName = [] } = props;
   const [options, setOptions] = useState<{ label; value }[]>([]);
 
   useEffect(() => {
@@ -46,7 +47,7 @@ export default function ProjectSelect(props: IProps) {
       labelWidth={70}
     >
       <Form.Item
-        name={['query', 'project']}
+        name={[...prefixName, 'query', 'project']}
         rules={[
           {
             required: true,

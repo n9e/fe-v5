@@ -180,3 +180,28 @@ export const getHistogram = function (data: {
     data,
   }).then((res) => res.dat);
 };
+
+export const getDsQuery = function (data: {
+  cate: string;
+  cluster: string;
+  query: {
+    project: string;
+    logstore: string;
+    from: number;
+    to: number;
+    lines: number;
+    offset: number;
+    reverse: boolean;
+    power_sql: boolean;
+  }[];
+}): Promise<{
+  dat: {
+    metric: string;
+    values: [number, number][];
+  }[];
+}> {
+  return request('/api/n9e-plus/ds-query', {
+    method: RequestMethod.Post,
+    data,
+  }).then((res) => res.dat);
+};

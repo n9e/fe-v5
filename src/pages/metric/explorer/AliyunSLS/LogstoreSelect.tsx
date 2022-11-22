@@ -10,10 +10,11 @@ interface IProps {
   datasourceCate: DatasourceCateEnum.aliyunSLS;
   datasourceName: string;
   project?: string;
+  prefixName?: string[];
 }
 
 export default function LogstoreSelect(props: IProps) {
-  const { datasourceCate, datasourceName, project } = props;
+  const { datasourceCate, datasourceName, project, prefixName = [] } = props;
   const [options, setOptions] = useState<{ label; value }[]>([]);
 
   useEffect(() => {
@@ -48,7 +49,7 @@ export default function LogstoreSelect(props: IProps) {
       labelWidth={80}
     >
       <Form.Item
-        name={['query', 'logstore']}
+        name={[...prefixName, 'query', 'logstore']}
         rules={[
           {
             required: true,

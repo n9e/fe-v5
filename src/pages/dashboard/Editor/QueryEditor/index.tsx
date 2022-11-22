@@ -5,6 +5,7 @@ import AdvancedWrap from '@/components/AdvancedWrap';
 import Prometheus from './Prometheus';
 import Elasticsearch from './Elasticsearch';
 import ElasticsearchLog from './ElasticsearchLog';
+import AliyunSLS from './AliyunSLS';
 import ClusterSelect from './components/ClusterSelect';
 
 const prometheusCate = {
@@ -132,6 +133,9 @@ export default function index({ chartForm, defaultDatasourceName }) {
           }
           if (cate === 'elasticsearch-log') {
             return <ElasticsearchLog chartForm={chartForm} />;
+          }
+          if (cate === 'aliyun-sls') {
+            return <AliyunSLS chartForm={chartForm} />;
           }
           return null;
         }}
