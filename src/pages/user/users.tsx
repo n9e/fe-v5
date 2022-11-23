@@ -192,6 +192,7 @@ const Resource: React.FC = () => {
             fetchParams={{
               query,
             }}
+            tableLayout='auto'
           ></BaseTable>
         </div>
 
