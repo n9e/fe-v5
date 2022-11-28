@@ -5,10 +5,11 @@ import { CaretDownOutlined } from '@ant-design/icons';
 const typeNameMap = {
   prometheus: 'Prometheus',
   elasticsearch: 'Elasticsearch',
+  'aliyun-sls': '阿里云SLS',
 };
 
 export default function index({ visible, form }) {
-  const options = visible ? ['prometheus', 'elasticsearch'] : ['prometheus'];
+  const options = visible ? ['prometheus', 'elasticsearch', 'aliyun-sls'] : ['prometheus'];
   return (
     <Form.Item label='数据源类型' name='cate' initialValue='prometheus'>
       <Select

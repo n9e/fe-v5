@@ -1,4 +1,6 @@
 import _ from 'lodash';
+import moment from 'moment';
+import { parseRange } from '@/components/TimeRangePicker';
 
 export const parseTimeToValueAndUnit = (value?: number) => {
   if (!value) {
@@ -67,6 +69,16 @@ export const parseValues = (values: any = {}) => {
       };
     });
     cloned.query = query;
+  } else if (cate === 'aliyun-sls') {
+    const queryString = cloned.prom_ql;
+    let query: any = {};
+    try {
+      query = JSON.parse(queryString);
+    } catch (e) {
+      console.error(e);
+    }
+    cloned.queries = query.queries;
+    cloned.triggers = query.triggers;
   }
   cloned.cate = cate;
   return cloned;
@@ -98,6 +110,52 @@ export const stringifyValues = (values) => {
     });
     cloned.prom_ql = JSON.stringify(query);
     delete cloned.query;
+  } else if (cate === 'aliyun-sls') {
+    const { queries, triggers } = cloned;
+    const prom_ql: any = {};
+    prom_ql.queries = _.map(queries, (query) => {
+      const parsedRange = parseRange(query.range);
+      const from = moment(parsedRange.start).unix();
+      const to = moment(parsedRange.end).unix();
+      return {
+        ..._.omit(query, 'range'),
+        from,
+        to,
+      };
+    });
+    prom_ql.triggers = _.map(triggers, (trigger) => {
+      if (trigger.mode === 0) {
+        return {
+          ...trigger,
+          exp: stringifyExpressions(trigger.expressions),
+        };
+      }
+      return trigger;
+    });
+    cloned.prom_ql = JSON.stringify(prom_ql);
+    delete cloned.queries;
+    delete cloned.triggers;
   }
+
   return cloned;
+};
+
+export const stringifyExpressions = (
+  expressions: {
+    ref: string;
+    label: string;
+    comparisonOperator: string;
+    value: string;
+    logicalOperator?: string;
+  }[],
+) => {
+  const logicalOperator = _.get(expressions, '[0].logicalOperator');
+  let exp = '';
+  _.forEach(expressions, (expression, index) => {
+    if (index !== 0) {
+      exp += ` ${logicalOperator} `;
+    }
+    exp += `$${expression.ref}${expression.label ? `.${expression.label}` : ''} ${expression.comparisonOperator} ${expression.value}`;
+  });
+  return exp;
 };
