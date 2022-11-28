@@ -51,11 +51,11 @@ export default function index(props: IProps) {
         </div>
       )}
       <Space style={{ display: 'flex' }}>
-        <ProjectSelect datasourceCate={datasourceCate} datasourceName={datasourceName} />
+        <ProjectSelect datasourceCate={datasourceCate} datasourceName={datasourceName} prefixName={['query']} />
         <Form.Item shouldUpdate noStyle>
           {({ getFieldValue }) => {
             const project = getFieldValue(['query', 'project']);
-            return <LogstoreSelect datasourceCate={datasourceCate} datasourceName={datasourceName} project={project} />;
+            return <LogstoreSelect datasourceCate={datasourceCate} datasourceName={datasourceName} project={project} prefixName={['query']} />;
           }}
         </Form.Item>
         <InputGroupWithFormItem

@@ -31,11 +31,10 @@ export function getColumnsFromFields(selectedFields: string[], dateField?: strin
     columns = _.map(selectedFields, (item) => {
       return {
         title: item,
-        dataIndex: 'fields',
-        render: (fields) => {
-          return _.join(fields[item], ',');
+        render: (record) => {
+          return record[item];
         },
-        sorter: (a, b) => localeCompareFunc(_.join(_.get(a, `fields[${item}]`, '')), _.join(_.get(b, `fields[${item}]`, ''))),
+        sorter: (a, b) => localeCompareFunc(_.get(a, item, ''), _.get(b, item, '')),
       };
     });
   }
@@ -48,7 +47,7 @@ export function getColumnsFromFields(selectedFields: string[], dateField?: strin
         return moment.unix(text).format('YYYY-MM-DD HH:mm:ss');
       },
       sorter: (a, b) => {
-        return localeCompareFunc(_.join(_.get(a, `fields[${dateField}]`, '')), _.join(_.get(b, `fields[${dateField}]`, '')));
+        return localeCompareFunc(_.get(a, dateField, ''), _.get(b, dateField, ''));
       },
     });
   }

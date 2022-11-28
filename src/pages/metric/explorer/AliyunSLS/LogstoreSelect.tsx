@@ -10,13 +10,14 @@ interface IProps {
   datasourceCate: DatasourceCateEnum.aliyunSLS;
   datasourceName: string;
   project?: string;
-  prefixName?: string[];
+  prefixField?: any;
+  prefixName?: (string | number)[];
   width?: number | string;
   layout?: 'horizontal' | 'vertical';
 }
 
 export default function LogstoreSelect(props: IProps) {
-  const { datasourceCate, datasourceName, project, prefixName = [], width = 190, layout = 'horizontal' } = props;
+  const { datasourceCate, datasourceName, project, prefixField = {}, prefixName = [], width = 190, layout = 'horizontal' } = props;
   const [options, setOptions] = useState<{ label; value }[]>([]);
   const label = (
     <span>
@@ -49,8 +50,9 @@ export default function LogstoreSelect(props: IProps) {
   if (layout === 'vertical') {
     return (
       <Form.Item
+        {...prefixField}
         label={label}
-        name={[...prefixName, 'query', 'logstore']}
+        name={[...prefixName, 'logstore']}
         rules={[
           {
             required: true,
@@ -67,7 +69,8 @@ export default function LogstoreSelect(props: IProps) {
   return (
     <InputGroupWithFormItem label={label} labelWidth={80}>
       <Form.Item
-        name={[...prefixName, 'query', 'logstore']}
+        {...prefixField}
+        name={[...prefixName, 'logstore']}
         rules={[
           {
             required: true,

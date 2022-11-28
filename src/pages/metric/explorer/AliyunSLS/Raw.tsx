@@ -102,7 +102,7 @@ function Raw(props, ref) {
             <Table
               size='small'
               className='event-logs-table'
-              tableLayout='fixed'
+              tableLayout='auto'
               rowKey='__time__'
               columns={getColumnsFromFields(selectedFields, '__time__')}
               dataSource={logs}
@@ -132,7 +132,7 @@ function Raw(props, ref) {
                 expandIcon: ({ expanded, onExpand, record }) =>
                   expanded ? <DownOutlined onClick={(e) => onExpand(record, e)} /> : <RightOutlined onClick={(e) => onExpand(record, e)} />,
               }}
-              scroll={{ x: _.isEmpty(selectedFields) ? undefined : 'max-content', y: !isMore ? 312 - 35 : 312 }}
+              scroll={{ x: 'max-content', y: !isMore ? 312 - 35 : 312 }}
               pagination={false}
               footer={
                 !isMore

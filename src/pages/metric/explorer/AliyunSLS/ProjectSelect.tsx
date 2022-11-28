@@ -9,13 +9,14 @@ import InputGroupWithFormItem from '@/components/InputGroupWithFormItem';
 interface IProps {
   datasourceCate: DatasourceCateEnum.aliyunSLS;
   datasourceName: string;
-  prefixName?: string[];
+  prefixField?: any;
+  prefixName?: (string | number)[];
   width?: number | string;
   layout?: 'horizontal' | 'vertical';
 }
 
 export default function ProjectSelect(props: IProps) {
-  const { datasourceCate, datasourceName, prefixName = [], width = 180, layout = 'horizontal' } = props;
+  const { datasourceCate, datasourceName, prefixField = {}, prefixName = [], width = 180, layout = 'horizontal' } = props;
   const [options, setOptions] = useState<{ label; value }[]>([]);
   const label = (
     <span>
@@ -47,8 +48,9 @@ export default function ProjectSelect(props: IProps) {
   if (layout === 'vertical') {
     return (
       <Form.Item
+        {...prefixField}
         label={label}
-        name={[...prefixName, 'query', 'project']}
+        name={[...prefixName, 'project']}
         rules={[
           {
             required: true,
@@ -64,7 +66,8 @@ export default function ProjectSelect(props: IProps) {
   return (
     <InputGroupWithFormItem label={label} labelWidth={70}>
       <Form.Item
-        name={[...prefixName, 'query', 'project']}
+        {...prefixField}
+        name={[...prefixName, 'project']}
         rules={[
           {
             required: true,
