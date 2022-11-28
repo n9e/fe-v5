@@ -56,14 +56,14 @@ export default function AliyunSLS({ chartForm }) {
                         return (
                           <Row gutter={10}>
                             <Col span={12}>
-                              <ProjectSelect datasourceCate={datasourceCate} datasourceName={datasourceName} prefixName={[field.name]} width='100%' layout='vertical' />
+                              <ProjectSelect datasourceCate={datasourceCate} datasourceName={datasourceName} prefixName={[field.name, 'query']} width='100%' layout='vertical' />
                             </Col>
                             <Col span={12}>
                               <LogstoreSelect
                                 datasourceCate={datasourceCate}
                                 datasourceName={datasourceName}
                                 project={project}
-                                prefixName={[field.name]}
+                                prefixName={[field.name, 'query']}
                                 width='100%'
                                 layout='vertical'
                               />
