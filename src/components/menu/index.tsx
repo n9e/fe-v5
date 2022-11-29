@@ -303,7 +303,7 @@ const SideMenu: FC = () => {
         </div>
       )}
       {defaultSelectedKeys && (
-        <FcMenu items={menus} onClick={handleClick} collapsed={collapsed} switchCollapsed={switchCollapsed} defaultSelectedKeys={defaultSelectedKeys} activeMode='click' />
+        <FcMenu items={menus} onClick={handleClick} collapsed={collapsed} switchCollapsed={switchCollapsed} defaultSelectedKeys={defaultSelectedKeys} activeMode='hover' />
       )}
     </div>
   );
