@@ -1,3 +1,6 @@
+/**
+ * v5.14.3 版本去除 elasticsearch-log 类型数据源，但是仍然兼容该类型数据源对应的设置项
+ */
 import React from 'react';
 import { Form, Row, Col, Input, InputNumber, Button } from 'antd';
 import { DeleteOutlined, QuestionCircleOutlined } from '@ant-design/icons';

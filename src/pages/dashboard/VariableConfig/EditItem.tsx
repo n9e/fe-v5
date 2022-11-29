@@ -19,6 +19,9 @@ import { Form, Input, Row, Col, Select, Switch, Button, Space } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { IRawTimeRange } from '@/components/TimeRangePicker';
+import AdvancedWrap from '@/components/AdvancedWrap';
+import IndexSelect from '@/pages/warning/strategy/components/ElasticsearchSettings/IndexSelect';
+import ClusterSelect from '@/pages/dashboard/Editor/QueryEditor/components/ClusterSelect';
 import { IVariable } from './definition';
 import { convertExpressionToQuery, replaceExpressionVars, filterOptionsByReg, setVaraiableSelected } from './constant';
 
@@ -48,6 +51,19 @@ const typeOptions = [
   {
     label: 'Constant',
     value: 'constant',
+  },
+];
+
+const prometheusOption = {
+  value: 'prometheus',
+  label: 'Prometheus',
+};
+
+const allOptions = [
+  prometheusOption,
+  {
+    value: 'elasticsearch',
+    label: 'Elasticsearch',
   },
 ];
 
@@ -107,7 +123,49 @@ function EditItem(props: IProps) {
           </Form.Item>
         </Col>
       </Row>
-      <Form.Item shouldUpdate={(prevValues, curValues) => prevValues.type !== curValues.typ} noStyle>
+      <AdvancedWrap
+        var='VITE_IS_QUERY_ES_DS'
+        children={(isES) => {
+          return (
+            <Form.Item shouldUpdate={(prevValues, curValues) => prevValues?.datasource?.cate !== curValues?.datasource?.cate} noStyle>
+              {({ getFieldValue }) => {
+                const datasourceCate = getFieldValue(['datasource', 'cate']);
+                return (
+                  <Row gutter={16}>
+                    <Col span={datasourceCate === 'elasticsearch' ? 8 : 24}>
+                      <Form.Item label='数据源' name={['datasource', 'cate']} rules={[{ required: true, message: '请选择数据源' }]} initialValue='prometheus'>
+                        <Select dropdownMatchSelectWidth={false} style={{ minWidth: 70 }}>
+                          {_.map(isES ? allOptions : [prometheusOption], (item) => (
+                            <Select.Option key={item.value} value={item.value}>
+                              {item.label}
+                            </Select.Option>
+                          ))}
+                        </Select>
+                      </Form.Item>
+                    </Col>
+                    {datasourceCate === 'elasticsearch' && (
+                      <>
+                        <Col span={8}>
+                          <ClusterSelect cate={datasourceCate} label='关联数据源' name={['datasource', 'name']} />
+                        </Col>
+                        <Col span={8}>
+                          <Form.Item shouldUpdate={(prevValues, curValues) => prevValues?.datasource?.name !== curValues?.datasource?.name} noStyle>
+                            {({ getFieldValue }) => {
+                              const datasourceName = getFieldValue(['datasource', 'name']);
+                              return <IndexSelect name={['config', 'index']} cate={datasourceCate} cluster={datasourceName ? [datasourceName] : []} />;
+                            }}
+                          </Form.Item>
+                        </Col>
+                      </>
+                    )}
+                  </Row>
+                );
+              }}
+            </Form.Item>
+          );
+        }}
+      />
+      <Form.Item shouldUpdate={(prevValues, curValues) => prevValues.type !== curValues.type} noStyle>
         {({ getFieldValue }) => {
           const type = getFieldValue('type');
           if (type === 'query') {
@@ -124,7 +182,27 @@ function EditItem(props: IProps) {
                     </span>
                   }
                   name='definition'
-                  rules={[{ required: true, message: '请输入变量定义' }]}
+                  rules={[
+                    () => ({
+                      validator(_) {
+                        const datasourceCate = getFieldValue(['datasource', 'cate']);
+                        const definition = getFieldValue('definition');
+                        if (definition) {
+                          if (datasourceCate === 'elasticsearch') {
+                            try {
+                              JSON.parse(definition);
+                              return Promise.resolve();
+                            } catch (e) {
+                              return Promise.reject('变量定义必须是合法的JSON');
+                            }
+                          }
+                          return Promise.resolve();
+                        } else {
+                          return Promise.reject(new Error('请输入变量定义'));
+                        }
+                      },
+                    }),
+                  ]}
                 >
                   <Input onBlur={(e) => handleBlur(e.target.value)} />
                 </Form.Item>
@@ -154,7 +232,7 @@ function EditItem(props: IProps) {
           }
         }}
       </Form.Item>
-      <Form.Item shouldUpdate={(prevValues, curValues) => prevValues.type !== curValues.typ} noStyle>
+      <Form.Item shouldUpdate={(prevValues, curValues) => prevValues.type !== curValues.type} noStyle>
         {({ getFieldValue }) => {
           const type = getFieldValue('type');
           if (type === 'query' || type === 'custom') {
