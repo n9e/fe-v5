@@ -16,6 +16,7 @@
  */
 import React, { useEffect, useState, useRef } from 'react';
 import { useSelector } from 'react-redux';
+import moment from 'moment';
 import { useParams } from 'react-router-dom';
 import PageLayout from '@/components/pageLayout';
 import { Button, Table, Input, Switch, message, List, Row, Col, Pagination, Modal } from 'antd';
@@ -78,6 +79,14 @@ const Resource: React.FC = () => {
       title: t('角色'),
       dataIndex: 'roles',
       render: (text: [], record) => text.join(', '),
+    },
+    {
+      title: t('创建时间'),
+      dataIndex: 'create_at',
+      render: (text) => {
+        return moment.unix(text).format('YYYY-MM-DD HH:mm:ss');
+      },
+      sorter: (a, b) => a.create_at - b.create_at,
     },
     {
       title: t('操作'),
@@ -183,6 +192,7 @@ const Resource: React.FC = () => {
             fetchParams={{
               query,
             }}
+            tableLayout='auto'
           ></BaseTable>
         </div>
 

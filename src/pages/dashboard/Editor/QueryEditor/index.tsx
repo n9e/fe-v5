@@ -1,5 +1,5 @@
 import React from 'react';
-import { Space, Input, Form, Select } from 'antd';
+import { Space, Input, Form, Select, Alert, Tooltip } from 'antd';
 import _ from 'lodash';
 import AdvancedWrap from '@/components/AdvancedWrap';
 import Prometheus from './Prometheus';
@@ -17,10 +17,6 @@ const allCates = [
   {
     value: 'elasticsearch',
     label: 'Elasticsearch',
-  },
-  {
-    value: 'elasticsearch-log',
-    label: 'Elasticsearch Log',
   },
 ];
 
@@ -72,19 +68,6 @@ export default function index({ chartForm, defaultDatasourceName }) {
                             ],
                             datasourceName: undefined,
                           });
-                        } else if (val === 'elasticsearch-log') {
-                          chartForm.setFieldsValue({
-                            targets: [
-                              {
-                                refId: 'A',
-                                query: {
-                                  date_field: '@timestamp',
-                                  limit: 10,
-                                },
-                              },
-                            ],
-                            datasourceName: undefined,
-                          });
                         }
                       }, 500);
                     }}
@@ -120,6 +103,13 @@ export default function index({ chartForm, defaultDatasourceName }) {
             );
           }}
         </Form.Item>
+        {chartForm.getFieldValue('datasourceCate') === 'elasticsearch-log' && (
+          <span className='ant-form-text'>
+            <Tooltip title='请选择 elasticsearch 数据源类型，数据提取选择 raw data'>
+              <Alert showIcon style={{ lineHeight: 1.1 }} message='数据源类型 elasticsearch-log 已废弃' type='warning' />
+            </Tooltip>
+          </span>
+        )}
       </Space>
       <Form.Item shouldUpdate={(prev, curr) => prev.datasourceCate !== curr.datasourceCate} noStyle>
         {({ getFieldValue }) => {
@@ -130,6 +120,7 @@ export default function index({ chartForm, defaultDatasourceName }) {
           if (cate === 'elasticsearch') {
             return <Elasticsearch chartForm={chartForm} />;
           }
+          // 兼容老数据，当前最新版本没有 elasticsearch-log 类型
           if (cate === 'elasticsearch-log') {
             return <ElasticsearchLog chartForm={chartForm} />;
           }

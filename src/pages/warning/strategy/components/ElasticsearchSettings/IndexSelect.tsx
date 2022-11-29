@@ -3,7 +3,15 @@ import { Form, AutoComplete } from 'antd';
 import _ from 'lodash';
 import { getIndices } from '@/services/warning';
 
-export default function IndexSelect({ prefixField = {}, prefixName = [], cate, cluster }: any) {
+interface IProps {
+  prefixField?: any;
+  prefixName?: string[];
+  cate: string;
+  cluster: string[];
+  name?: string | string[]; // 可自定义 name 或者 [...prefixName, 'query', 'index']
+}
+
+export default function IndexSelect({ prefixField = {}, prefixName = [], cate, cluster, name }: IProps) {
   const [options, setOptions] = useState([]);
   const [search, setSearch] = useState('');
 
@@ -37,7 +45,7 @@ export default function IndexSelect({ prefixField = {}, prefixName = [], cate, c
         </div>
       }
       {...prefixField}
-      name={[...prefixName, 'query', 'index']}
+      name={name || [...prefixName, 'query', 'index']}
       rules={[
         {
           required: true,

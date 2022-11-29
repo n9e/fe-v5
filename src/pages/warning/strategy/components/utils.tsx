@@ -15,9 +15,16 @@ export const parseTimeToValueAndUnit = (value?: number) => {
     };
   }
   time = time / 60;
+  if (time < 24) {
+    return {
+      value: time,
+      unit: 'hour',
+    };
+  }
+  time = time / 24;
   return {
     value: time,
-    unit: 'hour',
+    unit: 'day',
   };
 };
 
@@ -31,7 +38,13 @@ export const normalizeTime = (value?: number, unit?: 'second' | 'min' | 'hour') 
   if (unit === 'min') {
     return value * 60;
   }
-  return value * 60 * 60;
+  if (unit === 'hour') {
+    return value * 60 * 60;
+  }
+  if (unit === 'day') {
+    return value * 60 * 60 * 24;
+  }
+  return value;
 };
 
 /**
