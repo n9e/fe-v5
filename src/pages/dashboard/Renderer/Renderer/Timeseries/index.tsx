@@ -73,7 +73,7 @@ export default function index(props: IProps) {
   const hasLegend = displayMode !== 'hidden';
   const [legendData, setLegendData] = useState([]);
   const [isExpanded, setIsExpanded] = useState(false);
-  let _chartHeight = hasLegend ? '70%' : '100%';
+  let _chartHeight = hasLegend ? `calc(100% - ${legendEleSize?.height! + 16}px)` : '100%';
   let _tableHeight = hasLegend ? '30%' : '0px';
 
   if (!inDashboard) {
@@ -248,125 +248,132 @@ export default function index(props: IProps) {
         display: placement === 'right' ? 'flex' : 'block',
       }}
     >
-      <div ref={chartEleRef} style={{ height: _chartHeight, width: placement === 'right' ? (isExpanded ? 0 : '60%') : '100%' }} />
+      <div ref={chartEleRef} style={{ height: _chartHeight, minHeight: '70%', width: placement === 'right' ? (isExpanded ? 0 : '60%') : '100%' }} />
       {hasLegend && (
         <div
           className='renderer-timeseries-legend-table'
-          style={{ [inDashboard ? 'height' : 'maxHeight']: _tableHeight, width: placement === 'right' ? (isExpanded ? '100%' : '40%') : '100%', overflow: 'hidden' }}
-          ref={legendEleRef}
+          style={{
+            [inDashboard ? 'maxHeight' : 'maxHeight']: _tableHeight,
+            height: legendEleSize?.height! + 16,
+            width: placement === 'right' ? (isExpanded ? '100%' : '40%') : '100%',
+            overflow: 'hidden',
+            overflowY: 'auto',
+          }}
         >
           {displayMode === 'table' && (
-            <Table
-              rowKey='id'
-              size='small'
-              className='scroll-container-table'
-              scroll={{ x: 650, y: legendEleSize?.height || 100 - 46 }}
-              columns={[
-                {
-                  title: `Series (${series.length})`,
-                  dataIndex: 'name',
-                  ellipsis: {
-                    showTitle: false,
+            <div ref={legendEleRef}>
+              <Table
+                rowKey='id'
+                size='small'
+                className='scroll-container-table'
+                scroll={{ x: 650 }}
+                columns={[
+                  {
+                    title: `Series (${series.length})`,
+                    dataIndex: 'name',
+                    ellipsis: {
+                      showTitle: false,
+                    },
+                    render: (_text, record: any) => {
+                      return (
+                        <Tooltip
+                          placement='topLeft'
+                          title={
+                            <div>
+                              <div>{_.get(record, 'metric.__name__')}</div>
+                              <div>{record.offset && record.offset !== 'current' ? `offfset ${record.offset}` : ''}</div>
+                              {_.map(_.omit(record.metric, '__name__'), (val, key) => {
+                                return (
+                                  <div key={key}>
+                                    {key}={val}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          }
+                          getTooltipContainer={() => document.body}
+                        >
+                          <span className='renderer-timeseries-legend-color-symbol' style={{ backgroundColor: record.color }} />
+                          {record.offset && record.offset !== 'current' ? <span style={{ paddingRight: 5 }}>offfset {record.offset}</span> : ''}
+                          <span>{_text}</span>
+                        </Tooltip>
+                      );
+                    },
                   },
-                  render: (_text, record: any) => {
-                    return (
-                      <Tooltip
-                        placement='topLeft'
-                        title={
-                          <div>
-                            <div>{_.get(record, 'metric.__name__')}</div>
-                            <div>{record.offset && record.offset !== 'current' ? `offfset ${record.offset}` : ''}</div>
-                            {_.map(_.omit(record.metric, '__name__'), (val, key) => {
-                              return (
-                                <div key={key}>
-                                  {key}={val}
-                                </div>
-                              );
-                            })}
-                          </div>
-                        }
-                        getTooltipContainer={() => document.body}
-                      >
-                        <span className='renderer-timeseries-legend-color-symbol' style={{ backgroundColor: record.color }} />
-                        {record.offset && record.offset !== 'current' ? <span style={{ paddingRight: 5 }}>offfset {record.offset}</span> : ''}
-                        <span>{_text}</span>
-                      </Tooltip>
-                    );
+                  {
+                    title: 'Max',
+                    dataIndex: 'max',
+                    width: 100,
+                    sorter: (a, b) => a.max.value - b.max.value,
+                    render: (text) => {
+                      return text.text;
+                    },
                   },
-                },
-                {
-                  title: 'Max',
-                  dataIndex: 'max',
-                  width: 100,
-                  sorter: (a, b) => a.max.value - b.max.value,
-                  render: (text) => {
-                    return text.text;
+                  {
+                    title: 'Min',
+                    dataIndex: 'min',
+                    width: 100,
+                    sorter: (a, b) => a.min.value - b.min.value,
+                    render: (text) => {
+                      return text.text;
+                    },
                   },
-                },
-                {
-                  title: 'Min',
-                  dataIndex: 'min',
-                  width: 100,
-                  sorter: (a, b) => a.min.value - b.min.value,
-                  render: (text) => {
-                    return text.text;
+                  {
+                    title: 'Avg',
+                    dataIndex: 'avg',
+                    width: 100,
+                    sorter: (a, b) => a.avg.value - b.avg.value,
+                    render: (text) => {
+                      return text.text;
+                    },
                   },
-                },
-                {
-                  title: 'Avg',
-                  dataIndex: 'avg',
-                  width: 100,
-                  sorter: (a, b) => a.avg.value - b.avg.value,
-                  render: (text) => {
-                    return text.text;
+                  {
+                    title: 'Sum',
+                    dataIndex: 'sum',
+                    width: 100,
+                    sorter: (a, b) => a.sum.value - b.sum.value,
+                    render: (text) => {
+                      return text.text;
+                    },
                   },
-                },
-                {
-                  title: 'Sum',
-                  dataIndex: 'sum',
-                  width: 100,
-                  sorter: (a, b) => a.sum.value - b.sum.value,
-                  render: (text) => {
-                    return text.text;
+                  {
+                    title: 'Last',
+                    dataIndex: 'last',
+                    width: 100,
+                    sorter: (a, b) => a.last.value - b.last.value,
+                    render: (text) => {
+                      return text.text;
+                    },
                   },
-                },
-                {
-                  title: 'Last',
-                  dataIndex: 'last',
-                  width: 100,
-                  sorter: (a, b) => a.last.value - b.last.value,
-                  render: (text) => {
-                    return text.text;
-                  },
-                },
-              ]}
-              dataSource={legendData}
-              locale={{
-                emptyText: '暂无数据',
-              }}
-              pagination={false}
-              rowClassName={(record) => {
-                return record.disabled ? 'disabled' : '';
-              }}
-              onRow={(record) => {
-                return {
-                  onClick: () => {
-                    setActiveLegend(activeLegend !== record.id ? record.id : '');
-                    setSeriesData(
-                      _.map(seriesData, (subItem) => {
-                        return {
-                          ...subItem,
-                          visible: activeLegend === record.id ? true : record.id === subItem.id,
-                        };
-                      }),
-                    );
-                  },
-                };
-              }}
-            />
+                ]}
+                dataSource={legendData}
+                locale={{
+                  emptyText: '暂无数据',
+                }}
+                pagination={false}
+                rowClassName={(record) => {
+                  return record.disabled ? 'disabled' : '';
+                }}
+                onRow={(record) => {
+                  return {
+                    onClick: () => {
+                      setActiveLegend(activeLegend !== record.id ? record.id : '');
+                      setSeriesData(
+                        _.map(seriesData, (subItem) => {
+                          return {
+                            ...subItem,
+                            visible: activeLegend === record.id ? true : record.id === subItem.id,
+                          };
+                        }),
+                      );
+                    },
+                  };
+                }}
+              />
+            </div>
           )}
           {displayMode === 'list' && !_.isEmpty(legendData) && (
-            <div className='renderer-timeseries-legend-container'>
+            <div className='renderer-timeseries-legend-container' ref={legendEleRef}>
               <div
                 className={classNames({
                   'renderer-timeseries-legend-list': true,
