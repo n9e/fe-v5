@@ -11,7 +11,7 @@ export default function FcMenuItem(props: Props) {
   const { items } = props;
   const [menuSelect, setMenuSelect] = useMenuSelect();
 
-  const [hoverSecondMenus, setHoverSecondMenus] = useState<MenuItemProps[]>([]);
+  const [hoverSecondMenus, setHoverSecondMenus] = useState<SubMenuProps>();
 
   return (
     <div className={'fc-skim-menu'}>
@@ -19,24 +19,22 @@ export default function FcMenuItem(props: Props) {
         {items
           .filter((item) => !!item)
           .map((item: SubMenuProps) => (
-            <div
-              key={item.key}
-              onMouseEnter={() => setHoverSecondMenus(item.children || [])}
-              onClick={() => !item.children && setMenuSelect([item.key])}
-            >
+            <div key={item.key} onMouseEnter={() => setHoverSecondMenus(item)} onClick={() => !item.children && setMenuSelect([item.key])}>
               {item.label}
             </div>
           ))}
       </div>
       <div className='fc-skim-menu-secondary'>
         <div className='fc-skim-menu-secondary-wrap'>
-          {hoverSecondMenus
-            .filter((item) => !!item)
-            .map((item: MenuItemProps) => (
-              <div key={item.key} onClick={() => setMenuSelect([item.key])}>
-                {item.label}
-              </div>
-            ))}
+          {hoverSecondMenus &&
+            hoverSecondMenus.children &&
+            hoverSecondMenus.children
+              .filter((item) => !!item)
+              .map((item: MenuItemProps) => (
+                <div key={item.key} onClick={() => setMenuSelect([hoverSecondMenus.key, item.key])}>
+                  {item.label}
+                </div>
+              ))}
         </div>
       </div>
     </div>

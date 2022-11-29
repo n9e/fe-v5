@@ -16,7 +16,6 @@
 
 .fc-menu-bay {
   background-color: #f9f9f9;
-  padding-top: 10px;
   padding-bottom: 10px;
   & > .fc-menu-sub-top {
     position: absolute;
@@ -96,6 +95,20 @@
   &.hide {
     width: 0px;
   }
+  &.hoverMode {
+    .fc-menu-sub-selected {
+      background-color: #f9f9f9;
+      padding-top: 10px;
+      padding-bottom: 10px;
+      color: #666;
+      .fc-menu-bay();
+      .fc-menu-sub-title,
+      .fc-menu-item-selected {
+        color: @primary-color;
+        padding: 0;
+      }
+    }
+  }
   flex: 1;
   width: 152px;
   background-color: @primary-color;
@@ -105,11 +118,6 @@
     line-height: 48px;
     display: flex;
     position: relative;
-    &.fc-menu-item-selected {
-      line-height: 45px;
-      color: @primary-color;
-      .fc-menu-bay();
-    }
 
     &:hover {
       color: #bba6fa;
@@ -124,26 +132,49 @@
 
   &-sub {
     position: relative;
-    // transition: 0.3s all;
-    // height: 48px;
     overflow: hidden;
-    &-open {
-      height: auto;
-    }
     &-selected {
       height: auto;
+      &:not(.fc-menu-sub-open) {
+        .fc-menu-sub-title {
+          color: #bba6fa;
+        }
+      }
+      &.fc-menu-sub-open {
+        .fc-menu-sub-title,
+        .fc-menu-item-selected {
+          color: @primary-color;
+          padding: 0;
+        }
+      }
+      .fc-menu-item-selected {
+        line-height: 45px;
+        color: @primary-color;
+        .fc-menu-bay();
+      }
+    }
+    &-open {
+      height: auto;
+      background-color: #f9f9f9;
       padding-top: 10px;
       padding-bottom: 10px;
-      background-color: #f9f9f9;
       color: #666;
-      .fc-menu-sub-title,
-      .fc-menu-item-selected {
-        color: @primary-color;
-        padding: 0;
-      }
       .fc-menu-bay();
+      .fc-menu-sub-title {
+        &:hover {
+          color: @primary-color;
+        }
+      }
+      .fc-menu-item-selected {
+        line-height: 45px;
+        color: @primary-color;
+        .fc-menu-bay();
+      }
     }
     &-title {
+      &:hover {
+        color: #bba6fa;
+      }
       font-size: 14px;
       line-height: 48px;
       display: flex;

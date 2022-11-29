@@ -1,10 +1,9 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useContext } from 'react';
 import { Tooltip } from 'antd';
 import { MenuItemProps, isSubMenu } from './types';
 import './index.less';
-import { useMenuSelect, useMenuActive } from './index';
+import { useMenuSelect, useMenuActive, Context } from './index';
 import classNames from 'classnames';
-
 interface Props {
   item: MenuItemProps;
   subMenuKey?: string;
@@ -13,6 +12,7 @@ interface Props {
 
 export default function FcMenuItem(props: Props) {
   const { item, subMenuKey, collapsed } = props;
+  const { activeMode } = useContext(Context);
   const [menuSelect, setMenuSelect] = useMenuSelect();
   const [menuActive, setMenuActive] = useMenuActive();
   const handleClick = () => {
@@ -22,16 +22,18 @@ export default function FcMenuItem(props: Props) {
   };
 
   const handleHover = () => {
-    const keys = [item.key];
-    subMenuKey && keys.unshift(subMenuKey);
-    setMenuActive(keys);
+    if (activeMode === 'hover') {
+      const keys = [item.key];
+      subMenuKey && keys.unshift(subMenuKey);
+      setMenuActive(keys);
+    }
   };
 
   return (
     <div
       className={classNames({
         'fc-menu-item': true,
-        'fc-menu-item-selected': menuActive.length > 0 ? menuActive.includes(item.key) : menuSelect.includes(item.key),
+        'fc-menu-item-selected': menuSelect.includes(item.key),
       })}
       onClick={handleClick}
       onMouseEnter={handleHover}
