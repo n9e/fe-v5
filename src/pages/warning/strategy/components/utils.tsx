@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import moment from 'moment';
-import { parseRange } from '@/components/TimeRangePicker';
+import { parseRange, mapOptionToRelativeTimeRange, mapRelativeTimeRangeToOption } from '@/components/TimeRangePicker';
 
 export const parseTimeToValueAndUnit = (value?: number) => {
   if (!value) {
@@ -77,7 +77,15 @@ export const parseValues = (values: any = {}) => {
     } catch (e) {
       console.error(e);
     }
-    cloned.queries = query.queries;
+    cloned.queries = _.map(query.queries, (query) => {
+      return {
+        ..._.omit(query, ['from', 'to']),
+        range: mapRelativeTimeRangeToOption({
+          start: query.from,
+          end: query.to,
+        }),
+      };
+    });
     cloned.triggers = query.triggers;
   }
   cloned.cate = cate;
@@ -114,13 +122,11 @@ export const stringifyValues = (values) => {
     const { queries, triggers } = cloned;
     const prom_ql: any = {};
     prom_ql.queries = _.map(queries, (query) => {
-      const parsedRange = parseRange(query.range);
-      const from = moment(parsedRange.start).unix();
-      const to = moment(parsedRange.end).unix();
+      const parsedRange = mapOptionToRelativeTimeRange(query.range);
       return {
         ..._.omit(query, 'range'),
-        from,
-        to,
+        from: parsedRange?.start,
+        to: parsedRange?.end,
       };
     });
     prom_ql.triggers = _.map(triggers, (trigger) => {
