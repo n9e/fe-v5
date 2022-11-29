@@ -19,7 +19,8 @@ import './App.less';
 import 'antd/dist/antd.less';
 import './global.variable.less';
 import { Provider } from 'react-redux';
-import { ConfigProvider, Empty } from 'antd';
+// Modal 会被注入的代码所使用，请不要删除
+import { ConfigProvider, Empty, Modal } from 'antd';
 import HeaderMenu from './components/menu';
 import Content from './routers';
 import store from '@/store';
@@ -42,12 +43,12 @@ function App() {
         //   }
         //   return document.body;
         // }}
-        renderEmpty={() => (
-          <div style={{ padding: 20 }}>
-            <img src='/image/empty.png' width='64' />
-            <div className='ant-empty-description'>{t('无数据')}</div>
-          </div>
-        )}
+        // renderEmpty={() => (
+        //   <div style={{ padding: 20 }}>
+        //     <img src='/image/empty.png' width='64' />
+        //     <div className='ant-empty-description'>{t('无数据')}</div>
+        //   </div>
+        // )}
       >
         <Provider store={store as any}>
           <Router>

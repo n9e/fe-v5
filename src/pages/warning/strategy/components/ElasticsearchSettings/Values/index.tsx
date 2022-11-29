@@ -4,6 +4,7 @@ import { PlusCircleOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { useDebounceFn } from 'ahooks';
 import { getFields } from '@/services/warning';
+import InputGroupWithFormItem from '@/components/InputGroupWithFormItem';
 
 interface IProps {
   prefixField?: any;
@@ -138,9 +139,8 @@ export default function index({ prefixField = {}, prefixFields = [], prefixNameF
                             </Col>
                             {func !== 'count' && func !== 'rawData' && (
                               <Col span={12}>
-                                <Input.Group>
-                                  <span className='ant-input-group-addon'>Field key</span>
-                                  <Form.Item {...field} name={[field.name, 'field']} noStyle>
+                                <InputGroupWithFormItem label='Field key' labelWidth={80}>
+                                  <Form.Item {...field} name={[field.name, 'field']} rules={[{ required: true, message: '必须填写 field key' }]}>
                                     <AutoComplete
                                       options={_.filter(fieldsOptions, (item) => {
                                         if (search) {
@@ -152,7 +152,7 @@ export default function index({ prefixField = {}, prefixFields = [], prefixNameF
                                       onSearch={setSearch}
                                     />
                                   </Form.Item>
-                                </Input.Group>
+                                </InputGroupWithFormItem>
                               </Col>
                             )}
                           </Row>

@@ -34,6 +34,7 @@ interface IProps {
   url?: string;
   datasourceId?: number;
   datasourceIdRequired?: boolean; // 如果不指定 datasourceId 则使用 X-Cluster 作为集群 key，否则 X-Data-Source-Id
+  datasourceName?: string;
   contentMaxHeight?: number;
   type?: 'table' | 'graph';
   onTypeChange?: (type: 'table' | 'graph') => void;
@@ -55,6 +56,7 @@ export default function index(props: IProps) {
     url = '/api/v1/datasource/prometheus',
     datasourceId,
     datasourceIdRequired,
+    datasourceName,
     promQL,
     contentMaxHeight = 300,
     type = 'table',
@@ -132,7 +134,7 @@ export default function index(props: IProps) {
                       'X-Data-Source-Id': _.toString(datasourceId),
                     }
                   : {
-                      'X-Cluster': localStorage.getItem('curCluster') || 'DEFAULT',
+                      'X-Cluster': datasourceName || localStorage.getItem('curCluster') || 'DEFAULT',
                       Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
                     }
               }
@@ -167,7 +169,7 @@ export default function index(props: IProps) {
                 setPromql(value);
               }}
             >
-              Execute
+              查询
             </Button>
           </span>
         </Input.Group>
@@ -192,6 +194,7 @@ export default function index(props: IProps) {
             contentMaxHeight={contentMaxHeight}
             datasourceId={datasourceId}
             datasourceIdRequired={datasourceIdRequired}
+            datasourceName={datasourceName}
             promql={promql}
             setQueryStats={setQueryStats}
             setErrorContent={setErrorContent}
@@ -215,6 +218,7 @@ export default function index(props: IProps) {
             contentMaxHeight={contentMaxHeight}
             datasourceId={datasourceId}
             datasourceIdRequired={datasourceIdRequired}
+            datasourceName={datasourceName}
             promql={promql}
             setQueryStats={setQueryStats}
             setErrorContent={setErrorContent}

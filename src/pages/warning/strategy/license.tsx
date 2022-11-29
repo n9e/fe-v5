@@ -22,15 +22,14 @@ export default function License() {
         }, 10000);
       });
   }, []);
-  if (!days) return null;
-  if (days > 30) return null;
+  if (!days || days > 30) return null;
   return (
     <div style={{ marginRight: 20 }}>
       <Tooltip
         title={
           <div>
             <div>还剩 {days} 天到期</div>
-            <div>还可添加 {rules} 条规则</div>
+            {rules > 0 ? <div>还可添加 {rules} 条规则</div> : <div>请尽快联系管理员续费</div>}
           </div>
         }
       >

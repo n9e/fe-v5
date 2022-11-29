@@ -30,6 +30,7 @@ interface IProps {
   url: string;
   datasourceId?: number;
   datasourceIdRequired?: boolean;
+  datasourceName?: string;
   promql?: string;
   setQueryStats: (stats: QueryStats) => void;
   setErrorContent: (content: string) => void;
@@ -61,7 +62,22 @@ const getSerieName = (metric: any) => {
 };
 
 export default function Graph(props: IProps) {
-  const { url, datasourceId, datasourceIdRequired, promql, setQueryStats, setErrorContent, contentMaxHeight, range, setRange, step, setStep, graphOperates, refreshFlag } = props;
+  const {
+    url,
+    datasourceId,
+    datasourceIdRequired,
+    datasourceName,
+    promql,
+    setQueryStats,
+    setErrorContent,
+    contentMaxHeight,
+    range,
+    setRange,
+    step,
+    setStep,
+    graphOperates,
+    refreshFlag,
+  } = props;
   const [data, setData] = useState([]);
   const [highLevelConfig, setHighLevelConfig] = useState({
     shared: true,
@@ -111,7 +127,12 @@ export default function Graph(props: IProps) {
           end: moment(parsedRange.end).unix(),
           step: realStep,
         },
-        datasourceId ? { 'X-Data-Source-Id': datasourceId } : {},
+        datasourceId
+          ? { 'X-Data-Source-Id': datasourceId }
+          : {
+              'X-Cluster': datasourceName || localStorage.getItem('curCluster') || 'DEFAULT',
+              Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
+            },
       )
         .then((res) => {
           const series = _.map(res?.result, (item) => {
@@ -135,7 +156,7 @@ export default function Graph(props: IProps) {
           setErrorContent(`Error executing query: ${msg}`);
         });
     }
-  }, [JSON.stringify(range), step, datasourceId, promql, refreshFlag]);
+  }, [JSON.stringify(range), step, datasourceId, datasourceName, promql, refreshFlag]);
 
   return (
     <div className='prom-graph-graph-container'>
