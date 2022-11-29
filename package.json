@@ -36,6 +36,7 @@
     "d3-hexbin": "^0.2.2",
     "dayjs": "^1.10.4",
     "echarts": "^5.1.1",
+    "flashcat-menu": "1.0.0",
     "i18next": "20.3.2",
     "lezer": "^0.13.5",
     "lodash": "^4.17.21",
