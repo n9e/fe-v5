@@ -49,7 +49,7 @@ const defaultSelectedKey = (menus: any, pathname) => {
   let key;
   _.forEach(menus, (subMenus: any) => {
     _.forEach(subMenus.children, (menu: any) => {
-      if (pathname.indexOf(menu.key) !== -1) {
+      if (menu && pathname.indexOf(menu.key) !== -1) {
         key = menu.key;
       }
     });
@@ -185,7 +185,7 @@ const SideMenu: FC = () => {
                 key: '/help/source',
                 label: t('数据源管理'),
               }
-            : {},
+            : undefined,
         ],
       ],
     },
@@ -277,7 +277,7 @@ const SideMenu: FC = () => {
           const { dat } = res;
           const newMenus = [...menuList];
           newMenus.forEach((menu) => {
-            menu.children = menu.children.filter((item) => dat.includes(item.key));
+            menu.children = menu.children.filter((item) => item && dat.includes(item.key));
           });
           setMenus(newMenus);
         });
@@ -302,7 +302,9 @@ const SideMenu: FC = () => {
           </div>
         </div>
       )}
-      {defaultSelectedKeys && <FcMenu items={menus} onClick={handleClick} collapsed={collapsed} switchCollapsed={switchCollapsed} defaultSelectedKeys={defaultSelectedKeys} />}
+      {defaultSelectedKeys && (
+        <FcMenu items={menus} onClick={handleClick} collapsed={collapsed} switchCollapsed={switchCollapsed} defaultSelectedKeys={defaultSelectedKeys} activeMode='click' />
+      )}
     </div>
   );
 };
