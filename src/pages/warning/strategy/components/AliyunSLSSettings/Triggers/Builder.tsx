@@ -4,17 +4,19 @@
 import React from 'react';
 import { Form, Space, Input, Select, InputNumber } from 'antd';
 import { PlusCircleOutlined, MinusCircleOutlined } from '@ant-design/icons';
+import _ from 'lodash';
 
 interface IProps {
   prefixField?: any;
   fullPrefixName?: (string | number)[]; // 完整的前置字段名，用于 getFieldValue 获取指定字段的值
   prefixName?: (string | number)[]; // 列表字段名
+  queries: any[];
 }
 
 const alphabet = 'ABCDEFGHIGKLMNOPQRSTUVWXYZ'.split('');
 
 export default function Builder(props: IProps) {
-  const { prefixField = {}, fullPrefixName = [], prefixName = [] } = props;
+  const { prefixField = {}, fullPrefixName = [], prefixName = [], queries } = props;
 
   return (
     <div>
@@ -34,7 +36,11 @@ export default function Builder(props: IProps) {
                 <div key={field.key}>
                   <Space align='start'>
                     <Form.Item {...field} name={[field.name, 'ref']}>
-                      <Input disabled style={{ width: 32 }} />
+                      <Select>
+                        {_.map(queries, (_query, index) => {
+                          return <Select.Option value={alphabet[index]}>{alphabet[index]}</Select.Option>;
+                        })}
+                      </Select>
                     </Form.Item>
                     <Form.Item {...field} name={[field.name, 'label']}>
                       <Input />

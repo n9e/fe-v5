@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { Radio, Space, Input, Switch, Button, Tooltip, Form } from 'antd';
+import { Radio, Space, Input, Switch, Button, Tooltip, Form, Row, Col } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { FormInstance } from 'antd/lib/form/Form';
 import _ from 'lodash';
@@ -50,66 +50,81 @@ export default function index(props: IProps) {
           <ModeRadio mode={mode} setMode={setMode} />
         </div>
       )}
-      <Space style={{ display: 'flex' }}>
-        <ProjectSelect datasourceCate={datasourceCate} datasourceName={datasourceName} prefixName={['query']} />
-        <Form.Item shouldUpdate noStyle>
-          {({ getFieldValue }) => {
-            const project = getFieldValue(['query', 'project']);
-            return <LogstoreSelect datasourceCate={datasourceCate} datasourceName={datasourceName} project={project} prefixName={['query']} />;
-          }}
-        </Form.Item>
-        <InputGroupWithFormItem
-          label={
-            <span>
-              查询条件{' '}
-              <Tooltip
-                title={
-                  <a href='https://help.aliyun.com/document_detail/43772.html' target='_blank' style={{ color: '#c6b2fd' }}>
-                    详细文档
-                  </a>
-                }
+      <Row gutter={8}>
+        <Col flex='auto'>
+          <Row gutter={8}>
+            <Col span={12}>
+              <ProjectSelect width='100%' datasourceCate={datasourceCate} datasourceName={datasourceName} prefixName={['query']} />
+            </Col>
+            <Col span={12}>
+              <Form.Item shouldUpdate noStyle>
+                {({ getFieldValue }) => {
+                  const project = getFieldValue(['query', 'project']);
+                  return <LogstoreSelect width='100%' datasourceCate={datasourceCate} datasourceName={datasourceName} project={project} prefixName={['query']} />;
+                }}
+              </Form.Item>
+            </Col>
+          </Row>
+        </Col>
+        <Col flex='450px'>
+          <Space style={{ display: 'flex' }}>
+            <Form.Item name={['query', 'range']} initialValue={{ start: 'now-1h', end: 'now' }}>
+              <TimeRangePicker />
+            </Form.Item>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <div style={{ lineHeight: '32px' }}>SQL增强</div>
+              <Form.Item name={['query', 'power_sql']} valuePropName='checked'>
+                <Switch />
+              </Form.Item>
+            </div>
+            <Form.Item>
+              <Button
+                type='primary'
+                onClick={() => {
+                  form.validateFields().then((values) => {
+                    if (mode === 'raw') {
+                      if (rawRef.current && rawRef.current.fetchData) {
+                        rawRef.current.fetchData(datasourceCate, datasourceName, values);
+                      }
+                    }
+                    if (mode === 'timeSeries') {
+                      if (metricRef.current && metricRef.current.fetchData) {
+                        metricRef.current.fetchData(datasourceCate, datasourceName, values);
+                      }
+                    }
+                  });
+                }}
               >
-                <QuestionCircleOutlined />
-              </Tooltip>
-            </span>
-          }
-          labelWidth={90}
-        >
-          <Form.Item name={['query', 'query']} style={{ width: 300 }}>
-            <Input />
-          </Form.Item>
-        </InputGroupWithFormItem>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <div style={{ lineHeight: '32px' }}>SQL增强</div>
-          <Form.Item name={['query', 'power_sql']} valuePropName='checked'>
-            <Switch />
-          </Form.Item>
-        </div>
-        <Form.Item name={['query', 'range']} initialValue={{ start: 'now-1h', end: 'now' }}>
-          <TimeRangePicker />
-        </Form.Item>
-        <Form.Item>
-          <Button
-            type='primary'
-            onClick={() => {
-              form.validateFields().then((values) => {
-                if (mode === 'raw') {
-                  if (rawRef.current && rawRef.current.fetchData) {
-                    rawRef.current.fetchData(datasourceCate, datasourceName, values);
+                查询
+              </Button>
+            </Form.Item>
+          </Space>
+        </Col>
+        <Col span={24}>
+          <InputGroupWithFormItem
+            label={
+              <span>
+                查询条件{' '}
+                <Tooltip
+                  title={
+                    <a href='https://help.aliyun.com/document_detail/43772.html' target='_blank' style={{ color: '#c6b2fd' }}>
+                      详细文档
+                    </a>
                   }
-                }
-                if (mode === 'timeSeries') {
-                  if (metricRef.current && metricRef.current.fetchData) {
-                    metricRef.current.fetchData(datasourceCate, datasourceName, values);
-                  }
-                }
-              });
-            }}
+                >
+                  <QuestionCircleOutlined />
+                </Tooltip>
+              </span>
+            }
+            labelWidth={90}
           >
-            查询
-          </Button>
-        </Form.Item>
-      </Space>
+            <Form.Item name={['query', 'query']} style={{ width: '100%' }}>
+              <Input />
+            </Form.Item>
+          </InputGroupWithFormItem>
+        </Col>
+      </Row>
+
       {mode === 'timeSeries' && <Metric ref={metricRef} />}
       {mode === 'raw' && <Raw ref={rawRef} />}
     </div>

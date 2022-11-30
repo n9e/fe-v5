@@ -5,6 +5,7 @@ import { Spin, Empty } from 'antd';
 import { getDsQuery } from '@/services/metric';
 import { parseRange } from '@/components/TimeRangePicker';
 import Timeseries from '@/pages/dashboard/Renderer/Renderer/Timeseries';
+import { getSerieName } from '@/pages/dashboard/Renderer/datasource/utils';
 import AdvancedSettings from './AdvancedSettings';
 
 function Metric(props, ref) {
@@ -38,6 +39,7 @@ function Metric(props, ref) {
           setSeries(
             _.map(res, (item) => {
               return {
+                name: getSerieName(item.metric),
                 metric: item.metric,
                 data: item.values,
               };

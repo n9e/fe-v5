@@ -1,6 +1,7 @@
 import _ from 'lodash';
-import moment from 'moment';
-import { parseRange, mapOptionToRelativeTimeRange, mapRelativeTimeRangeToOption } from '@/components/TimeRangePicker';
+import { mapOptionToRelativeTimeRange, mapRelativeTimeRangeToOption } from '@/components/TimeRangePicker';
+
+const alphabet = 'ABCDEFGHIGKLMNOPQRSTUVWXYZ'.split('');
 
 export const parseTimeToValueAndUnit = (value?: number) => {
   if (!value) {
@@ -121,10 +122,11 @@ export const stringifyValues = (values) => {
   } else if (cate === 'aliyun-sls') {
     const { queries, triggers } = cloned;
     const prom_ql: any = {};
-    prom_ql.queries = _.map(queries, (query) => {
+    prom_ql.queries = _.map(queries, (query, index) => {
       const parsedRange = mapOptionToRelativeTimeRange(query.range);
       return {
         ..._.omit(query, 'range'),
+        ref: alphabet[index],
         from: parsedRange?.start,
         to: parsedRange?.end,
       };

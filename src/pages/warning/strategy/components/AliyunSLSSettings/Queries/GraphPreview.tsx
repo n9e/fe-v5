@@ -24,6 +24,7 @@ export default function GraphPreview({ form }) {
           return {
             project: q.project,
             logstore: q.logstore,
+            query: q.query,
             power_sql: q.power_sql,
             from,
             to,

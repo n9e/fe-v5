@@ -43,8 +43,10 @@ function getUrlParamsByName(name) {
 const getDefaultDatasourceName = (datasourceCate, datasourceList) => {
   const localPrometheus = localStorage.getItem('curCluster');
   const localElasticsearch = localStorage.getItem('datasource_es_name');
+  const localAliyunSLS = localStorage.getItem('datasource_aliyunsls_name');
   if (datasourceCate === 'prometheus') return localPrometheus || _.get(datasourceList, [datasourceCate, 0]);
   if (datasourceCate === 'elasticsearch') return localElasticsearch || _.get(datasourceList, [datasourceCate, 0]);
+  if (datasourceCate === 'aliyun-sls') return localAliyunSLS || _.get(datasourceList, [datasourceCate, 0]);
 };
 
 const setDefaultDatasourceName = (datasourceCate, value) => {
@@ -53,6 +55,9 @@ const setDefaultDatasourceName = (datasourceCate, value) => {
   }
   if (datasourceCate === 'elasticsearch') {
     localStorage.setItem('datasource_es_name', value);
+  }
+  if (datasourceCate === 'aliyun-sls') {
+    localStorage.setItem('datasource_aliyunsls_name', value);
   }
 };
 

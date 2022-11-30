@@ -23,16 +23,12 @@ export default function Trigger(props: IProps) {
           <Radio.Button value={1}>表达式模式</Radio.Button>
         </Radio.Group>
       </Form.Item>
-      <Form.Item
-        shouldUpdate={(prevValues, curValues) => {
-          return _.get(prevValues, [...fullPrefixName, 'mode']) !== _.get(curValues, [...fullPrefixName, 'mode']);
-        }}
-        noStyle
-      >
+      <Form.Item shouldUpdate noStyle>
         {({ getFieldValue }) => {
           const mode = getFieldValue([...fullPrefixName, 'mode']);
+          const queries = getFieldValue(['queries']);
           if (mode == 0) {
-            return <Builder prefixField={prefixField} prefixName={prefixName} />;
+            return <Builder prefixField={prefixField} prefixName={prefixName} queries={queries} />;
           }
           if (mode === 1) {
             return <Code prefixField={prefixField} prefixName={prefixName} />;
