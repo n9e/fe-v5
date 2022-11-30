@@ -1,6 +1,6 @@
 import React from 'react';
 import { Form, Radio, Space, Input, Select } from 'antd';
-import { PlusCircleOutlined, MinusCircleOutlined } from '@ant-design/icons';
+import { PlusCircleOutlined, MinusCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import InputGroupWithFormItem from '@/components/InputGroupWithFormItem';
 import Builder from './Builder';

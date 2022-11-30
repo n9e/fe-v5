@@ -78,7 +78,7 @@ export default function index({ form, prefixField = {}, fullPrefixName = [], pre
                               }
                               labelWidth={90}
                             >
-                              <Form.Item {...field} name={[field.name, 'query']} style={{ width: 300 }}>
+                              <Form.Item {...field} name={[field.name, 'query']} style={{ width: 250 }}>
                                 <Input />
                               </Form.Item>
                             </InputGroupWithFormItem>
