@@ -55,25 +55,27 @@ function Metric(props, ref) {
       <AdvancedSettings />
       {!_.isEmpty(series) ? (
         <Spin spinning={loading}>
-          <Timeseries
-            series={series}
-            values={
-              {
-                custom: {
-                  drawStyle: 'lines',
-                  lineInterpolation: 'smooth',
-                },
-                options: {
-                  legend: {
-                    displayMode: 'table',
+          <div style={{ height: 500 }}>
+            <Timeseries
+              series={series}
+              values={
+                {
+                  custom: {
+                    drawStyle: 'lines',
+                    lineInterpolation: 'smooth',
                   },
-                  tooltip: {
-                    mode: 'all',
+                  options: {
+                    legend: {
+                      displayMode: 'table',
+                    },
+                    tooltip: {
+                      mode: 'all',
+                    },
                   },
-                },
-              } as any
-            }
-          />
+                } as any
+              }
+            />
+          </div>
         </Spin>
       ) : (
         <div
