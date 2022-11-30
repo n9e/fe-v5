@@ -28,14 +28,14 @@ function AdvancedSettings(props: IProps) {
         <Row gutter={8}>
           <Col span={6}>
             <InputGroupWithFormItem label={<span>ValueKey</span>} labelWidth={80}>
-              <Form.Item name={[...prefixName, 'query', 'keys', 'valueKey']} style={{ width: '100%' }} initialValue='PV'>
+              <Form.Item name={[...prefixName, 'query', 'keys', 'valueKey']} style={{ width: '100%' }}>
                 <Input />
               </Form.Item>
             </InputGroupWithFormItem>
           </Col>
           <Col span={6}>
             <InputGroupWithFormItem label={<span>LabelKey</span>} labelWidth={80}>
-              <Form.Item name={[...prefixName, 'query', 'keys', 'labelKey']} style={{ width: '100%' }} initialValue=''>
+              <Form.Item name={[...prefixName, 'query', 'keys', 'labelKey']} style={{ width: '100%' }}>
                 <Input />
               </Form.Item>
             </InputGroupWithFormItem>

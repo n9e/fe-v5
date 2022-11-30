@@ -69,11 +69,7 @@ export default function index(props: IProps) {
           }
           labelWidth={90}
         >
-          <Form.Item
-            name={['query', 'query']}
-            style={{ width: 300 }}
-            initialValue={`* | select time_series(__time__, '1m', '%H:%i:%s' ,'0') as Time, count(1) as PV   group by Time order by Time limit 100`}
-          >
+          <Form.Item name={['query', 'query']} style={{ width: 300 }}>
             <Input />
           </Form.Item>
         </InputGroupWithFormItem>
