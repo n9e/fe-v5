@@ -2,7 +2,7 @@ import React from 'react';
 import { Form, Space, Tooltip, Switch, Input } from 'antd';
 import { PlusCircleOutlined, MinusCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash';
-import TimeRangePicker from '@/components/TimeRangePicker';
+import { RelativeTimeRangePicker } from '@/components/TimeRangePicker';
 import InputGroupWithFormItem from '@/components/InputGroupWithFormItem';
 import ProjectSelect from '@/pages/metric/explorer/AliyunSLS/ProjectSelect';
 import LogstoreSelect from '@/pages/metric/explorer/AliyunSLS/LogstoreSelect';
@@ -78,7 +78,7 @@ export default function index({ form, prefixField = {}, fullPrefixName = [], pre
                             </InputGroupWithFormItem>
                             <InputGroupWithFormItem label='查询区间' labelWidth={80}>
                               <Form.Item {...field} name={[field.name, 'range']} initialValue={{ start: 'now-1h', end: 'now' }}>
-                                <TimeRangePicker />
+                                <RelativeTimeRangePicker />
                               </Form.Item>
                             </InputGroupWithFormItem>
                             <div style={{ display: 'flex', gap: 8 }}>
