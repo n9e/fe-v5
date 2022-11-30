@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-import FcMenu, { IMenuProps } from 'flashcat-menu';
+import FcMenu, { IMenuProps } from '@fc-components/menu';
 import React, { FC, useState, useEffect } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
