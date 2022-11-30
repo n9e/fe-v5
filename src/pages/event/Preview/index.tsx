@@ -5,7 +5,8 @@ import { TimeRangePickerWithRefresh, IRawTimeRange } from '@/components/TimeRang
 import Resolution from '@/components/Resolution';
 import { getStepByTimeAndStep } from '@/pages/dashboard/utils';
 import AlgoGraph from './AlgoGraph';
-import ESGraph from './ESGraph';
+import ElasticsearchGraph from './ElasticsearchGraph';
+import AliyunSLSGraph from './AliyunSLSGraph';
 
 export default function index({ data, triggerTime, onClick }) {
   const [range, setRange] = useState<IRawTimeRange>({
@@ -32,7 +33,8 @@ export default function index({ data, triggerTime, onClick }) {
         {data.cate === 'prometheus' && <Resolution value={step} onChange={(v) => setStep(v)} initialValue={step} />}
       </Space>
       {data.rule_algo && <AlgoGraph rid={data.rule_id} tags={data.tags} range={range} step={step} />}
-      {data.cate === 'elasticsearch' && <ESGraph eventId={data.id} range={range} triggerTime={triggerTime} onClick={onClick} />}
+      {data.cate === 'elasticsearch' && <ElasticsearchGraph eventId={data.id} range={range} triggerTime={triggerTime} onClick={onClick} />}
+      {data.cate === 'aliyun-sls' && <AliyunSLSGraph eventId={data.id} range={range} triggerTime={triggerTime} onClick={onClick} />}
     </div>
   );
 }
