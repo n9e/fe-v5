@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Drawer, Table, Space, Input, Select, Tag } from 'antd';
-import { DownOutlined, RightOutlined } from '@ant-design/icons';
+import { Drawer, Space, Input, Select } from 'antd';
 import moment from 'moment';
 import _ from 'lodash';
 import TimeRangePicker, { IRawTimeRange, parseRange } from '@/components/TimeRangePicker';
 import { getEventLogQuery } from '@/services/warning';
 import ModalHOC, { ModalWrapProps } from '@/pages/dashboard/Components/ModalHOC';
-import { getColumnsFromFields, getInnerTagKeys } from '@/pages/metric/explorer/AliyunSLS/utils';
+import RawTable from '@/pages/metric/explorer/AliyunSLS/RawTable';
 import './style.less';
 
 interface IProps {
@@ -29,7 +28,6 @@ function index(props: IProps & ModalWrapProps) {
       [key: string]: string;
     }[]
   >([]);
-  const [isMore, setIsMore] = useState(true);
 
   useEffect(() => {
     const parsedRange = parseRange(range);
@@ -96,48 +94,7 @@ function index(props: IProps & ModalWrapProps) {
           </Input.Group>
         </Space>
       </div>
-      <Table
-        size='small'
-        className='event-logs-table'
-        tableLayout='auto'
-        rowKey='__time__'
-        columns={getColumnsFromFields(selectedFields, '__time__')}
-        dataSource={data}
-        expandable={{
-          expandedRowRender: (record) => {
-            const tagskeys = getInnerTagKeys(record);
-            return (
-              <div className='sls-discover-raw-content'>
-                {!_.isEmpty(tagskeys) && (
-                  <div className='sls-discover-raw-tags'>
-                    {_.map(tagskeys, (key) => {
-                      return <Tag color='purple'>{record[key]}</Tag>;
-                    })}
-                  </div>
-                )}
-                {_.map(record, (val, key) => {
-                  return (
-                    <dl key={key} className='event-logs-row'>
-                      <dt>{key}: </dt>
-                      <dd>{val}</dd>
-                    </dl>
-                  );
-                })}
-              </div>
-            );
-          },
-          expandIcon: ({ expanded, onExpand, record }) =>
-            expanded ? <DownOutlined onClick={(e) => onExpand(record, e)} /> : <RightOutlined onClick={(e) => onExpand(record, e)} />,
-        }}
-        pagination={false}
-        footer={
-          !isMore
-            ? () => {
-                return '只能查询您搜索匹配的前 500 个日志，请细化您的过滤条件。';
-              }
-            : undefined
-        }
-      />
+      <RawTable data={data} selectedFields={selectedFields} />
     </Drawer>
   );
 }

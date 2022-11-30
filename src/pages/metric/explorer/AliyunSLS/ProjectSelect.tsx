@@ -21,7 +21,16 @@ export default function ProjectSelect(props: IProps) {
   const label = (
     <span>
       项目{' '}
-      <Tooltip title=''>
+      <Tooltip
+        title={
+          <div>
+            项目是日志服务的资源管理单元，是进行多用户隔离与访问控制的主要边界。更多信息，请参见
+            <a href='https://help.aliyun.com/document_detail/48873.htm' target='_blank' style={{ color: '#c6b2fd' }}>
+              项目
+            </a>
+          </div>
+        }
+      >
         <QuestionCircleOutlined />
       </Tooltip>
     </span>

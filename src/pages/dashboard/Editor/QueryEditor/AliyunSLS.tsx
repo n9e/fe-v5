@@ -1,6 +1,6 @@
 import React from 'react';
-import { Form, Row, Col, Input, Button, Space, Switch, Radio } from 'antd';
-import { DeleteOutlined } from '@ant-design/icons';
+import { Form, Row, Col, Input, Button, Space, Switch, Radio, Tooltip } from 'antd';
+import { DeleteOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import Collapse, { Panel } from '../Components/Collapse';
 import getFirstUnusedLetter from '../../Renderer/utils/getFirstUnusedLetter';
@@ -74,7 +74,23 @@ export default function AliyunSLS({ chartForm }) {
                     </Form.Item>
                     <Row gutter={10}>
                       <Col flex='auto'>
-                        <Form.Item label='查询条件' name={[field.name, 'query', 'query']}>
+                        <Form.Item
+                          label={
+                            <span>
+                              查询条件{' '}
+                              <Tooltip
+                                title={
+                                  <a href='https://help.aliyun.com/document_detail/43772.html' target='_blank' style={{ color: '#c6b2fd' }}>
+                                    详细文档
+                                  </a>
+                                }
+                              >
+                                <QuestionCircleOutlined />
+                              </Tooltip>
+                            </span>
+                          }
+                          name={[field.name, 'query', 'query']}
+                        >
                           <Input />
                         </Form.Item>
                       </Col>

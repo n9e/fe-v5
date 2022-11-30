@@ -22,7 +22,16 @@ export default function LogstoreSelect(props: IProps) {
   const label = (
     <span>
       日志库{' '}
-      <Tooltip title=''>
+      <Tooltip
+        title={
+          <div>
+            日志库是日志服务中日志数据的采集、存储和查询单元。更多信息，请参见
+            <a href='https://help.aliyun.com/document_detail/48874.htm' target='_blank' style={{ color: '#c6b2fd' }}>
+              日志库
+            </a>
+          </div>
+        }
+      >
         <QuestionCircleOutlined />
       </Tooltip>
     </span>

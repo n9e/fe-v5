@@ -65,7 +65,13 @@ export default function index({ form, prefixField = {}, fullPrefixName = [], pre
                               label={
                                 <span>
                                   查询条件{' '}
-                                  <Tooltip title=''>
+                                  <Tooltip
+                                    title={
+                                      <a href='https://help.aliyun.com/document_detail/43772.html' target='_blank' style={{ color: '#c6b2fd' }}>
+                                        详细文档
+                                      </a>
+                                    }
+                                  >
                                     <QuestionCircleOutlined />
                                   </Tooltip>
                                 </span>
