@@ -73,7 +73,7 @@ export default function ProjectSelect(props: IProps) {
     );
   }
   return (
-    <InputGroupWithFormItem label={label} labelWidth={70}>
+    <InputGroupWithFormItem label={label} labelWidth={84}>
       <Form.Item
         {...prefixField}
         name={[...prefixName, 'project']}

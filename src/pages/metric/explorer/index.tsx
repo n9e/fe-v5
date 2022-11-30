@@ -21,6 +21,7 @@ import _ from 'lodash';
 import PageLayout from '@/components/pageLayout';
 import { generateID } from '@/utils';
 import AdvancedWrap from '@/components/AdvancedWrap';
+import InputGroupWithFormItem from '@/components/InputGroupWithFormItem';
 import { getCommonESClusters, getCommonClusters, getCommonSLSClusters } from '@/services/common';
 import { datasourceCatesMap, DatasourceCateEnum } from '@/utils/constant';
 import Elasticsearch from './Elasticsearch';
@@ -89,8 +90,7 @@ const Panel = ({
         }}
       >
         <Space align='start'>
-          <Input.Group>
-            <span className='ant-input-group-addon'>数据源类型</span>
+          <InputGroupWithFormItem label='数据源类型' labelWidth={84}>
             <AdvancedWrap
               var='VITE_IS_QUERY_ES_DS'
               children={(isES) => {
@@ -115,7 +115,7 @@ const Panel = ({
                 );
               }}
             />
-          </Input.Group>
+          </InputGroupWithFormItem>
           <Form.Item shouldUpdate={(prev, curr) => prev.datasourceCate !== curr.datasourceCate} noStyle>
             {({ getFieldValue }) => {
               const cate = getFieldValue('datasourceCate');

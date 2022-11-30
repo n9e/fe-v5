@@ -76,7 +76,7 @@ export default function LogstoreSelect(props: IProps) {
   }
 
   return (
-    <InputGroupWithFormItem label={label} labelWidth={80}>
+    <InputGroupWithFormItem label={label} labelWidth={84}>
       <Form.Item
         {...prefixField}
         name={[...prefixName, 'logstore']}

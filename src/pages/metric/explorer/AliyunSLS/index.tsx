@@ -116,7 +116,7 @@ export default function index(props: IProps) {
                 </Tooltip>
               </span>
             }
-            labelWidth={90}
+            labelWidth={84}
           >
             <Form.Item name={['query', 'query']} style={{ width: '100%' }}>
               <Input />
