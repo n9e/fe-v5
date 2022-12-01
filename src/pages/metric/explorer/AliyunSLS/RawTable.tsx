@@ -18,8 +18,13 @@ export default function RawTable(props: IProps) {
       size='small'
       className='event-logs-table'
       tableLayout='auto'
-      rowKey='Time'
-      columns={getColumnsFromFields(selectedFields, 'Time')}
+      rowKey={(record) => {
+        return _.join(
+          _.map(record, (val) => val),
+          '-',
+        );
+      }}
+      columns={getColumnsFromFields(selectedFields, '__time__')}
       dataSource={data}
       expandable={{
         expandedRowRender: (record) => {

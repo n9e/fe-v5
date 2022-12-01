@@ -103,7 +103,7 @@ function Raw(props: IProps, ref) {
 
   return (
     <Spin spinning={loading}>
-      {!_.isEmpty(logs) && !_.isEmpty(histogram) ? (
+      {!_.isEmpty(histogram) ? (
         <div className='sls-discover-content'>
           <FieldsSidebar fields={fields} setFields={setFields} value={selectedFields} onChange={setSelectedFields} />
           <div className='sls-discover-main'>

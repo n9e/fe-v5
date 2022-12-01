@@ -43,9 +43,9 @@ export function getColumnsFromFields(selectedFields: string[], dateField?: strin
       title: 'Time',
       dataIndex: dateField,
       width: 200,
-      // render: (text) => {
-      //   return moment.unix(text).format('YYYY-MM-DD HH:mm:ss');
-      // },
+      render: (text) => {
+        return moment.unix(text).format('YYYY-MM-DD HH:mm:ss');
+      },
       sorter: (a, b) => {
         return localeCompareFunc(_.get(a, dateField, ''), _.get(b, dateField, ''));
       },
