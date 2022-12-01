@@ -9,10 +9,7 @@ import ElasticsearchGraph from './ElasticsearchGraph';
 import AliyunSLSGraph from './AliyunSLSGraph';
 
 export default function index({ data, triggerTime, onClick }) {
-  const [range, setRange] = useState<IRawTimeRange>({
-    start: 'now-1h',
-    end: 'now',
-  });
+  const [range, setRange] = useState<IRawTimeRange>();
   const [step, setStep] = useState<number | null>(15);
 
   useEffect(() => {
@@ -21,6 +18,8 @@ export default function index({ data, triggerTime, onClick }) {
       end: moment.unix(triggerTime).add(30, 'minutes'),
     });
   }, [triggerTime]);
+
+  if (!range) return null;
 
   return (
     <div>
