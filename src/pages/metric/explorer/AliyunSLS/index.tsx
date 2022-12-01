@@ -40,6 +40,21 @@ export default function index(props: IProps) {
   const [mode, setMode] = useState('timeSeries');
   const rawRef = useRef<any>();
   const metricRef = useRef<any>();
+  const onExecute = () => {
+    form.validateFields().then((values) => {
+      cacheDefaultValues(values.query);
+      if (mode === 'raw') {
+        if (rawRef.current && rawRef.current.fetchData) {
+          rawRef.current.fetchData(datasourceCate, datasourceName, values);
+        }
+      }
+      if (mode === 'timeSeries') {
+        if (metricRef.current && metricRef.current.fetchData) {
+          metricRef.current.fetchData(datasourceCate, datasourceName, values);
+        }
+      }
+    });
+  };
 
   return (
     <div>
@@ -66,10 +81,10 @@ export default function index(props: IProps) {
             </Col>
           </Row>
         </Col>
-        <Col flex='450px'>
+        <Col flex='550px'>
           <Space style={{ display: 'flex' }}>
             <Form.Item name={['query', 'range']} initialValue={{ start: 'now-1h', end: 'now' }}>
-              <TimeRangePicker />
+              <TimeRangePicker dateFormat='YYYY-MM-DD HH:mm:ss' />
             </Form.Item>
             <div style={{ display: 'flex', gap: 8 }}>
               <div style={{ lineHeight: '32px' }}>SQL增强</div>
@@ -78,24 +93,7 @@ export default function index(props: IProps) {
               </Form.Item>
             </div>
             <Form.Item>
-              <Button
-                type='primary'
-                onClick={() => {
-                  form.validateFields().then((values) => {
-                    cacheDefaultValues(values.query);
-                    if (mode === 'raw') {
-                      if (rawRef.current && rawRef.current.fetchData) {
-                        rawRef.current.fetchData(datasourceCate, datasourceName, values);
-                      }
-                    }
-                    if (mode === 'timeSeries') {
-                      if (metricRef.current && metricRef.current.fetchData) {
-                        metricRef.current.fetchData(datasourceCate, datasourceName, values);
-                      }
-                    }
-                  });
-                }}
-              >
+              <Button type='primary' onClick={onExecute}>
                 查询
               </Button>
             </Form.Item>
@@ -127,7 +125,7 @@ export default function index(props: IProps) {
       </Row>
 
       {mode === 'timeSeries' && <Metric ref={metricRef} />}
-      {mode === 'raw' && <Raw ref={rawRef} />}
+      {mode === 'raw' && <Raw ref={rawRef} form={form} />}
     </div>
   );
 }
@@ -146,7 +144,7 @@ export const setDefaultValues = (form: FormInstance) => {
   try {
     query = JSON.parse(queryStr || '{}');
     form.setFieldsValue({
-      query,
+      query: _.omit(query, ['range']),
     });
   } catch (e) {}
 };

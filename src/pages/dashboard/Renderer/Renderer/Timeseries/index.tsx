@@ -38,7 +38,7 @@ interface IProps {
   values: IPanel;
   series: any[];
   themeMode?: 'dark';
-  onClick?: (event: any, datetime: Date, value: number) => void;
+  onClick?: (event: any, datetime: Date, value: number, points: any[]) => void;
 }
 
 function getStartAndEndByTargets(targets: any[]) {
@@ -104,8 +104,8 @@ export default function index(props: IProps) {
           marginTop: 0,
         },
         series: [],
-        onClick: (event, datetime, value) => {
-          if (onClick) onClick(event, datetime, value);
+        onClick: (event, datetime, value, points) => {
+          if (onClick) onClick(event, datetime, value, points);
         },
       });
     }
