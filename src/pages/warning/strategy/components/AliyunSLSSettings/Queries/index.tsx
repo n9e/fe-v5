@@ -1,11 +1,12 @@
 import React from 'react';
-import { Form, Space, Tooltip, Switch, Input, Row, Col } from 'antd';
-import { PlusCircleOutlined, CloseCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { Form, Space, Switch, Input, Row, Col } from 'antd';
+import { PlusCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { RelativeTimeRangePicker } from '@/components/TimeRangePicker';
 import InputGroupWithFormItem from '@/components/InputGroupWithFormItem';
 import ProjectSelect from '@/pages/metric/explorer/AliyunSLS/ProjectSelect';
 import LogstoreSelect from '@/pages/metric/explorer/AliyunSLS/LogstoreSelect';
+import Query from '@/pages/metric/explorer/AliyunSLS/Query';
 import GraphPreview from './GraphPreview';
 import AdvancedSettings from './AdvancedSettings';
 import './style.less';
@@ -93,27 +94,7 @@ export default function index({ form, prefixField = {}, fullPrefixName = [], pre
                               </Space>
                             </Col>
                             <Col span={24}>
-                              <InputGroupWithFormItem
-                                label={
-                                  <span>
-                                    查询条件{' '}
-                                    <Tooltip
-                                      title={
-                                        <a href='https://help.aliyun.com/document_detail/43772.html' target='_blank' style={{ color: '#c6b2fd' }}>
-                                          详细文档
-                                        </a>
-                                      }
-                                    >
-                                      <QuestionCircleOutlined />
-                                    </Tooltip>
-                                  </span>
-                                }
-                                labelWidth={90}
-                              >
-                                <Form.Item {...field} name={[field.name, 'query']} style={{ width: '100%' }}>
-                                  <Input />
-                                </Form.Item>
-                              </InputGroupWithFormItem>
+                              <Query width='100%' prefixField={field} prefixName={[field.name]} />
                             </Col>
                           </Row>
                         </>

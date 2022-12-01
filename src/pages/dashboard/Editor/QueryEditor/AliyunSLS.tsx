@@ -6,6 +6,7 @@ import Collapse, { Panel } from '../Components/Collapse';
 import getFirstUnusedLetter from '../../Renderer/utils/getFirstUnusedLetter';
 import ProjectSelect from '@/pages/metric/explorer/AliyunSLS/ProjectSelect';
 import LogstoreSelect from '@/pages/metric/explorer/AliyunSLS/LogstoreSelect';
+import Query from '@/pages/metric/explorer/AliyunSLS/Query';
 import AdvancedSettings from '@/pages/metric/explorer/AliyunSLS/AdvancedSettings';
 import { alphabet } from './config';
 
@@ -74,25 +75,7 @@ export default function AliyunSLS({ chartForm }) {
                     </Form.Item>
                     <Row gutter={10}>
                       <Col flex='auto'>
-                        <Form.Item
-                          label={
-                            <span>
-                              查询条件{' '}
-                              <Tooltip
-                                title={
-                                  <a href='https://help.aliyun.com/document_detail/43772.html' target='_blank' style={{ color: '#c6b2fd' }}>
-                                    详细文档
-                                  </a>
-                                }
-                              >
-                                <QuestionCircleOutlined />
-                              </Tooltip>
-                            </span>
-                          }
-                          name={[field.name, 'query', 'query']}
-                        >
-                          <Input />
-                        </Form.Item>
+                        <Query prefixName={[field.name, 'query']} width='100%' layout='vertical' />
                       </Col>
                       <Col flex='215px'>
                         <Space>

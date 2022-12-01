@@ -1,14 +1,13 @@
 import React, { useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { Radio, Space, Input, Switch, Button, Tooltip, Form, Row, Col } from 'antd';
-import { QuestionCircleOutlined } from '@ant-design/icons';
+import { Radio, Space, Switch, Button, Form, Row, Col } from 'antd';
 import { FormInstance } from 'antd/lib/form/Form';
 import _ from 'lodash';
 import { DatasourceCateEnum } from '@/utils/constant';
-import InputGroupWithFormItem from '@/components/InputGroupWithFormItem';
 import TimeRangePicker from '@/components/TimeRangePicker';
 import ProjectSelect from './ProjectSelect';
 import LogstoreSelect from './LogstoreSelect';
+import QueryInput from './Query';
 import Raw from './Raw';
 import Metric from './Metric';
 import './style.less';
@@ -100,27 +99,7 @@ export default function index(props: IProps) {
           </Space>
         </Col>
         <Col span={24}>
-          <InputGroupWithFormItem
-            label={
-              <span>
-                查询条件{' '}
-                <Tooltip
-                  title={
-                    <a href='https://help.aliyun.com/document_detail/43772.html' target='_blank' style={{ color: '#c6b2fd' }}>
-                      详细文档
-                    </a>
-                  }
-                >
-                  <QuestionCircleOutlined />
-                </Tooltip>
-              </span>
-            }
-            labelWidth={84}
-          >
-            <Form.Item name={['query', 'query']} style={{ width: '100%' }}>
-              <Input />
-            </Form.Item>
-          </InputGroupWithFormItem>
+          <QueryInput width='100%' prefixName={['query']} />
         </Col>
       </Row>
 
