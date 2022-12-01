@@ -38,6 +38,7 @@ function Raw(props, ref) {
           {
             project: query.project,
             logstore: query.logstore,
+            query: query.query,
             from: moment(parseRange(query.range).start).unix(),
             to: moment(parseRange(query.range).end).unix(),
             lines: 500,
