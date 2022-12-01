@@ -26,7 +26,7 @@ import { getCommonESClusters, getCommonClusters, getCommonSLSClusters } from '@/
 import { datasourceCatesMap, DatasourceCateEnum } from '@/utils/constant';
 import Elasticsearch from './Elasticsearch';
 import Prometheus from './Prometheus';
-import AliyunSLS from './AliyunSLS';
+import AliyunSLS, { setDefaultValues } from './AliyunSLS';
 import './index.less';
 
 type PanelMeta = { id: string; defaultPromQL?: string };
@@ -42,7 +42,7 @@ function getUrlParamsByName(name) {
 }
 
 const getDefaultDatasourceName = (datasourceCate, datasourceList) => {
-  const localPrometheus = localStorage.getItem('curCluster');
+  const localPrometheus = localStorage.getItem('curCluster'); // curCluster 是全局的 key name
   const localElasticsearch = localStorage.getItem('datasource_es_name');
   const localAliyunSLS = localStorage.getItem('datasource_aliyunsls_name');
   if (datasourceCate === 'prometheus') return localPrometheus || _.get(datasourceList, [datasourceCate, 0]);
@@ -103,6 +103,9 @@ const Panel = ({
                         form.setFieldsValue({
                           datasourceName: getDefaultDatasourceName(val, datasourceList),
                         });
+                        if (val === 'aliyun-sls') {
+                          setDefaultValues(form);
+                        }
                       }}
                     >
                       {_.map(isES ? datasourceCatesMap.all : datasourceCatesMap.normal, (item) => (

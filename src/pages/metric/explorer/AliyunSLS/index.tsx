@@ -82,6 +82,7 @@ export default function index(props: IProps) {
                 type='primary'
                 onClick={() => {
                   form.validateFields().then((values) => {
+                    cacheDefaultValues(values.query);
                     if (mode === 'raw') {
                       if (rawRef.current && rawRef.current.fetchData) {
                         rawRef.current.fetchData(datasourceCate, datasourceName, values);
@@ -130,3 +131,22 @@ export default function index(props: IProps) {
     </div>
   );
 }
+
+export const cacheDefaultValues = (query: any) => {
+  let queryStr = '';
+  try {
+    queryStr = JSON.stringify(query);
+    localStorage.setItem('explorer_aliyunsls_query', queryStr);
+  } catch (e) {}
+};
+
+export const setDefaultValues = (form: FormInstance) => {
+  const queryStr = localStorage.getItem('explorer_aliyunsls_query');
+  let query = {};
+  try {
+    query = JSON.parse(queryStr || '{}');
+    form.setFieldsValue({
+      query,
+    });
+  } catch (e) {}
+};
