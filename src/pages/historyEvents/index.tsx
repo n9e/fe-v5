@@ -143,6 +143,7 @@ const Event: React.FC = () => {
             >
               <Select.Option value='prometheus'>Prometheus</Select.Option>
               <Select.Option value='elasticsearch'>Elasticsearch</Select.Option>
+              <Select.Option value='aliyun-sls'>阿里云 SLS</Select.Option>
             </Select>
           </AdvancedWrap>
           <ClusterSelect cate={cate} onClusterChange={(e) => setCurClusterItems(e)} />

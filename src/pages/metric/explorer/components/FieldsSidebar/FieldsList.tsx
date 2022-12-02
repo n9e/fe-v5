@@ -40,7 +40,7 @@ export default function FieldsList(props: IProps) {
         }}
       >
         <div
-          className='es-discover-fields-title'
+          className='discover-fields-title'
           onClick={() => {
             setExpanded(!expanded);
           }}
@@ -55,10 +55,10 @@ export default function FieldsList(props: IProps) {
         {expanded &&
           _.map(filteredFields, (item) => {
             return (
-              <div className='es-discover-fields-item' key={item}>
-                <span className='es-discover-fields-item-content'>{item}</span>
+              <div className='discover-fields-item' key={item}>
+                <span className='discover-fields-item-content'>{item}</span>
                 <span
-                  className='es-discover-fields-item-oper'
+                  className='discover-fields-item-oper'
                   onClick={() => {
                     if (type === 'selected' && onRemove) {
                       onRemove(item);

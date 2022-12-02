@@ -1,4 +1,7 @@
 import _ from 'lodash';
+import { mapOptionToRelativeTimeRange, mapRelativeTimeRangeToOption } from '@/components/TimeRangePicker';
+
+const alphabet = 'ABCDEFGHIGKLMNOPQRSTUVWXYZ'.split('');
 
 export const parseTimeToValueAndUnit = (value?: number) => {
   if (!value) {
@@ -80,6 +83,24 @@ export const parseValues = (values: any = {}) => {
       };
     });
     cloned.query = query;
+  } else if (cate === 'aliyun-sls') {
+    const queryString = cloned.prom_ql;
+    let query: any = {};
+    try {
+      query = JSON.parse(queryString);
+    } catch (e) {
+      console.error(e);
+    }
+    cloned.queries = _.map(query.queries, (query) => {
+      return {
+        ..._.omit(query, ['from', 'to']),
+        range: mapRelativeTimeRangeToOption({
+          start: query.from,
+          end: query.to,
+        }),
+      };
+    });
+    cloned.triggers = query.triggers;
   }
   cloned.cate = cate;
   return cloned;
@@ -111,6 +132,51 @@ export const stringifyValues = (values) => {
     });
     cloned.prom_ql = JSON.stringify(query);
     delete cloned.query;
+  } else if (cate === 'aliyun-sls') {
+    const { queries, triggers } = cloned;
+    const prom_ql: any = {};
+    prom_ql.queries = _.map(queries, (query, index) => {
+      const parsedRange = mapOptionToRelativeTimeRange(query.range);
+      return {
+        ..._.omit(query, 'range'),
+        ref: alphabet[index],
+        from: parsedRange?.start,
+        to: parsedRange?.end,
+      };
+    });
+    prom_ql.triggers = _.map(triggers, (trigger) => {
+      if (trigger.mode === 0) {
+        return {
+          ...trigger,
+          exp: stringifyExpressions(trigger.expressions),
+        };
+      }
+      return trigger;
+    });
+    cloned.prom_ql = JSON.stringify(prom_ql);
+    delete cloned.queries;
+    delete cloned.triggers;
   }
+
   return cloned;
+};
+
+export const stringifyExpressions = (
+  expressions: {
+    ref: string;
+    label: string;
+    comparisonOperator: string;
+    value: string;
+    logicalOperator?: string;
+  }[],
+) => {
+  const logicalOperator = _.get(expressions, '[0].logicalOperator');
+  let exp = '';
+  _.forEach(expressions, (expression, index) => {
+    if (index !== 0) {
+      exp += ` ${logicalOperator} `;
+    }
+    exp += `$${expression.ref}${expression.label ? `.${expression.label}` : ''} ${expression.comparisonOperator} ${expression.value}`;
+  });
+  return exp;
 };
