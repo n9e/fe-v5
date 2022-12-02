@@ -98,7 +98,7 @@ export default function AliyunSLS({ chartForm }) {
                       {({ getFieldValue }) => {
                         const mode = getFieldValue(['targets', field.name, 'query', 'mode']);
                         if (mode === 'timeSeries') {
-                          return <AdvancedSettings prefixName={[field.name]} />;
+                          return <AdvancedSettings span={12} prefixName={[field.name]} />;
                         }
                       }}
                     </Form.Item>

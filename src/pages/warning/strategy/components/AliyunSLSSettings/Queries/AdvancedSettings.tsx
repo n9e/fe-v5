@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Row, Col, Form, Input, Tooltip } from 'antd';
+import { Row, Col, Form, Select, Tooltip } from 'antd';
 import { DownOutlined, RightOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import InputGroupWithFormItem from '@/components/InputGroupWithFormItem';
 
@@ -41,7 +41,7 @@ export default function AdvancedSettings(props: IProps) {
               labelWidth={100}
             >
               <Form.Item {...prefixField} name={[prefixField.name, 'keys', 'valueKey']} style={{ width: '100%' }}>
-                <Input />
+                <Select mode='tags' placeholder='回车输入多个' />
               </Form.Item>
             </InputGroupWithFormItem>
           </Col>
@@ -62,7 +62,7 @@ export default function AdvancedSettings(props: IProps) {
               labelWidth={100}
             >
               <Form.Item {...prefixField} name={[prefixField.name, 'keys', 'labelKey']} style={{ width: '100%' }}>
-                <Input />
+                <Select mode='tags' placeholder='回车输入多个' />
               </Form.Item>
             </InputGroupWithFormItem>
           </Col>

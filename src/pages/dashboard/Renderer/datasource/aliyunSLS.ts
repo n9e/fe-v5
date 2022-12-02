@@ -27,6 +27,12 @@ export default async function elasticSearchQuery(options: IOptions) {
     _.forEach(targets, (target) => {
       const query = target.query || {};
       const mode = query.mode;
+      if (query.keys.valueKey) {
+        query.keys.valueKey = _.join(query.keys.valueKey, ' ');
+      }
+      if (query.keys.labelKey) {
+        query.keys.labelKey = _.join(query.keys.labelKey, ' ');
+      }
       if (mode === 'timeSeries') {
         batchTimeSeriesParams.push({
           project: query.project,

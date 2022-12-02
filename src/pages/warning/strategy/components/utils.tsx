@@ -92,6 +92,16 @@ export const parseValues = (values: any = {}) => {
       console.error(e);
     }
     cloned.queries = _.map(query.queries, (query) => {
+      if (query?.keys?.valueKey) {
+        query.keys.valueKey = _.split(query.keys.valueKey, ' ');
+      } else {
+        query.keys.valueKey = [];
+      }
+      if (query?.keys?.labelKey) {
+        query.keys.labelKey = _.split(query.keys.labelKey, ' ');
+      } else {
+        query.keys.labelKey = [];
+      }
       return {
         ..._.omit(query, ['from', 'to']),
         range: mapRelativeTimeRangeToOption({
@@ -137,6 +147,12 @@ export const stringifyValues = (values) => {
     const prom_ql: any = {};
     prom_ql.queries = _.map(queries, (query, index) => {
       const parsedRange = mapOptionToRelativeTimeRange(query.range);
+      if (query?.keys?.valueKey) {
+        query.keys.valueKey = _.join(query.keys.valueKey, ' ');
+      }
+      if (query?.keys?.labelKey) {
+        query.keys.labelKey = _.join(query.keys.labelKey, ' ');
+      }
       return {
         ..._.omit(query, 'range'),
         ref: alphabet[index],

@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
-import { Row, Col, Form, Input, Tooltip } from 'antd';
+import { Row, Col, Form, Input, Tooltip, Select } from 'antd';
 import { DownOutlined, RightOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import InputGroupWithFormItem from '@/components/InputGroupWithFormItem';
 
 interface IProps {
+  span?: number;
   prefixName?: string[];
 }
 
 function AdvancedSettings(props: IProps) {
-  const { prefixName = [] } = props;
+  const { span = 6, prefixName = [] } = props;
   const [open, setOpen] = useState(false);
 
   return (
@@ -26,7 +27,7 @@ function AdvancedSettings(props: IProps) {
       </div>
       <div style={{ display: open ? 'block' : 'none' }}>
         <Row gutter={8}>
-          <Col span={6}>
+          <Col span={span}>
             <InputGroupWithFormItem
               label={
                 <span>
@@ -43,11 +44,11 @@ function AdvancedSettings(props: IProps) {
               labelWidth={100}
             >
               <Form.Item name={[...prefixName, 'query', 'keys', 'valueKey']} style={{ width: '100%' }}>
-                <Input />
+                <Select mode='tags' placeholder='回车输入多个' />
               </Form.Item>
             </InputGroupWithFormItem>
           </Col>
-          <Col span={6}>
+          <Col span={span}>
             <InputGroupWithFormItem
               label={
                 <span>
@@ -64,11 +65,11 @@ function AdvancedSettings(props: IProps) {
               labelWidth={100}
             >
               <Form.Item name={[...prefixName, 'query', 'keys', 'labelKey']} style={{ width: '100%' }}>
-                <Input />
+                <Select mode='tags' placeholder='回车输入多个' />
               </Form.Item>
             </InputGroupWithFormItem>
           </Col>
-          <Col span={6}>
+          <Col span={span}>
             <InputGroupWithFormItem
               label={
                 <span>
@@ -85,7 +86,7 @@ function AdvancedSettings(props: IProps) {
               </Form.Item>
             </InputGroupWithFormItem>
           </Col>
-          <Col span={6}>
+          <Col span={span}>
             <InputGroupWithFormItem
               label={
                 <span>
