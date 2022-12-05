@@ -37,9 +37,12 @@ let lazyMenu = Packages.reduce((result: any, module: Entry) => {
 }, []);
 const getDefaultOpenKey = (menus: any, pathname) => {
   const currentSubMenu = _.find(menus, (subMenus: any) => {
-    return _.some(subMenus.children, (menu) => {
-      return pathname.indexOf(menu.key) !== -1;
-    });
+    return _.some(
+      subMenus.children.filter((i) => !!i),
+      (menu) => {
+        return pathname.indexOf(menu.key) !== -1;
+      },
+    );
   });
   if (currentSubMenu) {
     return currentSubMenu.key;
