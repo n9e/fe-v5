@@ -38,7 +38,7 @@ export default function index(props: IProps) {
                 <Trigger prefixField={field} fullPrefixName={[...prefixName, 'triggers', field.name]} prefixName={[field.name]} />
                 {fields.length > 1 && (
                   <CloseCircleOutlined
-                    style={{ position: 'absolute', right: 16, top: 16 }}
+                    style={{ position: 'absolute', right: -4, top: -4 }}
                     onClick={() => {
                       remove(field.name);
                     }}

@@ -20,30 +20,48 @@ export default function index({ visible, form }) {
             prom_ql: '',
           };
           if (val === 'elasticsearch') {
-            values.query = {
-              values: [
-                {
+            // 旧版本，即将废弃
+            // values.query = {
+            //   values: [
+            //     {
+            //       func: 'count',
+            //       ref: 'A',
+            //     },
+            //   ],
+            //   date_field: '@timestamp',
+            //   interval: 1,
+            //   interval_unit: 'min',
+            //   rules: [
+            //     {
+            //       rule_op: 'AND',
+            //       severity: 2,
+            //       rule: [
+            //         {
+            //           value: 'A',
+            //           func: 'cur',
+            //           op: '>',
+            //         },
+            //       ],
+            //     },
+            //   ],
+            // };
+            values.queries = [
+              {
+                ref: 'A',
+                value: {
                   func: 'count',
-                  ref: 'A',
                 },
-              ],
-              date_field: '@timestamp',
-              interval: 1,
-              interval_unit: 'min',
-              rules: [
-                {
-                  rule_op: 'AND',
-                  severity: 2,
-                  rule: [
-                    {
-                      value: 'A',
-                      func: 'cur',
-                      op: '>',
-                    },
-                  ],
-                },
-              ],
-            };
+                date_field: '@timestamp',
+                interval: 1,
+                interval_unit: 'min',
+              },
+            ];
+            values.triggers = [
+              {
+                mode: 0,
+                severity: 1,
+              },
+            ];
           }
           form.setFieldsValue(values);
         }}

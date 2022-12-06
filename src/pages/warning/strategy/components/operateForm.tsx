@@ -30,6 +30,7 @@ import PromQLInput from '@/components/PromQLInput';
 import AdvancedWrap from '@/components/AdvancedWrap';
 import { SwitchWithLabel } from './SwitchWithLabel';
 import AbnormalDetection from './AbnormalDetection';
+import OldElasticsearchSettings from './ElasticsearchSettings/Old';
 import ElasticsearchSettings from './ElasticsearchSettings';
 import AliyunSLSSettings from './AliyunSLSSettings';
 import CateSelect from './CateSelect';
@@ -379,7 +380,13 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                   );
                 }
                 if (cate === 'elasticsearch') {
-                  return <ElasticsearchSettings form={form} />;
+                  const query = getFieldValue('query');
+                  const queries = getFieldValue('queries');
+                  if (query) {
+                    return <OldElasticsearchSettings form={form} />;
+                  } else if (queries) {
+                    return <ElasticsearchSettings form={form} />;
+                  }
                 }
                 if (cate === 'aliyun-sls') {
                   return <AliyunSLSSettings form={form} />;

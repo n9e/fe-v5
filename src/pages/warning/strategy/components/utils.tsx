@@ -68,21 +68,39 @@ export const parseValues = (values: any = {}) => {
     } catch (e) {
       console.error(e);
     }
-    query.interval = parseTimeToValueAndUnit(query.interval).value;
-    query.interval_unit = parseTimeToValueAndUnit(query.interval).unit;
-    query.rules = _.map(query.rules, (rule: any) => {
-      return {
-        ...rule,
-        rule: _.map(rule.rule, (item: any) => {
-          return {
-            ...item,
-            compare_time: parseTimeToValueAndUnit(item.compare_time).value,
-            compare_time_unit: parseTimeToValueAndUnit(item.compare_time).unit,
-          };
-        }),
-      };
-    });
-    cloned.query = query;
+    if (query?.interval !== undefined) {
+      // 第一版的结构，未来会废弃
+      query.interval = parseTimeToValueAndUnit(query.interval).value;
+      query.interval_unit = parseTimeToValueAndUnit(query.interval).unit;
+      query.rules = _.map(query.rules, (rule: any) => {
+        return {
+          ...rule,
+          rule: _.map(rule.rule, (item: any) => {
+            return {
+              ...item,
+              compare_time: parseTimeToValueAndUnit(item.compare_time).value,
+              compare_time_unit: parseTimeToValueAndUnit(item.compare_time).unit,
+            };
+          }),
+        };
+      });
+      cloned.query = query;
+    } else if (query?.queries && query?.triggers) {
+      /**
+       * 新版本结构跟 SLS 一致 Query {
+       *   queries: any[],
+       *   triggers: any[],
+       * }
+       */
+      cloned.queries = _.map(query.queries, (item) => {
+        return {
+          ...item,
+          interval: parseTimeToValueAndUnit(item.interval).value,
+          interval_unit: parseTimeToValueAndUnit(item.interval).unit,
+        };
+      });
+      cloned.triggers = query.triggers;
+    }
   } else if (cate === 'aliyun-sls') {
     const queryString = cloned.prom_ql;
     let query: any = {};
@@ -125,23 +143,38 @@ export const stringifyValues = (values) => {
   const cate = cloned.cate || 'prometheus';
   if (cate === 'elasticsearch') {
     const query = cloned.query;
-    query.interval = normalizeTime(query.interval, query.interval_unit);
-    delete query.interval_unit;
-    query.rules = _.map(query.rules, (rule: any) => {
-      return {
-        ...rule,
-        rule: _.map(rule.rule, (item: any) => {
-          const compare_time = normalizeTime(item.compare_time, item.compare_time_unit);
-          delete item.compare_time_unit;
-          return {
-            ...item,
-            compare_time,
-          };
-        }),
-      };
-    });
-    cloned.prom_ql = JSON.stringify(query);
-    delete cloned.query;
+    if (query?.interval !== undefined) {
+      // 第一版的结构，未来会废弃
+      query.interval = normalizeTime(query.interval, query.interval_unit);
+      delete query.interval_unit;
+      query.rules = _.map(query.rules, (rule: any) => {
+        return {
+          ...rule,
+          rule: _.map(rule.rule, (item: any) => {
+            const compare_time = normalizeTime(item.compare_time, item.compare_time_unit);
+            delete item.compare_time_unit;
+            return {
+              ...item,
+              compare_time,
+            };
+          }),
+        };
+      });
+      cloned.prom_ql = JSON.stringify(query);
+      delete cloned.query;
+    } else if (cloned?.queries && cloned?.triggers) {
+      const prom_ql: any = {};
+      prom_ql.queries = _.map(cloned.queries, (item) => {
+        return {
+          ..._.omit(item, 'interval_unit'),
+          interval: normalizeTime(item.interval, item.interval_unit),
+        };
+      });
+      prom_ql.triggers = cloned.triggers;
+      cloned.prom_ql = JSON.stringify(prom_ql);
+      delete cloned.queries;
+      delete cloned.triggers;
+    }
   } else if (cate === 'aliyun-sls') {
     const { queries, triggers } = cloned;
     const prom_ql: any = {};

@@ -185,7 +185,7 @@ const SideMenu: FC = () => {
                 key: '/help/source',
                 label: t('数据源管理'),
               }
-            : undefined,
+            : {},
         ],
       ],
     },
