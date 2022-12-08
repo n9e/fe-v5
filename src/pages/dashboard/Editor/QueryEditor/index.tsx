@@ -1,5 +1,5 @@
-import React from 'react';
-import { Space, Input, Form, Select, Alert, Tooltip } from 'antd';
+import React, { useState } from 'react';
+import { Space, Input, Form, Select, Alert, Tooltip, Radio } from 'antd';
 import _ from 'lodash';
 import AdvancedWrap from '@/components/AdvancedWrap';
 import Prometheus from './Prometheus';
@@ -7,6 +7,7 @@ import Elasticsearch from './Elasticsearch';
 import ElasticsearchLog from './ElasticsearchLog';
 import AliyunSLS from './AliyunSLS';
 import ClusterSelect from './components/ClusterSelect';
+import OrganizeFields from '../TransformationsEditor/OrganizeFields';
 
 const prometheusCate = {
   value: 'prometheus',
@@ -26,9 +27,20 @@ const allCates = [
 ];
 
 export default function index({ chartForm, defaultDatasourceName }) {
+  const [mode, setMode] = useState('query');
   return (
     <div>
       <Space align='start'>
+        <Radio.Group
+          value={mode}
+          onChange={(e) => {
+            setMode(e.target.value);
+          }}
+          buttonStyle='solid'
+        >
+          <Radio.Button value='query'>查询条件</Radio.Button>
+          <Radio.Button value='transform'>数据转换</Radio.Button>
+        </Radio.Group>
         <Input.Group>
           <span className='ant-input-group-addon'>数据源类型</span>
           <AdvancedWrap
@@ -116,25 +128,38 @@ export default function index({ chartForm, defaultDatasourceName }) {
           </span>
         )}
       </Space>
-      <Form.Item shouldUpdate={(prev, curr) => prev.datasourceCate !== curr.datasourceCate} noStyle>
-        {({ getFieldValue }) => {
-          const cate = getFieldValue('datasourceCate') || 'prometheus';
-          if (cate === 'prometheus') {
-            return <Prometheus chartForm={chartForm} />;
-          }
-          if (cate === 'elasticsearch') {
-            return <Elasticsearch chartForm={chartForm} />;
-          }
-          // 兼容老数据，当前最新版本没有 elasticsearch-log 类型
-          if (cate === 'elasticsearch-log') {
-            return <ElasticsearchLog chartForm={chartForm} />;
-          }
-          if (cate === 'aliyun-sls') {
-            return <AliyunSLS chartForm={chartForm} />;
-          }
-          return null;
+      <div
+        style={{
+          display: mode === 'query' ? 'block' : 'none',
         }}
-      </Form.Item>
+      >
+        <Form.Item shouldUpdate={(prev, curr) => prev.datasourceCate !== curr.datasourceCate} noStyle>
+          {({ getFieldValue }) => {
+            const cate = getFieldValue('datasourceCate') || 'prometheus';
+            if (cate === 'prometheus') {
+              return <Prometheus chartForm={chartForm} />;
+            }
+            if (cate === 'elasticsearch') {
+              return <Elasticsearch chartForm={chartForm} />;
+            }
+            // 兼容老数据，当前最新版本没有 elasticsearch-log 类型
+            if (cate === 'elasticsearch-log') {
+              return <ElasticsearchLog chartForm={chartForm} />;
+            }
+            if (cate === 'aliyun-sls') {
+              return <AliyunSLS chartForm={chartForm} />;
+            }
+            return null;
+          }}
+        </Form.Item>
+      </div>
+      <div
+        style={{
+          display: mode === 'transform' ? 'block' : 'none',
+        }}
+      >
+        <OrganizeFields chartForm={chartForm} />
+      </div>
     </div>
   );
 }
