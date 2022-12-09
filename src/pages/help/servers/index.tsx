@@ -15,9 +15,10 @@
  *
  */
 import React, { useState, useEffect } from 'react';
-import { Table, Space, Button, Popover, Select, Modal, Form, Input, Popconfirm } from 'antd';
+import { Table, Space, Button, Popover, Select, Modal, Form, Input, Popconfirm, AutoComplete } from 'antd';
 import Icon from '@ant-design/icons';
 import moment from 'moment';
+import _ from 'lodash';
 import { useSelector } from 'react-redux';
 import PageLayout from '@/components/pageLayout';
 import { getN9EServers, updateN9EServerCluster, addN9EServers, deleteN9EServers } from '@/services/help';
@@ -38,23 +39,21 @@ function ClusterEditor({ id, defaultValue, clusters, onSave }) {
       destroyTooltipOnHide
       content={
         <Space>
-          <Select
+          <AutoComplete
             style={{ minWidth: 200 }}
             placeholder='选择集群'
+            options={_.map(clusters, (item) => {
+              return {
+                label: item,
+                value: item,
+              };
+            })}
             allowClear
             value={cluster}
             onChange={(val) => {
               setCluster(val);
             }}
-          >
-            {clusters.map((item) => {
-              return (
-                <Select.Option key={item} value={item}>
-                  {item}
-                </Select.Option>
-              );
-            })}
-          </Select>
+          />
           <Button
             type='primary'
             onClick={() => {
@@ -225,15 +224,15 @@ export default function Servers() {
             <Input />
           </Form.Item>
           <Form.Item label='告警集群' name='cluster' rules={[{ required: true, message: '请选择告警集群' }]}>
-            <Select style={{ minWidth: 200 }} placeholder='选择集群' allowClear>
-              {clusters.map((item) => {
-                return (
-                  <Select.Option key={item} value={item}>
-                    {item}
-                  </Select.Option>
-                );
+            <AutoComplete
+              options={_.map(clusters, (item) => {
+                return {
+                  label: item,
+                  value: item,
+                };
               })}
-            </Select>
+              allowClear
+            />
           </Form.Item>
         </Form>
       </Modal>
