@@ -192,6 +192,9 @@ export default function Servers() {
       <Modal
         title='新增'
         visible={visible}
+        onCancel={() => {
+          setVisible(false);
+        }}
         footer={[
           <Button
             key='cancel'
