@@ -72,7 +72,7 @@ export default defineConfig({
         changeOrigin: true,
       },
       '/api/n9e': {
-        target: 'http://10.206.0.11:9000/',
+        target: 'http://10.206.0.16:18000',
         changeOrigin: true,
       },
       '/api/v1/': {
