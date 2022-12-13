@@ -51,6 +51,8 @@ function index(props: IProps) {
     if (formRef.current && formRef.current.getFormInstance) {
       const formInstance = formRef.current.getFormInstance();
       formInstance.validateFields().then(async (values) => {
+        console.log('values', values);
+        return;
         // TODO: 渲染 hexbin 图时，colorRange 需要从 string 转换为 array
         if (values.type === 'hexbin') {
           _.set(values, 'custom.colorRange', _.split(values.custom.colorRange, ','));

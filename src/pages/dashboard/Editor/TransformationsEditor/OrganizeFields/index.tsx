@@ -18,7 +18,14 @@ export default function index({ chartForm }) {
         return (
           <>
             {_.map(fields, (field) => {
-              return <OrganizeFields key={field.key} />;
+              return (
+                <div key={field.key}>
+                  <Form.Item {...field} name={[field.name, 'id']} hidden />
+                  <Form.Item {...field} name={[field.name, 'options']}>
+                    <OrganizeFields />
+                  </Form.Item>
+                </div>
+              );
             })}
           </>
         );
