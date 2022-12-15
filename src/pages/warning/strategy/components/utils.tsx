@@ -170,7 +170,15 @@ export const stringifyValues = (values) => {
           interval: normalizeTime(item.interval, item.interval_unit),
         };
       });
-      prom_ql.triggers = cloned.triggers;
+      prom_ql.triggers = _.map(cloned.triggers, (trigger) => {
+        if (trigger.mode === 0) {
+          return {
+            ...trigger,
+            exp: stringifyExpressions(trigger.expressions),
+          };
+        }
+        return trigger;
+      });
       cloned.prom_ql = JSON.stringify(prom_ql);
       delete cloned.queries;
       delete cloned.triggers;
