@@ -89,6 +89,10 @@ request.interceptors.response.use(
           }
         });
     }
+    // 屏蔽日志侧拉板接口报错
+    if (status === 500 && response.url.indexOf('/api/v1/dimensions/log/aggregation') > -1) {
+      return;
+    }
     // 兼容异常处理
     if (status === 500 && (response.url.includes('/api/v1') || response.url.includes('/api/v2'))) {
       return response
