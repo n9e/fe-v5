@@ -107,7 +107,7 @@ export default function Prometheus({ chartForm }) {
                                   <GroupBy
                                     prefixField={field}
                                     prefixFields={['targets']}
-                                    prefixNameField={[field.name]}
+                                    prefixNameField={[field.name, 'query']}
                                     cate={getFieldValue('datasourceCate')}
                                     cluster={datasourceName}
                                     index={getFieldValue([...prefixName, 'query', 'index'])}

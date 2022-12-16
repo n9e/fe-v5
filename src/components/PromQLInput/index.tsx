@@ -140,6 +140,9 @@ const ExpressionInput = (
                   if (typeof executeQueryCallback.current === 'function') {
                     executeQueryCallback.current(realValue.current);
                   }
+                  if (typeof onChange === 'function' && _.includes(trigger, 'onEnter')) {
+                    onChange(realValue.current);
+                  }
                   return true;
                 },
               },
@@ -199,13 +202,6 @@ const ExpressionInput = (
       className={classNames({ 'ant-input': true, readonly: readonly, 'promql-input': true })}
       onBlur={() => {
         if (typeof onChange === 'function' && _.includes(trigger, 'onBlur')) {
-          if (realValue.current !== value) {
-            onChange(realValue.current);
-          }
-        }
-      }}
-      onKeyDown={(e) => {
-        if (e.code === 'Enter' && typeof onChange === 'function' && _.includes(trigger, 'onEnter')) {
           if (realValue.current !== value) {
             onChange(realValue.current);
           }

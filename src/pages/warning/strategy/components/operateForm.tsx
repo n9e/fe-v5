@@ -30,7 +30,9 @@ import PromQLInput from '@/components/PromQLInput';
 import AdvancedWrap from '@/components/AdvancedWrap';
 import { SwitchWithLabel } from './SwitchWithLabel';
 import AbnormalDetection from './AbnormalDetection';
+import OldElasticsearchSettings from './ElasticsearchSettings/Old';
 import ElasticsearchSettings from './ElasticsearchSettings';
+import AliyunSLSSettings from './AliyunSLSSettings';
 import CateSelect from './CateSelect';
 import ClusterSelect, { ClusterAll } from './ClusterSelect';
 import { parseValues, stringifyValues } from './utils';
@@ -141,67 +143,72 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
   };
 
   const addSubmit = () => {
-    form.validateFields().then(async (values) => {
-      if (values.cate === 'prometheus') {
-        if (!isChecked && values.algorithm === 'holtwinters') {
-          message.warning('请先校验指标');
-          return;
+    form
+      .validateFields()
+      .then(async (values) => {
+        if (values.cate === 'prometheus') {
+          if (!isChecked && values.algorithm === 'holtwinters') {
+            message.warning('请先校验指标');
+            return;
+          }
+          const cluster = values.cluster.includes(ClusterAll) && clusterList.length > 0 ? clusterList[0] : values.cluster[0] || '';
+          const res = await prometheusQuery({ query: values.prom_ql }, cluster);
+          if (res.error) {
+            notification.error({
+              message: res.error,
+            });
+            return false;
+          }
+        } else if (values.cate === 'elasticsearch' || values.cate === 'aliyun-sls') {
+          values = stringifyValues(values);
         }
-        const cluster = values.cluster.includes(ClusterAll) && clusterList.length > 0 ? clusterList[0] : values.cluster[0] || '';
-        const res = await prometheusQuery({ query: values.prom_ql }, cluster);
-        if (res.error) {
-          notification.error({
-            message: res.error,
+        const callbacks = values.callbacks.map((item) => item.url);
+        const data = {
+          ...values,
+          enable_stime: values.enable_stime.format('HH:mm'),
+          enable_etime: values.enable_etime.format('HH:mm'),
+          disabled: !values.enable_status ? 1 : 0,
+          notify_recovered: values.notify_recovered ? 1 : 0,
+          enable_in_bg: values.enable_in_bg ? 1 : 0,
+          callbacks,
+          cluster: values.cluster.join(' '),
+        };
+        let reqBody,
+          method = 'Post';
+        if (type === 1) {
+          reqBody = data;
+          method = 'Put';
+          const res = await EditStrategy(reqBody, curBusiItem.id, detail.id);
+          if (res.err) {
+            message.error(res.error);
+          } else {
+            message.success(t('编辑成功！'));
+            history.push('/alert-rules');
+          }
+        } else {
+          const licenseRulesRemaining = _.toNumber(window.localStorage.getItem('license_rules_remaining'));
+          if (licenseRulesRemaining === 0 && data.algorithm === 'holtwinters') {
+            message.error('可添加的智能告警规则数量已达上限，请联系客服');
+          }
+          reqBody = [data];
+          const { dat } = await addOrEditStrategy(reqBody, curBusiItem.id, method);
+          let errorNum = 0;
+          const msg = Object.keys(dat).map((key) => {
+            dat[key] && errorNum++;
+            return dat[key];
           });
-          return false;
-        }
-      } else if (values.cate === 'elasticsearch') {
-        values = stringifyValues(values);
-      }
-      const callbacks = values.callbacks.map((item) => item.url);
-      const data = {
-        ...values,
-        enable_stime: values.enable_stime.format('HH:mm'),
-        enable_etime: values.enable_etime.format('HH:mm'),
-        disabled: !values.enable_status ? 1 : 0,
-        notify_recovered: values.notify_recovered ? 1 : 0,
-        enable_in_bg: values.enable_in_bg ? 1 : 0,
-        callbacks,
-        cluster: values.cluster.join(' '),
-      };
-      let reqBody,
-        method = 'Post';
-      if (type === 1) {
-        reqBody = data;
-        method = 'Put';
-        const res = await EditStrategy(reqBody, curBusiItem.id, detail.id);
-        if (res.err) {
-          message.error(res.error);
-        } else {
-          message.success(t('编辑成功！'));
-          history.push('/alert-rules');
-        }
-      } else {
-        const licenseRulesRemaining = _.toNumber(window.localStorage.getItem('license_rules_remaining'));
-        if (licenseRulesRemaining === 0 && data.algorithm === 'holtwinters') {
-          message.error('可添加的智能告警规则数量已达上限，请联系客服');
-        }
-        reqBody = [data];
-        const { dat } = await addOrEditStrategy(reqBody, curBusiItem.id, method);
-        let errorNum = 0;
-        const msg = Object.keys(dat).map((key) => {
-          dat[key] && errorNum++;
-          return dat[key];
-        });
 
-        if (!errorNum) {
-          message.success(`${type === 2 ? t('告警规则克隆成功') : t('告警规则创建成功')}`);
-          history.push('/alert-rules');
-        } else {
-          message.error(t(msg));
+          if (!errorNum) {
+            message.success(`${type === 2 ? t('告警规则克隆成功') : t('告警规则创建成功')}`);
+            history.push('/alert-rules');
+          } else {
+            message.error(t(msg));
+          }
         }
-      }
-    });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   const debounceFetcher = useCallback(debounce(getGroups, 800), []);
@@ -293,10 +300,10 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                 </Form.Item>
               </Col>
             </Row>
-            <ElasticsearchSettings form={form} />
             <Form.Item shouldUpdate={(prevValues, curValues) => prevValues.cate !== curValues.cate} noStyle>
               {({ getFieldValue }) => {
-                if (getFieldValue('cate') === 'prometheus') {
+                const cate = getFieldValue('cate');
+                if (cate === 'prometheus') {
                   return (
                     <>
                       <AdvancedWrap var='VITE_IS_ALERT_AI'>
@@ -371,6 +378,18 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                       </Form.Item>
                     </>
                   );
+                }
+                if (cate === 'elasticsearch') {
+                  const query = getFieldValue('query');
+                  const queries = getFieldValue('queries');
+                  if (query) {
+                    return <OldElasticsearchSettings form={form} />;
+                  } else if (queries) {
+                    return <ElasticsearchSettings form={form} />;
+                  }
+                }
+                if (cate === 'aliyun-sls') {
+                  return <AliyunSLSSettings form={form} />;
                 }
               }}
             </Form.Item>

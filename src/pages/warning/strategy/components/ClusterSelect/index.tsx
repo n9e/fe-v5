@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Select } from 'antd';
+import _ from 'lodash';
 import { CaretDownOutlined } from '@ant-design/icons';
-import { getCommonClusters, getCommonESClusters } from '@/services/common';
+import { getCommonClusters, getCommonESClusters, getCommonSLSClusters } from '@/services/common';
 export const ClusterAll = '$all';
 
 export default function index({ form, cate }) {
-  const [clusterList, setClusterList] = useState([]);
+  const [clusterList, setClusterList] = useState<string[]>([]);
   const handleClusterChange = (v: string[]) => {
     if (v.includes(ClusterAll)) {
       form.setFieldsValue({ cluster: [ClusterAll] });
@@ -21,10 +22,20 @@ export default function index({ form, cate }) {
         .catch(() => {
           setClusterList([]);
         });
-    } else {
-      getCommonClusters()
+    }
+    if (cate === 'aliyun-sls') {
+      getCommonSLSClusters()
         .then(({ dat }) => {
           setClusterList(dat);
+        })
+        .catch(() => {
+          setClusterList([]);
+        });
+    }
+    if (cate === 'prometheus') {
+      getCommonClusters()
+        .then(({ dat }) => {
+          setClusterList(_.concat(['$all'], dat));
         })
         .catch(() => {
           setClusterList([]);
@@ -44,9 +55,6 @@ export default function index({ form, cate }) {
       ]}
     >
       <Select suffixIcon={<CaretDownOutlined />} mode='multiple' onChange={handleClusterChange}>
-        <Select.Option value={ClusterAll} key={ClusterAll}>
-          {ClusterAll}
-        </Select.Option>
         {clusterList?.map((item) => (
           <Select.Option value={item} key={item}>
             {item}

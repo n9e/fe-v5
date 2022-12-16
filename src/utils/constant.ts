@@ -19,37 +19,11 @@ export const PAGE_SIZE_MAX = 100000;
 export const PAGE_SIZE_OPTION = 20;
 export const PAGE_SIZE_OPTION_LARGE = 150;
 
-export const randomColor = [
-  'pink',
-  'red',
-  'yellow',
-  'orange',
-  'cyan',
-  'green',
-  'blue',
-  'purple',
-  'geekblue',
-  'magenta',
-  'volcano',
-  'gold',
-  'lime',
-];
+export const randomColor = ['pink', 'red', 'yellow', 'orange', 'cyan', 'green', 'blue', 'purple', 'geekblue', 'magenta', 'volcano', 'gold', 'lime'];
 
 export const priorityColor = ['red', 'orange', 'blue'];
 // 主题色
-export const chartColor = [
-  '#c23531',
-  '#2f4554',
-  '#61a0a8',
-  '#d48265',
-  '#91c7ae',
-  '#749f83',
-  '#ca8622',
-  '#bda29a',
-  '#6e7074',
-  '#546570',
-  '#c4ccd3',
-];
+export const chartColor = ['#c23531', '#2f4554', '#61a0a8', '#d48265', '#91c7ae', '#749f83', '#ca8622', '#bda29a', '#6e7074', '#546570', '#c4ccd3'];
 export const METRICS = {
   TOTAL: 'total',
   ERROR: 'error',
@@ -82,3 +56,33 @@ export const chartDefaultOptions = {
   },
   animation: false,
 };
+
+export const normalDatasourceCates = [
+  {
+    value: 'prometheus',
+    label: 'Prometheus',
+  },
+];
+
+export const datasourceCates = [
+  ...normalDatasourceCates,
+  {
+    value: 'elasticsearch',
+    label: 'Elasticsearch',
+  },
+  {
+    value: 'aliyun-sls',
+    label: '阿里云SLS',
+  },
+];
+
+export const datasourceCatesMap = {
+  normal: normalDatasourceCates,
+  all: datasourceCates,
+};
+
+export enum DatasourceCateEnum {
+  prometheus = 'prometheus',
+  elasticsearch = 'elasticsearch',
+  aliyunSLS = 'aliyun-sls',
+}

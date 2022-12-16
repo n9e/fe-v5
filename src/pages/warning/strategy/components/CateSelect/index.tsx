@@ -5,10 +5,11 @@ import { CaretDownOutlined } from '@ant-design/icons';
 const typeNameMap = {
   prometheus: 'Prometheus',
   elasticsearch: 'Elasticsearch',
+  'aliyun-sls': '阿里云SLS',
 };
 
 export default function index({ visible, form }) {
-  const options = visible ? ['prometheus', 'elasticsearch'] : ['prometheus'];
+  const options = visible ? ['prometheus', 'elasticsearch', 'aliyun-sls'] : ['prometheus'];
   return (
     <Form.Item label='数据源类型' name='cate' initialValue='prometheus'>
       <Select
@@ -19,30 +20,48 @@ export default function index({ visible, form }) {
             prom_ql: '',
           };
           if (val === 'elasticsearch') {
-            values.query = {
-              values: [
-                {
+            // 旧版本，即将废弃
+            // values.query = {
+            //   values: [
+            //     {
+            //       func: 'count',
+            //       ref: 'A',
+            //     },
+            //   ],
+            //   date_field: '@timestamp',
+            //   interval: 1,
+            //   interval_unit: 'min',
+            //   rules: [
+            //     {
+            //       rule_op: 'AND',
+            //       severity: 2,
+            //       rule: [
+            //         {
+            //           value: 'A',
+            //           func: 'cur',
+            //           op: '>',
+            //         },
+            //       ],
+            //     },
+            //   ],
+            // };
+            values.queries = [
+              {
+                ref: 'A',
+                value: {
                   func: 'count',
-                  ref: 'A',
                 },
-              ],
-              date_field: '@timestamp',
-              interval: 1,
-              interval_unit: 'min',
-              rules: [
-                {
-                  rule_op: 'AND',
-                  severity: 2,
-                  rule: [
-                    {
-                      value: 'A',
-                      func: 'cur',
-                      op: '>',
-                    },
-                  ],
-                },
-              ],
-            };
+                date_field: '@timestamp',
+                interval: 1,
+                interval_unit: 'min',
+              },
+            ];
+            values.triggers = [
+              {
+                mode: 0,
+                severity: 1,
+              },
+            ];
           }
           form.setFieldsValue(values);
         }}

@@ -24,21 +24,21 @@ export default function GraphPreview({ form }) {
   });
   const [series, setSeries] = useState<any[]>([]);
   const fetchSeries = () => {
-    const query = form.getFieldValue('query');
+    const queries = form.getFieldValue('queries');
     const parsedRange = parseRange(range);
     const start = moment(parsedRange.start).unix();
     const end = moment(parsedRange.end).unix();
     getDsQuery({
       cate: form.getFieldValue('cate'),
       cluster: _.join(form.getFieldValue('cluster'), ' '),
-      query: _.map(query.values, (value) => {
+      query: _.map(queries, (item) => {
         return {
-          index: query.index,
-          filter: query.filter,
-          value,
-          group_by: query.group_by,
-          date_field: query.date_field,
-          interval: normalizeTime(query.interval, query.interval_unit),
+          index: item.index,
+          filter: item.filter,
+          value: item.value,
+          group_by: item.group_by,
+          date_field: item.date_field,
+          interval: normalizeTime(item.interval, item.interval_unit),
           start,
           end,
         };

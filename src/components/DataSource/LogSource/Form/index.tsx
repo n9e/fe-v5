@@ -11,7 +11,7 @@ export const ESsourceType = ['elasticsearch', 'tencent-es', 'aliyun-es'];
 
 export default function FormCpt({ renderContent, backUrl = '/settings/source/log' }) {
   const history = useHistory();
-  const { action, type, category, id } = useParams<{ action: string; type: string; category: string; id: string }>();
+  const { action, type, cate, id } = useParams<{ action: string; type: string; cate: string; id: string }>();
 
   const [data, setData] = useState<any>();
   const [submitLoading, setSubmitLoading] = useState(false);
@@ -32,7 +32,7 @@ export default function FormCpt({ renderContent, backUrl = '/settings/source/log
     let pluginId = data?.plugin_id;
     if (!pluginId) {
       const result = await getDataSourcePluginList('logging');
-      pluginId = _.get(_.find(result, { type }), 'id'); // TODO: 这里跟 srm 有区别
+      pluginId = _.get(_.find(result, { type: `${type}.${cate}` }), 'id'); // TODO: 这里跟 srm 有区别
     }
     return submitRequest({
       ...values,

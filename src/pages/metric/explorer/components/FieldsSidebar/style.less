@@ -1,0 +1,44 @@
+.discover-sidebar {
+  display: flex;
+  flex-direction: column;
+  width: 250px;
+}
+.discover-sidebar-title {
+  margin-bottom: 18px;
+}
+.discover-sidebar-content {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.discover-fields-title {
+  font-weight: bolder;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.discover-fields-item {
+  min-height: 24px;
+  width: 250px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-right: 10px;
+  .discover-fields-item-oper {
+    display: none;
+    cursor: pointer;
+  }
+  &:hover {
+    .discover-fields-item-oper {
+      display: block;
+    }
+  }
+}
+.discover-fields-item-content {
+  width: calc(100% - 30px);
+  word-wrap: break-word;
+  word-break: normal;
+  line-height: 1.2;
+  padding: 4px 0;
+}

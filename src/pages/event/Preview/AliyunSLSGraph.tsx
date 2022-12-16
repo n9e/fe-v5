@@ -13,7 +13,7 @@ const getSerieName = (metric: Object) => {
   return _.trim(name);
 };
 
-export default function AlgoGraph({ eventId, range, triggerTime, onClick }) {
+export default function AliyunSLSGraph({ eventId, range, triggerTime, onClick }) {
   const [series, setSeries] = useState<any[]>([]);
 
   useEffect(() => {

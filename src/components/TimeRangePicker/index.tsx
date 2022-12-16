@@ -24,6 +24,8 @@ import { IRawTimeRange } from './types';
 import TimeRangePickerWithRefresh from './TimeRangePickerWithRefresh';
 import { parseRange, parse, valueAsString, isMathString, timeRangeUnix, describeTimeRange } from './utils';
 import { ITimeRangePickerProps } from './types';
+import { mapOptionToRelativeTimeRange, mapRelativeTimeRangeToOption } from './RelativeTimeRangePicker/utils';
+import RelativeTimeRangePicker from './RelativeTimeRangePicker';
 
 export default function index(props: ITimeRangePickerProps) {
   const { localKey, dateFormat = 'YYYY-MM-DD HH:mm', onChange } = props;
@@ -61,4 +63,14 @@ export function getDefaultValue(localKey: string, defaultValue: IRawTimeRange) {
   }
   return defaultValue;
 }
-export { TimeRangePickerWithRefresh, parseRange, parse, isMathString, timeRangeUnix, describeTimeRange };
+export {
+  TimeRangePickerWithRefresh,
+  RelativeTimeRangePicker,
+  parseRange,
+  parse,
+  isMathString,
+  timeRangeUnix,
+  describeTimeRange,
+  mapOptionToRelativeTimeRange,
+  mapRelativeTimeRangeToOption,
+};

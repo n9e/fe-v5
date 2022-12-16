@@ -5,6 +5,7 @@ import AdvancedWrap from '@/components/AdvancedWrap';
 import Prometheus from './Prometheus';
 import Elasticsearch from './Elasticsearch';
 import ElasticsearchLog from './ElasticsearchLog';
+import AliyunSLS from './AliyunSLS';
 import ClusterSelect from './components/ClusterSelect';
 
 const prometheusCate = {
@@ -17,6 +18,10 @@ const allCates = [
   {
     value: 'elasticsearch',
     label: 'Elasticsearch',
+  },
+  {
+    value: 'aliyun-sls',
+    label: '阿里云SLS',
   },
 ];
 
@@ -123,6 +128,9 @@ export default function index({ chartForm, defaultDatasourceName }) {
           // 兼容老数据，当前最新版本没有 elasticsearch-log 类型
           if (cate === 'elasticsearch-log') {
             return <ElasticsearchLog chartForm={chartForm} />;
+          }
+          if (cate === 'aliyun-sls') {
+            return <AliyunSLS chartForm={chartForm} />;
           }
           return null;
         }}

@@ -40,7 +40,7 @@ export default function FieldsList(props: IProps) {
         }}
       >
         <div
-          className='es-discover-fields-title'
+          className='discover-fields-title'
           onClick={() => {
             setExpanded(!expanded);
           }}

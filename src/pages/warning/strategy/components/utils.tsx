@@ -1,4 +1,7 @@
 import _ from 'lodash';
+import { mapOptionToRelativeTimeRange, mapRelativeTimeRangeToOption } from '@/components/TimeRangePicker';
+
+const alphabet = 'ABCDEFGHIGKLMNOPQRSTUVWXYZ'.split('');
 
 export const parseTimeToValueAndUnit = (value?: number) => {
   if (!value) {
@@ -65,21 +68,67 @@ export const parseValues = (values: any = {}) => {
     } catch (e) {
       console.error(e);
     }
-    query.interval = parseTimeToValueAndUnit(query.interval).value;
-    query.interval_unit = parseTimeToValueAndUnit(query.interval).unit;
-    query.rules = _.map(query.rules, (rule: any) => {
+    if (query?.interval !== undefined) {
+      // 第一版的结构，未来会废弃
+      query.interval = parseTimeToValueAndUnit(query.interval).value;
+      query.interval_unit = parseTimeToValueAndUnit(query.interval).unit;
+      query.rules = _.map(query.rules, (rule: any) => {
+        return {
+          ...rule,
+          rule: _.map(rule.rule, (item: any) => {
+            return {
+              ...item,
+              compare_time: parseTimeToValueAndUnit(item.compare_time).value,
+              compare_time_unit: parseTimeToValueAndUnit(item.compare_time).unit,
+            };
+          }),
+        };
+      });
+      cloned.query = query;
+    } else if (query?.queries && query?.triggers) {
+      /**
+       * 新版本结构跟 SLS 一致 Query {
+       *   queries: any[],
+       *   triggers: any[],
+       * }
+       */
+      cloned.queries = _.map(query.queries, (item) => {
+        return {
+          ...item,
+          interval: parseTimeToValueAndUnit(item.interval).value,
+          interval_unit: parseTimeToValueAndUnit(item.interval).unit,
+        };
+      });
+      cloned.triggers = query.triggers;
+    }
+  } else if (cate === 'aliyun-sls') {
+    const queryString = cloned.prom_ql;
+    let query: any = {};
+    try {
+      query = JSON.parse(queryString);
+    } catch (e) {
+      console.error(e);
+    }
+    cloned.queries = _.map(query.queries, (query) => {
+      if (query?.keys?.valueKey) {
+        query.keys.valueKey = _.split(query.keys.valueKey, ' ');
+      } else {
+        query.keys.valueKey = [];
+      }
+      if (query?.keys?.labelKey) {
+        query.keys.labelKey = _.split(query.keys.labelKey, ' ');
+      } else {
+        query.keys.labelKey = [];
+      }
       return {
-        ...rule,
-        rule: _.map(rule.rule, (item: any) => {
-          return {
-            ...item,
-            compare_time: parseTimeToValueAndUnit(item.compare_time).value,
-            compare_time_unit: parseTimeToValueAndUnit(item.compare_time).unit,
-          };
+        ..._.omit(query, ['from', 'to']),
+        range: mapRelativeTimeRangeToOption({
+          start: query.from,
+          end: query.to,
         }),
       };
     });
-    cloned.query = query;
+    cloned.triggers = query.triggers;
   }
   cloned.cate = cate;
   return cloned;
@@ -94,23 +143,97 @@ export const stringifyValues = (values) => {
   const cate = cloned.cate || 'prometheus';
   if (cate === 'elasticsearch') {
     const query = cloned.query;
-    query.interval = normalizeTime(query.interval, query.interval_unit);
-    delete query.interval_unit;
-    query.rules = _.map(query.rules, (rule: any) => {
-      return {
-        ...rule,
-        rule: _.map(rule.rule, (item: any) => {
-          const compare_time = normalizeTime(item.compare_time, item.compare_time_unit);
-          delete item.compare_time_unit;
+    if (query?.interval !== undefined) {
+      // 第一版的结构，未来会废弃
+      query.interval = normalizeTime(query.interval, query.interval_unit);
+      delete query.interval_unit;
+      query.rules = _.map(query.rules, (rule: any) => {
+        return {
+          ...rule,
+          rule: _.map(rule.rule, (item: any) => {
+            const compare_time = normalizeTime(item.compare_time, item.compare_time_unit);
+            delete item.compare_time_unit;
+            return {
+              ...item,
+              compare_time,
+            };
+          }),
+        };
+      });
+      cloned.prom_ql = JSON.stringify(query);
+      delete cloned.query;
+    } else if (cloned?.queries && cloned?.triggers) {
+      const prom_ql: any = {};
+      prom_ql.queries = _.map(cloned.queries, (item) => {
+        return {
+          ..._.omit(item, 'interval_unit'),
+          interval: normalizeTime(item.interval, item.interval_unit),
+        };
+      });
+      prom_ql.triggers = _.map(cloned.triggers, (trigger) => {
+        if (trigger.mode === 0) {
           return {
-            ...item,
-            compare_time,
+            ...trigger,
+            exp: stringifyExpressions(trigger.expressions),
           };
-        }),
+        }
+        return trigger;
+      });
+      cloned.prom_ql = JSON.stringify(prom_ql);
+      delete cloned.queries;
+      delete cloned.triggers;
+    }
+  } else if (cate === 'aliyun-sls') {
+    const { queries, triggers } = cloned;
+    const prom_ql: any = {};
+    prom_ql.queries = _.map(queries, (query, index) => {
+      const parsedRange = mapOptionToRelativeTimeRange(query.range);
+      if (query?.keys?.valueKey) {
+        query.keys.valueKey = _.join(query.keys.valueKey, ' ');
+      }
+      if (query?.keys?.labelKey) {
+        query.keys.labelKey = _.join(query.keys.labelKey, ' ');
+      }
+      return {
+        ..._.omit(query, 'range'),
+        ref: alphabet[index],
+        from: parsedRange?.start,
+        to: parsedRange?.end,
       };
     });
-    cloned.prom_ql = JSON.stringify(query);
-    delete cloned.query;
+    prom_ql.triggers = _.map(triggers, (trigger) => {
+      if (trigger.mode === 0) {
+        return {
+          ...trigger,
+          exp: stringifyExpressions(trigger.expressions),
+        };
+      }
+      return trigger;
+    });
+    cloned.prom_ql = JSON.stringify(prom_ql);
+    delete cloned.queries;
+    delete cloned.triggers;
   }
+
   return cloned;
+};
+
+export const stringifyExpressions = (
+  expressions: {
+    ref: string;
+    label: string;
+    comparisonOperator: string;
+    value: string;
+    logicalOperator?: string;
+  }[],
+) => {
+  const logicalOperator = _.get(expressions, '[0].logicalOperator');
+  let exp = '';
+  _.forEach(expressions, (expression, index) => {
+    if (index !== 0) {
+      exp += ` ${logicalOperator} `;
+    }
+    exp += `$${expression.ref}${expression.label ? `.${expression.label}` : ''} ${expression.comparisonOperator} ${expression.value}`;
+  });
+  return exp;
 };
