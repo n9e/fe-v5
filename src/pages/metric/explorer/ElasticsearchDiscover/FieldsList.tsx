@@ -55,20 +55,19 @@ export default function FieldsList(props: IProps) {
         {expanded &&
           _.map(filteredFields, (item) => {
             return (
-              <div className='es-discover-fields-item' key={item}>
+              <div
+                className='es-discover-fields-item'
+                key={item}
+                onClick={() => {
+                  if (type === 'selected' && onRemove) {
+                    onRemove(item);
+                  } else if (type === 'available' && onSelect) {
+                    onSelect(item);
+                  }
+                }}
+              >
                 <span className='es-discover-fields-item-content'>{item}</span>
-                <span
-                  className='es-discover-fields-item-oper'
-                  onClick={() => {
-                    if (type === 'selected' && onRemove) {
-                      onRemove(item);
-                    } else if (type === 'available' && onSelect) {
-                      onSelect(item);
-                    }
-                  }}
-                >
-                  {operIconMap[type]}
-                </span>
+                <span className='es-discover-fields-item-oper'>{operIconMap[type]}</span>
               </div>
             );
           })}
