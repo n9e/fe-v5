@@ -28,6 +28,7 @@ import Elasticsearch from './Elasticsearch';
 import Prometheus from './Prometheus';
 import AliyunSLS, { setDefaultValues } from './AliyunSLS';
 import './index.less';
+import { useLocation } from 'react-router-dom';
 
 type PanelMeta = { id: string; defaultPromQL?: string };
 
@@ -77,9 +78,13 @@ const Panel = ({
   defaultPromQL: string;
   removePanel: (id: string) => void;
 }) => {
+  const params = new URLSearchParams(useLocation().search);
+
   const [form] = Form.useForm();
   const headerExtraRef = useRef<HTMLDivElement>(null);
-  const [datasourceCate, setDatasourceCate] = useState(localStorage.getItem('datasource_cate') || DatasourceCateEnum.prometheus);
+  const [datasourceCate, setDatasourceCate] = useState(
+    params.get('data_source_id') ? DatasourceCateEnum.elasticsearch : localStorage.getItem('datasource_cate') || DatasourceCateEnum.prometheus,
+  );
 
   useEffect(() => {
     localStorage.setItem('datasource_cate', datasourceCate);

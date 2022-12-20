@@ -16,6 +16,8 @@ import metricQuery from './metricQuery';
 import { getColumnsFromFields } from './utils';
 import FieldsSidebar from '../components/FieldsSidebar';
 import './style.less';
+import { useLocation } from 'react-router-dom';
+import { getDatasourceNames } from '@/services/common';
 
 interface IProps {
   datasourceName?: string;
@@ -27,6 +29,15 @@ const TIME_FORMAT = 'YYYY.MM.DD HH:mm:ss';
 
 export default function index(props: IProps) {
   const { datasourceName, form } = props;
+
+  const params = new URLSearchParams(useLocation().search);
+  const filtersArr: string[] = [];
+  for (const [key, value] of params) {
+    if (!['data_source_id', 'index_name', 'timestamp'].includes(key)) {
+      filtersArr.push(`${key}:${value}`);
+    }
+  }
+
   const [indexOptions, setIndexOptions] = useState([]);
   const [indexSearch, setIndexSearch] = useState('');
   const [loading, setLoading] = useState(false);
@@ -45,6 +56,25 @@ export default function index(props: IProps) {
       start: number;
       end: number;
     }>();
+
+  useEffect(() => {
+    if (params.get('data_source_id')) {
+      const id = params.get('data_source_id');
+      getDatasourceNames([Number(id)]).then((res) => {
+        form.setFieldsValue({
+          datasourceName: res?.[Number(id)],
+          query: {
+            index: params.get('index_name'),
+            filter: filtersArr,
+            date_field: params.get('timestamp'),
+          },
+        });
+
+        // fetchData(1)
+      });
+    }
+  }, [params.get('data_source_id')]);
+
   const fetchSeries = (values) => {
     if (timesRef.current) {
       const { start, end } = timesRef.current;

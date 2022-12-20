@@ -124,3 +124,10 @@ export function getMenuPerm() {
     method: RequestMethod.Get,
   });
 }
+
+export function getDatasourceNames(ids: number[]) {
+  return request(`/api/v1/datasource/name/list`, {
+    method: RequestMethod.Post,
+    data: { ids },
+  }).then((res) => res.data);
+}
