@@ -57,24 +57,6 @@ export default function index(props: IProps) {
       end: number;
     }>();
 
-  useEffect(() => {
-    if (params.get('data_source_id')) {
-      const id = params.get('data_source_id');
-      getDatasourceNames([Number(id)]).then((res) => {
-        form.setFieldsValue({
-          datasourceName: res?.[Number(id)],
-          query: {
-            index: params.get('index_name'),
-            filter: filtersArr,
-            date_field: params.get('timestamp'),
-          },
-        });
-
-        // fetchData(1)
-      });
-    }
-  }, [params.get('data_source_id')]);
-
   const fetchSeries = (values) => {
     if (timesRef.current) {
       const { start, end } = timesRef.current;
@@ -148,7 +130,8 @@ export default function index(props: IProps) {
             value: item,
           };
         });
-        if (!_.includes(_.map(indexOptions, 'value'), index)) {
+
+        if (!_.includes(_.map(indexOptions, 'value'), index) && !params.has('data_source_id')) {
           form.setFieldsValue({
             query: {
               index: '',
@@ -158,7 +141,25 @@ export default function index(props: IProps) {
         setIndexOptions(indexOptions);
       });
     }
-  }, [datasourceName]);
+  }, [datasourceName, params.get('data_source_id')]);
+
+  useEffect(() => {
+    if (params.get('data_source_id')) {
+      const id = params.get('data_source_id');
+      getDatasourceNames([Number(id)]).then((res) => {
+        form.setFieldsValue({
+          datasourceName: res?.[Number(id)],
+          query: {
+            index: params.get('index_name'),
+            filter: filtersArr?.join(' and '),
+            date_field: params.get('timestamp'),
+          },
+        });
+
+        // fetchData(1)
+      });
+    }
+  }, [params.get('data_source_id')]);
 
   useEffect(() => {
     fetchSeries(form.getFieldsValue());
