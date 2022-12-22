@@ -126,8 +126,22 @@ export function getMenuPerm() {
 }
 
 export function getDatasourceNames(ids: number[]) {
-  return request(`/api/v1/datasource/name/list`, {
-    method: RequestMethod.Post,
-    data: { ids },
-  }).then((res) => res.data);
+  if (import.meta.env.VITE_IS_COMMON_DS === 'true') {
+    let url = '/api/v1/datasource/name/list';
+    if (import.meta.env.VITE_IS_DS_SETTING === 'true') {
+      // n9e暂时不用该接口
+      // url = '/api/n9e-plus/datasource/name/list';
+      return Promise.resolve({
+        data: [],
+      });
+    }
+    return request(url, {
+      method: RequestMethod.Post,
+      data: { ids },
+    }).then((res) => res.data);
+  }
+
+  return Promise.resolve({
+    data: [],
+  });
 }
