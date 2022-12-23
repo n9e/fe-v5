@@ -252,7 +252,13 @@ const SideMenu: FC = () => {
     }
   };
   const hideSideMenu = () => {
-    if (location.pathname === '/login' || location.pathname.startsWith('/chart/') || location.pathname.startsWith('/dashboards/share/') || location.pathname === '/callback') {
+    if (
+      location.pathname === '/login' ||
+      location.pathname.startsWith('/chart/') ||
+      location.pathname.startsWith('/dashboards/share/') ||
+      location.pathname === '/callback' ||
+      location.pathname.indexOf('/polaris/screen') === 0
+    ) {
       return true;
     }
     // 大盘全屏模式下也需要隐藏左侧菜单
