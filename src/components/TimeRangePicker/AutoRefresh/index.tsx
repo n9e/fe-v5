@@ -37,11 +37,13 @@ interface IProps {
   tooltip?: string;
   onRefresh: () => void;
   localKey?: string;
+  intervalSeconds?: number;
+  onIntervalSecondsChange?: (intervalSeconds: number) => void;
 }
 
 function Refresh(props: IProps, ref) {
   const intervalSecondsCache = props.localKey ? _.toNumber(window.localStorage.getItem(props.localKey)) : 0;
-  const [intervalSeconds, setIntervalSeconds] = useState(intervalSecondsCache);
+  const [intervalSeconds, setIntervalSeconds] = useState(props.intervalSeconds || intervalSecondsCache);
   const [visible, setVisible] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout>();
 
@@ -63,6 +65,10 @@ function Refresh(props: IProps, ref) {
       }
     };
   }, []);
+
+  useEffect(() => {
+    setIntervalSeconds(props.intervalSeconds || intervalSecondsCache);
+  }, [props.intervalSeconds]);
 
   useImperativeHandle(ref, () => ({
     closeRefresh() {
@@ -87,6 +93,7 @@ function Refresh(props: IProps, ref) {
             onClick={(e) => {
               setIntervalSeconds(_.toNumber(e.key));
               props.localKey && window.localStorage.setItem(props.localKey, e.key);
+              props.onIntervalSecondsChange && props.onIntervalSecondsChange(_.toNumber(e.key));
               setVisible(false);
             }}
           >
