@@ -156,7 +156,8 @@ export default function index(props: IProps) {
           },
         });
 
-        // fetchData(1)
+        onIndexChange(params.get('index_name'));
+        fetchData(1);
       });
     }
   }, [params.get('data_source_id')]);
