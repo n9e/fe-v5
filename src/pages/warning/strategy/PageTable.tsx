@@ -392,6 +392,7 @@ const PageTable: React.FC<Props> = ({ bgid }) => {
             >
               <Select.Option value='prometheus'>Prometheus</Select.Option>
               <Select.Option value='elasticsearch'>Elasticsearch</Select.Option>
+              <Select.Option value='aliyun-sls'>阿里云 SLS</Select.Option>
             </Select>
           </AdvancedWrap>
           <ColumnSelect noLeftPadding noRightPadding onSeverityChange={(e) => setSeverity(e)} onClusterChange={(e) => setClusters(e)} />

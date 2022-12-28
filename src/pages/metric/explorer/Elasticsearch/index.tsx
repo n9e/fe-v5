@@ -8,15 +8,16 @@ import CodeMirror from '@uiw/react-codemirror';
 import { EditorView } from '@codemirror/view';
 import { json } from '@codemirror/lang-json';
 import { defaultHighlightStyle } from '@codemirror/highlight';
-import { Column } from '@ant-design/plots';
 import { useDebounceFn } from 'ahooks';
 import { getIndices, getLogsQuery, getFields } from '@/services/warning';
 import TimeRangePicker, { parseRange } from '@/components/TimeRangePicker';
 import Timeseries from '@/pages/dashboard/Renderer/Renderer/Timeseries';
-import FieldsList from './FieldsList';
 import metricQuery from './metricQuery';
 import { getColumnsFromFields } from './utils';
+import FieldsSidebar from '../components/FieldsSidebar';
 import './style.less';
+import { useLocation } from 'react-router-dom';
+import { getDatasourceNames } from '@/services/common';
 
 interface IProps {
   datasourceName?: string;
@@ -28,13 +29,21 @@ const TIME_FORMAT = 'YYYY.MM.DD HH:mm:ss';
 
 export default function index(props: IProps) {
   const { datasourceName, form } = props;
+
+  const params = new URLSearchParams(useLocation().search);
+  const filtersArr: string[] = [];
+  for (const [key, value] of params) {
+    if (!['data_source_id', 'index_name', 'timestamp'].includes(key)) {
+      filtersArr.push(`${key}:"${value}"`);
+    }
+  }
+
   const [indexOptions, setIndexOptions] = useState([]);
   const [indexSearch, setIndexSearch] = useState('');
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any[]>([]);
   const [series, setSeries] = useState<any[]>([]);
   const [displayTimes, setDisplayTimes] = useState('');
-  const [fieldsSearch, setFieldsSearch] = useState('');
   const [fields, setFields] = useState<string[]>([]);
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
   const [isMore, setIsMore] = useState(true);
@@ -47,6 +56,7 @@ export default function index(props: IProps) {
       start: number;
       end: number;
     }>();
+
   const fetchSeries = (values) => {
     if (timesRef.current) {
       const { start, end } = timesRef.current;
@@ -120,7 +130,8 @@ export default function index(props: IProps) {
             value: item,
           };
         });
-        if (!_.includes(_.map(indexOptions, 'value'), index)) {
+
+        if (!_.includes(_.map(indexOptions, 'value'), index) && !params.has('data_source_id')) {
           form.setFieldsValue({
             query: {
               index: '',
@@ -130,7 +141,26 @@ export default function index(props: IProps) {
         setIndexOptions(indexOptions);
       });
     }
-  }, [datasourceName]);
+  }, [datasourceName, params.get('data_source_id')]);
+
+  useEffect(() => {
+    if (params.get('data_source_id')) {
+      const id = params.get('data_source_id');
+      getDatasourceNames([Number(id)]).then((res) => {
+        form.setFieldsValue({
+          datasourceName: res?.[Number(id)],
+          query: {
+            index: params.get('index_name'),
+            filter: filtersArr?.join(' and '),
+            date_field: params.get('timestamp'),
+          },
+        });
+
+        onIndexChange(params.get('index_name'));
+        fetchData(1);
+      });
+    }
+  }, [params.get('data_source_id')]);
 
   useEffect(() => {
     fetchSeries(form.getFieldsValue());
@@ -286,39 +316,7 @@ export default function index(props: IProps) {
       <Spin spinning={loading}>
         {!_.isEmpty(data) ? (
           <div className='es-discover-content'>
-            <div className='es-discover-sidebar'>
-              <div className='es-discover-sidebar-title'>
-                <Input
-                  placeholder='搜索字段'
-                  value={fieldsSearch}
-                  onChange={(e) => {
-                    setFieldsSearch(e.target.value);
-                  }}
-                  allowClear
-                />
-              </div>
-              <div className='es-discover-sidebar-content'>
-                <FieldsList
-                  style={{ marginBottom: 10 }}
-                  fieldsSearch={fieldsSearch}
-                  fields={selectedFields}
-                  type='selected'
-                  onRemove={(field) => {
-                    setSelectedFields(_.without(selectedFields, field));
-                    setFields(_.concat(fields, field));
-                  }}
-                />
-                <FieldsList
-                  fields={fields}
-                  fieldsSearch={fieldsSearch}
-                  type='available'
-                  onSelect={(field) => {
-                    setSelectedFields(_.concat(selectedFields, field));
-                    setFields(_.without(fields, field));
-                  }}
-                />
-              </div>
-            </div>
+            <FieldsSidebar fields={fields} setFields={setFields} value={selectedFields} onChange={setSelectedFields} />
             <div className='es-discover-main'>
               <div className='es-discover-chart'>
                 <div className='es-discover-chart-title'>

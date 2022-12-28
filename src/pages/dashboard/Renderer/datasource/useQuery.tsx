@@ -25,6 +25,7 @@ import { getSerieName } from './utils';
 import prometheusQuery from './prometheus';
 import elasticSearchQuery from './elasticSearch';
 import elasticSearchLogQuery from './elasticSearchLog';
+import aliyunSLS from './aliyunSLS';
 
 interface IProps {
   id?: string;
@@ -51,6 +52,7 @@ export default function usePrometheus(props: IProps) {
     prometheus: prometheusQuery,
     elasticsearch: elasticSearchQuery,
     'elasticsearch-log': elasticSearchLogQuery,
+    'aliyun-sls': aliyunSLS,
   };
   const fetchData = () => {
     if (!datasourceCate) return;

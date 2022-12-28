@@ -38,6 +38,8 @@ export default function TimeRangePickerWithRefresh(props: ITimeRangePickerWithRe
             });
           }
         }}
+        intervalSeconds={props.intervalSeconds}
+        onIntervalSecondsChange={props.onIntervalSecondsChange}
       />
       <TimeRangePicker
         {..._.omit(props, ['style'])}

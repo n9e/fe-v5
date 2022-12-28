@@ -19,20 +19,19 @@ import { useHistory, useParams } from 'react-router';
 import moment from 'moment';
 import _ from 'lodash';
 import { useSelector } from 'react-redux';
-import { Button, Card, Col, message, Row, Space, Spin, Tag, Typography } from 'antd';
-import { PlayCircleOutlined } from '@ant-design/icons';
-import queryString from 'query-string';
+import { Button, Card, message, Space, Spin, Tag, Typography } from 'antd';
 import PageLayout from '@/components/pageLayout';
 import { getAlertEventsById, getHistoryEventsById } from '@/services/warning';
 import { priorityColor } from '@/utils/constant';
-import PromQLInput from '@/components/PromQLInput';
 import { deleteAlertEventsModal } from '.';
 import { RootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
 import { parseValues } from '@/pages/warning/strategy/components/utils';
-import { severityMap } from '@/pages/warning/strategy/components/ElasticsearchSettings/Rules';
 import Preview from './Preview';
 import LogsDetail from './LogsDetail';
+import PrometheusDetail from './Detail/Prometheus';
+import ElasticsearchDetail from './Detail/Elasticsearch';
+import AliyunSLSDetail from './Detail/AliyunSLS';
 import './detail.less';
 
 const { Paragraph } = Typography;
@@ -130,7 +129,22 @@ const EventDetailPage: React.FC = () => {
                 size='small'
                 style={{ marginLeft: 16 }}
                 onClick={() => {
-                  LogsDetail({
+                  LogsDetail.Elasticsearch({
+                    id: eventId,
+                    start: eventDetail.trigger_time - 2 * eventDetail.prom_eval_interval,
+                    end: eventDetail.trigger_time + eventDetail.prom_eval_interval,
+                  });
+                }}
+              >
+                日志详情
+              </Button>
+            )}
+            {eventDetail?.cate === 'aliyun-sls' && (
+              <Button
+                size='small'
+                style={{ marginLeft: 16 }}
+                onClick={() => {
+                  LogsDetail.AliyunSLS({
                     id: eventId,
                     start: eventDetail.trigger_time - 2 * eventDetail.prom_eval_interval,
                     end: eventDetail.trigger_time + eventDetail.prom_eval_interval,
@@ -161,141 +175,18 @@ const EventDetailPage: React.FC = () => {
         return '阈值告警';
       },
     },
-    eventDetail?.cate === 'elasticsearch' && {
+    {
       label: '数据源类型',
       key: 'cate',
     },
-    eventDetail?.cate === 'prometheus' && {
-      label: 'PromQL',
-      key: 'prom_ql',
-      render(promql) {
-        return (
-          <Row className='promql-row'>
-            <Col span={20}>
-              <PromQLInput value={promql} url='/api/n9e/prometheus' readonly />
-            </Col>
-            <Col span={4}>
-              <Button
-                className='run-btn'
-                type='link'
-                onClick={() => {
-                  history.push({
-                    pathname: '/metric/explorer',
-                    search: queryString.stringify({
-                      promql,
-                      mode: 'graph',
-                      start: moment.unix(eventDetail.trigger_time).subtract(30, 'minutes').unix(),
-                      end: moment.unix(eventDetail.trigger_time).add(30, 'minutes').unix(),
-                    }),
-                  });
-                }}
-              >
-                <PlayCircleOutlined className='run-con' />
-              </Button>
-            </Col>
-          </Row>
-        );
-      },
-    },
-    eventDetail?.cate === 'elasticsearch' && {
-      label: '索引',
-      key: 'query',
-      render(query) {
-        return query?.index;
-      },
-    },
-    eventDetail?.cate === 'elasticsearch' && {
-      label: '过滤项',
-      key: 'query',
-      render(query) {
-        return query?.filter || '无';
-      },
-    },
-    eventDetail?.cate === 'elasticsearch' && {
-      label: '数值提取',
-      key: 'query',
-      render(query) {
-        return _.map(query?.values, (item) => {
-          return (
-            <div key={item.ref}>
-              <span className='pr16'>名称: {item.ref}</span>
-              <span className='pr16'>函数: {item.func}</span>
-              {item.func !== 'count' && <span>字段名: {item.field}</span>}
-            </div>
-          );
-        });
-      },
-    },
-    eventDetail?.cate === 'elasticsearch' && {
-      label: 'Group By',
-      key: 'query',
-      render(query) {
-        return _.map(query?.group_by, (item, idx) => {
-          return (
-            <div key={idx} style={{ backgroundColor: '#fafafa', padding: 8 }}>
-              <span className='pr16'>类型: {item.cate}</span>
-              {item.cate === 'filters' &&
-                _.map(item.params, (param, subIdx) => {
-                  return (
-                    <div key={subIdx}>
-                      <span className='pr16'>查询条件：{param.query}</span>
-                      <span className='pr16'>别名：{param.alias}</span>
-                    </div>
-                  );
-                })}
-              {item.cate === 'terms' ? (
-                <>
-                  <span className='pr16'>字段名: {item.field}</span>
-                  <span className='pr16'>匹配个数: {item.interval || 0}</span>
-                  <span className='pr16'>文档最小值: {item.min_value === undefined ? 0 : item.min_value}</span>
-                </>
-              ) : (
-                <>
-                  <span className='pr16'>字段名: {item.field}</span>
-                  <span className='pr16'>步长: {item.interval || '无'}</span>
-                  <span className='pr16'>最小值: {item.min_value === undefined ? '无' : item.min_value}</span>
-                </>
-              )}
-            </div>
-          );
-        });
-      },
-    },
-    eventDetail?.cate === 'elasticsearch' && {
-      label: '日期',
-      key: 'query',
-      render(query) {
-        return (
-          <>
-            <span className='pr16'>日期字段: {query?.date_field}</span>
-            <span className='pr16'>
-              时间间隔: {query?.interval} {query?.interval_unit}
-            </span>
-          </>
-        );
-      },
-    },
-    eventDetail?.cate === 'elasticsearch' && {
-      label: '告警条件',
-      key: 'query',
-      render(query) {
-        return _.map(query?.rules, (item, idx) => {
-          return (
-            <div key={idx} style={{ backgroundColor: '#fafafa', padding: 8 }}>
-              {_.map(item.rule, (rule, subIdx) => {
-                return (
-                  <div key={`${idx} ${subIdx}`}>
-                    <span className='pr16'>
-                      {rule.value}: {rule.func} {rule.op} {rule.threshold} {subIdx < item.rule.length - 1 ? item.rule_op : ''} 触发{severityMap[item.severity]}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          );
-        });
-      },
-    },
+    ...(eventDetail?.cate === 'prometheus'
+      ? PrometheusDetail({
+          eventDetail,
+          history,
+        })
+      : [false]),
+    ...(eventDetail?.cate === 'elasticsearch' ? ElasticsearchDetail() : [false]),
+    ...(eventDetail?.cate === 'aliyun-sls' ? AliyunSLSDetail() : [false]),
     {
       label: '执行频率',
       key: 'prom_eval_interval',
@@ -413,16 +304,24 @@ const EventDetailPage: React.FC = () => {
           >
             {eventDetail && (
               <div>
-                {parsedEventDetail.rule_algo || parsedEventDetail.cate === 'elasticsearch' ? (
+                {parsedEventDetail.rule_algo || parsedEventDetail.cate === 'elasticsearch' || parsedEventDetail.cate === 'aliyun-sls' ? (
                   <Preview
                     data={parsedEventDetail}
                     triggerTime={eventDetail.trigger_time}
                     onClick={(event, datetime) => {
-                      LogsDetail({
-                        id: eventId,
-                        start: moment(datetime).unix() - 2 * eventDetail.prom_eval_interval,
-                        end: moment(datetime).unix() + eventDetail.prom_eval_interval,
-                      });
+                      if (parsedEventDetail.cate === 'elasticsearch') {
+                        LogsDetail.Elasticsearch({
+                          id: eventId,
+                          start: moment(datetime).unix() - 2 * eventDetail.prom_eval_interval,
+                          end: moment(datetime).unix() + eventDetail.prom_eval_interval,
+                        });
+                      } else if (parsedEventDetail.cate === 'aliyun-sls') {
+                        LogsDetail.AliyunSLS({
+                          id: eventId,
+                          start: moment(datetime).unix() - 2 * eventDetail.prom_eval_interval,
+                          end: moment(datetime).unix() + eventDetail.prom_eval_interval,
+                        });
+                      }
                     }}
                   />
                 ) : null}

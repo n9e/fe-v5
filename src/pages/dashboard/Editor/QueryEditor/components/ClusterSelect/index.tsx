@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Select } from 'antd';
-import { getCommonESClusters, getCommonClusters } from '@/services/common';
+import { getCommonESClusters, getCommonClusters, getCommonSLSClusters } from '@/services/common';
 
 export default function index(props: { cate: string; defaultDatasourceName?: string; name?: string | string[]; label?: React.ReactNode }) {
   const { cate, defaultDatasourceName, name = 'datasourceName', label } = props;
@@ -9,6 +9,14 @@ export default function index(props: { cate: string; defaultDatasourceName?: str
   useEffect(() => {
     if (cate === 'elasticsearch' || cate === 'elasticsearch-log') {
       getCommonESClusters()
+        .then(({ dat }) => {
+          setClusterList(dat);
+        })
+        .catch(() => {
+          setClusterList([]);
+        });
+    } else if (cate === 'aliyun-sls') {
+      getCommonSLSClusters()
         .then(({ dat }) => {
           setClusterList(dat);
         })

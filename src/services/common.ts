@@ -75,6 +75,32 @@ export function getCommonESClusters() {
   });
 }
 
+// 获取 sls 集群信息
+export function getCommonSLSClusters() {
+  if (import.meta.env.VITE_IS_COMMON_DS === 'true') {
+    let url = '/api/v1/datasource/list';
+    if (import.meta.env.VITE_IS_DS_SETTING === 'true') {
+      url = '/api/n9e-plus/datasource/list';
+    }
+    return request(url, {
+      method: RequestMethod.Post,
+      data: {
+        p: 1,
+        limit: 100,
+        category: 'logging',
+        plugin_type: 'aliyun-sls.logging',
+      },
+    }).then((res) => {
+      return {
+        dat: _.map(res.data.items, 'name'),
+      };
+    });
+  }
+  return Promise.resolve({
+    dat: [],
+  });
+}
+
 export function getBusiGroups(query: string, limit: number = 200) {
   return request(`/api/n9e/busi-groups`, {
     method: RequestMethod.Get,
@@ -96,5 +122,26 @@ export function getPerm(busiGroup: string, perm: 'ro' | 'rw') {
 export function getMenuPerm() {
   return request(`/api/n9e/self/perms`, {
     method: RequestMethod.Get,
+  });
+}
+
+export function getDatasourceNames(ids: number[]) {
+  if (import.meta.env.VITE_IS_COMMON_DS === 'true') {
+    let url = '/api/v1/datasource/name/list';
+    if (import.meta.env.VITE_IS_DS_SETTING === 'true') {
+      // n9e暂时不用该接口
+      // url = '/api/n9e-plus/datasource/name/list';
+      return Promise.resolve({
+        data: [],
+      });
+    }
+    return request(url, {
+      method: RequestMethod.Post,
+      data: { ids },
+    }).then((res) => res.data);
+  }
+
+  return Promise.resolve({
+    data: [],
   });
 }

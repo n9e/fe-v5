@@ -16,7 +16,7 @@ export default function SourceCard(props: Props) {
       {_.map(sourceMap, (item) => {
         return (
           <Col span={6} key={item.name}>
-            <Link to={`/${urlPrefix}/add/${item.category}/${item.type.includes('.') ? _.toLower(item.type).split('.').join('/') : _.toLower(item.type)}`}>
+            <Link to={`/${urlPrefix}/add/${item.category}/${item.type.includes('.') ? _.toLower(item.type).split('.')[0] : _.toLower(item.type)}`}>
               <div className='settings-datasource-item'>
                 <div className='settings-datasource-item-meta'>
                   <div style={{ height: '45px', lineHeight: '45px' }}>{item.name !== '自定义事件' && item.logo}</div>
