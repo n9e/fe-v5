@@ -162,7 +162,7 @@ export default function Graph(props: IProps) {
     <div className='prom-graph-graph-container'>
       <div className='prom-graph-graph-controls'>
         <Space>
-          <TimeRangePicker value={range} onChange={setRange} />
+          <TimeRangePicker value={range} onChange={setRange} dateFormat='YYYY-MM-DD HH:mm:ss' />
           <InputNumber
             placeholder='Res. (s)'
             value={step}

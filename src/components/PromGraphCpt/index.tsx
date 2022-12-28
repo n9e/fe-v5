@@ -90,9 +90,6 @@ export default function index(props: IProps) {
       }
     } else {
       if (defaultTime?.start && defaultTime?.end) {
-        const parsedRange = parseRange(range);
-        const end = moment(parsedRange.end).unix();
-        setTimestamp(end);
         setRange(defaultTime);
       }
     }
@@ -201,13 +198,6 @@ export default function index(props: IProps) {
             timestamp={timestamp}
             setTimestamp={(val) => {
               setTimestamp(val);
-              if (val) {
-                onTimeChange &&
-                  onTimeChange({
-                    ...range,
-                    end: moment.unix(val),
-                  });
-              }
             }}
             refreshFlag={refreshFlag}
           />
