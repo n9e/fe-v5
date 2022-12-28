@@ -4,7 +4,7 @@ import queryString from 'query-string';
 import moment from 'moment';
 import _ from 'lodash';
 import PromGraph from '@/components/PromGraphCpt';
-import { IRawTimeRange, timeRangeUnix } from '@/components/TimeRangePicker';
+import { IRawTimeRange, timeRangeUnix, isMathString } from '@/components/TimeRangePicker';
 
 type IMode = 'table' | 'graph';
 
@@ -15,10 +15,10 @@ export default function Prometheus({ defaultPromQL }: { defaultPromQL: string })
 
   let defaultTime: undefined | IRawTimeRange;
 
-  if (query.start && query.end) {
+  if (typeof query.start === 'string' && typeof query.end === 'string') {
     defaultTime = {
-      start: moment.unix(_.toNumber(query.start)),
-      end: moment.unix(_.toNumber(query.end)),
+      start: isMathString(query.start) ? query.start : moment.unix(_.toNumber(query.start)),
+      end: isMathString(query.end) ? query.end : moment.unix(_.toNumber(query.end)),
     };
   }
 
@@ -34,9 +34,15 @@ export default function Prometheus({ defaultPromQL }: { defaultPromQL: string })
       }}
       defaultTime={defaultTime}
       onTimeChange={(newRange) => {
+        let { start, end } = newRange;
+        if (moment.isMoment(start) && moment.isMoment(end)) {
+          const parsedRange = timeRangeUnix(newRange);
+          start = parsedRange.start as any;
+          end = parsedRange.end as any;
+        }
         history.replace({
           pathname: '/metric/explorer',
-          search: queryString.stringify({ ...query, ...timeRangeUnix(newRange) }),
+          search: queryString.stringify({ ...query, start, end }),
         });
       }}
       promQL={defaultPromQL}
