@@ -19,6 +19,7 @@ import { Form, Input, Button, Radio, Collapse, Row, Col } from 'antd';
 const { Panel } = Collapse;
 import G2PieChart from '@/components/G2PieChart';
 import ColumnSelect from '@/components/ColumnSelect';
+import PromQueryBuilder from '@/components/PromQueryBuilder';
 
 let honeyCombData: any = [];
 for (let i = 0; i < 1000; i++) {
@@ -32,10 +33,10 @@ export default function Demo() {
   const [xCluster, setXCluster] = useState('Default');
   return (
     <div>
-      <Collapse defaultActiveKey='3'>
+      <Collapse defaultActiveKey='1'>
         <Panel header='PromqlEditor' key='1'>
           <Row style={{ marginBottom: 20 }}>
-            <p>PromqlEditor 的自动闭合及联想功能不支持动态切换集群，xCluster变化后自己销毁并重新初始化组件</p>
+            <PromQueryBuilder />
           </Row>
         </Panel>
         <Panel header='G2PieChart' key='2'>
