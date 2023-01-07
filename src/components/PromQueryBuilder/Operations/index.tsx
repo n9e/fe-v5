@@ -19,7 +19,7 @@ interface IProps {
   onChange: (query: PromVisualQuery) => void;
 }
 
-const SortableBody = SortableContainer(({ children }) => children);
+const SortableBody = SortableContainer(({ children }) => <div className='prom-query-builder-operations'>{children}</div>);
 
 export default function index(props: IProps) {
   const { query, onChange } = props;

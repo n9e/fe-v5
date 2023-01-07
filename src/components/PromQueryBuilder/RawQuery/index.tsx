@@ -47,12 +47,15 @@ function renderBinaryQuery(leftOperand: string, binaryQuery: PromVisualQueryBina
 }
 
 function renderLabels(labels: PromVisualQueryLabelFilter[]) {
-  if (labels.length === 0) {
+  const filteredLabels = _.filter(labels, (label) => {
+    return !!label.label && !!label.value;
+  });
+  if (filteredLabels.length === 0) {
     return '';
   }
 
   let expr = '{';
-  for (const filter of labels) {
+  for (const filter of filteredLabels) {
     if (expr !== '{') {
       expr += ', ';
     }

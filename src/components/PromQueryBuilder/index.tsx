@@ -17,7 +17,13 @@ interface IProps {
 export default function index(props: IProps) {
   const { datasourceValue, params } = props;
   const [query, setQuery] = useState<PromVisualQuery>({
-    labels: [] as any,
+    labels: [
+      {
+        label: '',
+        value: '',
+        op: '=',
+      },
+    ] as any,
     operations: [] as any,
   } as PromVisualQuery);
 
