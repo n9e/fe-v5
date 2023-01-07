@@ -33,7 +33,7 @@ function renderOperationParamEditor(
       <LabelNameSelect
         size='small'
         {...paramEditorProps}
-        style={{ width: '100%' }}
+        style={{ width: '100%', minWidth: 100 }}
         value={value}
         onChange={(val) => {
           onChange(val);

@@ -85,9 +85,5 @@ function renderQuery(query: PromVisualQuery, nested?: boolean) {
 
 export default function index(props: { query: PromVisualQuery }) {
   const promql = renderQuery(props.query);
-  return (
-    <div className='prom-query-builder-rawquery-container'>
-      <PromQLInput url='/api/v1/datasource/prometheus' value={promql} readonly />
-    </div>
-  );
+  return <div className='prom-query-builder-rawquery-container'>{promql && <PromQLInput url='/api/v1/datasource/prometheus' value={promql} readonly />}</div>;
 }

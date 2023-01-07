@@ -17,6 +17,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Form, Input, Button, Radio, Collapse, Row, Col } from 'antd';
 const { Panel } = Collapse;
+import moment from 'moment';
 import G2PieChart from '@/components/G2PieChart';
 import ColumnSelect from '@/components/ColumnSelect';
 import PromQueryBuilder from '@/components/PromQueryBuilder';
@@ -34,19 +35,15 @@ export default function Demo() {
   return (
     <div>
       <Collapse defaultActiveKey='1'>
-        <Panel header='PromqlEditor' key='1'>
+        <Panel header='Prom query builder' key='1'>
           <Row style={{ marginBottom: 20 }}>
-            <PromQueryBuilder />
-          </Row>
-        </Panel>
-        <Panel header='G2PieChart' key='2'>
-          <Row>
-            <ColumnSelect />
-          </Row>
-        </Panel>
-        <Panel header='Honeycomb' key='3'>
-          <Row>
-            <div style={{ height: 500, width: '100%' }}>{/* <Honeycomb data={honeyCombData} /> */}</div>
+            <PromQueryBuilder
+              datasourceValue='VM1'
+              params={{
+                start: moment().subtract(1, 'hours').unix(),
+                end: moment().unix(),
+              }}
+            />
           </Row>
         </Panel>
       </Collapse>
