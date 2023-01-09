@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import MetricSelect from './MetricSelect';
 import LabelFilters from './LabelFilters';
 import Operations from './Operations';
 import RawQuery from './RawQuery';
 import { PromVisualQuery } from './types';
+import NestedQueryList from './NestedQueryList';
 import './style.less';
 
 interface IProps {
@@ -12,11 +13,14 @@ interface IProps {
     start: number;
     end: number;
   };
+  rawQueryOpen?: boolean;
+  value: PromVisualQuery;
+  onChange: (query: PromVisualQuery) => void;
 }
 
 export default function index(props: IProps) {
-  const { datasourceValue, params } = props;
-  const [query, setQuery] = useState<PromVisualQuery>({
+  const { datasourceValue, params, rawQueryOpen = true, value, onChange } = props;
+  const query = value ?? {
     labels: [
       {
         label: '',
@@ -25,7 +29,7 @@ export default function index(props: IProps) {
       },
     ] as any,
     operations: [] as any,
-  } as PromVisualQuery);
+  };
 
   return (
     <div className='prom-query-builder-container'>
@@ -33,9 +37,9 @@ export default function index(props: IProps) {
         <MetricSelect
           datasourceValue={datasourceValue}
           params={params}
-          value={query.metric}
+          value={value.metric}
           onChange={(val) => {
-            setQuery({
+            onChange({
               ...query,
               metric: val,
             });
@@ -47,7 +51,7 @@ export default function index(props: IProps) {
           params={params}
           value={query.labels}
           onChange={(val) => {
-            setQuery({
+            onChange({
               ...query,
               labels: val,
             });
@@ -61,10 +65,23 @@ export default function index(props: IProps) {
         params={params}
         value={query.operations}
         onChange={(val) => {
-          setQuery(val);
+          onChange(val);
         }}
       />
-      <RawQuery query={query} />
+      {query.binaryQueries && query.binaryQueries.length > 0 && (
+        <NestedQueryList
+          params={params}
+          datasourceValue={datasourceValue}
+          value={query.binaryQueries}
+          onChange={(val) => {
+            onChange({
+              ...query,
+              binaryQueries: val,
+            });
+          }}
+        />
+      )}
+      {rawQueryOpen && <RawQuery query={query} />}
     </div>
   );
 }

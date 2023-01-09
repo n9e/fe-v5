@@ -31,7 +31,16 @@ for (let i = 0; i < 1000; i++) {
 }
 
 export default function Demo() {
-  const [xCluster, setXCluster] = useState('Default');
+  const [query, setQuery] = useState({
+    labels: [
+      {
+        label: '',
+        value: '',
+        op: '=',
+      },
+    ] as any,
+    operations: [] as any,
+  });
   return (
     <div>
       <Collapse defaultActiveKey='1'>
@@ -43,6 +52,8 @@ export default function Demo() {
                 start: moment().subtract(1, 'hours').unix(),
                 end: moment().unix(),
               }}
+              value={query}
+              onChange={setQuery}
             />
           </Row>
         </Panel>
