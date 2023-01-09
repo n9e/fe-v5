@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Form, Select } from 'antd';
 import { CaretDownOutlined } from '@ant-design/icons';
 import { getCommonClusters, getCommonESClusters } from '@/services/common';
-export const ClusterAll = '$all';
 
 export default function index({ cate, onClusterChange }) {
   const [clusterList, setClusterList] = useState([]);
@@ -36,9 +35,6 @@ export default function index({ cate, onClusterChange }) {
       style={{ minWidth: 80, marginLeft: 8 }}
       dropdownMatchSelectWidth={false}
     >
-      <Select.Option value={ClusterAll} key={ClusterAll}>
-        {ClusterAll}
-      </Select.Option>
       {clusterList?.map((item) => (
         <Select.Option value={item} key={item}>
           {item}

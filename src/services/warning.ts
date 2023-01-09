@@ -470,3 +470,10 @@ export function getLogsQuery(params) {
     data: params,
   });
 }
+
+export const getAlertEventList = function (params) {
+  return request('/api/n9e/alert-his-events/list', {
+    method: RequestMethod.Get,
+    params,
+  }).then((res) => res?.dat?.list || []);
+};

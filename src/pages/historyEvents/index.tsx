@@ -20,7 +20,7 @@ import { AlertOutlined, SearchOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import DataTable from '@/components/Dantd/components/data-table';
 import moment from 'moment';
-import { Input, Tag, Select } from 'antd';
+import { Input, Tag, Select, Button, message } from 'antd';
 import DateRangePicker, { RelativeRange } from '@/components/DateRangePicker';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -30,6 +30,7 @@ import ColumnSelect from '@/components/ColumnSelect';
 import AdvancedWrap from '@/components/AdvancedWrap';
 import ClusterSelect from './ClusterSelect';
 import { SeverityColor } from '../event';
+import exportEvents, { downloadFile } from './exportEvents';
 import '../event/index.less';
 
 const Event: React.FC = () => {
@@ -117,6 +118,8 @@ const Event: React.FC = () => {
     },
   ];
 
+  const [exportBtnLoadding, setExportBtnLoadding] = useState(false);
+
   function renderLeftHeader() {
     return (
       <div className='table-operate-box'>
@@ -160,6 +163,35 @@ const Event: React.FC = () => {
             onChange={(e) => saveData('hisQueryContent', e.target.value)}
             onPressEnter={(e) => tableRef.current.handleReload()}
           />
+          <Button
+            style={{ marginLeft: 8 }}
+            loading={exportBtnLoadding}
+            onClick={() => {
+              setExportBtnLoadding(true);
+              exportEvents(
+                Object.assign(
+                  { p: 1, limit: 1000000 },
+                  { hours: hisHourRange.unit !== 'hours' ? hisHourRange.num * 24 : hisHourRange.num },
+                  curClusterItems.length ? { clusters: curClusterItems.join(',') } : {},
+                  hisSeverity !== undefined ? { severity: hisSeverity } : {},
+                  hisQueryContent ? { query: hisQueryContent } : {},
+                  hisEventType !== undefined ? { is_recovered: hisEventType } : {},
+                  { bgid: curBusiId },
+                  { cate },
+                ),
+                (err, csv) => {
+                  if (err) {
+                    message.error('导出失败！');
+                  } else {
+                    downloadFile(csv, `告警事件_${moment().format('YYYY-MM-DD_HH-mm-ss')}.csv`);
+                  }
+                  setExportBtnLoadding(false);
+                },
+              );
+            }}
+          >
+            导出
+          </Button>
         </div>
       </div>
     );
