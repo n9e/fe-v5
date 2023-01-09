@@ -1,5 +1,3 @@
-import { ComponentType } from 'react';
-
 export enum PromVisualQueryOperationCategory {
   Aggregations = 'Aggregations',
   RangeFunctions = 'Range functions',
@@ -136,6 +134,22 @@ export enum PromVisualQueryOperationId {
   LessOrEqual = '__less_or_equal',
 }
 
+export interface QueryBuilderOperationDef<T = any> {
+  id: string;
+  name: string;
+  description?: string;
+  documentation?: string;
+  params: QueryBuilderOperationParamDef[];
+  defaultParams: VisualQueryOperationParamValue[];
+  category: string;
+  hideFromList?: boolean;
+  alternativesKey?: string;
+  orderRank?: number;
+  renderer: QueryBuilderOperationRenderer;
+  addOperationHandler: QueryBuilderAddOperationHandler<T>;
+  paramChangedHandler?: QueryBuilderOnParamChangedHandler;
+}
+
 export interface QueryBuilderOperationParamDef {
   name: string;
   type: 'string' | 'number' | 'boolean';
@@ -154,24 +168,6 @@ export interface QueryBuilderOperationParamDef {
   minWidth?: number;
   subType?: string;
   runQueryOnEnter?: boolean;
-}
-
-export interface QueryBuilderOperationDef<T = any> {
-  id: string;
-  name: string;
-  description?: string;
-  documentation?: string;
-  params: QueryBuilderOperationParamDef[];
-  defaultParams: VisualQueryOperationParamValue[];
-  category: string;
-  hideFromList?: boolean;
-  alternativesKey?: string;
-  orderRank?: number;
-  renderer: QueryBuilderOperationRenderer;
-  addOperationHandler: QueryBuilderAddOperationHandler<T>;
-  paramChangedHandler?: QueryBuilderOnParamChangedHandler;
-  explainHandler?: QueryBuilderExplainOperationHandler;
-  changeTypeHandler?: (op: PromVisualQueryOperation, newDef: QueryBuilderOperationDef<T>) => PromVisualQueryOperation;
 }
 
 export type VisualQueryModeller = any;

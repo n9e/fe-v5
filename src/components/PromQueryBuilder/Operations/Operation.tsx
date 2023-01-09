@@ -104,7 +104,6 @@ export default function Operation(props: IProps) {
   const { operations } = query;
   const addOperationOptions = getOperationDefinitions();
   const operationDef = _.find(addOperationOptions, { id: operation.id });
-
   const operationElements: React.ReactNode[] = [];
 
   for (let paramIndex = 0; paramIndex < operation.params.length; paramIndex++) {
