@@ -21,7 +21,6 @@ const operators = ['+', '-', '*', '/', '%', '^', '==', '!=', '<', '<=', '>', '>=
 
 export default function NestedQuery(props: IProps) {
   const { nestedQuery, datasourceValue, params, index, onChange, onRemove } = props;
-  console.log('nestedQuery', nestedQuery);
 
   return (
     <div>

@@ -316,3 +316,80 @@ function addNestedQueryHandler(def: QueryBuilderOperationDef, query: PromVisualQ
     ],
   };
 }
+
+export const binaryScalarDefs = [
+  {
+    id: PromVisualQueryOperationId.Addition,
+    name: 'Add scalar',
+    sign: '+',
+  },
+  {
+    id: PromVisualQueryOperationId.Subtraction,
+    name: 'Subtract scalar',
+    sign: '-',
+  },
+  {
+    id: PromVisualQueryOperationId.MultiplyBy,
+    name: 'Multiply by scalar',
+    sign: '*',
+  },
+  {
+    id: PromVisualQueryOperationId.DivideBy,
+    name: 'Divide by scalar',
+    sign: '/',
+  },
+  {
+    id: PromVisualQueryOperationId.Modulo,
+    name: 'Modulo by scalar',
+    sign: '%',
+  },
+  {
+    id: PromVisualQueryOperationId.Exponent,
+    name: 'Exponent',
+    sign: '^',
+  },
+  {
+    id: PromVisualQueryOperationId.EqualTo,
+    name: 'Equal to',
+    sign: '==',
+    comparison: true,
+  },
+  {
+    id: PromVisualQueryOperationId.NotEqualTo,
+    name: 'Not equal to',
+    sign: '!=',
+    comparison: true,
+  },
+  {
+    id: PromVisualQueryOperationId.GreaterThan,
+    name: 'Greater than',
+    sign: '>',
+    comparison: true,
+  },
+  {
+    id: PromVisualQueryOperationId.LessThan,
+    name: 'Less than',
+    sign: '<',
+    comparison: true,
+  },
+  {
+    id: PromVisualQueryOperationId.GreaterOrEqual,
+    name: 'Greater or equal to',
+    sign: '>=',
+    comparison: true,
+  },
+  {
+    id: PromVisualQueryOperationId.LessOrEqual,
+    name: 'Less or equal to',
+    sign: '<=',
+    comparison: true,
+  },
+];
+
+export const binaryScalarOperatorToOperatorName = binaryScalarDefs.reduce((acc, def) => {
+  acc[def.sign] = {
+    id: def.id,
+    comparison: def.comparison,
+  };
+  return acc;
+}, {} as Record<string, { id: string; comparison?: boolean }>);
