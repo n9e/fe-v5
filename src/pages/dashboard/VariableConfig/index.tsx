@@ -16,6 +16,8 @@
  */
 import React, { useState, useEffect } from 'react';
 import _ from 'lodash';
+import queryString from 'query-string';
+import { useLocation } from 'react-router-dom';
 import classNames from 'classnames';
 import { EditOutlined } from '@ant-design/icons';
 import { IRawTimeRange } from '@/components/TimeRangePicker';
@@ -44,6 +46,7 @@ function includes(source, target) {
 }
 
 function index(props: IProps) {
+  const query = queryString.parse(useLocation().search);
   const { id, cluster, editable = true, range, onChange, onOpenFire, isPreview = false } = props;
   const [editing, setEditing] = useState<boolean>(false);
   const [data, setData] = useState<IVariable[]>([]);
@@ -73,21 +76,23 @@ function index(props: IProps) {
               // 当大盘变量值为空时，设置默认值
               // 如果已选项不在待选项里也视做空值处理
               const selected = getVaraiableSelected(item.name, id);
-              if (selected === null || (selected && !_.isEmpty(regFilterOptions) && !includes(regFilterOptions, selected))) {
-                const head = regFilterOptions?.[0];
-                const defaultVal = item.multi ? (head ? [head] : []) : head;
-                setVaraiableSelected({ name: item.name, value: defaultVal, id, urlAttach: true });
+              if (query.__variable_value_fixed === undefined) {
+                if (selected === null || (selected && !_.isEmpty(regFilterOptions) && !includes(regFilterOptions, selected))) {
+                  const head = regFilterOptions?.[0];
+                  const defaultVal = item.multi ? (head ? [head] : []) : head;
+                  setVaraiableSelected({ name: item.name, value: defaultVal, id, urlAttach: true });
+                }
               }
             } else if (item.type === 'textbox') {
               result[idx] = item;
               const selected = getVaraiableSelected(item.name, id);
-              if (selected === null) {
+              if (selected === null && query.__variable_value_fixed === undefined) {
                 setVaraiableSelected({ name: item.name, value: item.defaultValue, id, urlAttach: true });
               }
             } else if (item.type === 'constant') {
               result[idx] = item;
               const selected = getVaraiableSelected(item.name, id);
-              if (selected === null) {
+              if (selected === null && query.__variable_value_fixed === undefined) {
                 setVaraiableSelected({ name: item.name, value: item.definition, id, urlAttach: true });
               }
             }
