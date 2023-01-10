@@ -32,7 +32,7 @@ interface ITargetProps {
 }
 
 interface IProps {
-  curBusiId: number;
+  curBusiId?: number;
   selectedIdents: string[];
   setSelectedIdents: (selectedIdents: string[]) => void;
   selectedRowKeys: any[];
@@ -254,19 +254,22 @@ export default function List(props: IProps) {
     },
   ];
   const featchData = ({ current, pageSize }): Promise<any> => {
-    const query = {
-      query: tableQueryContent,
-      bgid: curBusiId,
-      clusters: _.join(curClusters, ','),
-      limit: pageSize,
-      p: current,
-    };
-    return getMonObjectList(query).then((res) => {
-      return {
-        total: res.dat.total,
-        list: res.dat.list,
+    if (curBusiId !== undefined) {
+      const query = {
+        query: tableQueryContent,
+        bgid: curBusiId,
+        clusters: _.join(curClusters, ','),
+        limit: pageSize,
+        p: current,
       };
-    });
+      return getMonObjectList(query).then((res) => {
+        return {
+          total: res.dat.total,
+          list: res.dat.list,
+        };
+      });
+    }
+    return Promise.resolve({ total: 0, list: [] });
   };
   const showTotal = (total: number) => {
     return `共 ${total} 条`;

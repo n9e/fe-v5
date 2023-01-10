@@ -340,7 +340,7 @@ const OperationModal: React.FC<OperateionModalProps> = ({ operateType, setOperat
 const MonObjectManage: React.FC = () => {
   const { t } = useTranslation();
   const [operateType, setOperateType] = useState<OperateType>(OperateType.None);
-  const [curBusiId, setCurBusiId] = useState<number>(-2);
+  const [curBusiId, setCurBusiId] = useState<number>();
   const [selectedRowKeys, setSelectedRowKeys] = useState<(string | number)[]>([]);
   const [selectedIdents, setSelectedIdents] = useState<string[]>([]);
   const [refreshFlag, setRefreshFlag] = useState(_.uniqueId('refreshFlag_'));
@@ -358,7 +358,13 @@ const MonObjectManage: React.FC = () => {
             },
           }}
         />
-        <div className='table-area'>
+        <div
+          className='table-area'
+          style={{
+            height: '100%',
+            overflowY: 'auto',
+          }}
+        >
           <List
             curBusiId={curBusiId}
             selectedIdents={selectedIdents}
