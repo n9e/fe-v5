@@ -325,6 +325,9 @@ export const replaceExpressionVarsSpecifyRule = (
             } else {
               newExpression = replaceAllPolyfill(newExpression, placeholder, selected as string);
             }
+          } else if (selected === null) {
+            // 未选择或填写变量值时替换为空字符串
+            newExpression = replaceAllPolyfill(newExpression, placeholder, '');
           }
         }
       }
