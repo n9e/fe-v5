@@ -73,7 +73,7 @@ export default function GraphCpt(props: IProps) {
             }
             return [];
           }),
-          color: '#ddd',
+          color: '#ccc',
           opacity: 0.5,
         });
 

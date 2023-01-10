@@ -62,7 +62,7 @@ export default function AlgoGraph({ rid, tags, range, step }) {
         data: _.map(lower.data, (dataItem, idx) => {
           return [...dataItem, upper.data[idx][1]];
         }),
-        color: '#ddd',
+        color: '#ccc',
         opacity: 0.5,
       });
 
