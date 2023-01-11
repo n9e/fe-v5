@@ -39,7 +39,7 @@ export function getOperationDefinitions(): QueryBuilderOperationDef[] {
     createAggregationOverTime(PromVisualQueryOperationId.StddevOverTime),
     {
       id: PromVisualQueryOperationId.ArithmeticBinary,
-      name: 'Arithmetic binary operators',
+      name: 'Arithmetic',
       params: [
         {
           name: 'Operator',
@@ -61,7 +61,7 @@ export function getOperationDefinitions(): QueryBuilderOperationDef[] {
     },
     {
       id: PromVisualQueryOperationId.ComparisonBinary,
-      name: 'Comparison binary operators',
+      name: 'Comparison',
       params: [
         {
           name: 'Operator',
