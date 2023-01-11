@@ -17,7 +17,8 @@
 import React, { useState } from 'react';
 import { Collapse, Row } from 'antd';
 import moment from 'moment';
-import PromQueryBuilder, { renderQuery, buildPromVisualQueryFromPromQL } from '@/components/PromQueryBuilder';
+import PromQueryBuilder from '@/components/PromQueryBuilder';
+import { PromQLInputWithBuilder } from '@/components/PromQLInput';
 
 const { Panel } = Collapse;
 
@@ -32,9 +33,10 @@ export default function Demo() {
     ] as any,
     operations: [] as any,
   });
+  const [promQL, setPromQL] = useState<string | undefined>();
   return (
     <div>
-      <Collapse defaultActiveKey='1'>
+      <Collapse defaultActiveKey={['1', '2']}>
         <Panel header='Prom query builder' key='1'>
           <Row style={{ marginBottom: 20 }}>
             <PromQueryBuilder
@@ -45,13 +47,22 @@ export default function Demo() {
               }}
               value={query}
               onChange={(val) => {
-                const promql = renderQuery(val);
-                const query = buildPromVisualQueryFromPromQL(promql);
-                console.log(val.operations, query.query.operations);
                 setQuery(val);
               }}
             />
           </Row>
+        </Panel>
+        <Panel header='PromQL' key='2'>
+          <PromQLInputWithBuilder
+            url='/api/n9e/prometheus'
+            headers={{
+              'X-Cluster': localStorage.getItem('curCluster') || 'DEFAULT',
+              Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
+            }}
+            cluster={localStorage.getItem('curCluster') || 'DEFAULT'}
+            value={promQL}
+            onChange={setPromQL}
+          />
         </Panel>
       </Collapse>
     </div>

@@ -182,7 +182,7 @@ const Panel = ({
             const datasourceCate = getFieldValue('datasourceCate');
             const datasourceName = getFieldValue('datasourceName');
             if (datasourceCate === DatasourceCateEnum.prometheus) {
-              return <Prometheus defaultPromQL={defaultPromQL} />;
+              return <Prometheus defaultPromQL={defaultPromQL} headerExtra={headerExtraRef.current} />;
             } else if (datasourceCate === DatasourceCateEnum.elasticsearch) {
               return <Elasticsearch datasourceName={datasourceName} form={form} />;
             } else if (datasourceCate === DatasourceCateEnum.aliyunSLS) {
