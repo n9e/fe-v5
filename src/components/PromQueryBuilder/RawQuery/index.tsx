@@ -3,7 +3,7 @@ import _ from 'lodash';
 import PromQLInput from '@/components/PromQLInput';
 import { PromVisualQuery, PromVisualQueryOperation, PromVisualQueryBinary, PromVisualQueryLabelFilter } from '../types';
 import { getOperationDefinitions } from '../Operations/utils';
-import { buildVisualQueryFromString } from '../Operations/utils/parsing';
+import buildPromVisualQueryFromPromQL from '../utils/buildPromVisualQueryFromPromQL';
 
 function hasBinaryOp(query: PromVisualQuery): boolean {
   return (
@@ -86,7 +86,7 @@ function renderQuery(query: PromVisualQuery, nested?: boolean) {
 
 export default function index(props: { query: PromVisualQuery }) {
   const promql = renderQuery(props.query);
-  console.log(buildVisualQueryFromString(promql));
+  console.log(buildPromVisualQueryFromPromQL(promql));
   if (!promql) return null;
   return (
     <div className='prom-query-builder-rawquery-container'>

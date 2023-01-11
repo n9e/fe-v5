@@ -140,7 +140,7 @@ export function createAggregationOverTime(name: string): QueryBuilderOperationDe
     params: [getRangeVectorParamDef()],
     defaultParams: ['5m'],
     alternativesKey: 'overtime function',
-    category: PromVisualQueryOperationCategory.RangeFunctions,
+    category: PromVisualQueryOperationCategory.Aggregations,
     renderer: operationWithRangeVectorRenderer,
     addOperationHandler: addOperationWithRangeVector,
   };

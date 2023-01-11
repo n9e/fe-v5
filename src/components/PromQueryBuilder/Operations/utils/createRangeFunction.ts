@@ -19,7 +19,7 @@ export function createRangeFunction(name: string): QueryBuilderOperationDef {
     params: [getRangeVectorParamDef()],
     defaultParams: ['5m'],
     alternativesKey: 'range function',
-    category: PromVisualQueryOperationCategory.RangeFunctions,
+    category: PromVisualQueryOperationCategory.Functions,
     renderer: operationWithRangeVectorRenderer,
     addOperationHandler: addOperationWithRangeVector,
   };

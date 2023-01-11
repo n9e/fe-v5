@@ -1,10 +1,8 @@
 export enum PromVisualQueryOperationCategory {
   Aggregations = 'Aggregations',
-  RangeFunctions = 'Range functions',
-  Functions = 'Functions',
   BinaryOps = 'Binary operations',
+  Functions = 'Functions',
   Trigonometric = 'Trigonometric',
-  Time = 'Time Functions',
 }
 export interface PromVisualQueryBinary<T> {
   operator: string;

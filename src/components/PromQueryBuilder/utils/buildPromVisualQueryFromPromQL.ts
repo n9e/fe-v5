@@ -1,4 +1,4 @@
-import { SyntaxNode } from '@lezer/common';
+import { SyntaxNode, TreeCursor } from '@lezer/common';
 import {
   AggregateExpr,
   AggregateModifier,
@@ -27,11 +27,10 @@ import {
   Without,
 } from 'lezer-promql';
 
-import { binaryScalarOperatorToOperatorName } from './index';
-import { ErrorId, getAllByType, getLeftMostChild, getString, makeBinOp, makeError, replaceVariables } from './parsingUtils';
-import { PromVisualQuery, PromVisualQueryLabelFilter, PromVisualQueryOperation, PromVisualQueryBinary } from '../../types';
+import { binaryScalarOperatorToOperatorName } from '../Operations/utils';
+import { PromVisualQuery, PromVisualQueryLabelFilter, PromVisualQueryOperation, PromVisualQueryBinary, VisualQueryOperationParamValue } from '../types';
 
-export function buildVisualQueryFromString(expr: string): Context {
+export default function buildPromVisualQueryFromPromQL(expr: string): Context {
   const replacedExpr = replaceVariables(expr);
   const tree = parser.parse(replacedExpr);
   const node = tree.topNode as any;
@@ -75,7 +74,7 @@ interface Context {
   errors: ParsingError[];
 }
 
-export function handleExpression(expr: string, node: SyntaxNode, context: Context) {
+function handleExpression(expr: string, node: SyntaxNode, context: Context) {
   const visQuery = context.query;
 
   switch (node.type.id) {
@@ -317,4 +316,82 @@ function isEmptyQuery(query: PromVisualQuery) {
     return true;
   }
   return false;
+}
+
+const ErrorId = 0;
+
+function getLeftMostChild(cur: SyntaxNode): SyntaxNode {
+  return cur.firstChild ? getLeftMostChild(cur.firstChild) : cur;
+}
+
+function makeError(expr: string, node: SyntaxNode) {
+  return {
+    text: getString(expr, node),
+    from: node.from,
+    to: node.to,
+    parentType: node.parent?.name,
+  };
+}
+
+const variableRegex = /\$(\w+)|\[\[([\s\S]+?)(?::(\w+))?\]\]|\${(\w+)(?:\.([^:^\}]+))?(?::([^\}]+))?}/g;
+
+function replaceVariables(expr: string) {
+  return expr.replace(variableRegex, (match, var1, var2, fmt2, var3, fieldPath, fmt3) => {
+    const fmt = fmt2 || fmt3;
+    let variable = var1;
+    let varType = '0';
+
+    if (var2) {
+      variable = var2;
+      varType = '1';
+    }
+
+    if (var3) {
+      variable = var3;
+      varType = '2';
+    }
+
+    return `__V_${varType}__` + variable + '__V__' + (fmt ? '__F__' + fmt + '__F__' : '');
+  });
+}
+
+function getString(expr: string, node: SyntaxNode | TreeCursor | null | undefined) {
+  if (!node) {
+    return '';
+  }
+  return returnVariables(expr.substring(node.from, node.to));
+}
+
+const varTypeFunc = [(v: string, f?: string) => `\$${v}`, (v: string, f?: string) => `[[${v}${f ? `:${f}` : ''}]]`, (v: string, f?: string) => `\$\{${v}${f ? `:${f}` : ''}\}`];
+
+function returnVariables(expr: string) {
+  return expr.replace(/__V_(\d)__(.+?)__V__(?:__F__(\w+)__F__)?/g, (match, type, v, f) => {
+    return varTypeFunc[parseInt(type, 10)](v, f);
+  });
+}
+
+function makeBinOp(opDef: { id: string; comparison?: boolean }, expr: string, numberNode: SyntaxNode, hasBool: boolean): PromVisualQueryOperation {
+  const params: VisualQueryOperationParamValue[] = [parseFloat(getString(expr, numberNode))];
+  if (opDef.comparison) {
+    params.push(hasBool);
+  }
+  return {
+    id: opDef.id,
+    params,
+  };
+}
+
+function getAllByType(expr: string, cur: SyntaxNode, type: number | string): string[] {
+  if (cur.type.id === type || cur.name === type) {
+    return [getString(expr, cur)];
+  }
+  const values: string[] = [];
+  let pos = 0;
+  let child = cur.childAfter(pos);
+  while (child) {
+    values.push(...getAllByType(expr, child, type));
+    pos = child.to;
+    child = cur.childAfter(pos);
+  }
+  return values;
 }
