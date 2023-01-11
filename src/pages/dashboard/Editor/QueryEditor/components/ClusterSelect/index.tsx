@@ -45,7 +45,7 @@ export default function index(props: { cate: string; defaultDatasourceName?: str
         },
       ]}
     >
-      <Select placeholder={cate !== 'prometheus' ? '选择数据源' : defaultDatasourceName} style={{ minWidth: 70 }} dropdownMatchSelectWidth={false}>
+      <Select allowClear placeholder={cate !== 'prometheus' ? '选择数据源' : defaultDatasourceName} style={{ minWidth: 70 }} dropdownMatchSelectWidth={false}>
         {clusterList?.map((item) => (
           <Select.Option value={item} key={item}>
             {item}
