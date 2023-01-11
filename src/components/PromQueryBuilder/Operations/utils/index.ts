@@ -1,19 +1,13 @@
 import _ from 'lodash';
-import {
-  PromVisualQuery,
-  PromVisualQueryOperationCategory,
-  QueryBuilderOperationDef,
-  PromVisualQueryOperationId,
-  QueryBuilderOperationParamDef,
-  VisualQueryOperationParamValue,
-  PromVisualQueryOperation,
-  QueryWithOperations,
-} from '../../types';
+import { PromVisualQuery, PromVisualQueryOperationCategory, QueryBuilderOperationDef, PromVisualQueryOperationId, QueryBuilderOperationParamDef } from '../../types';
 import { createAggregationOperation, createAggregationOperationWithParam, createAggregationOverTime } from './createAggregationOperation';
 import { createRangeFunction } from './createRangeFunction';
 import { createFunction } from './createFunction';
 import { rangeRendererRightWithParams, rangeRendererLeftWithParams, functionRendererLeft, labelJoinRenderer, getSimpleBinaryRenderer } from './renderer';
 import { addOperationWithRangeVector, labelJoinAddOperationHandler, defaultAddOperationHandler } from './addOperationHandler';
+
+export const arithmeticBinaryOperators = ['+', '-', '*', '/', '%', '^'];
+export const comparisonBinaryOperators = ['==', '!=', '>', '<', '>=', '<='];
 
 export function getOperationDefinitions(): QueryBuilderOperationDef[] {
   const list: QueryBuilderOperationDef[] = [
@@ -44,13 +38,13 @@ export function getOperationDefinitions(): QueryBuilderOperationDef[] {
     createAggregationOverTime(PromVisualQueryOperationId.AbsentOverTime),
     createAggregationOverTime(PromVisualQueryOperationId.StddevOverTime),
     {
-      id: 'arithmetic_binary_operators',
+      id: PromVisualQueryOperationId.ArithmeticBinary,
       name: 'Arithmetic binary operators',
       params: [
         {
           name: 'Operator',
           type: 'string',
-          options: _.map(['+', '-', '*', '/', '%', '^'], (item) => {
+          options: _.map(arithmeticBinaryOperators, (item) => {
             return {
               label: item,
               value: item,
@@ -66,13 +60,13 @@ export function getOperationDefinitions(): QueryBuilderOperationDef[] {
       addOperationHandler: defaultAddOperationHandler,
     },
     {
-      id: 'comparison_binary_operators',
+      id: PromVisualQueryOperationId.ComparisonBinary,
       name: 'Comparison binary operators',
       params: [
         {
           name: 'Operator',
           type: 'string',
-          options: _.map(['==', '!=', '>', '<', '>=', '<='], (item) => {
+          options: _.map(comparisonBinaryOperators, (item) => {
             return {
               label: item,
               value: item,
@@ -316,80 +310,3 @@ function addNestedQueryHandler(def: QueryBuilderOperationDef, query: PromVisualQ
     ],
   };
 }
-
-export const binaryScalarDefs = [
-  {
-    id: PromVisualQueryOperationId.Addition,
-    name: 'Add scalar',
-    sign: '+',
-  },
-  {
-    id: PromVisualQueryOperationId.Subtraction,
-    name: 'Subtract scalar',
-    sign: '-',
-  },
-  {
-    id: PromVisualQueryOperationId.MultiplyBy,
-    name: 'Multiply by scalar',
-    sign: '*',
-  },
-  {
-    id: PromVisualQueryOperationId.DivideBy,
-    name: 'Divide by scalar',
-    sign: '/',
-  },
-  {
-    id: PromVisualQueryOperationId.Modulo,
-    name: 'Modulo by scalar',
-    sign: '%',
-  },
-  {
-    id: PromVisualQueryOperationId.Exponent,
-    name: 'Exponent',
-    sign: '^',
-  },
-  {
-    id: PromVisualQueryOperationId.EqualTo,
-    name: 'Equal to',
-    sign: '==',
-    comparison: true,
-  },
-  {
-    id: PromVisualQueryOperationId.NotEqualTo,
-    name: 'Not equal to',
-    sign: '!=',
-    comparison: true,
-  },
-  {
-    id: PromVisualQueryOperationId.GreaterThan,
-    name: 'Greater than',
-    sign: '>',
-    comparison: true,
-  },
-  {
-    id: PromVisualQueryOperationId.LessThan,
-    name: 'Less than',
-    sign: '<',
-    comparison: true,
-  },
-  {
-    id: PromVisualQueryOperationId.GreaterOrEqual,
-    name: 'Greater or equal to',
-    sign: '>=',
-    comparison: true,
-  },
-  {
-    id: PromVisualQueryOperationId.LessOrEqual,
-    name: 'Less or equal to',
-    sign: '<=',
-    comparison: true,
-  },
-];
-
-export const binaryScalarOperatorToOperatorName = binaryScalarDefs.reduce((acc, def) => {
-  acc[def.sign] = {
-    id: def.id,
-    comparison: def.comparison,
-  };
-  return acc;
-}, {} as Record<string, { id: string; comparison?: boolean }>);

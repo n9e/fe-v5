@@ -1,13 +1,4 @@
-import {
-  PromVisualQuery,
-  PromVisualQueryOperationCategory,
-  QueryBuilderOperationDef,
-  PromVisualQueryOperationId,
-  QueryBuilderOperationParamDef,
-  VisualQueryOperationParamValue,
-  PromVisualQueryOperation,
-  QueryWithOperations,
-} from '../../types';
+import { PromVisualQueryOperationCategory, QueryBuilderOperationDef } from '../../types';
 import { getPromOperationDisplayName } from './index';
 import { functionRendererRight, functionRendererLeft } from './renderer';
 import { defaultAddOperationHandler } from './addOperationHandler';

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Select, Input, Button, Space } from 'antd';
-import { PlusCircleOutlined, MinusOutlined } from '@ant-design/icons';
+import { PlusCircleOutlined, CloseOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { useDynamicList } from 'ahooks';
 import FormItem from '../components/FormItem';
@@ -109,7 +109,7 @@ export default function index(props: IProps) {
                   }}
                 />
                 <Button
-                  icon={<MinusOutlined />}
+                  icon={<CloseOutlined />}
                   onClick={() => {
                     remove(index);
                   }}

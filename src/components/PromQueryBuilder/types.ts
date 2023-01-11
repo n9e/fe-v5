@@ -4,6 +4,7 @@ export enum PromVisualQueryOperationCategory {
   Functions = 'Functions',
   Trigonometric = 'Trigonometric',
 }
+
 export interface PromVisualQueryBinary<T> {
   operator: string;
   vectorMatchesType?: 'on' | 'ignoring';
@@ -117,19 +118,9 @@ export enum PromVisualQueryOperationId {
   TopK = 'topk',
   Vector = 'vector',
   Year = 'year',
-  Addition = '__addition',
-  Subtraction = '__subtraction',
-  MultiplyBy = '__multiply_by',
-  DivideBy = '__divide_by',
-  Modulo = '__modulo',
-  Exponent = '__exponent',
+  ArithmeticBinary = '__arithmetic_binary_operators',
+  ComparisonBinary = '__comparison_binary_operators',
   NestedQuery = '__nested_query',
-  EqualTo = '__equal_to',
-  NotEqualTo = '__not_equal_to',
-  GreaterThan = '__greater_than',
-  LessThan = '__less_than',
-  GreaterOrEqual = '__greater_or_equal',
-  LessOrEqual = '__less_or_equal',
 }
 
 export interface QueryBuilderOperationDef<T = any> {

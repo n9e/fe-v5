@@ -14,21 +14,12 @@
  * limitations under the License.
  *
  */
-import React, { useRef, useEffect, useState } from 'react';
-import { Form, Input, Button, Radio, Collapse, Row, Col } from 'antd';
-const { Panel } = Collapse;
+import React, { useState } from 'react';
+import { Collapse, Row } from 'antd';
 import moment from 'moment';
-import G2PieChart from '@/components/G2PieChart';
-import ColumnSelect from '@/components/ColumnSelect';
-import PromQueryBuilder from '@/components/PromQueryBuilder';
+import PromQueryBuilder, { renderQuery, buildPromVisualQueryFromPromQL } from '@/components/PromQueryBuilder';
 
-let honeyCombData: any = [];
-for (let i = 0; i < 1000; i++) {
-  honeyCombData.push({
-    name: 'cluster=cloudcollector deployment=nite metric=avg node=nite-cloudcollector-',
-    value: Math.random() * 100,
-  });
-}
+const { Panel } = Collapse;
 
 export default function Demo() {
   const [query, setQuery] = useState({
@@ -53,7 +44,12 @@ export default function Demo() {
                 end: moment().unix(),
               }}
               value={query}
-              onChange={setQuery}
+              onChange={(val) => {
+                const promql = renderQuery(val);
+                const query = buildPromVisualQueryFromPromQL(promql);
+                console.log(val.operations, query.query.operations);
+                setQuery(val);
+              }}
             />
           </Row>
         </Panel>

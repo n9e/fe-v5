@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { SyntaxNode, TreeCursor } from '@lezer/common';
 import {
   AggregateExpr,
@@ -27,10 +28,10 @@ import {
   Without,
 } from 'lezer-promql';
 
-import { binaryScalarOperatorToOperatorName } from '../Operations/utils';
-import { PromVisualQuery, PromVisualQueryLabelFilter, PromVisualQueryOperation, PromVisualQueryBinary, VisualQueryOperationParamValue } from '../types';
+import { PromVisualQuery, PromVisualQueryLabelFilter, PromVisualQueryOperation, PromVisualQueryBinary, VisualQueryOperationParamValue, PromVisualQueryOperationId } from '../types';
+import { arithmeticBinaryOperators, comparisonBinaryOperators } from '../Operations/utils';
 
-export default function buildPromVisualQueryFromPromQL(expr: string): Context {
+export function buildPromVisualQueryFromPromQL(expr: string): Context {
   const replacedExpr = replaceVariables(expr);
   const tree = parser.parse(replacedExpr);
   const node = tree.topNode as any;
@@ -244,7 +245,7 @@ function handleBinary(expr: string, node: SyntaxNode, context: Context) {
 
   const right = node.lastChild!;
 
-  const opDef = binaryScalarOperatorToOperatorName[op];
+  const opDef = binaryScalarOperatorToOperatorName(op);
 
   const leftNumber = left.getChild(NumberLiteral);
   const rightNumber = right.getChild(NumberLiteral);
@@ -257,11 +258,11 @@ function handleBinary(expr: string, node: SyntaxNode, context: Context) {
   }
 
   if (rightNumber) {
-    visQuery.operations.push(makeBinOp(opDef, expr, right, !!binModifier?.isBool));
+    visQuery.operations.push(makeBinOp(op, opDef, expr, right, !!binModifier?.isBool));
   } else if (rightBinary) {
     const leftMostChild = getLeftMostChild(right);
     if (leftMostChild?.type.id === NumberLiteral) {
-      visQuery.operations.push(makeBinOp(opDef, expr, leftMostChild, !!binModifier?.isBool));
+      visQuery.operations.push(makeBinOp(op, opDef, expr, leftMostChild, !!binModifier?.isBool));
     }
 
     handleExpression(expr, right, context);
@@ -370,8 +371,8 @@ function returnVariables(expr: string) {
   });
 }
 
-function makeBinOp(opDef: { id: string; comparison?: boolean }, expr: string, numberNode: SyntaxNode, hasBool: boolean): PromVisualQueryOperation {
-  const params: VisualQueryOperationParamValue[] = [parseFloat(getString(expr, numberNode))];
+function makeBinOp(op: string, opDef: { id: string; comparison?: boolean }, expr: string, numberNode: SyntaxNode, hasBool: boolean): PromVisualQueryOperation {
+  const params: VisualQueryOperationParamValue[] = [op, parseFloat(getString(expr, numberNode))];
   if (opDef.comparison) {
     params.push(hasBool);
   }
@@ -394,4 +395,20 @@ function getAllByType(expr: string, cur: SyntaxNode, type: number | string): str
     child = cur.childAfter(pos);
   }
   return values;
+}
+
+function binaryScalarOperatorToOperatorName(op: string) {
+  const acc = {};
+  _.forEach(arithmeticBinaryOperators, (item) => {
+    acc[item] = {
+      id: PromVisualQueryOperationId.ArithmeticBinary,
+    };
+  });
+  _.forEach(comparisonBinaryOperators, (item) => {
+    acc[item] = {
+      id: PromVisualQueryOperationId.ComparisonBinary,
+      comparison: true,
+    };
+  });
+  return acc[op];
 }

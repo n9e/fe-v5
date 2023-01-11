@@ -1,13 +1,4 @@
-import {
-  PromVisualQuery,
-  PromVisualQueryOperationCategory,
-  QueryBuilderOperationDef,
-  PromVisualQueryOperationId,
-  QueryBuilderOperationParamDef,
-  VisualQueryOperationParamValue,
-  PromVisualQueryOperation,
-  QueryWithOperations,
-} from '../../types';
+import { PromVisualQuery, QueryBuilderOperationDef, PromVisualQueryOperation, QueryWithOperations } from '../../types';
 
 export function defaultAddOperationHandler<T extends QueryWithOperations>(def: QueryBuilderOperationDef, query: T) {
   const newOperation: PromVisualQueryOperation = {

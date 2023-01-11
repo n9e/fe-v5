@@ -44,11 +44,12 @@ export default function index(props: IProps) {
             }}
           >
             {_.map(operations, (operation, index) => {
-              return <Operation {...props} operation={operation} index={index} key={operation.id} />;
+              return <Operation {...props} operation={operation} index={index} key={`${operation.id}_${index}`} />;
             })}
           </SortableBody>
         )}
         <Cascader
+          value={[]}
           options={_.map(categories, (options, key) => {
             return {
               value: key,

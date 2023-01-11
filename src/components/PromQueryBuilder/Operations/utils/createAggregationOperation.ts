@@ -1,9 +1,7 @@
 import _ from 'lodash';
 import {
-  PromVisualQuery,
   PromVisualQueryOperationCategory,
   QueryBuilderOperationDef,
-  PromVisualQueryOperationId,
   QueryBuilderOperationParamDef,
   VisualQueryOperationParamValue,
   PromVisualQueryOperation,

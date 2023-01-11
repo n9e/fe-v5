@@ -1,13 +1,4 @@
-import {
-  PromVisualQuery,
-  PromVisualQueryOperationCategory,
-  QueryBuilderOperationDef,
-  PromVisualQueryOperationId,
-  QueryBuilderOperationParamDef,
-  VisualQueryOperationParamValue,
-  PromVisualQueryOperation,
-  QueryWithOperations,
-} from '../../types';
+import { QueryBuilderOperationDef, PromVisualQueryOperation } from '../../types';
 
 function renderParams(model: PromVisualQueryOperation, def: QueryBuilderOperationDef, innerExpr: string) {
   return (model.params ?? []).map((value, index) => {

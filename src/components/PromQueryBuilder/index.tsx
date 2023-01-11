@@ -5,7 +5,12 @@ import Operations from './Operations';
 import RawQuery from './RawQuery';
 import { PromVisualQuery } from './types';
 import NestedQueryList from './NestedQueryList';
+import { normalizeDefaultValue } from './utils';
 import './style.less';
+
+export type { PromVisualQuery } from './types';
+export { renderQuery } from './RawQuery';
+export { buildPromVisualQueryFromPromQL } from './utils/buildPromVisualQueryFromPromQL';
 
 interface IProps {
   datasourceValue: string;
@@ -20,16 +25,7 @@ interface IProps {
 
 export default function index(props: IProps) {
   const { datasourceValue, params, rawQueryOpen = true, value, onChange } = props;
-  const query = value ?? {
-    labels: [
-      {
-        label: '',
-        value: '',
-        op: '=',
-      },
-    ] as any,
-    operations: [] as any,
-  };
+  const query = normalizeDefaultValue(value);
 
   return (
     <div className='prom-query-builder-container'>
