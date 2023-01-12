@@ -19,14 +19,15 @@ import { Modal, Tag, Form, Input, Alert, Select, Tooltip, message } from 'antd';
 import { DatabaseOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import _, { debounce } from 'lodash';
-import { useSelector } from 'react-redux';
+import classNames from 'classnames';
+import { useDispatch, useSelector } from 'react-redux';
 import { bindTags, unbindTags, moveTargetBusi, updateTargetNote, deleteTargets, getTargetTags } from '@/services/monObjectManage';
 import { RootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
 import PageLayout from '@/components/pageLayout';
-import LeftTree from '@/components/LeftTree';
 import { getBusiGroups } from '@/services/common';
 import List from './List';
+import BusinessGroup from './BusinessGroup';
 import './index.less';
 
 enum OperateType {
@@ -37,17 +38,6 @@ enum OperateType {
   UpdateNote = 'updateNote',
   Delete = 'delete',
   None = 'none',
-}
-
-interface targetProps {
-  id: number;
-  cluster: string;
-  group_id: number;
-  group_obj: object | null;
-  ident: string;
-  note: string;
-  tags: string[];
-  update_at: number;
 }
 
 interface OperateionModalProps {
@@ -74,11 +64,7 @@ const bindTagDetail = () => {
   function tagRender(content) {
     const { isCorrectFormat, isLengthAllowed } = isTagValid(content.value);
     return isCorrectFormat && isLengthAllowed ? (
-      <Tag
-        closable={content.closable}
-        onClose={content.onClose}
-        // style={{ marginTop: '2px' }}
-      >
+      <Tag closable={content.closable} onClose={content.onClose}>
         {content.value}
       </Tag>
     ) : (
@@ -338,9 +324,11 @@ const OperationModal: React.FC<OperateionModalProps> = ({ operateType, setOperat
 };
 
 const MonObjectManage: React.FC = () => {
+  const dispatch = useDispatch();
+  const { curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const { t } = useTranslation();
   const [operateType, setOperateType] = useState<OperateType>(OperateType.None);
-  const [curBusiId, setCurBusiId] = useState<number>();
+  const [curBusiId, setCurBusiId] = useState<number>(curBusiItem?.id || -1);
   const [selectedRowKeys, setSelectedRowKeys] = useState<(string | number)[]>([]);
   const [selectedIdents, setSelectedIdents] = useState<string[]>([]);
   const [refreshFlag, setRefreshFlag] = useState(_.uniqueId('refreshFlag_'));
@@ -348,14 +336,45 @@ const MonObjectManage: React.FC = () => {
   return (
     <PageLayout icon={<DatabaseOutlined />} title={t('对象列表')} hideCluster>
       <div className='object-manage-page-content'>
-        <LeftTree
-          busiGroup={{
-            showNotGroupItem: true,
-            onChange(value) {
-              setCurBusiId(typeof value === 'number' ? value : -1);
-              setSelectedRowKeys([]);
-              setSelectedIdents([]);
-            },
+        <BusinessGroup
+          curBusiId={curBusiId}
+          setCurBusiId={(id, item) => {
+            setCurBusiId(id);
+            dispatch({
+              type: 'common/saveData',
+              prop: 'curBusiItem',
+              data: item,
+            });
+            localStorage.setItem('curBusiItem', JSON.stringify(item));
+          }}
+          renderHeadExtra={() => {
+            return (
+              <div>
+                <div className='left-area-group-title'>预留筛选</div>
+                <div
+                  className={classNames({
+                    'n9e-metric-views-list-content-item': true,
+                    active: curBusiId === 0,
+                  })}
+                  onClick={() => {
+                    setCurBusiId(0);
+                  }}
+                >
+                  未归组对象
+                </div>
+                <div
+                  className={classNames({
+                    'n9e-metric-views-list-content-item': true,
+                    active: curBusiId === -1,
+                  })}
+                  onClick={() => {
+                    setCurBusiId(-1);
+                  }}
+                >
+                  全部对象
+                </div>
+              </div>
+            );
           }}
         />
         <div

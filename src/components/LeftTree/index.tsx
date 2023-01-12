@@ -211,7 +211,7 @@ const busiGroupContent = (busiGroupProps: BusiGroupProps): IGroupItemProps => {
     }
   }
   // 初始化选中项
-  const initCurBusiItem = useMemo(() => (busiGroupProps.defaultSelect ? { id: busiGroupProps.defaultSelect } : curBusiItem?.id ? curBusiItem : { id: undefined }), [curBusiItem]);
+  const initCurBusiItem = useMemo(() => (busiGroupProps.defaultSelect ? { id: busiGroupProps.defaultSelect } : curBusiItem.id ? curBusiItem : { id: undefined }), [curBusiItem]);
 
   // 初始化展示所有业务组
   useEffect(() => {
@@ -273,11 +273,7 @@ const busiGroupContent = (busiGroupProps: BusiGroupProps): IGroupItemProps => {
                     prop: 'curBusiItem',
                     data: item,
                   });
-                  if (item) {
-                    localStorage.setItem('curBusiItem', JSON.stringify(item));
-                  } else {
-                    localStorage.removeItem('curBusiItem');
-                  }
+                  localStorage.setItem('curBusiItem', JSON.stringify(item));
                 }
                 busiGroupProps.onChange && busiGroupProps.onChange(value, item);
               }}
