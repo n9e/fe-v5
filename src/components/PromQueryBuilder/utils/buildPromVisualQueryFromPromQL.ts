@@ -32,8 +32,7 @@ import { PromVisualQuery, PromVisualQueryLabelFilter, PromVisualQueryOperation, 
 import { arithmeticBinaryOperators, comparisonBinaryOperators } from '../Operations/utils';
 
 export function buildPromVisualQueryFromPromQL(expr: string): Context {
-  const replacedExpr = replaceVariables(expr);
-  const tree = parser.parse(replacedExpr);
+  const tree = parser.parse(expr);
   const node = tree.topNode as any;
 
   const visQuery: PromVisualQuery = {
@@ -47,7 +46,7 @@ export function buildPromVisualQueryFromPromQL(expr: string): Context {
   };
 
   try {
-    handleExpression(replacedExpr, node, context);
+    handleExpression(expr, node, context);
   } catch (err) {
     console.error(err);
     if (err instanceof Error) {
@@ -136,7 +135,7 @@ function isIntervalVariableError(node: SyntaxNode) {
 function getLabel(expr: string, node: SyntaxNode): PromVisualQueryLabelFilter {
   const label = getString(expr, node.getChild(LabelName));
   const op = getString(expr, node.getChild(MatchOp));
-  const value = getString(expr, node.getChild(StringLiteral)).replace(/"/g, '');
+  const value = getString(expr, node.getChild(StringLiteral)).replace(/"|'/g, '');
   return {
     label,
     op,
@@ -332,28 +331,6 @@ function makeError(expr: string, node: SyntaxNode) {
     to: node.to,
     parentType: node.parent?.name,
   };
-}
-
-const variableRegex = /\$(\w+)|\[\[([\s\S]+?)(?::(\w+))?\]\]|\${(\w+)(?:\.([^:^\}]+))?(?::([^\}]+))?}/g;
-
-function replaceVariables(expr: string) {
-  return expr.replace(variableRegex, (match, var1, var2, fmt2, var3, fieldPath, fmt3) => {
-    const fmt = fmt2 || fmt3;
-    let variable = var1;
-    let varType = '0';
-
-    if (var2) {
-      variable = var2;
-      varType = '1';
-    }
-
-    if (var3) {
-      variable = var3;
-      varType = '2';
-    }
-
-    return `__V_${varType}__` + variable + '__V__' + (fmt ? '__F__' + fmt + '__F__' : '');
-  });
 }
 
 function getString(expr: string, node: SyntaxNode | TreeCursor | null | undefined) {
