@@ -94,9 +94,6 @@ export const SelectList: React.FC<SelectListProps> = ({ dataSource, fieldNames =
                   if (item.id !== active) {
                     setActive(item.id);
                     onChange && onChange(item.id, item);
-                  } else {
-                    setActive(-1);
-                    onChange && onChange(-1);
                   }
                 }}
               >
