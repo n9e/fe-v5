@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Select } from 'antd';
+import { AutoComplete } from 'antd';
 import _ from 'lodash';
 import { getLabelNames } from '@/services/dashboard';
 import { getMatchByLabels } from './utils';
@@ -25,6 +25,7 @@ interface IProps {
 export default function LabelNameSelect(props: IProps) {
   const { metric, labels, datasourceValue, params, style, size, value, onChange } = props;
   const [labelNames, setLabelNames] = useState<string[]>([]);
+  const [searchValue, setSearchValue] = useState<string | undefined>();
 
   useEffect(() => {
     if (metric) {
@@ -40,23 +41,37 @@ export default function LabelNameSelect(props: IProps) {
     }
   }, [metric, labels]);
 
+  useEffect(() => {
+    setSearchValue(value);
+  }, [value]);
+
   return (
-    <Select
+    <AutoComplete
+      size={size}
       style={{
         ...(style || {}),
       }}
-      size={size}
-      showSearch
-      value={value}
-      onChange={onChange}
-    >
-      {_.map(labelNames, (item) => {
-        return (
-          <Select.Option key={item} value={item}>
-            {item}
-          </Select.Option>
-        );
+      options={_.map(labelNames, (item) => {
+        return {
+          value: item,
+        };
       })}
-    </Select>
+      value={searchValue}
+      filterOption={(inputValue, option) => {
+        if (option && option.value) {
+          return option.value.indexOf(inputValue) !== -1;
+        }
+        return true;
+      }}
+      onSearch={(val) => {
+        setSearchValue(val);
+      }}
+      onBlur={(e: any) => {
+        onChange(e.target.value);
+      }}
+      onSelect={(val) => {
+        onChange(val);
+      }}
+    />
   );
 }
