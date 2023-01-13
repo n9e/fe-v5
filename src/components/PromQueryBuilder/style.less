@@ -1,0 +1,77 @@
+.row-dragging {
+  background: #fafafa;
+  z-index: 99999;
+}
+.prom-query-builder-container {
+  width: 100%;
+  display: flex;
+  flex-flow: column;
+  gap: 8px;
+}
+.prom-query-builder-metric-label-container {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 8px;
+}
+.prom-query-builder-labels-container {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 8px;
+}
+.prom-query-builder-formitem {
+  width: 100%;
+}
+.prom-query-builder-formitem-label {
+  margin-bottom: 8px;
+}
+.prom-query-builder-metric-label-container,.prom-query-builder-operations-container,.prom-query-builder-rawquery-container {
+  background-color: rgb(250, 250, 250);
+  padding: 16px;
+}
+.prom-query-builder-rawquery-container {
+  padding: 8px;
+  .ant-input {
+    background-color: transparent;
+  }
+}
+.prom-query-builder-operations {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 8px;
+}
+.prom-query-builder-operation {
+  background-color: #fff;
+  border: 1px solid #d9d9d9;
+  height: 100%;
+}
+.prom-query-builder-operation-header {
+  padding: 8px;
+  border-bottom: 1px solid #d9d9d9;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  align-items: center;
+  min-width: 160px;
+}
+.prom-query-builder-operation-handler {
+  cursor: grab;
+}
+.prom-query-builder-operation-content {
+  padding: 8px;
+  display: table;
+  width: 100%;
+}
+.prom-query-builder-operation-param {
+  display: table-row;
+  vertical-align: middle;
+}
+.prom-query-builder-operation-param-label {
+  display: table-cell;
+  padding: 0px 8px 0px 0px;
+  vertical-align: middle;
+  height: 26px;
+}
+.prom-query-builder-operation-param-value {
+  display: table-cell;
+  width: max-content;
+}

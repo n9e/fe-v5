@@ -26,7 +26,7 @@ import { RootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
 import { getTeamInfoList, getNotifiesList } from '@/services/manage';
 import { addOrEditStrategy, EditStrategy, prometheusQuery, deleteStrategy, checkBrainPromql } from '@/services/warning';
-import PromQLInput from '@/components/PromQLInput';
+import { PromQLInputWithBuilder } from '@/components/PromQLInput';
 import AdvancedWrap from '@/components/AdvancedWrap';
 import { SwitchWithLabel } from './SwitchWithLabel';
 import AbnormalDetection from './AbnormalDetection';
@@ -318,57 +318,54 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                                   const cluster =
                                     form.getFieldValue('cluster').includes(ClusterAll) && clusterList.length > 0 ? clusterList[0] : form.getFieldValue('cluster')[0] || '';
                                   return (
-                                    <Input.Group compact>
-                                      <Form.Item
-                                        style={{
-                                          width: visible && getFieldValue('algorithm') === 'holtwinters' ? 'calc(100% - 80px)' : '100%',
-                                        }}
-                                        name='prom_ql'
-                                        validateTrigger={['onBlur']}
-                                        trigger='onChange'
-                                        rules={[{ required: true, message: t('请输入PromQL') }]}
-                                      >
-                                        <PromQLInput
-                                          url='/api/n9e/prometheus'
-                                          headers={{
-                                            'X-Cluster': cluster,
-                                            Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
-                                          }}
-                                          onChange={() => {
-                                            setIsChecked(false);
-                                          }}
-                                        />
-                                      </Form.Item>
+                                    <Row gutter={8}>
+                                      <Col flex='auto'>
+                                        <Form.Item name='prom_ql' validateTrigger={['onBlur']} trigger='onChange' rules={[{ required: true, message: t('请输入PromQL') }]}>
+                                          <PromQLInputWithBuilder
+                                            url='/api/n9e/prometheus'
+                                            headers={{
+                                              'X-Cluster': cluster,
+                                              Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
+                                            }}
+                                            onChange={() => {
+                                              setIsChecked(false);
+                                            }}
+                                            cluster={cluster}
+                                          />
+                                        </Form.Item>
+                                      </Col>
                                       {visible && getFieldValue('algorithm') === 'holtwinters' && (
-                                        <Button
-                                          onClick={() => {
-                                            const values = form.getFieldsValue();
-                                            if (values.prom_ql) {
-                                              setIsChecked(true);
-                                              checkBrainPromql({
-                                                cluster: _.join(values.cluster, ''),
-                                                algorithm: values.algorithm,
-                                                algo_params: values.algo_params,
-                                                prom_ql: values.prom_ql,
-                                                prom_eval_interval: values.prom_eval_interval,
-                                              })
-                                                .then(() => {
-                                                  message.success('校验通过');
+                                        <Col flex='74px'>
+                                          <Button
+                                            onClick={() => {
+                                              const values = form.getFieldsValue();
+                                              if (values.prom_ql) {
+                                                setIsChecked(true);
+                                                checkBrainPromql({
+                                                  cluster: _.join(values.cluster, ''),
+                                                  algorithm: values.algorithm,
+                                                  algo_params: values.algo_params,
+                                                  prom_ql: values.prom_ql,
+                                                  prom_eval_interval: values.prom_eval_interval,
                                                 })
-                                                .catch((res) => {
-                                                  message.error(
-                                                    <div>
-                                                      校验失败<div>{res.data.error}</div>
-                                                    </div>,
-                                                  );
-                                                });
-                                            }
-                                          }}
-                                        >
-                                          指标校验
-                                        </Button>
+                                                  .then(() => {
+                                                    message.success('校验通过');
+                                                  })
+                                                  .catch((res) => {
+                                                    message.error(
+                                                      <div>
+                                                        校验失败<div>{res.data.error}</div>
+                                                      </div>,
+                                                    );
+                                                  });
+                                              }
+                                            }}
+                                          >
+                                            指标校验
+                                          </Button>
+                                        </Col>
                                       )}
-                                    </Input.Group>
+                                    </Row>
                                   );
                                 }}
                               </AdvancedWrap>
