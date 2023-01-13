@@ -85,7 +85,7 @@ export default function index(props: IProps) {
       }
       getLogsQuery({
         cate: 'elasticsearch',
-        cluster: datasourceName,
+        cluster: datasourceName || values.datasourceName,
         query: [
           {
             ...timesRef.current,
