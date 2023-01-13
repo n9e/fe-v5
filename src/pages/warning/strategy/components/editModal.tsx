@@ -17,15 +17,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import moment from 'moment';
-import { Form, Input, InputNumber, Radio, Select, Row, Col, TimePicker, Checkbox, Tag, message, Space, Switch, Tooltip, Modal } from 'antd';
+import { Form, Input, InputNumber, Radio, Select, Row, Col, TimePicker, Checkbox, Tag, message, Space, Switch, Tooltip, Modal, Button } from 'antd';
 const { Option } = Select;
-import { QuestionCircleFilled, MinusCircleOutlined, PlusCircleOutlined, CaretDownOutlined } from '@ant-design/icons';
+import { QuestionCircleFilled, MinusCircleOutlined, PlusCircleOutlined, CaretDownOutlined, PlusOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { RootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
 import { getTeamInfoList, getNotifiesList } from '@/services/manage';
 import { SwitchWithLabel } from './SwitchWithLabel';
-import { debounce } from 'lodash';
+import { debounce, join } from 'lodash';
 import { ClusterAll } from './operateForm';
 const layout = {
   labelCol: {
@@ -70,7 +70,7 @@ const fields = [
   },
   {
     id: 13,
-    field: 'enable_time',
+    field: 'effective_time',
     name: '生效时间',
   },
   {
@@ -234,9 +234,22 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
     form.validateFields().then(async (values) => {
       const data = { ...values };
       switch (values.field) {
-        case 'enable_time':
-          data.enable_stime = values.enable_stime.format('HH:mm');
-          data.enable_etime = values.enable_etime.format('HH:mm');
+        case 'effective_time':
+          data.enable_days_of_week = '';
+          values.effective_time.map((item, index) => {
+            if (values.effective_time.length === 1) {
+              data.enable_days_of_week += join(item.enable_days_of_week, ' ');
+            } else {
+              if (index === values.effective_time.length - 1) {
+                data.enable_days_of_week += join(item.enable_days_of_week, ' ');
+              } else {
+                data.enable_days_of_week += join(item.enable_days_of_week, ' ') + ';';
+              }
+            }
+          }),
+          data.enable_stime = values.effective_time.map((item) => item.enable_time[0].format('HH:mm')),
+          data.enable_etime = values.effective_time.map((item) => item.enable_time[1].format('HH:mm')),
+          delete data.effective_time;
           break;
         case 'disabled':
           data.disabled = !values.enable_status ? 1 : 0;
@@ -296,6 +309,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
         title={t('批量更新')}
         visible={isModalVisible}
         onOk={modelOk}
+        width={800}
         onCancel={() => {
           editModalClose();
         }}
@@ -310,10 +324,14 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
             disabled: 0, // 0:立即启用 1:禁用
             enable_status: true, // true:立即启用 false:禁用
             notify_recovered: 1, // 1:启用
-            enable_stime: moment('00:00', 'HH:mm'),
-            enable_etime: moment('23:59', 'HH:mm'),
+            effective_time: [
+              {
+                enable_time: [moment('00:00', 'HH:mm'), moment('23:59', 'HH:mm')],
+                enable_days_of_week: ['1', '2', '3', '4', '5', '6', '0'],
+              },
+            ],
             cluster: clusterList || ['Default'], // 生效集群
-            enable_days_of_week: ['1', '2', '3', '4', '5', '6', '0'],
+            // enable_days_of_week: ['1', '2', '3', '4', '5', '6', '0'],
             field: 'cluster',
           }}
         >
@@ -686,44 +704,78 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                     </Form.Item>
                   </>
                 );
-              case 'enable_time':
+              case 'effective_time':
                 return (
                   <>
                     <Form.Item
                       label={t('改为：')}
-                      name='enable_days_of_week'
+                      name='effective_time'
                       rules={[
                         {
-                          required: false,
+                          required: true,
                           message: t('生效时间不能为空'),
                         },
                       ]}
                     >
-                      <Select mode='tags'>{enableDaysOfWeekOptions}</Select>
-                    </Form.Item>
-                    <Form.Item
-                      name='enable_stime'
-                      label='开始时间'
-                      rules={[
-                        {
-                          required: true,
-                          message: t('开始时间不能为空'),
-                        },
-                      ]}
-                    >
-                      <TimePicker format='HH:mm' />
-                    </Form.Item>
-                    <Form.Item
-                      name='enable_etime'
-                      label='结束时间'
-                      rules={[
-                        {
-                          required: true,
-                          message: t('结束时间不能为空'),
-                        },
-                      ]}
-                    >
-                      <TimePicker format='HH:mm' />
+                      <Form.List name='effective_time'>
+                        {(fields, { add, remove }) => (
+                          <>
+                            {fields.map(({ key, name, ...restField }) => (
+                              <Space
+                                key={key}
+                                style={{
+                                  display: 'flex',
+                                  marginBottom: 8,
+                                }}
+                                align='baseline'
+                              >
+                                <Form.Item
+                                  {...restField}
+                                  name={[name, 'enable_days_of_week']}
+                                  style={{
+                                    minWidth: '421px',
+                                  }}
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: t('请选择生效周期'),
+                                    },
+                                  ]}
+                                >
+                                  <Select mode='tags'>{enableDaysOfWeekOptions}</Select>
+                                </Form.Item>
+                                <Form.Item
+                                  {...restField}
+                                  name={[name, 'enable_time']}
+                                  noStyle
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: t('请选择生效时间'),
+                                    },
+                                  ]}
+                                >
+                                  <TimePicker.RangePicker
+                                    format='HH:mm'
+                                    onChange={(val, val2) => {
+                                      form.setFieldsValue({
+                                        enable_stime: val2[0],
+                                        enable_etime: val2[1],
+                                      });
+                                    }}
+                                  />
+                                </Form.Item>
+                                <MinusCircleOutlined onClick={() => remove(name)} />
+                              </Space>
+                            ))}
+                            <Form.Item>
+                              <Button type='dashed' onClick={() => add()} block icon={<PlusOutlined />}>
+                                Add field
+                              </Button>
+                            </Form.Item>
+                          </>
+                        )}
+                      </Form.List>
                     </Form.Item>
                   </>
                 );

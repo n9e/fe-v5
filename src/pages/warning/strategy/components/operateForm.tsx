@@ -20,7 +20,7 @@ import { useHistory } from 'react-router-dom';
 import _, { debounce } from 'lodash';
 import moment from 'moment';
 import { Card, Form, Input, InputNumber, Radio, Select, Row, Col, Button, TimePicker, Checkbox, Modal, message, Space, Switch, Tooltip, Tag, notification } from 'antd';
-import { QuestionCircleFilled, MinusCircleOutlined, PlusCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import { QuestionCircleFilled, MinusCircleOutlined, PlusCircleOutlined} from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { RootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
@@ -483,76 +483,63 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
               <Switch />
             </Form.Item>
 
-            <Form.Item
-              label={t('生效时间')}
-              name='effective_time'
-              rules={[
-                {
-                  required: true,
-                  message: t('生效时间不能为空'),
-                },
-              ]}
-            >
-              <Form.List name='effective_time'>
-                {(fields, { add, remove }) => (
-                  <>
-                    {fields.map(({ key, name, ...restField }) => (
-                      <Space
-                        key={key}
+            <Form.List name='effective_time'>
+              {(fields, { add, remove }) => (
+                <>
+                  <div>
+                    生效时间 <PlusCircleOutlined className='control-icon-normal' onClick={() => add()} />
+                  </div>
+                  {fields.map(({ key, name, ...restField }) => (
+                    <Space
+                      key={key}
+                      style={{
+                        display: 'flex',
+                        marginBottom: 8,
+                      }}
+                      align='baseline'
+                    >
+                      <Form.Item
+                        {...restField}
+                        name={[name, 'enable_days_of_week']}
                         style={{
-                          display: 'flex',
-                          marginBottom: 8,
+                          minWidth: '421px',
                         }}
-                        align='baseline'
+                        rules={[
+                          {
+                            required: true,
+                            message: t('请选择生效周期'),
+                          },
+                        ]}
                       >
-                        <Form.Item
-                          {...restField}
-                          name={[name, 'enable_days_of_week']}
-                          style={{
-                            width: '421px',
+                        <Select mode='tags'>{enableDaysOfWeekOptions}</Select>
+                      </Form.Item>
+                      <Form.Item
+                        {...restField}
+                        name={[name, 'enable_time']}
+                        noStyle
+                        rules={[
+                          {
+                            required: true,
+                            message: t('请选择生效时间'),
+                          },
+                        ]}
+                      >
+                        <TimePicker.RangePicker
+                          format='HH:mm'
+                          onChange={(val, val2) => {
+                            form.setFieldsValue({
+                              enable_stime: val2[0],
+                              enable_etime: val2[1],
+                            });
                           }}
-                          rules={[
-                            {
-                              required: true,
-                              message: t('请选择生效周期'),
-                            },
-                          ]}
-                        >
-                          <Select mode='tags'>{enableDaysOfWeekOptions}</Select>
-                        </Form.Item>
-                        <Form.Item
-                          {...restField}
-                          name={[name, 'enable_time']}
-                          noStyle
-                          rules={[
-                            {
-                              required: true,
-                              message: t('请选择生效时间'),
-                            },
-                          ]}
-                        >
-                          <TimePicker.RangePicker
-                            format='HH:mm'
-                            onChange={(val, val2) => {
-                              form.setFieldsValue({
-                                enable_stime: val2[0],
-                                enable_etime: val2[1],
-                              });
-                            }}
-                          />
-                        </Form.Item>
-                        <MinusCircleOutlined onClick={() => remove(name)} />
-                      </Space>
-                    ))}
-                    <Form.Item>
-                      <Button type='dashed' onClick={() => add()} block icon={<PlusOutlined />}>
-                        Add field
-                      </Button>
-                    </Form.Item>
-                  </>
-                )}
-              </Form.List>
-            </Form.Item>
+                        />
+                      </Form.Item>
+                      <MinusCircleOutlined onClick={() => remove(name)} />
+                    </Space>
+                  ))}
+                </>
+              )}
+            </Form.List>
             <Form.Item shouldUpdate={(prevValues, curValues) => prevValues.cate !== curValues.cate} noStyle>
               {({ getFieldValue }) => {
                 if (getFieldValue('cate') === 'prometheus') {
