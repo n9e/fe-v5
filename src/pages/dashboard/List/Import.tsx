@@ -50,7 +50,7 @@ const BetaSvg = () => (
     ></path>
   </svg>
 );
-const BetaIcon = (props) => <Icon component={BetaSvg} {...props} />;
+export const BetaIcon = (props) => <Icon component={BetaSvg} {...props} />;
 
 function Import(props: IProps & ModalWrapProps) {
   const { visible, destroy, busiId, type, refreshList } = props;

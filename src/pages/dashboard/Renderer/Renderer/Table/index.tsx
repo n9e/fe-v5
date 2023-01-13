@@ -29,6 +29,7 @@ import getOverridePropertiesByName from '../../utils/getOverridePropertiesByName
 import localeCompare from '../../utils/localeCompare';
 import formatToTable from '../../utils/formatToTable';
 import { useGlobalState } from '../../../globalState';
+import { transformColumns } from './utils';
 import './style.less';
 
 interface IProps {
@@ -300,6 +301,10 @@ export default function Stat(props: IProps) {
         ...getColumnSearchProps([name, 'text']),
       });
     });
+  }
+
+  if (!_.isEmpty(calculatedValues) && !_.isEmpty(tableColumns)) {
+    tableColumns = transformColumns(tableColumns, values.transformations);
   }
 
   const headerHeight = showHeader ? 40 : 0;

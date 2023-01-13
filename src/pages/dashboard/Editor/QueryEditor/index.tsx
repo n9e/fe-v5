@@ -26,7 +26,7 @@ const allCates = [
   },
 ];
 
-export default function index({ chartForm, defaultDatasourceName }) {
+export default function index({ chartForm, defaultDatasourceName, type }) {
   const [mode, setMode] = useState('query');
   return (
     <div>
@@ -39,7 +39,7 @@ export default function index({ chartForm, defaultDatasourceName }) {
           buttonStyle='solid'
         >
           <Radio.Button value='query'>查询条件</Radio.Button>
-          <Radio.Button value='transform'>数据转换</Radio.Button>
+          {type === 'table' && <Radio.Button value='transform'>数据转换 (beta)</Radio.Button>}
         </Radio.Group>
         <Input.Group>
           <span className='ant-input-group-addon'>数据源类型</span>

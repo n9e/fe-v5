@@ -96,7 +96,7 @@ export default function OrganizeFields(props: IProps) {
                     <InputGroupWithFormItem label={field}>
                       <Input
                         value={rename}
-                        onBlur={(e) => {
+                        onChange={(e) => {
                           onChange &&
                             onChange({
                               ...(value || {}),
