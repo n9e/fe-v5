@@ -276,7 +276,6 @@ const TableSource = (props: IPropsType) => {
   const onSortEnd = ({ oldIndex, newIndex }: SortEnd) => {
     if (oldIndex !== newIndex) {
       const newData = arrayMoveImmutable(tableData.slice(), oldIndex, newIndex).filter((el) => !!el);
-      console.log('Sorted items: ', newData);
       setTableData(newData);
     }
   };

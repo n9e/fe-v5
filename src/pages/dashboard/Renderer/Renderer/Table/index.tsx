@@ -29,6 +29,7 @@ import getOverridePropertiesByName from '../../utils/getOverridePropertiesByName
 import localeCompare from '../../utils/localeCompare';
 import formatToTable from '../../utils/formatToTable';
 import { useGlobalState } from '../../../globalState';
+import { transformColumns } from './utils';
 import './style.less';
 
 interface IProps {
@@ -63,6 +64,7 @@ export default function Stat(props: IProps) {
     sortOrder,
   });
   const [tableFields, setTableFields] = useGlobalState('tableFields');
+  const [displayedTableFields, setDisplayedTableFields] = useGlobalState('displayedTableFields');
 
   useEffect(() => {
     setSortObj({
@@ -82,9 +84,18 @@ export default function Stat(props: IProps) {
       },
       options?.valueMappings,
     );
+    let fields: string[] = [];
+    if (displayMode === 'seriesToRows') {
+      fields = ['name', 'value'];
+    } else if (displayMode === 'labelsOfSeriesToRows') {
+      fields = !_.isEmpty(columns) ? columns : [...getColumnsKeys(data), 'value'];
+    } else if (displayMode === 'labelValuesToRows') {
+      fields = [aggrDimension];
+    }
+    setDisplayedTableFields(fields);
     setTableFields(getColumnsKeys(data));
     setCalculatedValues(data);
-  }, [JSON.stringify(series), calc, JSON.stringify(options)]);
+  }, [JSON.stringify(series), calc, JSON.stringify(options), displayMode, aggrDimension, JSON.stringify(columns)]);
 
   const searchInput = useRef<any>(null);
   const handleSearch = (confirm: (param?: FilterConfirmProps) => void) => {
@@ -181,7 +192,7 @@ export default function Stat(props: IProps) {
     const columnsKeys = _.isEmpty(columns) ? _.concat(getColumnsKeys(calculatedValues), 'value') : columns;
     tableColumns = _.map(columnsKeys, (key, idx) => {
       return {
-        title: <span title={key}>{key}</span>,
+        title: key,
         dataIndex: key,
         key: key,
         width: idx < columnsKeys.length - 1 ? _.get(size, 'width') / columnsKeys.length : undefined,
@@ -290,6 +301,10 @@ export default function Stat(props: IProps) {
         ...getColumnSearchProps([name, 'text']),
       });
     });
+  }
+
+  if (!_.isEmpty(calculatedValues) && !_.isEmpty(tableColumns)) {
+    tableColumns = transformColumns(tableColumns, values.transformations);
   }
 
   const headerHeight = showHeader ? 40 : 0;
