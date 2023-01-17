@@ -111,7 +111,6 @@ export default function Graph(props: IProps) {
         util: highLevelConfig.unit,
       },
     },
-    useLocalTime,
   };
 
   useEffect(() => {
@@ -239,7 +238,7 @@ export default function Graph(props: IProps) {
           )}
         </Space>
       </div>
-      <Timeseries inDashboard={false} values={lineGraphProps as any} series={data} />
+      <Timeseries inDashboard={false} values={lineGraphProps as any} series={data} useLocalTime={useLocalTime} />
     </div>
   );
 }
