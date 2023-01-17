@@ -19,7 +19,7 @@
  */
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Input, Tabs, Button, Alert, Checkbox } from 'antd';
+import { Input, Tabs, Button, Alert, Checkbox, Space } from 'antd';
 import { GlobalOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { IRawTimeRange } from '@/components/TimeRangePicker';
@@ -84,6 +84,7 @@ export default function index(props: IProps) {
   const [step, setStep] = useState<number>(); // for graph
   const [metricsExplorerVisible, setMetricsExplorerVisible] = useState(false);
   const [completeEnabled, setCompleteEnabled] = useState(true);
+  const [useLocalTime, setUseLocalTime] = useState(true);
   const promQLInputRef = useRef<any>(null);
 
   useEffect(() => {
@@ -107,33 +108,34 @@ export default function index(props: IProps) {
     setPromql(promql);
   }, [promql]);
 
+  const extraControllers = (
+    <Space>
+      <Checkbox
+        checked={useLocalTime}
+        onChange={(e) => {
+          setUseLocalTime(e.target.checked);
+          setRefreshFlag(_.uniqueId('refreshFlag_'));
+        }}
+      >
+        Use local time
+      </Checkbox>
+      <Checkbox
+        checked={completeEnabled}
+        onChange={(e) => {
+          setCompleteEnabled(e.target.checked);
+        }}
+      >
+        Enable autocomplete
+      </Checkbox>
+    </Space>
+  );
+
   return (
     <div className='prom-graph-container'>
       {headerExtra && globalOperates.enabled ? (
-        createPortal(
-          <div className='prom-graph-global-operate' style={{ marginTop: 5 }}>
-            <Checkbox
-              checked={completeEnabled}
-              onChange={(e) => {
-                setCompleteEnabled(e.target.checked);
-              }}
-            >
-              Enable autocomplete
-            </Checkbox>
-          </div>,
-          headerExtra,
-        )
+        createPortal(<div style={{ marginTop: 5 }}>{extraControllers}</div>, headerExtra)
       ) : (
-        <div className='prom-graph-global-operate'>
-          <Checkbox
-            checked={completeEnabled}
-            onChange={(e) => {
-              setCompleteEnabled(e.target.checked);
-            }}
-          >
-            Enable autocomplete
-          </Checkbox>
-        </div>
+        <div style={{ marginBottom: 10 }}>{extraControllers}</div>
       )}
 
       <div className='prom-graph-expression-input'>
@@ -259,6 +261,7 @@ export default function index(props: IProps) {
             setStep={setStep}
             graphOperates={graphOperates}
             refreshFlag={refreshFlag}
+            useLocalTime={useLocalTime}
           />
         </TabPane>
       </Tabs>

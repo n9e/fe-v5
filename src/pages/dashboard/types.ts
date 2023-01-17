@@ -222,4 +222,5 @@ export interface IDashboard {
   links: ILink[];
   var: IVariable[]; // 变量配置
   panels: IPanel[];
+  useLocalTime?: boolean;
 }

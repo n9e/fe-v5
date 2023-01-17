@@ -43,6 +43,7 @@ interface IProps {
     enabled: boolean;
   };
   refreshFlag: string;
+  useLocalTime?: boolean;
 }
 
 enum ChartType {
@@ -77,6 +78,7 @@ export default function Graph(props: IProps) {
     setStep,
     graphOperates,
     refreshFlag,
+    useLocalTime,
   } = props;
   const [data, setData] = useState([]);
   const [highLevelConfig, setHighLevelConfig] = useState({
@@ -109,6 +111,7 @@ export default function Graph(props: IProps) {
         util: highLevelConfig.unit,
       },
     },
+    useLocalTime,
   };
 
   useEffect(() => {

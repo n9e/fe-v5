@@ -54,6 +54,7 @@ interface IProps {
   variableConfig: any;
   panels: any[];
   isPreview: boolean;
+  useLocalTime?: boolean;
   setPanels: (panels: any[]) => void;
   onShareClick: (panel: any) => void;
   onUpdated: (res: any) => void;
@@ -65,7 +66,7 @@ function index(props: IProps) {
   const { profile } = useSelector<AccountRootState, accountStoreState>((state) => state.account);
   const location = useLocation();
   const { themeMode } = querystring.parse(location.search);
-  const { editable, curCluster, dashboard, range, step, variableConfig, panels, isPreview, setPanels, onShareClick, onUpdated } = props;
+  const { editable, curCluster, dashboard, range, step, variableConfig, panels, isPreview, useLocalTime, setPanels, onShareClick, onUpdated } = props;
   const layoutInitialized = useRef(false);
   const allowUpdateDashboardConfigs = useRef(false);
   const reactGridLayoutDefaultProps = {
@@ -155,6 +156,7 @@ function index(props: IProps) {
                       } as any
                     }
                     variableConfig={variableConfig}
+                    useLocalTime={useLocalTime}
                     onCloneClick={() => {
                       const newPanels = updatePanelsInsertNewPanel(panels, {
                         ...item,

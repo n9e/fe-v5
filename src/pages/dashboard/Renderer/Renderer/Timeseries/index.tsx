@@ -38,6 +38,7 @@ interface IProps {
   values: IPanel;
   series: any[];
   themeMode?: 'dark';
+  useLocalTime?: boolean;
   onClick?: (event: any, datetime: Date, value: number, points: any[]) => void;
 }
 
@@ -59,7 +60,7 @@ function getStartAndEndByTargets(targets: any[]) {
 }
 
 export default function index(props: IProps) {
-  const { time, values, series, inDashboard = true, chartHeight = '200px', tableHeight = '200px', themeMode = '', onClick } = props;
+  const { time, values, series, inDashboard = true, chartHeight = '200px', tableHeight = '200px', themeMode = '', useLocalTime = true, onClick } = props;
   const { custom, options = {}, targets } = values;
   const { lineWidth = 1, gradientMode = 'none', scaleDistribution } = custom;
   const [seriesData, setSeriesData] = useState(series);
@@ -214,6 +215,9 @@ export default function index(props: IProps) {
               val,
             ).text;
           },
+        },
+        time: {
+          timezoneOffset: useLocalTime ? undefined : 0,
         },
       });
     }

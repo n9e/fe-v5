@@ -46,6 +46,7 @@ interface IProps {
   values: IPanel;
   variableConfig?: IVariable[];
   isPreview?: boolean; // 是否是预览，预览中不显示编辑和分享
+  useLocalTime?: boolean;
   onCloneClick?: () => void;
   onShareClick?: () => void;
   onEditClick?: () => void;
@@ -60,7 +61,7 @@ function replaceFieldWithVariable(dashboardId, value: string, variableConfig?: I
 }
 
 function index(props: IProps) {
-  const { themeMode, dashboardId, id, step, variableConfig, isPreview, onCloneClick, onShareClick, onEditClick, onDeleteClick } = props;
+  const { themeMode, dashboardId, id, step, variableConfig, isPreview, useLocalTime, onCloneClick, onShareClick, onEditClick, onDeleteClick } = props;
   const [time, setTime] = useState(props.time);
   const [visible, setVisible] = useState(false);
   const values = _.cloneDeep(props.values);
@@ -96,6 +97,7 @@ function index(props: IProps) {
   const subProps = {
     values,
     series,
+    useLocalTime,
   };
   const RendererCptMap = {
     timeseries: () => <Timeseries {...subProps} themeMode={themeMode} time={time} />,

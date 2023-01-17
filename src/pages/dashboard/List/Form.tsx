@@ -16,7 +16,7 @@
  */
 import React, { useEffect } from 'react';
 import _ from 'lodash';
-import { Form, Modal, Input, Select, message } from 'antd';
+import { Form, Modal, Input, Select, Switch, message } from 'antd';
 import ModalHOC, { ModalWrapProps } from '@/components/ModalHOC';
 import { updateDashboard, createDashboard, updateDashboardConfigs, getDashboard } from '@/services/dashboardV2';
 import { JSONParse } from '../utils';
@@ -31,7 +31,7 @@ interface IProps {
 
 const layout = {
   labelCol: {
-    span: 4,
+    span: 5,
   },
   wrapperCol: {
     span: 16,
@@ -43,7 +43,7 @@ const titleMap = {
 };
 
 function FormCpt(props: IProps & ModalWrapProps) {
-  const { mode, initialValues = {}, visible, busiId, refreshList, destroy, clusters } = props;
+  const { mode, initialValues = { useLocalTime: true }, visible, busiId, refreshList, destroy, clusters } = props;
   const [form] = Form.useForm();
   const handleOk = async () => {
     try {
@@ -76,6 +76,7 @@ function FormCpt(props: IProps & ModalWrapProps) {
           configs: JSON.stringify({
             ...configs,
             datasourceValue: values.datasourceValue,
+            useLocalTime: values.useLocalTime,
           }),
         });
       }
@@ -92,6 +93,7 @@ function FormCpt(props: IProps & ModalWrapProps) {
         const configs = JSONParse(res.configs);
         form.setFieldsValue({
           datasourceValue: configs.datasourceValue,
+          useLocalTime: configs.useLocalTime === undefined ? true : !!configs.useLocalTime,
         });
       });
     }
@@ -111,12 +113,6 @@ function FormCpt(props: IProps & ModalWrapProps) {
         <Form.Item
           label='大盘名称'
           name='name'
-          labelCol={{
-            span: 5,
-          }}
-          wrapperCol={{
-            span: 24,
-          }}
           rules={[
             {
               required: true,
@@ -129,12 +125,6 @@ function FormCpt(props: IProps & ModalWrapProps) {
         <Form.Item
           label='英文标识'
           name='ident'
-          labelCol={{
-            span: 5,
-          }}
-          wrapperCol={{
-            span: 24,
-          }}
           rules={[
             {
               pattern: /^[a-zA-Z0-9\-]*$/,
@@ -144,16 +134,7 @@ function FormCpt(props: IProps & ModalWrapProps) {
         >
           <Input />
         </Form.Item>
-        <Form.Item
-          labelCol={{
-            span: 5,
-          }}
-          wrapperCol={{
-            span: 24,
-          }}
-          label='分类标签'
-          name='tags'
-        >
+        <Form.Item label='分类标签' name='tags'>
           <Select
             mode='tags'
             dropdownStyle={{
@@ -162,16 +143,7 @@ function FormCpt(props: IProps & ModalWrapProps) {
             placeholder={'请输入分类标签(请用回车分割)'}
           />
         </Form.Item>
-        <Form.Item
-          labelCol={{
-            span: 5,
-          }}
-          wrapperCol={{
-            span: 24,
-          }}
-          label='默认关联数据源'
-          name='datasourceValue'
-        >
+        <Form.Item label='默认关联数据源' name='datasourceValue'>
           <Select>
             {_.map(clusters, (item) => {
               return (
@@ -181,6 +153,9 @@ function FormCpt(props: IProps & ModalWrapProps) {
               );
             })}
           </Select>
+        </Form.Item>
+        <Form.Item label='本地时间' name='useLocalTime' valuePropName='checked'>
+          <Switch />
         </Form.Item>
         <Form.Item name='id' hidden>
           <Input />

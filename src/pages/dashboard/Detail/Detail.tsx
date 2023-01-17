@@ -71,6 +71,7 @@ export default function DetailV2({ isPreview = false }: { isPreview?: boolean })
     update_by: '',
   });
   const [curCluster, setCurCluster] = useState<string>();
+  const [useLocalTime, setUseLocalTime] = useState<boolean>(false);
   const [variableConfig, setVariableConfig] = useState<IVariable[]>();
   const [variableConfigWithOptions, setVariableConfigWithOptions] = useState<IVariable[]>();
   const [dashboardLinks, setDashboardLinks] = useState<ILink[]>();
@@ -114,6 +115,7 @@ export default function DetailV2({ isPreview = false }: { isPreview?: boolean })
         );
         setDashboardLinks(configs.links);
         setPanels(sortPanelsByGridLayout(configs.panels));
+        setUseLocalTime(configs.useLocalTime);
         if (cbk) {
           cbk();
         }
@@ -272,6 +274,7 @@ export default function DetailV2({ isPreview = false }: { isPreview?: boolean })
               range={range}
               step={step}
               variableConfig={variableConfigWithOptions}
+              useLocalTime={useLocalTime}
               onShareClick={(panel) => {
                 const serielData = {
                   dataProps: {
