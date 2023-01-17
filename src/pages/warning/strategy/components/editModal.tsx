@@ -29,7 +29,7 @@ import { debounce, join } from 'lodash';
 import { ClusterAll } from './operateForm';
 const layout = {
   labelCol: {
-    span: 4,
+    span: 2,
   },
   wrapperCol: {
     span: 20,
@@ -247,9 +247,9 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
               }
             }
           }),
-          data.enable_stime = values.effective_time.map((item) => item.enable_time[0].format('HH:mm')),
-          data.enable_etime = values.effective_time.map((item) => item.enable_time[1].format('HH:mm')),
-          delete data.effective_time;
+            (data.enable_stime = values.effective_time.map((item) => item.enable_stime.format('HH:mm'))),
+            (data.enable_etime = values.effective_time.map((item) => item.enable_etime.format('HH:mm'))),
+            delete data.effective_time;
           break;
         case 'disabled':
           data.disabled = !values.enable_status ? 1 : 0;
@@ -309,7 +309,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
         title={t('批量更新')}
         visible={isModalVisible}
         onOk={modelOk}
-        width={800}
+        width={860}
         onCancel={() => {
           editModalClose();
         }}
@@ -326,12 +326,12 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
             notify_recovered: 1, // 1:启用
             effective_time: [
               {
-                enable_time: [moment('00:00', 'HH:mm'), moment('23:59', 'HH:mm')],
+                enable_stime: moment('00:00', 'HH:mm'),
+                enable_etime: moment('23:59', 'HH:mm'),
                 enable_days_of_week: ['1', '2', '3', '4', '5', '6', '0'],
               },
             ],
             cluster: clusterList || ['Default'], // 生效集群
-            // enable_days_of_week: ['1', '2', '3', '4', '5', '6', '0'],
             field: 'cluster',
           }}
         >
@@ -733,7 +733,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                                   {...restField}
                                   name={[name, 'enable_days_of_week']}
                                   style={{
-                                    minWidth: '421px',
+                                    width: 450,
                                   }}
                                   rules={[
                                     {
@@ -742,35 +742,40 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                                     },
                                   ]}
                                 >
-                                  <Select mode='tags'>{enableDaysOfWeekOptions}</Select>
+                                  <Select mode='multiple' placeholder='生效周期'>
+                                    {enableDaysOfWeekOptions}
+                                  </Select>
                                 </Form.Item>
                                 <Form.Item
                                   {...restField}
-                                  name={[name, 'enable_time']}
-                                  noStyle
+                                  name={[name, 'enable_stime']}
                                   rules={[
                                     {
                                       required: true,
-                                      message: t('请选择生效时间'),
+                                      message: t('开始时间不能为空'),
                                     },
                                   ]}
                                 >
-                                  <TimePicker.RangePicker
-                                    format='HH:mm'
-                                    onChange={(val, val2) => {
-                                      form.setFieldsValue({
-                                        enable_stime: val2[0],
-                                        enable_etime: val2[1],
-                                      });
-                                    }}
-                                  />
+                                  <TimePicker format='HH:mm' placeholder='开始时间' />
+                                </Form.Item>
+                                <Form.Item
+                                  {...restField}
+                                  name={[name, 'enable_etime']}
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: t('结束时间不能为空'),
+                                    },
+                                  ]}
+                                >
+                                  <TimePicker format='HH:mm' placeholder='结束时间' />
                                 </Form.Item>
                                 <MinusCircleOutlined onClick={() => remove(name)} />
                               </Space>
                             ))}
                             <Form.Item>
                               <Button type='dashed' onClick={() => add()} block icon={<PlusOutlined />}>
-                                Add field
+                                添加生效时间
                               </Button>
                             </Form.Item>
                           </>

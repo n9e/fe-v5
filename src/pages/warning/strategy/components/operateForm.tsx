@@ -20,7 +20,7 @@ import { useHistory } from 'react-router-dom';
 import _, { debounce } from 'lodash';
 import moment from 'moment';
 import { Card, Form, Input, InputNumber, Radio, Select, Row, Col, Button, TimePicker, Checkbox, Modal, message, Space, Switch, Tooltip, Tag, notification } from 'antd';
-import { QuestionCircleFilled, MinusCircleOutlined, PlusCircleOutlined} from '@ant-design/icons';
+import { QuestionCircleFilled, MinusCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { RootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
@@ -166,8 +166,8 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
         const data = {
           ...values,
           enable_days_of_week: values.effective_time.map((item) => item.enable_days_of_week),
-          enable_stime: values.effective_time.map((item) => item.enable_time[0].format('HH:mm')),
-          enable_etime: values.effective_time.map((item) => item.enable_time[1].format('HH:mm')),
+          enable_stime: values.effective_time.map((item) => item.enable_stime.format('HH:mm')),
+          enable_etime: values.effective_time.map((item) => item.enable_etime.format('HH:mm')),
           disabled: !values.enable_status ? 1 : 0,
           notify_recovered: values.notify_recovered ? 1 : 0,
           enable_in_bg: values.enable_in_bg ? 1 : 0,
@@ -228,12 +228,14 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
           enable_in_bg: detail?.enable_in_bg === 1,
           effective_time: detail?.enable_stime
             ? detail?.enable_stime.map((item, index) => ({
-                enable_time: [moment(detail.enable_stime[index], 'HH:mm'), moment(detail.enable_etime[index], 'HH:mm')],
+                enable_stime: moment(detail.enable_stime[index], 'HH:mm'),
+                enable_etime: moment(detail.enable_etime[index], 'HH:mm'),
                 enable_days_of_week: detail.enable_days_of_week[index],
               }))
             : [
                 {
-                  enable_time: [moment('00:00', 'HH:mm'), moment('23:59', 'HH:mm')],
+                  enable_stime: moment('00:00', 'HH:mm'),
+                  enable_etime: moment('23:59', 'HH:mm'),
                   enable_days_of_week: ['1', '2', '3', '4', '5', '6', '0'],
                 },
               ],
@@ -483,9 +485,13 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
             <Form.List name='effective_time'>
               {(fields, { add, remove }) => (
                 <>
-                  <div>
-                    生效时间 <PlusCircleOutlined className='control-icon-normal' onClick={() => add()} />
-                  </div>
+                  <Space>
+                    <div style={{ width: 450 }}>
+                      生效时间 <PlusCircleOutlined className='control-icon-normal' onClick={() => add()} />
+                    </div>
+                    <div style={{ width: 110 }}>开始时间</div>
+                    <div style={{ width: 110 }}>结束时间</div>
+                  </Space>
                   {fields.map(({ key, name, ...restField }) => (
                     <Space
                       key={key}
@@ -498,9 +504,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                       <Form.Item
                         {...restField}
                         name={[name, 'enable_days_of_week']}
-                        style={{
-                          minWidth: '421px',
-                        }}
+                        style={{ width: 450 }}
                         rules={[
                           {
                             required: true,
@@ -512,24 +516,29 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                       </Form.Item>
                       <Form.Item
                         {...restField}
-                        name={[name, 'enable_time']}
-                        noStyle
+                        name={[name, 'enable_stime']}
+                        style={{ width: 110 }}
                         rules={[
                           {
                             required: true,
-                            message: t('请选择生效时间'),
+                            message: t('开始时间不能为空'),
                           },
                         ]}
                       >
-                        <TimePicker.RangePicker
-                          format='HH:mm'
-                          onChange={(val, val2) => {
-                            form.setFieldsValue({
-                              enable_stime: val2[0],
-                              enable_etime: val2[1],
-                            });
-                          }}
-                        />
+                        <TimePicker format='HH:mm' />
+                      </Form.Item>
+                      <Form.Item
+                        {...restField}
+                        name={[name, 'enable_etime']}
+                        style={{ width: 110 }}
+                        rules={[
+                          {
+                            required: true,
+                            message: t('结束时间不能为空'),
+                          },
+                        ]}
+                      >
+                        <TimePicker format='HH:mm' />
                       </Form.Item>
                       <MinusCircleOutlined onClick={() => remove(name)} />
                     </Space>
