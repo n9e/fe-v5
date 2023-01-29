@@ -271,7 +271,9 @@ export function getVaraiableSelected(name: string, id: string) {
   let v: any = searchObj.get(name);
   // 如果存在 __variable_value_fixed 参数，表示变量值是固定的，不需要从 localStorage 中获取
   if (!searchObj.has('__variable_value_fixed')) {
-    v = localStorage.getItem(`dashboard_${id}_${name}`);
+    if (!v) {
+      v = localStorage.getItem(`dashboard_${id}_${name}`);
+    }
   }
   if (v === null) return null; // null 表示没有初始化过，空字符串表示值被设置成空
   try {
