@@ -35,7 +35,7 @@ export default function index(props: IProps) {
           type='selected'
           onRemove={(field) => {
             onChange(_.without(value, field));
-            setFields(_.concat(fields, field));
+            setFields(_.sortBy(_.concat(fields, field)));
           }}
         />
         <FieldsList
@@ -44,7 +44,7 @@ export default function index(props: IProps) {
           type='available'
           onSelect={(field) => {
             onChange(_.concat(value, field));
-            setFields(_.without(fields, field));
+            setFields(_.sortBy(_.without(fields, field)));
           }}
         />
       </div>
