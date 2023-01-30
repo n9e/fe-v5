@@ -31,9 +31,11 @@ import { autocompletion, completionKeymap } from '@codemirror/autocomplete';
 import { PromQLExtension } from 'codemirror-promql';
 import { baseTheme, promqlHighlighter } from './CMTheme';
 
+export { PromQLInputWithBuilder } from './PromQLInputWithBuilder';
+
 const promqlExtension = new PromQLExtension();
 
-interface CMExpressionInputProps {
+export interface CMExpressionInputProps {
   url: string;
   readonly?: boolean;
   headers?: { [index: string]: string };
