@@ -159,10 +159,17 @@ function convertTimeseriesGrafanaToN9E(panel: any) {
   };
 }
 
+function normalizeCalc(calc: string) {
+  if (calc === 'mean') {
+    return 'avg';
+  }
+  return calc;
+}
+
 function convertPieGrafanaToN9E(panel: any) {
   return {
     version: '2.0.0',
-    calc: _.get(panel, 'options.reduceOptions.calcs[0]'),
+    calc: normalizeCalc(_.get(panel, 'options.reduceOptions.calcs[0]')),
     legengPosition: 'hidden',
   };
 }
@@ -171,7 +178,7 @@ function convertStatGrafanaToN9E(panel: any) {
   return {
     version: '2.0.0',
     textMode: 'value',
-    calc: _.get(panel, 'options.reduceOptions.calcs[0]'),
+    calc: normalizeCalc(_.get(panel, 'options.reduceOptions.calcs[0]')),
     colorMode: 'value',
   };
 }
@@ -180,7 +187,7 @@ function convertGaugeGrafanaToN9E(panel: any) {
   return {
     version: '2.0.0',
     textMode: 'value',
-    calc: _.get(panel, 'options.reduceOptions.calcs[0]'),
+    calc: normalizeCalc(_.get(panel, 'options.reduceOptions.calcs[0]')),
     colorMode: 'value',
   };
 }
@@ -188,7 +195,7 @@ function convertGaugeGrafanaToN9E(panel: any) {
 function convertBarGaugeGrafanaToN9E(panel: any) {
   return {
     version: '2.0.0',
-    calc: _.get(panel, 'options.reduceOptions.calcs[0]'),
+    calc: normalizeCalc(_.get(panel, 'options.reduceOptions.calcs[0]')),
   };
 }
 
