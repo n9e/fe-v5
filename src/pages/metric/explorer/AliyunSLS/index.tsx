@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Radio, Space, Switch, Button, Form, Row, Col } from 'antd';
 import { FormInstance } from 'antd/lib/form/Form';
@@ -11,7 +11,6 @@ import QueryInput from './Query';
 import Raw from './Raw';
 import Metric from './Metric';
 import './style.less';
-import { useLocation } from 'react-router-dom';
 
 interface IProps {
   datasourceCate: DatasourceCateEnum.aliyunSLS;
@@ -36,17 +35,10 @@ const ModeRadio = ({ mode, setMode }) => {
 };
 
 export default function index(props: IProps) {
-  const params = new URLSearchParams(useLocation().search);
-  const executeAtOnce = params.get('data_source_name') && params.get('data_source_type')?.includes('sls');
   const { datasourceCate, datasourceName, headerExtra, form } = props;
-  const [mode, setMode] = useState(executeAtOnce ? 'raw' : 'timeSeries');
+  const [mode, setMode] = useState('timeSeries');
   const rawRef = useRef<any>();
   const metricRef = useRef<any>();
-  useEffect(() => {
-    setTimeout(() => {
-      executeAtOnce && onExecute();
-    }, 0);
-  }, []);
   const onExecute = () => {
     form.validateFields().then((values) => {
       cacheDefaultValues(values.query);

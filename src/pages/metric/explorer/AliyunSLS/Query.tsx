@@ -48,7 +48,7 @@ export default function QueryInput(props: IProps) {
     );
   }
   return (
-    <InputGroupWithFormItem label={label}>
+    <InputGroupWithFormItem label={label} labelWidth={84}>
       <Form.Item {...prefixField} name={[...prefixName, 'query']} style={{ width }}>
         <Input />
       </Form.Item>

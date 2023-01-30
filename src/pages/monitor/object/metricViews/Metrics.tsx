@@ -209,7 +209,7 @@ export default function Metrics(props: IProps) {
               })}
             </>
           ) : (
-            <div style={{ marginTop: 12 }}>暂无指标数据，请选择左侧 Labels</div>
+            <div style={{ marginTop: 12 }}>暂无指标数据，请选择左侧 Lables</div>
           )}
         </div>
       </div>

@@ -7,11 +7,9 @@ export const { useGlobalState } = createGlobalState<{
   };
   statFields: string[];
   tableFields: string[];
-  displayedTableFields: string[];
 }>({
   statFields: [],
   tableFields: [],
-  displayedTableFields: [],
   dashboardMeta: {} as {
     dashboardId: string;
     variableConfigWithOptions: any;

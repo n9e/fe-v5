@@ -92,7 +92,7 @@ function FormCpt(props, ref) {
                           id={id}
                         />
                       </div>
-                      <QueryEditor chartForm={chartForm} defaultDatasourceName={cluster} type={type} />
+                      <QueryEditor chartForm={chartForm} defaultDatasourceName={cluster} />
                     </div>
                   );
                 }

@@ -1,31 +1,34 @@
 import React from 'react';
 import { Input } from 'antd';
-import classNames from 'classnames';
-import './style.less';
 
 interface IProps {
   children: React.ReactNode;
   label: React.ReactNode;
-  labelWidth?: number | string;
+  labelWidth?: number;
   noStyle?: boolean;
 }
 
 export default function index(props: IProps) {
-  const { children, label, labelWidth = 'max-content', noStyle = false } = props;
+  const { children, label, labelWidth = 60, noStyle = false } = props;
   return (
-    <Input.Group compact className='input-group-with-form-item'>
+    <Input.Group compact>
       <span
-        className={classNames({
-          'ant-input-group-addon': !noStyle,
-          'input-group-with-form-item-label': true,
-        })}
+        className={!noStyle ? 'ant-input-group-addon' : ''}
         style={{
+          height: 32,
+          lineHeight: '32px',
           width: labelWidth,
         }}
       >
         {label}
       </span>
-      <div className='input-group-with-form-item-content'>{children}</div>
+      <div
+        style={{
+          width: `calc(100% - ${labelWidth}px)`,
+        }}
+      >
+        {children}
+      </div>
     </Input.Group>
   );
 }

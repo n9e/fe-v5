@@ -40,7 +40,7 @@ const { TabPane } = Tabs;
 
 function FormCpt(props: ModalWrapProps & IProps) {
   const { t } = useTranslation();
-  const { action, visible, initialValues = {}, destroy, range, onOk, admin } = props;
+  const { action, visible, initialValues={}, destroy, range, onOk, admin } = props;
   const [form] = Form.useForm();
   const [labels, setLabels] = useState<string[]>([]);
   const [filteredLabels, setFilteredLabels] = useState<string[]>([]);
@@ -48,7 +48,7 @@ function FormCpt(props: ModalWrapProps & IProps) {
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewData, setPreviewData] = useState([]);
   const [activeKey, setActiveKey] = useState('form');
-  const getLabelsOptions = (_labels) => {
+  const getLablesOptions = (_labels) => {
     return _.map(_labels, (label) => {
       return (
         <Select.Option key={label} value={label}>
@@ -176,7 +176,7 @@ function FormCpt(props: ModalWrapProps & IProps) {
                     <Space key={key}>
                       <Form.Item name={[name, 'label']} rules={[{ required: true }]}>
                         <Select suffixIcon={<CaretDownOutlined />} allowClear showSearch style={{ width: 170 }}>
-                          {getLabelsOptions(labels)}
+                          {getLablesOptions(labels)}
                         </Select>
                       </Form.Item>
                       <Form.Item name={[name, 'oper']} rules={[{ required: true }]}>
@@ -205,12 +205,12 @@ function FormCpt(props: ModalWrapProps & IProps) {
           </Form.List>
           <Form.Item label='动态过滤标签' name='dynamicLabels'>
             <Select allowClear showSearch mode='multiple'>
-              {getLabelsOptions(filteredLabels)}
+              {getLablesOptions(filteredLabels)}
             </Select>
           </Form.Item>
           <Form.Item label='展开维度标签' name='dimensionLabels' rules={[{ required: true }]}>
             <Select allowClear showSearch mode='multiple'>
-              {getLabelsOptions(filteredLabels)}
+              {getLablesOptions(filteredLabels)}
             </Select>
           </Form.Item>
           <div style={{ textAlign: 'right', marginBottom: 10 }}>
@@ -245,18 +245,18 @@ function FormCpt(props: ModalWrapProps & IProps) {
               rowKey='label'
               columns={[
                 {
-                  title: 'Label Key',
+                  title: 'Lable Key',
                   dataIndex: 'label',
                 },
                 {
-                  title: 'Label Value 数量',
+                  title: 'Lable Value 数量',
                   dataIndex: 'values',
                   render: (text) => {
                     return text.length;
                   },
                 },
                 {
-                  title: 'Label Value 样例',
+                  title: 'Lable Value 样例',
                   dataIndex: 'values',
                   render: (text) => {
                     return (
