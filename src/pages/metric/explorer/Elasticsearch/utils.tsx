@@ -33,7 +33,15 @@ export function getColumnsFromFields(selectedFields: string[], dateField?: strin
         title: item,
         dataIndex: 'fields',
         render: (fields) => {
-          return _.join(fields[item], ',');
+          return (
+            <div
+              style={{
+                minWidth: item.length * 8,
+              }}
+            >
+              {fields[item]}
+            </div>
+          );
         },
         sorter: (a, b) => localeCompareFunc(_.join(_.get(a, `fields[${item}]`, '')), _.join(_.get(b, `fields[${item}]`, ''))),
       };
