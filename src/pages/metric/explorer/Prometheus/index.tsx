@@ -7,13 +7,8 @@ import PromGraph from '@/components/PromGraphCpt';
 import { IRawTimeRange, timeRangeUnix, isMathString } from '@/components/TimeRangePicker';
 
 type IMode = 'table' | 'graph';
-interface IProps {
-  defaultPromQL: string;
-  headerExtra: HTMLDivElement | null;
-}
 
-export default function Prometheus(props: IProps) {
-  const { defaultPromQL, headerExtra } = props;
+export default function Prometheus({ defaultPromQL }: { defaultPromQL: string }) {
   const history = useHistory();
   const { search } = useLocation();
   const query = queryString.parse(search);
@@ -54,7 +49,6 @@ export default function Prometheus(props: IProps) {
       datasourceIdRequired={false}
       graphOperates={{ enabled: true }}
       globalOperates={{ enabled: true }}
-      headerExtra={headerExtra}
     />
   );
 }

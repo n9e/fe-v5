@@ -5,7 +5,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import TimeRangePicker, { isMathString } from '@/components/TimeRangePicker';
 import Resolution from '@/components/Resolution';
-import PromQLInput, { PromQLInputWithBuilder } from '@/components/PromQLInput';
+import PromQLInput from '@/components/PromQLInput';
 import Collapse, { Panel } from '../Components/Collapse';
 import getFirstUnusedLetter from '../../Renderer/utils/getFirstUnusedLetter';
 
@@ -59,14 +59,13 @@ export default function Prometheus({ chartForm }) {
                         ]}
                         style={{ flex: 1 }}
                       >
-                        <PromQLInputWithBuilder
+                        <PromQLInput
                           validateTrigger={['onBlur']}
                           url='/api/n9e/prometheus'
                           headers={{
                             'X-Cluster': localStorage.getItem('curCluster') || 'DEFAULT',
                             Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
                           }}
-                          cluster={localStorage.getItem('curCluster') || 'DEFAULT'}
                         />
                       </Form.Item>
                     </div>

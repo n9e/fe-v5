@@ -39,7 +39,7 @@ export default function Trigger(props: IProps) {
         {(fields, { add, remove }) => (
           <div>
             <div style={{ marginBottom: 8 }}>
-              关联 Label:{' '}
+              关联 Lable:{' '}
               <PlusCircleOutlined
                 onClick={() => {
                   add();

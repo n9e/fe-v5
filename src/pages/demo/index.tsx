@@ -14,55 +14,41 @@
  * limitations under the License.
  *
  */
-import React, { useState } from 'react';
-import { Collapse, Row } from 'antd';
-import moment from 'moment';
-import PromQueryBuilder from '@/components/PromQueryBuilder';
-import { PromQLInputWithBuilder } from '@/components/PromQLInput';
-
+import React, { useRef, useEffect, useState } from 'react';
+import { Form, Input, Button, Radio, Collapse, Row, Col } from 'antd';
+import PromqlEditor from '@/components/PromqlEditor';
 const { Panel } = Collapse;
+import G2PieChart from '@/components/G2PieChart';
+import ColumnSelect from '@/components/ColumnSelect';
+
+let honeyCombData: any = [];
+for (let i = 0; i < 1000; i++) {
+  honeyCombData.push({
+    name: 'cluster=cloudcollector deployment=nite metric=avg node=nite-cloudcollector-',
+    value: Math.random() * 100,
+  });
+}
 
 export default function Demo() {
-  const [query, setQuery] = useState({
-    labels: [
-      {
-        label: '',
-        value: '',
-        op: '=',
-      },
-    ] as any,
-    operations: [] as any,
-  });
-  const [promQL, setPromQL] = useState<string | undefined>();
+  const [xCluster, setXCluster] = useState('Default');
   return (
     <div>
-      <Collapse defaultActiveKey={['1', '2']}>
-        <Panel header='Prom query builder' key='1'>
+      <Collapse defaultActiveKey='3'>
+        <Panel header='PromqlEditor' key='1'>
           <Row style={{ marginBottom: 20 }}>
-            <PromQueryBuilder
-              datasourceValue='VM1'
-              params={{
-                start: moment().subtract(1, 'hours').unix(),
-                end: moment().unix(),
-              }}
-              value={query}
-              onChange={(val) => {
-                setQuery(val);
-              }}
-            />
+            <p>PromqlEditor 的自动闭合及联想功能不支持动态切换集群，xCluster变化后自己销毁并重新初始化组件</p>
+            <PromqlEditor style={{ width: '100%' }} xCluster={xCluster} />
           </Row>
         </Panel>
-        <Panel header='PromQL' key='2'>
-          <PromQLInputWithBuilder
-            url='/api/n9e/prometheus'
-            headers={{
-              'X-Cluster': localStorage.getItem('curCluster') || 'DEFAULT',
-              Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
-            }}
-            cluster={localStorage.getItem('curCluster') || 'DEFAULT'}
-            value={promQL}
-            onChange={setPromQL}
-          />
+        <Panel header='G2PieChart' key='2'>
+          <Row>
+            <ColumnSelect />
+          </Row>
+        </Panel>
+        <Panel header='Honeycomb' key='3'>
+          <Row>
+            <div style={{ height: 500, width: '100%' }}>{/* <Honeycomb data={honeyCombData} /> */}</div>
+          </Row>
         </Panel>
       </Collapse>
     </div>

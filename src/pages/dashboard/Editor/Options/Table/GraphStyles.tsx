@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-import React from 'react';
+import React, { useContext } from 'react';
 import { Form, Select, Row, Col, Switch, Radio } from 'antd';
 import { CaretDownOutlined } from '@ant-design/icons';
 import _ from 'lodash';
@@ -58,16 +58,7 @@ export default function GraphStyles({ chartForm }) {
         <Row gutter={10}>
           <Col span={12}>
             <Form.Item label='显示模式' name={[...namePrefix, 'displayMode']}>
-              <Select
-                suffixIcon={<CaretDownOutlined />}
-                onChange={(val) => {
-                  if (val === 'labelsOfSeriesToRows') {
-                    chartForm.setFieldsValue({ custom: { columns: [] } });
-                  } else if (val === 'labelValuesToRows') {
-                    chartForm.setFieldsValue({ custom: { aggrDimension: '' } });
-                  }
-                }}
-              >
+              <Select suffixIcon={<CaretDownOutlined />}>
                 <Select.Option value='seriesToRows'>每行展示 serie 的值</Select.Option>
                 <Select.Option value='labelsOfSeriesToRows'>每行展示 labels 的值</Select.Option>
                 <Select.Option value='labelValuesToRows'>每行展示指定聚合维度的值</Select.Option>
@@ -119,8 +110,7 @@ export default function GraphStyles({ chartForm }) {
             <Form.Item noStyle shouldUpdate>
               {({ getFieldValue }) => {
                 const displayMode = getFieldValue([...namePrefix, 'displayMode']);
-                const fieldColumns = getFieldValue([...namePrefix, 'columns']);
-                const columns = !_.isEmpty(fieldColumns) ? fieldColumns : _.concat(tableFields, 'value');
+                const columns = getFieldValue([...namePrefix, 'columns']) ? getFieldValue([...namePrefix, 'columns']) : _.concat(tableFields, 'value');
                 const aggrDimension = getFieldValue([...namePrefix, 'aggrDimension']);
                 let keys: string[] = [];
                 if (displayMode === 'seriesToRows') {
@@ -128,7 +118,7 @@ export default function GraphStyles({ chartForm }) {
                 } else if (displayMode === 'labelsOfSeriesToRows') {
                   keys = columns;
                 } else if (displayMode === 'labelValuesToRows') {
-                  keys = [aggrDimension || 'name'];
+                  keys = [aggrDimension || 'name', 'value'];
                 }
                 return (
                   <Form.Item label='默认排序列' name={[...namePrefix, 'sortColumn']}>
