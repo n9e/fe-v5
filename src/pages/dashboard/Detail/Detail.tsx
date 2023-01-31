@@ -54,9 +54,7 @@ export default function DetailV2({ isPreview = false }: { isPreview?: boolean })
   const [dashboardMeta, setDashboardMeta] = useGlobalState('dashboardMeta');
   const { search } = useLocation();
   const locationQuery = queryString.parse(search);
-  if (_.get(locationQuery, '__cluster')) {
-    localStorage.setItem('curCluster', _.get(locationQuery, '__cluster'));
-  }
+  const urlCluster = _.get(locationQuery, '__cluster');
   const localCluster = localStorage.getItem('curCluster');
   const { id } = useParams<URLParam>();
   const refreshRef = useRef<{ closeRefresh: Function }>();
@@ -96,7 +94,7 @@ export default function DetailV2({ isPreview = false }: { isPreview?: boolean })
       setDashboard(res);
       if (!curCluster) {
         const dashboardConfigs: any = JSONParse(res.configs);
-        setCurCluster(dashboardConfigs.datasourceValue || localCluster || clusters[0]);
+        setCurCluster(urlCluster || dashboardConfigs.datasourceValue || localCluster || clusters[0]);
       }
       if (res.configs) {
         const configs = JSONParse(res.configs);
