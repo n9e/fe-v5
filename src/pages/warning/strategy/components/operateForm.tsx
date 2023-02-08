@@ -164,10 +164,10 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
         }
         const callbacks = values.callbacks.map((item) => item.url);
         const data = {
-          ...values,
-          enable_days_of_week: values.effective_time.map((item) => item.enable_days_of_week),
-          enable_stime: values.effective_time.map((item) => item.enable_stime.format('HH:mm')),
-          enable_etime: values.effective_time.map((item) => item.enable_etime.format('HH:mm')),
+          ..._.omit(values, ['effective_time']),
+          enable_days_of_weeks: values.effective_time.map((item) => item.enable_days_of_week),
+          enable_stimes: values.effective_time.map((item) => item.enable_stime.format('HH:mm')),
+          enable_etimes: values.effective_time.map((item) => item.enable_etime.format('HH:mm')),
           disabled: !values.enable_status ? 1 : 0,
           notify_recovered: values.notify_recovered ? 1 : 0,
           enable_in_bg: values.enable_in_bg ? 1 : 0,
@@ -226,11 +226,11 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
           ...parseValues(detail),
           cluster: detail.cluster ? detail.cluster.split(' ') : ['$all'], // 生效集群
           enable_in_bg: detail?.enable_in_bg === 1,
-          effective_time: detail?.enable_stime
-            ? detail?.enable_stime.map((item, index) => ({
-                enable_stime: moment(detail.enable_stime[index], 'HH:mm'),
-                enable_etime: moment(detail.enable_etime[index], 'HH:mm'),
-                enable_days_of_week: detail.enable_days_of_week[index],
+          effective_time: detail?.enable_etimes
+            ? detail?.enable_etimes.map((item, index) => ({
+                enable_stime: moment(detail.enable_stimes[index], 'HH:mm'),
+                enable_etime: moment(detail.enable_etimes[index], 'HH:mm'),
+                enable_days_of_week: detail.enable_days_of_weeks[index],
               }))
             : [
                 {
