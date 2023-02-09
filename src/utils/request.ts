@@ -155,12 +155,13 @@ request.interceptors.response.use(
     } else {
       const contentType = response.headers.get('content-type');
       const isPlainText = contentType?.indexOf('text/plain; charset=utf-8') !== -1;
-      if (isPlainText) {
+      const isJson = contentType?.indexOf('application/json') !== -1;
+      if (!isJson) {
         return response
           .clone()
           .text()
           .then((data) => {
-            throw new Error(data);
+            throw new Error(status + data);
           });
       } else {
         return response
