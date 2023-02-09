@@ -32,7 +32,7 @@ export default function FormCpt({ renderContent, backUrl = '/settings/source/log
     let pluginId = data?.plugin_id;
     if (!pluginId) {
       const result = await getDataSourcePluginList('logging');
-      pluginId = _.get(_.find(result, { type: `${type}.${cate}` }), 'id'); // TODO: 这里跟 srm 有区别
+      pluginId = _.get(_.find(result, { type }), 'id'); // TODO: 这里跟 srm 有区别
     }
     return submitRequest({
       ...values,

@@ -29,7 +29,7 @@ export const sourceLogoMap = {
   'elasticsearch.logging': <img src={'/logos/elasticSearch.svg'} alt='' className='prometheus_logo' width='46' />,
   'tencent-es.logging': <img src={'/logos/tencet-es.png'} alt='' className='prometheus_logo' width='61' />,
   'aliyun-es.logging': <img src={'/logos/aliyun-es.png'} alt='' className='prometheus_logo' width='61' />,
-  'aliyun-sls.logging': <img src={'/logos/aliyun-sls.png'} alt='' className='prometheus_logo' width='46' />,
+  'aliyun-sls': <img src={'/logos/aliyun-sls.png'} alt='' className='prometheus_logo' width='46' />,
   'kafka.logging': <img src={'/logos/kafka_logo--simple.png'} alt='' className='prometheus_logo' width='36' />,
   'zipkin.tracing': <img src={'/logos/zipkin_logo.png'} alt='' className='prometheus_logo' width='39' />,
   'jaeger.tracing': <img src={'/logos/jaeger_logo.png'} alt='' className='prometheus_logo' width='40' />,
