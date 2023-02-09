@@ -32,7 +32,7 @@ const options = [15, 30, 60, 120, 300].map((num) => ({
 export default function Resolution(props: Props) {
   const { onChange, value, initialValue } = props;
   const [inputContent, setInputContent] = useState<string>(String(initialValue || ''));
-  const [setp, setStep] = useState<number | null>(initialValue || null);
+  const [step, setStep] = useState<number | null>(initialValue || null);
 
   useEffect(() => {
     setInputContent(String(value || ''));
@@ -48,13 +48,13 @@ export default function Resolution(props: Props) {
 
   const handleResult = () => {
     // 如果清空输入，则不设置 Step 值
-    if (!inputContent && setp !== null) {
+    if (!inputContent) {
       setStep(null);
       onChange && onChange(null);
       return;
     }
     const newStep = Number(inputContent);
-    if (Number.isInteger(newStep) && newStep > 0 && newStep <= Number.MAX_SAFE_INTEGER && newStep !== setp) {
+    if (Number.isInteger(newStep) && newStep > 0 && newStep <= Number.MAX_SAFE_INTEGER && newStep !== step) {
       setStep(newStep);
       onChange && onChange(newStep);
     }
@@ -62,7 +62,7 @@ export default function Resolution(props: Props) {
 
   const handelSelect = (v) => {
     const newStep = Number(v);
-    if (newStep !== setp) {
+    if (newStep !== step) {
       setStep(newStep);
       onChange && onChange(newStep);
     }

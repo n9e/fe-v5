@@ -52,11 +52,11 @@ export default async function prometheusQuery(options: IOptions) {
           end = moment(parsedRange.end).unix();
         }
         _step = getDefaultStepByStartAndEnd(start, end);
-        if (target.step) {
-          _step = target.step;
-        }
       }
 
+      if (target.step) {
+        _step = target.step;
+      }
       start = start - (start % _step!);
       end = end - (end % _step!);
 
