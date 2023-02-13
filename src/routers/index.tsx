@@ -94,7 +94,7 @@ export default function Content() {
   const location = useLocation();
   const dispatch = useDispatch();
   if (!profile.id && location.pathname != '/login' && !location.pathname.startsWith('/callback')) {
-    if (!location.pathname.startsWith('/dashboards/share/')) {
+    if (!location.pathname.startsWith('/dashboards/share/') && !location.pathname.startsWith('/polaris/screen/')) {
       dispatch({ type: 'common/getClusters' });
     }
     if (
@@ -102,7 +102,8 @@ export default function Content() {
       !location.pathname.startsWith('/dashboards/share/') &&
       !location.pathname.startsWith('/alert-cur-events/') &&
       !location.pathname.startsWith('/alert-his-events/') &&
-      !location.pathname.startsWith('/callback')
+      !location.pathname.startsWith('/callback') &&
+      !location.pathname.startsWith('/polaris/screen/')
     ) {
       dispatch({ type: 'account/getProfile' });
       dispatch({ type: 'common/getBusiGroups' });
