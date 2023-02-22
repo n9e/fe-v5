@@ -2,12 +2,12 @@ import _ from 'lodash';
 import moment from 'moment';
 import { formatPickerDate } from '@/components/DateRangePicker';
 import { IRawTimeRange, parseRange } from '@/components/TimeRangePicker';
-import { replaceExpressionVars } from '../../VariableConfig/constant';
 import { fetchHistoryBatch } from '@/components/Graph/api';
 import { ITarget } from '../../types';
 import { IVariable } from '../../VariableConfig/definition';
 import replaceExpressionBracket from '../utils/replaceExpressionBracket';
 import { completeBreakpoints, getSerieName } from './utils';
+import replaceFieldWithVariable from '../utils/replaceFieldWithVariable';
 
 interface IOptions {
   dashboardId: string;
@@ -19,6 +19,7 @@ interface IOptions {
   targets: ITarget[];
   variableConfig?: IVariable[];
   spanNulls?: boolean;
+  scopedVars?: any;
 }
 
 const getDefaultStepByStartAndEnd = (start: number, end: number) => {
@@ -26,7 +27,7 @@ const getDefaultStepByStartAndEnd = (start: number, end: number) => {
 };
 
 export default async function prometheusQuery(options: IOptions) {
-  const { dashboardId, id, time, step, targets, variableConfig, spanNulls, datasourceName } = options;
+  const { dashboardId, id, time, step, targets, variableConfig, spanNulls, datasourceName, scopedVars } = options;
   if (!time.start) return;
   const parsedRange = parseRange(time);
   let start = moment(parsedRange.start).unix();
@@ -60,7 +61,7 @@ export default async function prometheusQuery(options: IOptions) {
       start = start - (start % _step!);
       end = end - (end % _step!);
 
-      const realExpr = variableConfig ? replaceExpressionVars(target.expr, variableConfig, variableConfig.length, dashboardId) : target.expr;
+      const realExpr = variableConfig ? replaceFieldWithVariable(dashboardId, target.expr, variableConfig, scopedVars) : target.expr;
       if (realExpr) {
         batchParams.push({
           end: end,

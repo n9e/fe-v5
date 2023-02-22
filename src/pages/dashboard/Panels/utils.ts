@@ -15,7 +15,8 @@
  *
  */
 import _ from 'lodash';
-import { IPanel } from '../types';
+import { v4 as uuidv4 } from 'uuid';
+import { IPanel, IVariable } from '../types';
 import { JSONParse } from '../utils';
 
 export function buildLayout(panels: IPanel[]) {
@@ -91,6 +92,7 @@ export function getRowPanelsMaxY(panels: IPanel[], rowId: string) {
   });
   return maxY;
 }
+
 export function getRowCollapsedPanels(panels: IPanel[], row: IPanel) {
   let newPanels = _.cloneDeep(panels);
   const rowIndex = getRowIndex(newPanels, row.id);
@@ -117,6 +119,7 @@ export function getRowCollapsedPanels(panels: IPanel[], row: IPanel) {
   }
   return newPanels;
 }
+
 export function getRowUnCollapsedPanels(panels: IPanel[], row: IPanel) {
   let newPanels = _.cloneDeep(panels);
   const curRowPanels = getRowPanels(newPanels, row.id);
@@ -129,6 +132,7 @@ export function getRowUnCollapsedPanels(panels: IPanel[], row: IPanel) {
   }
   return newPanels;
 }
+
 /**
  * 处理 Row 组件切换时需要更新的 panels，返回更新后的 panels
  * 关闭 row 时，需要把 row 下面的 rowPanels 删除掉，并且缓存被删除的 panels
@@ -218,6 +222,109 @@ export function updatePanelsInsertNewPanelToRow(panels: IPanel[], rowId: string,
 
 export function panelsMergeToConfigs(configs: string | undefined, panels: any[]) {
   const parsedConfigs = JSONParse(configs);
-  parsedConfigs.panels = panels;
+  const cloneDeep = _.cloneDeep(panels);
+  cleanUpRepeats(cloneDeep);
+  parsedConfigs.panels = cloneDeep;
   return JSON.stringify(parsedConfigs);
+}
+
+export function deleteScopeVars(panels: IPanel[]) {
+  for (const panel of panels) {
+    delete panel.scopedVars;
+    if (panel.panels?.length) {
+      for (const collapsedPanel of panel.panels) {
+        delete collapsedPanel.scopedVars;
+      }
+    }
+  }
+}
+
+export function cleanUpRepeats(panels: IPanel[]) {
+  const panelsToRemove = panels.filter((p) => !p.repeat && p.repeatPanelId);
+
+  deleteScopeVars(panels);
+
+  _.pull(panels, ...panelsToRemove);
+  sortPanelsByGridLayout(panels);
+}
+
+export function getPanelRepeatClone(sourcePanel: IPanel, valueIndex: number, sourcePanelIndex: number, panels: IPanel[]) {
+  // 源面板直接返回
+  if (valueIndex === 0) {
+    return sourcePanel;
+  }
+
+  const clone = _.cloneDeep(sourcePanel);
+  clone.id = uuidv4();
+
+  // 在源面板后面插入
+  panels.splice(sourcePanelIndex + valueIndex, 0, clone);
+
+  clone.repeatPanelId = sourcePanel.id;
+  clone.repeat = undefined;
+
+  return clone;
+}
+
+export function repeatPanel(panel: IPanel, panelIndex: number, panels: IPanel[], variables: IVariable[]) {
+  const variable = _.find(variables, { name: panel.repeat });
+  if (!variable) {
+    return;
+  }
+
+  const selectedOptions = variable.value;
+
+  const maxPerRow = panel.maxPerRow || 4;
+  let xPos = 0;
+  let yPos = panel.layout.y;
+
+  for (let index = 0; index < selectedOptions.length; index++) {
+    const option = selectedOptions[index];
+    let copy;
+
+    copy = getPanelRepeatClone(panel, index, panelIndex, panels);
+    copy.scopedVars ??= {};
+    copy.scopedVars[variable.name] = option;
+
+    // repeat 的面板默认占据整行
+    copy.layout.w = Math.max(24 / selectedOptions.length, 24 / maxPerRow);
+    copy.layout.x = xPos;
+    copy.layout.y = yPos;
+    copy.layout.i = copy.id;
+
+    xPos += copy.layout.w;
+
+    // 水平溢出的话就换行
+    if (xPos + copy.layout.w > 24) {
+      xPos = 0;
+      yPos += copy.layout.h;
+    }
+  }
+
+  // 更新后面 panel 的布局
+  const yOffset = yPos - panel.layout.y;
+  if (yOffset > 0) {
+    const panelBelowIndex = panelIndex + selectedOptions.length;
+    for (const curPanel of panels.slice(panelBelowIndex)) {
+      curPanel.layout.y += yOffset;
+    }
+  }
+}
+
+export function processRepeats(panels: IPanel[], variables: IVariable[]) {
+  if (!variables || variables.length === 0) {
+    return panels;
+  }
+
+  cleanUpRepeats(panels);
+
+  for (let i = 0; i < panels.length; i++) {
+    const panel = panels[i];
+    if (panel.repeat) {
+      repeatPanel(panel, i, panels, variables);
+    }
+  }
+
+  const newPanels = sortPanelsByGridLayout(panels);
+  return newPanels;
 }
