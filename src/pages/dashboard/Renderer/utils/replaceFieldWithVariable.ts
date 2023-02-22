@@ -27,7 +27,6 @@ export const replaceExpressionVarsSpecifyRule = (
   _.forEach(scopedVars, (vValue, vKey) => {
     newExpression = replaceAllPolyfill(newExpression, getPlaceholder(vKey), vValue);
   });
-
   return newExpression;
 };
 
@@ -53,7 +52,7 @@ export const replaceExpressionScopedVars = (expression: string, scopedVars: any)
 export default function replaceFieldWithVariable(dashboardId, value: string, variableConfig?: IVariable[], scopedVars?: any) {
   if (!value) return value;
   if (scopedVars) {
-    return replaceExpressionScopedVars(value, scopedVars);
+    value = replaceExpressionScopedVars(value, scopedVars);
   }
   if (!variableConfig) {
     return value;
