@@ -268,6 +268,7 @@ function convertPanlesGrafanaToN9E(panels: any) {
             ...item.gridPos,
             i: uid,
           },
+
           panels: convertPanlesGrafanaToN9E(item.panels),
         };
       }
@@ -297,6 +298,8 @@ function convertPanlesGrafanaToN9E(panels: any) {
           .value(),
         options: convertOptionsGrafanaToN9E(item),
         custom: chartsMap[item.type] ? chartsMap[item.type].fn(item) : {},
+        maxPerRow: item.maxPerRow || 4,
+        repeat: item.repeat,
       };
     })
     .value();
