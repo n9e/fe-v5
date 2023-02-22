@@ -33,7 +33,7 @@ export default function GraphStyles() {
     <Panel header='图表样式'>
       <>
         <Row gutter={10}>
-          <Col span={12}>
+          <Col span={8}>
             <Form.Item label='显示内容' name={[...namePrefix, 'textMode']}>
               <Radio.Group buttonStyle='solid'>
                 <Radio.Button value='valueAndName'>名称和值</Radio.Button>
@@ -41,7 +41,15 @@ export default function GraphStyles() {
               </Radio.Group>
             </Form.Item>
           </Col>
-          <Col span={12}>
+          <Col span={8}>
+            <Form.Item label='图表模式' name={[...namePrefix, 'graphMode']}>
+              <Radio.Group buttonStyle='solid'>
+                <Radio.Button value='none'>不显示</Radio.Button>
+                <Radio.Button value='area'>迷你图</Radio.Button>
+              </Radio.Group>
+            </Form.Item>
+          </Col>
+          <Col span={8}>
             <Form.Item label='颜色模式' name={[...namePrefix, 'colorMode']}>
               <Radio.Group buttonStyle='solid'>
                 <Radio.Button value='value'>值</Radio.Button>
