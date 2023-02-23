@@ -101,7 +101,7 @@ export const parseValues = (values: any = {}) => {
       });
       cloned.triggers = query.triggers;
     }
-  } else if (cate === 'aliyun-sls') {
+  } else if (cate === 'aliyun-sls' || cate === 'ck') {
     const queryString = cloned.prom_ql;
     let query: any = {};
     try {
@@ -110,16 +110,8 @@ export const parseValues = (values: any = {}) => {
       console.error(e);
     }
     cloned.queries = _.map(query.queries, (query) => {
-      if (query?.keys?.valueKey) {
-        query.keys.valueKey = _.split(query.keys.valueKey, ' ');
-      } else {
-        query.keys.valueKey = [];
-      }
-      if (query?.keys?.labelKey) {
-        query.keys.labelKey = _.split(query.keys.labelKey, ' ');
-      } else {
-        query.keys.labelKey = [];
-      }
+      _.set(query, 'keys.valueKey', query?.keys?.valueKey ? _.split(query.keys.valueKey, ' ') : []);
+      _.set(query, 'keys.labelKey', query?.keys?.labelKey ? _.split(query.keys.labelKey, ' ') : []);
       return {
         ..._.omit(query, ['from', 'to']),
         range: mapRelativeTimeRangeToOption({
@@ -183,7 +175,7 @@ export const stringifyValues = (values) => {
       delete cloned.queries;
       delete cloned.triggers;
     }
-  } else if (cate === 'aliyun-sls') {
+  } else if (cate === 'aliyun-sls' || cate === 'ck') {
     const { queries, triggers } = cloned;
     const prom_ql: any = {};
     prom_ql.queries = _.map(queries, (query, index) => {

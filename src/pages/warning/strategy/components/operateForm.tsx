@@ -33,6 +33,7 @@ import AbnormalDetection from './AbnormalDetection';
 import OldElasticsearchSettings from './ElasticsearchSettings/Old';
 import ElasticsearchSettings from './ElasticsearchSettings';
 import AliyunSLSSettings from './AliyunSLSSettings';
+import ClickHouseSettings from './ClickHouseSettings';
 import CateSelect from './CateSelect';
 import ClusterSelect, { ClusterAll } from './ClusterSelect';
 import { parseValues, stringifyValues } from './utils';
@@ -159,7 +160,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
             });
             return false;
           }
-        } else if (values.cate === 'elasticsearch' || values.cate === 'aliyun-sls') {
+        } else if (values.cate === 'elasticsearch' || values.cate === 'aliyun-sls' || values.cate === 'ck') {
           values = stringifyValues(values);
         }
         const callbacks = values.callbacks.map((item) => item.url);
@@ -398,6 +399,9 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                 }
                 if (cate === 'aliyun-sls') {
                   return <AliyunSLSSettings form={form} />;
+                }
+                if (cate === 'ck') {
+                  return <ClickHouseSettings form={form} />;
                 }
               }}
             </Form.Item>
