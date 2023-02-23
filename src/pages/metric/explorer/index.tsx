@@ -22,11 +22,12 @@ import PageLayout from '@/components/pageLayout';
 import { generateID } from '@/utils';
 import AdvancedWrap from '@/components/AdvancedWrap';
 import InputGroupWithFormItem from '@/components/InputGroupWithFormItem';
-import { getCommonESClusters, getCommonClusters, getCommonSLSClusters } from '@/services/common';
+import { getCommonESClusters, getCommonClusters, getCommonSLSClusters, getCommonCKClusters } from '@/services/common';
 import { datasourceCatesMap, DatasourceCateEnum } from '@/utils/constant';
 import Elasticsearch from './Elasticsearch';
 import Prometheus from './Prometheus';
 import AliyunSLS, { setDefaultValues } from './AliyunSLS';
+import ClickHouse from './ClickHouse';
 import './index.less';
 import { useLocation } from 'react-router-dom';
 
@@ -46,9 +47,11 @@ const getDefaultDatasourceName = (datasourceCate, datasourceList) => {
   const localPrometheus = localStorage.getItem('curCluster'); // curCluster 是全局的 key name
   const localElasticsearch = localStorage.getItem('datasource_es_name');
   const localAliyunSLS = localStorage.getItem('datasource_aliyunsls_name');
+  const localCK = localStorage.getItem('datasource_ck_name');
   if (datasourceCate === 'prometheus') return localPrometheus || _.get(datasourceList, [datasourceCate, 0]);
   if (datasourceCate === 'elasticsearch') return localElasticsearch || _.get(datasourceList, [datasourceCate, 0]);
   if (datasourceCate === 'aliyun-sls') return localAliyunSLS || _.get(datasourceList, [datasourceCate, 0]);
+  if (datasourceCate === 'ck') return localCK || _.get(datasourceList, [datasourceCate, 0]);
 };
 
 const setDefaultDatasourceName = (datasourceCate, value) => {
@@ -60,6 +63,9 @@ const setDefaultDatasourceName = (datasourceCate, value) => {
   }
   if (datasourceCate === 'aliyun-sls') {
     localStorage.setItem('datasource_aliyunsls_name', value);
+  }
+  if (datasourceCate === 'ck') {
+    localStorage.setItem('datasource_ck_name', value);
   }
 };
 
@@ -74,6 +80,7 @@ const Panel = ({
     prometheus: string[];
     elasticsearch: string[];
     'aliyun-sls': string[];
+    ck: string[];
   };
   defaultPromQL: string;
   removePanel: (id: string) => void;
@@ -192,6 +199,8 @@ const Panel = ({
               return <Elasticsearch datasourceName={datasourceName} form={form} />;
             } else if (datasourceCate === DatasourceCateEnum.aliyunSLS) {
               return <AliyunSLS datasourceCate={DatasourceCateEnum.aliyunSLS} datasourceName={datasourceName} headerExtra={headerExtraRef.current} form={form} />;
+            } else if (datasourceCate === DatasourceCateEnum.ck) {
+              return <ClickHouse datasourceCate={datasourceCate} datasourceName={datasourceName} headerExtra={headerExtraRef.current} form={form} />;
             }
           }}
         </Form.Item>
@@ -214,10 +223,12 @@ const PanelList = () => {
     prometheus: string[];
     elasticsearch: string[];
     'aliyun-sls': string[];
+    ck: string[];
   }>({
     prometheus: [],
     elasticsearch: [],
     'aliyun-sls': [],
+    ck: [],
   });
 
   useEffect(() => {
@@ -225,10 +236,12 @@ const PanelList = () => {
       const promList = await getCommonClusters().then((res) => res.dat);
       const esList = await getCommonESClusters().then((res) => res.dat);
       const slsList = await getCommonSLSClusters().then((res) => res.dat);
+      const ckList = await getCommonCKClusters().then((res) => res.dat);
       setDatasourceList({
         prometheus: promList,
         elasticsearch: esList,
         'aliyun-sls': slsList,
+        ck: ckList,
       });
     };
     fetchDatasourceList().catch(() => {
@@ -236,6 +249,7 @@ const PanelList = () => {
         prometheus: [],
         elasticsearch: [],
         'aliyun-sls': [],
+        ck: [],
       });
     });
   }, []);

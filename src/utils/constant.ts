@@ -74,6 +74,10 @@ export const datasourceCates = [
     value: 'aliyun-sls',
     label: '阿里云SLS',
   },
+  {
+    value: 'ck',
+    label: 'ClickHouse',
+  },
 ];
 
 export const datasourceCatesMap = {
@@ -85,4 +89,5 @@ export enum DatasourceCateEnum {
   prometheus = 'prometheus',
   elasticsearch = 'elasticsearch',
   aliyunSLS = 'aliyun-sls',
+  ck = 'ck',
 }
