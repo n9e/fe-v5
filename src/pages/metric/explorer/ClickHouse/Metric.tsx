@@ -15,9 +15,6 @@ function Metric(props, ref) {
   useImperativeHandle(ref, () => ({
     fetchData: (datasourceCate, datasourceName, values) => {
       const query = values.query;
-      if (query.keys.valueKey) {
-        query.keys.valueKey = _.join(query.keys.valueKey, ' ');
-      }
       if (query.keys.labelKey) {
         query.keys.labelKey = _.join(query.keys.labelKey, ' ');
       }

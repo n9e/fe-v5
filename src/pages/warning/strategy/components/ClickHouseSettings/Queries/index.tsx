@@ -1,6 +1,6 @@
 import React from 'react';
-import { Form, Space, Input, Row, Col, Select } from 'antd';
-import { PlusCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { Form, Space, Input, Row, Col, Select, Tooltip } from 'antd';
+import { PlusCircleOutlined, CloseCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { RelativeTimeRangePicker } from '@/components/TimeRangePicker';
 import InputGroupWithFormItem from '@/components/InputGroupWithFormItem';
@@ -58,21 +58,35 @@ export default function index({ form, prefixField = {}, fullPrefixName = [], pre
                             </Col>
                             <Col flex='auto'>
                               <InputGroupWithFormItem label='SQL' labelWidth={64}>
-                                <Form.Item {...field} name={[field.name, 'sql']}>
+                                <Form.Item {...field} name={[field.name, 'sql']} rules={[{ required: true, message: '请输入 SQL' }]}>
                                   <Input />
                                 </Form.Item>
                               </InputGroupWithFormItem>
                             </Col>
                             <Col flex='650px'>
                               <Space style={{ display: 'flex' }}>
-                                <InputGroupWithFormItem label='时间字段' labelWidth={84}>
-                                  <Form.Item {...field} name={[field.name, 'time_field']}>
+                                <InputGroupWithFormItem
+                                  label={
+                                    <Space>
+                                      <span>时间字段</span>
+                                      <Tooltip
+                                        title={
+                                          'SQL中代表时间的字段，该字段会作为数据的查询范围和时序数据的时间。如果为空则需要自行在SQL中处理查询范围，避免查全表数据量过大导致系统异常'
+                                        }
+                                      >
+                                        <QuestionCircleOutlined />
+                                      </Tooltip>
+                                    </Space>
+                                  }
+                                  labelWidth={90}
+                                >
+                                  <Form.Item {...field} name={[field.name, 'time_field']} rules={[{ required: true, message: '请输入时间字段' }]}>
                                     <Input />
                                   </Form.Item>
                                 </InputGroupWithFormItem>
                                 <InputGroupWithFormItem label='时间格式' labelWidth={84}>
                                   <Form.Item {...field} name={[field.name, 'time_format']} initialValue='datetime'>
-                                    <Select style={{ width: 120 }}>
+                                    <Select style={{ width: 120 }} allowClear>
                                       {_.map(
                                         [
                                           {
@@ -101,7 +115,7 @@ export default function index({ form, prefixField = {}, fullPrefixName = [], pre
                                 </InputGroupWithFormItem>
                                 <InputGroupWithFormItem label='查询区间' labelWidth={80}>
                                   <Form.Item {...field} name={[field.name, 'range']} initialValue={{ start: 'now-5m', end: 'now' }}>
-                                    <RelativeTimeRangePicker />
+                                    <RelativeTimeRangePicker allowClear />
                                   </Form.Item>
                                 </InputGroupWithFormItem>
                               </Space>

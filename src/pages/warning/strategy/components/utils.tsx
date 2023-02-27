@@ -110,7 +110,9 @@ export const parseValues = (values: any = {}) => {
       console.error(e);
     }
     cloned.queries = _.map(query.queries, (query) => {
-      _.set(query, 'keys.valueKey', query?.keys?.valueKey ? _.split(query.keys.valueKey, ' ') : []);
+      if (cate === 'aliyun-sls') {
+        _.set(query, 'keys.valueKey', query?.keys?.valueKey ? _.split(query.keys.valueKey, ' ') : []);
+      }
       _.set(query, 'keys.labelKey', query?.keys?.labelKey ? _.split(query.keys.labelKey, ' ') : []);
       return {
         ..._.omit(query, ['from', 'to']),
@@ -180,8 +182,10 @@ export const stringifyValues = (values) => {
     const prom_ql: any = {};
     prom_ql.queries = _.map(queries, (query, index) => {
       const parsedRange = mapOptionToRelativeTimeRange(query.range);
-      if (query?.keys?.valueKey) {
-        query.keys.valueKey = _.join(query.keys.valueKey, ' ');
+      if (cate === 'aliyun-sls') {
+        if (query?.keys?.valueKey) {
+          query.keys.valueKey = _.join(query.keys.valueKey, ' ');
+        }
       }
       if (query?.keys?.labelKey) {
         query.keys.labelKey = _.join(query.keys.labelKey, ' ');

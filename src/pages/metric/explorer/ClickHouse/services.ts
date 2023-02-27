@@ -28,3 +28,10 @@ export const getSQLPreview = function (data: any) {
     data,
   }).then((res) => res.dat);
 };
+
+export const getHistogram = function (data: any) {
+  return request('/api/n9e-plus/ck-histogram', {
+    method: RequestMethod.Post,
+    data,
+  }).then((res) => res.dat);
+};

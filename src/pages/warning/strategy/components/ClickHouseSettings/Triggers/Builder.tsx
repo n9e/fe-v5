@@ -42,9 +42,9 @@ export default function Builder(props: IProps) {
                         })}
                       </Select>
                     </Form.Item>
-                    <Form.Item {...field} name={[field.name, 'label']}>
+                    {/* <Form.Item {...field} name={[field.name, 'label']}>
                       <Input />
-                    </Form.Item>
+                    </Form.Item> */}
                     <Form.Item {...field} name={[field.name, 'comparisonOperator']} initialValue='=='>
                       <Select style={{ width: 64 }}>
                         <Select.Option value='=='>==</Select.Option>

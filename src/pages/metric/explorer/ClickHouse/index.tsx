@@ -2,7 +2,8 @@ import React, { useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import _ from 'lodash';
 import moment from 'moment';
-import { Radio, Row, Col, Form, Space, Button, Input, Select } from 'antd';
+import { Radio, Row, Col, Form, Space, Button, Input, Select, Tooltip } from 'antd';
+import { QuestionCircleOutlined } from '@ant-design/icons';
 import { FormInstance } from 'antd/lib/form/Form';
 import { DatasourceCateEnum } from '@/utils/constant';
 import TimeRangePicker, { parseRange } from '@/components/TimeRangePicker';
@@ -88,22 +89,48 @@ export default function index(props: IProps) {
 
       <Row gutter={8} style={{ marginBottom: 10 }}>
         <Col flex='auto'>
-          <InputGroupWithFormItem label='SQL' labelWidth={84}>
-            <Form.Item name={['query', 'sql']}>
+          <InputGroupWithFormItem
+            label={
+              <Space>
+                <span>SQL</span>
+                <Tooltip title='SQL：查询数据的SQL语句，例如：select count() AS cnt, event_time, type from system.query_log GROUP BY type, event_time'>
+                  <QuestionCircleOutlined />
+                </Tooltip>
+              </Space>
+            }
+            labelWidth={84}
+          >
+            <Form.Item name={['query', 'sql']} rules={[{ required: true, message: '请输入 SQL' }]}>
               <Input />
             </Form.Item>
           </InputGroupWithFormItem>
         </Col>
         <Col flex='850px'>
           <Space style={{ display: 'flex' }}>
-            <InputGroupWithFormItem label='时间字段' labelWidth={84}>
-              <Form.Item name={['query', 'time_field']}>
+            <InputGroupWithFormItem
+              label={
+                <Space>
+                  <span>时间字段</span>
+                  <Tooltip
+                    title={
+                      mode === 'timeSeries'
+                        ? 'SQL中代表时间的字段，该字段会作为数据的查询范围和时序数据的时间'
+                        : 'SQL中代表时间的字段，如果该字段不会空，会作为查询条件拼接到查询语句中。如果该字段为空，则需要在SQL中自行处理查询范围，避免查全表数据量过大导致系统异常'
+                    }
+                  >
+                    <QuestionCircleOutlined />
+                  </Tooltip>
+                </Space>
+              }
+              labelWidth={90}
+            >
+              <Form.Item name={['query', 'time_field']} rules={[{ required: true, message: '请输入时间字段' }]}>
                 <Input />
               </Form.Item>
             </InputGroupWithFormItem>
             <InputGroupWithFormItem label='时间格式' labelWidth={84}>
               <Form.Item name={['query', 'time_format']} initialValue='datetime'>
-                <Select style={{ width: 120 }}>
+                <Select style={{ width: 120 }} allowClear>
                   {_.map(
                     [
                       {
@@ -131,7 +158,7 @@ export default function index(props: IProps) {
               </Form.Item>
             </InputGroupWithFormItem>
             <Form.Item name={['query', 'range']} initialValue={{ start: 'now-1h', end: 'now' }}>
-              <TimeRangePicker dateFormat='YYYY-MM-DD HH:mm:ss' />
+              <TimeRangePicker dateFormat='YYYY-MM-DD HH:mm:ss' allowClear />
             </Form.Item>
             <Form.Item>
               <Button type='primary' onClick={onExecute}>
