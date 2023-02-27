@@ -83,15 +83,15 @@ const Panel = ({
   const [form] = Form.useForm();
   const headerExtraRef = useRef<HTMLDivElement>(null);
   const [datasourceCate, setDatasourceCate] = useState(
-    params.get('data_source_name') && params.get('data_source_type')?.includes('sls')
-      ? DatasourceCateEnum.aliyunSLS
+    params.get('data_source_name')
+      ? params.get('data_source_name')
       : params.get('data_source_id')
       ? DatasourceCateEnum.elasticsearch
       : localStorage.getItem('datasource_cate') || DatasourceCateEnum.prometheus,
   );
 
   useEffect(() => {
-    localStorage.setItem('datasource_cate', datasourceCate);
+    localStorage.setItem('datasource_cate', datasourceCate || '');
     if (datasourceCate === 'aliyun-sls') {
       setDefaultValues(form);
       form.setFieldsValue({ query: { project: params.get('project'), logstore: params.get('logstore'), query: params.get('queryString') } });
