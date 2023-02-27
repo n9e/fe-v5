@@ -104,7 +104,7 @@ const Panel = ({
         form={form}
         initialValues={{
           datasourceCate: datasourceCate,
-          datasourceName: params.get('data_source_name') || getDefaultDatasourceName(datasourceCate, datasourceList),
+          datasourceName: getDefaultDatasourceName(datasourceCate, datasourceList),
         }}
       >
         <Space align='start'>
