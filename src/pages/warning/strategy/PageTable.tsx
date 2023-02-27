@@ -152,7 +152,6 @@ const PageTable: React.FC<Props> = ({ bgid }) => {
             to={{
               pathname: `/alert-rules/edit/${record.id}`,
             }}
-            target='_blank'
           >
             {data}
           </Link>

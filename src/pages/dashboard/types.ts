@@ -126,6 +126,7 @@ export interface IStatStyles {
   };
   calc: string;
   colorMode: 'value' | 'background';
+  graphMode?: 'none' | 'area';
 }
 
 export interface ITableStyles {
@@ -182,6 +183,13 @@ export interface IRow {
   layout: IGridPos;
 }
 
+export interface ITransformation {
+  id: 'string';
+  options: {
+    [key: string]: any;
+  };
+}
+
 export interface IPanel {
   version: string; // 单个图表面板使用的版本
   id: string;
@@ -198,6 +206,11 @@ export interface IPanel {
   overrides: IOverride[];
   collapsed?: boolean; // 用于 row 展开收起控制是否显示
   panels?: IPanel[]; // 用于 row 收起时保存子面板
+  transformations?: ITransformation[];
+  repeat: string;
+  maxPerRow?: number;
+  repeatPanelId?: string;
+  scopedVars?: any;
 }
 
 export interface IVariable {

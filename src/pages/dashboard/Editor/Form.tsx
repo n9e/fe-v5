@@ -15,7 +15,7 @@
  *
  */
 import React, { useEffect, useState, useImperativeHandle, forwardRef } from 'react';
-import { Form, Row, Col, Button, Space, Switch, Tooltip, Mentions } from 'antd';
+import { Form, Row, Col, Button, Space, Switch, Tooltip, Mentions, Collapse as AntdCollapse, Select } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { defaultValues, defaultCustomValuesMap } from './config';
@@ -114,7 +114,7 @@ function FormCpt(props, ref) {
                       })}
                     </Mentions>
                   </Form.Item>
-                  <Form.Item label={'下钻链接'}>
+                  <Form.Item label={'下钻链接'} style={{ marginBottom: 0 }}>
                     <Form.List name={'links'}>
                       {(fields, { add, remove }) => (
                         <>
@@ -191,18 +191,50 @@ function FormCpt(props, ref) {
                         </>
                       )}
                     </Form.List>
-                    <Form.Item label='备注' name='description'>
-                      <Mentions prefix='$' split='' rows={3} placeholder='支持 markdown'>
-                        {_.map(variableConfigWithOptions, (item) => {
-                          return (
-                            <Mentions.Option key={item.name} value={item.name}>
-                              {item.name}
-                            </Mentions.Option>
-                          );
-                        })}
-                      </Mentions>
-                    </Form.Item>
                   </Form.Item>
+                  <Form.Item label='备注' name='description'>
+                    <Mentions prefix='$' split='' rows={3} placeholder='支持 markdown'>
+                      {_.map(variableConfigWithOptions, (item) => {
+                        return (
+                          <Mentions.Option key={item.name} value={item.name}>
+                            {item.name}
+                          </Mentions.Option>
+                        );
+                      })}
+                    </Mentions>
+                  </Form.Item>
+                  <AntdCollapse ghost defaultActiveKey={[]}>
+                    <AntdCollapse.Panel header='图表重复' key='1' forceRender>
+                      <Row gutter={10}>
+                        <Col span={12}>
+                          <Form.Item label='变量' name='repeat' tooltip='对所选变量的每个值重复此面板'>
+                            <Select allowClear>
+                              {_.map(variableConfigWithOptions, (item) => {
+                                return (
+                                  <Select.Option key={item.name} value={item.name}>
+                                    {item.name}
+                                  </Select.Option>
+                                );
+                              })}
+                            </Select>
+                          </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                          <Form.Item label='每行最多显示' name='maxPerRow' initialValue={4}>
+                            <Select allowClear>
+                              {_.map([2, 3, 4, 6, 8, 12], (item) => {
+                                return (
+                                  <Select.Option key={item} value={item}>
+                                    {item}
+                                  </Select.Option>
+                                );
+                              })}
+                            </Select>
+                          </Form.Item>
+                        </Col>
+                      </Row>
+                    </AntdCollapse.Panel>
+                  </AntdCollapse>
                 </>
               </Panel>
               <Form.Item shouldUpdate={(prevValues, curValues) => !_.isEqual(prevValues.targets, curValues.targets)}>

@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import _ from 'lodash';
 import semver from 'semver';
 import { v4 as uuidv4 } from 'uuid';
@@ -39,6 +39,7 @@ import {
   updatePanelsInsertNewPanelToRow,
   getRowCollapsedPanels,
   getRowUnCollapsedPanels,
+  processRepeats,
 } from './utils';
 import Renderer from '../Renderer/Renderer/index';
 import Row from './Row';
@@ -91,6 +92,10 @@ function index(props: IProps) {
     id: '',
     initialValues: {} as any,
   });
+
+  useEffect(() => {
+    setPanels(processRepeats(panels, variableConfig));
+  }, [JSON.stringify(panels)]);
 
   return (
     <div className='dashboards-panels scroll-container'>

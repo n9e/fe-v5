@@ -20,6 +20,7 @@ import moment from 'moment';
 import _ from 'lodash';
 import { useSelector } from 'react-redux';
 import { Button, Card, message, Space, Spin, Tag, Typography } from 'antd';
+import { Link } from 'react-router-dom';
 import PageLayout from '@/components/pageLayout';
 import { getAlertEventsById, getHistoryEventsById } from '@/services/warning';
 import { priorityColor } from '@/utils/constant';
@@ -56,16 +57,14 @@ const EventDetailPage: React.FC = () => {
       key: 'rule_name',
       render(content, { rule_id }) {
         return (
-          <Button
-            size='small'
-            type='link'
-            className='rule-link-btn'
-            onClick={() => {
-              history.push(`/alert-rules/edit/${rule_id}`);
+          <Link
+            to={{
+              pathname: `/alert-rules/edit/${rule_id}`,
             }}
+            target='_blank'
           >
             {content}
-          </Button>
+          </Link>
         );
       },
     },

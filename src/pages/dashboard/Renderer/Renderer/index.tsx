@@ -30,11 +30,11 @@ import BarGauge from './BarGauge';
 import Text from './Text';
 import Gauge from './Gauge';
 import { IVariable } from '../../VariableConfig/definition';
-import { replaceExpressionVars } from '../../VariableConfig/constant';
 import Markdown from '../../Editor/Components/Markdown';
 import useQuery from '../datasource/useQuery';
 import { IPanel } from '../../types';
 import { getStepByTimeAndStep } from '../../utils';
+import replaceFieldWithVariable from '../utils/replaceFieldWithVariable';
 import './style.less';
 
 interface IProps {
@@ -50,13 +50,6 @@ interface IProps {
   onShareClick?: () => void;
   onEditClick?: () => void;
   onDeleteClick?: () => void;
-}
-
-function replaceFieldWithVariable(dashboardId, value: string, variableConfig?: IVariable[]) {
-  if (!variableConfig) {
-    return value;
-  }
-  return replaceExpressionVars(value, variableConfig, variableConfig.length, dashboardId);
 }
 
 function index(props: IProps) {
@@ -78,9 +71,10 @@ function index(props: IProps) {
     datasourceCate: values.datasourceCate || 'prometheus',
     datasourceName: values.datasourceName,
     spanNulls: values.custom?.spanNulls,
+    scopedVars: values.scopedVars,
   });
-  const name = replaceFieldWithVariable(dashboardId, values.name, variableConfig);
-  const description = replaceFieldWithVariable(dashboardId, values.description, variableConfig);
+  const name = replaceFieldWithVariable(dashboardId, values.name, variableConfig, values.scopedVars);
+  const description = replaceFieldWithVariable(dashboardId, values.description, variableConfig, values.scopedVars);
   const tipsVisible = description || !_.isEmpty(values.links);
 
   useEffect(() => {
@@ -132,8 +126,8 @@ function index(props: IProps) {
                     {_.map(values.links, (link, i) => {
                       return (
                         <div key={i}>
-                          <a href={replaceFieldWithVariable(dashboardId, link.url, variableConfig)} target={link.targetBlank ? '_blank' : '_self'}>
-                            {replaceFieldWithVariable(dashboardId, link.title, variableConfig)}
+                          <a href={replaceFieldWithVariable(dashboardId, link.url, variableConfig, values.scopedVars)} target={link.targetBlank ? '_blank' : '_self'}>
+                            {replaceFieldWithVariable(dashboardId, link.title, variableConfig, values.scopedVars)}
                           </a>
                         </div>
                       );
@@ -185,26 +179,30 @@ function index(props: IProps) {
                           </div>
                         </Tooltip>
                       </Menu.Item>
-                      <Menu.Item
-                        onClick={() => {
-                          setVisible(false);
-                          if (onEditClick) onEditClick();
-                        }}
-                        key='1'
-                      >
-                        <SettingOutlined style={{ marginRight: 8 }} />
-                        编辑
-                      </Menu.Item>
-                      <Menu.Item
-                        onClick={() => {
-                          setVisible(false);
-                          if (onCloneClick) onCloneClick();
-                        }}
-                        key='2'
-                      >
-                        <CopyOutlined style={{ marginRight: 8 }} />
-                        克隆
-                      </Menu.Item>
+                      {!values.repeatPanelId && (
+                        <Menu.Item
+                          onClick={() => {
+                            setVisible(false);
+                            if (onEditClick) onEditClick();
+                          }}
+                          key='1'
+                        >
+                          <SettingOutlined style={{ marginRight: 8 }} />
+                          编辑
+                        </Menu.Item>
+                      )}
+                      {!values.repeatPanelId && (
+                        <Menu.Item
+                          onClick={() => {
+                            setVisible(false);
+                            if (onCloneClick) onCloneClick();
+                          }}
+                          key='2'
+                        >
+                          <CopyOutlined style={{ marginRight: 8 }} />
+                          克隆
+                        </Menu.Item>
+                      )}
                       <Menu.Item
                         onClick={() => {
                           setVisible(false);
@@ -215,16 +213,18 @@ function index(props: IProps) {
                         <ShareAltOutlined style={{ marginRight: 8 }} />
                         分享
                       </Menu.Item>
-                      <Menu.Item
-                        onClick={() => {
-                          setVisible(false);
-                          if (onDeleteClick) onDeleteClick();
-                        }}
-                        key='4'
-                      >
-                        <DeleteOutlined style={{ marginRight: 8 }} />
-                        删除
-                      </Menu.Item>
+                      {!values.repeatPanelId && (
+                        <Menu.Item
+                          onClick={() => {
+                            setVisible(false);
+                            if (onDeleteClick) onDeleteClick();
+                          }}
+                          key='4'
+                        >
+                          <DeleteOutlined style={{ marginRight: 8 }} />
+                          删除
+                        </Menu.Item>
+                      )}
                     </Menu>
                   }
                 >

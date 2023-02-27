@@ -350,7 +350,7 @@ const MonObjectManage: React.FC = () => {
           renderHeadExtra={() => {
             return (
               <div>
-                <div className='left-area-group-title'>预留筛选</div>
+                <div className='left-area-group-title'>预置筛选</div>
                 <div
                   className={classNames({
                     'n9e-metric-views-list-content-item': true,

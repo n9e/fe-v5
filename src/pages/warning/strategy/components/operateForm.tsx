@@ -164,9 +164,10 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
         }
         const callbacks = values.callbacks.map((item) => item.url);
         const data = {
-          ...values,
-          enable_stime: values.enable_stime.format('HH:mm'),
-          enable_etime: values.enable_etime.format('HH:mm'),
+          ..._.omit(values, ['effective_time']),
+          enable_days_of_weeks: values.effective_time.map((item) => item.enable_days_of_week),
+          enable_stimes: values.effective_time.map((item) => item.enable_stime.format('HH:mm')),
+          enable_etimes: values.effective_time.map((item) => item.enable_etime.format('HH:mm')),
           disabled: !values.enable_status ? 1 : 0,
           notify_recovered: values.notify_recovered ? 1 : 0,
           enable_in_bg: values.enable_in_bg ? 1 : 0,
@@ -222,12 +223,22 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
         initialValues={{
           severity: 2,
           disabled: 0, // 0:立即启用 1:禁用  待修改
-          enable_days_of_week: ['1', '2', '3', '4', '5', '6', '0'],
           ...parseValues(detail),
           cluster: detail.cluster ? detail.cluster.split(' ') : ['$all'], // 生效集群
           enable_in_bg: detail?.enable_in_bg === 1,
-          enable_stime: detail?.enable_stime ? moment(detail.enable_stime, 'HH:mm') : moment('00:00', 'HH:mm'),
-          enable_etime: detail?.enable_etime ? moment(detail.enable_etime, 'HH:mm') : moment('23:59', 'HH:mm'),
+          effective_time: detail?.enable_etimes
+            ? detail?.enable_etimes.map((item, index) => ({
+                enable_stime: moment(detail.enable_stimes[index], 'HH:mm'),
+                enable_etime: moment(detail.enable_etimes[index], 'HH:mm'),
+                enable_days_of_week: detail.enable_days_of_weeks[index],
+              }))
+            : [
+                {
+                  enable_stime: moment('00:00', 'HH:mm'),
+                  enable_etime: moment('23:59', 'HH:mm'),
+                  enable_days_of_week: ['1', '2', '3', '4', '5', '6', '0'],
+                },
+              ],
           enable_status: detail?.disabled === undefined ? true : !detail?.disabled,
           notify_recovered: detail?.notify_recovered === 1 || detail?.notify_recovered === undefined ? true : false, // 1:启用 0:禁用
           callbacks: !_.isEmpty(detail?.callbacks)
@@ -474,44 +485,70 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
               <Switch />
             </Form.Item>
 
-            <Space>
-              <Form.Item
-                label={t('生效时间')}
-                name='enable_days_of_week'
-                rules={[
-                  {
-                    required: true,
-                    message: t('生效时间不能为空'),
-                  },
-                ]}
-              >
-                <Select mode='tags'>{enableDaysOfWeekOptions}</Select>
-              </Form.Item>
-              <Form.Item
-                name='enable_stime'
-                label='开始时间'
-                rules={[
-                  {
-                    required: true,
-                    message: t('开始时间不能为空'),
-                  },
-                ]}
-              >
-                <TimePicker format='HH:mm' />
-              </Form.Item>
-              <Form.Item
-                name='enable_etime'
-                label='结束时间'
-                rules={[
-                  {
-                    required: true,
-                    message: t('结束时间不能为空'),
-                  },
-                ]}
-              >
-                <TimePicker format='HH:mm' />
-              </Form.Item>
-            </Space>
+            <Form.List name='effective_time'>
+              {(fields, { add, remove }) => (
+                <>
+                  <Space>
+                    <div style={{ width: 450 }}>
+                      生效时间 <PlusCircleOutlined className='control-icon-normal' onClick={() => add()} />
+                    </div>
+                    <div style={{ width: 110 }}>开始时间</div>
+                    <div style={{ width: 110 }}>结束时间</div>
+                  </Space>
+                  {fields.map(({ key, name, ...restField }) => (
+                    <Space
+                      key={key}
+                      style={{
+                        display: 'flex',
+                        marginBottom: 8,
+                      }}
+                      align='baseline'
+                    >
+                      <Form.Item
+                        {...restField}
+                        name={[name, 'enable_days_of_week']}
+                        style={{ width: 450 }}
+                        rules={[
+                          {
+                            required: true,
+                            message: t('请选择生效周期'),
+                          },
+                        ]}
+                      >
+                        <Select mode='tags'>{enableDaysOfWeekOptions}</Select>
+                      </Form.Item>
+                      <Form.Item
+                        {...restField}
+                        name={[name, 'enable_stime']}
+                        style={{ width: 110 }}
+                        rules={[
+                          {
+                            required: true,
+                            message: t('开始时间不能为空'),
+                          },
+                        ]}
+                      >
+                        <TimePicker format='HH:mm' />
+                      </Form.Item>
+                      <Form.Item
+                        {...restField}
+                        name={[name, 'enable_etime']}
+                        style={{ width: 110 }}
+                        rules={[
+                          {
+                            required: true,
+                            message: t('结束时间不能为空'),
+                          },
+                        ]}
+                      >
+                        <TimePicker format='HH:mm' />
+                      </Form.Item>
+                      <MinusCircleOutlined onClick={() => remove(name)} />
+                    </Space>
+                  ))}
+                </>
+              )}
+            </Form.List>
             <Form.Item shouldUpdate={(prevValues, curValues) => prevValues.cate !== curValues.cate} noStyle>
               {({ getFieldValue }) => {
                 if (getFieldValue('cate') === 'prometheus') {

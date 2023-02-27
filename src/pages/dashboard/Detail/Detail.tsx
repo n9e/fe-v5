@@ -38,7 +38,7 @@ import Title from './Title';
 import { JSONParse } from '../utils';
 import Editor from '../Editor';
 import { defaultCustomValuesMap, defaultOptionsValuesMap } from '../Editor/config';
-import { sortPanelsByGridLayout, panelsMergeToConfigs, updatePanelsInsertNewPanelToGlobal } from '../Panels/utils';
+import { sortPanelsByGridLayout, panelsMergeToConfigs, updatePanelsInsertNewPanelToGlobal, processRepeats } from '../Panels/utils';
 import { useGlobalState } from '../globalState';
 import './style.less';
 import './dark.antd.less';
