@@ -94,6 +94,7 @@ const Panel = ({
     localStorage.setItem('datasource_cate', datasourceCate || '');
     if (datasourceCate === 'aliyun-sls') {
       setDefaultValues(form);
+      form.setFieldsValue({ query: { project: params.get('project'), logstore: params.get('logstore'), query: params.get('queryString') } });
     }
   }, [datasourceCate]);
 
@@ -103,7 +104,7 @@ const Panel = ({
         form={form}
         initialValues={{
           datasourceCate: datasourceCate,
-          datasourceName: getDefaultDatasourceName(datasourceCate, datasourceList),
+          datasourceName: params.get('data_source_name') || getDefaultDatasourceName(datasourceCate, datasourceList),
         }}
       >
         <Space align='start'>
