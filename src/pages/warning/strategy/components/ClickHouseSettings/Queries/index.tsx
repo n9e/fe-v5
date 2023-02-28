@@ -78,7 +78,7 @@ export default function index({ form, prefixField = {}, fullPrefixName = [], pre
                                       </Tooltip>
                                     </Space>
                                   }
-                                  labelWidth={90}
+                                  labelWidth={95}
                                 >
                                   <Form.Item {...field} name={[field.name, 'time_field']} rules={[{ required: true, message: '请输入时间字段' }]}>
                                     <Input />
