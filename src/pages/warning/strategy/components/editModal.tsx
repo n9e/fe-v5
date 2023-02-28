@@ -53,6 +53,54 @@ function isTagValid(tag) {
 // 渲染标签
 function tagRender(content) {
   const { t } = useTranslation();
+
+  const { isCorrectFormat, isLengthAllowed } = isTagValid(content.value);
+  return isCorrectFormat && isLengthAllowed ? (
+    <Tag
+      closable={content.closable}
+      onClose={content.onClose}
+      // style={{ marginTop: '2px' }}
+    >
+      {content.value}
+    </Tag>
+  ) : (
+    <Tooltip title={isCorrectFormat ? t('标签长度应小于等于 64 位') : t('标签格式应为 key=value。且 key 以字母或下划线开头，由字母、数字和下划线组成。')}>
+      <Tag
+        color='error'
+        closable={content.closable}
+        onClose={content.onClose}
+        style={{
+          marginTop: '2px',
+        }}
+      >
+        {content.value}
+      </Tag>
+    </Tooltip>
+  );
+}
+
+// 校验所有标签格式
+function isValidFormat() {
+  return {
+    validator(_, value) {
+      const isInvalid =
+        value &&
+        value.some((tag) => {
+          const { isCorrectFormat, isLengthAllowed } = isTagValid(tag);
+          if (!isCorrectFormat || !isLengthAllowed) {
+            return true;
+          }
+        });
+      return isInvalid ? Promise.reject(new Error('标签格式不正确，请检查！')) : Promise.resolve();
+    },
+  };
+}
+interface Props {
+  isModalVisible: boolean;
+  editModalFinish: Function;
+}
+const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
+  const { t, i18n } = useTranslation();
   const fields = [
     {
       id: 2,
@@ -140,54 +188,6 @@ function tagRender(content) {
       name: t('预案链接'),
     },
   ];
-
-  const { isCorrectFormat, isLengthAllowed } = isTagValid(content.value);
-  return isCorrectFormat && isLengthAllowed ? (
-    <Tag
-      closable={content.closable}
-      onClose={content.onClose}
-      // style={{ marginTop: '2px' }}
-    >
-      {content.value}
-    </Tag>
-  ) : (
-    <Tooltip title={isCorrectFormat ? t('标签长度应小于等于 64 位') : t('标签格式应为 key=value。且 key 以字母或下划线开头，由字母、数字和下划线组成。')}>
-      <Tag
-        color='error'
-        closable={content.closable}
-        onClose={content.onClose}
-        style={{
-          marginTop: '2px',
-        }}
-      >
-        {content.value}
-      </Tag>
-    </Tooltip>
-  );
-}
-
-// 校验所有标签格式
-function isValidFormat() {
-  return {
-    validator(_, value) {
-      const isInvalid =
-        value &&
-        value.some((tag) => {
-          const { isCorrectFormat, isLengthAllowed } = isTagValid(tag);
-          if (!isCorrectFormat || !isLengthAllowed) {
-            return true;
-          }
-        });
-      return isInvalid ? Promise.reject(new Error('标签格式不正确，请检查！')) : Promise.resolve();
-    },
-  };
-}
-interface Props {
-  isModalVisible: boolean;
-  editModalFinish: Function;
-}
-const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
-  const { t, i18n } = useTranslation();
   const [form] = Form.useForm();
   const { clusters: clusterList } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const [contactList, setInitContactList] = useState([]);

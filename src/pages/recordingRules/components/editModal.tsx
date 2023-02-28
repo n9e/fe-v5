@@ -26,28 +26,7 @@ function isTagValid(tag) {
 
 function tagRender(content) {
   const { t } = useTranslation();
-  const fields = [
-    {
-      id: 2,
-      field: 'cluster',
-      name: t('集群'),
-    },
-    {
-      id: 5,
-      field: 'prom_eval_interval',
-      name: t('执行频率'),
-    },
-    {
-      id: 4,
-      field: 'disabled',
-      name: t('启用'),
-    },
-    {
-      id: 12,
-      field: 'append_tags',
-      name: t('附加标签'),
-    },
-  ]; // 校验单个标签格式是否正确
+
   const { isCorrectFormat, isLengthAllowed } = isTagValid(content.value);
   return isCorrectFormat && isLengthAllowed ? (
     <Tag
@@ -96,6 +75,28 @@ interface Props {
 
 const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
   const { t } = useTranslation();
+  const fields = [
+    {
+      id: 2,
+      field: 'cluster',
+      name: t('集群'),
+    },
+    {
+      id: 5,
+      field: 'prom_eval_interval',
+      name: t('执行频率'),
+    },
+    {
+      id: 4,
+      field: 'disabled',
+      name: t('启用'),
+    },
+    {
+      id: 12,
+      field: 'append_tags',
+      name: t('附加标签'),
+    },
+  ]; // 校验单个标签格式是否正确
   const [form] = Form.useForm();
   const { clusters: clusterList } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const [field, setField] = useState<string>('cluster');

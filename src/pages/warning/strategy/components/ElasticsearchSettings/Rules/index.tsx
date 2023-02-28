@@ -3,8 +3,9 @@ import { Form, Row, Col, Input, Select } from 'antd';
 import { PlusCircleOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import Rule from './Rule';
 import { ops, functions } from './configs';
-
+import { useTranslation } from 'react-i18next';
 export default function index({ form }) {
+  const { t } = useTranslation();
   return (
     <Form.Item shouldUpdate noStyle>
       {({ getFieldValue }) => {
