@@ -46,7 +46,7 @@ export default function index(props: IProps) {
           <div style={{
         marginBottom: 8
       }}>
-            {t("查询统计")}计{' '}
+            {t("查询统计")}{t("计")}{' '}
             <PlusCircleOutlined onClick={() => {
           add({});
         }} />
@@ -70,7 +70,7 @@ export default function index(props: IProps) {
                     <Row gutter={8}>
                       <Col span={8}>
                         <InputGroupWithFormItem label={<span>
-                              {t("索引")}引{' '}
+                              {t("索引")}{t("引")}{' '}
                               <Tooltip title={<div>
                                     {t("支持多种配置方式")}
                                    <br />
@@ -92,6 +92,7 @@ export default function index(props: IProps) {
                         if (indexSearch) {
                           return item.value.includes(indexSearch);
                         }
+
                         return true;
                       })} onSearch={val => {
                         setIndexSearch(val);
@@ -101,7 +102,7 @@ export default function index(props: IProps) {
                       </Col>
                       <Col span={7}>
                         <InputGroupWithFormItem label={<span>
-                              {t("查询条件")}件{' '}
+                              {t("查询条件")}{t("件")}{' '}
                               <a href='https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html#query-string-syntax ' target='_blank'>
                                 <QuestionCircleOutlined />
                               </a>

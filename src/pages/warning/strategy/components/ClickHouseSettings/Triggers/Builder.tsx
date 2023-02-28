@@ -5,19 +5,19 @@ import React from 'react';
 import { Form, Space, Input, Select, InputNumber } from 'antd';
 import { PlusCircleOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash';
-
+import { useTranslation } from 'react-i18next';
 interface IProps {
   prefixField?: any;
   fullPrefixName?: (string | number)[]; // 完整的前置字段名，用于 getFieldValue 获取指定字段的值
+
   prefixName?: (string | number)[]; // 列表字段名
+
   queries: any[];
 }
-
 const alphabet = 'ABCDEFGHIGKLMNOPQRSTUVWXYZ'.split('');
-
 export default function Builder(props: IProps) {
+  const { t } = useTranslation();
   const { prefixField = {}, fullPrefixName = [], prefixName = [], queries } = props;
-
   return (
     <div>
       <Form.List
@@ -43,10 +43,14 @@ export default function Builder(props: IProps) {
                       </Select>
                     </Form.Item>
                     {/* <Form.Item {...field} name={[field.name, 'label']}>
-                      <Input />
-                    </Form.Item> */}
+                 <Input />
+                </Form.Item> */}
                     <Form.Item {...field} name={[field.name, 'comparisonOperator']} initialValue='=='>
-                      <Select style={{ width: 64 }}>
+                      <Select
+                        style={{
+                          width: 64,
+                        }}
+                      >
                         <Select.Option value='=='>==</Select.Option>
                         <Select.Option value='!='>!=</Select.Option>
                         <Select.Option value='>'>{'>'}</Select.Option>
@@ -56,11 +60,19 @@ export default function Builder(props: IProps) {
                       </Select>
                     </Form.Item>
                     <Form.Item {...field} name={[field.name, 'value']}>
-                      <InputNumber style={{ width: 200 }} />
+                      <InputNumber
+                        style={{
+                          width: 200,
+                        }}
+                      />
                     </Form.Item>
                     {field.name !== fields.length - 1 && (
                       <Form.Item {...field} name={[0, 'logicalOperator']} initialValue='&&'>
-                        <Select style={{ width: 80 }}>
+                        <Select
+                          style={{
+                            width: 80,
+                          }}
+                        >
                           <Select.Option value='&&'>AND</Select.Option>
                           <Select.Option value='||'>OR</Select.Option>
                         </Select>

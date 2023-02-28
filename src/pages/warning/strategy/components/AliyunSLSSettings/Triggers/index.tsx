@@ -6,9 +6,10 @@ import { useTranslation } from "react-i18next";
 interface IProps {
   prefixField?: any;
   fullPrefixName?: string[]; // 完整的前置字段名，用于 getFieldValue 获取指定字段的值
-  prefixName?: string[]; // 列表字段名
-}
 
+  prefixName?: string[]; // 列表字段名
+
+}
 export default function index(props: IProps) {
   const {
     t
@@ -28,7 +29,7 @@ export default function index(props: IProps) {
           <div style={{
         marginBottom: 8
       }}>
-            {t("告警条件")}件{' '}
+            {t("告警条件")}{t("件")}{' '}
             <PlusCircleOutlined style={{
           cursor: 'pointer'
         }} onClick={() => {

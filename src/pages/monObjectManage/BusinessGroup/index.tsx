@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/common';
 import { CommonStoreState } from '@/store/commonInterface';
 import { getBusiGroups } from '@/services/common';
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 interface IProps {
   curBusiId?: number;
   setCurBusiId?: (id: number, item: any) => void;
@@ -17,82 +17,95 @@ interface IProps {
   renderHeadExtra?: () => React.ReactNode;
 }
 export default function index(props: IProps) {
-  const {
-    t
-  } = useTranslation();
-  const {
-    title = t("业务组"),
-    renderHeadExtra,
-    curBusiId,
-    setCurBusiId
-  } = props;
+  const { t } = useTranslation();
+  const { title = t('业务组'), renderHeadExtra, curBusiId, setCurBusiId } = props;
   const history = useHistory();
   const [collapse, setCollapse] = useState(localStorage.getItem('leftlist') === '1');
   const [width, setWidth] = useState(_.toNumber(localStorage.getItem('leftwidth') || 200));
-  const [businessGroupData, setBusinessGroupData] = useState<{
-    id: number;
-    name: string;
-  }[]>([]);
+  const [businessGroupData, setBusinessGroupData] = useState<
+    {
+      id: number;
+      name: string;
+    }[]
+  >([]);
   useEffect(() => {
-    getBusiGroups('').then(res => {
+    getBusiGroups('').then((res) => {
       setBusinessGroupData(res.dat || []);
     });
   }, []);
-  return <Resizable style={{
-    marginRight: collapse ? 0 : 10
-  }} size={{
-    width: collapse ? 0 : width,
-    height: '100%'
-  }} enable={{
-    right: collapse ? false : true
-  }} onResizeStop={(e, direction, ref, d) => {
-    let curWidth = width + d.width;
+  return (
+    <Resizable
+      style={{
+        marginRight: collapse ? 0 : 10,
+      }}
+      size={{
+        width: collapse ? 0 : width,
+        height: '100%',
+      }}
+      enable={{
+        right: collapse ? false : true,
+      }}
+      onResizeStop={(e, direction, ref, d) => {
+        let curWidth = width + d.width;
 
-    if (curWidth < 200) {
-      curWidth = 200;
-    }
+        if (curWidth < 200) {
+          curWidth = 200;
+        }
 
-    setWidth(curWidth);
-    localStorage.setItem('leftwidth', curWidth.toString());
-  }}>
+        setWidth(curWidth);
+        localStorage.setItem('leftwidth', curWidth.toString());
+      }}
+    >
       <div className={collapse ? 'left-area collapse' : 'left-area'}>
-        <div className='collapse-btn' onClick={() => {
-        localStorage.setItem('leftlist', !collapse ? '1' : '0');
-        setCollapse(!collapse);
-      }}>
+        <div
+          className='collapse-btn'
+          onClick={() => {
+            localStorage.setItem('leftlist', !collapse ? '1' : '0');
+            setCollapse(!collapse);
+          }}
+        >
           {!collapse ? <LeftOutlined /> : <RightOutlined />}
         </div>
         <div className='left-area-group group-shrink'>
           {renderHeadExtra && renderHeadExtra()}
           <div className='left-area-group-title'>
             {title}
-            {title === t("业务组") && <SettingOutlined onClick={() => history.push(`/busi-groups`)} />}
+            {title === t('业务组') && <SettingOutlined onClick={() => history.push(`/busi-groups`)} />}
           </div>
-          <Input className='left-area-group-search' prefix={<SearchOutlined />} onPressEnter={e => {
-          e.preventDefault();
-          const value = e.currentTarget.value;
-          getBusiGroups(value).then(res => {
-            setBusinessGroupData(res.dat || []);
-          });
-        }} placeholder={t("请输入业务组名称进行筛选")} />
+          <Input
+            className='left-area-group-search'
+            prefix={<SearchOutlined />}
+            onPressEnter={(e) => {
+              e.preventDefault();
+              const value = e.currentTarget.value;
+              getBusiGroups(value).then((res) => {
+                setBusinessGroupData(res.dat || []);
+              });
+            }}
+            placeholder={t('请输入业务组名称进行筛选')}
+          />
           <div className='radio-list'>
-            {_.map(businessGroupData, item => {
-            const {
-              t
-            } = useTranslation();
-            return <div className={classNames({
-              'n9e-metric-views-list-content-item': true,
-              active: item.id == curBusiId
-            })} key={item.id} onClick={() => {
-              if (item.id !== curBusiId) {
-                setCurBusiId && setCurBusiId(item.id, item);
-              }
-            }}>
+            {_.map(businessGroupData, (item) => {
+              return (
+                <div
+                  className={classNames({
+                    'n9e-metric-views-list-content-item': true,
+                    active: item.id == curBusiId,
+                  })}
+                  key={item.id}
+                  onClick={() => {
+                    if (item.id !== curBusiId) {
+                      setCurBusiId && setCurBusiId(item.id, item);
+                    }
+                  }}
+                >
                   <span className='name'>{item.name}</span>
-                </div>;
-          })}
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
-    </Resizable>;
+    </Resizable>
+  );
 }

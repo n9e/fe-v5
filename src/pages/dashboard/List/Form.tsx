@@ -173,7 +173,6 @@ function FormCpt(props: IProps & ModalWrapProps) {
         >
           <Select>
             {_.map(clusters, (item) => {
-              const { t } = useTranslation();
               return (
                 <Select.Option key={item} value={item}>
                   {item}

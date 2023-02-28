@@ -19,49 +19,55 @@ import { Form, Select, InputNumber, Row, Col, Tooltip, Input } from 'antd';
 import { InfoCircleOutlined, CaretDownOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { Panel } from '../../Components/Collapse';
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 interface IProps {
   preNamePrefix?: (string | number)[];
   namePrefix?: (string | number)[];
 }
-const {
-  Option,
-  OptGroup
-} = Select;
+const { Option, OptGroup } = Select;
 export default function index(props: IProps) {
-  const {
-    t
-  } = useTranslation();
-  const {
-    preNamePrefix = [],
-    namePrefix = ['options', 'standardOptions']
-  } = props;
-  return <Panel header={t("高级设置")}>
+  const { t } = useTranslation();
+  const { preNamePrefix = [], namePrefix = ['options', 'standardOptions'] } = props;
+  return (
+    <Panel header={t('高级设置')}>
       <>
         <Form.Item shouldUpdate>
-          {({
-          getFieldValue
-        }) => {
-          const {
-            t
-          } = useTranslation();
-          const unit = getFieldValue([...namePrefix, 'util']) || '';
-          return <Row gutter={10}>
+          {({ getFieldValue }) => {
+            const unit = getFieldValue([...namePrefix, 'util']) || '';
+            return (
+              <Row gutter={10}>
                 <Col span={unit.indexOf('datetime') > -1 ? 12 : 24}>
-                  <Form.Item label={<div>
-                        {t("单位")}位{' '}
-                        <Tooltip overlayInnerStyle={{
-                  width: 500
-                }} getTooltipContainer={() => document.body} title={<div>
-                              <div>{t("默认会做")} SI Prefixes {t("处理，如不想默认的处理可选择")} none {t("关闭")}闭</div>
-                              <div>{t("Data(SI):")} {t("基数为")} 1000, {t("单位为")} B、kB、MB、GB、TB、PB、EB、ZB、YBB</div>
-                              <div>{t("Data(IEC):")} {t("基数为")} 1024, {t("单位为")} B、KiB、MiB、GiB、TiB、PiB、EiB、ZiB、YiBB</div>
+                  <Form.Item
+                    label={
+                      <div>
+                        {t('单位')}位{' '}
+                        <Tooltip
+                          overlayInnerStyle={{
+                            width: 500,
+                          }}
+                          getTooltipContainer={() => document.body}
+                          title={
+                            <div>
+                              <div>
+                                {t('默认会做')} SI Prefixes {t('处理，如不想默认的处理可选择')} none {t('关闭')}闭
+                              </div>
+                              <div>
+                                {t('Data(SI):')} {t('基数为')} 1000, {t('单位为')} B、kB、MB、GB、TB、PB、EB、ZB、YBB
+                              </div>
+                              <div>
+                                {t('Data(IEC):')} {t('基数为')} 1024, {t('单位为')} B、KiB、MiB、GiB、TiB、PiB、EiB、ZiB、YiBB
+                              </div>
                               <div>bits: b</div>
                               <div>bytes: B</div>
-                            </div>}>
+                            </div>
+                          }
+                        >
                           <InfoCircleOutlined />
                         </Tooltip>
-                      </div>} name={[...namePrefix, 'util']}>
+                      </div>
+                    }
+                    name={[...namePrefix, 'util']}
+                  >
                     <Select suffixIcon={<CaretDownOutlined />} placeholder='auto' allowClear>
                       <Option value='none'>none</Option>
                       <OptGroup label='Data(SI)'>
@@ -72,11 +78,11 @@ export default function index(props: IProps) {
                         <Option value='bitsIEC'>bits(IEC)</Option>
                         <Option value='bytesIEC'>bytes(IEC)</Option>
                       </OptGroup>
-                      <OptGroup label={t("百分比")}>
-                        <Option value='percent'>{t("百分比(0-100)")}</Option>
-                        <Option value='percentUnit'>{t("百分比(0.0-1.0)")}</Option>
+                      <OptGroup label={t('百分比')}>
+                        <Option value='percent'>{t('百分比(0-100)')}</Option>
+                        <Option value='percentUnit'>{t('百分比(0.0-1.0)')}</Option>
                       </OptGroup>
-                      <OptGroup label={t("时间")}>
+                      <OptGroup label={t('时间')}>
                         <Option value='seconds'>seconds</Option>
                         <Option value='milliseconds'>milliseconds</Option>
                         <Option value='humantimeSeconds'>humanize(seconds)</Option>
@@ -87,39 +93,55 @@ export default function index(props: IProps) {
                     </Select>
                   </Form.Item>
                 </Col>
-                {unit.indexOf('datetime') > -1 && <Col span={12}>
-                    <Form.Item label={t("时间格式化")} name={[...preNamePrefix, ...namePrefix, 'dateFormat']}>
-                      <Input style={{
-                  width: '100%'
-                }} placeholder='YYYY-MM-DD HH:mm:ss' />
+                {unit.indexOf('datetime') > -1 && (
+                  <Col span={12}>
+                    <Form.Item label={t('时间格式化')} name={[...preNamePrefix, ...namePrefix, 'dateFormat']}>
+                      <Input
+                        style={{
+                          width: '100%',
+                        }}
+                        placeholder='YYYY-MM-DD HH:mm:ss'
+                      />
                     </Form.Item>
-                  </Col>}
-              </Row>;
-        }}
+                  </Col>
+                )}
+              </Row>
+            );
+          }}
         </Form.Item>
         <Row gutter={10}>
           <Col span={8}>
-            <Form.Item label={t("最小值")} name={[...preNamePrefix, ...namePrefix, 'min']}>
-              <InputNumber placeholder='auto' style={{
-              width: '100%'
-            }} />
+            <Form.Item label={t('最小值')} name={[...preNamePrefix, ...namePrefix, 'min']}>
+              <InputNumber
+                placeholder='auto'
+                style={{
+                  width: '100%',
+                }}
+              />
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item label={t("最大值")} name={[...preNamePrefix, ...namePrefix, 'max']}>
-              <InputNumber placeholder='auto' style={{
-              width: '100%'
-            }} />
+            <Form.Item label={t('最大值')} name={[...preNamePrefix, ...namePrefix, 'max']}>
+              <InputNumber
+                placeholder='auto'
+                style={{
+                  width: '100%',
+                }}
+              />
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item label={t("小数点")} name={[...preNamePrefix, ...namePrefix, 'decimals']}>
-              <InputNumber placeholder='auto' style={{
-              width: '100%'
-            }} />
+            <Form.Item label={t('小数点')} name={[...preNamePrefix, ...namePrefix, 'decimals']}>
+              <InputNumber
+                placeholder='auto'
+                style={{
+                  width: '100%',
+                }}
+              />
             </Form.Item>
           </Col>
         </Row>
       </>
-    </Panel>;
+    </Panel>
+  );
 }

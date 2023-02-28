@@ -5,72 +5,72 @@ import { CaretDownOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { getCommonClusters, getCommonESClusters, getCommonSLSClusters, getCommonCKClusters } from '@/services/common';
 export const ClusterAll = '$all';
-export default function index({ form, cate }) {
-  const { t } = useTranslation();
+export default function index({
+  form,
+  cate
+}) {
+  const {
+    t
+  } = useTranslation();
   const [clusterList, setClusterList] = useState<string[]>([]);
+
   const handleClusterChange = (v: string[]) => {
     if (v.includes(ClusterAll)) {
       form.setFieldsValue({
-        cluster: [ClusterAll],
+        cluster: [ClusterAll]
       });
     }
   };
+
   useEffect(() => {
     if (cate === 'elasticsearch') {
-      getCommonESClusters()
-        .then(({ dat }) => {
-          setClusterList(dat);
-        })
-        .catch(() => {
-          setClusterList([]);
-        });
+      getCommonESClusters().then(({
+        dat
+      }) => {
+        setClusterList(dat);
+      }).catch(() => {
+        setClusterList([]);
+      });
     }
+
     if (cate === 'aliyun-sls') {
-      getCommonSLSClusters()
-        .then(({ dat }) => {
-          setClusterList(dat);
-        })
-        .catch(() => {
-          setClusterList([]);
-        });
+      getCommonSLSClusters().then(({
+        dat
+      }) => {
+        setClusterList(dat);
+      }).catch(() => {
+        setClusterList([]);
+      });
     }
+
     if (cate === 'prometheus') {
-      getCommonClusters()
-        .then(({ dat }) => {
-          setClusterList(_.concat(['$all'], dat));
-        })
-        .catch(() => {
-          setClusterList([]);
-        });
+      getCommonClusters().then(({
+        dat
+      }) => {
+        setClusterList(_.concat(['$all'], dat));
+      }).catch(() => {
+        setClusterList([]);
+      });
     }
+
     if (cate === 'ck') {
-      getCommonCKClusters()
-        .then(({ dat }) => {
-          setClusterList(dat);
-        })
-        .catch(() => {
-          setClusterList([]);
-        });
+      getCommonCKClusters().then(({
+        dat
+      }) => {
+        setClusterList(dat);
+      }).catch(() => {
+        setClusterList([]);
+      });
     }
   }, [cate]);
-  return (
-    <Form.Item
-      label={t('生效集群')}
-      name='cluster'
-      rules={[
-        {
-          required: true,
-          message: t('生效集群不能为空'),
-        },
-      ]}
-    >
+  return <Form.Item label={t('生效集群')} name='cluster' rules={[{
+    required: true,
+    message: t('生效集群不能为空')
+  }]}>
       <Select suffixIcon={<CaretDownOutlined />} mode='multiple' onChange={handleClusterChange}>
-        {clusterList?.map((item) => (
-          <Select.Option value={item} key={item}>
+        {clusterList?.map(item => <Select.Option value={item} key={item}>
             {item}
-          </Select.Option>
-        ))}
+          </Select.Option>)}
       </Select>
-    </Form.Item>
-  );
+    </Form.Item>;
 }

@@ -19,7 +19,7 @@ export default function QueryInput(props: IProps) {
   const { prefixField = {}, prefixName = [], width = 84, layout = 'horizontal' } = props;
   const label = (
     <span>
-      {t('查询条件')}件{' '}
+      {t('查询条件')}
       <Tooltip overlayClassName='sls-discover-tooltips' placement='right' title={<Markdown content={content} />}>
         <QuestionCircleOutlined />
       </Tooltip>

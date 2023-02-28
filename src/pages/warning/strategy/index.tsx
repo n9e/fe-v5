@@ -24,24 +24,30 @@ import { SettingOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import '../index.less';
 import { useQuery } from '@/utils';
+
 const Strategy: React.FC = () => {
   const urlQuery = useQuery();
   const history = useHistory();
   const id = urlQuery.get('id');
-  const {
-    t
-  } = useTranslation();
-  const busiChange = id => {
+  const { t } = useTranslation();
+
+  const busiChange = (id) => {
     history.push(`/alert-rules?id=${id}`);
   };
-  return <PageLayout title={t('告警规则')} icon={<SettingOutlined />} hideCluster>
+
+  return (
+    <PageLayout title={t('告警规则')} icon={<SettingOutlined />} hideCluster>
       <div className='strategy-content'>
-        <LeftTree busiGroup={{
-        defaultSelect: id ? Number(id) : undefined,
-        onChange: busiChange
-      }}></LeftTree>
-        {id ? <PageTable bgid={Number(id)}></PageTable> : <BlankBusinessPlaceholder text={t("告警规则")} />}
+        <LeftTree
+          busiGroup={{
+            defaultSelect: id ? Number(id) : undefined,
+            onChange: busiChange,
+          }}
+        ></LeftTree>
+        {id ? <PageTable bgid={Number(id)}></PageTable> : <BlankBusinessPlaceholder text={t('告警规则')} />}
       </div>
-    </PageLayout>;
+    </PageLayout>
+  );
 };
+
 export default Strategy;

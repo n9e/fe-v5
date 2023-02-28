@@ -1,6 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 import moment from 'moment';
+import { useTranslation } from 'react-i18next';
 
 function localeCompareFunc(a, b) {
   return a.localeCompare(b);
@@ -8,10 +9,12 @@ function localeCompareFunc(a, b) {
 
 export function getColumnsFromFields(selectedFields: string[], dateField?: string) {
   let columns: any[] = [];
+
   if (_.isEmpty(selectedFields)) {
     columns = [
       {
         title: 'Document',
+
         render(record) {
           return (
             <dl className='event-logs-row'>
@@ -38,7 +41,9 @@ export function getColumnsFromFields(selectedFields: string[], dateField?: strin
       };
     });
   }
+
   console.log('dateField', dateField);
+
   if (dateField) {
     columns.unshift({
       title: 'Time',
@@ -52,15 +57,17 @@ export function getColumnsFromFields(selectedFields: string[], dateField?: strin
       },
     });
   }
+
   return columns;
 }
-
 export function getInnerTagKeys(log: { [index: string]: string }) {
   const innerFields: string[] = [];
+
   _.forEach(log, (_val, key) => {
     if (key.indexOf('__tag__') === 0) {
       innerFields.push(key);
     }
   });
+
   return innerFields;
 }

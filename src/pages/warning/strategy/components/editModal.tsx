@@ -39,27 +39,23 @@ const tailLayout = {
   wrapperCol: {
     offset: 5,
   },
-};
+}; // 校验单个标签格式是否正确
 
-// 校验单个标签格式是否正确
 function isTagValid(tag) {
   const contentRegExp = /^[a-zA-Z_][\w]*={1}[^=]+$/;
   return {
     isCorrectFormat: contentRegExp.test(tag.toString()),
     isLengthAllowed: tag.toString().length <= 64,
   };
-}
+} // 渲染标签
 
-// 渲染标签
 function tagRender(content) {
   const { t } = useTranslation();
-
   const { isCorrectFormat, isLengthAllowed } = isTagValid(content.value);
   return isCorrectFormat && isLengthAllowed ? (
     <Tag
       closable={content.closable}
-      onClose={content.onClose}
-      // style={{ marginTop: '2px' }}
+      onClose={content.onClose} // style={{ marginTop: '2px' }}
     >
       {content.value}
     </Tag>
@@ -77,9 +73,8 @@ function tagRender(content) {
       </Tag>
     </Tooltip>
   );
-}
+} // 校验所有标签格式
 
-// 校验所有标签格式
 function isValidFormat() {
   return {
     validator(_, value) {
@@ -87,6 +82,7 @@ function isValidFormat() {
         value &&
         value.some((tag) => {
           const { isCorrectFormat, isLengthAllowed } = isTagValid(tag);
+
           if (!isCorrectFormat || !isLengthAllowed) {
             return true;
           }
@@ -95,10 +91,12 @@ function isValidFormat() {
     },
   };
 }
+
 interface Props {
   isModalVisible: boolean;
   editModalFinish: Function;
 }
+
 const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
   const { t, i18n } = useTranslation();
   const fields = [
@@ -212,11 +210,13 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
       {ng.name}
     </Option>
   ));
+
   const getNotifyChannel = async () => {
     const res = await getNotifiesList();
     let contactList = res || [];
     setInitContactList(contactList);
   };
+
   const getGroups = async (str) => {
     const res = await getTeamInfoList({
       query: str,
@@ -224,12 +224,13 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
     const data = res.dat || res;
     setNotifyGroups(data || []);
   };
+
   const debounceFetcher = useCallback(debounce(getGroups, 800), []);
+
   const modelOk = () => {
     form.validateFields().then(async (values) => {
-      const data = {
-        ...values,
-      };
+      const data = { ...values };
+
       switch (values.field) {
         case 'effective_time':
           data.enable_days_of_week = '';
@@ -248,13 +249,16 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
             (data.enable_etime = values.effective_time.map((item) => item.enable_etime.format('HH:mm'))),
             delete data.effective_time;
           break;
+
         case 'disabled':
           data.disabled = !values.enable_status ? 1 : 0;
           delete data.enable_status;
           break;
+
         case 'enable_in_bg':
           data.enable_in_bg = values.enable_in_bg ? 1 : 0;
           break;
+
         case 'callbacks':
           if (data.action === 'cover') {
             delete data.action;
@@ -262,22 +266,28 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
           } else {
             data.callbacks = values.callbacks;
           }
+
           break;
+
         case 'cluster':
           data.cluster = values.cluster.join(' ');
           break;
+
         case 'notify_recovered':
           data.notify_recovered = values.notify_recovered ? 1 : 0;
           break;
+
         default:
           break;
       }
+
       delete data.field;
       Object.keys(data).forEach((key) => {
         // 因为功能上有清除备注的需求，需要支持传空
         if (data[key] === undefined) {
           data[key] = '';
         }
+
         if (Array.isArray(data[key])) {
           data[key] = data[key].join(' ');
         }
@@ -285,6 +295,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
       editModalFinish(true, data);
     });
   };
+
   const handleClusterChange = (v: string[]) => {
     if (v.includes(ClusterAll)) {
       form.setFieldsValue({
@@ -292,12 +303,15 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
       });
     }
   };
+
   const editModalClose = () => {
     editModalFinish(false);
   };
+
   const fieldChange = (val) => {
     setField(val);
   };
+
   return (
     <>
       <Modal
@@ -375,6 +389,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                     </Form.Item>
                   </>
                 );
+
               case 'runbook_url':
                 return (
                   <>
@@ -383,6 +398,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                     </Form.Item>
                   </>
                 );
+
               case 'cluster':
                 return (
                   <>
@@ -409,6 +425,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                     </Form.Item>
                   </>
                 );
+
               case 'severity':
                 return (
                   <>
@@ -431,6 +448,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                     </Form.Item>
                   </>
                 );
+
               case 'disabled':
                 return (
                   <>
@@ -449,6 +467,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                     </Form.Item>
                   </>
                 );
+
               case 'enable_in_bg':
                 return (
                   <>
@@ -457,6 +476,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                     </Form.Item>
                   </>
                 );
+
               case 'prom_eval_interval':
                 return (
                   <>
@@ -499,6 +519,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                     </Form.Item>
                   </>
                 );
+
               case 'prom_for_duration':
                 return (
                   <>
@@ -538,6 +559,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                     </Form.Item>
                   </>
                 );
+
               case 'notify_channels':
                 return (
                   <>
@@ -546,6 +568,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                     </Form.Item>
                   </>
                 );
+
               case 'notify_groups':
                 return (
                   <>
@@ -556,6 +579,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                     </Form.Item>
                   </>
                 );
+
               case 'notify_recovered':
                 return (
                   <>
@@ -564,6 +588,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                     </Form.Item>
                   </>
                 );
+
               case 'recover_duration':
                 return (
                   <>
@@ -600,6 +625,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                     </Form.Item>
                   </>
                 );
+
               case 'notify_repeat_step':
                 return (
                   <>
@@ -636,6 +662,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                     </Form.Item>
                   </>
                 );
+
               case 'notify_max_number':
                 return (
                   <>
@@ -666,6 +693,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                     </Form.Item>
                   </>
                 );
+
               case 'callbacks':
                 return (
                   <>
@@ -696,6 +724,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                     <Form.Item shouldUpdate noStyle>
                       {({ getFieldValue }) => {
                         const action = getFieldValue('action');
+
                         if (action === 'cover') {
                           return (
                             <Form.Item label={t('改为：')}>
@@ -738,6 +767,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                     </Form.Item>
                   </>
                 );
+
               case 'append_tags':
                 return (
                   <>
@@ -756,6 +786,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                     </Form.Item>
                   </>
                 );
+
               case 'effective_time':
                 return (
                   <>
@@ -836,6 +867,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                     </Form.Item>
                   </>
                 );
+
               default:
                 return null;
             }
@@ -845,4 +877,5 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
     </>
   );
 };
+
 export default editModal;

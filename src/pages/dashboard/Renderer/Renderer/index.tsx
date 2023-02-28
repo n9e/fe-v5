@@ -36,7 +36,7 @@ import { IPanel } from '../../types';
 import { getStepByTimeAndStep } from '../../utils';
 import replaceFieldWithVariable from '../utils/replaceFieldWithVariable';
 import './style.less';
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 interface IProps {
   themeMode?: 'dark';
   dashboardId: string;
@@ -54,21 +54,8 @@ interface IProps {
 }
 
 function index(props: IProps) {
-  const {
-    t
-  } = useTranslation();
-  const {
-    themeMode,
-    dashboardId,
-    id,
-    step,
-    variableConfig,
-    isPreview,
-    onCloneClick,
-    onShareClick,
-    onEditClick,
-    onDeleteClick
-  } = props;
+  const { t } = useTranslation();
+  const { themeMode, dashboardId, id, step, variableConfig, isPreview, onCloneClick, onShareClick, onEditClick, onDeleteClick } = props;
   const [time, setTime] = useState(props.time);
   const [visible, setVisible] = useState(false);
 
@@ -77,10 +64,7 @@ function index(props: IProps) {
   const ref = useRef<HTMLDivElement>(null);
   const bodyWrapRef = useRef<HTMLDivElement>(null);
   const [inViewPort] = useInViewport(ref);
-  const {
-    series,
-    loading
-  } = useQuery({
+  const { series, loading } = useQuery({
     id,
     dashboardId,
     time,
@@ -91,7 +75,7 @@ function index(props: IProps) {
     datasourceCate: values.datasourceCate || 'prometheus',
     datasourceName: values.datasourceName,
     spanNulls: values.custom?.spanNulls,
-    scopedVars: values.scopedVars
+    scopedVars: values.scopedVars,
   });
   const name = replaceFieldWithVariable(dashboardId, values.name, variableConfig, values.scopedVars);
   const description = replaceFieldWithVariable(dashboardId, values.description, variableConfig, values.scopedVars);
@@ -107,7 +91,7 @@ function index(props: IProps) {
 
   const subProps = {
     values,
-    series
+    series,
   };
   const RendererCptMap = {
     timeseries: () => <Timeseries {...subProps} themeMode={themeMode} time={time} />,
@@ -117,32 +101,44 @@ function index(props: IProps) {
     hexbin: () => <Hexbin {...subProps} themeMode={themeMode} />,
     barGauge: () => <BarGauge {...subProps} themeMode={themeMode} />,
     text: () => <Text {...subProps} />,
-    gauge: () => <Gauge {...subProps} themeMode={themeMode} />
+    gauge: () => <Gauge {...subProps} themeMode={themeMode} />,
   };
-  return <div className={classNames({
-    'renderer-container': true,
-    'renderer-container-no-title': !values.name
-  })} ref={ref}>
+  return (
+    <div
+      className={classNames({
+        'renderer-container': true,
+        'renderer-container-no-title': !values.name,
+      })}
+      ref={ref}
+    >
       <div className='renderer-body-wrap' ref={bodyWrapRef}>
         <div className='renderer-header graph-header dashboards-panels-item-drag-handle'>
           <div className='renderer-header-desc'>
-            {tipsVisible ? <Tooltip placement='top' overlayInnerStyle={{
-            width: 300
-          }} getPopupContainer={() => ref.current!} title={<div>
+            {tipsVisible ? (
+              <Tooltip
+                placement='top'
+                overlayInnerStyle={{
+                  width: 300,
+                }}
+                getPopupContainer={() => ref.current!}
+                title={
+                  <div>
                     <Markdown content={description} />
                     {_.map(values.links, (link, i) => {
-              const {
-                t
-              } = useTranslation();
-              return <div key={i}>
+                      return (
+                        <div key={i}>
                           <a href={replaceFieldWithVariable(dashboardId, link.url, variableConfig, values.scopedVars)} target={link.targetBlank ? '_blank' : '_self'}>
                             {replaceFieldWithVariable(dashboardId, link.title, variableConfig, values.scopedVars)}
                           </a>
-                        </div>;
-            })}
-                  </div>}>
+                        </div>
+                      );
+                    })}
+                  </div>
+                }
+              >
                 <div className='renderer-header-desc'>{description ? <InfoCircleOutlined /> : <LinkOutlined />}</div>
-              </Tooltip> : null}
+              </Tooltip>
+            ) : null}
           </div>
           <div className='renderer-header-content'>
             <Tooltip title={name} getPopupContainer={() => ref.current!}>
@@ -150,74 +146,127 @@ function index(props: IProps) {
             </Tooltip>
           </div>
           <div className='renderer-header-loading'>
-            {loading ? <SyncOutlined spin /> : !isPreview && <Dropdown trigger={['click']} placement='bottomCenter' getPopupContainer={() => ref.current!} overlayStyle={{
-            minWidth: '100px'
-          }} visible={visible} onVisibleChange={visible => {
-            setVisible(visible);
-          }} overlay={<Menu>
-                      <Menu.Item onClick={() => {
-              setVisible(true);
-              setTime({ ...time,
-                refreshFlag: _.uniqueId('refreshFlag_ ')
-              });
-            }} key='0'>
-                        <Tooltip title={`${t("刷新间隔小于 step(")}${getStepByTimeAndStep(time, step)}${t("s) 将不会更新数据")}`} placement='left'>
+            {loading ? (
+              <SyncOutlined spin />
+            ) : (
+              !isPreview && (
+                <Dropdown
+                  trigger={['click']}
+                  placement='bottomCenter'
+                  getPopupContainer={() => ref.current!}
+                  overlayStyle={{
+                    minWidth: '100px',
+                  }}
+                  visible={visible}
+                  onVisibleChange={(visible) => {
+                    setVisible(visible);
+                  }}
+                  overlay={
+                    <Menu>
+                      <Menu.Item
+                        onClick={() => {
+                          setVisible(true);
+                          setTime({ ...time, refreshFlag: _.uniqueId('refreshFlag_ ') });
+                        }}
+                        key='0'
+                      >
+                        <Tooltip title={`${t('刷新间隔小于 step(')}${getStepByTimeAndStep(time, step)}${t('s) 将不会更新数据')}`} placement='left'>
                           <div>
-                            <SyncOutlined style={{
-                    marginRight: 8
-                  }} />
-                            {t("刷新")}
-                         </div>
+                            <SyncOutlined
+                              style={{
+                                marginRight: 8,
+                              }}
+                            />
+                            {t('刷新')}
+                          </div>
                         </Tooltip>
                       </Menu.Item>
-                      {!values.repeatPanelId && <Menu.Item onClick={() => {
-              setVisible(false);
-              if (onEditClick) onEditClick();
-            }} key='1'>
-                          <SettingOutlined style={{
-                marginRight: 8
-              }} />
-                          {t("编辑")}
-                       </Menu.Item>}
-                      {!values.repeatPanelId && <Menu.Item onClick={() => {
-              setVisible(false);
-              if (onCloneClick) onCloneClick();
-            }} key='2'>
-                          <CopyOutlined style={{
-                marginRight: 8
-              }} />
-                          {t("克隆")}
-                       </Menu.Item>}
-                      <Menu.Item onClick={() => {
-              setVisible(false);
-              if (onShareClick) onShareClick();
-            }} key='3'>
-                        <ShareAltOutlined style={{
-                marginRight: 8
-              }} />
-                        {t("分享")}
-                     </Menu.Item>
-                      {!values.repeatPanelId && <Menu.Item onClick={() => {
-              setVisible(false);
-              if (onDeleteClick) onDeleteClick();
-            }} key='4'>
-                          <DeleteOutlined style={{
-                marginRight: 8
-              }} />
-                          {t("删除")}
-                       </Menu.Item>}
-                    </Menu>}>
+                      {!values.repeatPanelId && (
+                        <Menu.Item
+                          onClick={() => {
+                            setVisible(false);
+                            if (onEditClick) onEditClick();
+                          }}
+                          key='1'
+                        >
+                          <SettingOutlined
+                            style={{
+                              marginRight: 8,
+                            }}
+                          />
+                          {t('编辑')}
+                        </Menu.Item>
+                      )}
+                      {!values.repeatPanelId && (
+                        <Menu.Item
+                          onClick={() => {
+                            setVisible(false);
+                            if (onCloneClick) onCloneClick();
+                          }}
+                          key='2'
+                        >
+                          <CopyOutlined
+                            style={{
+                              marginRight: 8,
+                            }}
+                          />
+                          {t('克隆')}
+                        </Menu.Item>
+                      )}
+                      <Menu.Item
+                        onClick={() => {
+                          setVisible(false);
+                          if (onShareClick) onShareClick();
+                        }}
+                        key='3'
+                      >
+                        <ShareAltOutlined
+                          style={{
+                            marginRight: 8,
+                          }}
+                        />
+                        {t('分享')}
+                      </Menu.Item>
+                      {!values.repeatPanelId && (
+                        <Menu.Item
+                          onClick={() => {
+                            setVisible(false);
+                            if (onDeleteClick) onDeleteClick();
+                          }}
+                          key='4'
+                        >
+                          <DeleteOutlined
+                            style={{
+                              marginRight: 8,
+                            }}
+                          />
+                          {t('删除')}
+                        </Menu.Item>
+                      )}
+                    </Menu>
+                  }
+                >
                   <MoreOutlined className='renderer-header-more' />
-                </Dropdown>}
+                </Dropdown>
+              )
+            )}
           </div>
         </div>
-        <div className='renderer-body' style={{
-        height: values.name ? `calc(100% - 47px)` : '100%'
-      }}>
-          {_.isEmpty(series) && values.type !== 'text' ? <div className='renderer-body-content-empty'>{t("暂无数据")}</div> : <>{RendererCptMap[values.type] ? RendererCptMap[values.type]() : <div className='unknown-type'>{`${t("无效的图表类型 ")}${values.type}`}</div>}</>}
+        <div
+          className='renderer-body'
+          style={{
+            height: values.name ? `calc(100% - 47px)` : '100%',
+          }}
+        >
+          {_.isEmpty(series) && values.type !== 'text' ? (
+            <div className='renderer-body-content-empty'>{t('暂无数据')}</div>
+          ) : (
+            <>{RendererCptMap[values.type] ? RendererCptMap[values.type]() : <div className='unknown-type'>{`${t('无效的图表类型 ')}${values.type}`}</div>}</>
+          )}
         </div>
       </div>
-    </div>;
+    </div>
+  );
 }
 
 export default React.memo(index);

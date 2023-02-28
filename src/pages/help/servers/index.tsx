@@ -25,54 +25,64 @@ import { getN9EServers, updateN9EServerCluster, addN9EServers, deleteN9EServers 
 import { getCommonClusters } from '@/services/common';
 import { RootState as AccountRootState, accountStoreState } from '@/store/accountInterface';
 import SystemInfoSvg from '../../../../public/image/system-info.svg';
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 
-function ClusterEditor({
-  id,
-  defaultValue,
-  clusters,
-  onSave
-}) {
-  const {
-    t
-  } = useTranslation();
+function ClusterEditor({ id, defaultValue, clusters, onSave }) {
+  const { t } = useTranslation();
   const [visible, setVisible] = useState(false);
   const [cluster, setCluster] = useState(defaultValue);
-  return <Popover visible={visible} onVisibleChange={newVisible => {
-    setVisible(newVisible);
-  }} destroyTooltipOnHide content={<Space>
-          <AutoComplete style={{
-      minWidth: 200
-    }} placeholder={t("选择集群")} options={_.map(clusters, item => {
-      return {
-        label: item,
-        value: item
-      };
-    })} allowClear value={cluster} onChange={val => {
-      setCluster(val);
-    }} />
-          <Button type='primary' onClick={() => {
-      updateN9EServerCluster(id, {
-        cluster: cluster || ''
-      }).then(() => {
-        onSave();
-        setVisible(false);
-      });
-    }}>
-            {t("保存")}
-         </Button>
-        </Space>} title={t("修改集群")} trigger='click'>
-      <Button type='link'>{t("修改集群")}</Button>
-    </Popover>;
+  return (
+    <Popover
+      visible={visible}
+      onVisibleChange={(newVisible) => {
+        setVisible(newVisible);
+      }}
+      destroyTooltipOnHide
+      content={
+        <Space>
+          <AutoComplete
+            style={{
+              minWidth: 200,
+            }}
+            placeholder={t('选择集群')}
+            options={_.map(clusters, (item) => {
+              return {
+                label: item,
+                value: item,
+              };
+            })}
+            allowClear
+            value={cluster}
+            onChange={(val) => {
+              setCluster(val);
+            }}
+          />
+          <Button
+            type='primary'
+            onClick={() => {
+              updateN9EServerCluster(id, {
+                cluster: cluster || '',
+              }).then(() => {
+                onSave();
+                setVisible(false);
+              });
+            }}
+          >
+            {t('保存')}
+          </Button>
+        </Space>
+      }
+      title={t('修改集群')}
+      trigger='click'
+    >
+      <Button type='link'>{t('修改集群')}</Button>
+    </Popover>
+  );
 }
 
 export default function Servers() {
-  const {
-    t
-  } = useTranslation();
-  const {
-    profile
-  } = useSelector<AccountRootState, accountStoreState>(state => state.account);
+  const { t } = useTranslation();
+  const { profile } = useSelector<AccountRootState, accountStoreState>((state) => state.account);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [clusters, setClusters] = useState([]);
@@ -80,113 +90,184 @@ export default function Servers() {
   const [visible, setVisible] = useState(false);
 
   const fetchData = () => {
-    getN9EServers().then(res => {
-      setData(res.dat);
-    }).finally(() => {
-      setLoading(false);
-    });
+    getN9EServers()
+      .then((res) => {
+        setData(res.dat);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   useEffect(() => {
-    getCommonClusters().then(res => {
+    getCommonClusters().then((res) => {
       setClusters(res.dat);
     });
     fetchData();
   }, []);
-  return <PageLayout title={<>
-          <Icon component={(SystemInfoSvg as any)} /> {t("告警引擎")}
-       </>} hideCluster>
+  return (
+    <PageLayout
+      title={
+        <>
+          <Icon component={SystemInfoSvg as any} /> {t('告警引擎')}
+        </>
+      }
+      hideCluster
+    >
       <div>
-        <div style={{
-        padding: 20
-      }}>
-          {profile.admin ? <div>
-              <div style={{
-            display: 'flex',
-            justifyContent: 'flex-end'
-          }}>
-                <Button onClick={() => {
-              setVisible(true);
-            }}>
-                  {t("新增")}
-               </Button>
+        <div
+          style={{
+            padding: 20,
+          }}
+        >
+          {profile.admin ? (
+            <div>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                }}
+              >
+                <Button
+                  onClick={() => {
+                    setVisible(true);
+                  }}
+                >
+                  {t('新增')}
+                </Button>
               </div>
-              <Table rowKey='id' loading={loading} dataSource={data} pagination={false} columns={[{
-            title: t("引擎实例"),
-            dataIndex: 'instance',
-            key: 'instance'
-          }, {
-            title: t("告警集群"),
-            dataIndex: 'cluster',
-            key: 'cluster'
-          }, {
-            title: t("上次心跳时间"),
-            dataIndex: 'clock',
-            key: 'clock',
-            render: text => {
-              return moment.unix(text).format('YYYY-MM-DD HH:mm:ss');
-            }
-          }, {
-            title: t("操作"),
-            width: 150,
-            render: record => {
-              const {
-                t
-              } = useTranslation();
-              return <Space>
-                          <ClusterEditor id={record.id} defaultValue={record.cluster || undefined} clusters={clusters} onSave={() => {
-                  fetchData();
-                }} />
-                          <Popconfirm title={t("确认删除？")} onConfirm={() => {
-                  deleteN9EServers([record.id]).then(() => {
-                    fetchData();
-                  });
-                }}>
-                            <a style={{
-                    color: '#f53146'
-                  }}>{t("删除")}</a>
+              <Table
+                rowKey='id'
+                loading={loading}
+                dataSource={data}
+                pagination={false}
+                columns={[
+                  {
+                    title: t('引擎实例'),
+                    dataIndex: 'instance',
+                    key: 'instance',
+                  },
+                  {
+                    title: t('告警集群'),
+                    dataIndex: 'cluster',
+                    key: 'cluster',
+                  },
+                  {
+                    title: t('上次心跳时间'),
+                    dataIndex: 'clock',
+                    key: 'clock',
+                    render: (text) => {
+                      return moment.unix(text).format('YYYY-MM-DD HH:mm:ss');
+                    },
+                  },
+                  {
+                    title: t('操作'),
+                    width: 150,
+                    render: (record) => {
+                      return (
+                        <Space>
+                          <ClusterEditor
+                            id={record.id}
+                            defaultValue={record.cluster || undefined}
+                            clusters={clusters}
+                            onSave={() => {
+                              fetchData();
+                            }}
+                          />
+                          <Popconfirm
+                            title={t('确认删除？')}
+                            onConfirm={() => {
+                              deleteN9EServers([record.id]).then(() => {
+                                fetchData();
+                              });
+                            }}
+                          >
+                            <a
+                              style={{
+                                color: '#f53146',
+                              }}
+                            >
+                              {t('删除')}
+                            </a>
                           </Popconfirm>
-                        </Space>;
-            }
-          }]} />
-            </div> : <div>{t("您没有权限查看")}</div>}
+                        </Space>
+                      );
+                    },
+                  },
+                ]}
+              />
+            </div>
+          ) : (
+            <div>{t('您没有权限查看')}</div>
+          )}
         </div>
       </div>
-      <Modal title={t("新增")} visible={visible} onCancel={() => {
-      setVisible(false);
-    }} footer={[<Button key='cancel' onClick={() => {
-      setVisible(false);
-    }}>
-            {t("取消")}
-         </Button>, <Button key='ok' type='primary' onClick={() => {
-      form.validateFields().then(values => {
-        addN9EServers(values).then(() => {
+      <Modal
+        title={t('新增')}
+        visible={visible}
+        onCancel={() => {
           setVisible(false);
-          fetchData();
-        });
-      });
-    }}>
-            {t("提交")}
-         </Button>]}>
+        }}
+        footer={[
+          <Button
+            key='cancel'
+            onClick={() => {
+              setVisible(false);
+            }}
+          >
+            {t('取消')}
+          </Button>,
+          <Button
+            key='ok'
+            type='primary'
+            onClick={() => {
+              form.validateFields().then((values) => {
+                addN9EServers(values).then(() => {
+                  setVisible(false);
+                  fetchData();
+                });
+              });
+            }}
+          >
+            {t('提交')}
+          </Button>,
+        ]}
+      >
         <Form form={form}>
-          <Form.Item label={t("引擎实例")} name='instance' rules={[{
-          required: true,
-          message: t("请填写引擎实例")
-        }]}>
+          <Form.Item
+            label={t('引擎实例')}
+            name='instance'
+            rules={[
+              {
+                required: true,
+                message: t('请填写引擎实例'),
+              },
+            ]}
+          >
             <Input />
           </Form.Item>
-          <Form.Item label={t("告警集群")} name='cluster' rules={[{
-          required: true,
-          message: t("请选择告警集群")
-        }]}>
-            <AutoComplete options={_.map(clusters, item => {
-            return {
-              label: item,
-              value: item
-            };
-          })} allowClear />
+          <Form.Item
+            label={t('告警集群')}
+            name='cluster'
+            rules={[
+              {
+                required: true,
+                message: t('请选择告警集群'),
+              },
+            ]}
+          >
+            <AutoComplete
+              options={_.map(clusters, (item) => {
+                return {
+                  label: item,
+                  value: item,
+                };
+              })}
+              allowClear
+            />
           </Form.Item>
         </Form>
       </Modal>
-    </PageLayout>;
+    </PageLayout>
+  );
 }

@@ -26,7 +26,7 @@ import { IVariable } from './definition';
 import DisplayItem from './DisplayItem';
 import EditItems from './EditItems';
 import './index.less';
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 interface IProps {
   id: string;
   cluster: string; // 集群变动后需要重新获取数据
@@ -48,30 +48,18 @@ function includes(source, target) {
 }
 
 function index(props: IProps) {
-  const {
-    t
-  } = useTranslation();
+  const { t } = useTranslation();
   const query = queryString.parse(useLocation().search);
-  const {
-    id,
-    cluster,
-    editable = true,
-    range,
-    onChange,
-    onOpenFire,
-    isPreview = false
-  } = props;
+  const { id, cluster, editable = true, range, onChange, onOpenFire, isPreview = false } = props;
   const [editing, setEditing] = useState<boolean>(false);
   const [data, setData] = useState<IVariable[]>([]);
 
-  const dataWithoutConstant = _.filter(data, item => item.type !== 'constant');
+  const dataWithoutConstant = _.filter(data, (item) => item.type !== 'constant');
 
   const [refreshFlag, setRefreshFlag] = useState<string>(_.uniqueId('refreshFlag_'));
 
-  const value = _.map(props.value, item => {
-    return { ...item,
-      type: item.type || 'query'
-    };
+  const value = _.map(props.value, (item) => {
+    return { ...item, type: item.type || 'query' };
   });
 
   useEffect(() => {
@@ -95,14 +83,14 @@ function index(props: IProps) {
               const selected = getVaraiableSelected(item.name, id);
 
               if (query.__variable_value_fixed === undefined) {
-                if (selected === null || selected && !_.isEmpty(regFilterOptions) && !includes(regFilterOptions, selected)) {
+                if (selected === null || (selected && !_.isEmpty(regFilterOptions) && !includes(regFilterOptions, selected))) {
                   const head = regFilterOptions?.[0];
-                  const defaultVal = item.multi ? head ? [head] : [] : head;
+                  const defaultVal = item.multi ? (head ? [head] : []) : head;
                   setVaraiableSelected({
                     name: item.name,
                     value: defaultVal,
                     id,
-                    urlAttach: true
+                    urlAttach: true,
                   });
                 }
               }
@@ -115,7 +103,7 @@ function index(props: IProps) {
                   name: item.name,
                   value: item.defaultValue,
                   id,
-                  urlAttach: true
+                  urlAttach: true,
                 });
               }
             } else if (item.type === 'constant') {
@@ -127,17 +115,14 @@ function index(props: IProps) {
                   name: item.name,
                   value: item.definition,
                   id,
-                  urlAttach: true
+                  urlAttach: true,
                 });
               }
             }
           } // 设置变量默认值，优先从 url 中获取，其次是 localStorage
 
-
-          result = _.map(_.compact(result), item => {
-            return { ...item,
-              value: getVaraiableSelected(item?.name, id)
-            };
+          result = _.map(_.compact(result), (item) => {
+            return { ...item, value: getVaraiableSelected(item?.name, id) };
           });
           setData(result);
           onChange(value, false, result);
@@ -147,51 +132,75 @@ function index(props: IProps) {
       }
     }
   }, [JSON.stringify(value), cluster, refreshFlag]);
-  return <div className='tag-area'>
+  return (
+    <div className='tag-area'>
       <div className={classNames('tag-content', 'tag-content-close')}>
-        {_.map(dataWithoutConstant, item => {
-        const {
-          t
-        } = useTranslation();
-        return <DisplayItem key={item.name} expression={item} value={item.value} onChange={val => {
-          // 缓存变量值，更新 url 里的变量值
-          setVaraiableSelected({
-            name: item.name,
-            value: val,
-            id,
-            urlAttach: true,
-            vars: dataWithoutConstant
-          });
-          setData(_.map(data, subItem => {
-            if (subItem.name === item.name) {
-              return { ...item,
-                value: val
-              };
-            }
+        {_.map(dataWithoutConstant, (item) => {
+          return (
+            <DisplayItem
+              key={item.name}
+              expression={item}
+              value={item.value}
+              onChange={(val) => {
+                // 缓存变量值，更新 url 里的变量值
+                setVaraiableSelected({
+                  name: item.name,
+                  value: val,
+                  id,
+                  urlAttach: true,
+                  vars: dataWithoutConstant,
+                });
+                setData(
+                  _.map(data, (subItem) => {
+                    if (subItem.name === item.name) {
+                      return { ...item, value: val };
+                    }
 
-            return subItem;
-          }));
-          setRefreshFlag(_.uniqueId('refreshFlag_'));
-        }} />;
-      })}
-        {editable && !isPreview ? <EditOutlined className='icon' onClick={() => {
-        setEditing(true);
-        onOpenFire && onOpenFire();
-      }} /> : null}
-        {(data ? _.filter(data, item => item.type != 'constant')?.length === 0 : true) && editable && <div className='add-variable-tips' onClick={() => {
-        setEditing(true);
-        onOpenFire && onOpenFire();
-      }}>
-            {t("添加大盘变量")}
-         </div>}
+                    return subItem;
+                  }),
+                );
+                setRefreshFlag(_.uniqueId('refreshFlag_'));
+              }}
+            />
+          );
+        })}
+        {editable && !isPreview ? (
+          <EditOutlined
+            className='icon'
+            onClick={() => {
+              setEditing(true);
+              onOpenFire && onOpenFire();
+            }}
+          />
+        ) : null}
+        {(data ? _.filter(data, (item) => item.type != 'constant')?.length === 0 : true) && editable && (
+          <div
+            className='add-variable-tips'
+            onClick={() => {
+              setEditing(true);
+              onOpenFire && onOpenFire();
+            }}
+          >
+            {t('添加大盘变量')}
+          </div>
+        )}
       </div>
-      <EditItems cluster={cluster} visible={editing} setVisible={setEditing} value={value} onChange={(v: IVariable[]) => {
-      if (v) {
-        onChange(v, true);
-        setData(v);
-      }
-    }} range={range} id={id} />
-    </div>;
+      <EditItems
+        cluster={cluster}
+        visible={editing}
+        setVisible={setEditing}
+        value={value}
+        onChange={(v: IVariable[]) => {
+          if (v) {
+            onChange(v, true);
+            setData(v);
+          }
+        }}
+        range={range}
+        id={id}
+      />
+    </div>
+  );
 }
 
 export type { IVariable } from './definition';

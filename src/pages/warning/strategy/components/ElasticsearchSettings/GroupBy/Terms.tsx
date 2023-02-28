@@ -38,6 +38,7 @@ export default function Terms({
                 if (search) {
                   return item.value.includes(search);
                 }
+
                 return true;
               })} style={{
                 width: '100%'

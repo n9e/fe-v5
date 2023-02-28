@@ -19,70 +19,81 @@ import _ from 'lodash';
 import { Menu, Checkbox, Dropdown } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import { units } from '../config';
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 interface IProps {
   highLevelConfig: any;
   setHighLevelConfig: (val: any) => void;
 }
 export default function GraphStandardOptions(props: IProps) {
-  const {
-    t
-  } = useTranslation();
-  const {
-    highLevelConfig,
-    setHighLevelConfig
-  } = props;
-  const aggrFuncMenu = <Menu onClick={sort => {
-    setHighLevelConfig({ ...highLevelConfig,
-      sharedSortDirection: (sort as {
-        key: 'desc' | 'asc';
-      }).key
-    });
-  }} selectedKeys={[highLevelConfig.sharedSortDirection]}>
+  const { t } = useTranslation();
+  const { highLevelConfig, setHighLevelConfig } = props;
+  const aggrFuncMenu = (
+    <Menu
+      onClick={(sort) => {
+        setHighLevelConfig({
+          ...highLevelConfig,
+          sharedSortDirection: (
+            sort as {
+              key: 'desc' | 'asc';
+            }
+          ).key,
+        });
+      }}
+      selectedKeys={[highLevelConfig.sharedSortDirection]}
+    >
       <Menu.Item key='desc'>desc</Menu.Item>
       <Menu.Item key='asc'>asc</Menu.Item>
-    </Menu>;
-  const precisionMenu = <Menu onClick={e => {
-    setHighLevelConfig({ ...highLevelConfig,
-      unit: e.key
-    });
-  }} selectedKeys={[highLevelConfig.unit]}>
-      {_.map(units, item => {
-      const {
-        t
-      } = useTranslation();
-      return <Menu.Item key={item.value}>{item.label}</Menu.Item>;
-    })}
-    </Menu>;
-  return <div>
-      <Checkbox checked={highLevelConfig.shared} onChange={e => {
-      setHighLevelConfig({ ...highLevelConfig,
-        shared: e.target.checked
-      });
-    }}>
+    </Menu>
+  );
+  const precisionMenu = (
+    <Menu
+      onClick={(e) => {
+        setHighLevelConfig({ ...highLevelConfig, unit: e.key });
+      }}
+      selectedKeys={[highLevelConfig.unit]}
+    >
+      {_.map(units, (item) => {
+        return <Menu.Item key={item.value}>{item.label}</Menu.Item>;
+      })}
+    </Menu>
+  );
+  return (
+    <div>
+      <Checkbox
+        checked={highLevelConfig.shared}
+        onChange={(e) => {
+          setHighLevelConfig({ ...highLevelConfig, shared: e.target.checked });
+        }}
+      >
         Multi Series in Tooltip, order value
       </Checkbox>
       <Dropdown overlay={aggrFuncMenu}>
-        <a className='ant-dropdown-link' onClick={e => e.preventDefault()}>
+        <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
           {highLevelConfig.sharedSortDirection} <DownOutlined />
         </a>
       </Dropdown>
       <br />
-      <Checkbox checked={highLevelConfig.legend} onChange={e => {
-      setHighLevelConfig({ ...highLevelConfig,
-        legend: e.target.checked
-      });
-    }}>
+      <Checkbox
+        checked={highLevelConfig.legend}
+        onChange={(e) => {
+          setHighLevelConfig({ ...highLevelConfig, legend: e.target.checked });
+        }}
+      >
         Show Legend
       </Checkbox>
       <br />
       Value format with:{' '}
       <Dropdown overlay={precisionMenu}>
-        <a className='ant-dropdown-link' onClick={e => e.preventDefault()}>
-          {_.get(_.find(units, {
-          value: highLevelConfig.unit
-        }), 'label')} <DownOutlined />
+        <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
+          {_.get(
+            _.find(units, {
+              value: highLevelConfig.unit,
+            }),
+            'label',
+          )}{' '}
+          <DownOutlined />
         </a>
       </Dropdown>
-    </div>;
+    </div>
+  );
 }

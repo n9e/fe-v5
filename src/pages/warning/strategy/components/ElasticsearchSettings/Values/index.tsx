@@ -9,7 +9,9 @@ import { useTranslation } from "react-i18next";
 interface IProps {
   prefixField?: any;
   prefixFields?: string[]; // 前缀字段名
+
   prefixNameField?: string[]; // 列表字段名
+
   cate: string;
   cluster: string[];
   index: string;
@@ -71,23 +73,26 @@ export default function index({
     }) => <div>
           <Form.Item shouldUpdate={(prevValues, curValues) => {
         const preQueryValues = _.get(prevValues, [...prefixFields, ...prefixNameField, 'query', 'values']);
+
         const curQueryValues = _.get(curValues, [...prefixFields, ...prefixNameField, 'query', 'values']);
+
         return !_.isEqual(preQueryValues, curQueryValues);
       }} noStyle>
             {({
           getFieldValue
         }) => {
-          const targetQueryValues = getFieldValue([...prefixFields, ...prefixNameField, 'query', 'values']);
-          // 当提取日志原文时不可再添加 func
+          const targetQueryValues = getFieldValue([...prefixFields, ...prefixNameField, 'query', 'values']); // 当提取日志原文时不可再添加 func
+
           if (_.get(targetQueryValues, [0, 'func']) === 'rawData') {
             return <div style={{
               marginBottom: 8
             }}>{t("数值提取")}</div>;
           }
+
           return <div style={{
             marginBottom: 8
           }}>
-                  {t("数值提取")}取{' '}
+                  {t("数值提取")}{t("取")}{' '}
                   <PlusCircleOutlined style={{
               cursor: 'pointer'
             }} onClick={() => {
@@ -151,6 +156,7 @@ export default function index({
                             if (search) {
                               return item.value.includes(search);
                             }
+
                             return true;
                           })} style={{
                             width: '100%'

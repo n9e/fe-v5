@@ -24,7 +24,7 @@ import { useGlobalState } from '../../../globalState';
 import Gauge from './Gauge';
 import { calculateGridDimensions } from '../../utils/squares';
 import './style.less';
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 interface IProps {
   values: IPanel;
   series: any[];
@@ -41,95 +41,87 @@ const MIN_SIZE = 12;
 const ITEM_SPACIING = 8;
 
 function GaugeItemContent(props) {
-  const {
-    t
-  } = useTranslation();
-  const {
-    eleSize,
-    realHeaderFontSize,
-    item,
-    themeMode,
-    thresholds
-  } = props;
+  const { eleSize, realHeaderFontSize, item, themeMode, thresholds } = props;
   const height = eleSize?.height! - realHeaderFontSize;
   const width = eleSize?.width! > height ? height : eleSize?.width;
   if (!eleSize?.width) return null;
-  return <div className='renderer-gauge-item-content-chart'>
-      <Gauge value={item.stat} formatedValue={item.value} valueUnit={item.unit} color={item.color} bgColor={themeMode === 'dark' ? '#404456' : '#eeeeee'} width={width} height={width} thresholds={thresholds} />
-    </div>;
+  return (
+    <div className='renderer-gauge-item-content-chart'>
+      <Gauge
+        value={item.stat}
+        formatedValue={item.value}
+        valueUnit={item.unit}
+        color={item.color}
+        bgColor={themeMode === 'dark' ? '#404456' : '#eeeeee'}
+        width={width}
+        height={width}
+        thresholds={thresholds}
+      />
+    </div>
+  );
 }
 
 function GaugeItemLabel(props) {
-  const {
-    t
-  } = useTranslation();
-  const {
-    eleSize,
-    realHeaderFontSize,
-    name
-  } = props;
+  const { eleSize, realHeaderFontSize, name } = props;
   if (!eleSize?.width) return null;
-  return <div className='renderer-gauge-header' style={{
-    width: eleSize?.width,
-    fontSize: realHeaderFontSize > 24 ? 24 : realHeaderFontSize
-  }}>
+  return (
+    <div
+      className='renderer-gauge-header'
+      style={{
+        width: eleSize?.width,
+        fontSize: realHeaderFontSize > 24 ? 24 : realHeaderFontSize,
+      }}
+    >
       {name}
-    </div>;
+    </div>
+  );
 }
 
 function GaugeItem(props) {
-  const {
-    t
-  } = useTranslation();
   const ele = useRef(null);
   const eleSize = useSize(ele);
-  const {
-    item,
-    textMode = 'valueAndName',
-    style
-  } = props;
+  const { item, textMode = 'valueAndName', style } = props;
   const headerFontSize = eleSize?.width! / _.toString(item.name).length || MIN_SIZE;
   const realHeaderFontSize = headerFontSize > 24 ? 24 : headerFontSize;
-  return <Tooltip title={textMode === 'valueAndName' ? item.name : undefined}>
+  return (
+    <Tooltip title={textMode === 'valueAndName' ? item.name : undefined}>
       <div key={item.name} className='renderer-gauge-item' ref={ele} style={style}>
         <div className='renderer-gauge-item-content'>
           <GaugeItemContent {...props} eleSize={eleSize} realHeaderFontSize={realHeaderFontSize} />
           {textMode === 'valueAndName' && <GaugeItemLabel eleSize={eleSize} realHeaderFontSize={realHeaderFontSize} name={item.name} />}
         </div>
       </div>
-    </Tooltip>;
+    </Tooltip>
+  );
 }
 
 const getColumnsKeys = (data: any[]) => {
-  const keys = _.reduce(data, (result, item) => {
-    return _.union(result, _.keys(item.metric));
-  }, []);
+  const keys = _.reduce(
+    data,
+    (result, item) => {
+      return _.union(result, _.keys(item.metric));
+    },
+    [],
+  );
 
   return _.uniq(keys);
 };
 
 export default function Index(props: IProps) {
-  const {
-    t
-  } = useTranslation();
-  const {
-    values,
+  const { values, series, themeMode } = props;
+  const { custom, options } = values;
+  const { calc, textMode } = custom;
+  const calculatedValues = getCalculatedValuesBySeries(
     series,
-    themeMode
-  } = props;
-  const {
-    custom,
-    options
-  } = values;
-  const {
     calc,
-    textMode
-  } = custom;
-  const calculatedValues = getCalculatedValuesBySeries(series, calc, {
-    unit: options?.standardOptions?.util,
-    decimals: options?.standardOptions?.decimals,
-    dateFormat: options?.standardOptions?.dateFormat
-  }, options?.valueMappings, options?.thresholds);
+    {
+      unit: options?.standardOptions?.util,
+      decimals: options?.standardOptions?.decimals,
+      dateFormat: options?.standardOptions?.dateFormat,
+    },
+    options?.valueMappings,
+    options?.thresholds,
+  );
   const [statFields, setStatFields] = useGlobalState('statFields');
   const ele = useRef(null);
   const eleSize = useSize(ele);
@@ -144,34 +136,44 @@ export default function Index(props: IProps) {
       setGrid(grid);
     }
   }, [JSON.stringify(calculatedValues), eleSize?.width]);
-  return <div className='renderer-gauge-container'>
+  return (
+    <div className='renderer-gauge-container'>
       <div className='renderer-gauge-container-box scroll-container'>
         <div ref={ele} className='renderer-gauge-container-box-content'>
-          {grid && _.map(calculatedValues, (item, idx) => {
-          const {
-            t
-          } = useTranslation();
-          const isLastRow = yGrid === grid.yCount - 1;
-          const itemWidth = isLastRow ? grid.widthOnLastRow : grid.width;
-          const itemHeight = grid.height;
-          const xPos = xGrid * itemWidth + ITEM_SPACIING * xGrid;
-          const yPos = yGrid * itemHeight + ITEM_SPACIING * yGrid;
-          xGrid++;
+          {grid &&
+            _.map(calculatedValues, (item, idx) => {
+              const isLastRow = yGrid === grid.yCount - 1;
+              const itemWidth = isLastRow ? grid.widthOnLastRow : grid.width;
+              const itemHeight = grid.height;
+              const xPos = xGrid * itemWidth + ITEM_SPACIING * xGrid;
+              const yPos = yGrid * itemHeight + ITEM_SPACIING * yGrid;
+              xGrid++;
 
-          if (xGrid === grid.xCount) {
-            xGrid = 0;
-            yGrid++;
-          }
+              if (xGrid === grid.xCount) {
+                xGrid = 0;
+                yGrid++;
+              }
 
-          return <GaugeItem key={item.id} item={item} idx={idx} textMode={textMode} themeMode={themeMode} thresholds={options.thresholds} style={{
-            position: 'absolute',
-            left: xPos,
-            top: yPos,
-            width: `${itemWidth}px`,
-            height: `${itemHeight}px`
-          }} />;
-        })}
+              return (
+                <GaugeItem
+                  key={item.id}
+                  item={item}
+                  idx={idx}
+                  textMode={textMode}
+                  themeMode={themeMode}
+                  thresholds={options.thresholds}
+                  style={{
+                    position: 'absolute',
+                    left: xPos,
+                    top: yPos,
+                    width: `${itemWidth}px`,
+                    height: `${itemHeight}px`,
+                  }}
+                />
+              );
+            })}
         </div>
       </div>
-    </div>;
+    </div>
+  );
 }

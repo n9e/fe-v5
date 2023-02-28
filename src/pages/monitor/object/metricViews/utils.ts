@@ -16,20 +16,22 @@
  */
 import _ from 'lodash';
 import { IMatch } from '../types';
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 export function getFiltersStr(filters: IMatch['filters']) {
-  const arr = _.compact(_.map(filters, item => {
-    if (item.label && item.value) {
-      return `${item.label}${item.oper}"${item.value}"`;
-    }
+  const arr = _.compact(
+    _.map(filters, (item) => {
+      if (item.label && item.value) {
+        return `${item.label}${item.oper}"${item.value}"`;
+      }
 
-    return '';
-  }));
+      return '';
+    }),
+  );
 
   return _.join(_.compact(arr), ',');
 }
 export function getDynamicLabelsStr(dynamicLabels: IMatch['dynamicLabels']) {
-  const arr = _.map(dynamicLabels, item => {
+  const arr = _.map(dynamicLabels, (item) => {
     if (item.value) {
       return `${item.label}="${item.value}"`;
     }
@@ -40,11 +42,7 @@ export function getDynamicLabelsStr(dynamicLabels: IMatch['dynamicLabels']) {
   return _.join(_.compact(arr), ',');
 }
 export function getMatchStr(match: IMatch) {
-  const {
-    t
-  } = useTranslation();
-
-  const arr = _.map(match.dimensionLabels, item => {
+  const arr = _.map(match.dimensionLabels, (item) => {
     if (!_.isEmpty(item.value)) {
       return `${item.label}=~"${_.join(item.value, '|')}"`;
     }

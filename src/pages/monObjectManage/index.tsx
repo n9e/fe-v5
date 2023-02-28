@@ -46,8 +46,7 @@ interface OperateionModalProps {
 }
 const { TextArea } = Input; // 绑定标签弹窗内容
 
-const bindTagDetail = () => {
-  const { t } = useTranslation();
+const bindTagDetail = (t) => {
   // 校验单个标签格式是否正确
   function isTagValid(tag) {
     const contentRegExp = /^[a-zA-Z_][\w]*={1}[^=]+$/;
@@ -119,8 +118,7 @@ const bindTagDetail = () => {
   };
 }; // 解绑标签弹窗内容
 
-const unbindTagDetail = (tagsList) => {
-  const { t } = useTranslation();
+const unbindTagDetail = (t, tagsList) => {
   return {
     operateTitle: t('解绑标签'),
     requestFunc: unbindTags,
@@ -153,8 +151,7 @@ const unbindTagDetail = (tagsList) => {
   };
 }; // 移出业务组弹窗内容
 
-const removeBusiDetail = () => {
-  const { t } = useTranslation();
+const removeBusiDetail = (t) => {
   return {
     operateTitle: t('移出业务组'),
     requestFunc: moveTargetBusi,
@@ -166,8 +163,7 @@ const removeBusiDetail = () => {
   };
 }; // 修改备注弹窗内容
 
-const updateNoteDetail = () => {
-  const { t } = useTranslation();
+const updateNoteDetail = (t) => {
   return {
     operateTitle: t('修改备注'),
     requestFunc: updateTargetNote,
@@ -183,8 +179,7 @@ const updateNoteDetail = () => {
   };
 }; // 批量删除弹窗内容
 
-const deleteDetail = () => {
-  const { t } = useTranslation();
+const deleteDetail = (t) => {
   return {
     operateTitle: t('批量删除'),
     requestFunc: deleteTargets,
@@ -272,7 +267,7 @@ const OperationModal: React.FC<OperateionModalProps> = ({ operateType, setOperat
       render() {},
     }),
   };
-  const { operateTitle, requestFunc, isFormItem, render } = operateDetail[`${operateType}Detail`](detailProp);
+  const { operateTitle, requestFunc, isFormItem, render } = operateDetail[`${operateType}Detail`](t, detailProp);
   const [filteredBusiGroups, setFilteredBusiGroups] = useState(busiGroups);
 
   function formatValue() {

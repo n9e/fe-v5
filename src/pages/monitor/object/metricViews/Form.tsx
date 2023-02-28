@@ -337,7 +337,6 @@ function FormCpt(props: ModalWrapProps & IProps) {
                   title: t('Lable Value 样例'),
                   dataIndex: 'values',
                   render: (text) => {
-                    const { t } = useTranslation();
                     return (
                       <Tooltip
                         placement='right'

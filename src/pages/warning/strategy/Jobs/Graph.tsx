@@ -45,6 +45,7 @@ export default function GraphCpt(props: IProps) {
     const end = moment(parsedRange.end).unix();
     let _step = step;
     if (!step) _step = Math.max(Math.floor((end - start) / 240), 1);
+
     if (rid && uuid) {
       getBrainData({
         rid,
@@ -64,30 +65,38 @@ export default function GraphCpt(props: IProps) {
             lineDash: type === 'origin' || type === 'anomaly' ? [] : [4, 4]
           };
         });
+
         const newSeries: any[] = [];
+
         const origin = _.cloneDeep(_.find(dat, {
           name: 'origin'
         }));
+
         const lower = _.find(dat, {
           name: 'lower_bound'
         });
+
         const upper = _.find(dat, {
           name: 'upper_bound'
         });
+
         newSeries.push({
           name: 'lower_upper_bound',
           data: _.map(lower?.data, (dataItem, idx) => {
             if (upper) {
               return [...dataItem, upper?.data[idx][1]];
             }
+
             return [];
           }),
           color: '#ccc',
           opacity: 0.5
         });
+
         if (origin) {
           newSeries.push(origin);
         }
+
         setSeries(newSeries);
       });
     }

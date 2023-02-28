@@ -21,57 +21,61 @@ import _ from 'lodash';
 import { Panel } from '../../Components/Collapse';
 import { calcsOptions } from '../../config';
 import ColorPicker from '../../../Components/ColorPicker';
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 export default function GraphStyles() {
-  const {
-    t
-  } = useTranslation();
+  const { t } = useTranslation();
   const namePrefix = ['custom'];
-  return <Panel header={t("图表样式")}>
+  return (
+    <Panel header={t('图表样式')}>
       <>
         <Row gutter={10}>
           <Col span={12}>
-            <Form.Item label={t("取值计算")} name={[...namePrefix, 'calc']}>
+            <Form.Item label={t('取值计算')} name={[...namePrefix, 'calc']}>
               <Select suffixIcon={<CaretDownOutlined />}>
                 {_.map(calcsOptions, (item, key) => {
-                const {
-                  t
-                } = useTranslation();
-                return <Select.Option key={key} value={key}>
+                  return (
+                    <Select.Option key={key} value={key}>
                       {item.name}
-                    </Select.Option>;
-              })}
+                    </Select.Option>
+                  );
+                })}
               </Select>
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item label={t("最大值")} name={[...namePrefix, 'maxValue']}>
-              <InputNumber placeholder='auto' style={{
-              width: '100%'
-            }} />
+            <Form.Item label={t('最大值')} name={[...namePrefix, 'maxValue']}>
+              <InputNumber
+                placeholder='auto'
+                style={{
+                  width: '100%',
+                }}
+              />
             </Form.Item>
           </Col>
           <Col span={3}>
-            <Form.Item label={t("基础颜色")} name={[...namePrefix, 'baseColor']}>
+            <Form.Item label={t('基础颜色')} name={[...namePrefix, 'baseColor']}>
               <ColorPicker />
             </Form.Item>
           </Col>
         </Row>
         <Row gutter={10}>
           <Col span={12}>
-            <Form.Item label={t("序列名宽度")}>
+            <Form.Item label={t('序列名宽度')}>
               <Input.Group>
                 <Form.Item noStyle name={[...namePrefix, 'serieWidth']}>
-                  <InputNumber style={{
-                  width: '100%'
-                }} placeholder='auto' />
+                  <InputNumber
+                    style={{
+                      width: '100%',
+                    }}
+                    placeholder='auto'
+                  />
                 </Form.Item>
                 <span className='ant-input-group-addon'>%</span>
               </Input.Group>
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item label={t("排序")} name={[...namePrefix, 'sortOrder']}>
+            <Form.Item label={t('排序')} name={[...namePrefix, 'sortOrder']}>
               <Select>
                 <Select.Option value='none'>none</Select.Option>
                 <Select.Option value='asc'>asc</Select.Option>
@@ -81,5 +85,6 @@ export default function GraphStyles() {
           </Col>
         </Row>
       </>
-    </Panel>;
+    </Panel>
+  );
 }

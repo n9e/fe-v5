@@ -25,7 +25,7 @@ import { statHexPalette } from '../../../config';
 import getCalculatedValuesBySeries from '../../utils/getCalculatedValuesBySeries';
 import { useGlobalState } from '../../../globalState';
 import './style.less';
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 interface IProps {
   values: IPanel;
   series: any[];
@@ -39,31 +39,16 @@ const MIN_SIZE = 12;
 const UNIT_PADDING = 4;
 
 const getTextColor = (color, colorMode) => {
-  const {
-    t
-  } = useTranslation();
   return colorMode === 'value' ? color : '#fff';
 };
 
 function StatItem(props) {
-  const {
-    t
-  } = useTranslation();
+  const { t } = useTranslation();
   const ele = useRef(null);
   const eleSize = useSize(ele);
   const chartEleRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<TsGraph>(null);
-  const {
-    item,
-    colSpan,
-    textMode,
-    colorMode,
-    textSize,
-    isFullSizeBackground,
-    valueField = 'Value',
-    graphMode,
-    serie
-  } = props;
+  const { item, colSpan, textMode, colorMode, textSize, isFullSizeBackground, valueField = 'Value', graphMode, serie } = props;
   const headerFontSize = textSize?.title ? textSize?.title : eleSize?.width! / _.toString(item.name).length || MIN_SIZE;
   let statFontSize = textSize?.value ? textSize?.value : (eleSize?.width! - item.unit.length * UNIT_SIZE - UNIT_PADDING) / _.toString(item.value).length || MIN_SIZE;
   const color = item.color;
@@ -84,7 +69,7 @@ function StatItem(props) {
         xkey: 0,
         ykey: 1,
         ykey2: 2,
-        ykeyFormatter: value => Number(value),
+        ykeyFormatter: (value) => Number(value),
         chart: {
           renderTo: chartEleRef.current,
           height: chartEleRef.current.clientHeight,
@@ -92,96 +77,118 @@ function StatItem(props) {
           marginRight: 0,
           marginBottom: 0,
           marginLeft: 0,
-          colors: [colorMode === 'background' ? 'rgba(255, 255, 255, 0.5)' : color]
+          colors: [colorMode === 'background' ? 'rgba(255, 255, 255, 0.5)' : color],
         },
         series: [serie],
         line: {
-          width: 1
+          width: 1,
         },
         xAxis: {
-          visible: false
+          visible: false,
         },
         yAxis: {
-          visible: false
+          visible: false,
         },
         area: {
-          opacity: 0.2
-        }
+          opacity: 0.2,
+        },
       });
     }
   }, [colorMode]);
-  return <div key={item.name} className='renderer-stat-item' ref={ele} style={{
-    width: `${100 / colSpan}%`,
-    flexBasis: `${100 / colSpan}%`,
-    backgroundColor: isFullSizeBackground ? 'transparent' : backgroundColor
-  }}>
-      <div style={{
-      width: '100%'
-    }}>
-        {graphMode === 'area' && <div className='renderer-stat-item-graph'>
-            <div ref={chartEleRef} style={{
-          height: '100%',
-          width: '100%'
-        }} />
-          </div>}
+  return (
+    <div
+      key={item.name}
+      className='renderer-stat-item'
+      ref={ele}
+      style={{
+        width: `${100 / colSpan}%`,
+        flexBasis: `${100 / colSpan}%`,
+        backgroundColor: isFullSizeBackground ? 'transparent' : backgroundColor,
+      }}
+    >
+      <div
+        style={{
+          width: '100%',
+        }}
+      >
+        {graphMode === 'area' && (
+          <div className='renderer-stat-item-graph'>
+            <div
+              ref={chartEleRef}
+              style={{
+                height: '100%',
+                width: '100%',
+              }}
+            />
+          </div>
+        )}
         <div className='renderer-stat-item-content'>
-          {textMode === 'valueAndName' && <div className='renderer-stat-header' style={{
-          fontSize: headerFontSize > 100 ? 100 : headerFontSize
-        }}>
+          {textMode === 'valueAndName' && (
+            <div
+              className='renderer-stat-header'
+              style={{
+                fontSize: headerFontSize > 100 ? 100 : headerFontSize,
+              }}
+            >
               {item.name}
-            </div>}
-          <div className='renderer-stat-value' style={{
-          color: getTextColor(color, colorMode),
-          fontSize: statFontSize > 100 ? 100 : statFontSize
-        }}>
-            {valueField === 'Value' ? <>
+            </div>
+          )}
+          <div
+            className='renderer-stat-value'
+            style={{
+              color: getTextColor(color, colorMode),
+              fontSize: statFontSize > 100 ? 100 : statFontSize,
+            }}
+          >
+            {valueField === 'Value' ? (
+              <>
                 {item.value}
-                <span style={{
-              fontSize: UNIT_SIZE,
-              paddingLeft: UNIT_PADDING
-            }}>{item.unit}</span>
-              </> : _.get(item, ['metric', valueField])}
+                <span
+                  style={{
+                    fontSize: UNIT_SIZE,
+                    paddingLeft: UNIT_PADDING,
+                  }}
+                >
+                  {item.unit}
+                </span>
+              </>
+            ) : (
+              _.get(item, ['metric', valueField])
+            )}
           </div>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 }
 
 const getColumnsKeys = (data: any[]) => {
-  const keys = _.reduce(data, (result, item) => {
-    return _.union(result, _.keys(item.metric));
-  }, []);
+  const keys = _.reduce(
+    data,
+    (result, item) => {
+      return _.union(result, _.keys(item.metric));
+    },
+    [],
+  );
 
   return _.uniq(keys);
 };
 
 export default function Stat(props: IProps) {
-  const {
-    t
-  } = useTranslation();
-  const {
-    values,
+  const { values, series, bodyWrapRef } = props;
+  const { custom, options } = values;
+  const { calc, textMode, colorMode, colSpan, textSize, valueField, graphMode } = custom;
+  const calculatedValues = getCalculatedValuesBySeries(
     series,
-    bodyWrapRef
-  } = props;
-  const {
-    custom,
-    options
-  } = values;
-  const {
     calc,
-    textMode,
-    colorMode,
-    colSpan,
-    textSize,
-    valueField,
-    graphMode
-  } = custom;
-  const calculatedValues = getCalculatedValuesBySeries(series, calc, {
-    unit: options?.standardOptions?.util,
-    decimals: options?.standardOptions?.decimals,
-    dateFormat: options?.standardOptions?.dateFormat
-  }, options?.valueMappings, options?.thresholds);
+    {
+      unit: options?.standardOptions?.util,
+      decimals: options?.standardOptions?.decimals,
+      dateFormat: options?.standardOptions?.dateFormat,
+    },
+    options?.valueMappings,
+    options?.thresholds,
+  );
   const [isFullSizeBackground, setIsFullSizeBackground] = useState(false);
   const [statFields, setStatFields] = useGlobalState('statFields'); // 只有单个序列值且是背景色模式，则填充整个卡片的背景色
 
@@ -206,16 +213,29 @@ export default function Stat(props: IProps) {
       }
     }
   }, [JSON.stringify(calculatedValues), colorMode]);
-  return <div className='renderer-stat-container'>
+  return (
+    <div className='renderer-stat-container'>
       <div className='renderer-stat-container-box scroll-container'>
         {_.map(calculatedValues, (item, idx) => {
-        const {
-          t
-        } = useTranslation();
-        return <StatItem key={item.name} item={item} idx={idx} colSpan={colSpan} textMode={textMode} colorMode={colorMode} textSize={textSize} isFullSizeBackground={isFullSizeBackground} valueField={valueField} graphMode={graphMode} serie={_.find(series, {
-          id: item.id
-        })} />;
-      })}
+          return (
+            <StatItem
+              key={item.name}
+              item={item}
+              idx={idx}
+              colSpan={colSpan}
+              textMode={textMode}
+              colorMode={colorMode}
+              textSize={textSize}
+              isFullSizeBackground={isFullSizeBackground}
+              valueField={valueField}
+              graphMode={graphMode}
+              serie={_.find(series, {
+                id: item.id,
+              })}
+            />
+          );
+        })}
       </div>
-    </div>;
+    </div>
+  );
 }

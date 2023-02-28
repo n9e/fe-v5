@@ -9,7 +9,9 @@ import { useTranslation } from "react-i18next";
 interface IProps {
   prefixField?: any;
   fullPrefixName?: (string | number)[]; // 完整的前置字段名，用于 getFieldValue 获取指定字段的值
+
   prefixName?: (string | number)[]; // 列表字段名
+
   queries: any[];
 }
 const alphabet = 'ABCDEFGHIGKLMNOPQRSTUVWXYZ'.split('');
@@ -41,9 +43,11 @@ export default function Builder(props: IProps) {
                   })}
                       </Select>
                     </Form.Item>
-                    {/* <Form.Item {...field} name={[field.name, 'label']}>
-                      <Input />
-                     </Form.Item> */}
+                    {
+                /* <Form.Item {...field} name={[field.name, 'label']}>
+                 <Input />
+                </Form.Item> */
+              }
                     <Form.Item {...field} name={[field.name, 'comparisonOperator']} initialValue='=='>
                       <Select style={{
                   width: 64

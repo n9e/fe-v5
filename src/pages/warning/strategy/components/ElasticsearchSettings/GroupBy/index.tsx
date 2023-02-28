@@ -11,7 +11,9 @@ import { useTranslation } from "react-i18next";
 interface IProps {
   prefixField?: any;
   prefixFields?: string[]; // 前缀字段名
+
   prefixNameField?: (string | number)[]; // 列表字段名
+
   cate: string;
   cluster: string[];
   index: string;

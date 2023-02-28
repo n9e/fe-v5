@@ -15,9 +15,10 @@ interface IProps {
   form: any;
   prefixField?: any;
   fullPrefixName?: string[]; // 完整的前置字段名，用于 getFieldValue 获取指定字段的值
-  prefixName?: string[]; // 列表字段名
-}
 
+  prefixName?: string[]; // 列表字段名
+
+}
 const alphabet = 'ABCDEFGHIGKLMNOPQRSTUVWXYZ'.split('');
 export default function index({
   form,
@@ -39,7 +40,7 @@ export default function index({
             <div style={{
           marginBottom: 8
         }}>
-              {t("查询统计")}计{' '}
+              {t("查询统计")}{t("计")}{' '}
               <PlusCircleOutlined style={{
             cursor: 'pointer'
           }} onClick={() => {

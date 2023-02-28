@@ -76,7 +76,6 @@ export default function EditItems(props: IProps) {
               title: t('变量名'),
               dataIndex: 'name',
               render: (text, record, idx) => {
-                const { t } = useTranslation();
                 return (
                   <a
                     onClick={() => {
@@ -109,7 +108,6 @@ export default function EditItems(props: IProps) {
               title: t('操作'),
               width: 200,
               render: (_text, record, idx) => {
-                const { t } = useTranslation();
                 return (
                   <Space>
                     <Button
@@ -167,7 +165,6 @@ export default function EditItems(props: IProps) {
           ]}
           pagination={false}
           footer={() => {
-            const { t } = useTranslation();
             return (
               <Button
                 type='primary'

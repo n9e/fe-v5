@@ -14,10 +14,12 @@ export default function GraphPreview({
   const divRef = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
   const [data, setData] = useState<any[]>([]);
+
   const fetchData = () => {
     const cate = form.getFieldValue('cate');
     const cluster = form.getFieldValue('cluster');
     const queries = form.getFieldValue('queries');
+
     if (!_.isEmpty(cluster)) {
       getSLSLogs({
         cate,
@@ -43,6 +45,7 @@ export default function GraphPreview({
       });
     }
   };
+
   return <div style={{
     marginBottom: 16
   }} ref={divRef}>

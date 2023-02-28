@@ -8,7 +8,6 @@ import { getBrainJobs } from '@/services/warning';
 import Graph from './Graph';
 import './style.less';
 import { useTranslation } from 'react-i18next';
-
 export default function Jobs() {
   const { t } = useTranslation();
   const typeMap = {
@@ -67,7 +66,6 @@ export default function Jobs() {
         >
           <Row gutter={16}>
             {_.map(data, (value, key) => {
-              const { t } = useTranslation();
               return (
                 <Col key={key} span={6}>
                   <div
@@ -131,9 +129,11 @@ export default function Jobs() {
               if (search) {
                 return item.promql.indexOf(search) > -1;
               }
+
               if (activeType !== 'total') {
                 return item.status === typeMap[activeType].status;
               }
+
               return true;
             })}
             columns={[
@@ -162,7 +162,6 @@ export default function Jobs() {
               {
                 title: t('操作'),
                 render: (record) => {
-                  const { t } = useTranslation();
                   if (record.status === 2) return null;
                   return (
                     <a
@@ -182,7 +181,6 @@ export default function Jobs() {
             ]}
             locale={{
               emptyText: () => {
-                const { t } = useTranslation();
                 if (data.total === 0 || (data.total !== 0 && data.training !== 0)) {
                   return (
                     <div
@@ -199,6 +197,7 @@ export default function Jobs() {
                     </div>
                   );
                 }
+
                 return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />;
               },
             }}
@@ -209,10 +208,7 @@ export default function Jobs() {
         rid={params.id}
         {...graphParams}
         setVisible={(visible) => {
-          setGraphParams({
-            ...graphParams,
-            visible,
-          });
+          setGraphParams({ ...graphParams, visible });
         }}
       />
     </PageLayout>

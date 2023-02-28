@@ -2,7 +2,6 @@ import React from 'react';
 import { Form, Select } from 'antd';
 import { CaretDownOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-
 export default function index({ visible, form }) {
   const { t } = useTranslation();
   const typeNameMap = {
@@ -21,6 +20,7 @@ export default function index({ visible, form }) {
             cluster: [],
             prom_ql: '',
           };
+
           if (val === 'elasticsearch') {
             // 旧版本，即将废弃
             // values.query = {
@@ -65,6 +65,7 @@ export default function index({ visible, form }) {
               },
             ];
           }
+
           form.setFieldsValue(values);
         }}
       >

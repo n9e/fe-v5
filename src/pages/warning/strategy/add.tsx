@@ -19,6 +19,7 @@ import PageLayout from '@/components/pageLayout';
 import OperateForm from './components/operateForm';
 import { useTranslation } from 'react-i18next';
 import './index.less';
+
 const StrategyAdd: React.FC = () => {
   const {
     t
@@ -27,4 +28,5 @@ const StrategyAdd: React.FC = () => {
       <OperateForm />
     </PageLayout>;
 };
+
 export default StrategyAdd;

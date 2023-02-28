@@ -30,7 +30,7 @@ import { colors } from '../../../dashboard/Components/ColorRangeMenu/config';
 import LineGraphStandardOptions from './graphStandardOptions/Line';
 import HexbinGraphStandardOptions from './graphStandardOptions/Hexbin';
 import { HexbinIcon } from './config';
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 interface IProps {
   metric: string;
   match: IMatch;
@@ -39,18 +39,12 @@ interface IProps {
   onClose: () => void;
 }
 export default function Graph(props: IProps) {
-  const {
-    t
-  } = useTranslation();
-  const {
-    metric,
-    match,
-    range,
-    step,
-    onClose
-  } = props;
+  const { metric, match, range, step, onClose } = props;
 
-  const newGroups = _.map(_.filter(match.dimensionLabels, item => !_.isEmpty(item.value)), 'label');
+  const newGroups = _.map(
+    _.filter(match.dimensionLabels, (item) => !_.isEmpty(item.value)),
+    'label',
+  );
 
   const [refreshFlag, setRefreshFlag] = useState(_.uniqueId('refreshFlag_'));
   const [calcFunc, setCalcFunc] = useState('');
@@ -68,7 +62,7 @@ export default function Graph(props: IProps) {
     reverseColorOrder: false,
     colorDomainAuto: true,
     colorDomain: [],
-    chartheight: 300
+    chartheight: 300,
   });
   const [chartType, setChartType] = useState('line');
   const [reduceFunc, setReduceFunc] = useState('last');
@@ -77,20 +71,20 @@ export default function Graph(props: IProps) {
       drawStyle: 'lines',
       fillOpacity: 0,
       stack: 'hidden',
-      lineInterpolation: 'smooth'
+      lineInterpolation: 'smooth',
     },
     options: {
       legend: {
-        displayMode: highLevelConfig.legend ? 'table' : 'hidden'
+        displayMode: highLevelConfig.legend ? 'table' : 'hidden',
       },
       tooltip: {
         mode: highLevelConfig.shared ? 'all' : 'single',
-        sort: highLevelConfig.sharedSortDirection
+        sort: highLevelConfig.sharedSortDirection,
       },
       standardOptions: {
-        util: highLevelConfig.unit
-      }
-    }
+        util: highLevelConfig.unit,
+      },
+    },
   };
   const hexbinGraphProps = {
     custom: {
@@ -98,24 +92,24 @@ export default function Graph(props: IProps) {
       colorRange: highLevelConfig.colorRange,
       reverseColorOrder: highLevelConfig.reverseColorOrder,
       colorDomainAuto: highLevelConfig.colorDomainAuto,
-      colorDomain: highLevelConfig.colorDomain
+      colorDomain: highLevelConfig.colorDomain,
     },
     options: {
       standardOptions: {
-        util: highLevelConfig.unit
-      }
-    }
+        util: highLevelConfig.unit,
+      },
+    },
   };
   const graphStandardOptions = {
     line: <LineGraphStandardOptions highLevelConfig={highLevelConfig} setHighLevelConfig={setHighLevelConfig} />,
-    hexbin: <HexbinGraphStandardOptions highLevelConfig={highLevelConfig} setHighLevelConfig={setHighLevelConfig} />
+    hexbin: <HexbinGraphStandardOptions highLevelConfig={highLevelConfig} setHighLevelConfig={setHighLevelConfig} />,
   };
   useEffect(() => {
     setAggrGroups(newGroups);
   }, [JSON.stringify(newGroups)]);
   useEffect(() => {
     const matchStr = getMatchStr(match);
-    getLabels(`${metric}${matchStr}`, range).then(res => {
+    getLabels(`${metric}${matchStr}`, range).then((res) => {
       setLabels(res);
     });
   }, [refreshFlag, JSON.stringify(match), JSON.stringify(range)]);
@@ -128,30 +122,46 @@ export default function Graph(props: IProps) {
       aggrFunc,
       aggrGroups,
       calcFunc,
-      comparison
-    }).then(res => {
+      comparison,
+    }).then((res) => {
       setSeries(res);
     });
   }, [refreshFlag, metric, JSON.stringify(match), JSON.stringify(range), step, calcFunc, comparison, aggrFunc, aggrGroups]);
-  return <Card size='small' style={{
-    marginBottom: 10
-  }} title={metric} className='n9e-metric-views-metrics-graph' extra={<Space>
-          <Space size={0} style={{
-      marginRight: 10
-    }}>
-            <LineChartOutlined className={classNames({
-        'button-link-icon': true,
-        active: chartType === 'line'
-      })} onClick={() => {
-        setChartType('line');
-      }} />
+  return (
+    <Card
+      size='small'
+      style={{
+        marginBottom: 10,
+      }}
+      title={metric}
+      className='n9e-metric-views-metrics-graph'
+      extra={
+        <Space>
+          <Space
+            size={0}
+            style={{
+              marginRight: 10,
+            }}
+          >
+            <LineChartOutlined
+              className={classNames({
+                'button-link-icon': true,
+                active: chartType === 'line',
+              })}
+              onClick={() => {
+                setChartType('line');
+              }}
+            />
             <Divider type='vertical' />
-            <HexbinIcon className={classNames({
-        'button-link-icon': true,
-        active: chartType === 'hexbin'
-      })} onClick={() => {
-        setChartType('hexbin');
-      }} />
+            <HexbinIcon
+              className={classNames({
+                'button-link-icon': true,
+                active: chartType === 'hexbin',
+              })}
+              onClick={() => {
+                setChartType('hexbin');
+              }}
+            />
           </Space>
           <Popover placement='left' content={graphStandardOptions[chartType]} trigger='click' autoAdjustOverflow={false} getPopupContainer={() => document.body}>
             <a className='a-icon'>
@@ -159,152 +169,214 @@ export default function Graph(props: IProps) {
             </a>
           </Popover>
           <a className='a-icon'>
-            <SyncOutlined onClick={() => {
-        setRefreshFlag(_.uniqueId('refreshFlag_'));
-      }} />
+            <SyncOutlined
+              onClick={() => {
+                setRefreshFlag(_.uniqueId('refreshFlag_'));
+              }}
+            />
           </a>
           <a className='a-icon'>
-            <ShareAltOutlined onClick={() => {
-        const curCluster = localStorage.getItem('curCluster');
-        const dataProps = {
-          type: 'timeseries',
-          version: '2.0.0',
-          name: metric,
-          step,
-          range,
-          ...lineGraphProps,
-          targets: _.map(getExprs({
-            metric,
-            match: getMatchStr(match),
-            aggrFunc,
-            aggrGroups,
-            calcFunc,
-            comparison
-          }), expr => {
-            return {
-              expr
-            };
-          })
-        };
-        setTmpChartData([{
-          configs: JSON.stringify({
-            curCluster,
-            dataProps
-          })
-        }]).then(res => {
-          const ids = res.dat;
-          window.open('/chart/' + ids);
-        });
-      }} />
+            <ShareAltOutlined
+              onClick={() => {
+                const curCluster = localStorage.getItem('curCluster');
+                const dataProps = {
+                  type: 'timeseries',
+                  version: '2.0.0',
+                  name: metric,
+                  step,
+                  range,
+                  ...lineGraphProps,
+                  targets: _.map(
+                    getExprs({
+                      metric,
+                      match: getMatchStr(match),
+                      aggrFunc,
+                      aggrGroups,
+                      calcFunc,
+                      comparison,
+                    }),
+                    (expr) => {
+                      return {
+                        expr,
+                      };
+                    },
+                  ),
+                };
+                setTmpChartData([
+                  {
+                    configs: JSON.stringify({
+                      curCluster,
+                      dataProps,
+                    }),
+                  },
+                ]).then((res) => {
+                  const ids = res.dat;
+                  window.open('/chart/' + ids);
+                });
+              }}
+            />
           </a>
           <a className='a-icon'>
             <CloseCircleOutlined onClick={onClose} />
           </a>
-        </Space>}>
+        </Space>
+      }
+    >
       <div>
         <Space size={'large'}>
           <div>
-            {t("计算函数：")}
-           <Dropdown overlay={<Menu onClick={e => setCalcFunc(e.key === 'clear' ? '' : e.key)} selectedKeys={[calcFunc]}>
+            {'计算函数：'}
+            <Dropdown
+              overlay={
+                <Menu onClick={(e) => setCalcFunc(e.key === 'clear' ? '' : e.key)} selectedKeys={[calcFunc]}>
                   <Menu.Item key='rate_1m'>rate_1m</Menu.Item>
                   <Menu.Item key='rate_5m'>rate_5m</Menu.Item>
                   <Menu.Item key='increase_1m'>increase_1m</Menu.Item>
                   <Menu.Item key='increase_5m'>increase_5m</Menu.Item>
                   <Menu.Divider></Menu.Divider>
                   <Menu.Item key='clear'>clear</Menu.Item>
-                </Menu>}>
-              <a className='ant-dropdown-link' onClick={e => e.preventDefault()}>
-                {calcFunc || t("无")} <DownOutlined />
+                </Menu>
+              }
+            >
+              <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
+                {calcFunc || '无'} <DownOutlined />
               </a>
             </Dropdown>
           </div>
           <div>
-            {t("环比：")}
-           {comparison.map(ag => <Tag key={ag} closable onClose={() => {
-            setComparison(_.without(comparison, ag));
-          }}>
+            {'环比：'}
+            {comparison.map((ag) => (
+              <Tag
+                key={ag}
+                closable
+                onClose={() => {
+                  setComparison(_.without(comparison, ag));
+                }}
+              >
                 {ag}
-              </Tag>)}
-            <Dropdown overlay={<Menu style={{
-            maxHeight: '200px',
-            overflowY: 'auto'
-          }} onClick={e => {
-            if (comparison.indexOf(e.key) === -1) {
-              setComparison([...comparison, e.key]);
-            } else {
-              setComparison(_.without(comparison, e.key));
-            }
-          }} selectedKeys={comparison}>
+              </Tag>
+            ))}
+            <Dropdown
+              overlay={
+                <Menu
+                  style={{
+                    maxHeight: '200px',
+                    overflowY: 'auto',
+                  }}
+                  onClick={(e) => {
+                    if (comparison.indexOf(e.key) === -1) {
+                      setComparison([...comparison, e.key]);
+                    } else {
+                      setComparison(_.without(comparison, e.key));
+                    }
+                  }}
+                  selectedKeys={comparison}
+                >
                   <Menu.Item key='1d'>1d</Menu.Item>
                   <Menu.Item key='7d'>7d</Menu.Item>
-                </Menu>}>
-              <a className='ant-dropdown-link' onClick={e => e.preventDefault()}>
+                </Menu>
+              }
+            >
+              <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
                 <PlusCircleOutlined />
               </a>
             </Dropdown>
           </div>
           <div>
-            {t("聚合函数：")}
-           <Dropdown overlay={<Menu onClick={e => setAggrFunc(e.key)} selectedKeys={[aggrFunc]}>
+            {'聚合函数：'}
+            <Dropdown
+              overlay={
+                <Menu onClick={(e) => setAggrFunc(e.key)} selectedKeys={[aggrFunc]}>
                   <Menu.Item key='sum'>sum</Menu.Item>
                   <Menu.Item key='avg'>avg</Menu.Item>
                   <Menu.Item key='max'>max</Menu.Item>
                   <Menu.Item key='min'>min</Menu.Item>
-                </Menu>}>
-              <a className='ant-dropdown-link' onClick={e => e.preventDefault()}>
+                </Menu>
+              }
+            >
+              <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
                 {aggrFunc} <DownOutlined />
               </a>
             </Dropdown>
           </div>
-          {aggrFunc ? <div className='graph-config-inner-item'>
-              {t("聚合维度：")}
-             {aggrGroups.map(ag => <Tag key={ag} closable onClose={() => {
-            setAggrGroups(_.without(aggrGroups, ag));
-          }}>
+          {aggrFunc ? (
+            <div className='graph-config-inner-item'>
+              {'聚合维度：'}
+              {aggrGroups.map((ag) => (
+                <Tag
+                  key={ag}
+                  closable
+                  onClose={() => {
+                    setAggrGroups(_.without(aggrGroups, ag));
+                  }}
+                >
                   {ag}
-                </Tag>)}
-              <Dropdown overlay={<Menu style={{
-            maxHeight: '200px',
-            overflowY: 'auto'
-          }} onClick={e => {
-            if (aggrGroups.indexOf(e.key) === -1) {
-              setAggrGroups([...aggrGroups, e.key]);
-            } else {
-              setAggrGroups(_.without(aggrGroups, e.key));
-            }
-          }} selectedKeys={aggrGroups}>
-                    {_.map(_.filter(labels, n => n !== '__name__'), ag => <Menu.Item key={ag}>{ag}</Menu.Item>)}
-                  </Menu>}>
-                <a className='ant-dropdown-link' onClick={e => e.preventDefault()}>
+                </Tag>
+              ))}
+              <Dropdown
+                overlay={
+                  <Menu
+                    style={{
+                      maxHeight: '200px',
+                      overflowY: 'auto',
+                    }}
+                    onClick={(e) => {
+                      if (aggrGroups.indexOf(e.key) === -1) {
+                        setAggrGroups([...aggrGroups, e.key]);
+                      } else {
+                        setAggrGroups(_.without(aggrGroups, e.key));
+                      }
+                    }}
+                    selectedKeys={aggrGroups}
+                  >
+                    {_.map(
+                      _.filter(labels, (n) => n !== '__name__'),
+                      (ag) => (
+                        <Menu.Item key={ag}>{ag}</Menu.Item>
+                      ),
+                    )}
+                  </Menu>
+                }
+              >
+                <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
                   <PlusCircleOutlined />
                 </a>
               </Dropdown>
-            </div> : null}
-          {chartType === 'hexbin' && <div>
-              {t("取值计算：")}
-             <Dropdown overlay={<Menu onClick={e => setReduceFunc(e.key)} selectedKeys={[reduceFunc]}>
+            </div>
+          ) : null}
+          {chartType === 'hexbin' && (
+            <div>
+              {'取值计算：'}
+              <Dropdown
+                overlay={
+                  <Menu onClick={(e) => setReduceFunc(e.key)} selectedKeys={[reduceFunc]}>
                     {_.map(calcsOptions, (val, key) => {
-              const {
-                t
-              } = useTranslation();
-              return <Menu.Item key={key}>{val.name}</Menu.Item>;
-            })}
-                  </Menu>}>
-                <a className='ant-dropdown-link' onClick={e => e.preventDefault()}>
+                      return <Menu.Item key={key}>{val.name}</Menu.Item>;
+                    })}
+                  </Menu>
+                }
+              >
+                <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
                   {calcsOptions[reduceFunc]?.name} <DownOutlined />
                 </a>
               </Dropdown>
-            </div>}
+            </div>
+          )}
         </Space>
       </div>
       <div>
-        {chartType === 'line' && <Timeseries inDashboard={false} values={(lineGraphProps as any)} series={series} />}
-        {chartType === 'hexbin' && <div style={{
-        padding: '20px 0 0 0',
-        height: highLevelConfig.chartheight
-      }}>
-            <Hexbin values={(hexbinGraphProps as any)} series={series} />
-          </div>}
+        {chartType === 'line' && <Timeseries inDashboard={false} values={lineGraphProps as any} series={series} />}
+        {chartType === 'hexbin' && (
+          <div
+            style={{
+              padding: '20px 0 0 0',
+              height: highLevelConfig.chartheight,
+            }}
+          >
+            <Hexbin values={hexbinGraphProps as any} series={series} />
+          </div>
+        )}
       </div>
-    </Card>;
+    </Card>
+  );
 }

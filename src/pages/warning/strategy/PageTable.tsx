@@ -58,6 +58,7 @@ const exportIgnoreAttrsObj = {
 interface Props {
   bgid?: number;
 }
+
 const PageTable: React.FC<Props> = ({
   bgid
 }) => {
@@ -88,10 +89,12 @@ const PageTable: React.FC<Props> = ({
   useEffect(() => {
     filterData();
   }, [query, clusters, currentStrategyDataAll]);
+
   const getAlertRules = async () => {
     if (!bgid) {
       return;
     }
+
     setLoading(true);
     const {
       success,
@@ -99,6 +102,7 @@ const PageTable: React.FC<Props> = ({
     } = await getStrategyGroupSubList({
       id: bgid
     });
+
     if (success) {
       setCurrentStrategyDataAll(dat.filter(item => {
         return !severity || item.severity === severity;
@@ -106,6 +110,7 @@ const PageTable: React.FC<Props> = ({
       setLoading(false);
     }
   };
+
   const filterData = () => {
     const data = JSON.parse(JSON.stringify(currentStrategyDataAll));
     const res = data.filter(item => {
@@ -114,12 +119,15 @@ const PageTable: React.FC<Props> = ({
     });
     setCurrentStrategyData(res || []);
   };
+
   const goToAddWarningStrategy = () => {
     curBusiItem?.id && history.push(`/alert-rules/add/${curBusiItem.id}`);
   };
+
   const refreshList = () => {
     getAlertRules();
   };
+
   const columns: ColumnType<strategyItem>[] = [{
     title: t('集群'),
     dataIndex: 'cluster',
@@ -212,7 +220,9 @@ const PageTable: React.FC<Props> = ({
                 refreshList();
               });
             },
+
             onCancel() {}
+
           });
         }}>
               {t('删除')}
@@ -225,6 +235,7 @@ const PageTable: React.FC<Props> = ({
           </div>;
     }
   }];
+
   const toOneArr = (arr, res, name) => {
     arr.forEach(ele => {
       if (Array.isArray(ele)) {
@@ -234,13 +245,16 @@ const PageTable: React.FC<Props> = ({
       }
     });
   };
+
   const openModel = (title, item) => {
     if (selectRowKeys.length == 0) {
       message.warning(t('请先选择策略'));
       return;
     }
+
     setisModalVisible(true);
   };
+
   const menu = useMemo(() => {
     return <ul className='ant-dropdown-menu'>
         <li className='ant-dropdown-menu-item' onClick={() => setModalType(ModalStatus.BuiltIn)}>
@@ -249,8 +263,7 @@ const PageTable: React.FC<Props> = ({
         <li className='ant-dropdown-menu-item' onClick={() => {
         if (selectedRows.length) {
           const exportData = selectedRows.map(item => {
-            return {
-              ...item,
+            return { ...item,
               ...exportIgnoreAttrsObj
             };
           });
@@ -272,7 +285,9 @@ const PageTable: React.FC<Props> = ({
                 refreshList();
               });
             },
+
             onCancel() {}
+
           });
         } else {
           message.warning(t('未选择任何规则'));
@@ -287,12 +302,14 @@ const PageTable: React.FC<Props> = ({
         </li>
       </ul>;
   }, [selectRowKeys, t]);
+
   const handleImportStrategy = async data => {
     const {
       dat
     } = await addOrEditStrategy(data, curBusiItem.id, 'Post');
     return dat || {};
   };
+
   const editModalFinish = async (isOk, fieldsData?) => {
     if (isOk) {
       const action = fieldsData.action;
@@ -302,6 +319,7 @@ const PageTable: React.FC<Props> = ({
         fields: fieldsData,
         action
       }, curBusiItem.id);
+
       if (!res.err) {
         message.success(t("修改成功！"));
         refreshList();
@@ -313,6 +331,7 @@ const PageTable: React.FC<Props> = ({
       setisModalVisible(false);
     }
   };
+
   return <div className='strategy-table-content'>
       <div className='strategy-table-search table-handle'>
         <Space>
@@ -350,8 +369,7 @@ const PageTable: React.FC<Props> = ({
         </div>
       </div>
 
-      <Table rowKey='id'
-    // sticky
+      <Table rowKey='id' // sticky
     pagination={{
       total: currentStrategyData.length,
       showQuickJumper: true,
@@ -363,9 +381,11 @@ const PageTable: React.FC<Props> = ({
       defaultPageSize: 30
     }} loading={loading} dataSource={_.filter(currentStrategyData, item => {
       const curItemCate = item.cate || 'prometheus';
+
       if (cate) {
         return curItemCate === cate;
       }
+
       return true;
     })} rowSelection={{
       selectedRowKeys: selectedRows.map(item => item.id),
@@ -385,4 +405,5 @@ const PageTable: React.FC<Props> = ({
       {isModalVisible && <EditModal isModalVisible={isModalVisible} editModalFinish={editModalFinish} />}
     </div>;
 };
+
 export default PageTable;

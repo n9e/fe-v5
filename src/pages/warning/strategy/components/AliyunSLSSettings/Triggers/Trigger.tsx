@@ -9,9 +9,10 @@ import { useTranslation } from "react-i18next";
 interface IProps {
   prefixField?: any;
   fullPrefixName?: (string | number)[]; // 完整的前置字段名，用于 getFieldValue 获取指定字段的值
-  prefixName?: (string | number)[]; // 列表字段名
-}
 
+  prefixName?: (string | number)[]; // 列表字段名
+
+}
 export default function Trigger(props: IProps) {
   const {
     t
@@ -38,9 +39,11 @@ export default function Trigger(props: IProps) {
       }) => {
         const mode = getFieldValue([...fullPrefixName, 'mode']);
         const queries = getFieldValue(['queries']);
+
         if (mode == 0) {
           return <Builder prefixField={prefixField} prefixName={prefixName} queries={queries} />;
         }
+
         if (mode === 1) {
           return <Code prefixField={prefixField} prefixName={prefixName} />;
         }

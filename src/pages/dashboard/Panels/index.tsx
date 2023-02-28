@@ -28,12 +28,24 @@ import { RootState as AccountRootState, accountStoreState } from '@/store/accoun
 import { IRawTimeRange } from '@/components/TimeRangePicker';
 import { updateDashboardConfigs as updateDashboardConfigsFunc } from '@/services/dashboardV2';
 import { Dashboard } from '@/store/dashboardInterface';
-import { buildLayout, sortPanelsByGridLayout, updatePanelsLayout, handleRowToggle, updatePanelsWithNewPanel, updatePanelsInsertNewPanel, panelsMergeToConfigs, updatePanelsInsertNewPanelToRow, getRowCollapsedPanels, getRowUnCollapsedPanels, processRepeats } from './utils';
+import {
+  buildLayout,
+  sortPanelsByGridLayout,
+  updatePanelsLayout,
+  handleRowToggle,
+  updatePanelsWithNewPanel,
+  updatePanelsInsertNewPanel,
+  panelsMergeToConfigs,
+  updatePanelsInsertNewPanelToRow,
+  getRowCollapsedPanels,
+  getRowUnCollapsedPanels,
+  processRepeats,
+} from './utils';
 import Renderer from '../Renderer/Renderer/index';
 import Row from './Row';
 import Editor from '../Editor';
 import './style.less';
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 interface IProps {
   editable: boolean;
   curCluster: string;
@@ -50,45 +62,27 @@ interface IProps {
 const ReactGridLayout = WidthProvider(RGL);
 
 function index(props: IProps) {
-  const {
-    t
-  } = useTranslation();
-  const {
-    profile
-  } = useSelector<AccountRootState, accountStoreState>(state => state.account);
+  const { t } = useTranslation();
+  const { profile } = useSelector<AccountRootState, accountStoreState>((state) => state.account);
   const location = useLocation();
-  const {
-    themeMode
-  } = querystring.parse(location.search);
-  const {
-    editable,
-    curCluster,
-    dashboard,
-    range,
-    step,
-    variableConfig,
-    panels,
-    isPreview,
-    setPanels,
-    onShareClick,
-    onUpdated
-  } = props;
+  const { themeMode } = querystring.parse(location.search);
+  const { editable, curCluster, dashboard, range, step, variableConfig, panels, isPreview, setPanels, onShareClick, onUpdated } = props;
   const layoutInitialized = useRef(false);
   const allowUpdateDashboardConfigs = useRef(false);
   const reactGridLayoutDefaultProps = {
     rowHeight: 40,
     cols: 24,
     useCSSTransforms: false,
-    draggableHandle: '.dashboards-panels-item-drag-handle'
+    draggableHandle: '.dashboards-panels-item-drag-handle',
   };
 
   const updateDashboardConfigs = (dashboardId, options) => {
     const roles = _.get(profile, 'roles', []);
 
-    const isAuthorized = !_.some(roles, item => item === 'Guest');
+    const isAuthorized = !_.some(roles, (item) => item === 'Guest');
 
     if (!editable) {
-      message.warning(t("大盘已经被别人修改，为避免相互覆盖，请刷新大盘查看最新配置和数据"));
+      message.warning(t('大盘已经被别人修改，为避免相互覆盖，请刷新大盘查看最新配置和数据'));
     }
 
     if (!_.isEmpty(roles) && isAuthorized && editable) {
@@ -102,177 +96,215 @@ function index(props: IProps) {
     mode: 'add',
     visible: false,
     id: '',
-    initialValues: ({} as any)
+    initialValues: {} as any,
   });
   useEffect(() => {
     setPanels(processRepeats(panels, variableConfig));
   }, [JSON.stringify(panels)]);
-  return <div className='dashboards-panels scroll-container'>
-      <ReactGridLayout layout={buildLayout(panels)} onLayoutChange={layout => {
-      if (layoutInitialized.current) {
-        const newPanels = sortPanelsByGridLayout(updatePanelsLayout(panels, layout));
+  return (
+    <div className='dashboards-panels scroll-container'>
+      <ReactGridLayout
+        layout={buildLayout(panels)}
+        onLayoutChange={(layout) => {
+          if (layoutInitialized.current) {
+            const newPanels = sortPanelsByGridLayout(updatePanelsLayout(panels, layout));
 
-        if (!_.isEqual(panels, newPanels)) {
-          setPanels(newPanels); // TODO: 这里可能会触发两次 update, 删除、克隆面板后可能会触发 layoutChange，此时需要更新面板重新更新下 dashboard 配置
+            if (!_.isEqual(panels, newPanels)) {
+              setPanels(newPanels); // TODO: 这里可能会触发两次 update, 删除、克隆面板后可能会触发 layoutChange，此时需要更新面板重新更新下 dashboard 配置
 
-          if (allowUpdateDashboardConfigs.current) {
-            allowUpdateDashboardConfigs.current = false;
+              if (allowUpdateDashboardConfigs.current) {
+                allowUpdateDashboardConfigs.current = false;
+                updateDashboardConfigs(dashboard.id, {
+                  configs: panelsMergeToConfigs(dashboard.configs, newPanels),
+                }).then((res) => {
+                  onUpdated(res);
+                });
+              }
+            }
+          }
+
+          layoutInitialized.current = true;
+        }}
+        onDragStop={(layout) => {
+          const newPanels = sortPanelsByGridLayout(updatePanelsLayout(panels, layout));
+
+          if (!_.isEqual(panels, newPanels)) {
             updateDashboardConfigs(dashboard.id, {
-              configs: panelsMergeToConfigs(dashboard.configs, newPanels)
-            }).then(res => {
+              configs: panelsMergeToConfigs(dashboard.configs, newPanels),
+            }).then((res) => {
               onUpdated(res);
             });
           }
-        }
-      }
+        }}
+        onResizeStop={(layout) => {
+          const newPanels = sortPanelsByGridLayout(updatePanelsLayout(panels, layout));
 
-      layoutInitialized.current = true;
-    }} onDragStop={layout => {
-      const newPanels = sortPanelsByGridLayout(updatePanelsLayout(panels, layout));
-
-      if (!_.isEqual(panels, newPanels)) {
-        updateDashboardConfigs(dashboard.id, {
-          configs: panelsMergeToConfigs(dashboard.configs, newPanels)
-        }).then(res => {
-          onUpdated(res);
-        });
-      }
-    }} onResizeStop={layout => {
-      const newPanels = sortPanelsByGridLayout(updatePanelsLayout(panels, layout));
-
-      if (!_.isEqual(panels, newPanels)) {
-        updateDashboardConfigs(dashboard.id, {
-          configs: panelsMergeToConfigs(dashboard.configs, newPanels)
-        }).then(res => {
-          onUpdated(res);
-        });
-      }
-    }} {...reactGridLayoutDefaultProps}>
-        {_.map(panels, item => {
-        const {
-          t
-        } = useTranslation();
-        return <div key={item.layout.i} data-id={item.layout.i}>
-              {item.type !== 'row' ? semver.valid(item.version) ? <Renderer isPreview={isPreview} themeMode={(themeMode as 'dark')} dashboardId={_.toString(dashboard.id)} id={item.id} time={range} step={step} values={({ ...item,
-            datasourceName: item.datasourceName || curCluster
-          } as any)} variableConfig={variableConfig} onCloneClick={() => {
-            const newPanels = updatePanelsInsertNewPanel(panels, { ...item,
-              id: uuidv4(),
-              layout: { ...item.layout,
-                i: uuidv4()
-              }
+          if (!_.isEqual(panels, newPanels)) {
+            updateDashboardConfigs(dashboard.id, {
+              configs: panelsMergeToConfigs(dashboard.configs, newPanels),
+            }).then((res) => {
+              onUpdated(res);
             });
-            setPanels(newPanels); // 克隆面板必然会触发 layoutChange，更新 dashboard 放到 onLayoutChange 里面处理
+          }
+        }}
+        {...reactGridLayoutDefaultProps}
+      >
+        {_.map(panels, (item) => {
+          return (
+            <div key={item.layout.i} data-id={item.layout.i}>
+              {item.type !== 'row' ? (
+                semver.valid(item.version) ? (
+                  <Renderer
+                    isPreview={isPreview}
+                    themeMode={themeMode as 'dark'}
+                    dashboardId={_.toString(dashboard.id)}
+                    id={item.id}
+                    time={range}
+                    step={step}
+                    values={{ ...item, datasourceName: item.datasourceName || curCluster } as any}
+                    variableConfig={variableConfig}
+                    onCloneClick={() => {
+                      const newPanels = updatePanelsInsertNewPanel(panels, { ...item, id: uuidv4(), layout: { ...item.layout, i: uuidv4() } });
+                      setPanels(newPanels); // 克隆面板必然会触发 layoutChange，更新 dashboard 放到 onLayoutChange 里面处理
 
-            allowUpdateDashboardConfigs.current = true;
-          }} onShareClick={() => {
-            onShareClick(item);
-          }} onEditClick={() => {
-            setEditorData({
-              mode: 'edit',
-              visible: true,
-              id: item.id,
-              initialValues: { ...item,
-                id: item.id
-              }
-            });
-          }} onDeleteClick={() => {
-            Modal.confirm({
-              title: `${t("是否删除图表：")}${item.name}`,
-              onOk: async () => {
-                const newPanels = _.filter(panels, panel => panel.id !== item.id);
+                      allowUpdateDashboardConfigs.current = true;
+                    }}
+                    onShareClick={() => {
+                      onShareClick(item);
+                    }}
+                    onEditClick={() => {
+                      setEditorData({
+                        mode: 'edit',
+                        visible: true,
+                        id: item.id,
+                        initialValues: { ...item, id: item.id },
+                      });
+                    }}
+                    onDeleteClick={() => {
+                      Modal.confirm({
+                        title: `${t('是否删除图表：')}${item.name}`,
+                        onOk: async () => {
+                          const newPanels = _.filter(panels, (panel) => panel.id !== item.id);
 
-                allowUpdateDashboardConfigs.current = true;
-                setPanels(newPanels);
-                updateDashboardConfigs(dashboard.id, {
-                  configs: panelsMergeToConfigs(dashboard.configs, newPanels)
-                }).then(res => {
-                  onUpdated(res);
-                });
-              }
-            });
-          }} /> : <div className='dashboards-panels-item-invalid'>
+                          allowUpdateDashboardConfigs.current = true;
+                          setPanels(newPanels);
+                          updateDashboardConfigs(dashboard.id, {
+                            configs: panelsMergeToConfigs(dashboard.configs, newPanels),
+                          }).then((res) => {
+                            onUpdated(res);
+                          });
+                        },
+                      });
+                    }}
+                  />
+                ) : (
+                  <div className='dashboards-panels-item-invalid'>
                     <div>
-                      <div>{t("无效的图表配置")}</div>
-                      <a onClick={() => {
-                const newPanels = _.filter(panels, panel => panel.id !== item.id);
+                      <div>{t('无效的图表配置')}</div>
+                      <a
+                        onClick={() => {
+                          const newPanels = _.filter(panels, (panel) => panel.id !== item.id);
 
-                allowUpdateDashboardConfigs.current = true;
-                setPanels(newPanels);
-                updateDashboardConfigs(dashboard.id, {
-                  configs: panelsMergeToConfigs(dashboard.configs, newPanels)
-                }).then(res => {
-                  onUpdated(res);
-                });
-              }}>
-                        {t("删除")}
-                     </a>
+                          allowUpdateDashboardConfigs.current = true;
+                          setPanels(newPanels);
+                          updateDashboardConfigs(dashboard.id, {
+                            configs: panelsMergeToConfigs(dashboard.configs, newPanels),
+                          }).then((res) => {
+                            onUpdated(res);
+                          });
+                        }}
+                      >
+                        {t('删除')}
+                      </a>
                     </div>
-                  </div> : <Row name={item.name} row={item} onToggle={() => {
-            const newPanels = handleRowToggle(!item.collapsed, panels, _.cloneDeep(item));
-            setPanels(newPanels);
-            updateDashboardConfigs(dashboard.id, {
-              configs: panelsMergeToConfigs(dashboard.configs, newPanels)
-            }).then(res => {
-              onUpdated(res);
-            });
-          }} onAddClick={() => {
-            setEditorData({
-              mode: 'add',
-              visible: true,
-              id: item.id,
-              initialValues: {
-                type: 'timeseries',
-                targets: [{
-                  refId: 'A',
-                  expr: ''
-                }]
-              }
-            });
-          }} onEditClick={newPanel => {
-            const newPanels = updatePanelsWithNewPanel(panels, newPanel);
-            setPanels(newPanels);
-            updateDashboardConfigs(dashboard.id, {
-              configs: panelsMergeToConfigs(dashboard.configs, newPanels)
-            }).then(res => {
-              onUpdated(res);
-            });
-          }} onDeleteClick={(mode: 'self' | 'withPanels') => {
-            let newPanels: any[] = _.cloneDeep(panels);
+                  </div>
+                )
+              ) : (
+                <Row
+                  name={item.name}
+                  row={item}
+                  onToggle={() => {
+                    const newPanels = handleRowToggle(!item.collapsed, panels, _.cloneDeep(item));
+                    setPanels(newPanels);
+                    updateDashboardConfigs(dashboard.id, {
+                      configs: panelsMergeToConfigs(dashboard.configs, newPanels),
+                    }).then((res) => {
+                      onUpdated(res);
+                    });
+                  }}
+                  onAddClick={() => {
+                    setEditorData({
+                      mode: 'add',
+                      visible: true,
+                      id: item.id,
+                      initialValues: {
+                        type: 'timeseries',
+                        targets: [
+                          {
+                            refId: 'A',
+                            expr: '',
+                          },
+                        ],
+                      },
+                    });
+                  }}
+                  onEditClick={(newPanel) => {
+                    const newPanels = updatePanelsWithNewPanel(panels, newPanel);
+                    setPanels(newPanels);
+                    updateDashboardConfigs(dashboard.id, {
+                      configs: panelsMergeToConfigs(dashboard.configs, newPanels),
+                    }).then((res) => {
+                      onUpdated(res);
+                    });
+                  }}
+                  onDeleteClick={(mode: 'self' | 'withPanels') => {
+                    let newPanels: any[] = _.cloneDeep(panels);
 
-            if (mode === 'self') {
-              newPanels = getRowCollapsedPanels(newPanels, item);
-              newPanels = _.filter(newPanels, panel => panel.id !== item.id);
-            } else {
-              newPanels = getRowUnCollapsedPanels(newPanels, item);
-              newPanels = _.filter(newPanels, panel => panel.id !== item.id);
-            }
+                    if (mode === 'self') {
+                      newPanels = getRowCollapsedPanels(newPanels, item);
+                      newPanels = _.filter(newPanels, (panel) => panel.id !== item.id);
+                    } else {
+                      newPanels = getRowUnCollapsedPanels(newPanels, item);
+                      newPanels = _.filter(newPanels, (panel) => panel.id !== item.id);
+                    }
 
-            allowUpdateDashboardConfigs.current = true;
-            setPanels(newPanels);
-            updateDashboardConfigs(dashboard.id, {
-              configs: panelsMergeToConfigs(dashboard.configs, newPanels)
-            }).then(res => {
-              onUpdated(res);
-            });
-          }} />}
-            </div>;
-      })}
+                    allowUpdateDashboardConfigs.current = true;
+                    setPanels(newPanels);
+                    updateDashboardConfigs(dashboard.id, {
+                      configs: panelsMergeToConfigs(dashboard.configs, newPanels),
+                    }).then((res) => {
+                      onUpdated(res);
+                    });
+                  }}
+                />
+              )}
+            </div>
+          );
+        })}
       </ReactGridLayout>
-      <Editor mode={editorData.mode} visible={editorData.visible} setVisible={visible => {
-      setEditorData({ ...editorData,
-        visible
-      });
-    }} variableConfigWithOptions={variableConfig} cluster={curCluster} id={editorData.id} time={range} initialValues={editorData.initialValues} onOK={(values, mode) => {
-      const newPanels = mode === 'edit' ? updatePanelsWithNewPanel(panels, values) : updatePanelsInsertNewPanelToRow(panels, editorData.id, values);
-      setPanels(newPanels);
-      updateDashboardConfigs(dashboard.id, {
-        configs: panelsMergeToConfigs(dashboard.configs, newPanels)
-      }).then(res => {
-        onUpdated(res);
-      });
-    }} />
-    </div>;
+      <Editor
+        mode={editorData.mode}
+        visible={editorData.visible}
+        setVisible={(visible) => {
+          setEditorData({ ...editorData, visible });
+        }}
+        variableConfigWithOptions={variableConfig}
+        cluster={curCluster}
+        id={editorData.id}
+        time={range}
+        initialValues={editorData.initialValues}
+        onOK={(values, mode) => {
+          const newPanels = mode === 'edit' ? updatePanelsWithNewPanel(panels, values) : updatePanelsInsertNewPanelToRow(panels, editorData.id, values);
+          setPanels(newPanels);
+          updateDashboardConfigs(dashboard.id, {
+            configs: panelsMergeToConfigs(dashboard.configs, newPanels),
+          }).then((res) => {
+            onUpdated(res);
+          });
+        }}
+      />
+    </div>
+  );
 }
 
 export default React.memo(index);

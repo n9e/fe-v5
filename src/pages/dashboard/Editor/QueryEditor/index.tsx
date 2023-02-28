@@ -34,7 +34,6 @@ export default function index({ chartForm, defaultDatasourceName }) {
           <AdvancedWrap
             var='VITE_IS_QUERY_ES_DS'
             children={(isES) => {
-              const { t } = useTranslation();
               return (
                 <Form.Item name='datasourceCate' noStyle initialValue='prometheus'>
                   <Select
@@ -93,7 +92,6 @@ export default function index({ chartForm, defaultDatasourceName }) {
         </Input.Group>
         <Form.Item shouldUpdate={(prev, curr) => prev.datasourceCate !== curr.datasourceCate} noStyle>
           {({ getFieldValue }) => {
-            const { t } = useTranslation();
             const cate = getFieldValue('datasourceCate') || 'prometheus';
             return (
               <Input.Group compact>

@@ -39,42 +39,45 @@ import ClusterSelect, { ClusterAll } from './ClusterSelect';
 import { parseValues, stringifyValues } from './utils';
 export { ClusterAll } from './ClusterSelect';
 const { Option } = Select;
-
 interface Props {
   detail?: any;
   type?: number; // 1:编辑 2:克隆
-}
+} // 校验单个标签格式是否正确
 
-// 校验单个标签格式是否正确
 function isTagValid(tag) {
   const contentRegExp = /^[a-zA-Z_][\w]*={1}[^=]+$/;
   return {
     isCorrectFormat: contentRegExp.test(tag.toString()),
     isLengthAllowed: tag.toString().length <= 64,
   };
-}
+} // 渲染标签
 
-// 渲染标签
 function tagRender(content) {
+  const { t } = useTranslation();
   const { isCorrectFormat, isLengthAllowed } = isTagValid(content.value);
   return isCorrectFormat && isLengthAllowed ? (
     <Tag
       closable={content.closable}
-      onClose={content.onClose}
-      // style={{ marginTop: '2px' }}
+      onClose={content.onClose} // style={{ marginTop: '2px' }}
     >
       {content.value}
     </Tag>
   ) : (
-    <Tooltip title={isCorrectFormat ? '标签长度应小于等于 64 位' : '标签格式应为 key=value。且 key 以字母或下划线开头，由字母、数字和下划线组成。'}>
-      <Tag color='error' closable={content.closable} onClose={content.onClose} style={{ marginTop: '2px' }}>
+    <Tooltip title={isCorrectFormat ? t('标签长度应小于等于 64 位') : t('标签格式应为 key=value。且 key 以字母或下划线开头，由字母、数字和下划线组成。')}>
+      <Tag
+        color='error'
+        closable={content.closable}
+        onClose={content.onClose}
+        style={{
+          marginTop: '2px',
+        }}
+      >
         {content.value}
       </Tag>
     </Tooltip>
   );
-}
+} // 校验所有标签格式
 
-// 校验所有标签格式
 function isValidFormat() {
   return {
     validator(_, value) {
@@ -82,6 +85,7 @@ function isValidFormat() {
         value &&
         value.some((tag) => {
           const { isCorrectFormat, isLengthAllowed } = isTagValid(tag);
+
           if (!isCorrectFormat || !isLengthAllowed) {
             return true;
           }
@@ -94,36 +98,32 @@ function isValidFormat() {
 const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
   const { t } = useTranslation();
   const history = useHistory(); // 创建的时候默认选中的值
+
   const [form] = Form.useForm();
   const { clusters: clusterList } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const { curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const [contactList, setInitContactList] = useState([]);
   const [notifyGroups, setNotifyGroups] = useState<any[]>([]);
   const [isChecked, setIsChecked] = useState(true);
-
   useEffect(() => {
     getNotifyChannel();
     getGroups('');
     return () => {};
   }, []);
-
   useEffect(() => {
     if (type == 1) {
       const groups = (detail.notify_groups_obj ? detail.notify_groups_obj.filter((item) => !notifyGroups.find((i) => item.id === i.id)) : []).concat(notifyGroups);
       setNotifyGroups(groups);
     }
   }, [JSON.stringify(detail)]);
-
   const enableDaysOfWeekOptions = [t('周日'), t('周一'), t('周二'), t('周三'), t('周四'), t('周五'), t('周六')].map((v, i) => {
     return <Option value={String(i)} key={i}>{`${v}`}</Option>;
   });
-
   const contactListCheckboxes = contactList.map((c: { key: string; label: string }) => (
     <Checkbox value={c.key} key={c.label}>
       {c.label}
     </Checkbox>
   ));
-
   const notifyGroupsOptions = notifyGroups.map((ng: any) => (
     <Option value={String(ng.id)} key={ng.id}>
       {ng.name}
@@ -137,7 +137,9 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
   };
 
   const getGroups = async (str) => {
-    const res = await getTeamInfoList({ query: str });
+    const res = await getTeamInfoList({
+      query: str,
+    });
     const data = res.dat || res;
     const combineData = (detail.notify_groups_obj ? detail.notify_groups_obj.filter((item) => !data.find((i) => item.id === i.id)) : []).concat(data);
     setNotifyGroups(combineData || []);
@@ -149,11 +151,18 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
       .then(async (values) => {
         if (values.cate === 'prometheus') {
           if (!isChecked && values.algorithm === 'holtwinters') {
-            message.warning('请先校验指标');
+            message.warning(t('请先校验指标'));
             return;
           }
+
           const cluster = values.cluster.includes(ClusterAll) && clusterList.length > 0 ? clusterList[0] : values.cluster[0] || '';
-          const res = await prometheusQuery({ query: values.prom_ql }, cluster);
+          const res = await prometheusQuery(
+            {
+              query: values.prom_ql,
+            },
+            cluster,
+          );
+
           if (res.error) {
             notification.error({
               message: res.error,
@@ -163,6 +172,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
         } else if (values.cate === 'elasticsearch' || values.cate === 'aliyun-sls' || values.cate === 'ck') {
           values = stringifyValues(values);
         }
+
         const callbacks = values.callbacks.map((item) => item.url);
         const data = {
           ..._.omit(values, ['effective_time']),
@@ -177,10 +187,12 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
         };
         let reqBody,
           method = 'Post';
+
         if (type === 1) {
           reqBody = data;
           method = 'Put';
           const res = await EditStrategy(reqBody, curBusiItem.id, detail.id);
+
           if (res.err) {
             message.error(res.error);
           } else {
@@ -189,9 +201,11 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
           }
         } else {
           const licenseRulesRemaining = _.toNumber(window.localStorage.getItem('license_rules_remaining'));
+
           if (licenseRulesRemaining === 0 && data.algorithm === 'holtwinters') {
-            message.error('可添加的智能告警规则数量已达上限，请联系客服');
+            message.error(t('可添加的智能告警规则数量已达上限，请联系客服'));
           }
+
           reqBody = [data];
           const { dat } = await addOrEditStrategy(reqBody, curBusiItem.id, method);
           let errorNum = 0;
@@ -214,7 +228,6 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
   };
 
   const debounceFetcher = useCallback(debounce(getGroups, 800), []);
-
   return (
     <div className='operate_con'>
       <Form
@@ -223,9 +236,11 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
         layout='vertical'
         initialValues={{
           severity: 2,
-          disabled: 0, // 0:立即启用 1:禁用  待修改
+          disabled: 0,
+          // 0:立即启用 1:禁用  待修改
           ...parseValues(detail),
-          cluster: detail.cluster ? detail.cluster.split(' ') : ['$all'], // 生效集群
+          cluster: detail.cluster ? detail.cluster.split(' ') : ['$all'],
+          // 生效集群
           enable_in_bg: detail?.enable_in_bg === 1,
           effective_time: detail?.enable_etimes
             ? detail?.enable_etimes.map((item, index) => ({
@@ -241,7 +256,8 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                 },
               ],
           enable_status: detail?.disabled === undefined ? true : !detail?.disabled,
-          notify_recovered: detail?.notify_recovered === 1 || detail?.notify_recovered === undefined ? true : false, // 1:启用 0:禁用
+          notify_recovered: detail?.notify_recovered === 1 || detail?.notify_recovered === undefined ? true : false,
+          // 1:启用 0:禁用
           callbacks: !_.isEmpty(detail?.callbacks)
             ? detail.callbacks.map((item) => ({
                 url: item,
@@ -249,7 +265,12 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
             : [{}],
         }}
       >
-        <Space direction='vertical' style={{ width: '100%' }}>
+        <Space
+          direction='vertical'
+          style={{
+            width: '100%',
+          }}
+        >
           <Card title={t('基本配置')}>
             <Row gutter={16}>
               <Col span={12}>
@@ -315,6 +336,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
             <Form.Item shouldUpdate={(prevValues, curValues) => prevValues.cate !== curValues.cate} noStyle>
               {({ getFieldValue }) => {
                 const cate = getFieldValue('cate');
+
                 if (cate === 'prometheus') {
                   return (
                     <>
@@ -324,7 +346,14 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                       <Form.Item noStyle shouldUpdate={(prevValues, curValues) => prevValues.cluster !== curValues.cluster}>
                         {({ getFieldValue }) => {
                           return (
-                            <Form.Item label='PromQL' className={'Promeql-content'} required style={{ marginBottom: 0 }}>
+                            <Form.Item
+                              label='PromQL'
+                              className={'Promeql-content'}
+                              required
+                              style={{
+                                marginBottom: 0,
+                              }}
+                            >
                               <AdvancedWrap var='VITE_IS_ALERT_AI'>
                                 {(visible) => {
                                   const cluster =
@@ -338,7 +367,12 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                                         name='prom_ql'
                                         validateTrigger={['onBlur']}
                                         trigger='onChange'
-                                        rules={[{ required: true, message: t('请输入PromQL') }]}
+                                        rules={[
+                                          {
+                                            required: true,
+                                            message: t('请输入PromQL'),
+                                          },
+                                        ]}
                                       >
                                         <PromQLInput
                                           url='/api/n9e/prometheus'
@@ -355,6 +389,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                                         <Button
                                           onClick={() => {
                                             const values = form.getFieldsValue();
+
                                             if (values.prom_ql) {
                                               setIsChecked(true);
                                               checkBrainPromql({
@@ -365,19 +400,19 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                                                 prom_eval_interval: values.prom_eval_interval,
                                               })
                                                 .then(() => {
-                                                  message.success('校验通过');
+                                                  message.success(t('校验通过'));
                                                 })
                                                 .catch((res) => {
                                                   message.error(
                                                     <div>
-                                                      校验失败<div>{res.data.error}</div>
+                                                      {t('校验失败')}败<div>{res.data.error}</div>
                                                     </div>,
                                                   );
                                                 });
                                             }
                                           }}
                                         >
-                                          指标校验
+                                          {t('指标校验')}
                                         </Button>
                                       )}
                                     </Input.Group>
@@ -391,18 +426,22 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                     </>
                   );
                 }
+
                 if (cate === 'elasticsearch') {
                   const query = getFieldValue('query');
                   const queries = getFieldValue('queries');
+
                   if (query) {
                     return <OldElasticsearchSettings form={form} />;
                   } else if (queries) {
                     return <ElasticsearchSettings form={form} />;
                   }
                 }
+
                 if (cate === 'aliyun-sls') {
                   return <AliyunSLSSettings form={form} />;
                 }
+
                 if (cate === 'ck') {
                   return <ClickHouseSettings form={form} />;
                 }
@@ -419,8 +458,12 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                         label={t('执行频率（秒）')}
                         tooltip={
                           cate === 'prometheus'
-                            ? t(`每隔${form.getFieldValue('prom_eval_interval')}秒，把PromQL作为查询条件，去查询后端存储，如果查到了数据就表示当次有监控数据触发了规则`)
-                            : `每隔${form.getFieldValue('prom_eval_interval')}秒，去查询后端存储`
+                            ? t(
+                                `${t('每隔')}${form.getFieldValue('prom_eval_interval')}${t(
+                                  '秒，把PromQL作为查询条件，去查询后端存储，如果查到了数据就表示当次有监控数据触发了规则',
+                                )}`,
+                              )
+                            : `${t('每隔')}${form.getFieldValue('prom_eval_interval')}${t('秒，去查询后端存储')}`
                         }
                         initialValue={60}
                         rules={[
@@ -430,7 +473,12 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                           },
                         ]}
                       >
-                        <InputNumber min={1} style={{ width: '100%' }} />
+                        <InputNumber
+                          min={1}
+                          style={{
+                            width: '100%',
+                          }}
+                        />
                       </Form.Item>
                     );
                   }}
@@ -447,9 +495,13 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                         tooltip={
                           cate === 'prometheus'
                             ? t(
-                                `通常持续时长大于执行频率，在持续时长内按照执行频率多次执行PromQL查询，每次都触发才生成告警；如果持续时长置为0，表示只要有一次PromQL查询触发阈值，就生成告警`,
+                                `${t(
+                                  '通常持续时长大于执行频率，在持续时长内按照执行频率多次执行PromQL查询，每次都触发才生成告警；如果持续时长置为0，表示只要有一次PromQL查询触发阈值，就生成告警',
+                                )}`,
                               )
-                            : '通常持续时长大于执行频率，在持续时长内按照执行频率多次执行查询，每次都触发才生成告警；如果持续时长置为0，表示只要有一次查询的数据满足告警条件，就生成告警'
+                            : t(
+                                '通常持续时长大于执行频率，在持续时长内按照执行频率多次执行查询，每次都触发才生成告警；如果持续时长置为0，表示只要有一次查询的数据满足告警条件，就生成告警',
+                              )
                         }
                         initialValue={60}
                         rules={[
@@ -459,7 +511,12 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                           },
                         ]}
                       >
-                        <InputNumber min={0} style={{ width: '100%' }} />
+                        <InputNumber
+                          min={0}
+                          style={{
+                            width: '100%',
+                          }}
+                        />
                       </Form.Item>
                     );
                   }}
@@ -467,8 +524,18 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
               </Col>
             </Row>
 
-            <Form.Item label='附加标签' name='append_tags' rules={[{ required: false, message: '请填写至少一项标签！' }, isValidFormat]}>
-              <Select mode='tags' tokenSeparators={[' ']} open={false} placeholder={'标签格式为 key=value ，使用回车或空格分隔'} tagRender={tagRender} />
+            <Form.Item
+              label={t('附加标签')}
+              name='append_tags'
+              rules={[
+                {
+                  required: false,
+                  message: t('请填写至少一项标签！'),
+                },
+                isValidFormat,
+              ]}
+            >
+              <Select mode='tags' tokenSeparators={[' ']} open={false} placeholder={t('标签格式为 key=value ，使用回车或空格分隔')} tagRender={tagRender} />
             </Form.Item>
             <Form.Item label={t('预案链接')} name='runbook_url'>
               <Input />
@@ -493,11 +560,28 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
               {(fields, { add, remove }) => (
                 <>
                   <Space>
-                    <div style={{ width: 450 }}>
-                      生效时间 <PlusCircleOutlined className='control-icon-normal' onClick={() => add()} />
+                    <div
+                      style={{
+                        width: 450,
+                      }}
+                    >
+                      {t('生效时间')}
+                      <PlusCircleOutlined className='control-icon-normal' onClick={() => add()} />
                     </div>
-                    <div style={{ width: 110 }}>开始时间</div>
-                    <div style={{ width: 110 }}>结束时间</div>
+                    <div
+                      style={{
+                        width: 110,
+                      }}
+                    >
+                      {t('开始时间')}
+                    </div>
+                    <div
+                      style={{
+                        width: 110,
+                      }}
+                    >
+                      {t('结束时间')}
+                    </div>
                   </Space>
                   {fields.map(({ key, name, ...restField }) => (
                     <Space
@@ -511,7 +595,9 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                       <Form.Item
                         {...restField}
                         name={[name, 'enable_days_of_week']}
-                        style={{ width: 450 }}
+                        style={{
+                          width: 450,
+                        }}
                         rules={[
                           {
                             required: true,
@@ -524,7 +610,9 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                       <Form.Item
                         {...restField}
                         name={[name, 'enable_stime']}
-                        style={{ width: 110 }}
+                        style={{
+                          width: 110,
+                        }}
                         rules={[
                           {
                             required: true,
@@ -537,7 +625,9 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                       <Form.Item
                         {...restField}
                         name={[name, 'enable_etime']}
-                        style={{ width: 110 }}
+                        style={{
+                          width: 110,
+                        }}
                         rules={[
                           {
                             required: true,
@@ -558,7 +648,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                 if (getFieldValue('cate') === 'prometheus') {
                   return (
                     <Form.Item label={t('仅在本业务组生效')} name='enable_in_bg' valuePropName='checked'>
-                      <SwitchWithLabel label='根据告警事件中的ident归属关系判断' />
+                      <SwitchWithLabel label={t('根据告警事件中的ident归属关系判断')} />
                     </Form.Item>
                   );
                 }
@@ -576,10 +666,16 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
             </Form.Item>
             <Form.Item label={t('启用恢复通知')}>
               <Space>
-                <Form.Item name='notify_recovered' valuePropName='checked' style={{ marginBottom: 0 }}>
+                <Form.Item
+                  name='notify_recovered'
+                  valuePropName='checked'
+                  style={{
+                    marginBottom: 0,
+                  }}
+                >
                   <Switch />
                 </Form.Item>
-                <Tooltip title={t(`告警恢复时也发送通知`)}>
+                <Tooltip title={t(`${t('告警恢复时也发送通知')}`)}>
                   <QuestionCircleFilled />
                 </Tooltip>
               </Space>
@@ -590,9 +686,14 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                   label={t('留观时长（秒）')}
                   name='recover_duration'
                   initialValue={0}
-                  tooltip={t(`持续${form.getFieldValue('recover_duration')}秒没有再次触发阈值才发送恢复通知`)}
+                  tooltip={t(`${t('持续')}${form.getFieldValue('recover_duration')}${t('秒没有再次触发阈值才发送恢复通知')}`)}
                 >
-                  <InputNumber min={0} style={{ width: '100%' }} />
+                  <InputNumber
+                    min={0}
+                    style={{
+                      width: '100%',
+                    }}
+                  />
                 </Form.Item>
               </Col>
               <Col span={8}>
@@ -606,9 +707,14 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                       message: t('重复发送频率不能为空'),
                     },
                   ]}
-                  tooltip={t(`如果告警持续未恢复，间隔${form.getFieldValue('notify_repeat_step')}分钟之后重复提醒告警接收组的成员`)}
+                  tooltip={t(`${t('如果告警持续未恢复，间隔')}${form.getFieldValue('notify_repeat_step')}${t('分钟之后重复提醒告警接收组的成员')}`)}
                 >
-                  <InputNumber min={0} style={{ width: '100%' }} />
+                  <InputNumber
+                    min={0}
+                    style={{
+                      width: '100%',
+                    }}
+                  />
                 </Form.Item>
               </Col>
               <Col span={8}>
@@ -622,9 +728,15 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                       message: t('最大发送次数不能为空'),
                     },
                   ]}
-                  tooltip={t(`如果值为0，则不做最大发送次数的限制`)}
+                  tooltip={t(`${t('如果值为0，则不做最大发送次数的限制')}`)}
                 >
-                  <InputNumber min={0} precision={0} style={{ width: '100%' }} />
+                  <InputNumber
+                    min={0}
+                    precision={0}
+                    style={{
+                      width: '100%',
+                    }}
+                  />
                 </Form.Item>
               </Col>
             </Row>
@@ -632,7 +744,8 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
               {(fields, { add, remove }) => (
                 <>
                   <div>
-                    回调地址 <PlusCircleOutlined className='control-icon-normal' onClick={() => add()} />
+                    {t('回调地址')}
+                    <PlusCircleOutlined className='control-icon-normal' onClick={() => add()} />
                   </div>
                   {fields.map((field) => (
                     <Row gutter={16} key={field.key}>
@@ -655,13 +768,21 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
               marginTop: 20,
             }}
           >
-            <Button type='primary' onClick={addSubmit} style={{ marginRight: '8px' }}>
+            <Button
+              type='primary'
+              onClick={addSubmit}
+              style={{
+                marginRight: '8px',
+              }}
+            >
               {type === 1 ? t('编辑') : type === 2 ? t('克隆') : t('创建')}
             </Button>
             {type === 1 && (
               <Button
                 danger
-                style={{ marginRight: '8px' }}
+                style={{
+                  marginRight: '8px',
+                }}
                 onClick={() => {
                   Modal.confirm({
                     title: t('是否删除该告警规则?'),
