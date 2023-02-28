@@ -161,7 +161,7 @@ request.interceptors.response.use(
           .clone()
           .text()
           .then((data) => {
-            throw new Error(data);
+            throw new Error(status + data);
           });
       } else {
         return response

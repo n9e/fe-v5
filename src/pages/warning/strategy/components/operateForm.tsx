@@ -33,6 +33,7 @@ import AbnormalDetection from './AbnormalDetection';
 import OldElasticsearchSettings from './ElasticsearchSettings/Old';
 import ElasticsearchSettings from './ElasticsearchSettings';
 import AliyunSLSSettings from './AliyunSLSSettings';
+import ClickHouseSettings from './ClickHouseSettings';
 import CateSelect from './CateSelect';
 import ClusterSelect, { ClusterAll } from './ClusterSelect';
 import { parseValues, stringifyValues } from './utils';
@@ -159,7 +160,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
             });
             return false;
           }
-        } else if (values.cate === 'elasticsearch' || values.cate === 'aliyun-sls') {
+        } else if (values.cate === 'elasticsearch' || values.cate === 'aliyun-sls' || values.cate === 'ck') {
           values = stringifyValues(values);
         }
         const callbacks = values.callbacks.map((item) => item.url);
@@ -402,6 +403,9 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                 if (cate === 'aliyun-sls') {
                   return <AliyunSLSSettings form={form} />;
                 }
+                if (cate === 'ck') {
+                  return <ClickHouseSettings form={form} />;
+                }
               }}
             </Form.Item>
             <Row gutter={16}>
@@ -416,7 +420,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                         tooltip={
                           cate === 'prometheus'
                             ? t(`每隔${form.getFieldValue('prom_eval_interval')}秒，把PromQL作为查询条件，去查询后端存储，如果查到了数据就表示当次有监控数据触发了规则`)
-                            : '每隔15秒，去查询后端存储'
+                            : `每隔${form.getFieldValue('prom_eval_interval')}秒，去查询后端存储`
                         }
                         initialValue={60}
                         rules={[

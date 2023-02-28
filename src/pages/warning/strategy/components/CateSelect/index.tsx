@@ -6,10 +6,11 @@ const typeNameMap = {
   prometheus: 'Prometheus',
   elasticsearch: 'Elasticsearch',
   'aliyun-sls': '阿里云SLS',
+  ck: 'ClickHouse',
 };
 
 export default function index({ visible, form }) {
-  const options = visible ? ['prometheus', 'elasticsearch', 'aliyun-sls'] : ['prometheus'];
+  const options = visible ? ['prometheus', 'elasticsearch', 'aliyun-sls', 'ck'] : ['prometheus'];
   return (
     <Form.Item label='数据源类型' name='cate' initialValue='prometheus'>
       <Select

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Select } from 'antd';
 import { CaretDownOutlined } from '@ant-design/icons';
-import { getCommonClusters, getCommonESClusters, getCommonSLSClusters } from '@/services/common';
+import { getCommonClusters, getCommonESClusters, getCommonSLSClusters, getCommonCKClusters } from '@/services/common';
 export const ClusterAll = '$all';
 
 export default function index({ form, cate }) {
@@ -33,6 +33,15 @@ export default function index({ form, cate }) {
     }
     if (cate === 'prometheus') {
       getCommonClusters()
+        .then(({ dat }) => {
+          setClusterList(dat);
+        })
+        .catch(() => {
+          setClusterList([]);
+        });
+    }
+    if (cate === 'ck') {
+      getCommonCKClusters()
         .then(({ dat }) => {
           setClusterList(dat);
         })
