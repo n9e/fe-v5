@@ -124,7 +124,7 @@ export default function index(props: IProps) {
               }
               labelWidth={95}
             >
-              <Form.Item name={['query', 'time_field']} rules={[{ required: true, message: '请输入时间字段' }]}>
+              <Form.Item name={['query', 'time_field']} rules={[{ required: mode === IMode.timeSeries, message: '请输入时间字段' }]}>
                 <Input />
               </Form.Item>
             </InputGroupWithFormItem>
