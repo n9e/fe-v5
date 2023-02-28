@@ -80,7 +80,7 @@ export default function index({ form, prefixField = {}, fullPrefixName = [], pre
                                   }
                                   labelWidth={95}
                                 >
-                                  <Form.Item {...field} name={[field.name, 'time_field']} rules={[{ required: true, message: '请输入时间字段' }]}>
+                                  <Form.Item {...field} name={[field.name, 'time_field']}>
                                     <Input />
                                   </Form.Item>
                                 </InputGroupWithFormItem>
