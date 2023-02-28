@@ -21,55 +21,45 @@ import _ from 'lodash';
 import { Panel } from '../../Components/Collapse';
 import ValueMappings from '../ValueMappings';
 import StandardOptions from '../StandardOptions';
-
-export default function index({ targets }) {
+import { useTranslation } from "react-i18next";
+export default function index({
+  targets
+}) {
+  const {
+    t
+  } = useTranslation();
   const namePrefix = ['overrides'];
-
-  return (
-    <Form.List name={namePrefix}>
-      {(fields, { add, remove }) =>
-        fields.map(({ key, name, ...restField }) => {
-          return (
-            <Panel
-              key={key}
-              isInner
-              header='override'
-              extra={
-                <Space>
-                  <PlusCircleOutlined
-                    onClick={() => {
-                      add({
-                        type: 'special',
-                      });
-                    }}
-                  />
-                  {fields.length > 1 && (
-                    <MinusCircleOutlined
-                      onClick={() => {
-                        remove(name);
-                      }}
-                    />
-                  )}
-                </Space>
-              }
-            >
-              <Form.Item label='查询条件名称' {...restField} name={[name, 'matcher', 'value']}>
+  return <Form.List name={namePrefix}>
+      {(fields, {
+      add,
+      remove
+    }) => fields.map(({
+      key,
+      name,
+      ...restField
+    }) => {
+      return <Panel key={key} isInner header='override' extra={<Space>
+                  <PlusCircleOutlined onClick={() => {
+          add({
+            type: 'special'
+          });
+        }} />
+                  {fields.length > 1 && <MinusCircleOutlined onClick={() => {
+          remove(name);
+        }} />}
+                </Space>}>
+              <Form.Item label={t("查询条件名称")} {...restField} name={[name, 'matcher', 'value']}>
                 <Select suffixIcon={<CaretDownOutlined />} allowClear>
-                  {_.map(targets, (target) => {
-                    return (
-                      <Select.Option key={target.refId} value={target.refId}>
+                  {_.map(targets, target => {
+              return <Select.Option key={target.refId} value={target.refId}>
                         {target.refId}
-                      </Select.Option>
-                    );
-                  })}
+                      </Select.Option>;
+            })}
                 </Select>
               </Form.Item>
               <ValueMappings preNamePrefix={namePrefix} namePrefix={[name, 'properties', 'valueMappings']} />
               <StandardOptions preNamePrefix={namePrefix} namePrefix={[name, 'properties', 'standardOptions']} />
-            </Panel>
-          );
-        })
-      }
-    </Form.List>
-  );
+            </Panel>;
+    })}
+    </Form.List>;
 }

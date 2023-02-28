@@ -24,44 +24,30 @@ import List from './metricViews/List';
 import LabelsValues from './metricViews/LabelsValues';
 import Metrics from './metricViews/Metrics';
 import './style.less';
-
+import { useTranslation } from "react-i18next";
 export default function index() {
+  const {
+    t
+  } = useTranslation();
   const [match, setMatch] = useState<IMatch>();
   const [range, setRange] = useState<IRawTimeRange>({
     start: 'now-1h',
-    end: 'now',
+    end: 'now'
   });
   const [rerenderFlag, setRerenderFlag] = useState(_.uniqueId('rerenderFlag_'));
-
-  return (
-    <PageLayout
-      title='快捷视图'
-      icon={<LineChartOutlined />}
-      hideCluster={false}
-      onChangeCluster={() => {
-        setRerenderFlag(_.uniqueId('rerenderFlag_'));
-      }}
-    >
+  return <PageLayout title={t("快捷视图")} icon={<LineChartOutlined />} hideCluster={false} onChangeCluster={() => {
+    setRerenderFlag(_.uniqueId('rerenderFlag_'));
+  }}>
       <div className='n9e-metric-views' key={rerenderFlag}>
-        <List
-          onSelect={(record: IMatch) => {
-            setMatch(record);
-          }}
-          range={range}
-        />
-        {match ? (
-          <>
-            <LabelsValues
-              range={range}
-              value={match}
-              onChange={(val) => {
-                setMatch(val);
-              }}
-            />
+        <List onSelect={(record: IMatch) => {
+        setMatch(record);
+      }} range={range} />
+        {match ? <>
+            <LabelsValues range={range} value={match} onChange={val => {
+          setMatch(val);
+        }} />
             <Metrics range={range} setRange={setRange} match={match} />
-          </>
-        ) : null}
+          </> : null}
       </div>
-    </PageLayout>
-  );
+    </PageLayout>;
 }

@@ -20,66 +20,66 @@ import { DeleteOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { Panel } from '../../Components/Collapse';
 import ColorPicker from '../../../Components/ColorPicker';
-
+import { useTranslation } from "react-i18next";
 export default function index() {
+  const {
+    t
+  } = useTranslation();
   const namePrefix = ['options', 'thresholds'];
-
-  return (
-    <Panel header='阈值'>
+  return <Panel header={t("阈值")}>
       <Form.List name={[...namePrefix, 'steps']}>
-        {(fields, { add, remove }) => (
-          <>
-            {fields.map(({ key, name, ...restField }) => {
-              return (
-                <Input.Group key={key} compact style={{ marginBottom: 5 }}>
+        {(fields, {
+        add,
+        remove
+      }) => <>
+            {fields.map(({
+          key,
+          name,
+          ...restField
+        }) => {
+          return <Input.Group key={key} compact style={{
+            marginBottom: 5
+          }}>
                   <Form.Item noStyle {...restField} name={[name, 'color']}>
                     <ColorPicker />
                   </Form.Item>
                   <Form.Item shouldUpdate noStyle>
-                    {({ getFieldValue }) => {
-                      const type = getFieldValue([...namePrefix, 'steps', name, 'type']);
-                      const width = type === 'base' ? 'calc(100% - 32px)' : 'calc(100% - 82px)';
-                      return (
-                        <>
+                    {({
+                getFieldValue
+              }) => {
+                const type = getFieldValue([...namePrefix, 'steps', name, 'type']);
+                const width = type === 'base' ? 'calc(100% - 32px)' : 'calc(100% - 82px)';
+                return <>
                           <Form.Item noStyle {...restField} name={[name, 'type']} hidden>
                             <div />
                           </Form.Item>
                           <Form.Item noStyle {...restField} name={[name, 'value']}>
-                            <InputNumber style={{ width }} disabled={type === 'base'} placeholder={type} />
+                            <InputNumber style={{
+                      width
+                    }} disabled={type === 'base'} placeholder={type} />
                           </Form.Item>
-                          {type === 'base' ? null : (
-                            <Button
-                              style={{ width: 50 }}
-                              icon={<DeleteOutlined />}
-                              onClick={() => {
-                                remove(name);
-                              }}
-                            />
-                          )}
-                        </>
-                      );
-                    }}
-                  </Form.Item>
-                </Input.Group>
-              );
-            })}
-            <Button
-              style={{ width: '100%' }}
-              onClick={() => {
-                add(
-                  {
-                    value: 0,
-                    type: '', // 只是为了不让合并默认值的时候被覆盖
-                  },
-                  0,
-                );
+                          {type === 'base' ? null : <Button style={{
+                    width: 50
+                  }} icon={<DeleteOutlined />} onClick={() => {
+                    remove(name);
+                  }} />}
+                        </>;
               }}
-            >
-              添加
-            </Button>
-          </>
-        )}
+                  </Form.Item>
+                </Input.Group>;
+        })}
+            <Button style={{
+          width: '100%'
+        }} onClick={() => {
+          add({
+            value: 0,
+            type: '' // 只是为了不让合并默认值的时候被覆盖
+
+          }, 0);
+        }}>
+              {t("添加")}
+           </Button>
+          </>}
       </Form.List>
-    </Panel>
-  );
+    </Panel>;
 }

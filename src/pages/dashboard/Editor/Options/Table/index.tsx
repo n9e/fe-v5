@@ -19,14 +19,18 @@ import GraphStyles from './GraphStyles';
 import StandardOptions from '../../Fields/StandardOptions';
 import ValueMappings from '../../Fields/ValueMappings';
 import Overrides from '../../Fields/Overrides';
-
-export default function Timeseries({ targets, chartForm }) {
-  return (
-    <>
+import { useTranslation } from "react-i18next";
+export default function Timeseries({
+  targets,
+  chartForm
+}) {
+  const {
+    t
+  } = useTranslation();
+  return <>
       <GraphStyles chartForm={chartForm} />
       <ValueMappings />
       <StandardOptions />
       <Overrides targets={targets} />
-    </>
-  );
+    </>;
 }

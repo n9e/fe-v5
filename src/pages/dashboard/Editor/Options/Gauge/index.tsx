@@ -19,14 +19,15 @@ import GraphStyles from './GraphStyles';
 import StandardOptions from '../../Fields/StandardOptions';
 import ValueMappings from '../../Fields/ValueMappings';
 import Thresholds from '../../Fields/Thresholds';
-
+import { useTranslation } from "react-i18next";
 export default function Timeseries() {
-  return (
-    <>
+  const {
+    t
+  } = useTranslation();
+  return <>
       <GraphStyles />
       <ValueMappings />
       <StandardOptions />
       <Thresholds />
-    </>
-  );
+    </>;
 }

@@ -20,46 +20,49 @@ import G2PieChart from '@/components/G2PieChart';
 import { IPanel } from '../../../types';
 import getCalculatedValuesBySeries from '../../utils/getCalculatedValuesBySeries';
 import './style.less';
-
+import { useTranslation } from "react-i18next";
 interface IProps {
   values: IPanel;
   series: any[];
   themeMode?: 'dark';
 }
-
 export default function Pie(props: IProps) {
-  const { values, series, themeMode } = props;
-  const { custom, options } = values;
-  const { calc, legengPosition, max, labelWithName, donut = false } = custom;
-  const calculatedValues = getCalculatedValuesBySeries(
+  const {
+    t
+  } = useTranslation();
+  const {
+    values,
     series,
+    themeMode
+  } = props;
+  const {
+    custom,
+    options
+  } = values;
+  const {
     calc,
-    {
-      unit: options?.standardOptions?.util,
-      decimals: options?.standardOptions?.decimals,
-      dateFormat: options?.standardOptions?.dateFormat,
-    },
-    options?.valueMappings,
-  );
-
+    legengPosition,
+    max,
+    labelWithName,
+    donut = false
+  } = custom;
+  const calculatedValues = getCalculatedValuesBySeries(series, calc, {
+    unit: options?.standardOptions?.util,
+    decimals: options?.standardOptions?.decimals,
+    dateFormat: options?.standardOptions?.dateFormat
+  }, options?.valueMappings);
   const sortedValues = calculatedValues.sort((a, b) => b.value - a.value);
-  const data =
-    max && sortedValues.length > max
-      ? sortedValues
-          .slice(0, max)
-          .map((i) => ({ name: i.name, value: i.stat }))
-          .concat({ name: '其他', value: sortedValues.slice(max).reduce((previousValue, currentValue) => currentValue.stat + previousValue, 0) })
-      : sortedValues.map((i) => ({ name: i.name, value: i.stat }));
-  return (
-    <div className='renderer-pie-container'>
-      <G2PieChart
-        themeMode={themeMode}
-        data={data}
-        positon={legengPosition !== 'hidden' ? legengPosition : undefined}
-        hidden={legengPosition === 'hidden'}
-        labelWithName={labelWithName}
-        donut={donut}
-      />
-    </div>
-  );
+  const data = max && sortedValues.length > max ? sortedValues.slice(0, max).map(i => ({
+    name: i.name,
+    value: i.stat
+  })).concat({
+    name: t("其他"),
+    value: sortedValues.slice(max).reduce((previousValue, currentValue) => currentValue.stat + previousValue, 0)
+  }) : sortedValues.map(i => ({
+    name: i.name,
+    value: i.stat
+  }));
+  return <div className='renderer-pie-container'>
+      <G2PieChart themeMode={themeMode} data={data} positon={legengPosition !== 'hidden' ? legengPosition : undefined} hidden={legengPosition === 'hidden'} labelWithName={labelWithName} donut={donut} />
+    </div>;
 }

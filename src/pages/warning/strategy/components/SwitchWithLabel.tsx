@@ -16,18 +16,24 @@
  */
 import React from 'react';
 import { Switch } from 'antd';
-
+import { useTranslation } from "react-i18next";
 interface Props {
   label: string;
   checked?: boolean;
   onChange?: (value: boolean) => void;
 }
-
-export const SwitchWithLabel: React.FC<Props> = ({ checked, onChange, label }) => {
-  return (
-    <>
-      <Switch checked={checked} onChange={onChange} style={{ marginRight: 5 }} />
+export const SwitchWithLabel: React.FC<Props> = ({
+  checked,
+  onChange,
+  label
+}) => {
+  const {
+    t
+  } = useTranslation();
+  return <>
+      <Switch checked={checked} onChange={onChange} style={{
+      marginRight: 5
+    }} />
       {label}
-    </>
-  );
+    </>;
 };

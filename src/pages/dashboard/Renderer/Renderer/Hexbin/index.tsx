@@ -24,36 +24,44 @@ import { IPanel, IHexbinStyles } from '../../../types';
 import getCalculatedValuesBySeries from '../../utils/getCalculatedValuesBySeries';
 import { getColorScaleLinearDomain } from './utils';
 import './style.less';
-
+import { useTranslation } from "react-i18next";
 interface HoneyCombProps {
   values: IPanel;
   series: any[];
   themeMode?: 'dark';
 }
 
-const Hexbin: FunctionComponent<HoneyCombProps> = (props) => {
-  const { values, series, themeMode } = props;
-  const { custom = {}, options } = values;
-  const { calc, colorRange = [], reverseColorOrder = false, colorDomainAuto, colorDomain, textMode = 'valueAndName' } = custom as IHexbinStyles;
+const Hexbin: FunctionComponent<HoneyCombProps> = props => {
+  const {
+    t
+  } = useTranslation();
+  const {
+    values,
+    series,
+    themeMode
+  } = props;
+  const {
+    custom = {},
+    options
+  } = values;
+  const {
+    calc,
+    colorRange = [],
+    reverseColorOrder = false,
+    colorDomainAuto,
+    colorDomain,
+    textMode = 'valueAndName'
+  } = (custom as IHexbinStyles);
   const groupEl = useRef<SVGGElement>(null);
   const svgEl = useRef<HTMLDivElement>(null);
   const svgSize = useSize(svgEl);
-
   useEffect(() => {
-    const calculatedValues = getCalculatedValuesBySeries(
-      series,
-      calc,
-      {
-        unit: options?.standardOptions?.util,
-        decimals: options?.standardOptions?.decimals,
-        dateFormat: options?.standardOptions?.dateFormat,
-      },
-      options?.valueMappings,
-    );
-    const colorScales = d3
-      .scaleLinear()
-      .domain(getColorScaleLinearDomain(calculatedValues, colorDomainAuto, colorDomain))
-      .range(reverseColorOrder ? _.reverse(_.slice(colorRange)) : colorRange);
+    const calculatedValues = getCalculatedValuesBySeries(series, calc, {
+      unit: options?.standardOptions?.util,
+      decimals: options?.standardOptions?.decimals,
+      dateFormat: options?.standardOptions?.dateFormat
+    }, options?.valueMappings);
+    const colorScales = d3.scaleLinear().domain(getColorScaleLinearDomain(calculatedValues, colorDomainAuto, colorDomain)).range(reverseColorOrder ? _.reverse(_.slice(colorRange)) : colorRange);
 
     if (svgSize?.width && svgSize?.height) {
       const renderProps = {
@@ -61,28 +69,34 @@ const Hexbin: FunctionComponent<HoneyCombProps> = (props) => {
         height: svgSize?.height,
         parentGroupEl: groupEl.current,
         themeMode,
-        textMode,
+        textMode
       };
-      const data = _.map(calculatedValues, (item) => {
-        return {
-          ...item,
+
+      const data = _.map(calculatedValues, item => {
+        return { ...item,
           value: item.text,
-          color: item.color || colorScales(item.stat) || '#3399CC',
+          color: item.color || colorScales(item.stat) || '#3399CC'
         };
       });
+
       d3.select(groupEl.current).selectAll('*').remove();
+
       if (data.length) {
         renderFn(data, renderProps);
       }
     }
   }, [JSON.stringify(series), JSON.stringify(options), svgSize?.width, svgSize?.height, calc, colorRange, reverseColorOrder, colorDomainAuto, colorDomain]);
-  return (
-    <div ref={svgEl} style={{ width: '100%', height: '100%' }}>
-      <svg style={{ width: '100%', height: '100%' }}>
+  return <div ref={svgEl} style={{
+    width: '100%',
+    height: '100%'
+  }}>
+      <svg style={{
+      width: '100%',
+      height: '100%'
+    }}>
         <g ref={groupEl} />
       </svg>
-    </div>
-  );
+    </div>;
 };
 
 export default Hexbin;

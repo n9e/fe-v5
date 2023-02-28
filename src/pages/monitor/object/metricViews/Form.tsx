@@ -23,7 +23,6 @@ import ModalHOC, { ModalWrapProps } from '@/components/ModalHOC';
 import { getLabels, getLabelValues, addMetricView, updateMetricView } from '@/services/metricViews';
 import { IRawTimeRange } from '@/components/TimeRangePicker';
 import { getFiltersStr } from './utils';
-
 interface IProps {
   action: 'add' | 'edit';
   initialValues?: any;
@@ -32,15 +31,15 @@ interface IProps {
   onOk: Function;
 }
 
-const titleMap = {
-  add: '新建快捷视图',
-  edit: '编辑快捷视图',
-};
 const { TabPane } = Tabs;
 
 function FormCpt(props: ModalWrapProps & IProps) {
   const { t } = useTranslation();
-  const { action, visible, initialValues={}, destroy, range, onOk, admin } = props;
+  const titleMap = {
+    add: t('新建快捷视图'),
+    edit: t('编辑快捷视图'),
+  };
+  const { action, visible, initialValues = {}, destroy, range, onOk, admin } = props;
   const [form] = Form.useForm();
   const [labels, setLabels] = useState<string[]>([]);
   const [filteredLabels, setFilteredLabels] = useState<string[]>([]);
@@ -48,6 +47,7 @@ function FormCpt(props: ModalWrapProps & IProps) {
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewData, setPreviewData] = useState([]);
   const [activeKey, setActiveKey] = useState('form');
+
   const getLablesOptions = (_labels) => {
     return _.map(_labels, (label) => {
       return (
@@ -64,14 +64,13 @@ function FormCpt(props: ModalWrapProps & IProps) {
       setFilteredLabels(res);
     });
   }, [JSON.stringify(range)]);
-
   return (
     <Modal
       className='n9e-metric-views-modal'
       title={
         <Tabs className='custom-import-title' activeKey={activeKey} onChange={setActiveKey}>
           <TabPane tab={titleMap[action]} key='form' />
-          {action === 'add' && <TabPane tab='导入快捷视图' key='import' />}
+          {action === 'add' && <TabPane tab={t('导入快捷视图')} key='import' />}
         </Tabs>
       }
       visible={visible}
@@ -81,6 +80,7 @@ function FormCpt(props: ModalWrapProps & IProps) {
       onOk={() => {
         form.validateFields().then((values) => {
           let _values = _.cloneDeep(values);
+
           if (activeKey === 'form') {
             _values.dynamicLabels = _.map(_values.dynamicLabels, (item) => {
               return {
@@ -95,6 +95,7 @@ function FormCpt(props: ModalWrapProps & IProps) {
               };
             });
           }
+
           if (activeKey === 'import') {
             try {
               const config = JSON.parse(values.import);
@@ -108,6 +109,7 @@ function FormCpt(props: ModalWrapProps & IProps) {
               return;
             }
           }
+
           const { name, cate } = _values;
           const configs = JSON.stringify(_.omit(_values, ['name', 'cate']));
           const data: any = {
@@ -115,16 +117,17 @@ function FormCpt(props: ModalWrapProps & IProps) {
             cate: cate ? 0 : 1,
             configs,
           };
+
           if (action === 'add') {
             addMetricView(data).then((res) => {
-              message.success('添加成功');
+              message.success(t('添加成功'));
               onOk(res);
               destroy();
             });
           } else if (action === 'edit') {
             data.id = initialValues.id;
             updateMetricView(data).then(() => {
-              message.success('修改成功');
+              message.success(t('修改成功'));
               onOk();
               destroy();
             });
@@ -150,19 +153,40 @@ function FormCpt(props: ModalWrapProps & IProps) {
             }
           }}
         >
-          <Form.Item label='视图名称' name='name' rules={[{ required: true }]}>
+          <Form.Item
+            label={t('视图名称')}
+            name='name'
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
             <Input />
           </Form.Item>
           {admin && (
-            <Form.Item label='是否公开' name='cate' rules={[{ required: true }]} valuePropName='checked'>
+            <Form.Item
+              label={t('是否公开')}
+              name='cate'
+              rules={[
+                {
+                  required: true,
+                },
+              ]}
+              valuePropName='checked'
+            >
               <Switch />
             </Form.Item>
           )}
           <Form.List name='filters'>
             {(fields, { add, remove }) => (
               <>
-                <div style={{ paddingBottom: 8 }}>
-                  前置过滤条件{' '}
+                <div
+                  style={{
+                    paddingBottom: 8,
+                  }}
+                >
+                  {t('前置过滤条件')}件{' '}
                   <PlusCircleOutlined
                     onClick={() => {
                       add({
@@ -174,21 +198,58 @@ function FormCpt(props: ModalWrapProps & IProps) {
                 {fields.map(({ key, name }) => {
                   return (
                     <Space key={key}>
-                      <Form.Item name={[name, 'label']} rules={[{ required: true }]}>
-                        <Select suffixIcon={<CaretDownOutlined />} allowClear showSearch style={{ width: 170 }}>
+                      <Form.Item
+                        name={[name, 'label']}
+                        rules={[
+                          {
+                            required: true,
+                          },
+                        ]}
+                      >
+                        <Select
+                          suffixIcon={<CaretDownOutlined />}
+                          allowClear
+                          showSearch
+                          style={{
+                            width: 170,
+                          }}
+                        >
                           {getLablesOptions(labels)}
                         </Select>
                       </Form.Item>
-                      <Form.Item name={[name, 'oper']} rules={[{ required: true }]}>
-                        <Select suffixIcon={<CaretDownOutlined />} style={{ width: 60 }}>
+                      <Form.Item
+                        name={[name, 'oper']}
+                        rules={[
+                          {
+                            required: true,
+                          },
+                        ]}
+                      >
+                        <Select
+                          suffixIcon={<CaretDownOutlined />}
+                          style={{
+                            width: 60,
+                          }}
+                        >
                           <Select.Option value='='>=</Select.Option>
                           <Select.Option value='!='>!=</Select.Option>
                           <Select.Option value='=~'>=~</Select.Option>
                           <Select.Option value='!~'>!~</Select.Option>
                         </Select>
                       </Form.Item>
-                      <Form.Item name={[name, 'value']} rules={[{ required: true }]}>
-                        <Input style={{ width: 200 }} />
+                      <Form.Item
+                        name={[name, 'value']}
+                        rules={[
+                          {
+                            required: true,
+                          },
+                        ]}
+                      >
+                        <Input
+                          style={{
+                            width: 200,
+                          }}
+                        />
                       </Form.Item>
                       <Form.Item>
                         <MinusCircleOutlined
@@ -203,27 +264,43 @@ function FormCpt(props: ModalWrapProps & IProps) {
               </>
             )}
           </Form.List>
-          <Form.Item label='动态过滤标签' name='dynamicLabels'>
+          <Form.Item label={t('动态过滤标签')} name='dynamicLabels'>
             <Select allowClear showSearch mode='multiple'>
               {getLablesOptions(filteredLabels)}
             </Select>
           </Form.Item>
-          <Form.Item label='展开维度标签' name='dimensionLabels' rules={[{ required: true }]}>
+          <Form.Item
+            label={t('展开维度标签')}
+            name='dimensionLabels'
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
             <Select allowClear showSearch mode='multiple'>
               {getLablesOptions(filteredLabels)}
             </Select>
           </Form.Item>
-          <div style={{ textAlign: 'right', marginBottom: 10 }}>
+          <div
+            style={{
+              textAlign: 'right',
+              marginBottom: 10,
+            }}
+          >
             <Button
               onClick={() => {
                 const values = form.getFieldsValue();
                 setPreviewVisible(true);
                 setPreviewLoading(true);
                 const filtersStr = getFiltersStr(values.filters);
+
                 const _labels = _.compact(_.concat(values.dynamicLabels, values.dimensionLabels));
+
                 const requests = _.map(_labels, (item) => {
                   return getLabelValues(item, range, filtersStr ? `{${filtersStr}}` : '');
                 });
+
                 Promise.all(requests).then((res) => {
                   const data = _.map(_labels, (item, idx) => {
                     return {
@@ -231,12 +308,13 @@ function FormCpt(props: ModalWrapProps & IProps) {
                       values: res[idx],
                     };
                   });
+
                   setPreviewData(data);
                   setPreviewLoading(false);
                 });
               }}
             >
-              预览
+              {t('预览')}
             </Button>
           </div>
           {previewVisible && (
@@ -249,16 +327,17 @@ function FormCpt(props: ModalWrapProps & IProps) {
                   dataIndex: 'label',
                 },
                 {
-                  title: 'Lable Value 数量',
+                  title: t('Lable Value 数量'),
                   dataIndex: 'values',
                   render: (text) => {
                     return text.length;
                   },
                 },
                 {
-                  title: 'Lable Value 样例',
+                  title: t('Lable Value 样例'),
                   dataIndex: 'values',
                   render: (text) => {
+                    const { t } = useTranslation();
                     return (
                       <Tooltip
                         placement='right'
@@ -291,16 +370,33 @@ function FormCpt(props: ModalWrapProps & IProps) {
             }
           }
         >
-          <Form.Item label='视图名称' name='name' rules={[{ required: true }]}>
+          <Form.Item
+            label={t('视图名称')}
+            name='name'
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
             <Input />
           </Form.Item>
           {admin && (
-            <Form.Item label='是否公开' name='cate' rules={[{ required: true }]} valuePropName='checked'>
+            <Form.Item
+              label={t('是否公开')}
+              name='cate'
+              rules={[
+                {
+                  required: true,
+                },
+              ]}
+              valuePropName='checked'
+            >
               <Switch />
             </Form.Item>
           )}
           <Form.Item
-            label='配置JSON：'
+            label={t('配置JSON：')}
             name='import'
             rules={[
               {

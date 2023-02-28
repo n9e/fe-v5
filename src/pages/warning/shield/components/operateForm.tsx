@@ -33,10 +33,12 @@ import { timeLensDefault } from '../../const';
 import CateSelect from './CateSelect';
 import ClusterSelect from './ClusterSelect';
 import '../index.less';
-
-const { Option } = Select;
-const { TextArea } = Input;
-
+const {
+  Option
+} = Select;
+const {
+  TextArea
+} = Input;
 interface ItagsObj {
   tags: any[];
   cluster: string;
@@ -47,38 +49,45 @@ interface Props {
   type?: number; // 1:创建; 2:克隆 3:编辑
 }
 
-const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) => {
+const OperateForm: React.FC<Props> = ({
+  detail = {},
+  type,
+  tagsObj = {}
+}: any) => {
   const btimeDefault = new Date().getTime();
   const etimeDefault = new Date().getTime() + 1 * 60 * 60 * 1000; // 默认时长1h
-  const { t } = useTranslation();
+  const {
+    t
+  } = useTranslation();
   const layout = {
     labelCol: {
-      span: 24,
+      span: 24
     },
     wrapperCol: {
-      span: 24,
-    },
+      span: 24
+    }
   };
   const tailLayout = {
     labelCol: {
-      span: 0,
+      span: 0
     },
     wrapperCol: {
-      span: 24,
-    },
+      span: 24
+    }
   };
-  const [form] = Form.useForm(null as any);
+  const [form] = Form.useForm((null as any));
   const history = useHistory();
   const [timeLen, setTimeLen] = useState('1h');
-  const { curBusiItem, busiGroups } = useSelector<RootState, CommonStoreState>((state) => state.common);
+  const {
+    curBusiItem,
+    busiGroups
+  } = useSelector<RootState, CommonStoreState>(state => state.common);
   const [filteredBusiGroups, setFilteredBusiGroups] = useState(busiGroups);
-
   useEffect(() => {
     if (!filteredBusiGroups.length) {
       setFilteredBusiGroups(busiGroups);
     }
   }, [JSON.stringify(busiGroups)]);
-
   useEffect(() => {
     const btime = form.getFieldValue('btime');
     const etime = form.getFieldValue('etime');
@@ -89,42 +98,43 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) 
       const s = moment.duration(etime - btime).seconds();
     }
     if (curBusiItem) {
-      form.setFieldsValue({ busiGroup: curBusiItem.id });
+      form.setFieldsValue({
+        busiGroup: curBusiItem.id
+      });
     } else if (filteredBusiGroups.length > 0) {
-      form.setFieldsValue({ busiGroup: filteredBusiGroups[0].id });
+      form.setFieldsValue({
+        busiGroup: filteredBusiGroups[0].id
+      });
     } else {
-      message.warning('无可用业务组');
+      message.warning(t("无可用业务组"));
       history.push('/alert-mutes');
     }
     return () => {};
   }, [form]);
-
   useEffect(() => {
     // 只有add 的时候才传入tagsObj
     if (tagsObj?.tags && tagsObj?.tags.length > 0) {
-      const tags = tagsObj?.tags?.map((item) => {
+      const tags = tagsObj?.tags?.map(item => {
         return {
           ...item,
-          value: item.func === 'in' ? item.value.split(' ') : item.value,
+          value: item.func === 'in' ? item.value.split(' ') : item.value
         };
       });
       form.setFieldsValue({
         tags: tags || [{}],
         cluster: [tagsObj.cluster],
-        busiGroup: tagsObj.group_id,
+        busiGroup: tagsObj.group_id
       });
     }
     if (tagsObj?.cate) {
       form.setFieldsValue({
-        cate: tagsObj?.cate,
+        cate: tagsObj?.cate
       });
     }
   }, [tagsObj]);
-
   useEffect(() => {
     timeChange();
   }, [detail]);
-
   const timeChange = () => {
     const btime = form.getFieldValue('btime');
     const etime = form.getFieldValue('etime');
@@ -143,12 +153,11 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) 
       }
     }
   };
-
-  const onFinish = (values) => {
-    const tags = values?.tags?.map((item) => {
+  const onFinish = values => {
+    const tags = values?.tags?.map(item => {
       return {
         ...item,
-        value: Array.isArray(item.value) ? item.value.join(' ') : item.value,
+        value: Array.isArray(item.value) ? item.value.join(' ') : item.value
       };
     });
     const params = {
@@ -156,16 +165,16 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) 
       cluster: values.cluster.join(' '),
       btime: moment(values.btime).unix(),
       etime: moment(values.etime).unix(),
-      tags,
+      tags
     };
     const curBusiItemId = form.getFieldValue('busiGroup');
     if (type == 1) {
-      editShield(params, curBusiItemId, detail.id).then((_) => {
+      editShield(params, curBusiItemId, detail.id).then(_ => {
         message.success(t('编辑告警屏蔽成功'));
         history.push('/alert-mutes');
       });
     } else {
-      addShield(params, curBusiItemId).then((_) => {
+      addShield(params, curBusiItemId).then(_ => {
         message.success(t('新建告警屏蔽成功'));
         history.push('/alert-mutes');
       });
@@ -179,11 +188,10 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) 
     form.setFieldsValue({
       btime: moment(time),
       etime: moment(time).add({
-        [unit]: num,
-      }),
+        [unit]: num
+      })
     });
   };
-
   const [fetching, setFetching] = useState(false);
   const fetchRef = useRef(0);
   const debounceFetcher = useMemo(() => {
@@ -192,68 +200,50 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) 
       const fetchId = fetchRef.current;
       setFilteredBusiGroups([]);
       setFetching(true);
-
-      getBusiGroups(value).then((res) => {
+      getBusiGroups(value).then(res => {
         if (fetchId !== fetchRef.current) {
           // for fetch callback order
           return;
         }
-
         setFilteredBusiGroups(res.dat || []);
         setFetching(false);
       });
     };
-
     return _.debounce(loadOptions, 500);
   }, []);
-
-  const content = (
-    <Form
-      form={form}
-      {...layout}
-      layout='vertical'
-      className='operate-form'
-      onFinish={onFinish}
-      initialValues={{
-        ...detail,
-        btime: detail?.btime ? moment(detail.btime * 1000) : moment(btimeDefault),
-        etime: detail?.etime ? moment(detail.etime * 1000) : moment(etimeDefault),
-        cluster: detail.cluster ? detail.cluster.split(' ') : ['$all'], // 生效集群
-      }}
-    >
+  const content = <Form form={form} {...layout} layout='vertical' className='operate-form' onFinish={onFinish} initialValues={{
+    ...detail,
+    btime: detail?.btime ? moment(detail.btime * 1000) : moment(btimeDefault),
+    etime: detail?.etime ? moment(detail.etime * 1000) : moment(etimeDefault),
+    cluster: detail.cluster ? detail.cluster.split(' ') : ['$all'] // 生效集群
+  }}>
       <Card>
-        <Form.Item
-          label={t('规则备注：')}
-          name='note'
-          rules={[
-            {
-              required: true,
-              message: t('规则备注不能为空'),
-            },
-          ]}
-        >
+        <Form.Item label={t('规则备注：')} name='note' rules={[{
+        required: true,
+        message: t('规则备注不能为空')
+      }]}>
           <Input placeholder={t('请输入规则备注')} />
         </Form.Item>
 
         <Form.Item label={t('业务组：')} name='busiGroup'>
           <Select showSearch filterOption={false} suffixIcon={<CaretDownOutlined />} onSearch={debounceFetcher} notFoundContent={fetching ? <Spin size='small' /> : null}>
-            {_.map(filteredBusiGroups, (item) => (
-              <Option value={item.id} key={item.id}>
+            {_.map(filteredBusiGroups, item => <Option value={item.id} key={item.id}>
                 {item.name}
-              </Option>
-            ))}
+              </Option>)}
           </Select>
         </Form.Item>
 
         <AdvancedWrap var='VITE_IS_ALERT_ES_DS'>
-          {(visible) => {
-            return <CateSelect form={form} visible={visible} />;
-          }}
+          {visible => {
+          return <CateSelect form={form} visible={visible} />;
+        }}
         </AdvancedWrap>
         <Form.Item shouldUpdate={(prevValues, curValues) => prevValues.cate !== curValues.cate} noStyle>
-          {({ getFieldValue }) => {
-            return <ClusterSelect form={form} cate={getFieldValue('cate')} />;
-          }}
+          {({
+          getFieldValue
+        }) => {
+          return <ClusterSelect form={form} cate={getFieldValue('cate')} />;
+        }}
         </Form.Item>
 
         <Row gutter={10}>
@@ -265,11 +255,9 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) 
           <Col span={8}>
             <Form.Item label={t('屏蔽时长：')}>
               <Select suffixIcon={<CaretDownOutlined />} placeholder={t('请选择屏蔽时长')} onChange={timeLenChange} value={timeLen}>
-                {timeLensDefault.map((item: any, index: number) => (
-                  <Option key={index} value={item.value}>
+                {timeLensDefault.map((item: any, index: number) => <Option key={index} value={item.value}>
                     {item.value}
-                  </Option>
-                ))}
+                  </Option>)}
               </Select>
             </Form.Item>
           </Col>
@@ -279,10 +267,12 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) 
             </Form.Item>
           </Col>
         </Row>
-        <Row gutter={[10, 10]} style={{ marginBottom: '8px' }}>
+        <Row gutter={[10, 10]} style={{
+        marginBottom: '8px'
+      }}>
           <Col span={5}>
             {t('屏蔽事件标签Key：')}
-            <Tooltip title={t(`这里的标签是指告警事件的标签，通过如下标签匹配规则过滤告警事件`)}>
+            <Tooltip title={t(`${t("这里的标签是指告警事件的标签，通过如下标签匹配规则过滤告警事件")}`)}>
               <QuestionCircleFilled />
             </Tooltip>
           </Col>
@@ -290,27 +280,20 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) 
           <Col span={16}>{t('标签Value：')}</Col>
         </Row>
         <Form.List name='tags' initialValue={[{}]}>
-          {(fields, { add, remove }) => (
-            <>
-              {fields.map((field, index) => (
-                <TagItem field={field} key={index} remove={remove} form={form} />
-              ))}
+          {(fields, {
+          add,
+          remove
+        }) => <>
+              {fields.map((field, index) => <TagItem field={field} key={index} remove={remove} form={form} />)}
               <Form.Item>
                 <PlusCircleOutlined className='control-icon-normal' onClick={() => add()} />
               </Form.Item>
-            </>
-          )}
+            </>}
         </Form.List>
-        <Form.Item
-          label={t('屏蔽原因')}
-          name='cause'
-          rules={[
-            {
-              required: true,
-              message: t('请填写屏蔽原因'),
-            },
-          ]}
-        >
+        <Form.Item label={t('屏蔽原因')} name='cause' rules={[{
+        required: true,
+        message: t('请填写屏蔽原因')
+      }]}>
           <TextArea rows={3} />
         </Form.Item>
         <Form.Item {...tailLayout}>
@@ -322,9 +305,7 @@ const OperateForm: React.FC<Props> = ({ detail = {}, type, tagsObj = {} }: any) 
           </Space>
         </Form.Item>
       </Card>
-    </Form>
-  );
+    </Form>;
   return <div className='operate-form-index'>{content}</div>;
 };
-
 export default OperateForm;

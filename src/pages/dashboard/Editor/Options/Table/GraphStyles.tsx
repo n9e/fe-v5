@@ -21,135 +21,136 @@ import _ from 'lodash';
 import { Panel } from '../../Components/Collapse';
 import { calcsOptions } from '../../config';
 import { useGlobalState } from '../../../globalState';
-
-export default function GraphStyles({ chartForm }) {
+import { useTranslation } from "react-i18next";
+export default function GraphStyles({
+  chartForm
+}) {
+  const {
+    t
+  } = useTranslation();
   const namePrefix = ['custom'];
   const [tableFields] = useGlobalState('tableFields');
-
-  return (
-    <Panel header='图表样式'>
+  return <Panel header={t("图表样式")}>
       <>
         <Row gutter={10}>
           <Col span={12}>
-            <Form.Item label='显示表头' name={[...namePrefix, 'showHeader']} valuePropName='checked'>
+            <Form.Item label={t("显示表头")} name={[...namePrefix, 'showHeader']} valuePropName='checked'>
               <Switch size='small' />
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item label='颜色模式' name={[...namePrefix, 'colorMode']}>
+            <Form.Item label={t("颜色模式")} name={[...namePrefix, 'colorMode']}>
               <Radio.Group buttonStyle='solid'>
-                <Radio.Button value='value'>值</Radio.Button>
-                <Radio.Button value='background'>背景</Radio.Button>
+                <Radio.Button value='value'>{t("值")}</Radio.Button>
+                <Radio.Button value='background'>{t("背景")}</Radio.Button>
               </Radio.Group>
             </Form.Item>
           </Col>
         </Row>
-        <Form.Item label='取值计算' name={[...namePrefix, 'calc']}>
+        <Form.Item label={t("取值计算")} name={[...namePrefix, 'calc']}>
           <Select suffixIcon={<CaretDownOutlined />}>
             {_.map(calcsOptions, (item, key) => {
-              return (
-                <Select.Option key={key} value={key}>
+            const {
+              t
+            } = useTranslation();
+            return <Select.Option key={key} value={key}>
                   {item.name}
-                </Select.Option>
-              );
-            })}
+                </Select.Option>;
+          })}
           </Select>
         </Form.Item>
         <Row gutter={10}>
           <Col span={12}>
-            <Form.Item label='显示模式' name={[...namePrefix, 'displayMode']}>
+            <Form.Item label={t("显示模式")} name={[...namePrefix, 'displayMode']}>
               <Select suffixIcon={<CaretDownOutlined />}>
-                <Select.Option value='seriesToRows'>每行展示 serie 的值</Select.Option>
-                <Select.Option value='labelsOfSeriesToRows'>每行展示 labels 的值</Select.Option>
-                <Select.Option value='labelValuesToRows'>每行展示指定聚合维度的值</Select.Option>
+                <Select.Option value='seriesToRows'>{t("每行展示")} serie {t("的值")}值</Select.Option>
+                <Select.Option value='labelsOfSeriesToRows'>{t("每行展示")} labels {t("的值")}值</Select.Option>
+                <Select.Option value='labelValuesToRows'>{t("每行展示指定聚合维度的值")}</Select.Option>
               </Select>
             </Form.Item>
           </Col>
           <Form.Item noStyle shouldUpdate={(prevValues, curValues) => _.get(prevValues, [...namePrefix, 'displayMode']) !== _.get(curValues, [...namePrefix, 'displayMode'])}>
-            {({ getFieldValue }) => {
-              if (getFieldValue([...namePrefix, 'displayMode']) === 'labelsOfSeriesToRows') {
-                return (
-                  <Col span={12}>
-                    <Form.Item label='显示列' name={[...namePrefix, 'columns']}>
-                      <Select mode='multiple' placeholder='默认全选' suffixIcon={<CaretDownOutlined />}>
-                        {_.map(_.concat(tableFields, 'value'), (item) => {
-                          return (
-                            <Select.Option key={item} value={item}>
+            {({
+            getFieldValue
+          }) => {
+            if (getFieldValue([...namePrefix, 'displayMode']) === 'labelsOfSeriesToRows') {
+              return <Col span={12}>
+                    <Form.Item label={t("显示列")} name={[...namePrefix, 'columns']}>
+                      <Select mode='multiple' placeholder={t("默认全选")} suffixIcon={<CaretDownOutlined />}>
+                        {_.map(_.concat(tableFields, 'value'), item => {
+                      return <Select.Option key={item} value={item}>
                               {item}
-                            </Select.Option>
-                          );
-                        })}
+                            </Select.Option>;
+                    })}
                       </Select>
                     </Form.Item>
-                  </Col>
-                );
-              }
-              if (getFieldValue([...namePrefix, 'displayMode']) === 'labelValuesToRows') {
-                return (
-                  <Col span={12}>
-                    <Form.Item label='显示维度' name={[...namePrefix, 'aggrDimension']}>
+                  </Col>;
+            }
+
+            if (getFieldValue([...namePrefix, 'displayMode']) === 'labelValuesToRows') {
+              return <Col span={12}>
+                    <Form.Item label={t("显示维度")} name={[...namePrefix, 'aggrDimension']}>
                       <Select suffixIcon={<CaretDownOutlined />}>
-                        {_.map(tableFields, (item) => {
-                          return (
-                            <Select.Option key={item} value={item}>
+                        {_.map(tableFields, item => {
+                      return <Select.Option key={item} value={item}>
                               {item}
-                            </Select.Option>
-                          );
-                        })}
+                            </Select.Option>;
+                    })}
                       </Select>
                     </Form.Item>
-                  </Col>
-                );
-              }
-              return null;
-            }}
+                  </Col>;
+            }
+
+            return null;
+          }}
           </Form.Item>
         </Row>
         <Row gutter={10}>
           <Col span={12}>
             <Form.Item noStyle shouldUpdate>
-              {({ getFieldValue }) => {
-                const displayMode = getFieldValue([...namePrefix, 'displayMode']);
-                const columns = getFieldValue([...namePrefix, 'columns']) ? getFieldValue([...namePrefix, 'columns']) : _.concat(tableFields, 'value');
-                const aggrDimension = getFieldValue([...namePrefix, 'aggrDimension']);
-                let keys: string[] = [];
-                if (displayMode === 'seriesToRows') {
-                  keys = ['name', 'value'];
-                } else if (displayMode === 'labelsOfSeriesToRows') {
-                  keys = columns;
-                } else if (displayMode === 'labelValuesToRows') {
-                  keys = [aggrDimension || 'name', 'value'];
-                }
-                return (
-                  <Form.Item label='默认排序列' name={[...namePrefix, 'sortColumn']}>
-                    <Select
-                      suffixIcon={<CaretDownOutlined />}
-                      allowClear
-                      onChange={() => {
-                        if (!chartForm.getFieldValue([...namePrefix, 'sortOrder'])) {
-                          const customValues = chartForm.getFieldValue('custom');
-                          _.set(customValues, 'sortOrder', 'ascend');
-                          chartForm.setFieldsValue({
-                            custom: customValues,
-                          });
-                        }
-                      }}
-                    >
-                      {_.map(keys, (item) => {
-                        return (
-                          <Select.Option key={item} value={item}>
+              {({
+              getFieldValue
+            }) => {
+              const {
+                t
+              } = useTranslation();
+              const displayMode = getFieldValue([...namePrefix, 'displayMode']);
+              const columns = getFieldValue([...namePrefix, 'columns']) ? getFieldValue([...namePrefix, 'columns']) : _.concat(tableFields, 'value');
+              const aggrDimension = getFieldValue([...namePrefix, 'aggrDimension']);
+              let keys: string[] = [];
+
+              if (displayMode === 'seriesToRows') {
+                keys = ['name', 'value'];
+              } else if (displayMode === 'labelsOfSeriesToRows') {
+                keys = columns;
+              } else if (displayMode === 'labelValuesToRows') {
+                keys = [aggrDimension || 'name', 'value'];
+              }
+
+              return <Form.Item label={t("默认排序列")} name={[...namePrefix, 'sortColumn']}>
+                    <Select suffixIcon={<CaretDownOutlined />} allowClear onChange={() => {
+                  if (!chartForm.getFieldValue([...namePrefix, 'sortOrder'])) {
+                    const customValues = chartForm.getFieldValue('custom');
+
+                    _.set(customValues, 'sortOrder', 'ascend');
+
+                    chartForm.setFieldsValue({
+                      custom: customValues
+                    });
+                  }
+                }}>
+                      {_.map(keys, item => {
+                    return <Select.Option key={item} value={item}>
                             {item}
-                          </Select.Option>
-                        );
-                      })}
+                          </Select.Option>;
+                  })}
                     </Select>
-                  </Form.Item>
-                );
-              }}
+                  </Form.Item>;
+            }}
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item label='默认排序顺序' name={[...namePrefix, 'sortOrder']}>
+            <Form.Item label={t("默认排序顺序")} name={[...namePrefix, 'sortOrder']}>
               <Select suffixIcon={<CaretDownOutlined />} allowClear>
                 <Select.Option value='ascend'>asc</Select.Option>
                 <Select.Option value='descend'>desc</Select.Option>
@@ -158,6 +159,5 @@ export default function GraphStyles({ chartForm }) {
           </Col>
         </Row>
       </>
-    </Panel>
-  );
+    </Panel>;
 }

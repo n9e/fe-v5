@@ -1,8 +1,10 @@
 import React from 'react';
 import _ from 'lodash';
-import { severityMap } from '@/pages/warning/strategy/components/ElasticsearchSettings/Rules';
+import { useTranslation } from 'react-i18next';
 
 export default function ElasticsearchDetail() {
+  const { t } = useTranslation();
+  const severityMap = [t('一级告警'), t('二级告警'), t('三级告警')];
   return [
     {
       label: '数值提取',

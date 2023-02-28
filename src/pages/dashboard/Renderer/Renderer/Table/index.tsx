@@ -30,7 +30,7 @@ import localeCompare from '../../utils/localeCompare';
 import formatToTable from '../../utils/formatToTable';
 import { useGlobalState } from '../../../globalState';
 import './style.less';
-
+import { useTranslation } from "react-i18next";
 interface IProps {
   values: IPanel;
   series: any[];
@@ -38,144 +38,164 @@ interface IProps {
 }
 
 const getColumnsKeys = (data: any[]) => {
-  const keys = _.reduce(
-    data,
-    (result, item) => {
-      return _.union(result, _.keys(item.metric));
-    },
-    [],
-  );
+  const keys = _.reduce(data, (result, item) => {
+    return _.union(result, _.keys(item.metric));
+  }, []);
+
   return _.uniq(keys);
 };
+
 const getSortOrder = (key, sortObj) => {
+  const {
+    t
+  } = useTranslation();
   return sortObj.sortColumn === key ? sortObj.sortOrder : false;
 };
 
 export default function Stat(props: IProps) {
+  const {
+    t
+  } = useTranslation();
   const eleRef = useRef<HTMLDivElement>(null);
   const size = useSize(eleRef);
-  const { values, series, themeMode } = props;
-  const { custom, options, overrides } = values;
-  const { showHeader, calc, aggrDimension, displayMode, columns, sortColumn, sortOrder, colorMode = 'value' } = custom;
+  const {
+    values,
+    series,
+    themeMode
+  } = props;
+  const {
+    custom,
+    options,
+    overrides
+  } = values;
+  const {
+    showHeader,
+    calc,
+    aggrDimension,
+    displayMode,
+    columns,
+    sortColumn,
+    sortOrder,
+    colorMode = 'value'
+  } = custom;
   const [calculatedValues, setCalculatedValues] = useState([]);
   const [sortObj, setSortObj] = useState({
     sortColumn,
-    sortOrder,
+    sortOrder
   });
   const [tableFields, setTableFields] = useGlobalState('tableFields');
-
   useEffect(() => {
     setSortObj({
       sortColumn,
-      sortOrder,
+      sortOrder
     });
   }, [sortColumn, sortOrder]);
-
   useEffect(() => {
-    const data = getCalculatedValuesBySeries(
-      series,
-      calc,
-      {
-        unit: options?.standardOptions?.util,
-        decimals: options?.standardOptions?.decimals,
-        dateFormat: options?.standardOptions?.dateFormat,
-      },
-      options?.valueMappings,
-    );
+    const data = getCalculatedValuesBySeries(series, calc, {
+      unit: options?.standardOptions?.util,
+      decimals: options?.standardOptions?.decimals,
+      dateFormat: options?.standardOptions?.dateFormat
+    }, options?.valueMappings);
     setTableFields(getColumnsKeys(data));
     setCalculatedValues(data);
   }, [JSON.stringify(series), calc, JSON.stringify(options)]);
-
   const searchInput = useRef<any>(null);
+
   const handleSearch = (confirm: (param?: FilterConfirmProps) => void) => {
     confirm();
   };
+
   const handleReset = (clearFilters: () => void, confirm: (param?: FilterConfirmProps) => void) => {
     clearFilters();
     confirm();
   };
+
   const getColumnSearchProps = (names: string[]): ColumnType<any> => ({
-    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
-      <div style={{ padding: 8 }}>
-        <Input
-          ref={searchInput}
-          value={selectedKeys[0]}
-          onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-          onPressEnter={() => handleSearch(confirm)}
-          style={{ marginBottom: 8, display: 'block' }}
-        />
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters
+    }) => <div style={{
+      padding: 8
+    }}>
+        <Input ref={searchInput} value={selectedKeys[0]} onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])} onPressEnter={() => handleSearch(confirm)} style={{
+        marginBottom: 8,
+        display: 'block'
+      }} />
         <Space>
-          <Button type='primary' onClick={() => handleSearch(confirm)} icon={<SearchOutlined />} size='small' style={{ width: 90 }}>
+          <Button type='primary' onClick={() => handleSearch(confirm)} icon={<SearchOutlined />} size='small' style={{
+          width: 90
+        }}>
             Search
           </Button>
-          <Button onClick={() => clearFilters && handleReset(clearFilters, confirm)} size='small' style={{ width: 90 }}>
+          <Button onClick={() => clearFilters && handleReset(clearFilters, confirm)} size='small' style={{
+          width: 90
+        }}>
             Reset
           </Button>
         </Space>
-      </div>
-    ),
-    filterIcon: (filtered: boolean) => <FilterOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+      </div>,
+    filterIcon: (filtered: boolean) => <FilterOutlined style={{
+      color: filtered ? '#1890ff' : undefined
+    }} />,
     onFilter: (value, record) => {
       const fieldVal = _.get(record, names);
+
       if (typeof fieldVal === 'string' || _.isArray(fieldVal)) {
-        return fieldVal
-          .toString()
-          .toLowerCase()
-          .includes((value as string).toLowerCase());
+        return fieldVal.toString().toLowerCase().includes((value as string).toLowerCase());
       }
+
       return true;
-    },
+    }
   });
 
   let tableDataSource = calculatedValues;
-  let tableColumns: any[] = [
-    {
-      title: 'name',
-      dataIndex: 'name',
-      key: 'name',
-      width: _.get(size, 'width') - 200,
-      sorter: (a, b) => {
-        return localeCompare(a.name, b.name);
-      },
-      sortOrder: getSortOrder('name', sortObj),
-      render: (text) => <div className='renderer-table-td-content'>{text}</div>,
-      ...getColumnSearchProps(['name']),
+  let tableColumns: any[] = [{
+    title: 'name',
+    dataIndex: 'name',
+    key: 'name',
+    width: _.get(size, 'width') - 200,
+    sorter: (a, b) => {
+      return localeCompare(a.name, b.name);
     },
-    {
-      title: 'value',
-      dataIndex: 'text',
-      key: 'text',
-      sorter: (a, b) => {
-        return a.stat - b.stat;
-      },
-      sortOrder: getSortOrder('text', sortObj),
-      className: 'renderer-table-td-content-value-container',
-      render: (text, record) => {
-        let textObj = {
-          value: text,
-          unit: '',
-          color: record.color || (themeMode === 'dark' ? '#fff' : '#000'),
-        };
-        const overrideProps = getOverridePropertiesByName(overrides, record.fields?.refId);
-        if (!_.isEmpty(overrideProps)) {
-          textObj = getSerieTextObj(record?.stat, overrideProps?.standardOptions, overrideProps?.valueMappings);
-        }
-        return (
-          <div
-            className='renderer-table-td-content'
-            style={{
-              color: colorMode === 'background' ? '#fff' : textObj?.color,
-              backgroundColor: colorMode === 'background' ? textObj.color : 'unset',
-            }}
-          >
+    sortOrder: getSortOrder('name', sortObj),
+    render: text => <div className='renderer-table-td-content'>{text}</div>,
+    ...getColumnSearchProps(['name'])
+  }, {
+    title: 'value',
+    dataIndex: 'text',
+    key: 'text',
+    sorter: (a, b) => {
+      return a.stat - b.stat;
+    },
+    sortOrder: getSortOrder('text', sortObj),
+    className: 'renderer-table-td-content-value-container',
+    render: (text, record) => {
+      const {
+        t
+      } = useTranslation();
+      let textObj = {
+        value: text,
+        unit: '',
+        color: record.color || (themeMode === 'dark' ? '#fff' : '#000')
+      };
+      const overrideProps = getOverridePropertiesByName(overrides, record.fields?.refId);
+
+      if (!_.isEmpty(overrideProps)) {
+        textObj = getSerieTextObj(record?.stat, overrideProps?.standardOptions, overrideProps?.valueMappings);
+      }
+
+      return <div className='renderer-table-td-content' style={{
+        color: colorMode === 'background' ? '#fff' : textObj?.color,
+        backgroundColor: colorMode === 'background' ? textObj.color : 'unset'
+      }}>
             {textObj.value}
             {textObj.unit}
-          </div>
-        );
-      },
-      ...getColumnSearchProps(['text']),
+          </div>;
     },
-  ];
+    ...getColumnSearchProps(['text'])
+  }];
 
   if (displayMode === 'labelsOfSeriesToRows') {
     const columnsKeys = _.isEmpty(columns) ? _.concat(getColumnsKeys(calculatedValues), 'value') : columns;
@@ -189,6 +209,7 @@ export default function Stat(props: IProps) {
           if (key === 'value') {
             return a.stat - b.stat;
           }
+
           return localeCompare(_.toString(_.get(a.metric, key)), _.toString(_.get(b.metric, key)));
         },
         sortOrder: getSortOrder(key, sortObj),
@@ -198,55 +219,49 @@ export default function Stat(props: IProps) {
             const textObj = {
               value: record?.value,
               unit: record?.unit,
-              color: record.color || (themeMode === 'dark' ? '#fff' : '#000'),
+              color: record.color || (themeMode === 'dark' ? '#fff' : '#000')
             };
-            return (
-              <div
-                className='renderer-table-td-content'
-                style={{
-                  color: colorMode === 'background' ? '#fff' : textObj?.color,
-                  backgroundColor: colorMode === 'background' ? textObj.color : 'unset',
-                }}
-              >
+            return <div className='renderer-table-td-content' style={{
+              color: colorMode === 'background' ? '#fff' : textObj?.color,
+              backgroundColor: colorMode === 'background' ? textObj.color : 'unset'
+            }}>
                 {textObj?.value}
                 {textObj?.unit}
-              </div>
-            );
+              </div>;
           }
+
           return <span title={_.get(record.metric, key)}>{_.get(record.metric, key)}</span>;
         },
-        ...getColumnSearchProps(['metric', key]),
+        ...getColumnSearchProps(['metric', key])
       };
     });
   }
 
   if (displayMode === 'labelValuesToRows' && aggrDimension) {
     tableDataSource = formatToTable(calculatedValues, aggrDimension, 'refId');
-    const groupNames = _.reduce(
-      tableDataSource,
-      (pre, item) => {
-        return _.union(_.concat(pre, item.groupNames));
+
+    const groupNames = _.reduce(tableDataSource, (pre, item) => {
+      return _.union(_.concat(pre, item.groupNames));
+    }, []);
+
+    tableColumns = [{
+      title: aggrDimension,
+      dataIndex: aggrDimension,
+      key: aggrDimension,
+      width: _.get(size, 'width') / (groupNames.length + 1),
+      sorter: (a, b) => {
+        return localeCompare(a[aggrDimension], b[aggrDimension]);
       },
-      [],
-    );
-    tableColumns = [
-      {
-        title: aggrDimension,
-        dataIndex: aggrDimension,
-        key: aggrDimension,
-        width: _.get(size, 'width') / (groupNames.length + 1),
-        sorter: (a, b) => {
-          return localeCompare(a[aggrDimension], b[aggrDimension]);
-        },
-        sortOrder: getSortOrder(aggrDimension, sortObj),
-        render: (text) => <div className='renderer-table-td-content'>{text}</div>,
-        ...getColumnSearchProps([aggrDimension]),
-      },
-    ];
+      sortOrder: getSortOrder(aggrDimension, sortObj),
+      render: text => <div className='renderer-table-td-content'>{text}</div>,
+      ...getColumnSearchProps([aggrDimension])
+    }];
+
     _.map(groupNames, (name, idx) => {
-      const result = _.find(tableDataSource, (item) => {
+      const result = _.find(tableDataSource, item => {
         return item[name];
       });
+
       tableColumns.push({
         title: result[name]?.name,
         dataIndex: name,
@@ -257,37 +272,30 @@ export default function Stat(props: IProps) {
         },
         sortOrder: getSortOrder(name, sortObj),
         className: 'renderer-table-td-content-value-container',
-        render: (text) => {
+        render: text => {
           let textObj = {
             value: text?.text,
             unit: '',
-            color: text?.color || (themeMode === 'dark' ? '#fff' : '#000'),
+            color: text?.color || (themeMode === 'dark' ? '#fff' : '#000')
           };
           const overrideProps = getOverridePropertiesByName(overrides, name);
+
           if (!_.isEmpty(overrideProps)) {
-            textObj = getSerieTextObj(
-              text?.stat,
-              {
-                ...(overrideProps?.standardOptions || {}),
-                unit: overrideProps?.standardOptions?.util, // TODO: 兼容性问题，后续需要修改
-              },
-              overrideProps?.valueMappings,
-            );
+            textObj = getSerieTextObj(text?.stat, { ...(overrideProps?.standardOptions || {}),
+              unit: overrideProps?.standardOptions?.util // TODO: 兼容性问题，后续需要修改
+
+            }, overrideProps?.valueMappings);
           }
-          return (
-            <div
-              className='renderer-table-td-content'
-              style={{
-                color: colorMode === 'background' ? '#fff' : textObj?.color,
-                backgroundColor: colorMode === 'background' ? textObj?.color : 'unset',
-              }}
-            >
+
+          return <div className='renderer-table-td-content' style={{
+            color: colorMode === 'background' ? '#fff' : textObj?.color,
+            backgroundColor: colorMode === 'background' ? textObj?.color : 'unset'
+          }}>
               {textObj?.value}
               {textObj?.unit}
-            </div>
-          );
+            </div>;
         },
-        ...getColumnSearchProps([name, 'text']),
+        ...getColumnSearchProps([name, 'text'])
       });
     });
   }
@@ -295,33 +303,25 @@ export default function Stat(props: IProps) {
   const headerHeight = showHeader ? 40 : 0;
   const height = _.get(size, 'height') - headerHeight;
   const realHeight = isNaN(height) ? 0 : height;
-
-  const { components, resizableColumns, tableWidth, resetColumns } = useAntdResizableHeader({
-    columns: useMemo(() => tableColumns, [JSON.stringify(columns), displayMode, JSON.stringify(calculatedValues), sortObj, themeMode, aggrDimension, overrides, size]),
+  const {
+    components,
+    resizableColumns,
+    tableWidth,
+    resetColumns
+  } = useAntdResizableHeader({
+    columns: useMemo(() => tableColumns, [JSON.stringify(columns), displayMode, JSON.stringify(calculatedValues), sortObj, themeMode, aggrDimension, overrides, size])
   });
-
-  return (
-    <div className='renderer-table-container' ref={eleRef}>
+  return <div className='renderer-table-container' ref={eleRef}>
       <div className='renderer-table-container-box'>
-        <Table
-          rowKey='id'
-          getPopupContainer={() => document.body}
-          showSorterTooltip={false}
-          showHeader={showHeader}
-          dataSource={tableDataSource}
-          columns={resizableColumns}
-          scroll={{ y: realHeight, x: tableWidth }}
-          bordered={false}
-          pagination={false}
-          onChange={(pagination, filters, sorter: any) => {
-            setSortObj({
-              sortColumn: sorter.columnKey,
-              sortOrder: sorter.order,
-            });
-          }}
-          components={components}
-        />
+        <Table rowKey='id' getPopupContainer={() => document.body} showSorterTooltip={false} showHeader={showHeader} dataSource={tableDataSource} columns={resizableColumns} scroll={{
+        y: realHeight,
+        x: tableWidth
+      }} bordered={false} pagination={false} onChange={(pagination, filters, sorter: any) => {
+        setSortObj({
+          sortColumn: sorter.columnKey,
+          sortOrder: sorter.order
+        });
+      }} components={components} />
       </div>
-    </div>
-  );
+    </div>;
 }

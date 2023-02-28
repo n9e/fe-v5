@@ -2,7 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import { Tag } from 'antd';
 import { DownOutlined, RightOutlined, PlusCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
-
+import { useTranslation } from 'react-i18next';
 interface IProps {
   style?: React.CSSProperties;
   fieldsSearch?: string;
@@ -12,33 +12,29 @@ interface IProps {
   onRemove?: (field: string) => void;
 }
 
-const titleMap = {
-  selected: '已选字段',
-  available: '可选字段',
-};
-
 const operIconMap = {
   selected: <CloseCircleOutlined />,
   available: <PlusCircleOutlined />,
 };
-
 export default function FieldsList(props: IProps) {
   const { style = {}, fieldsSearch, fields, type, onSelect, onRemove } = props;
   const [expanded, setExpanded] = React.useState<boolean>(true);
+  const { t } = useTranslation();
+  const titleMap = {
+    selected: t('已选字段'),
+    available: t('可选字段'),
+  };
   const filteredFields = _.filter(fields, (field) => {
     if (fieldsSearch) {
       return field.indexOf(fieldsSearch) > -1;
     }
+
     return true;
   });
 
   if ((!_.isEmpty(filteredFields) && type === 'selected') || type === 'available') {
     return (
-      <div
-        style={{
-          ...style,
-        }}
-      >
+      <div style={{ ...style }}>
         <div
           className='discover-fields-title'
           onClick={() => {
@@ -74,5 +70,6 @@ export default function FieldsList(props: IProps) {
       </div>
     );
   }
+
   return null;
 }

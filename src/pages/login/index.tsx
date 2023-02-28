@@ -21,7 +21,6 @@ import { useDispatch } from 'react-redux';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { getSsoConfig, getRedirectURL, getRedirectURLCAS, getRedirectURLOAuth } from '@/services/login';
 import './login.less';
-
 import { useTranslation } from 'react-i18next';
 export interface DisplayName {
   oidc: string;
@@ -29,7 +28,9 @@ export interface DisplayName {
   oauth: string;
 }
 export default function Login() {
-  const { t } = useTranslation();
+  const {
+    t
+  } = useTranslation();
   const [form] = Form.useForm();
   const history = useHistory();
   const location = useLocation();
@@ -38,16 +39,15 @@ export default function Login() {
   const [displayName, setDis] = useState<DisplayName>({
     oidc: 'OIDC',
     cas: 'CAS',
-    oauth: 'OAuth',
+    oauth: 'OAuth'
   });
-
   useEffect(() => {
-    getSsoConfig().then((res) => {
+    getSsoConfig().then(res => {
       if (res.dat) {
         setDis({
           oidc: res.dat.oidcDisplayName,
           cas: res.dat.casDisplayName,
-          oauth: res.dat.oauthDisplayName,
+          oauth: res.dat.oauthDisplayName
         });
       }
     });
@@ -63,11 +63,14 @@ export default function Login() {
   };
 
   const login = async () => {
-    let { username, password } = form.getFieldsValue();
+    let {
+      username,
+      password
+    } = form.getFieldsValue();
     const err = await dispatch({
       type: 'account/login',
       username,
-      password,
+      password
     });
 
     if (!err) {
@@ -75,41 +78,34 @@ export default function Login() {
     }
   };
 
-  return (
-    <div className='login-warp'>
+  return <div className='login-warp'>
       <img src={'/image/login-left-top-corner.png'} className='left-top-bg'></img>
       <img src={'/image/login-right-bottom-corner.png'} className='right-bottom-bg'></img>
       <div className='banner integration'>
-        <img src={'/image/login-dashboard.svg'} style={{ margin: '0 60px', zIndex: 5, width: 632 }}></img>
+        <img src={'/image/login-dashboard.svg'} style={{
+        margin: '0 60px',
+        zIndex: 5,
+        width: 632
+      }}></img>
       </div>
       <div className='login-panel'>
         <div className='login-main  integration'>
           <div className='login-title'>
-            <img src={'/image/logo-dark.svg'} style={{ width: '120px' }} />
+            <img src={'/image/logo-dark.svg'} style={{
+            width: '120px'
+          }} />
           </div>
           <Form form={form} layout='vertical' requiredMark={true}>
-            <Form.Item
-              label='账户'
-              name='username'
-              rules={[
-                {
-                  required: true,
-                  message: t('请输入用户名'),
-                },
-              ]}
-            >
+            <Form.Item label={t("账户")} name='username' rules={[{
+            required: true,
+            message: t('请输入用户名')
+          }]}>
               <Input placeholder={t('请输入用户名')} prefix={<UserOutlined className='site-form-item-icon' />} />
             </Form.Item>
-            <Form.Item
-              label='密码'
-              name='password'
-              rules={[
-                {
-                  required: true,
-                  message: t('请输入密码'),
-                },
-              ]}
-            >
+            <Form.Item label={t("密码")} name='password' rules={[{
+            required: true,
+            message: t('请输入密码')
+          }]}>
               <Input type='password' placeholder={t('请输入密码')} onPressEnter={handleSubmit} prefix={<LockOutlined className='site-form-item-icon' />} />
             </Form.Item>
 
@@ -119,53 +115,46 @@ export default function Login() {
               </Button>
             </Form.Item>
             <div className='login-other'>
-              <strong>其他登录方式：</strong>
-              <a
-                onClick={() => {
-                  getRedirectURL().then((res) => {
-                    if (res.dat) {
-                      window.location.href = res.dat;
-                    } else {
-                      message.warning('没有配置 OIDC 登录地址！');
-                    }
-                  });
-                }}
-              >
+              <strong>{t("其他登录方式：")}</strong>
+              <a onClick={() => {
+              getRedirectURL().then(res => {
+                if (res.dat) {
+                  window.location.href = res.dat;
+                } else {
+                  message.warning(t("没有配置 OIDC 登录地址！"));
+                }
+              });
+            }}>
                 {displayName.oidc}
               </a>
               &nbsp;&nbsp;
-              <a
-                onClick={() => {
-                  getRedirectURLCAS().then((res) => {
-                    if (res.dat) {
-                      window.location.href = res.dat.redirect;
-                      localStorage.setItem('CAS_state', res.dat.state);
-                    } else {
-                      message.warning('没有配置 CAS 登录地址！');
-                    }
-                  });
-                }}
-              >
+              <a onClick={() => {
+              getRedirectURLCAS().then(res => {
+                if (res.dat) {
+                  window.location.href = res.dat.redirect;
+                  localStorage.setItem('CAS_state', res.dat.state);
+                } else {
+                  message.warning(t("没有配置 CAS 登录地址！"));
+                }
+              });
+            }}>
                 {displayName.cas}
               </a>
               &nbsp;&nbsp;
-              <a
-                onClick={() => {
-                  getRedirectURLOAuth().then((res) => {
-                    if (res.dat) {
-                      window.location.href = res.dat;
-                    } else {
-                      message.warning('没有配置 OAuth 登录地址！');
-                    }
-                  });
-                }}
-              >
+              <a onClick={() => {
+              getRedirectURLOAuth().then(res => {
+                if (res.dat) {
+                  window.location.href = res.dat;
+                } else {
+                  message.warning(t("没有配置 OAuth 登录地址！"));
+                }
+              });
+            }}>
                 {displayName.oauth}
               </a>
             </div>
           </Form>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 }

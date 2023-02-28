@@ -8,7 +8,9 @@ import OperateForm from './components/operateForm';
 import './index.less';
 
 const StrategyEdit: React.FC = () => {
-  const { t } = useTranslation();
+  const {
+    t
+  } = useTranslation();
   const query = useQuery();
   const isClone = query.get('mode');
   const params: any = useParams();
@@ -26,11 +28,9 @@ const StrategyEdit: React.FC = () => {
     setCurStrategy(res.dat || {});
   };
 
-  return (
-    <PageLayout title={t('记录规则')} showBack hideCluster>
+  return <PageLayout title={t('记录规则')} showBack hideCluster>
       {curStrategy.id && <OperateForm detail={curStrategy} type={!isClone ? 1 : 2} />}
-    </PageLayout>
-  );
+    </PageLayout>;
 };
 
 export default StrategyEdit;

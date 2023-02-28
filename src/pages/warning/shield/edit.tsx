@@ -22,29 +22,28 @@ import { IshieldState } from '@/store/warningInterface/shield';
 import PageLayout from '@/components/pageLayout';
 import OperateForm from './components/operateForm';
 import { useTranslation } from 'react-i18next';
-
 import './index.less';
-
 function useQuery() {
-  const { search } = useLocation();
+  const {
+    search
+  } = useLocation();
   return React.useMemo(() => new URLSearchParams(search), [search]);
 }
-
 const EditShield: React.FC = () => {
-  const { t } = useTranslation();
+  const {
+    t
+  } = useTranslation();
   const history = useHistory();
-  const { curShieldData } = useSelector<RootState, IshieldState>((state) => state.shield);
+  const {
+    curShieldData
+  } = useSelector<RootState, IshieldState>(state => state.shield);
   if (!curShieldData.id) {
     history.push(`/alert-mutes`);
   }
   const query = useQuery();
   const isClone = query.get('mode');
-
-  return (
-    <PageLayout title={t('告警屏蔽')} showBack hideCluster>
+  return <PageLayout title={t('告警屏蔽')} showBack hideCluster>
       <div className='shield-add'>{curShieldData.id && <OperateForm detail={curShieldData} type={!isClone ? 1 : 2} />}</div>
-    </PageLayout>
-  );
+    </PageLayout>;
 };
-
 export default EditShield;

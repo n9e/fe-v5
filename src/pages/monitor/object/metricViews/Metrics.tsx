@@ -24,15 +24,21 @@ import { getMetricValues, getMetricsDesc } from '@/services/metricViews';
 import Graph from './Graph';
 import { IMatch } from '../types';
 import { getMatchStr } from './utils';
-
+import { useTranslation } from "react-i18next";
 interface IProps {
   range: IRawTimeRange;
   setRange: (range: IRawTimeRange) => void;
   match: IMatch;
 }
-
 export default function Metrics(props: IProps) {
-  const { range, setRange, match } = props;
+  const {
+    t
+  } = useTranslation();
+  const {
+    range,
+    setRange,
+    match
+  } = props;
   const [refreshFlag, setRefreshFlag] = useState(_.uniqueId('refreshFlag_'));
   const [search, setSearch] = useState('');
   const [metrics, setMetrics] = useState([]);
@@ -42,10 +48,16 @@ export default function Metrics(props: IProps) {
   const [selectedMetrics, setSelectedMetrics] = useState([]);
   const [step, setStep] = useState<number>();
   const matchStr = getMatchStr(match);
+
   const renderMetricList = (metrics = [], metricTabKey: string) => {
-    const filtered = _.filter(metrics, (metric) => {
+    const {
+      t
+    } = useTranslation();
+
+    const filtered = _.filter(metrics, metric => {
       let flag = true;
       flag = metricTabKey === 'all' ? true : metric.indexOf(metricTabKey) === 0;
+
       if (flag && search) {
         try {
           const reg = new RegExp(search, 'gi');
@@ -54,165 +66,128 @@ export default function Metrics(props: IProps) {
           flag = false;
         }
       }
+
       return flag;
     });
-    return (
-      <div className='tabPane' style={{ height: 240, overflow: 'auto' }}>
-        {filtered.length ? (
-          <ul className='n9e-metric-views-metrics-content' style={{ border: 'none' }}>
+
+    return <div className='tabPane' style={{
+      height: 240,
+      overflow: 'auto'
+    }}>
+        {filtered.length ? <ul className='n9e-metric-views-metrics-content' style={{
+        border: 'none'
+      }}>
             {_.map(filtered, (metric, i) => {
-              return (
-                <li
-                  className='item'
-                  key={i}
-                  onClick={() => {
-                    setSelectedMetrics(_.union(_.concat(metric, selectedMetrics)));
-                  }}
-                >
+          return <li className='item' key={i} onClick={() => {
+            setSelectedMetrics(_.union(_.concat(metric, selectedMetrics)));
+          }}>
                   <span>{metric}</span>
-                  {_.find(selectedMetrics, (sm) => sm === metric) ? <span style={{ marginLeft: 8 }}>+1</span> : null}
-                  {metricsDesc[metric] ? (
-                    <Tooltip title={metricsDesc[metric]}>
+                  {_.find(selectedMetrics, sm => sm === metric) ? <span style={{
+              marginLeft: 8
+            }}>+1</span> : null}
+                  {metricsDesc[metric] ? <Tooltip title={metricsDesc[metric]}>
                       <span className='desc'>{metricsDesc[metric]}</span>
-                    </Tooltip>
-                  ) : null}
-                </li>
-              );
-            })}
-          </ul>
-        ) : (
-          <div style={{ textAlign: 'center' }}>No data</div>
-        )}
-      </div>
-    );
+                    </Tooltip> : null}
+                </li>;
+        })}
+          </ul> : <div style={{
+        textAlign: 'center'
+      }}>No data</div>}
+      </div>;
   };
 
   useEffect(() => {
     if (matchStr) {
-      getMetricValues(matchStr, range).then((res) => {
+      getMetricValues(matchStr, range).then(res => {
         const _metrics = _.union(res);
-        const metricPrefixes = _.union(
-          _.compact(
-            _.map(_metrics, (m) => {
-              return _.get(_.split(m, '_'), '[0]');
-            }),
-          ),
-        );
+
+        const metricPrefixes = _.union(_.compact(_.map(_metrics, m => {
+          return _.get(_.split(m, '_'), '[0]');
+        })));
+
         setMetrics(_metrics);
         setMetricPrefixes(metricPrefixes);
-        getMetricsDesc(_metrics).then((res) => {
+        getMetricsDesc(_metrics).then(res => {
           setMetricsDesc(res);
         });
       });
     }
   }, [refreshFlag, matchStr]);
-
   useEffect(() => {
     setSelectedMetrics([]);
     setActiveKey('all');
     setMetrics([]);
   }, [match.id, matchStr]);
-
-  return (
-    <div className='n9e-metric-views-metrics'>
+  return <div className='n9e-metric-views-metrics'>
       <div>
         <div className='n9e-metric-views-metrics-header'>
-          <div className='metric-page-title'>监控指标</div>
-          <Input
-            prefix={<SearchOutlined />}
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-            }}
-            placeholder='搜索，空格分隔多个关键字'
-            addonAfter={
-              <SyncOutlined
-                style={{ cursor: 'pointer' }}
-                onClick={() => {
-                  setRefreshFlag(_.uniqueId('refreshFlag_'));
-                }}
-              />
-            }
-          />
+          <div className='metric-page-title'>{t("监控指标")}</div>
+          <Input prefix={<SearchOutlined />} value={search} onChange={e => {
+          setSearch(e.target.value);
+        }} placeholder={t("搜索，空格分隔多个关键字")} addonAfter={<SyncOutlined style={{
+          cursor: 'pointer'
+        }} onClick={() => {
+          setRefreshFlag(_.uniqueId('refreshFlag_'));
+        }} />} />
         </div>
         <div>
-          {metrics.length > 0 ? (
-            <>
-              <Card
-                size='small'
-                style={{ width: '100%' }}
-                tabList={_.map(['all', ...metricPrefixes], (item) => {
-                  return {
-                    key: item,
-                    tab: item,
-                  };
-                })}
-                activeTabKey={activeKey}
-                onTabChange={setActiveKey}
-              >
+          {metrics.length > 0 ? <>
+              <Card size='small' style={{
+            width: '100%'
+          }} tabList={_.map(['all', ...metricPrefixes], item => {
+            return {
+              key: item,
+              tab: item
+            };
+          })} activeTabKey={activeKey} onTabChange={setActiveKey}>
                 <div>{renderMetricList(metrics, activeKey)}</div>
               </Card>
-              <Row style={{ padding: '10px 0' }}>
+              <Row style={{
+            padding: '10px 0'
+          }}>
                 <Col span={8}>
                   <Space>
-                    <TimeRangePicker
-                      value={range}
-                      onChange={(e: IRawTimeRange) => {
-                        setRange(e);
-                      }}
-                    />
-                    <Resolution
-                      onChange={(v) => {
-                        setStep(v === null ? undefined : v);
-                      }}
-                      initialValue={step}
-                    />
-                    <Button
-                      style={{ padding: '4px 8px' }}
-                      onClick={() => {
-                        setRange({
-                          ...range,
-                          refreshFlag: _.uniqueId('refreshFlag_'),
-                        });
-                      }}
-                      icon={<SyncOutlined />}
-                    ></Button>
+                    <TimeRangePicker value={range} onChange={(e: IRawTimeRange) => {
+                  setRange(e);
+                }} />
+                    <Resolution onChange={v => {
+                  setStep(v === null ? undefined : v);
+                }} initialValue={step} />
+                    <Button style={{
+                  padding: '4px 8px'
+                }} onClick={() => {
+                  setRange({ ...range,
+                    refreshFlag: _.uniqueId('refreshFlag_')
+                  });
+                }} icon={<SyncOutlined />}></Button>
                   </Space>
                 </Col>
-                <Col span={16} style={{ textAlign: 'right' }}>
-                  <Button
-                    onClick={() => {
-                      setSelectedMetrics([]);
-                    }}
-                    disabled={!selectedMetrics.length}
-                    style={{ background: '#fff' }}
-                  >
-                    清空图表
-                  </Button>
+                <Col span={16} style={{
+              textAlign: 'right'
+            }}>
+                  <Button onClick={() => {
+                setSelectedMetrics([]);
+              }} disabled={!selectedMetrics.length} style={{
+                background: '#fff'
+              }}>
+                    {t("清空图表")}
+                 </Button>
                 </Col>
               </Row>
               {_.map(selectedMetrics, (metric, i) => {
-                return (
-                  <Graph
-                    key={metric}
-                    metric={metric}
-                    match={match}
-                    range={range}
-                    step={step}
-                    onClose={() => {
-                      const newselectedMetrics = [...selectedMetrics];
-                      newselectedMetrics.splice(i, 1);
-                      setSelectedMetrics(newselectedMetrics);
-                    }}
-                  />
-                );
-              })}
-            </>
-          ) : (
-            <div style={{ marginTop: 12 }}>暂无指标数据，请选择左侧 Lables</div>
-          )}
+            const {
+              t
+            } = useTranslation();
+            return <Graph key={metric} metric={metric} match={match} range={range} step={step} onClose={() => {
+              const newselectedMetrics = [...selectedMetrics];
+              newselectedMetrics.splice(i, 1);
+              setSelectedMetrics(newselectedMetrics);
+            }} />;
+          })}
+            </> : <div style={{
+          marginTop: 12
+        }}>{t("暂无指标数据，请选择左侧")} Labless</div>}
         </div>
       </div>
-    </div>
-  );
+    </div>;
 }

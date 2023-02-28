@@ -24,15 +24,24 @@ import Collapse, { Panel } from './Components/Collapse';
 import VariableConfig, { IVariable } from '../VariableConfig';
 import Renderer from '../Renderer/Renderer';
 import QueryEditor from './QueryEditor';
+import { useTranslation } from "react-i18next";
 
 function FormCpt(props, ref) {
+  const {
+    t
+  } = useTranslation();
   const [chartForm] = Form.useForm();
-  const { initialValues, cluster, range, id, step } = props;
+  const {
+    initialValues,
+    cluster,
+    range,
+    id,
+    step
+  } = props;
   const [variableConfigWithOptions, setVariableConfigWithOptions] = useState<IVariable[]>(props.variableConfigWithOptions);
-
   defaultValues.custom = defaultCustomValuesMap[initialValues?.type || defaultValues.type];
 
-  _.forEach(initialValues.targets, (item) => {
+  _.forEach(initialValues.targets, item => {
     if (_.get(item, 'time.unit')) {
       delete item.time;
     }
@@ -41,194 +50,186 @@ function FormCpt(props, ref) {
   useImperativeHandle(ref, () => ({
     getFormInstance: () => {
       return chartForm;
-    },
+    }
   }));
-
   useEffect(() => {
     setVariableConfigWithOptions(props.variableConfigWithOptions);
   }, [JSON.stringify(props.variableConfigWithOptions)]);
-
-  return (
-    <Form layout='vertical' form={chartForm} initialValues={_.merge({}, defaultValues, initialValues)}>
+  return <Form layout='vertical' form={chartForm} initialValues={_.merge({}, defaultValues, initialValues)}>
       <Form.Item name='type' hidden />
       <Form.Item name='id' hidden />
       <Form.Item name='layout' hidden />
       <Form.Item name='version' hidden />
-      <div
-        style={{
-          height: 'calc(100vh - 173px)',
-        }}
-      >
-        <Row
-          gutter={20}
-          style={{
-            flexWrap: 'nowrap',
-            height: '100%',
-          }}
-        >
-          <Col flex={1} style={{ minWidth: 100 }}>
-            <div style={{ marginBottom: 10, height: 300 }}>
+      <div style={{
+      height: 'calc(100vh - 173px)'
+    }}>
+        <Row gutter={20} style={{
+        flexWrap: 'nowrap',
+        height: '100%'
+      }}>
+          <Col flex={1} style={{
+          minWidth: 100
+        }}>
+            <div style={{
+            marginBottom: 10,
+            height: 300
+          }}>
               <Form.Item shouldUpdate noStyle>
-                {({ getFieldsValue }) => {
-                  return <Renderer dashboardId={id} time={range} step={step} values={getFieldsValue()} variableConfig={variableConfigWithOptions} isPreview />;
-                }}
+                {({
+                getFieldsValue
+              }) => {
+                const {
+                  t
+                } = useTranslation();
+                return <Renderer dashboardId={id} time={range} step={step} values={getFieldsValue()} variableConfig={variableConfigWithOptions} isPreview />;
+              }}
               </Form.Item>
             </div>
             <Form.Item shouldUpdate={(prevValues, curValues) => prevValues.type !== curValues.type} noStyle>
-              {({ getFieldValue }) => {
-                const type = getFieldValue('type');
-                if (type !== 'text') {
-                  return (
-                    <div style={{ height: 'calc(100% - 310px)', overflowY: 'auto' }}>
-                      <div style={{ marginBottom: 10 }}>
-                        <VariableConfig
-                          onChange={(value, bool, withOptions) => {
-                            setVariableConfigWithOptions(withOptions || []);
-                          }}
-                          value={variableConfigWithOptions}
-                          editable={false}
-                          cluster={cluster}
-                          range={range}
-                          id={id}
-                        />
+              {({
+              getFieldValue
+            }) => {
+              const type = getFieldValue('type');
+
+              if (type !== 'text') {
+                return <div style={{
+                  height: 'calc(100% - 310px)',
+                  overflowY: 'auto'
+                }}>
+                      <div style={{
+                    marginBottom: 10
+                  }}>
+                        <VariableConfig onChange={(value, bool, withOptions) => {
+                      setVariableConfigWithOptions(withOptions || []);
+                    }} value={variableConfigWithOptions} editable={false} cluster={cluster} range={range} id={id} />
                       </div>
                       <QueryEditor chartForm={chartForm} defaultDatasourceName={cluster} />
-                    </div>
-                  );
-                }
-              }}
+                    </div>;
+              }
+            }}
             </Form.Item>
           </Col>
-          <Col flex='600px' style={{ overflowY: 'auto' }}>
+          <Col flex='600px' style={{
+          overflowY: 'auto'
+        }}>
             <Collapse>
-              <Panel header='面板配置'>
+              <Panel header={t("面板配置")}>
                 <>
-                  <Form.Item label={'标题'} name='name'>
+                  <Form.Item label={t("标题")} name='name'>
                     <Mentions prefix='$' split=''>
-                      {_.map(variableConfigWithOptions, (item) => {
-                        return (
-                          <Mentions.Option key={item.name} value={item.name}>
+                      {_.map(variableConfigWithOptions, item => {
+                      const {
+                        t
+                      } = useTranslation();
+                      return <Mentions.Option key={item.name} value={item.name}>
                             {item.name}
-                          </Mentions.Option>
-                        );
-                      })}
+                          </Mentions.Option>;
+                    })}
                     </Mentions>
                   </Form.Item>
-                  <Form.Item label={'下钻链接'} style={{ marginBottom: 0 }}>
+                  <Form.Item label={t("下钻链接")} style={{
+                  marginBottom: 0
+                }}>
                     <Form.List name={'links'}>
-                      {(fields, { add, remove }) => (
-                        <>
-                          <Button
-                            style={{ width: '100%', marginBottom: 10 }}
-                            onClick={() => {
-                              add({});
-                            }}
-                          >
-                            添加
-                          </Button>
-                          {fields.map(({ key, name, ...restField }) => {
-                            return (
-                              <Space
-                                key={key}
-                                style={{
-                                  alignItems: 'flex-start',
-                                }}
-                              >
-                                <Form.Item
-                                  {...restField}
-                                  name={[name, 'title']}
-                                  rules={[
-                                    {
-                                      required: true,
-                                      message: '链接名称',
-                                    },
-                                  ]}
-                                >
-                                  <Mentions prefix='$' split='' placeholder='链接名称'>
-                                    {_.map(variableConfigWithOptions, (item) => {
-                                      return (
-                                        <Mentions.Option key={item.name} value={item.name}>
+                      {(fields, {
+                      add,
+                      remove
+                    }) => <>
+                          <Button style={{
+                        width: '100%',
+                        marginBottom: 10
+                      }} onClick={() => {
+                        add({});
+                      }}>
+                            {t("添加")}
+                         </Button>
+                          {fields.map(({
+                        key,
+                        name,
+                        ...restField
+                      }) => {
+                        return <Space key={key} style={{
+                          alignItems: 'flex-start'
+                        }}>
+                                <Form.Item {...restField} name={[name, 'title']} rules={[{
+                            required: true,
+                            message: t("链接名称")
+                          }]}>
+                                  <Mentions prefix='$' split='' placeholder={t("链接名称")}>
+                                    {_.map(variableConfigWithOptions, item => {
+                                return <Mentions.Option key={item.name} value={item.name}>
                                           {item.name}
-                                        </Mentions.Option>
-                                      );
-                                    })}
+                                        </Mentions.Option>;
+                              })}
                                   </Mentions>
                                 </Form.Item>
-                                <Form.Item
-                                  {...restField}
-                                  name={[name, 'url']}
-                                  rules={[
-                                    {
-                                      required: true,
-                                      message: '链接地址',
-                                    },
-                                  ]}
-                                >
-                                  <Mentions prefix='$' split='' style={{ width: 260 }} placeholder='链接地址'>
-                                    {_.map(variableConfigWithOptions, (item) => {
-                                      return (
-                                        <Mentions.Option key={item.name} value={item.name}>
+                                <Form.Item {...restField} name={[name, 'url']} rules={[{
+                            required: true,
+                            message: t("链接地址")
+                          }]}>
+                                  <Mentions prefix='$' split='' style={{
+                              width: 260
+                            }} placeholder={t("链接地址")}>
+                                    {_.map(variableConfigWithOptions, item => {
+                                return <Mentions.Option key={item.name} value={item.name}>
                                           {item.name}
-                                        </Mentions.Option>
-                                      );
-                                    })}
+                                        </Mentions.Option>;
+                              })}
                                   </Mentions>
                                 </Form.Item>
-                                <Tooltip title='是否新窗口打开'>
+                                <Tooltip title={t("是否新窗口打开")}>
                                   <Form.Item {...restField} name={[name, 'targetBlank']} valuePropName='checked'>
                                     <Switch />
                                   </Form.Item>
                                 </Tooltip>
-                                <Button
-                                  icon={<DeleteOutlined />}
-                                  onClick={() => {
-                                    remove(name);
-                                  }}
-                                />
-                              </Space>
-                            );
-                          })}
-                        </>
-                      )}
+                                <Button icon={<DeleteOutlined />} onClick={() => {
+                            remove(name);
+                          }} />
+                              </Space>;
+                      })}
+                        </>}
                     </Form.List>
                   </Form.Item>
-                  <Form.Item label='备注' name='description'>
-                    <Mentions prefix='$' split='' rows={3} placeholder='支持 markdown'>
-                      {_.map(variableConfigWithOptions, (item) => {
-                        return (
-                          <Mentions.Option key={item.name} value={item.name}>
+                  <Form.Item label={t("备注")} name='description'>
+                    <Mentions prefix='$' split='' rows={3} placeholder={t("支持 markdown")}>
+                      {_.map(variableConfigWithOptions, item => {
+                      const {
+                        t
+                      } = useTranslation();
+                      return <Mentions.Option key={item.name} value={item.name}>
                             {item.name}
-                          </Mentions.Option>
-                        );
-                      })}
+                          </Mentions.Option>;
+                    })}
                     </Mentions>
                   </Form.Item>
                   <AntdCollapse ghost defaultActiveKey={[]}>
-                    <AntdCollapse.Panel header='图表重复' key='1' forceRender>
+                    <AntdCollapse.Panel header={t("图表重复")} key='1' forceRender>
                       <Row gutter={10}>
                         <Col span={12}>
-                          <Form.Item label='变量' name='repeat' tooltip='对所选变量的每个值重复此面板'>
+                          <Form.Item label={t("变量")} name='repeat' tooltip={t("对所选变量的每个值重复此面板")}>
                             <Select allowClear>
-                              {_.map(variableConfigWithOptions, (item) => {
-                                return (
-                                  <Select.Option key={item.name} value={item.name}>
+                              {_.map(variableConfigWithOptions, item => {
+                              const {
+                                t
+                              } = useTranslation();
+                              return <Select.Option key={item.name} value={item.name}>
                                     {item.name}
-                                  </Select.Option>
-                                );
-                              })}
+                                  </Select.Option>;
+                            })}
                             </Select>
                           </Form.Item>
                         </Col>
                         <Col span={12}>
-                          <Form.Item label='每行最多显示' name='maxPerRow' initialValue={4}>
+                          <Form.Item label={t("每行最多显示")} name='maxPerRow' initialValue={4}>
                             <Select allowClear>
-                              {_.map([2, 3, 4, 6, 8, 12], (item) => {
-                                return (
-                                  <Select.Option key={item} value={item}>
+                              {_.map([2, 3, 4, 6, 8, 12], item => {
+                              const {
+                                t
+                              } = useTranslation();
+                              return <Select.Option key={item} value={item}>
                                     {item}
-                                  </Select.Option>
-                                );
-                              })}
+                                  </Select.Option>;
+                            })}
                             </Select>
                           </Form.Item>
                         </Col>
@@ -238,16 +239,20 @@ function FormCpt(props, ref) {
                 </>
               </Panel>
               <Form.Item shouldUpdate={(prevValues, curValues) => !_.isEqual(prevValues.targets, curValues.targets)}>
-                {({ getFieldValue }) => {
-                  return <Options type={getFieldValue('type')} targets={getFieldValue('targets')} chartForm={chartForm} variableConfigWithOptions={variableConfigWithOptions} />;
-                }}
+                {({
+                getFieldValue
+              }) => {
+                const {
+                  t
+                } = useTranslation();
+                return <Options type={getFieldValue('type')} targets={getFieldValue('targets')} chartForm={chartForm} variableConfigWithOptions={variableConfigWithOptions} />;
+              }}
               </Form.Item>
             </Collapse>
           </Col>
         </Row>
       </div>
-    </Form>
-  );
+    </Form>;
 }
 
 export default forwardRef(FormCpt);

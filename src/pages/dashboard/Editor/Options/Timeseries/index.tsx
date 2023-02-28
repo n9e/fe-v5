@@ -20,15 +20,16 @@ import Legend from '../../Fields/Legend';
 import GraphStyles from './GraphStyles';
 import StandardOptions from '../../Fields/StandardOptions';
 import Thresholds from '../../Fields/Thresholds';
-
+import { useTranslation } from "react-i18next";
 export default function Timeseries() {
-  return (
-    <>
+  const {
+    t
+  } = useTranslation();
+  return <>
       <Tooltip />
       <Legend />
       <GraphStyles />
       <StandardOptions />
       <Thresholds />
-    </>
-  );
+    </>;
 }

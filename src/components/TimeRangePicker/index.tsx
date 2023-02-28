@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+
 /**
  * 时间选择器组件
  * 时间范围默认值：如果开启了本地缓存，需要调用 getDefaultValue(localKey: string, defaultValue: IRawTimeRange) 来获取真实的默认值
@@ -26,34 +27,33 @@ import { parseRange, parse, valueAsString, isMathString, timeRangeUnix, describe
 import { ITimeRangePickerProps } from './types';
 import { mapOptionToRelativeTimeRange, mapRelativeTimeRangeToOption } from './RelativeTimeRangePicker/utils';
 import RelativeTimeRangePicker from './RelativeTimeRangePicker';
-
+import { useTranslation } from "react-i18next";
 export default function index(props: ITimeRangePickerProps) {
-  const { localKey, dateFormat = 'YYYY-MM-DD HH:mm', onChange } = props;
+  const {
+    t
+  } = useTranslation();
+  const {
+    localKey,
+    dateFormat = 'YYYY-MM-DD HH:mm',
+    onChange
+  } = props;
+  return <TimeRangePicker {...props} onChange={val => {
+    if (localKey) {
+      localStorage.setItem(localKey, JSON.stringify({
+        start: valueAsString(val.start, dateFormat),
+        end: valueAsString(val.end, dateFormat)
+      }));
+    }
 
-  return (
-    <TimeRangePicker
-      {...props}
-      onChange={(val) => {
-        if (localKey) {
-          localStorage.setItem(
-            localKey,
-            JSON.stringify({
-              start: valueAsString(val.start, dateFormat),
-              end: valueAsString(val.end, dateFormat),
-            }),
-          );
-        }
-        if (onChange) {
-          onChange(val);
-        }
-      }}
-    />
-  );
+    if (onChange) {
+      onChange(val);
+    }
+  }} />;
 }
-
 export type { IRawTimeRange } from './types';
 export function getDefaultValue(localKey: string, defaultValue: IRawTimeRange) {
   const localeValue = localStorage.getItem(localKey);
+
   if (localeValue) {
     try {
       return JSON.parse(localeValue);
@@ -61,16 +61,7 @@ export function getDefaultValue(localKey: string, defaultValue: IRawTimeRange) {
       return defaultValue;
     }
   }
+
   return defaultValue;
 }
-export {
-  TimeRangePickerWithRefresh,
-  RelativeTimeRangePicker,
-  parseRange,
-  parse,
-  isMathString,
-  timeRangeUnix,
-  describeTimeRange,
-  mapOptionToRelativeTimeRange,
-  mapRelativeTimeRangeToOption,
-};
+export { TimeRangePickerWithRefresh, RelativeTimeRangePicker, parseRange, parse, isMathString, timeRangeUnix, describeTimeRange, mapOptionToRelativeTimeRange, mapRelativeTimeRangeToOption };

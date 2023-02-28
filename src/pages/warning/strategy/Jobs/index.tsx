@@ -7,45 +7,45 @@ import PageLayout from '@/components/pageLayout';
 import { getBrainJobs } from '@/services/warning';
 import Graph from './Graph';
 import './style.less';
-
-const typeMap = {
-  total: {
-    border: '#9684C6',
-    bg: '#EBE8F2',
-    text: '总曲线数',
-    title: '所有曲线',
-  },
-  success: {
-    border: '#83D35C',
-    bg: '#E8F4E3',
-    text: '训练成功',
-    title: '训练成功',
-    status: 1,
-  },
-  fail: {
-    border: '#EE5A52',
-    bg: '#FCE7E6',
-    text: '训练失败',
-    title: '训练失败',
-    status: 2,
-  },
-  training: {
-    border: '#CCCCCC',
-    bg: '#F4F4F4',
-    text: '训练中',
-    title: '训练中',
-    status: 0,
-  },
-};
+import { useTranslation } from 'react-i18next';
 
 export default function Jobs() {
+  const { t } = useTranslation();
+  const typeMap = {
+    total: {
+      border: '#9684C6',
+      bg: '#EBE8F2',
+      text: t('总曲线数'),
+      title: t('所有曲线'),
+    },
+    success: {
+      border: '#83D35C',
+      bg: '#E8F4E3',
+      text: t('训练成功'),
+      title: t('训练成功'),
+      status: 1,
+    },
+    fail: {
+      border: '#EE5A52',
+      bg: '#FCE7E6',
+      text: t('训练失败'),
+      title: t('训练失败'),
+      status: 2,
+    },
+    training: {
+      border: '#CCCCCC',
+      bg: '#F4F4F4',
+      text: t('训练中'),
+      title: t('训练中'),
+      status: 0,
+    },
+  };
   const [data, setData] = useState<any>({});
   const [jobs, setJobs] = useState<any[]>([]);
   const [search, setSearch] = useState<string>('');
   const [graphParams, setGraphParams] = useState<any>({});
   const [activeType, setActiveType] = useState<string>('total');
   const params: any = useParams();
-
   useEffect(() => {
     getBrainJobs(params.id).then((res) => {
       setData({
@@ -57,13 +57,17 @@ export default function Jobs() {
       setJobs(res.jobs);
     });
   }, [params.id]);
-
   return (
-    <PageLayout title='训练结果' showBack hideCluster>
+    <PageLayout title={t('训练结果')} showBack hideCluster>
       <div className='strategy-jobs-content'>
-        <div style={{ padding: 16 }}>
+        <div
+          style={{
+            padding: 16,
+          }}
+        >
           <Row gutter={16}>
             {_.map(data, (value, key) => {
+              const { t } = useTranslation();
               return (
                 <Col key={key} span={6}>
                   <div
@@ -117,7 +121,9 @@ export default function Jobs() {
             })}
           </Row>
           <Table
-            style={{ marginTop: 6 }}
+            style={{
+              marginTop: 6,
+            }}
             rowKey='uuid'
             showHeader
             title={() => <h3>{typeMap[activeType].title}</h3>}
@@ -149,13 +155,14 @@ export default function Jobs() {
                 key: 'promql',
               },
               {
-                title: '结果',
+                title: t('结果'),
                 dataIndex: 'train_detail',
                 key: 'train_detail',
               },
               {
-                title: '操作',
+                title: t('操作'),
                 render: (record) => {
+                  const { t } = useTranslation();
                   if (record.status === 2) return null;
                   return (
                     <a
@@ -167,7 +174,7 @@ export default function Jobs() {
                         });
                       }}
                     >
-                      曲线详情
+                      {t('曲线详情')}
                     </a>
                   );
                 },
@@ -175,11 +182,20 @@ export default function Jobs() {
             ]}
             locale={{
               emptyText: () => {
+                const { t } = useTranslation();
                 if (data.total === 0 || (data.total !== 0 && data.training !== 0)) {
                   return (
-                    <div style={{ padding: '20px 0' }}>
-                      <LoadingOutlined style={{ fontSize: 24 }} />
-                      <div>曲线模型训练中</div>
+                    <div
+                      style={{
+                        padding: '20px 0',
+                      }}
+                    >
+                      <LoadingOutlined
+                        style={{
+                          fontSize: 24,
+                        }}
+                      />
+                      <div>{t('曲线模型训练中')}</div>
                     </div>
                   );
                 }

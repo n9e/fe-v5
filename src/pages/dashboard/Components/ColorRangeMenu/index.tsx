@@ -19,35 +19,34 @@ import _ from 'lodash';
 import { Menu } from 'antd';
 import { colors } from './config';
 import './style.less';
-
+import { useTranslation } from "react-i18next";
 interface IProps {
   onClick: (e: any) => void;
   selectedKeys: string[];
 }
-
 export default function index(props: IProps) {
-  const { onClick, selectedKeys } = props;
-  return (
-    <Menu prefixCls='ant-dropdown-menu' onClick={onClick} selectedKeys={selectedKeys} className='color-scales'>
-      {_.map(colors, (item) => {
-        return (
-          <Menu.Item key={item.value} className='color-scales-menu-item'>
+  const {
+    t
+  } = useTranslation();
+  const {
+    onClick,
+    selectedKeys
+  } = props;
+  return <Menu prefixCls='ant-dropdown-menu' onClick={onClick} selectedKeys={selectedKeys} className='color-scales'>
+      {_.map(colors, item => {
+      const {
+        t
+      } = useTranslation();
+      return <Menu.Item key={item.value} className='color-scales-menu-item'>
             <span className='color-scales-menu-colors'>
-              {_.map(item.value, (color) => {
-                return (
-                  <span
-                    key={color}
-                    style={{
-                      backgroundColor: color,
-                    }}
-                  />
-                );
-              })}
+              {_.map(item.value, color => {
+            return <span key={color} style={{
+              backgroundColor: color
+            }} />;
+          })}
             </span>
             {item.label}
-          </Menu.Item>
-        );
-      })}
-    </Menu>
-  );
+          </Menu.Item>;
+    })}
+    </Menu>;
 }

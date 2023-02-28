@@ -18,40 +18,41 @@ import React from 'react';
 import { Form, Radio, Row, Col } from 'antd';
 import _ from 'lodash';
 import { Panel } from '../../Components/Collapse';
-
+import { useTranslation } from "react-i18next";
 export default function index() {
+  const {
+    t
+  } = useTranslation();
   const namePrefix = ['options', 'legend'];
-
-  return (
-    <Panel header='Legend'>
+  return <Panel header='Legend'>
       <Row>
         <Col span={12}>
-          <Form.Item label='显示模式' name={[...namePrefix, 'displayMode']}>
+          <Form.Item label={t("显示模式")} name={[...namePrefix, 'displayMode']}>
             <Radio.Group buttonStyle='solid'>
-              <Radio.Button value='table'>表格</Radio.Button>
-              <Radio.Button value='list'>列表</Radio.Button>
-              <Radio.Button value='hidden'>关闭</Radio.Button>
+              <Radio.Button value='table'>{t("表格")}</Radio.Button>
+              <Radio.Button value='list'>{t("列表")}</Radio.Button>
+              <Radio.Button value='hidden'>{t("关闭")}</Radio.Button>
             </Radio.Group>
           </Form.Item>
         </Col>
         <Col span={12}>
           <Form.Item noStyle shouldUpdate={(prevValues, curValues) => _.get(prevValues, [...namePrefix, 'displayMode']) !== _.get(curValues, [...namePrefix, 'displayMode'])}>
-            {({ getFieldValue }) => {
-              if (getFieldValue([...namePrefix, 'displayMode']) === 'list') {
-                return (
-                  <Form.Item label='位置' name={[...namePrefix, 'placement']}>
+            {({
+            getFieldValue
+          }) => {
+            if (getFieldValue([...namePrefix, 'displayMode']) === 'list') {
+              return <Form.Item label={t("位置")} name={[...namePrefix, 'placement']}>
                     <Radio.Group buttonStyle='solid'>
                       <Radio.Button value='bottom'>bottom</Radio.Button>
                       <Radio.Button value='right'>right</Radio.Button>
                     </Radio.Group>
-                  </Form.Item>
-                );
-              }
-              return null;
-            }}
+                  </Form.Item>;
+            }
+
+            return null;
+          }}
           </Form.Item>
         </Col>
       </Row>
-    </Panel>
-  );
+    </Panel>;
 }

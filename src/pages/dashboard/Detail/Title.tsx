@@ -27,7 +27,7 @@ import { AddPanelIcon } from '../config';
 import { visualizations } from '../Editor/config';
 import { getStepByTimeAndStep } from '../utils';
 import { dashboardTimeCacheKey } from './Detail';
-
+import { useTranslation } from "react-i18next";
 interface IProps {
   curCluster: string;
   clusters: string[];
@@ -43,169 +43,159 @@ interface IProps {
   onAddPanel: (type: string) => void;
   isPreview: boolean;
 }
-
 export default function Title(props: IProps) {
-  const { curCluster, clusters, setCurCluster, dashboard, setDashboard, refresh, range, setRange, step, setStep, refreshRef, onAddPanel, isPreview } = props;
-  const { id, name } = dashboard;
+  const {
+    t
+  } = useTranslation();
+  const {
+    curCluster,
+    clusters,
+    setCurCluster,
+    dashboard,
+    setDashboard,
+    refresh,
+    range,
+    setRange,
+    step,
+    setStep,
+    refreshRef,
+    onAddPanel,
+    isPreview
+  } = props;
+  const {
+    id,
+    name
+  } = dashboard;
   const history = useHistory();
   const location = useLocation();
   const query = querystring.parse(location.search);
-  const { viewMode, themeMode } = query;
+  const {
+    viewMode,
+    themeMode
+  } = query;
   const [titleEditing, setTitleEditing] = useState(false);
   const titleRef = useRef<any>(null);
-  const handleModifyTitle = async (newName) => {
-    updateDashboard(id, { ...dashboard, name: newName }).then(() => {
-      setDashboard({ ...dashboard, name: newName });
+
+  const handleModifyTitle = async newName => {
+    updateDashboard(id, { ...dashboard,
+      name: newName
+    }).then(() => {
+      setDashboard({ ...dashboard,
+        name: newName
+      });
       setTitleEditing(false);
     });
   };
 
-  return (
-    <div className='dashboard-detail-header'>
+  return <div className='dashboard-detail-header'>
       <div className='dashboard-detail-header-left'>
         {!isPreview && <RollbackOutlined className='back' onClick={() => history.push('/dashboards')} />}
-        {titleEditing ? (
-          <Input
-            ref={titleRef}
-            defaultValue={name}
-            onPressEnter={(e: any) => {
-              handleModifyTitle(e.target.value);
-            }}
-          />
+        {titleEditing ? <Input ref={titleRef} defaultValue={name} onPressEnter={(e: any) => {
+        handleModifyTitle(e.target.value);
+      }} /> : <div className='title'>{dashboard.name}</div>}
+        {
+        /* {!titleEditing ? (
+         !isPreview ? (
+           <EditOutlined
+             className='edit'
+             onClick={() => {
+               setTitleEditing(!titleEditing);
+             }}
+           />
+         ) : null
         ) : (
-          <div className='title'>{dashboard.name}</div>
-        )}
-        {/* {!titleEditing ? (
-          !isPreview ? (
-            <EditOutlined
-              className='edit'
-              onClick={() => {
-                setTitleEditing(!titleEditing);
-              }}
-            />
-          ) : null
-        ) : (
-          <>
-            <Button size='small' style={{ marginRight: 5, marginLeft: 5 }} onClick={() => setTitleEditing(false)}>
-              取消
-            </Button>
-            <Button
-              size='small'
-              type='primary'
-              onClick={() => {
-                handleModifyTitle(titleRef.current.state.value);
-              }}
-            >
-              保存
-            </Button>
-          </>
-        )} */}
+         <>
+           <Button size='small' style={{ marginRight: 5, marginLeft: 5 }} onClick={() => setTitleEditing(false)}>
+             取消
+           </Button>
+           <Button
+             size='small'
+             type='primary'
+             onClick={() => {
+               handleModifyTitle(titleRef.current.state.value);
+             }}
+           >
+             保存
+           </Button>
+         </>
+        )} */
+      }
       </div>
       <div className='dashboard-detail-header-right'>
         <Space>
           <div>
-            {!isPreview && (
-              <Dropdown
-                trigger={['click']}
-                overlay={
-                  <Menu>
-                    {_.map([{ type: 'row', name: '分组' }, ...visualizations], (item) => {
-                      return (
-                        <Menu.Item
-                          key={item.type}
-                          onClick={() => {
-                            onAddPanel(item.type);
-                          }}
-                        >
+            {!isPreview && <Dropdown trigger={['click']} overlay={<Menu>
+                    {_.map([{
+              type: 'row',
+              name: t("分组")
+            }, ...visualizations], item => {
+              const {
+                t
+              } = useTranslation();
+              return <Menu.Item key={item.type} onClick={() => {
+                onAddPanel(item.type);
+              }}>
                           {item.name}
-                        </Menu.Item>
-                      );
-                    })}
-                  </Menu>
-                }
-              >
+                        </Menu.Item>;
+            })}
+                  </Menu>}>
                 <Button type='primary' icon={<AddPanelIcon />}>
-                  添加图表
-                </Button>
-              </Dropdown>
-            )}
+                  {t("添加图表")}
+               </Button>
+              </Dropdown>}
           </div>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            集群：
-            {isPreview ? (
-              curCluster
-            ) : (
-              <Dropdown
-                overlay={
-                  <Menu selectedKeys={[curCluster]}>
-                    {clusters.map((cluster) => (
-                      <Menu.Item
-                        key={cluster}
-                        onClick={(_) => {
-                          setCurCluster(cluster);
-                          localStorage.setItem('curCluster', cluster);
-                          refresh();
-                        }}
-                      >
+          <div style={{
+          display: 'flex',
+          alignItems: 'center'
+        }}>
+            {t("集群：")}
+           {isPreview ? curCluster : <Dropdown overlay={<Menu selectedKeys={[curCluster]}>
+                    {clusters.map(cluster => <Menu.Item key={cluster} onClick={_ => {
+              setCurCluster(cluster);
+              localStorage.setItem('curCluster', cluster);
+              refresh();
+            }}>
                         {cluster}
-                      </Menu.Item>
-                    ))}
-                  </Menu>
-                }
-              >
+                      </Menu.Item>)}
+                  </Menu>}>
                 <Button>
                   {curCluster} <DownOutlined />
                 </Button>
-              </Dropdown>
-            )}
+              </Dropdown>}
           </div>
-          <TimeRangePickerWithRefresh
-            localKey={dashboardTimeCacheKey}
-            dateFormat='YYYY-MM-DD HH:mm:ss'
-            refreshTooltip={`刷新间隔小于 step(${getStepByTimeAndStep(range, step)}s) 将不会更新数据`}
-            value={range}
-            onChange={setRange}
-          />
-          <Resolution onChange={(v) => setStep(v)} initialValue={step} />
-          {!isPreview && (
-            <Button
-              onClick={() => {
-                const newQuery = _.omit(query, ['viewMode', 'themeMode']);
-                if (!viewMode) {
-                  newQuery.viewMode = 'fullscreen';
-                }
-                history.replace({
-                  pathname: location.pathname,
-                  search: querystring.stringify(newQuery),
-                });
-                // TODO: 解决大盘 layout resize 问题
-                setTimeout(() => {
-                  window.dispatchEvent(new Event('resize'));
-                }, 500);
-              }}
-            >
-              {viewMode === 'fullscreen' ? '关闭全屏' : '全屏'}
-            </Button>
-          )}
-          {viewMode === 'fullscreen' && (
-            <Switch
-              checkedChildren='dark'
-              unCheckedChildren='light'
-              checked={themeMode === 'dark'}
-              onChange={(checked) => {
-                const newQuery = _.omit(query, ['themeMode']);
-                if (checked) {
-                  newQuery.themeMode = 'dark';
-                }
-                history.replace({
-                  pathname: location.pathname,
-                  search: querystring.stringify(newQuery),
-                });
-              }}
-            />
-          )}
+          <TimeRangePickerWithRefresh localKey={dashboardTimeCacheKey} dateFormat='YYYY-MM-DD HH:mm:ss' refreshTooltip={`${t("刷新间隔小于 step(")}${getStepByTimeAndStep(range, step)}${t("s) 将不会更新数据")}`} value={range} onChange={setRange} />
+          <Resolution onChange={v => setStep(v)} initialValue={step} />
+          {!isPreview && <Button onClick={() => {
+          const newQuery = _.omit(query, ['viewMode', 'themeMode']);
+
+          if (!viewMode) {
+            newQuery.viewMode = 'fullscreen';
+          }
+
+          history.replace({
+            pathname: location.pathname,
+            search: querystring.stringify(newQuery)
+          }); // TODO: 解决大盘 layout resize 问题
+
+          setTimeout(() => {
+            window.dispatchEvent(new Event('resize'));
+          }, 500);
+        }}>
+              {viewMode === 'fullscreen' ? t("关闭全屏") : t("全屏")}
+            </Button>}
+          {viewMode === 'fullscreen' && <Switch checkedChildren='dark' unCheckedChildren='light' checked={themeMode === 'dark'} onChange={checked => {
+          const newQuery = _.omit(query, ['themeMode']);
+
+          if (checked) {
+            newQuery.themeMode = 'dark';
+          }
+
+          history.replace({
+            pathname: location.pathname,
+            search: querystring.stringify(newQuery)
+          });
+        }} />}
         </Space>
       </div>
-    </div>
-  );
+    </div>;
 }

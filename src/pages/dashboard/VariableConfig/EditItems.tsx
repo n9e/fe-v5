@@ -22,7 +22,7 @@ import _ from 'lodash';
 import { IRawTimeRange } from '@/components/TimeRangePicker';
 import EditItem from './EditItem';
 import { IVariable } from './definition';
-
+import { useTranslation } from 'react-i18next';
 interface IProps {
   cluster: string;
   id: string;
@@ -33,13 +33,13 @@ interface IProps {
   onChange: (v?: IVariable[]) => void;
 }
 
-const titleMap = {
-  list: '大盘变量',
-  add: '添加大盘变量',
-  edit: '编辑大盘变量',
-};
-
 export default function EditItems(props: IProps) {
+  const { t } = useTranslation();
+  const titleMap = {
+    list: t('大盘变量'),
+    add: t('添加大盘变量'),
+    edit: t('编辑大盘变量'),
+  };
   const { visible, setVisible, onChange, value, range, id, cluster } = props;
   const [data, setData] = useState<IVariable[]>(value || []);
   const [record, setRecord] = useState<IVariable>({
@@ -49,7 +49,6 @@ export default function EditItems(props: IProps) {
   });
   const [recordIndex, setRecordIndex] = useState<number>(-1);
   const [mode, setMode] = useState<'list' | 'add' | 'edit'>('list');
-
   return (
     <Modal
       title={titleMap[mode]}
@@ -74,9 +73,10 @@ export default function EditItems(props: IProps) {
           dataSource={data}
           columns={[
             {
-              title: '变量名',
+              title: t('变量名'),
               dataIndex: 'name',
               render: (text, record, idx) => {
+                const { t } = useTranslation();
                 return (
                   <a
                     onClick={() => {
@@ -91,23 +91,25 @@ export default function EditItems(props: IProps) {
               },
             },
             {
-              title: '变量类型',
+              title: t('变量类型'),
               dataIndex: 'type',
             },
             {
-              title: '变量定义',
+              title: t('变量定义'),
               dataIndex: 'definition',
               render: (text, record) => {
                 if (record.type === 'textbox') {
                   return record.defaultValue;
                 }
+
                 return text;
               },
             },
             {
-              title: '操作',
+              title: t('操作'),
               width: 200,
               render: (_text, record, idx) => {
+                const { t } = useTranslation();
                 return (
                   <Space>
                     <Button
@@ -138,13 +140,7 @@ export default function EditItems(props: IProps) {
                       type='link'
                       size='small'
                       onClick={() => {
-                        const newData = [
-                          ...data,
-                          {
-                            ...record,
-                            name: 'copy_of_' + record.name,
-                          },
-                        ];
+                        const newData = [...data, { ...record, name: 'copy_of_' + record.name }];
                         setData(newData);
                         onChange(newData);
                       }}
@@ -156,6 +152,7 @@ export default function EditItems(props: IProps) {
                       size='small'
                       onClick={() => {
                         const newData = _.cloneDeep(data);
+
                         newData.splice(idx, 1);
                         setData(newData);
                         onChange(newData);
@@ -170,6 +167,7 @@ export default function EditItems(props: IProps) {
           ]}
           pagination={false}
           footer={() => {
+            const { t } = useTranslation();
             return (
               <Button
                 type='primary'
@@ -183,7 +181,7 @@ export default function EditItems(props: IProps) {
                   });
                 }}
               >
-                添加变量
+                {t('添加变量')}
               </Button>
             );
           }}
@@ -197,6 +195,7 @@ export default function EditItems(props: IProps) {
           data={record}
           onOk={(val) => {
             let newData = data;
+
             if (mode === 'add') {
               newData = [...data, val];
             } else if (mode === 'edit') {
@@ -204,9 +203,11 @@ export default function EditItems(props: IProps) {
                 if (i === recordIndex) {
                   return val;
                 }
+
                 return item;
               });
             }
+
             setData(newData);
             onChange(newData);
             setMode('list');

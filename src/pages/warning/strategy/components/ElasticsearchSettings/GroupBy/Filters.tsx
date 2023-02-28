@@ -2,26 +2,36 @@ import React from 'react';
 import { Form, Select, Row, Col, Input, Space } from 'antd';
 import { PlusCircleOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import { groupByCates, groupByCatesMap } from './configs';
-
-export default function Filters({ prefixField }) {
-  return (
-    <>
+import { useTranslation } from "react-i18next";
+export default function Filters({
+  prefixField
+}) {
+  const {
+    t
+  } = useTranslation();
+  return <>
       <Form.Item {...prefixField} name={[prefixField.name, 'cate']}>
-        <Select style={{ width: '100%' }} optionLabelProp='value'>
-          {groupByCates.map((func) => (
-            <Select.Option key={func} value={func}>
+        <Select style={{
+        width: '100%'
+      }} optionLabelProp='value'>
+          {groupByCates.map(func => <Select.Option key={func} value={func}>
               {func} ({groupByCatesMap[func]})
-            </Select.Option>
-          ))}
+            </Select.Option>)}
         </Select>
       </Form.Item>
       <Form.List {...prefixField} name={[prefixField.name, 'params']}>
-        {(fields, { add, remove }) => {
-          return (
-            <div>
+        {(fields, {
+        add,
+        remove
+      }) => {
+        const {
+          t
+        } = useTranslation();
+        return <div>
               {fields.map((field, index) => {
-                return (
-                  <Row gutter={16} key={field.key} style={{ marginBottom: index < fields.length - 1 ? 16 : 0 }}>
+            return <Row gutter={16} key={field.key} style={{
+              marginBottom: index < fields.length - 1 ? 16 : 0
+            }}>
                     <Col flex='auto'>
                       <Row gutter={16}>
                         <Col flex={12}>
@@ -36,38 +46,30 @@ export default function Filters({ prefixField }) {
                         </Col>
                       </Row>
                     </Col>
-                    <Col flex='40px' style={{ display: 'flex', alignItems: 'center' }}>
+                    <Col flex='40px' style={{
+                display: 'flex',
+                alignItems: 'center'
+              }}>
                       <Space>
-                        <PlusCircleOutlined
-                          style={{
-                            cursor: 'pointer',
-                          }}
-                          onClick={() => {
-                            add({
-                              alias: '',
-                              query: '',
-                            });
-                          }}
-                        />
-                        {fields.length > 1 && (
-                          <MinusCircleOutlined
-                            style={{
-                              cursor: 'pointer',
-                            }}
-                            onClick={() => {
-                              remove(field.name);
-                            }}
-                          />
-                        )}
+                        <PlusCircleOutlined style={{
+                    cursor: 'pointer'
+                  }} onClick={() => {
+                    add({
+                      alias: '',
+                      query: ''
+                    });
+                  }} />
+                        {fields.length > 1 && <MinusCircleOutlined style={{
+                    cursor: 'pointer'
+                  }} onClick={() => {
+                    remove(field.name);
+                  }} />}
                       </Space>
                     </Col>
-                  </Row>
-                );
-              })}
-            </div>
-          );
-        }}
+                  </Row>;
+          })}
+            </div>;
+      }}
       </Form.List>
-    </>
-  );
+    </>;
 }

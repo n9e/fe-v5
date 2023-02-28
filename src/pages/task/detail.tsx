@@ -30,42 +30,41 @@ import PageLayout from '@/components/pageLayout';
 import Editor from '../taskTpl/editor';
 import './style.less';
 
-
 const Detail = (props: any) => {
   const history = useHistory();
-  const { curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
-  const { t } = useTranslation();
-  const taskId = _.get(props, 'match.params.id');
-  const [loading, setLoading] = useState(false);
-  const [data, setData] = useState({} as any);
+  const {
+    curBusiItem
+  } = useSelector<RootState, CommonStoreState>(state => state.common);
+  const {
+    t
+  } = useTranslation();
 
+  const taskId = _.get(props, 'match.params.id');
+
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState(({} as any));
   useEffect(() => {
     if (taskId !== undefined) {
       setLoading(true);
-      request(`${api.task(curBusiItem.id)}/${taskId}`).then((data) => {
-        setData({
-          ...data.dat.meta,
-          hosts: _.map(data.dat.hosts, (host) => {
+      request(`${api.task(curBusiItem.id)}/${taskId}`).then(data => {
+        setData({ ...data.dat.meta,
+          hosts: _.map(data.dat.hosts, host => {
             return host.host;
-          }),
+          })
         });
       }).finally(() => {
         setLoading(false);
       });
     }
   }, [taskId]);
-
-  return (
-    <PageLayout hideCluster title={
-      <>
+  return <PageLayout hideCluster title={<>
         <RollbackOutlined className='back' onClick={() => history.push('/job-tasks')} />
-        执行历史
-      </>
-    }>
-      <div style={{ padding: 10 }}>
-        <Card
-          title={data.title}
-        >
+        {t("执行历史")}
+     </>}>
+      <div style={{
+      padding: 10
+    }}>
+        <Card title={data.title}>
         <Spin spinning={loading}>
           <div className="job-task-table">
             <div className="ant-table ant-table-default ant-table-bordered">
@@ -73,7 +72,10 @@ const Detail = (props: any) => {
                 <div className="ant-table-body">
                   <table>
                     <colgroup>
-                      <col style={{ width: 100, minWidth: 100 }} />
+                      <col style={{
+                        width: 100,
+                        minWidth: 100
+                      }} />
                       <col />
                     </colgroup>
                     <tbody className="ant-table-tbody">
@@ -114,11 +116,9 @@ const Detail = (props: any) => {
                       <tr className="ant-table-row ant-table-row-level-0">
                         <td>{t('task.host.list')}</td>
                         <td>
-                          {
-                            _.map(data.hosts, (host) => {
-                              return <div key={host}>{host}</div>;
-                            })
-                          }
+                          {_.map(data.hosts, host => {
+                            return <div key={host}>{host}</div>;
+                          })}
                         </td>
                       </tr>
                     </tbody>
@@ -127,19 +127,27 @@ const Detail = (props: any) => {
               </div>
             </div>
           </div>
-          <div style={{ marginTop: 10 }}>
-            <Link to={{ pathname: '/job-tasks/add', search: `task=${taskId}` }}>
+          <div style={{
+            marginTop: 10
+          }}>
+            <Link to={{
+              pathname: '/job-tasks/add',
+              search: `task=${taskId}`
+            }}>
               <Button type="primary">{t('task.clone.new')}</Button>
             </Link>
-            <Link style={{ marginLeft: 8 }} to={{ pathname: `/job-tasks` }}>
-              <Button>返回</Button>
+            <Link style={{
+              marginLeft: 8
+            }} to={{
+              pathname: `/job-tasks`
+            }}>
+              <Button>{t("返回")}</Button>
             </Link>
           </div>
         </Spin>
       </Card>
       </div>
-    </PageLayout>
-  );
+    </PageLayout>;
 };
 
 export default Detail;

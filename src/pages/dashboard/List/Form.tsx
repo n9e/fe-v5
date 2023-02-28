@@ -20,7 +20,7 @@ import { Form, Modal, Input, Select, message } from 'antd';
 import ModalHOC, { ModalWrapProps } from '@/components/ModalHOC';
 import { updateDashboard, createDashboard, updateDashboardConfigs, getDashboard } from '@/services/dashboardV2';
 import { JSONParse } from '../utils';
-
+import { useTranslation } from 'react-i18next';
 interface IProps {
   mode: 'crate' | 'edit';
   initialValues?: any;
@@ -28,7 +28,6 @@ interface IProps {
   refreshList: () => void;
   clusters: string[];
 }
-
 const layout = {
   labelCol: {
     span: 4,
@@ -37,14 +36,16 @@ const layout = {
     span: 16,
   },
 };
-const titleMap = {
-  crate: '创建新监控大盘',
-  edit: '编辑监控大盘',
-};
 
 function FormCpt(props: IProps & ModalWrapProps) {
+  const { t } = useTranslation();
+  const titleMap = {
+    crate: t('创建新监控大盘'),
+    edit: t('编辑监控大盘'),
+  };
   const { mode, initialValues = {}, visible, busiId, refreshList, destroy, clusters } = props;
   const [form] = Form.useForm();
+
   const handleOk = async () => {
     try {
       const values = await form.validateFields();
@@ -56,7 +57,7 @@ function FormCpt(props: IProps & ModalWrapProps) {
           ident: values.ident,
           tags: _.join(values.tags, ' '),
         });
-        message.success('编辑大盘成功');
+        message.success(t('编辑大盘成功'));
       } else if (mode === 'crate') {
         result = await createDashboard(busiId, {
           name: values.name,
@@ -68,21 +69,20 @@ function FormCpt(props: IProps & ModalWrapProps) {
             version: '2.0.0',
           }),
         });
-        message.success('新建大盘成功');
+        message.success(t('新建大盘成功'));
       }
+
       if (result) {
         const configs = JSONParse(result.configs);
         await updateDashboardConfigs(result.id, {
-          configs: JSON.stringify({
-            ...configs,
-            datasourceValue: values.datasourceValue,
-          }),
+          configs: JSON.stringify({ ...configs, datasourceValue: values.datasourceValue }),
         });
       }
+
       refreshList();
       destroy();
     } catch (error) {
-      message.error('操作失败');
+      message.error(t('操作失败'));
     }
   };
 
@@ -96,7 +96,6 @@ function FormCpt(props: IProps & ModalWrapProps) {
       });
     }
   }, [initialValues.id]);
-
   return (
     <Modal
       title={titleMap[mode]}
@@ -109,7 +108,7 @@ function FormCpt(props: IProps & ModalWrapProps) {
     >
       <Form {...layout} form={form} preserve={false} initialValues={initialValues}>
         <Form.Item
-          label='大盘名称'
+          label={t('大盘名称')}
           name='name'
           labelCol={{
             span: 5,
@@ -120,14 +119,14 @@ function FormCpt(props: IProps & ModalWrapProps) {
           rules={[
             {
               required: true,
-              message: '请输入大盘名称',
+              message: t('请输入大盘名称'),
             },
           ]}
         >
           <Input />
         </Form.Item>
         <Form.Item
-          label='英文标识'
+          label={t('英文标识')}
           name='ident'
           labelCol={{
             span: 5,
@@ -138,7 +137,7 @@ function FormCpt(props: IProps & ModalWrapProps) {
           rules={[
             {
               pattern: /^[a-zA-Z0-9\-]*$/,
-              message: '请输入英文字母、数字、中划线',
+              message: t('请输入英文字母、数字、中划线'),
             },
           ]}
         >
@@ -151,7 +150,7 @@ function FormCpt(props: IProps & ModalWrapProps) {
           wrapperCol={{
             span: 24,
           }}
-          label='分类标签'
+          label={t('分类标签')}
           name='tags'
         >
           <Select
@@ -159,7 +158,7 @@ function FormCpt(props: IProps & ModalWrapProps) {
             dropdownStyle={{
               display: 'none',
             }}
-            placeholder={'请输入分类标签(请用回车分割)'}
+            placeholder={t('请输入分类标签(请用回车分割)')}
           />
         </Form.Item>
         <Form.Item
@@ -169,11 +168,12 @@ function FormCpt(props: IProps & ModalWrapProps) {
           wrapperCol={{
             span: 24,
           }}
-          label='默认关联数据源'
+          label={t('默认关联数据源')}
           name='datasourceValue'
         >
           <Select>
             {_.map(clusters, (item) => {
+              const { t } = useTranslation();
               return (
                 <Select.Option key={item} value={item}>
                   {item}

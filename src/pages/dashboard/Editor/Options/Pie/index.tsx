@@ -18,13 +18,18 @@ import React from 'react';
 import GraphStyles from './GraphStyles';
 import StandardOptions from '../../Fields/StandardOptions';
 import ValueMappings from '../../Fields/ValueMappings';
-
+import { useTranslation } from "react-i18next";
 export default function Pie() {
-  return (
-    <>
+  const {
+    t
+  } = useTranslation();
+  return <>
       <GraphStyles />
-      {/* <ValueMappings /> */}
-      {/* <StandardOptions /> */}
-    </>
-  );
+      {
+      /* <ValueMappings /> */
+    }
+      {
+      /* <StandardOptions /> */
+    }
+    </>;
 }

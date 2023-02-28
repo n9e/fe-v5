@@ -20,57 +20,61 @@ import { CaretDownOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { Panel } from '../../Components/Collapse';
 import { calcsOptions, legendPostion } from '../../config';
-
+import { useTranslation } from "react-i18next";
 export default function GraphStyles() {
+  const {
+    t
+  } = useTranslation();
   const namePrefix = ['custom'];
-
-  return (
-    <Panel header='图表样式'>
+  return <Panel header={t("图表样式")}>
       <>
         <Row gutter={10}>
           <Col span={12}>
-            <Form.Item label='取值计算' name={[...namePrefix, 'calc']}>
+            <Form.Item label={t("取值计算")} name={[...namePrefix, 'calc']}>
               <Select suffixIcon={<CaretDownOutlined />}>
                 {_.map(calcsOptions, (item, key) => {
-                  return (
-                    <Select.Option key={key} value={key}>
+                const {
+                  t
+                } = useTranslation();
+                return <Select.Option key={key} value={key}>
                       {item.name}
-                    </Select.Option>
-                  );
-                })}
+                    </Select.Option>;
+              })}
               </Select>
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item label='图例位置' name={[...namePrefix, 'legengPosition']}>
+            <Form.Item label={t("图例位置")} name={[...namePrefix, 'legengPosition']}>
               <Select suffixIcon={<CaretDownOutlined />}>
-                {legendPostion.map((item) => {
-                  return (
-                    <Select.Option key={item} value={item}>
+                {legendPostion.map(item => {
+                const {
+                  t
+                } = useTranslation();
+                return <Select.Option key={item} value={item}>
                       {item}
-                    </Select.Option>
-                  );
-                })}
+                    </Select.Option>;
+              })}
               </Select>
             </Form.Item>
           </Col>
           <Col span={9}>
-            <Form.Item label='最多展示块数' name={[...namePrefix, 'max']} tooltip='超过的块数则合并展示为其他'>
-              <InputNumber style={{ width: '100%' }} />
+            <Form.Item label={t("最多展示块数")} name={[...namePrefix, 'max']} tooltip={t("超过的块数则合并展示为其他")}>
+              <InputNumber style={{
+              width: '100%'
+            }} />
             </Form.Item>
           </Col>
           <Col span={3}>
-            <Form.Item label='环图模式' name={[...namePrefix, 'donut']} valuePropName='checked'>
+            <Form.Item label={t("环图模式")} name={[...namePrefix, 'donut']} valuePropName='checked'>
               <Switch />
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item label='label是否包含名称' name={[...namePrefix, 'labelWithName']} valuePropName='checked'>
+            <Form.Item label={t("label是否包含名称")} name={[...namePrefix, 'labelWithName']} valuePropName='checked'>
               <Switch />
             </Form.Item>
           </Col>
         </Row>
       </>
-    </Panel>
-  );
+    </Panel>;
 }

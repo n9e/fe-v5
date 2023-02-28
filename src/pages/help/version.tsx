@@ -19,35 +19,29 @@ import Icon from '@ant-design/icons';
 import PageLayout from '@/components/pageLayout';
 import SystemInfoSvg from '../../../public/image/system-info.svg';
 import pkgJson from '../../../package.json';
-
+import { useTranslation } from "react-i18next";
 export default function version() {
+  const {
+    t
+  } = useTranslation();
   const [backendVersion, setBackendVersion] = useState('');
-
   useEffect(() => {
-    fetch('/api/n9e/version')
-      .then((res) => {
-        return res.text();
-      })
-      .then((res) => {
-        setBackendVersion(res);
-      });
+    fetch('/api/n9e/version').then(res => {
+      return res.text();
+    }).then(res => {
+      setBackendVersion(res);
+    });
   }, []);
-
-  return (
-    <PageLayout
-      title={
-        <>
-          <Icon component={SystemInfoSvg as any} /> 系统版本
-        </>
-      }
-      hideCluster
-    >
+  return <PageLayout title={<>
+          <Icon component={(SystemInfoSvg as any)} /> {t("系统版本")}
+       </>} hideCluster>
       <div>
-        <ul style={{ padding: '20px 30px' }}>
-          <li>前端版本：{pkgJson.version}</li>
-          <li>后端版本：{backendVersion}</li>
+        <ul style={{
+        padding: '20px 30px'
+      }}>
+          <li>{t("前端版本：")}{pkgJson.version}</li>
+          <li>{t("后端版本：")}{backendVersion}</li>
         </ul>
       </div>
-    </PageLayout>
-  );
+    </PageLayout>;
 }

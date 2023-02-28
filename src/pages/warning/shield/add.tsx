@@ -20,22 +20,19 @@ import PageLayout from '@/components/pageLayout';
 import OperateForm from './components/operateForm';
 import { useTranslation } from 'react-i18next';
 import './index.less';
-
 const AddShield: React.FC = () => {
-  const { t } = useTranslation();
+  const {
+    t
+  } = useTranslation();
   const location = useLocation();
   let tags: any = location.state || {};
   if (tags) {
     tags.cate = tags.cate || 'prometheus';
   }
-
-  return (
-    <PageLayout title={t('告警屏蔽')} showBack hideCluster>
+  return <PageLayout title={t('告警屏蔽')} showBack hideCluster>
       <div className='shield-add'>
         <OperateForm tagsObj={tags ? tags : undefined} />
       </div>
-    </PageLayout>
-  );
+    </PageLayout>;
 };
-
 export default AddShield;

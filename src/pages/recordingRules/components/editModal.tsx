@@ -16,59 +16,62 @@ const layout = {
   },
 };
 
-const fields = [
-  {
-    id: 2,
-    field: 'cluster',
-    name: '集群',
-  },
-  {
-    id: 5,
-    field: 'prom_eval_interval',
-    name: '执行频率',
-  },
-  {
-    id: 4,
-    field: 'disabled',
-    name: '启用',
-  },
-  {
-    id: 12,
-    field: 'append_tags',
-    name: '附加标签',
-  },
-];
-
-// 校验单个标签格式是否正确
 function isTagValid(tag) {
   const contentRegExp = /^[a-zA-Z_][\w]*={1}[^=]+$/;
   return {
     isCorrectFormat: contentRegExp.test(tag.toString()),
     isLengthAllowed: tag.toString().length <= 64,
   };
-}
+} // 渲染标签
 
-// 渲染标签
 function tagRender(content) {
+  const { t } = useTranslation();
+  const fields = [
+    {
+      id: 2,
+      field: 'cluster',
+      name: t('集群'),
+    },
+    {
+      id: 5,
+      field: 'prom_eval_interval',
+      name: t('执行频率'),
+    },
+    {
+      id: 4,
+      field: 'disabled',
+      name: t('启用'),
+    },
+    {
+      id: 12,
+      field: 'append_tags',
+      name: t('附加标签'),
+    },
+  ]; // 校验单个标签格式是否正确
   const { isCorrectFormat, isLengthAllowed } = isTagValid(content.value);
   return isCorrectFormat && isLengthAllowed ? (
     <Tag
       closable={content.closable}
-      onClose={content.onClose}
-      // style={{ marginTop: '2px' }}
+      onClose={content.onClose} // style={{ marginTop: '2px' }}
     >
       {content.value}
     </Tag>
   ) : (
-    <Tooltip title={isCorrectFormat ? '标签长度应小于等于 64 位' : '标签格式应为 key=value。且 key 以字母或下划线开头，由字母、数字和下划线组成。'}>
-      <Tag color='error' closable={content.closable} onClose={content.onClose} style={{ marginTop: '2px' }}>
+    <Tooltip title={isCorrectFormat ? t('标签长度应小于等于 64 位') : t('标签格式应为 key=value。且 key 以字母或下划线开头，由字母、数字和下划线组成。')}>
+      <Tag
+        color='error'
+        closable={content.closable}
+        onClose={content.onClose}
+        style={{
+          marginTop: '2px',
+        }}
+      >
         {content.value}
       </Tag>
     </Tooltip>
   );
-}
+} // 校验所有标签格式
 
-// 校验所有标签格式
 function isValidFormat() {
   return {
     validator(_, value) {
@@ -76,6 +79,7 @@ function isValidFormat() {
         value &&
         value.some((tag) => {
           const { isCorrectFormat, isLengthAllowed } = isTagValid(tag);
+
           if (!isCorrectFormat || !isLengthAllowed) {
             return true;
           }
@@ -92,10 +96,8 @@ interface Props {
 
 const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
   const { t } = useTranslation();
-
   const [form] = Form.useForm();
   const { clusters: clusterList } = useSelector<RootState, CommonStoreState>((state) => state.common);
-
   const [field, setField] = useState<string>('cluster');
   const [refresh, setRefresh] = useState(true);
 
@@ -103,18 +105,22 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
     form.validateFields().then(async (values) => {
       const data = { ...values };
       delete data.field;
+
       if (values.field === 'disabled') {
         data.disabled = !values.enable_status ? 1 : 0;
         delete data.enable_status;
       }
+
       if (values.field === 'cluster') {
         data.cluster = values.cluster.join(' ');
       }
+
       Object.keys(data).forEach((key) => {
         // 因为功能上有清除备注的需求，需要支持传空
         if (data[key] === undefined) {
           data[key] = '';
         }
+
         if (Array.isArray(data[key])) {
           data[key] = data[key].join(' ');
         }
@@ -125,7 +131,9 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
 
   const handleClusterChange = (v: string[]) => {
     if (v.includes(ClusterAll)) {
-      form.setFieldsValue({ cluster: [ClusterAll] });
+      form.setFieldsValue({
+        cluster: [ClusterAll],
+      });
     }
   };
 
@@ -154,7 +162,8 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
           layout={refresh ? 'horizontal' : 'horizontal'}
           initialValues={{
             prom_eval_interval: 15,
-            cluster: clusterList || ['Default'], // 生效集群
+            cluster: clusterList || ['Default'],
+            // 生效集群
             field: 'cluster',
             enable_status: true,
           }}
@@ -168,7 +177,12 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
               },
             ]}
           >
-            <Select style={{ width: '100%' }} onChange={fieldChange}>
+            <Select
+              style={{
+                width: '100%',
+              }}
+              onChange={fieldChange}
+            >
               {fields.map((item) => (
                 <Option key={item.id} value={item.field}>
                   {item.name}
@@ -194,6 +208,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                     </Form.Item>
                   </>
                 );
+
               case 'cluster':
                 return (
                   <>
@@ -234,7 +249,16 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                       ]}
                     >
                       <Space>
-                        <Form.Item style={{ marginBottom: 0 }} name='prom_eval_interval' initialValue={15} wrapperCol={{ span: 10 }}>
+                        <Form.Item
+                          style={{
+                            marginBottom: 0,
+                          }}
+                          name='prom_eval_interval'
+                          initialValue={15}
+                          wrapperCol={{
+                            span: 10,
+                          }}
+                        >
                           <InputNumber
                             min={1}
                             onChange={() => {
@@ -242,14 +266,15 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                             }}
                           />
                         </Form.Item>
-                        秒
-                        <Tooltip title={t(`promql 执行频率，每隔 ${form.getFieldValue('prom_eval_interval')} 秒查询时序库，查到的结果重新命名写回时序库`)}>
+                        {t('秒')}
+                        <Tooltip title={t(`${t('promql 执行频率，每隔 ')}${form.getFieldValue('prom_eval_interval')}${t(' 秒查询时序库，查到的结果重新命名写回时序库')}`)}>
                           <QuestionCircleFilled />
                         </Tooltip>
                       </Space>
                     </Form.Item>
                   </>
                 );
+
               case 'disabled':
                 return (
                   <>
@@ -258,14 +283,26 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                     </Form.Item>
                   </>
                 );
+
               case 'append_tags':
                 return (
                   <>
-                    <Form.Item label='附加标签' name='append_tags' rules={[{ required: false, message: '请填写至少一项标签！' }, isValidFormat]}>
-                      <Select mode='tags' tokenSeparators={[' ']} open={false} placeholder={'标签格式为 key=value ，使用回车或空格分隔'} tagRender={tagRender} />
+                    <Form.Item
+                      label={t('附加标签')}
+                      name='append_tags'
+                      rules={[
+                        {
+                          required: false,
+                          message: t('请填写至少一项标签！'),
+                        },
+                        isValidFormat,
+                      ]}
+                    >
+                      <Select mode='tags' tokenSeparators={[' ']} open={false} placeholder={t('标签格式为 key=value ，使用回车或空格分隔')} tagRender={tagRender} />
                     </Form.Item>
                   </>
                 );
+
               default:
                 return null;
             }

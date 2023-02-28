@@ -17,12 +17,13 @@
 import React from 'react';
 import GraphStyles from './GraphStyles';
 import StandardOptions from '../../Fields/StandardOptions';
-
+import { useTranslation } from "react-i18next";
 export default function Timeseries() {
-  return (
-    <>
+  const {
+    t
+  } = useTranslation();
+  return <>
       <GraphStyles />
       <StandardOptions />
-    </>
-  );
+    </>;
 }

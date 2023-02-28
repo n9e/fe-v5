@@ -30,45 +30,43 @@ import TplForm from './tplForm';
 
 const Add = (props: any) => {
   const history = useHistory();
-  const { curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
-  const { t } = useTranslation();
+  const {
+    curBusiItem
+  } = useSelector<RootState, CommonStoreState>(state => state.common);
+  const {
+    t
+  } = useTranslation();
+
   const handleSubmit = (values: any) => {
     request(`${api.tasktpls(curBusiItem.id)}`, {
       method: 'POST',
-      body: JSON.stringify(values),
+      body: JSON.stringify(values)
     }).then(() => {
       message.success(t('msg.create.success'));
       props.history.push({
-        pathname: `/job-tpls`,
+        pathname: `/job-tpls`
       });
     });
   };
 
-  return (
-    <PageLayout hideCluster title={
-      <>
+  return <PageLayout hideCluster title={<>
         <RollbackOutlined className='back' onClick={() => history.push('/job-tpls')} />
-        自愈脚本
-      </>
-    }>
-      <div style={{ padding: 10 }}>
-        <Card
-          title="创建自愈脚本"
-        >
-        <TplForm
-          onSubmit={handleSubmit}
-          footer={
-            <div>
-              <Button type="primary" htmlType="submit" style={{ marginRight: 8 }}> 
+        {t("自愈脚本")}
+     </>}>
+      <div style={{
+      padding: 10
+    }}>
+        <Card title={t("创建自愈脚本")}>
+        <TplForm onSubmit={handleSubmit} footer={<div>
+              <Button type="primary" htmlType="submit" style={{
+            marginRight: 8
+          }}> 
                 {t('form.submit')}
               </Button>
-            </div>
-          }
-        />
+            </div>} />
         </Card>
       </div>
-    </PageLayout>
-  )
-}
+    </PageLayout>;
+};
 
 export default Add;

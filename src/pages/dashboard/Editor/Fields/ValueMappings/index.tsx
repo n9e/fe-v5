@@ -20,22 +20,24 @@ import { DeleteOutlined, InfoCircleOutlined, CaretDownOutlined } from '@ant-desi
 import _ from 'lodash';
 import { Panel } from '../../Components/Collapse';
 import ColorPicker from '../../../Components/ColorPicker';
-
+import { useTranslation } from 'react-i18next';
 interface IProps {
   preNamePrefix?: (string | number)[];
   namePrefix?: (string | number)[];
 }
-
 export default function index(props: IProps) {
+  const { t } = useTranslation();
   const { preNamePrefix = [], namePrefix = ['options', 'valueMappings'] } = props;
-
   return (
-    <Panel header='值映射'>
+    <Panel header={t('值映射')}>
       <Form.List name={namePrefix}>
         {(fields, { add, remove }) => (
           <>
             <Button
-              style={{ width: '100%', marginBottom: 10 }}
+              style={{
+                width: '100%',
+                marginBottom: 10,
+              }}
               onClick={() => {
                 add({
                   type: 'special',
@@ -45,7 +47,7 @@ export default function index(props: IProps) {
                 });
               }}
             >
-              添加
+              {t('添加')}
             </Button>
             {_.isEmpty(fields) ? null : (
               <Row gutter={10}>
@@ -56,32 +58,48 @@ export default function index(props: IProps) {
                     }}
                     title={
                       <div>
-                        <div>范围值说明: from &gt;= value &lt;= to</div>
-                        <div>范围值默认值: from=-Infinity; to=Infinity </div>
-                        <div>特殊值Null说明: 匹配值为 null 或 undefined 或 no data</div>
+                        <div>
+                          {t('范围值说明:')} from ${'>='} value ${'<='} too
+                        </div>
+                        <div>{t('范围值默认值:')} from=-Infinity; to=Infinity</div>
+                        <div>
+                          {t('特殊值Null说明:')} {t('匹配值为')} null {t('或')} undefined {t('或')} no dataa
+                        </div>
                       </div>
                     }
                   >
-                    条件 <InfoCircleOutlined />
+                    {t('条件')}
+                    <InfoCircleOutlined />
                   </Tooltip>
                 </Col>
-                <Col flex='210'>显示文字</Col>
-                <Col flex='45'>颜色</Col>
-                <Col flex='50'>操作</Col>
+                <Col flex='210'>{t('显示文字')}</Col>
+                <Col flex='45'>{t('颜色')}</Col>
+                <Col flex='50'>{t('操作')}</Col>
               </Row>
             )}
 
             {fields.map(({ key, name, ...restField }) => {
               return (
-                <Row key={key} gutter={10} style={{ marginBottom: 10 }}>
+                <Row
+                  key={key}
+                  gutter={10}
+                  style={{
+                    marginBottom: 10,
+                  }}
+                >
                   <Col flex='290px'>
                     <Row gutter={10}>
                       <Col flex='80px'>
                         <Form.Item noStyle {...restField} name={[name, 'type']}>
-                          <Select suffixIcon={<CaretDownOutlined />} style={{ width: 80 }}>
-                            <Select.Option value='special'>固定值</Select.Option>
-                            <Select.Option value='range'>范围值</Select.Option>
-                            <Select.Option value='specialValue'>特殊值</Select.Option>
+                          <Select
+                            suffixIcon={<CaretDownOutlined />}
+                            style={{
+                              width: 80,
+                            }}
+                          >
+                            <Select.Option value='special'>{t('固定值')}</Select.Option>
+                            <Select.Option value='range'>{t('范围值')}</Select.Option>
+                            <Select.Option value='specialValue'>{t('特殊值')}</Select.Option>
                           </Select>
                         </Form.Item>
                       </Col>
@@ -89,13 +107,19 @@ export default function index(props: IProps) {
                         <Form.Item noStyle {...restField} shouldUpdate>
                           {({ getFieldValue }) => {
                             const type = getFieldValue([...preNamePrefix, ...namePrefix, name, 'type']);
+
                             if (type === 'special') {
                               return (
                                 <Form.Item noStyle {...restField} name={[name, 'match', 'special']}>
-                                  <InputNumber style={{ width: '100%' }} />
+                                  <InputNumber
+                                    style={{
+                                      width: '100%',
+                                    }}
+                                  />
                                 </Form.Item>
                               );
                             }
+
                             if (type === 'range') {
                               return (
                                 <Row gutter={10}>
@@ -112,16 +136,23 @@ export default function index(props: IProps) {
                                 </Row>
                               );
                             }
+
                             if (type === 'specialValue') {
                               return (
                                 <Form.Item noStyle {...restField} name={[name, 'match', 'specialValue']}>
-                                  <Select suffixIcon={<CaretDownOutlined />} style={{ width: '100%' }}>
+                                  <Select
+                                    suffixIcon={<CaretDownOutlined />}
+                                    style={{
+                                      width: '100%',
+                                    }}
+                                  >
                                     <Select.Option value='null'>Null</Select.Option>
                                     <Select.Option value='empty'>Empty string</Select.Option>
                                   </Select>
                                 </Form.Item>
                               );
                             }
+
                             return null;
                           }}
                         </Form.Item>
@@ -130,7 +161,7 @@ export default function index(props: IProps) {
                   </Col>
                   <Col flex='210'>
                     <Form.Item noStyle {...restField} name={[name, 'result', 'text']}>
-                      <Input placeholder='可选' />
+                      <Input placeholder={t('可选')} />
                     </Form.Item>
                   </Col>
                   <Col flex='45'>

@@ -27,7 +27,6 @@ import { IVariable } from '../VariableConfig';
 import FormCpt from './Form';
 import { IPanel } from '../types';
 import { normalizeInitialValues } from './util';
-
 interface IProps {
   mode: string;
   visible: boolean;
@@ -41,28 +40,42 @@ interface IProps {
 }
 
 function index(props: IProps) {
-  const { t } = useTranslation();
+  const {
+    t
+  } = useTranslation();
   const formRef = useRef<any>();
-  const { mode, visible, setVisible, variableConfigWithOptions, cluster, id, time } = props;
+  const {
+    mode,
+    visible,
+    setVisible,
+    variableConfigWithOptions,
+    cluster,
+    id,
+    time
+  } = props;
   const [initialValues, setInitialValues] = useState<IPanel>(_.cloneDeep(props.initialValues));
   const [range, setRange] = useState<IRawTimeRange>(time);
   const [step, setStep] = useState<number | null>(null);
+
   const handleAddChart = async () => {
     if (formRef.current && formRef.current.getFormInstance) {
       const formInstance = formRef.current.getFormInstance();
-      formInstance.validateFields().then(async (values) => {
+      formInstance.validateFields().then(async values => {
         // TODO: 渲染 hexbin 图时，colorRange 需要从 string 转换为 array
         if (values.type === 'hexbin') {
           _.set(values, 'custom.colorRange', _.split(values.custom.colorRange, ','));
         }
+
         let formData = Object.assign(values, {
-          version: '2.0.0',
+          version: '2.0.0'
         });
+
         if (values && values.id) {
           formData.id = values.id;
         } else {
           formData.id = uuidv4();
         }
+
         props.onOK(formData, mode);
         setVisible(false);
       });
@@ -71,109 +84,86 @@ function index(props: IProps) {
 
   useEffect(() => {
     const initialValuesCopy = _.cloneDeep(props.initialValues);
-    initialValuesCopy.type = initialValuesCopy.type || defaultValues.type;
-    // TODO: 渲染 hexbin 配置时，colorRange 需要从 array 转换为 string
+
+    initialValuesCopy.type = initialValuesCopy.type || defaultValues.type; // TODO: 渲染 hexbin 配置时，colorRange 需要从 array 转换为 string
+
     if (initialValuesCopy.type === 'hexbin' && initialValuesCopy?.custom?.colorRange) {
       if (_.isArray(initialValuesCopy.custom.colorRange)) {
         _.set(initialValuesCopy, 'custom.colorRange', _.join(initialValuesCopy.custom.colorRange, ','));
+
         setInitialValues(initialValuesCopy);
       }
     } else {
       setInitialValues(initialValuesCopy);
     }
   }, [JSON.stringify(props.initialValues)]);
-
-  return (
-    <Modal
-      width='100%'
-      title={
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+  return <Modal width='100%' title={<div style={{
+    display: 'flex',
+    alignItems: 'center'
+  }}>
           <div>{initialValues ? t('编辑图表') : t('新建图表')}</div>
-          <Space style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', fontSize: 12, lineHeight: '20px' }}>
-            <Select
-              dropdownMatchSelectWidth={false}
-              value={initialValues.type}
-              onChange={(val) => {
-                if (formRef.current && formRef.current.getFormInstance) {
-                  const formInstance = formRef.current.getFormInstance();
-                  const values = formInstance.getFieldsValue();
-                  const valuesCopy = _.cloneDeep(values);
-                  _.set(valuesCopy, 'type', val);
-                  _.set(valuesCopy, 'custom', defaultCustomValuesMap[val]);
-                  _.set(valuesCopy, 'options', defaultOptionsValuesMap[val]);
-                  setInitialValues(valuesCopy);
-                }
-              }}
-            >
-              {_.map(visualizations, (item) => {
-                return (
-                  <Select.Option value={item.type} key={item.type}>
+          <Space style={{
+      flex: 1,
+      display: 'flex',
+      justifyContent: 'flex-end',
+      alignItems: 'center',
+      fontSize: 12,
+      lineHeight: '20px'
+    }}>
+            <Select dropdownMatchSelectWidth={false} value={initialValues.type} onChange={val => {
+        if (formRef.current && formRef.current.getFormInstance) {
+          const formInstance = formRef.current.getFormInstance();
+          const values = formInstance.getFieldsValue();
+
+          const valuesCopy = _.cloneDeep(values);
+
+          _.set(valuesCopy, 'type', val);
+
+          _.set(valuesCopy, 'custom', defaultCustomValuesMap[val]);
+
+          _.set(valuesCopy, 'options', defaultOptionsValuesMap[val]);
+
+          setInitialValues(valuesCopy);
+        }
+      }}>
+              {_.map(visualizations, item => {
+          const {
+            t
+          } = useTranslation();
+          return <Select.Option value={item.type} key={item.type}>
                     {item.name}
-                  </Select.Option>
-                );
-              })}
+                  </Select.Option>;
+        })}
             </Select>
-            <TimeRangePicker
-              dateFormat='YYYY-MM-DD HH:mm:ss'
-              value={range}
-              onChange={(val: IRawTimeRange) => {
-                setRange(val);
-              }}
-            />
-            <Resolution onChange={(v) => setStep(v)} initialValue={step} />
-            <CloseOutlined
-              style={{ fontSize: 18 }}
-              onClick={() => {
-                setVisible(false);
-              }}
-            />
-          </Space>
-        </div>
-      }
-      style={{ top: 10, padding: 0 }}
-      visible={visible}
-      closable={false}
-      destroyOnClose
-      footer={[
-        <Button
-          key='cancel'
-          onClick={() => {
-            setVisible(false);
-          }}
-        >
-          取消
-        </Button>,
-        <Button
-          key='ok'
-          type='primary'
-          onClick={() => {
-            handleAddChart();
-          }}
-        >
-          确认
-        </Button>,
-      ]}
-      onCancel={() => {
+            <TimeRangePicker dateFormat='YYYY-MM-DD HH:mm:ss' value={range} onChange={(val: IRawTimeRange) => {
+        setRange(val);
+      }} />
+            <Resolution onChange={v => setStep(v)} initialValue={step} />
+            <CloseOutlined style={{
+        fontSize: 18
+      }} onClick={() => {
         setVisible(false);
-      }}
-      bodyStyle={{
-        padding: '10px 24px 24px 24px',
-      }}
-    >
-      {!_.isEmpty(initialValues) && (
-        <FormCpt
-          ref={formRef}
-          initialValues={normalizeInitialValues(initialValues)}
-          variableConfigWithOptions={variableConfigWithOptions}
-          cluster={cluster}
-          range={range}
-          id={id}
-          step={step}
-          key={initialValues.type} // 每次切换图表类型，都重新渲染
-        />
-      )}
-    </Modal>
-  );
+      }} />
+          </Space>
+        </div>} style={{
+    top: 10,
+    padding: 0
+  }} visible={visible} closable={false} destroyOnClose footer={[<Button key='cancel' onClick={() => {
+    setVisible(false);
+  }}>
+          {t("取消")}
+       </Button>, <Button key='ok' type='primary' onClick={() => {
+    handleAddChart();
+  }}>
+          {t("确认")}
+       </Button>]} onCancel={() => {
+    setVisible(false);
+  }} bodyStyle={{
+    padding: '10px 24px 24px 24px'
+  }}>
+      {!_.isEmpty(initialValues) && <FormCpt ref={formRef} initialValues={normalizeInitialValues(initialValues)} variableConfigWithOptions={variableConfigWithOptions} cluster={cluster} range={range} id={id} step={step} key={initialValues.type} // 每次切换图表类型，都重新渲染
+    />}
+    </Modal>;
 }
 
 export default index;

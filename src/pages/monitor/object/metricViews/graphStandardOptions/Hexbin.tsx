@@ -21,118 +21,113 @@ import { DownOutlined } from '@ant-design/icons';
 import { units } from '../config';
 import ColorRangeMenu from '../../../../dashboard/Components/ColorRangeMenu';
 import { colors } from '../../../../dashboard/Components/ColorRangeMenu/config';
-
+import { useTranslation } from "react-i18next";
 interface IProps {
   highLevelConfig: any;
   setHighLevelConfig: (val: any) => void;
 }
-
 export default function GraphStandardOptions(props: IProps) {
-  const { highLevelConfig, setHighLevelConfig } = props;
-  const precisionMenu = (
-    <Menu
-      onClick={(e) => {
-        setHighLevelConfig({ ...highLevelConfig, unit: e.key });
-      }}
-      selectedKeys={[highLevelConfig.unit]}
-    >
-      {_.map(units, (item) => {
-        return <Menu.Item key={item.value}>{item.label}</Menu.Item>;
-      })}
-    </Menu>
-  );
-
-  return (
-    <div>
-      <div style={{ marginBottom: 5 }}>
+  const {
+    t
+  } = useTranslation();
+  const {
+    highLevelConfig,
+    setHighLevelConfig
+  } = props;
+  const precisionMenu = <Menu onClick={e => {
+    setHighLevelConfig({ ...highLevelConfig,
+      unit: e.key
+    });
+  }} selectedKeys={[highLevelConfig.unit]}>
+      {_.map(units, item => {
+      const {
+        t
+      } = useTranslation();
+      return <Menu.Item key={item.value}>{item.label}</Menu.Item>;
+    })}
+    </Menu>;
+  return <div>
+      <div style={{
+      marginBottom: 5
+    }}>
         Height:{' '}
-        <InputNumber
-          size='small'
-          value={highLevelConfig.chartheight}
-          onBlur={(e) => {
-            setHighLevelConfig({ ...highLevelConfig, chartheight: _.toNumber(e.target.value) });
-          }}
-        />
+        <InputNumber size='small' value={highLevelConfig.chartheight} onBlur={e => {
+        setHighLevelConfig({ ...highLevelConfig,
+          chartheight: _.toNumber(e.target.value)
+        });
+      }} />
       </div>
-      <div style={{ marginBottom: 5 }}>
+      <div style={{
+      marginBottom: 5
+    }}>
         Color:{' '}
-        <Dropdown
-          overlay={
-            <ColorRangeMenu
-              onClick={(e) => {
-                setHighLevelConfig({ ...highLevelConfig, colorRange: _.split(e.key, ',') });
-              }}
-              selectedKeys={[_.join(highLevelConfig.colorRange, ',')]}
-            />
-          }
-        >
-          <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
-            {_.get(
-              _.find(colors, (item) => {
-                return _.isEqual(item.value, highLevelConfig.colorRange);
-              }),
-              'label',
-            )}{' '}
+        <Dropdown overlay={<ColorRangeMenu onClick={e => {
+        setHighLevelConfig({ ...highLevelConfig,
+          colorRange: _.split(e.key, ',')
+        });
+      }} selectedKeys={[_.join(highLevelConfig.colorRange, ',')]} />}>
+          <a className='ant-dropdown-link' onClick={e => e.preventDefault()}>
+            {_.get(_.find(colors, item => {
+            return _.isEqual(item.value, highLevelConfig.colorRange);
+          }), 'label')}{' '}
             <DownOutlined />
           </a>
         </Dropdown>
       </div>
-      <div style={{ marginBottom: 5 }}>
+      <div style={{
+      marginBottom: 5
+    }}>
         Reverse color order:{' '}
-        <Switch
-          size='small'
-          checked={highLevelConfig.reverseColorOrder}
-          onChange={(checked) => {
-            setHighLevelConfig({ ...highLevelConfig, reverseColorOrder: checked });
-          }}
-        />
+        <Switch size='small' checked={highLevelConfig.reverseColorOrder} onChange={checked => {
+        setHighLevelConfig({ ...highLevelConfig,
+          reverseColorOrder: checked
+        });
+      }} />
       </div>
-      <div style={{ marginBottom: 5 }}>
+      <div style={{
+      marginBottom: 5
+    }}>
         Auto min/max color values:{' '}
-        <Switch
-          size='small'
-          checked={highLevelConfig.colorDomainAuto}
-          onChange={(checked) => {
-            setHighLevelConfig({ ...highLevelConfig, colorDomainAuto: checked, colorDomain: [0, 100] });
-          }}
-        />
+        <Switch size='small' checked={highLevelConfig.colorDomainAuto} onChange={checked => {
+        setHighLevelConfig({ ...highLevelConfig,
+          colorDomainAuto: checked,
+          colorDomain: [0, 100]
+        });
+      }} />
       </div>
-      {!highLevelConfig.colorDomainAuto && (
-        <div style={{ marginBottom: 5 }}>
+      {!highLevelConfig.colorDomainAuto && <div style={{
+      marginBottom: 5
+    }}>
           <Row gutter={8}>
             <Col span={12}>
-              <InputNumber
-                size='small'
-                addonBefore='min'
-                style={{ width: 110 }}
-                value={highLevelConfig.colorDomain[0]}
-                onChange={(val) => {
-                  setHighLevelConfig({ ...highLevelConfig, colorDomain: [val, highLevelConfig.colorDomain[1]] });
-                }}
-              />
+              <InputNumber size='small' addonBefore='min' style={{
+            width: 110
+          }} value={highLevelConfig.colorDomain[0]} onChange={val => {
+            setHighLevelConfig({ ...highLevelConfig,
+              colorDomain: [val, highLevelConfig.colorDomain[1]]
+            });
+          }} />
             </Col>
             <Col span={12}>
-              <InputNumber
-                size='small'
-                addonBefore='max'
-                style={{ width: 110 }}
-                value={highLevelConfig.colorDomain[1]}
-                onChange={(val) => {
-                  setHighLevelConfig({ ...highLevelConfig, colorDomain: [highLevelConfig.colorDomain[0], val] });
-                }}
-              />
+              <InputNumber size='small' addonBefore='max' style={{
+            width: 110
+          }} value={highLevelConfig.colorDomain[1]} onChange={val => {
+            setHighLevelConfig({ ...highLevelConfig,
+              colorDomain: [highLevelConfig.colorDomain[0], val]
+            });
+          }} />
             </Col>
           </Row>
-        </div>
-      )}
+        </div>}
       <div>
         Value format with:{' '}
         <Dropdown overlay={precisionMenu}>
-          <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
-            {_.get(_.find(units, { value: highLevelConfig.unit }), 'label')} <DownOutlined />
+          <a className='ant-dropdown-link' onClick={e => e.preventDefault()}>
+            {_.get(_.find(units, {
+            value: highLevelConfig.unit
+          }), 'label')} <DownOutlined />
           </a>
         </Dropdown>
       </div>
-    </div>
-  );
+    </div>;
 }

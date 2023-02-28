@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import { Form, Input } from 'antd';
-
+import { useTranslation } from "react-i18next";
 interface IProps {
   prefixField?: any;
   fullPrefixName?: (string | number)[]; // 完整的前置字段名，用于 getFieldValue 获取指定字段的值
@@ -11,11 +11,15 @@ interface IProps {
 }
 
 export default function Code(props: IProps) {
-  const { prefixField = {}, fullPrefixName = [], prefixName = [] } = props;
-
-  return (
-    <Form.Item {...prefixField} name={[...prefixName, 'exp']}>
+  const {
+    t
+  } = useTranslation();
+  const {
+    prefixField = {},
+    fullPrefixName = [],
+    prefixName = []
+  } = props;
+  return <Form.Item {...prefixField} name={[...prefixName, 'exp']}>
       <Input />
-    </Form.Item>
-  );
+    </Form.Item>;
 }

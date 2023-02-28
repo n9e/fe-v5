@@ -34,174 +34,176 @@ import exportEvents, { downloadFile } from './exportEvents';
 import '../event/index.less';
 
 const Event: React.FC = () => {
-  const { t } = useTranslation();
+  const {
+    t
+  } = useTranslation();
   const dispatch = useDispatch();
   const tableRef = useRef({
-    handleReload() {},
+    handleReload() {}
+
   });
-  const { hisHourRange, hisQueryContent } = useSelector<RootState, eventStoreState>((state) => state.event);
+  const {
+    hisHourRange,
+    hisQueryContent
+  } = useSelector<RootState, eventStoreState>(state => state.event);
   const [hisSeverity, setHisSeverity] = useState<number>();
   const [hisEventType, setHisEventType] = useState<number>();
   const [curClusterItems, setCurClusterItems] = useState<string[]>([]);
   const isAddTagToQueryInput = useRef(false);
   const [curBusiId, setCurBusiId] = useState<number>(-1);
   const [cate, setCate] = useState<string>();
-  const DateRangeItems: RelativeRange[] = useMemo(
-    () => [
-      { num: 6, unit: 'hours', description: t('hours') },
-      { num: 12, unit: 'hours', description: t('hours') },
-      { num: 1, unit: 'day', description: t('天') },
-      { num: 2, unit: 'days', description: t('天') },
-      { num: 3, unit: 'days', description: t('天') },
-      { num: 7, unit: 'days', description: t('天') },
-      { num: 14, unit: 'days', description: t('天') },
-      { num: 30, unit: 'days', description: t('天') },
-      { num: 60, unit: 'days', description: t('天') },
-      { num: 90, unit: 'days', description: t('天') },
-    ],
-    [],
-  );
+  const DateRangeItems: RelativeRange[] = useMemo(() => [{
+    num: 6,
+    unit: 'hours',
+    description: t('hours')
+  }, {
+    num: 12,
+    unit: 'hours',
+    description: t('hours')
+  }, {
+    num: 1,
+    unit: 'day',
+    description: t('天')
+  }, {
+    num: 2,
+    unit: 'days',
+    description: t('天')
+  }, {
+    num: 3,
+    unit: 'days',
+    description: t('天')
+  }, {
+    num: 7,
+    unit: 'days',
+    description: t('天')
+  }, {
+    num: 14,
+    unit: 'days',
+    description: t('天')
+  }, {
+    num: 30,
+    unit: 'days',
+    description: t('天')
+  }, {
+    num: 60,
+    unit: 'days',
+    description: t('天')
+  }, {
+    num: 90,
+    unit: 'days',
+    description: t('天')
+  }], []);
+  const columns = [{
+    title: t('集群'),
+    dataIndex: 'cluster',
+    width: 120
+  }, {
+    title: t('规则标题&事件标签'),
+    dataIndex: 'rule_name',
 
-  const columns = [
-    {
-      title: t('集群'),
-      dataIndex: 'cluster',
-      width: 120,
-    },
-    {
-      title: t('规则标题&事件标签'),
-      dataIndex: 'rule_name',
-      render(title, { id, tags }) {
-        const content =
-          tags &&
-          tags.map((item) => (
-            <Tag
-              color='purple'
-              key={item}
-              onClick={(e) => {
-                if (!hisQueryContent.includes(item)) {
-                  isAddTagToQueryInput.current = true;
-                  saveData('hisQueryContent', hisQueryContent ? `${hisQueryContent.trim()} ${item}` : item);
-                }
-              }}
-            >
+    render(title, {
+      id,
+      tags
+    }) {
+      const content = tags && tags.map(item => <Tag color='purple' key={item} onClick={e => {
+        if (!hisQueryContent.includes(item)) {
+          isAddTagToQueryInput.current = true;
+          saveData('hisQueryContent', hisQueryContent ? `${hisQueryContent.trim()} ${item}` : item);
+        }
+      }}>
               {item}
-            </Tag>
-          ));
-        return (
-          <>
+            </Tag>);
+      return <>
             <div>
-              <Link
-                to={{
-                  pathname: `/alert-his-events/${id}`,
-                }}
-                target='_blank'
-              >
+              <Link to={{
+            pathname: `/alert-his-events/${id}`
+          }} target='_blank'>
                 {title}
               </Link>
             </div>
             <div>
               <span className='event-tags'>{content}</span>
             </div>
-          </>
-        );
-      },
-    },
+          </>;
+    }
 
-    {
-      title: t('计算时间'),
-      dataIndex: 'last_eval_time',
-      width: 120,
-      render(value) {
-        return moment((value ? value : 0) * 1000).format('YYYY-MM-DD HH:mm:ss');
-      },
-    },
-  ];
+  }, {
+    title: t('计算时间'),
+    dataIndex: 'last_eval_time',
+    width: 120,
 
+    render(value) {
+      return moment((value ? value : 0) * 1000).format('YYYY-MM-DD HH:mm:ss');
+    }
+
+  }];
   const [exportBtnLoadding, setExportBtnLoadding] = useState(false);
 
   function renderLeftHeader() {
-    return (
-      <div className='table-operate-box'>
+    return <div className='table-operate-box'>
         <div className='left'>
-          <DateRangePicker
-            showRight={false}
-            leftList={DateRangeItems}
-            value={hisHourRange}
-            onChange={(range: RelativeRange) => {
-              if (range.num !== hisHourRange.num || range.unit !== hisHourRange.unit) {
-                saveData('hisHourRange', range);
-              }
-            }}
-          />
+          <DateRangePicker showRight={false} leftList={DateRangeItems} value={hisHourRange} onChange={(range: RelativeRange) => {
+          if (range.num !== hisHourRange.num || range.unit !== hisHourRange.unit) {
+            saveData('hisHourRange', range);
+          }
+        }} />
           <AdvancedWrap var='VITE_IS_ALERT_ES_DS'>
-            <Select
-              value={cate}
-              onChange={(val) => {
-                setCate(val);
-              }}
-              style={{ marginLeft: 8, width: 120 }}
-              placeholder='数据源类型'
-              allowClear
-            >
+            <Select value={cate} onChange={val => {
+            setCate(val);
+          }} style={{
+            marginLeft: 8,
+            width: 120
+          }} placeholder={t("数据源类型")} allowClear>
               <Select.Option value='prometheus'>Prometheus</Select.Option>
               <Select.Option value='elasticsearch'>Elasticsearch</Select.Option>
-              <Select.Option value='aliyun-sls'>阿里云 SLS</Select.Option>
+              <Select.Option value='aliyun-sls'>{t("阿里云")} SLSS</Select.Option>
             </Select>
           </AdvancedWrap>
-          <ClusterSelect cate={cate} onClusterChange={(e) => setCurClusterItems(e)} />
-          <ColumnSelect
-            onSeverityChange={(e) => setHisSeverity(e)}
-            onEventTypeChange={(e) => setHisEventType(e)}
-            onBusiGroupChange={(e) => setCurBusiId(typeof e === 'number' ? e : -1)}
-          />
-          <Input
-            className='search-input'
-            prefix={<SearchOutlined />}
-            placeholder='模糊搜索规则和标签(多个关键词请用空格分隔)'
-            value={hisQueryContent}
-            onChange={(e) => saveData('hisQueryContent', e.target.value)}
-            onPressEnter={(e) => tableRef.current.handleReload()}
-          />
-          <Button
-            style={{ marginLeft: 8 }}
-            loading={exportBtnLoadding}
-            onClick={() => {
-              setExportBtnLoadding(true);
-              exportEvents(
-                Object.assign(
-                  { p: 1, limit: 1000000 },
-                  { hours: hisHourRange.unit !== 'hours' ? hisHourRange.num * 24 : hisHourRange.num },
-                  curClusterItems.length ? { clusters: curClusterItems.join(',') } : {},
-                  hisSeverity !== undefined ? { severity: hisSeverity } : {},
-                  hisQueryContent ? { query: hisQueryContent } : {},
-                  hisEventType !== undefined ? { is_recovered: hisEventType } : {},
-                  { bgid: curBusiId },
-                  { cate },
-                ),
-                (err, csv) => {
-                  if (err) {
-                    message.error('导出失败！');
-                  } else {
-                    downloadFile(csv, `告警事件_${moment().format('YYYY-MM-DD_HH-mm-ss')}.csv`);
-                  }
-                  setExportBtnLoadding(false);
-                },
-              );
-            }}
-          >
-            导出
-          </Button>
+          <ClusterSelect cate={cate} onClusterChange={e => setCurClusterItems(e)} />
+          <ColumnSelect onSeverityChange={e => setHisSeverity(e)} onEventTypeChange={e => setHisEventType(e)} onBusiGroupChange={e => setCurBusiId(typeof e === 'number' ? e : -1)} />
+          <Input className='search-input' prefix={<SearchOutlined />} placeholder={t("模糊搜索规则和标签(多个关键词请用空格分隔)")} value={hisQueryContent} onChange={e => saveData('hisQueryContent', e.target.value)} onPressEnter={e => tableRef.current.handleReload()} />
+          <Button style={{
+          marginLeft: 8
+        }} loading={exportBtnLoadding} onClick={() => {
+          setExportBtnLoadding(true);
+          exportEvents(Object.assign({
+            p: 1,
+            limit: 1000000
+          }, {
+            hours: hisHourRange.unit !== 'hours' ? hisHourRange.num * 24 : hisHourRange.num
+          }, curClusterItems.length ? {
+            clusters: curClusterItems.join(',')
+          } : {}, hisSeverity !== undefined ? {
+            severity: hisSeverity
+          } : {}, hisQueryContent ? {
+            query: hisQueryContent
+          } : {}, hisEventType !== undefined ? {
+            is_recovered: hisEventType
+          } : {}, {
+            bgid: curBusiId
+          }, {
+            cate
+          }), (err, csv) => {
+            if (err) {
+              message.error(t("导出失败！"));
+            } else {
+              downloadFile(csv, `${t("告警事件_")}.csv${moment().format('YYYY-MM-DD_HH-mm-ss')}`);
+            }
+
+            setExportBtnLoadding(false);
+          });
+        }}>
+            {t("导出")}
+         </Button>
         </div>
-      </div>
-    );
+      </div>;
   }
 
   function saveData(prop, data) {
     dispatch({
       type: 'event/saveData',
       prop,
-      data,
+      data
     });
   }
 
@@ -211,57 +213,52 @@ const Event: React.FC = () => {
       isAddTagToQueryInput.current = false;
     }
   }, [hisQueryContent]);
-
   useEffect(() => {
     tableRef.current.handleReload();
   }, [curClusterItems, hisSeverity, hisHourRange, hisEventType, curBusiId, cate]);
-
-  return (
-    <PageLayout icon={<AlertOutlined />} title={t('历史告警')} hideCluster>
+  return <PageLayout icon={<AlertOutlined />} title={t('历史告警')} hideCluster>
       <div className='event-content'>
         <div className='table-area'>
-          <DataTable
-            ref={tableRef}
-            antProps={{
-              rowKey: 'id',
-              rowClassName: (record: { severity: number; is_recovered: number }, index) => {
-                return SeverityColor[record.is_recovered ? 3 : record.severity - 1] + '-left-border';
-              },
-              // scroll: { x: 'max-content' },
-            }}
-            url={`/api/n9e/alert-his-events/list`}
-            customQueryCallback={(data) =>
-              Object.assign(
-                data,
-                { hours: hisHourRange.unit !== 'hours' ? hisHourRange.num * 24 : hisHourRange.num },
-                curClusterItems.length ? { clusters: curClusterItems.join(',') } : {},
-                hisSeverity !== undefined ? { severity: hisSeverity } : {},
-                hisQueryContent ? { query: hisQueryContent } : {},
-                hisEventType !== undefined ? { is_recovered: hisEventType } : {},
-                { bgid: curBusiId },
-                { cate },
-              )
-            }
-            pageParams={{
-              curPageName: 'p',
-              pageSizeName: 'limit',
-              pageSize: 30,
-              pageSizeOptions: ['30', '100', '200', '500'],
-            }}
-            apiCallback={({ dat: { list: data, total } }) => ({
-              data,
-              total,
-            })}
-            columns={columns}
-            reloadBtnType='btn'
-            reloadBtnPos='left'
-            filterType='flex'
-            leftHeader={renderLeftHeader()}
-          />
+          <DataTable ref={tableRef} antProps={{
+          rowKey: 'id',
+          rowClassName: (record: {
+            severity: number;
+            is_recovered: number;
+          }, index) => {
+            return SeverityColor[record.is_recovered ? 3 : record.severity - 1] + '-left-border';
+          } // scroll: { x: 'max-content' },
+
+        }} url={`/api/n9e/alert-his-events/list`} customQueryCallback={data => Object.assign(data, {
+          hours: hisHourRange.unit !== 'hours' ? hisHourRange.num * 24 : hisHourRange.num
+        }, curClusterItems.length ? {
+          clusters: curClusterItems.join(',')
+        } : {}, hisSeverity !== undefined ? {
+          severity: hisSeverity
+        } : {}, hisQueryContent ? {
+          query: hisQueryContent
+        } : {}, hisEventType !== undefined ? {
+          is_recovered: hisEventType
+        } : {}, {
+          bgid: curBusiId
+        }, {
+          cate
+        })} pageParams={{
+          curPageName: 'p',
+          pageSizeName: 'limit',
+          pageSize: 30,
+          pageSizeOptions: ['30', '100', '200', '500']
+        }} apiCallback={({
+          dat: {
+            list: data,
+            total
+          }
+        }) => ({
+          data,
+          total
+        })} columns={columns} reloadBtnType='btn' reloadBtnPos='left' filterType='flex' leftHeader={renderLeftHeader()} />
         </div>
       </div>
-    </PageLayout>
-  );
+    </PageLayout>;
 };
 
 export default Event;

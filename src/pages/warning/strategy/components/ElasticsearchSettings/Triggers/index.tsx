@@ -1,5 +1,10 @@
 import React from 'react';
-
-export default function index({ form }) {
+import { useTranslation } from "react-i18next";
+export default function index({
+  form
+}) {
+  const {
+    t
+  } = useTranslation();
   return <div>index</div>;
 }

@@ -31,20 +31,26 @@ import { Tpl } from './interface';
 
 const Add = (props: any) => {
   const history = useHistory();
+
   const id = _.get(props, 'match.params.id');
-  const { curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
-  const { t } = useTranslation();
+
+  const {
+    curBusiItem
+  } = useSelector<RootState, CommonStoreState>(state => state.common);
+  const {
+    t
+  } = useTranslation();
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState({} as Tpl);
+  const [data, setData] = useState(({} as Tpl));
 
   const handleSubmit = (values: any) => {
     request(`${api.tasktpls(curBusiItem.id)}`, {
       method: 'POST',
-      body: JSON.stringify(values),
+      body: JSON.stringify(values)
     }).then(() => {
       message.success(t('msg.create.success'));
       props.history.push({
-        pathname: `/job-tpls`,
+        pathname: `/job-tpls`
       });
     });
   };
@@ -52,50 +58,39 @@ const Add = (props: any) => {
   useEffect(() => {
     if (id) {
       setLoading(true);
-      request(`${api.tasktpl(curBusiItem.id)}/${id}`).then((data) => {
-        const { dat } = data;
-        setData({
-          ...dat.tpl,
+      request(`${api.tasktpl(curBusiItem.id)}/${id}`).then(data => {
+        const {
+          dat
+        } = data;
+        setData({ ...dat.tpl,
           hosts: dat.hosts,
-          grp: dat.grp,
+          grp: dat.grp
         });
       }).finally(() => {
         setLoading(false);
       });
     }
   }, [id, curBusiItem.id]);
-
-  return (
-    <PageLayout hideCluster title={
-      <>
+  return <PageLayout hideCluster title={<>
         <RollbackOutlined className='back' onClick={() => history.push('/job-tpls')} />
-        自愈脚本
-      </>
-    }>
-      <div style={{ padding: 10 }}>
-        <Card
-          title="克隆自愈脚本"
-        >
+        {t("自愈脚本")}
+     </>}>
+      <div style={{
+      padding: 10
+    }}>
+        <Card title={t("克隆自愈脚本")}>
           <Spin spinning={loading}>
-            {
-              data.title ?
-              <TplForm
-                onSubmit={handleSubmit}
-                initialValues={data}
-                footer={
-                  <div>
-                    <Button type="primary" htmlType="submit" style={{ marginRight: 8 }}> 
+            {data.title ? <TplForm onSubmit={handleSubmit} initialValues={data} footer={<div>
+                    <Button type="primary" htmlType="submit" style={{
+              marginRight: 8
+            }}> 
                       {t('form.submit')}
                     </Button>
-                  </div>
-                }
-              /> : null
-            }
+                  </div>} /> : null}
           </Spin>
         </Card>
       </div>
-    </PageLayout>
-  )
-}
+    </PageLayout>;
+};
 
 export default Add;

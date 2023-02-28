@@ -23,52 +23,53 @@ import request from '@/utils/request';
 import api from '@/utils/api';
 const FormItem = Form.Item;
 
-const BindTags = (props) => {
-  const { t } = useTranslation();
+const BindTags = props => {
+  const {
+    t
+  } = useTranslation();
   const [form] = Form.useForm();
+
   const handleOk = () => {
-    const { selectedIds } = props;
+    const {
+      selectedIds
+    } = props;
     form.validateFields().then((values: any) => {
       request(`${api.tasktpls(props.busiId)}/tags`, {
         method: 'POST',
         body: JSON.stringify({
           tags: values.tags,
-          ids: selectedIds,
-        }),
+          ids: selectedIds
+        })
       }).then(() => {
         message.success(t('tpl.tag.bind.success'));
         props.onOk();
         props.destroy();
       });
     });
-  }
+  };
 
   const handleCancel = () => {
     props.destroy();
-  }
+  };
 
-  const { visible } = props;
-
-  return (
-    <Modal
-      title={t('tpl.tag.bind.title')}
-      visible={visible}
-      onOk={handleOk}
-      onCancel={handleCancel}
-    >
+  const {
+    visible
+  } = props;
+  return <Modal title={t('tpl.tag.bind.title')} visible={visible} onOk={handleOk} onCancel={handleCancel}>
       <Form form={form}>
-        <FormItem label={t('tpl.tag.bind.field')} required name="tags" rules={[{ required: true , message: '请选择！'}]}>
+        <FormItem label={t('tpl.tag.bind.field')} required name="tags" rules={[{
+        required: true,
+        message: t("请选择！")
+      }]}>
           <Select mode="tags" open={false} />
         </FormItem>
       </Form>
-    </Modal>
-  );
-}
+    </Modal>;
+};
 
 BindTags.defaultProps = {
   visible: true,
   onOk: _.noop,
-  destroy: _.noop,
+  destroy: _.noop
 };
-
-export default ModalControl(BindTags as any);
+export default ModalControl((BindTags as any));

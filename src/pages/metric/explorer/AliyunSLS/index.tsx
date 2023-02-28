@@ -12,7 +12,7 @@ import Raw from './Raw';
 import Metric from './Metric';
 import './style.less';
 import { useLocation } from 'react-router-dom';
-
+import { useTranslation } from "react-i18next";
 interface IProps {
   datasourceCate: DatasourceCateEnum.aliyunSLS;
   datasourceName: string;
@@ -20,25 +20,33 @@ interface IProps {
   form: FormInstance;
 }
 
-const ModeRadio = ({ mode, setMode }) => {
-  return (
-    <Radio.Group
-      value={mode}
-      onChange={(e) => {
-        setMode(e.target.value);
-      }}
-      buttonStyle='solid'
-    >
-      <Radio.Button value='timeSeries'>时序值</Radio.Button>
-      <Radio.Button value='raw'>日志原文</Radio.Button>
-    </Radio.Group>
-  );
+const ModeRadio = ({
+  mode,
+  setMode
+}) => {
+  const {
+    t
+  } = useTranslation();
+  return <Radio.Group value={mode} onChange={e => {
+    setMode(e.target.value);
+  }} buttonStyle='solid'>
+      <Radio.Button value='timeSeries'>{t("时序值")}</Radio.Button>
+      <Radio.Button value='raw'>{t("日志原文")}</Radio.Button>
+    </Radio.Group>;
 };
 
 export default function index(props: IProps) {
+  const {
+    t
+  } = useTranslation();
   const params = new URLSearchParams(useLocation().search);
   const executeAtOnce = params.get('data_source_name') && params.get('data_source_type')?.includes('sls');
-  const { datasourceCate, datasourceName, headerExtra, form } = props;
+  const {
+    datasourceCate,
+    datasourceName,
+    headerExtra,
+    form
+  } = props;
   const [mode, setMode] = useState(executeAtOnce ? 'raw' : 'timeSeries');
   const rawRef = useRef<any>();
   const metricRef = useRef<any>();
@@ -47,14 +55,17 @@ export default function index(props: IProps) {
       executeAtOnce && onExecute();
     }, 0);
   }, []);
+
   const onExecute = () => {
-    form.validateFields().then((values) => {
+    form.validateFields().then(values => {
       cacheDefaultValues(values.query);
+
       if (mode === 'raw') {
         if (rawRef.current && rawRef.current.fetchData) {
           rawRef.current.fetchData(datasourceCate, datasourceName, values);
         }
       }
+
       if (mode === 'timeSeries') {
         if (metricRef.current && metricRef.current.fetchData) {
           metricRef.current.fetchData(datasourceCate, datasourceName, values);
@@ -63,15 +74,12 @@ export default function index(props: IProps) {
     });
   };
 
-  return (
-    <div>
-      {headerExtra ? (
-        createPortal(<ModeRadio mode={mode} setMode={setMode} />, headerExtra)
-      ) : (
-        <div style={{ marginBottom: 10 }}>
+  return <div>
+      {headerExtra ? createPortal(<ModeRadio mode={mode} setMode={setMode} />, headerExtra) : <div style={{
+      marginBottom: 10
+    }}>
           <ModeRadio mode={mode} setMode={setMode} />
-        </div>
-      )}
+        </div>}
       <Row gutter={8}>
         <Col flex='auto'>
           <Row gutter={8}>
@@ -80,29 +88,44 @@ export default function index(props: IProps) {
             </Col>
             <Col span={12}>
               <Form.Item shouldUpdate noStyle>
-                {({ getFieldValue }) => {
-                  const project = getFieldValue(['query', 'project']);
-                  return <LogstoreSelect width='100%' datasourceCate={datasourceCate} datasourceName={datasourceName} project={project} prefixName={['query']} />;
-                }}
+                {({
+                getFieldValue
+              }) => {
+                const {
+                  t
+                } = useTranslation();
+                const project = getFieldValue(['query', 'project']);
+                return <LogstoreSelect width='100%' datasourceCate={datasourceCate} datasourceName={datasourceName} project={project} prefixName={['query']} />;
+              }}
               </Form.Item>
             </Col>
           </Row>
         </Col>
         <Col flex='550px'>
-          <Space style={{ display: 'flex' }}>
-            <Form.Item name={['query', 'range']} initialValue={{ start: 'now-1h', end: 'now' }}>
+          <Space style={{
+          display: 'flex'
+        }}>
+            <Form.Item name={['query', 'range']} initialValue={{
+            start: 'now-1h',
+            end: 'now'
+          }}>
               <TimeRangePicker dateFormat='YYYY-MM-DD HH:mm:ss' />
             </Form.Item>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <div style={{ lineHeight: '32px' }}>SQL增强</div>
+            <div style={{
+            display: 'flex',
+            gap: 8
+          }}>
+              <div style={{
+              lineHeight: '32px'
+            }}>{t("SQL增强")}</div>
               <Form.Item name={['query', 'power_sql']} valuePropName='checked'>
                 <Switch />
               </Form.Item>
             </div>
             <Form.Item>
               <Button type='primary' onClick={onExecute}>
-                查询
-              </Button>
+                {t("查询")}
+             </Button>
             </Form.Item>
           </Space>
         </Col>
@@ -113,25 +136,24 @@ export default function index(props: IProps) {
 
       {mode === 'timeSeries' && <Metric ref={metricRef} />}
       {mode === 'raw' && <Raw ref={rawRef} form={form} />}
-    </div>
-  );
+    </div>;
 }
-
 export const cacheDefaultValues = (query: any) => {
   let queryStr = '';
+
   try {
     queryStr = JSON.stringify(query);
     localStorage.setItem('explorer_aliyunsls_query', queryStr);
   } catch (e) {}
 };
-
 export const setDefaultValues = (form: FormInstance) => {
   const queryStr = localStorage.getItem('explorer_aliyunsls_query');
   let query = {};
+
   try {
     query = JSON.parse(queryStr || '{}');
     form.setFieldsValue({
-      query: _.omit(query, ['range']),
+      query: _.omit(query, ['range'])
     });
   } catch (e) {}
 };

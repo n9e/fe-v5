@@ -34,101 +34,82 @@ import ColumnSelect from '@/components/ColumnSelect';
 import ColorTag from '@/components/ColorTag';
 import { pageSizeOptionsDefault } from '../const';
 import './index.less';
-
-const { confirm } = Modal;
-
+const {
+  confirm
+} = Modal;
 const Shield: React.FC = () => {
-  const { t } = useTranslation();
+  const {
+    t
+  } = useTranslation();
   const history = useHistory();
   const dispatch = useDispatch();
   const [query, setQuery] = useState<string>('');
-  const { curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
+  const {
+    curBusiItem
+  } = useSelector<RootState, CommonStoreState>(state => state.common);
   const [bgid, setBgid] = useState(undefined);
   const [clusters, setClusters] = useState<string[]>([]);
   const [currentShieldDataAll, setCurrentShieldDataAll] = useState<Array<shieldItem>>([]);
   const [currentShieldData, setCurrentShieldData] = useState<Array<shieldItem>>([]);
   const [loading, setLoading] = useState<boolean>(false);
-
-  const columns: ColumnsType = [
-    {
-      title: t('集群'),
-      dataIndex: 'cluster',
-      render: (data) => {
-        const array = data.split(' ') || [];
-        return (
-          (array.length &&
-            array.map((tag: string, index: number) => {
-              return <ColorTag text={tag} key={index}></ColorTag>;
-            })) || <div></div>
-        );
-      },
-    },
-    {
-      title: t('规则备注'),
-      dataIndex: 'note',
-      render: (data, record: any) => {
-        return (
-          <div
-            className='table-active-text'
-            onClick={() => {
-              dispatch({
-                type: 'shield/setCurShieldData',
-                data: record,
-              });
-              handleClickEdit(record.id);
-            }}
-          >
+  const columns: ColumnsType = [{
+    title: t('集群'),
+    dataIndex: 'cluster',
+    render: data => {
+      const array = data.split(' ') || [];
+      return array.length && array.map((tag: string, index: number) => {
+        return <ColorTag text={tag} key={index}></ColorTag>;
+      }) || <div></div>;
+    }
+  }, {
+    title: t('规则备注'),
+    dataIndex: 'note',
+    render: (data, record: any) => {
+      return <div className='table-active-text' onClick={() => {
+        dispatch({
+          type: 'shield/setCurShieldData',
+          data: record
+        });
+        handleClickEdit(record.id);
+      }}>
             {data}
-          </div>
-        );
-      },
-    },
-    {
-      title: t('标签'),
-      dataIndex: 'tags',
-      render: (text: any) => {
-        return (
-          <>
-            {text
-              ? text.map((tag, index) => {
-                  return tag ? (
-                    <div key={index} style={{ lineHeight: '16px' }}>{`${tag.key} ${tag.func} ${tag.func === 'in' ? tag.value.split(' ').join(', ') : tag.value}`}</div>
-                  ) : null;
-                })
-              : ''}
-          </>
-        );
-      },
-    },
-    {
-      title: t('屏蔽原因'),
-      dataIndex: 'cause',
-      render: (text: string, record: shieldItem) => {
-        return (
-          <>
+          </div>;
+    }
+  }, {
+    title: t('标签'),
+    dataIndex: 'tags',
+    render: (text: any) => {
+      return <>
+            {text ? text.map((tag, index) => {
+          return tag ? <div key={index} style={{
+            lineHeight: '16px'
+          }}>{`${tag.key} ${tag.func} ${tag.func === 'in' ? tag.value.split(' ').join(', ') : tag.value}`}</div> : null;
+        }) : ''}
+          </>;
+    }
+  }, {
+    title: t('屏蔽原因'),
+    dataIndex: 'cause',
+    render: (text: string, record: shieldItem) => {
+      return <>
             <Tooltip placement='topLeft' title={text}>
-              <div
-                style={{
-                  whiteSpace: 'nowrap',
-                  textOverflow: 'ellipsis',
-                  overflow: 'hidden',
-                  lineHeight: '16px',
-                }}
-              >
+              <div style={{
+            whiteSpace: 'nowrap',
+            textOverflow: 'ellipsis',
+            overflow: 'hidden',
+            lineHeight: '16px'
+          }}>
                 {text}
               </div>
             </Tooltip>
             by {record.create_by}
-          </>
-        );
-      },
-    },
-    {
-      title: t('屏蔽时间'),
-      dataIndex: 'btime',
-      render: (text: number, record: shieldItem) => {
-        return (
-          <div className='shield-time'>
+          </>;
+    }
+  }, {
+    title: t('屏蔽时间'),
+    dataIndex: 'btime',
+    render: (text: number, record: shieldItem) => {
+      return <div className='shield-time'>
             <div>
               {t('开始:')}
               {dayjs(record?.btime * 1000).format('YYYY-MM-DD HH:mm:ss')}
@@ -137,96 +118,74 @@ const Shield: React.FC = () => {
               {t('结束:')}
               {dayjs(record?.etime * 1000).format('YYYY-MM-DD HH:mm:ss')}
             </div>
-          </div>
-        );
-      },
-    },
-    {
-      title: t('启用'),
-      dataIndex: 'disabled',
-      render: (disabled, record) => (
-        <Switch
-          checked={disabled === strategyStatus.Enable}
-          size='small'
-          onChange={() => {
-            // @ts-ignore
-            const { id, disabled } = record;
-            updateShields(
-              {
-                ids: [id],
-                fields: {
-                  disabled: !disabled ? 1 : 0,
-                },
-              },
-              curBusiItem.id,
-            ).then(() => {
-              refreshList();
-            });
-          }}
-        />
-      ),
-    },
-    {
-      title: t('操作'),
-      width: '98px',
-      dataIndex: 'operation',
-      render: (text: undefined, record: shieldItem) => {
-        return (
-          <>
+          </div>;
+    }
+  }, {
+    title: t('启用'),
+    dataIndex: 'disabled',
+    render: (disabled, record) => <Switch checked={disabled === strategyStatus.Enable} size='small' onChange={() => {
+      // @ts-ignore
+      const {
+        id,
+        disabled
+      } = record;
+      updateShields({
+        ids: [id],
+        fields: {
+          disabled: !disabled ? 1 : 0
+        }
+      }, curBusiItem.id).then(() => {
+        refreshList();
+      });
+    }} />
+  }, {
+    title: t('操作'),
+    width: '98px',
+    dataIndex: 'operation',
+    render: (text: undefined, record: shieldItem) => {
+      return <>
             <div className='table-operator-area'>
-              <div
-                className='table-operator-area-normal'
-                style={{
-                  cursor: 'pointer',
-                  display: 'inline-block',
-                }}
-                onClick={() => {
-                  dispatch({
-                    type: 'shield/setCurShieldData',
-                    data: record,
-                  });
-                  curBusiItem?.id && history.push(`/alert-mutes/edit/${record.id}?mode=clone`);
-                }}
-              >
+              <div className='table-operator-area-normal' style={{
+            cursor: 'pointer',
+            display: 'inline-block'
+          }} onClick={() => {
+            dispatch({
+              type: 'shield/setCurShieldData',
+              data: record
+            });
+            curBusiItem?.id && history.push(`/alert-mutes/edit/${record.id}?mode=clone`);
+          }}>
                 {t('克隆')}
               </div>
-              <div
-                className='table-operator-area-warning'
-                style={{
-                  cursor: 'pointer',
-                  display: 'inline-block',
-                }}
-                onClick={() => {
-                  confirm({
-                    title: t('确定删除该告警屏蔽?'),
-                    icon: <ExclamationCircleOutlined />,
-                    onOk: () => {
-                      dismiss(record.id);
-                    },
-
-                    onCancel() {},
-                  });
-                }}
-              >
+              <div className='table-operator-area-warning' style={{
+            cursor: 'pointer',
+            display: 'inline-block'
+          }} onClick={() => {
+            confirm({
+              title: t('确定删除该告警屏蔽?'),
+              icon: <ExclamationCircleOutlined />,
+              onOk: () => {
+                dismiss(record.id);
+              },
+              onCancel() {}
+            });
+          }}>
                 {t('删除')}
               </div>
             </div>
-          </>
-        );
-      },
-    },
-  ];
-
+          </>;
+    }
+  }];
   useEffect(() => {
     getList();
   }, [curBusiItem]);
-
   useEffect(() => {
     filterData();
   }, [query, clusters, currentShieldDataAll]);
-
   const dismiss = (id: number) => {
-    deleteShields({ ids: [id] }, curBusiItem.id).then((res) => {
+    deleteShields({
+      ids: [id]
+    }, curBusiItem.id).then(res => {
       refreshList();
       if (res.err) {
         message.success(res.err);
@@ -235,107 +194,81 @@ const Shield: React.FC = () => {
       }
     });
   };
-
   const filterData = () => {
     const data = JSON.parse(JSON.stringify(currentShieldDataAll));
     const res = data.filter((item: shieldItem) => {
-      const tagFind = item.tags.find((tag) => {
+      const tagFind = item.tags.find(tag => {
         return tag.key.indexOf(query) > -1 || tag.value.indexOf(query) > -1 || tag.func.indexOf(query) > -1;
       });
-      return (item.cause.indexOf(query) > -1 || !!tagFind) && ((clusters && clusters?.indexOf(item.cluster) > -1) || clusters?.length === 0);
+      return (item.cause.indexOf(query) > -1 || !!tagFind) && (clusters && clusters?.indexOf(item.cluster) > -1 || clusters?.length === 0);
     });
     setCurrentShieldData(res || []);
   };
-
   const getList = async () => {
     if (curBusiItem.id) {
       setLoading(true);
-      const { success, dat } = await getShieldList({ id: curBusiItem.id });
+      const {
+        success,
+        dat
+      } = await getShieldList({
+        id: curBusiItem.id
+      });
       if (success) {
         setCurrentShieldDataAll(dat || []);
         setLoading(false);
       }
     }
   };
-
   const refreshList = () => {
     getList();
   };
-
   const handleClickEdit = (id, isClone = false) => {
     curBusiItem?.id && history.push(`/alert-mutes/edit/${id}${isClone ? '?mode=clone' : ''}`);
   };
-
-  const onSearchQuery = (e) => {
+  const onSearchQuery = e => {
     let val = e.target.value;
     setQuery(val);
   };
-
-  const clusterChange = (data) => {
+  const clusterChange = data => {
     setClusters(data);
   };
-
-  const busiChange = (data) => {
+  const busiChange = data => {
     setBgid(data);
   };
-
-  return (
-    <PageLayout title={t('屏蔽规则')} icon={<CloseCircleOutlined />} hideCluster>
+  return <PageLayout title={t('屏蔽规则')} icon={<CloseCircleOutlined />} hideCluster>
       <div className='shield-content'>
-        <LeftTree
-          busiGroup={{
-            onChange: busiChange,
-          }}
-        ></LeftTree>
-        {curBusiItem?.id ? (
-          <div className='shield-index'>
+        <LeftTree busiGroup={{
+        onChange: busiChange
+      }}></LeftTree>
+        {curBusiItem?.id ? <div className='shield-index'>
             <div className='header'>
               <div className='header-left'>
-                <RefreshIcon
-                  className='strategy-table-search-left-refresh'
-                  onClick={() => {
-                    refreshList();
-                  }}
-                />
-                <ColumnSelect onClusterChange={(e) => setClusters(e)} />
+                <RefreshIcon className='strategy-table-search-left-refresh' onClick={() => {
+              refreshList();
+            }} />
+                <ColumnSelect onClusterChange={e => setClusters(e)} />
                 <Input onPressEnter={onSearchQuery} className={'searchInput'} prefix={<SearchOutlined />} placeholder={t('搜索标签、屏蔽原因')} />
               </div>
               <div className='header-right'>
-                <Button
-                  type='primary'
-                  className='add'
-                  ghost
-                  onClick={() => {
-                    history.push('/alert-mutes/add');
-                  }}
-                >
+                <Button type='primary' className='add' ghost onClick={() => {
+              history.push('/alert-mutes/add');
+            }}>
                   {t('新增屏蔽规则')}
                 </Button>
               </div>
             </div>
-            <Table
-              rowKey='id'
-              pagination={{
-                total: currentShieldData.length,
-                showQuickJumper: true,
-                showSizeChanger: true,
-                showTotal: (total) => {
-                  return `共 ${total} 条数据`;
-                },
-                pageSizeOptions: pageSizeOptionsDefault,
-                defaultPageSize: 30,
-              }}
-              loading={loading}
-              dataSource={currentShieldData}
-              columns={columns}
-            />
-          </div>
-        ) : (
-          <BlankBusinessPlaceholder text='屏蔽规则' />
-        )}
+            <Table rowKey='id' pagination={{
+          total: currentShieldData.length,
+          showQuickJumper: true,
+          showSizeChanger: true,
+          showTotal: total => {
+            return `${t("共 ")}${total}${t(" 条数据")}`;
+          },
+          pageSizeOptions: pageSizeOptionsDefault,
+          defaultPageSize: 30
+        }} loading={loading} dataSource={currentShieldData} columns={columns} />
+          </div> : <BlankBusinessPlaceholder text={t("屏蔽规则")} />}
       </div>
-    </PageLayout>
-  );
+    </PageLayout>;
 };
-
 export default Shield;

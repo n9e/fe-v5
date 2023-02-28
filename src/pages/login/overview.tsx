@@ -15,7 +15,10 @@
  *
  */
 import React, { useState, useEffect, useRef } from 'react';
-
+import { useTranslation } from "react-i18next";
 export default function Overview() {
+  const {
+    t
+  } = useTranslation();
   return <div className='login-warp'></div>;
 }

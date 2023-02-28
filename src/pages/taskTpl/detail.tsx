@@ -32,42 +32,41 @@ import { Tpl } from './interface';
 
 const Detail = (props: any) => {
   const history = useHistory();
-  const id = _.get(props, 'match.params.id');
-  const { curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
-  const { t } = useTranslation();
-  const [loading, setLoading] = useState(false);
-  const [data, setData] = useState({} as Tpl);
 
+  const id = _.get(props, 'match.params.id');
+
+  const {
+    curBusiItem
+  } = useSelector<RootState, CommonStoreState>(state => state.common);
+  const {
+    t
+  } = useTranslation();
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState(({} as Tpl));
   useEffect(() => {
     if (id) {
       setLoading(true);
-      request(`${api.tasktpl(curBusiItem.id)}/${id}`)
-        .then((data) => {
-          const { dat } = data;
-          setData({
-            ...dat.tpl,
-            hosts: dat.hosts,
-            grp: dat.grp,
-          });
-        })
-        .finally(() => {
-          setLoading(false);
+      request(`${api.tasktpl(curBusiItem.id)}/${id}`).then(data => {
+        const {
+          dat
+        } = data;
+        setData({ ...dat.tpl,
+          hosts: dat.hosts,
+          grp: dat.grp
         });
+      }).finally(() => {
+        setLoading(false);
+      });
     }
   }, [id, curBusiItem.id]);
-
-  return (
-    <PageLayout
-      hideCluster
-      title={
-        <>
+  return <PageLayout hideCluster title={<>
           <RollbackOutlined className='back' onClick={() => history.push('/job-tpls')} />
-          自愈脚本
-        </>
-      }
-    >
-      <div style={{ padding: 10 }}>
-        <Card title='自愈脚本详情'>
+          {t("自愈脚本")}
+       </>}>
+      <div style={{
+      padding: 10
+    }}>
+        <Card title={t("自愈脚本详情")}>
           <Spin spinning={loading}>
             <div className='job-task-table'>
               <div className='ant-table ant-table-default ant-table-bordered'>
@@ -75,7 +74,10 @@ const Detail = (props: any) => {
                   <div className='ant-table-body'>
                     <table>
                       <colgroup>
-                        <col style={{ width: 100, minWidth: 100 }} />
+                        <col style={{
+                        width: 100,
+                        minWidth: 100
+                      }} />
                         <col />
                       </colgroup>
                       <tbody className='ant-table-tbody'>
@@ -105,7 +107,9 @@ const Detail = (props: any) => {
                         </tr>
                         <tr className='ant-table-row ant-table-row-level-0'>
                           <td>
-                            <div style={{ height: '100%' }}>{t('task.script')}</div>
+                            <div style={{
+                            height: '100%'
+                          }}>{t('task.script')}</div>
                           </td>
                           <td>
                             <Editor value={data.script} readOnly height='200px' />
@@ -122,9 +126,9 @@ const Detail = (props: any) => {
                         <tr className='ant-table-row ant-table-row-level-0'>
                           <td>{t('task.host.list')}</td>
                           <td>
-                            {_.map(data.hosts, (host) => {
-                              return <div key={host}>{host}</div>;
-                            })}
+                            {_.map(data.hosts, host => {
+                            return <div key={host}>{host}</div>;
+                          })}
                           </td>
                         </tr>
                       </tbody>
@@ -133,21 +137,29 @@ const Detail = (props: any) => {
                 </div>
               </div>
             </div>
-            <div style={{ marginTop: 10 }}>
-              <Link to={{ pathname: `/job-tpls/${id}/modify` }}>
-                <Button type='primary' style={{ marginRight: 10 }}>
+            <div style={{
+            marginTop: 10
+          }}>
+              <Link to={{
+              pathname: `/job-tpls/${id}/modify`
+            }}>
+                <Button type='primary' style={{
+                marginRight: 10
+              }}>
                   {t('tpl.modify')}
                 </Button>
               </Link>
-              <Link to={{ pathname: `/job-tpls/add/task`, search: `tpl=${id}` }}>
+              <Link to={{
+              pathname: `/job-tpls/add/task`,
+              search: `tpl=${id}`
+            }}>
                 <Button type='primary'>{t('tpl.create.task')}</Button>
               </Link>
             </div>
           </Spin>
         </Card>
       </div>
-    </PageLayout>
-  );
+    </PageLayout>;
 };
 
 export default Detail;

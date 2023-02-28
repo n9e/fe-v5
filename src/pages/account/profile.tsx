@@ -23,21 +23,26 @@ import './profile.less';
 import PageLayout from '@/components/pageLayout';
 import { useParams, useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-const { TabPane } = Tabs;
+const {
+  TabPane
+} = Tabs;
 interface Param {
   tab: string;
 }
 export default function Profile() {
-  const { t } = useTranslation();
-  const { tab } = useParams<Param>();
+  const {
+    t
+  } = useTranslation();
+  const {
+    tab
+  } = useParams<Param>();
   const history = useHistory();
 
-  const handleChange = (tab) => {
+  const handleChange = tab => {
     history.push('/account/profile/' + tab);
   };
 
-  return (
-    <PageLayout title={t('个人中心')} hideCluster>
+  return <PageLayout title={t('个人中心')} hideCluster>
       <Tabs activeKey={tab} className='profile' onChange={handleChange}>
         <TabPane tab={t('personalInfo')} key='info'>
           <Info />
@@ -45,10 +50,11 @@ export default function Profile() {
         <TabPane tab={t('修改密码')} key='pwd'>
           <ChangePassword />
         </TabPane>
-        {/* <TabPane tab={t('秘钥管理')} key='secret'>
-          <SecretKey />
-        </TabPane> */}
+        {
+        /* <TabPane tab={t('秘钥管理')} key='secret'>
+         <SecretKey />
+        </TabPane> */
+      }
       </Tabs>
-    </PageLayout>
-  );
+    </PageLayout>;
 }

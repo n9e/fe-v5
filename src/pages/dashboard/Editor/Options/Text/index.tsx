@@ -16,11 +16,14 @@
  */
 import React from 'react';
 import GraphStyles from './GraphStyles';
-
-export default function Timeseries({ variableConfigWithOptions }) {
-  return (
-    <>
+import { useTranslation } from "react-i18next";
+export default function Timeseries({
+  variableConfigWithOptions
+}) {
+  const {
+    t
+  } = useTranslation();
+  return <>
       <GraphStyles variableConfigWithOptions={variableConfigWithOptions} />
-    </>
-  );
+    </>;
 }

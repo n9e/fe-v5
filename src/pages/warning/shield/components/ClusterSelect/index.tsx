@@ -2,67 +2,63 @@ import React, { useState, useEffect } from 'react';
 import { Form, Select } from 'antd';
 import { CaretDownOutlined } from '@ant-design/icons';
 import { getCommonClusters, getCommonESClusters, getCommonSLSClusters } from '@/services/common';
+import { useTranslation } from "react-i18next";
 export const ClusterAll = '$all';
-
-export default function index({ form, cate }) {
+export default function index({
+  form,
+  cate
+}) {
+  const {
+    t
+  } = useTranslation();
   const [clusterList, setClusterList] = useState([]);
   const handleClusterChange = (v: string[]) => {
     if (v.includes(ClusterAll)) {
-      form.setFieldsValue({ cluster: [ClusterAll] });
+      form.setFieldsValue({
+        cluster: [ClusterAll]
+      });
     }
   };
-
   useEffect(() => {
     if (cate === 'elasticsearch') {
-      getCommonESClusters()
-        .then(({ dat }) => {
-          setClusterList(dat);
-        })
-        .catch(() => {
-          setClusterList([]);
-        });
+      getCommonESClusters().then(({
+        dat
+      }) => {
+        setClusterList(dat);
+      }).catch(() => {
+        setClusterList([]);
+      });
     }
     if (cate === 'aliyun-sls') {
-      getCommonSLSClusters()
-        .then(({ dat }) => {
-          setClusterList(dat);
-        })
-        .catch(() => {
-          setClusterList([]);
-        });
+      getCommonSLSClusters().then(({
+        dat
+      }) => {
+        setClusterList(dat);
+      }).catch(() => {
+        setClusterList([]);
+      });
     }
     if (cate === 'prometheus') {
-      getCommonClusters()
-        .then(({ dat }) => {
-          setClusterList(dat);
-        })
-        .catch(() => {
-          setClusterList([]);
-        });
+      getCommonClusters().then(({
+        dat
+      }) => {
+        setClusterList(dat);
+      }).catch(() => {
+        setClusterList([]);
+      });
     }
   }, [cate]);
-
-  return (
-    <Form.Item
-      label='生效集群'
-      name='cluster'
-      rules={[
-        {
-          required: true,
-          message: '生效集群不能为空',
-        },
-      ]}
-    >
+  return <Form.Item label={t("生效集群")} name='cluster' rules={[{
+    required: true,
+    message: t("生效集群不能为空")
+  }]}>
       <Select suffixIcon={<CaretDownOutlined />} mode='multiple' onChange={handleClusterChange}>
         <Select.Option value={ClusterAll} key={ClusterAll}>
           {ClusterAll}
         </Select.Option>
-        {clusterList?.map((item) => (
-          <Select.Option value={item} key={item}>
+        {clusterList?.map(item => <Select.Option value={item} key={item}>
             {item}
-          </Select.Option>
-        ))}
+          </Select.Option>)}
       </Select>
-    </Form.Item>
-  );
+    </Form.Item>;
 }

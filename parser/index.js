@@ -1,18 +1,8 @@
-/*
- * Copyright 2022 Nightingale Team
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
+/* 本脚本的目标是动态在tsx进行如下操作
+ *  1. 插入依赖
+ *  2. 调用useTranslation hook
+ *  3. 包裹字符串
+ *  因为他是hook，所以只能在function component中使用，所以class component需要手动改一改
  */
 const fs = require('fs');
 const babelParser = require('@babel/parser');
@@ -21,7 +11,7 @@ const generate = require('@babel/generator').default;
 const t = require('@babel/types');
 const core = require('@babel/core');
 const path = require('path');
-const srcPath = path.resolve('../', 'src', 'pages');
+const srcPath = path.resolve('../', 'src', 'components', 'TimeRangePicker');
 const prettier = require('prettier');
 const prettierConfig = require('../.prettierrc.json');
 const outputPath = path.resolve('../', 'output.json');
@@ -49,7 +39,6 @@ const runParser = function (code) {
     sourceType: 'module', // default: "script"
     plugins: ['typescript', 'jsx'],
   });
-  // console.dir(ast, { depth: null });
 
   const createIntlCall = function (value) {
     let callee = t.identifier(I8N_FUNC_NAME);
@@ -58,23 +47,12 @@ const runParser = function (code) {
   };
 
   const createImportIntl = function () {
-    let importSpecifier = t.importSpecifier(
-      t.identifier(USE_TRANSLATION_FUN),
-      t.identifier(USE_TRANSLATION_FUN),
-    );
-    return t.importDeclaration(
-      [importSpecifier],
-      t.stringLiteral(IMPORT_SOURCE),
-    );
+    let importSpecifier = t.importSpecifier(t.identifier(USE_TRANSLATION_FUN), t.identifier(USE_TRANSLATION_FUN));
+    return t.importDeclaration([importSpecifier], t.stringLiteral(IMPORT_SOURCE));
   };
 
   const createUseTranslationExpression = function () {
-    let objectProperty = t.objectProperty(
-      t.identifier(I8N_FUNC_NAME),
-      t.identifier(I8N_FUNC_NAME),
-      false,
-      true,
-    );
+    let objectProperty = t.objectProperty(t.identifier(I8N_FUNC_NAME), t.identifier(I8N_FUNC_NAME), false, true);
     let objectPattern = t.objectPattern([objectProperty]);
     let callee = t.identifier(USE_TRANSLATION_FUN);
     let useTranslationCall = t.callExpression(callee, []);
@@ -95,6 +73,8 @@ const runParser = function (code) {
     return newJsx;
   };
 
+  let isFunctionComponent = false;
+
   //todo 判断是函数组件!! 普通函数要做区分 一定要是函数组件!(判断)  ,然后插入 useTranslation
 
   // 问题罗列
@@ -105,9 +85,7 @@ const runParser = function (code) {
     enter: function (path) {
       // 进入节点
       // output.push(path.node);
-    },
-    leave: function(path) {
-
+      // console.log(path.node)
     },
     Program: function (path) {
       const { node } = path;
@@ -243,32 +221,20 @@ const runParser = function (code) {
               newAstNodes.push(createJSXExpressionContainer(contentValue));
             } else {
               newAstNodes.push(createJSXText(value.substring(0, contentIndex)));
-              newAstNodes.push(
-                hasChinese(contentValue)
-                  ? createJSXExpressionContainer(contentValue)
-                  : createJSXText(contentValue),
-              );
+              newAstNodes.push(hasChinese(contentValue) ? createJSXExpressionContainer(contentValue) : createJSXText(contentValue));
             }
           } else {
             const lastContent = contentResults[index - 1];
             const [lastContentValue] = lastContent;
             const lastContentIndex = lastContent.index;
             const lastEnd = lastContentIndex + lastContentValue.length;
-            newAstNodes.push(
-              createJSXText(value.substring(lastEnd, contentIndex)),
-            );
-            newAstNodes.push(
-              hasChinese(contentValue)
-                ? createJSXExpressionContainer(contentValue)
-                : createJSXText(contentValue),
-            );
+            newAstNodes.push(createJSXText(value.substring(lastEnd, contentIndex)));
+            newAstNodes.push(hasChinese(contentValue) ? createJSXExpressionContainer(contentValue) : createJSXText(contentValue));
           }
           endIndex = contentIndex + contentValue.length;
         });
         if (endIndex !== value.length - 1) {
-          newAstNodes.push(
-            createJSXText(value.substring(endIndex, value.length - 1)),
-          );
+          newAstNodes.push(createJSXText(value.substring(endIndex, value.length - 1)));
         }
         // console.dir(newAstNodes, { depth: null });
         path.replaceWithMultiple(newAstNodes);
@@ -283,28 +249,18 @@ const runParser = function (code) {
       output.push(node.argument);
       output.push(parentPath.parent);
       if (
-        (t.isJSXElement(node.argument) ||
-          t.isConditionalExpression(node.argument) ||
-          t.isJSXFragment(node.argument)) &&
-        (t.isArrowFunctionExpression(parentPath.parent) ||
-          t.isFunctionExpression(parentPath.parent) ||
-          t.isFunctionDeclaration(parentPath.parent)) &&
-        parentPath.parentPath.findParent(
-          (path) =>
-            path.isArrowFunctionExpression() || path.isFunctionExpression(),
-        ) === null
+        (t.isJSXElement(node.argument) || t.isConditionalExpression(node.argument) || t.isJSXFragment(node.argument)) &&
+        (t.isArrowFunctionExpression(parentPath.parent) || t.isFunctionExpression(parentPath.parent) || t.isFunctionDeclaration(parentPath.parent)) &&
+        parentPath.parentPath.findParent((path) => path.isArrowFunctionExpression() || path.isFunctionExpression()) === null
       ) {
+        isFunctionComponent = true;
         // 粗浅
         const { body } = parent;
         let hasUseTranslation = false;
         body.forEach((bodyNode) => {
           if (t.isVariableDeclaration(bodyNode)) {
             const { kind, declarations } = bodyNode;
-            if (
-              kind === 'const' &&
-              declarations.length === 1 &&
-              t.isVariableDeclarator(declarations[0])
-            ) {
+            if (kind === 'const' && declarations.length === 1 && t.isVariableDeclarator(declarations[0])) {
               const { init } = declarations[0];
               if (t.isCallExpression(init)) {
                 const { callee } = init;
@@ -317,9 +273,7 @@ const runParser = function (code) {
         });
         if (!hasUseTranslation) {
           // body.unshift(createUseTranslationExpression());
-          body.unshift(
-            babelParser.parse('const { t } = useTranslation()').program.body[0],
-          );
+          body.unshift(babelParser.parse('const { t } = useTranslation()').program.body[0]);
         }
       }
     },
@@ -330,19 +284,17 @@ const runParser = function (code) {
     jsescOption: { minimal: true },
   });
   // console.dir(newAst);
-  return newAst.code;
+  return isFunctionComponent ? newAst.code : code;
 };
 
 if (arg[0] === 'all') {
   try {
     let fileLists = getAllTSXFile(srcPath, []);
     fileLists.forEach((file) => {
+      console.log('file', file);
       const code = fs.readFileSync(path.resolve(file), 'utf8');
       const targetCode = runParser(code);
       const newFilePathArr = file.split('/');
-      if (!newFilePathArr.slice(-1)[0].startsWith('const')) {
-        return;
-      }
       // const srcIndex = newFilePathArr.indexOf('src');
       // newFilePathArr[srcIndex + 1] = newFilePathArr[srcIndex + 1] + '1'; // 临时拷贝到一个新目录用作对比
       // fs.mkdirSync(newFilePathArr.slice(0, -1).join('/'), { recursive: true });
@@ -350,23 +302,16 @@ if (arg[0] === 'all') {
       fs.writeFile(file, targetCode, null, () => {});
     });
   } catch (error) {
+    console.log(error);
     console.warn(error);
   }
 } else {
   // parse src/test.tsx file and output into test2.tsx
-  const code = fs.readFileSync(
-    path.resolve('../', 'src', './test.tsx'),
-    'utf8',
-  );
+  const code = fs.readFileSync(path.resolve('../', 'src/pages/warning/strategy/components/ElasticsearchSettings/GroupBy/configs.ts'), 'utf8');
 
   const targetCode = runParser(code);
 
-  fs.writeFile(
-    path.resolve('../', 'src', './test2.tsx'),
-    targetCode,
-    null,
-    () => {},
-  );
+  fs.writeFile(path.resolve('../', 'src/pages/warning/strategy/components/ElasticsearchSettings/GroupBy/configs.ts'), targetCode, null, () => {});
 }
 
 // write the mountainous log into the output

@@ -19,28 +19,27 @@ import { Tabs } from 'antd';
 import { RetweetOutlined } from '@ant-design/icons';
 import PageLayout from '@/components/pageLayout';
 import Dashboard from './Dashboard';
-
-const { TabPane } = Tabs;
-
+import { useTranslation } from "react-i18next";
+const {
+  TabPane
+} = Tabs;
 export default function Migrate() {
-  return (
-    <PageLayout
-      title={
-        <>
-          <RetweetOutlined /> 管理员迁移
-        </>
-      }
-      hideCluster
-    >
+  const {
+    t
+  } = useTranslation();
+  return <PageLayout title={<>
+          <RetweetOutlined /> {t("管理员迁移")}
+       </>} hideCluster>
       <div>
-        <div style={{ padding: 20 }}>
+        <div style={{
+        padding: 20
+      }}>
           <Tabs defaultActiveKey='boards'>
-            <TabPane tab='大盘迁移' key='boards'>
+            <TabPane tab={t("大盘迁移")} key='boards'>
               <Dashboard />
             </TabPane>
           </Tabs>
         </div>
       </div>
-    </PageLayout>
-  );
+    </PageLayout>;
 }

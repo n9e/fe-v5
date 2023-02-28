@@ -5,12 +5,12 @@ import OperateForm from './components/operateForm';
 import './index.less';
 
 const StrategyAdd: React.FC = () => {
-  const { t } = useTranslation();
-  return (
-    <PageLayout title={t('记录规则')} showBack hideCluster>
+  const {
+    t
+  } = useTranslation();
+  return <PageLayout title={t('记录规则')} showBack hideCluster>
       <OperateForm />
-    </PageLayout>
-  );
+    </PageLayout>;
 };
 
 export default StrategyAdd;
