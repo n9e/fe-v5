@@ -417,7 +417,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                         tooltip={
                           cate === 'prometheus'
                             ? t(`每隔${form.getFieldValue('prom_eval_interval')}秒，把PromQL作为查询条件，去查询后端存储，如果查到了数据就表示当次有监控数据触发了规则`)
-                            : '每隔15秒，去查询后端存储'
+                            : `每隔${form.getFieldValue('prom_eval_interval')}秒，去查询后端存储`
                         }
                         initialValue={60}
                         rules={[
