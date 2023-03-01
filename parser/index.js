@@ -11,7 +11,7 @@ const generate = require('@babel/generator').default;
 const t = require('@babel/types');
 const core = require('@babel/core');
 const path = require('path');
-const srcPath = path.resolve('../', 'src', 'components', 'TimeRangePicker');
+const srcPath = path.resolve('../../srm-fe', 'src/Packages/MultiDimension');
 const prettier = require('prettier');
 const prettierConfig = require('../.prettierrc.json');
 const outputPath = path.resolve('../', 'output.json');
@@ -74,7 +74,6 @@ const runParser = function (code) {
   };
 
   let isFunctionComponent = false;
-
   //todo 判断是函数组件!! 普通函数要做区分 一定要是函数组件!(判断)  ,然后插入 useTranslation
 
   // 问题罗列
@@ -128,7 +127,7 @@ const runParser = function (code) {
         return;
       }
       if (t.isCallExpression(parent)) {
-        output[value] = value;
+        // output[value] = value;
         const { callee } = parent;
         if (t.isIdentifier(callee) && callee.name === I8N_FUNC_NAME) return;
       }
@@ -246,12 +245,12 @@ const runParser = function (code) {
       // 1.return 返回jsx代码
       // 2.调用return的是函数表达式或者箭头函数表达式
       // 3.函数没有被其他函数包裹
-      output.push(node.argument);
-      output.push(parentPath.parent);
+      // output.push(path);
+      // output.push(parentPath.parent);
       if (
-        (t.isJSXElement(node.argument) || t.isConditionalExpression(node.argument) || t.isJSXFragment(node.argument)) &&
-        (t.isArrowFunctionExpression(parentPath.parent) || t.isFunctionExpression(parentPath.parent) || t.isFunctionDeclaration(parentPath.parent)) &&
-        parentPath.parentPath.findParent((path) => path.isArrowFunctionExpression() || path.isFunctionExpression()) === null
+        (t.isJSXElement(node.argument) || t.isConditionalExpression(node.argument) || t.isJSXFragment(node.argument)) && 
+        (t.isArrowFunctionExpression(parentPath.parent) || t.isFunctionExpression(parentPath.parent) || t.isFunctionDeclaration(parentPath.parent)) && 
+        path.findParent((path) => path.isArrowFunctionExpression() || path.isFunctionExpression()) === null
       ) {
         isFunctionComponent = true;
         // 粗浅
@@ -307,11 +306,10 @@ if (arg[0] === 'all') {
   }
 } else {
   // parse src/test.tsx file and output into test2.tsx
-  const code = fs.readFileSync(path.resolve('../', 'src/pages/warning/strategy/components/ElasticsearchSettings/GroupBy/configs.ts'), 'utf8');
-
+  const code = fs.readFileSync(path.resolve('../../srm-fe', 'src/Packages/Polaris/pages/index.tsx'), 'utf8');
   const targetCode = runParser(code);
 
-  fs.writeFile(path.resolve('../', 'src/pages/warning/strategy/components/ElasticsearchSettings/GroupBy/configs.ts'), targetCode, null, () => {});
+  fs.writeFile(path.resolve('../../srm-fe', 'src/Packages/Polaris/pages/index.tsx'), targetCode, null, () => {});
 }
 
 // write the mountainous log into the output
