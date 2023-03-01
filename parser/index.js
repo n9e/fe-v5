@@ -11,7 +11,7 @@ const generate = require('@babel/generator').default;
 const t = require('@babel/types');
 const core = require('@babel/core');
 const path = require('path');
-const srcPath = path.resolve('../../srm-fe', 'src/components/menu');
+const srcPath = path.resolve('../../srm-fe', 'src/Packages/Outfire/components/createModalButton');
 const prettier = require('prettier');
 const prettierConfig = require('../.prettierrc.json');
 const outputPath = path.resolve('../', 'output.json');
@@ -306,10 +306,10 @@ if (arg[0] === 'all') {
   }
 } else {
   // parse src/test.tsx file and output into test2.tsx
-  const code = fs.readFileSync(path.resolve('../../srm-fe', 'src/Packages/Polaris/pages/index.tsx'), 'utf8');
+  const file = 'src/Packages/Polaris/components/AuthManage/index.tsx'
+  const code = fs.readFileSync(path.resolve('../../srm-fe', file), 'utf8');
   const targetCode = runParser(code);
-
-  fs.writeFile(path.resolve('../../srm-fe', 'src/Packages/Polaris/pages/index.tsx'), targetCode, null, () => {});
+  fs.writeFile(path.resolve('../../srm-fe', file), targetCode, null, () => {});
 }
 
 // write the mountainous log into the output

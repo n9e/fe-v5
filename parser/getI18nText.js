@@ -7,8 +7,9 @@
 const { match } = require('assert');
 const fs = require('fs');
 const path = require('path');
-const srcPath = path.resolve('../../srm-fe', 'src');
+const srcPath = path.resolve('../../srm-fe', 'src/Packages/Outfire/components/createModalButton');
 // const srcPath = path.resolve('../', 'src');
+const localePath = path.resolve('../../srm-fe/src','locales/en.json')
 const outputPath = path.resolve('../', 'output.json');
 const { getAllTSXFile } = require('./util');
 let arg = process.argv.slice(2);
@@ -33,11 +34,18 @@ const extractI18nKey = (str)=>{
   console.log(obj)
 }
 
+const filterEmptyKey = (obj, locales)=>{
+  const objArr = Object.keys(obj).filter(item => !locales[item])
+  const result = objArr.reduce((prev,curr)=> ({...prev,[curr]:''}),{} )
+  console.log(objArr, result)
+   return result 
+  
+}
+const locales = JSON.parse(fs.readFileSync(localePath, 'utf8'))
 if (arg[0] === 'all') {
   try {
     let fileLists = getAllTSXFile(srcPath, []);
     fileLists.forEach((file) => {
-      console.log('file', file);
       const code = fs.readFileSync(path.resolve(file), 'utf8');
       extractI18nKey(code)
     });
@@ -46,9 +54,11 @@ if (arg[0] === 'all') {
     console.warn(error);
   }
 } else {
-  const code = fs.readFileSync(path.resolve('../../srm-fe', 'src/Packages/Polaris/pages/Detail/index.tsx'), 'utf8');
+  const code = fs.readFileSync(path.resolve('../../srm-fe', 'src/Packages/Outfire/components/createModalButton/index.tsx'), 'utf8');
+  console.log(code)
   extractI18nKey(code)
 }
 
 // write the mountainous log into the output
-fs.writeFile(outputPath, JSON.stringify(obj, null, 2), null, () => {});
+// fs.writeFile(outputPath, JSON.stringify(locales, null, 2), null, () => {});
+fs.writeFile(outputPath, JSON.stringify(filterEmptyKey(obj, locales), null, 2), null, () => {});
