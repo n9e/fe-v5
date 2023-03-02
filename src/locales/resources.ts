@@ -14,15 +14,15 @@
  * limitations under the License.
  *
  */
-import en from './en.json';
-import zh from './zh.json';
+import en_US from './en_US.json';
+import zh_CN from './zh_CN.json';
 
 const resources = {
-  en: {
-    translation: en,
+  en_US: {
+    translation: en_US,
   },
-  zh: {
-    translation: zh,
+  zh_CN: {
+    translation: zh_CN,
   },
 };
 

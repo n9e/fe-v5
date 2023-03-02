@@ -27,26 +27,27 @@ import { SearchOutlined, SettingOutlined, LeftOutlined, RightOutlined } from '@a
 import { useHistory } from 'react-router-dom';
 import { eventStoreState } from '@/store/eventInterface';
 import classNames from 'classnames';
-
+import { useTranslation } from 'react-i18next';
 const CheckboxGroup = Checkbox.Group;
 type ChangeFunction = (value: any, item?: any) => void;
-
 interface groupProps {
   isShow?: boolean;
   onChange?: ChangeFunction;
 }
-
 interface BusiGroupProps {
   defaultSelect?: number | undefined;
   showNotGroupItem?: boolean;
   showAlertings?: boolean;
   onChange?: ChangeFunction;
 }
-
 interface LeftTreeProps {
   clusterGroup?: groupProps;
-  eventLevelGroup?: groupProps & { defaultSelect?: number | undefined };
-  eventTypeGroup?: groupProps & { defaultSelect?: number | undefined };
+  eventLevelGroup?: groupProps & {
+    defaultSelect?: number | undefined;
+  };
+  eventTypeGroup?: groupProps & {
+    defaultSelect?: number | undefined;
+  };
   busiGroup?: BusiGroupProps;
 }
 interface IGroupItemProps {
@@ -59,7 +60,6 @@ interface IGroupItemProps {
       };
   render: Function;
 }
-
 interface SelectListProps {
   dataSource: object[];
   fieldNames?: {
@@ -70,14 +70,15 @@ interface SelectListProps {
   defaultSelect?: object | string | number;
   allowNotSelect?: boolean;
   showBadge?: boolean;
-  badgeInfo?: { ['index']?: number };
+  badgeInfo?: {
+    ['index']?: number;
+  };
   onChange?: ChangeFunction;
 }
 
 // 内容可选列表
 export const SelectList: React.FC<SelectListProps> = ({ dataSource, fieldNames = {}, allowNotSelect = false, defaultSelect, showBadge = false, badgeInfo = {}, onChange }) => {
   const [active, setActive] = useState<string | number>(defaultSelect && typeof defaultSelect === 'object' ? defaultSelect[fieldNames.key || 'value'] : defaultSelect);
-
   return (
     <div className='radio-list'>
       {dataSource.map((item: any) => {
@@ -102,7 +103,12 @@ export const SelectList: React.FC<SelectListProps> = ({ dataSource, fieldNames =
             </Col>
             {showBadge && (
               <Col span={4}>
-                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                  }}
+                >
                   <Badge count={badgeInfo[item.id] || 0} />
                 </div>
               </Col>
@@ -116,11 +122,11 @@ export const SelectList: React.FC<SelectListProps> = ({ dataSource, fieldNames =
 
 // 集群渲染内容
 const clustersGroupContent = (clusterGroup: groupProps): IGroupItemProps => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { clusters, curClusterItems } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const [indeterminate, setIndeterminate] = useState<boolean>(false);
   const [checkAll, setCheckAll] = useState<boolean>(false);
-
   const setClusterItems = (curClusterItems) => {
     dispatch({
       type: 'common/saveData',
@@ -141,19 +147,22 @@ const clustersGroupContent = (clusterGroup: groupProps): IGroupItemProps => {
   useEffect(() => {
     setCheckAll(clusters.length === curClusterItems.length);
     setIndeterminate(!!curClusterItems.length && curClusterItems.length < clusters.length);
-
     if (clusters.length && clusterGroup.onChange) {
       clusterGroup.onChange(curClusterItems);
     }
   }, [clusters]);
-
   return {
     title: (
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <span>集群</span>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+        }}
+      >
+        <span>{t('集群')}</span>
         {/* <Checkbox indeterminate={indeterminate} onChange={onCheckAllChange} checked={checkAll}>
           全选
-        </Checkbox> */}
+         </Checkbox> */}
       </div>
     ),
     isShow: clusterGroup.isShow,
@@ -185,6 +194,7 @@ const clustersGroupContent = (clusterGroup: groupProps): IGroupItemProps => {
 
 // 业务组渲染内容
 const busiGroupContent = (busiGroupProps: BusiGroupProps): IGroupItemProps => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { busiGroups, curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const { alertings } = useSelector<RootState, eventStoreState>((state) => state.event);
@@ -211,7 +221,19 @@ const busiGroupContent = (busiGroupProps: BusiGroupProps): IGroupItemProps => {
     }
   }
   // 初始化选中项
-  const initCurBusiItem = useMemo(() => (busiGroupProps.defaultSelect ? { id: busiGroupProps.defaultSelect } : curBusiItem.id ? curBusiItem : { id: undefined }), [curBusiItem]);
+  const initCurBusiItem = useMemo(
+    () =>
+      busiGroupProps.defaultSelect
+        ? {
+            id: busiGroupProps.defaultSelect,
+          }
+        : curBusiItem.id
+        ? curBusiItem
+        : {
+            id: undefined,
+          },
+    [curBusiItem],
+  );
 
   // 初始化展示所有业务组
   useEffect(() => {
@@ -226,9 +248,8 @@ const busiGroupContent = (busiGroupProps: BusiGroupProps): IGroupItemProps => {
       busiGroupProps.onChange(initCurBusiItem.id, initCurBusiItem);
     }
   }, [busiGroups, initCurBusiItem]);
-
   return {
-    title: '业务组',
+    title: t('业务组'),
     isShow: true,
     shrink: true,
     render() {
@@ -256,12 +277,25 @@ const busiGroupContent = (busiGroupProps: BusiGroupProps): IGroupItemProps => {
                 });
               }
             }}
-            placeholder={'请输入业务组名称进行筛选'}
+            placeholder={t('请输入业务组名称进行筛选')}
           />
           {(!showNotGroupItem && curBusiItem.id && filteredBusiGroups.length !== 0) || showNotGroupItem ? (
             <SelectList
-              dataSource={showNotGroupItem ? [{ id: 0, name: '未归组对象' }].concat(filteredBusiGroups) : filteredBusiGroups}
-              fieldNames={{ key: 'id', label: 'name', value: 'id' }}
+              dataSource={
+                showNotGroupItem
+                  ? [
+                      {
+                        id: 0,
+                        name: t('未归组对象'),
+                      },
+                    ].concat(filteredBusiGroups)
+                  : filteredBusiGroups
+              }
+              fieldNames={{
+                key: 'id',
+                label: 'name',
+                value: 'id',
+              }}
               allowNotSelect={showNotGroupItem}
               defaultSelect={initCurBusiItem}
               showBadge={busiGroupProps.showAlertings}
@@ -279,9 +313,17 @@ const busiGroupContent = (busiGroupProps: BusiGroupProps): IGroupItemProps => {
               }}
             />
           ) : (
-            <div style={{ display: 'flex', alignItems: 'center', flexDirection: 'column', padding: 20, marginLeft: -20 }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                flexDirection: 'column',
+                padding: 20,
+                marginLeft: -20,
+              }}
+            >
               <img src='/image/empty.png' width='64' />
-              <div className='ant-empty-description'>{'暂无数据'}</div>
+              <div className='ant-empty-description'>{t('暂无数据')}</div>
             </div>
           )}
         </>
@@ -292,21 +334,31 @@ const busiGroupContent = (busiGroupProps: BusiGroupProps): IGroupItemProps => {
 
 // 左侧栏
 const LeftTree: React.FC<LeftTreeProps> = ({ clusterGroup = {}, busiGroup = {}, eventLevelGroup = {}, eventTypeGroup = {} }) => {
+  const { t } = useTranslation();
   const history = useHistory();
   const [collapse, setCollapse] = useState(localStorage.getItem('leftlist') === '1');
   const groupItems: IGroupItemProps[] = [
     clustersGroupContent(clusterGroup),
     busiGroupContent(busiGroup),
     {
-      title: '事件级别',
+      title: t('事件级别'),
       isShow: eventLevelGroup.isShow,
       render() {
         return (
           <SelectList
             dataSource={[
-              { label: '一级告警', value: 1 },
-              { label: '二级告警', value: 2 },
-              { label: '三级告警', value: 3 },
+              {
+                label: t('一级告警'),
+                value: 1,
+              },
+              {
+                label: t('二级告警'),
+                value: 2,
+              },
+              {
+                label: t('三级告警'),
+                value: 3,
+              },
             ]}
             defaultSelect={eventLevelGroup.defaultSelect}
             allowNotSelect={true}
@@ -316,14 +368,20 @@ const LeftTree: React.FC<LeftTreeProps> = ({ clusterGroup = {}, busiGroup = {}, 
       },
     },
     {
-      title: '事件类别',
+      title: t('事件类别'),
       isShow: eventTypeGroup.isShow,
       render() {
         return (
           <SelectList
             dataSource={[
-              { label: 'Triggered', value: 0 },
-              { label: 'Recovered', value: 1 },
+              {
+                label: 'Triggered',
+                value: 0,
+              },
+              {
+                label: 'Recovered',
+                value: 1,
+              },
             ]}
             defaultSelect={eventTypeGroup.defaultSelect}
             allowNotSelect={true}
@@ -334,13 +392,15 @@ const LeftTree: React.FC<LeftTreeProps> = ({ clusterGroup = {}, busiGroup = {}, 
     },
   ];
   const [width, setWidth] = useState(_.toNumber(localStorage.getItem('leftwidth') || 200));
-
   return (
     <Resizable
       style={{
         marginRight: collapse ? 0 : 10,
       }}
-      size={{ width: collapse ? 0 : width, height: '100%' }}
+      size={{
+        width: collapse ? 0 : width,
+        height: '100%',
+      }}
       enable={{
         right: collapse ? false : true,
       }}
@@ -370,7 +430,7 @@ const LeftTree: React.FC<LeftTreeProps> = ({ clusterGroup = {}, busiGroup = {}, 
               <div key={i} className={`left-area-group ${shrink ? 'group-shrink' : ''}`} style={typeof shrink === 'object' ? shrink.style : {}}>
                 <div className='left-area-group-title'>
                   {title}
-                  {title === '业务组' && <SettingOutlined onClick={() => history.push(`/busi-groups`)} />}
+                  {title === t('业务组') && <SettingOutlined onClick={() => history.push(`/busi-groups`)} />}
                 </div>
                 {render()}
               </div>
@@ -380,5 +440,4 @@ const LeftTree: React.FC<LeftTreeProps> = ({ clusterGroup = {}, busiGroup = {}, 
     </Resizable>
   );
 };
-
 export default LeftTree;

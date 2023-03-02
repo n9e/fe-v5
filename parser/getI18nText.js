@@ -7,9 +7,9 @@
 const { match } = require('assert');
 const fs = require('fs');
 const path = require('path');
-const srcPath = path.resolve('../../srm-fe', 'src/Packages/Event');
+const srcPath = path.resolve('../', 'src/');
 // const srcPath = path.resolve('../', 'src');
-const localePath = path.resolve('../../srm-fe/src','locales/en.json')
+const localePath = path.resolve('../src','locales/en.json')
 const outputPath = path.resolve('../', 'output.json');
 const { getAllTSXFile } = require('./util');
 let arg = process.argv.slice(2);
@@ -18,8 +18,8 @@ if (fs.existsSync(outputPath)) {
   fs.unlinkSync(outputPath);
 }
 
-const reg = /t\('([\u4e00-\u9fa5：，。、a-z\f\r\t\n\s]+)'\)/g
-const regDoubleQuotation = /t\("([\u4e00-\u9fa5：，。、a-z\f\r\t\n\s]+)"\)/g
+const reg = /t\('([\u4e00-\u9fa5：，。、a-zA-Z\f\r\t\n\s]+)'\)/g
+const regDoubleQuotation = /t\("([\u4e00-\u9fa5：，。、a-zA-Z\f\r\t\n\s]+)"\)/g
 
 let obj = {}
 
@@ -64,7 +64,7 @@ if (arg[0] === 'all') {
     console.warn(error);
   }
 } else {
-  const code = fs.readFileSync(path.resolve('../../srm-fe', 'src/Packages/MultiDimension/AddTopic/components/DatasourceSelect/index.tsx'), 'utf8');
+  const code = fs.readFileSync(path.resolve('../', 'src/pages/dashboard/List/Import.tsx'), 'utf8');
   extractI18nKey(code)
 }
 
