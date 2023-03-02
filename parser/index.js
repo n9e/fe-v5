@@ -11,7 +11,7 @@ const generate = require('@babel/generator').default;
 const t = require('@babel/types');
 const core = require('@babel/core');
 const path = require('path');
-const srcPath = path.resolve('../../srm-fe', 'src/Packages/Outfire/components/createModalButton');
+const srcPath = path.resolve('../../srm-fe', 'src/Packages/Event');
 const prettier = require('prettier');
 const prettierConfig = require('../.prettierrc.json');
 const outputPath = path.resolve('../', 'output.json');
@@ -248,9 +248,9 @@ const runParser = function (code) {
       // output.push(path);
       // output.push(parentPath.parent);
       if (
-        (t.isJSXElement(node.argument) || t.isConditionalExpression(node.argument) || t.isJSXFragment(node.argument)) && 
-        (t.isArrowFunctionExpression(parentPath.parent) || t.isFunctionExpression(parentPath.parent) || t.isFunctionDeclaration(parentPath.parent)) && 
-        path.findParent((path) => path.isArrowFunctionExpression() || path.isFunctionExpression()) === null
+        (t.isJSXElement(node.argument) || t.isConditionalExpression(node.argument) || t.isJSXFragment(node.argument)) &&
+        (t.isArrowFunctionExpression(parentPath.parent) || t.isFunctionExpression(parentPath.parent) || t.isFunctionDeclaration(parentPath.parent)) 
+        // path.findParent((path) => path.isArrowFunctionExpression() || path.isFunctionExpression()) === null
       ) {
         isFunctionComponent = true;
         // 粗浅
@@ -306,7 +306,7 @@ if (arg[0] === 'all') {
   }
 } else {
   // parse src/test.tsx file and output into test2.tsx
-  const file = 'src/Packages/Polaris/components/AuthManage/index.tsx'
+  const file = 'src/Packages/Event/pages/index.tsx'
   const code = fs.readFileSync(path.resolve('../../srm-fe', file), 'utf8');
   const targetCode = runParser(code);
   fs.writeFile(path.resolve('../../srm-fe', file), targetCode, null, () => {});

@@ -7,7 +7,7 @@
 const { match } = require('assert');
 const fs = require('fs');
 const path = require('path');
-const srcPath = path.resolve('../../srm-fe', 'src/Packages/Outfire/components/createModalButton');
+const srcPath = path.resolve('../../srm-fe', 'src/Packages/Event');
 // const srcPath = path.resolve('../', 'src');
 const localePath = path.resolve('../../srm-fe/src','locales/en.json')
 const outputPath = path.resolve('../', 'output.json');
@@ -18,7 +18,8 @@ if (fs.existsSync(outputPath)) {
   fs.unlinkSync(outputPath);
 }
 
-const reg = /t\('([\u4e00-\u9fa5]+)'\)/g
+const reg = /t\('([\u4e00-\u9fa5：，。、a-z\f\r\t\n\s]+)'\)/g
+const regDoubleQuotation = /t\("([\u4e00-\u9fa5：，。、a-z\f\r\t\n\s]+)"\)/g
 
 let obj = {}
 
@@ -27,6 +28,14 @@ const extractI18nKey = (str)=>{
   if(matchArr && matchArr.length > 0 ){
     // "t('新增指标')" => {新增指标:''}
     const a = matchArr.map(k=>({[k.slice(3, -2)]:''})).reduce((prev,curr)=>{
+      return {...curr, ...prev}
+    },{})
+    obj = {...a,...obj}
+  }
+  const matchArr1 = str.match(regDoubleQuotation)
+  if(matchArr1 && matchArr1.length > 0 ){
+    // "t('新增指标')" => {新增指标:''}
+    const a = matchArr1.map(k=>({[k.slice(3, -2)]:''})).reduce((prev,curr)=>{
       return {...curr, ...prev}
     },{})
     obj = {...a,...obj}
@@ -46,6 +55,7 @@ if (arg[0] === 'all') {
   try {
     let fileLists = getAllTSXFile(srcPath, []);
     fileLists.forEach((file) => {
+
       const code = fs.readFileSync(path.resolve(file), 'utf8');
       extractI18nKey(code)
     });
@@ -54,8 +64,7 @@ if (arg[0] === 'all') {
     console.warn(error);
   }
 } else {
-  const code = fs.readFileSync(path.resolve('../../srm-fe', 'src/Packages/Outfire/components/createModalButton/index.tsx'), 'utf8');
-  console.log(code)
+  const code = fs.readFileSync(path.resolve('../../srm-fe', 'src/Packages/MultiDimension/AddTopic/components/DatasourceSelect/index.tsx'), 'utf8');
   extractI18nKey(code)
 }
 
