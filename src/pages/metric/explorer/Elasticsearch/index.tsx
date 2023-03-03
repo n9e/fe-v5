@@ -32,7 +32,7 @@ export default function index(props: IProps) {
   const filtersArr: string[] = [];
 
   for (const [key, value] of params) {
-    if (!['data_source_id', 'index_name', 'timestamp'].includes(key)) {
+    if (!['data_source_id', 'index_name', 'query_string', 'timestamp'].includes(key)) {
       filtersArr.push(`${key}:"${value}"`);
     }
   }
@@ -144,8 +144,8 @@ export default function index(props: IProps) {
           datasourceName: res?.[Number(id)],
           query: {
             index: params.get('index_name'),
-            filter: filtersArr?.join(' and '),
-            date_field: params.get('timestamp'),
+            filter: params.get('query_string') ? params.get('query_string') : filtersArr?.join(' and '),
+            // date_field: params.get('timestamp'),
           },
         });
         onIndexChange(params.get('index_name'));
@@ -309,7 +309,6 @@ export default function index(props: IProps) {
                   showSearch
                 >
                   {_.map(_.sortBy(_.concat(fields, selectedFields)), (item) => {
-                    const { t } = useTranslation();
                     return (
                       <Select.Option key={item} value={item}>
                         {item}
