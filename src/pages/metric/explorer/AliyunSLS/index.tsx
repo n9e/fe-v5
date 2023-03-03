@@ -30,8 +30,8 @@ const ModeRadio = ({ mode, setMode }) => {
       }}
       buttonStyle='solid'
     >
-      <Radio.Button value='timeSeries'>{t('时序值')}</Radio.Button>
       <Radio.Button value='raw'>{t('日志原文')}</Radio.Button>
+      <Radio.Button value='timeSeries'>{t('时序值')}</Radio.Button>
     </Radio.Group>
   );
 };
@@ -41,7 +41,7 @@ export default function index(props: IProps) {
   const params = new URLSearchParams(useLocation().search);
   const executeAtOnce = params.get('data_source_name') && params.get('data_source_type')?.includes('sls');
   const { datasourceCate, datasourceName, headerExtra, form } = props;
-  const [mode, setMode] = useState(executeAtOnce ? 'raw' : 'timeSeries');
+  const [mode, setMode] = useState('raw');
   const rawRef = useRef<any>();
   const metricRef = useRef<any>();
   useEffect(() => {
@@ -137,7 +137,7 @@ export default function index(props: IProps) {
           </Space>
         </Col>
         <Col span={24}>
-          <QueryInput width='100%' prefixName={['query']} />
+          <QueryInput width='100%' prefixName={['query']} required={mode === 'timeSeries'} />
         </Col>
       </Row>
 
