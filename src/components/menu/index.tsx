@@ -240,12 +240,6 @@ const SideMenu: FC = () => {
   const handleClick = (key) => {
     if (location.pathname === key) return;
     setSelectedKeys([key as string]);
-    // 写两个key as string 感觉有点傻
-    if (key === 'changeLanguage') {
-      let language = i18n.language == 'en' ? 'zh' : 'en';
-      i18n.changeLanguage(language);
-      localStorage.setItem('language', language);
-    }
 
     if ((key as string).startsWith('/')) {
       history.push(key as string);
@@ -294,7 +288,7 @@ const SideMenu: FC = () => {
         setMenus(menuList);
       }
     }
-  }, [profile.roles]);
+  }, [profile.roles, i18n.language]);
 
   return hideSideMenu() ? null : (
     <div
