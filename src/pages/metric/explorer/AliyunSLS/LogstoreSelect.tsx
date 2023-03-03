@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { AutoComplete, Tooltip, Form } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash';
+import { useDebounceFn } from 'ahooks';
 import { DatasourceCateEnum } from '@/utils/constant';
 import { getSLSLogstore } from '@/services/metric';
 import InputGroupWithFormItem from '@/components/InputGroupWithFormItem';
@@ -19,6 +20,7 @@ interface IProps {
 export default function LogstoreSelect(props: IProps) {
   const { datasourceCate, datasourceName, project, prefixField = {}, prefixName = [], width = 190, layout = 'horizontal' } = props;
   const [options, setOptions] = useState<{ label; value }[]>([]);
+  const [search, setSearch] = useState<string>('');
   const label = (
     <span>
       日志库{' '}
@@ -39,22 +41,33 @@ export default function LogstoreSelect(props: IProps) {
 
   useEffect(() => {
     if (datasourceName && project) {
-      getSLSLogstore({
-        cate: datasourceCate,
-        cluster: datasourceName,
-        project,
-      }).then((res) => {
-        setOptions(
-          _.map(res, (item) => {
-            return {
-              label: item,
-              value: item,
-            };
-          }),
-        );
-      });
+      fetchSLSLogstore();
     }
   }, [datasourceName, project]);
+
+  const { run: fetchSLSLogstore } = useDebounceFn(
+    () => {
+      if (datasourceName && project) {
+        getSLSLogstore({
+          cate: datasourceCate,
+          cluster: datasourceName,
+          project,
+        }).then((res) => {
+          setOptions(
+            _.map(res, (item) => {
+              return {
+                label: item,
+                value: item,
+              };
+            }),
+          );
+        });
+      }
+    },
+    {
+      wait: 500,
+    },
+  );
 
   if (layout === 'vertical') {
     return (
@@ -88,7 +101,17 @@ export default function LogstoreSelect(props: IProps) {
         ]}
         style={{ width }}
       >
-        <AutoComplete options={options} />
+        <AutoComplete
+          options={_.filter(options, (item) => {
+            if (search) {
+              return item.label.indexOf(search) > -1;
+            }
+            return true;
+          })}
+          onSearch={(val) => {
+            setSearch(val);
+          }}
+        />
       </Form.Item>
     </InputGroupWithFormItem>
   );
