@@ -17,12 +17,8 @@ interface IProps {
 export default function ProjectSelect(props: IProps) {
   const { t } = useTranslation();
   const { datasourceCate, datasourceName, prefixField = {}, prefixName = [], width = 180, layout = 'horizontal' } = props;
-  const [options, setOptions] = useState<
-    {
-      label;
-      value;
-    }[]
-  >([]);
+  const [options, setOptions] = useState<{ label; value }[]>([]);
+  const [search, setSearch] = useState<string>('');
   const label = (
     <span>
       {t('项目')}
@@ -100,7 +96,17 @@ export default function ProjectSelect(props: IProps) {
           width,
         }}
       >
-        <AutoComplete options={options} />
+        <AutoComplete
+          options={_.filter(options, (item) => {
+            if (search) {
+              return item.label.indexOf(search) > -1;
+            }
+            return true;
+          })}
+          onSearch={(val) => {
+            setSearch(val);
+          }}
+        />
       </Form.Item>
     </InputGroupWithFormItem>
   );

@@ -82,6 +82,7 @@ export const getSLSLogstore = function (data: { cate: string; cluster: string; p
   return request('/api/n9e-plus/sls-logstore', {
     method: RequestMethod.Post,
     data,
+    silence: true,
   }).then((res) => res.dat);
 };
 
