@@ -10,6 +10,7 @@ interface IProps {
   prefixName?: (string | number)[];
   width?: number | string;
   layout?: 'horizontal' | 'vertical';
+  required?: boolean;
 }
 
 const content = `
@@ -30,7 +31,7 @@ const content = `
 - [函数概览](https://help.aliyun.com/document_detail/321454.html)`;
 
 export default function QueryInput(props: IProps) {
-  const { prefixField = {}, prefixName = [], width = 84, layout = 'horizontal' } = props;
+  const { prefixField = {}, prefixName = [], width = 84, layout = 'horizontal', required = false } = props;
   const label = (
     <span>
       查询条件{' '}
@@ -42,14 +43,34 @@ export default function QueryInput(props: IProps) {
 
   if (layout === 'vertical') {
     return (
-      <Form.Item {...prefixField} label={label} name={[...prefixName, 'query']}>
+      <Form.Item
+        {...prefixField}
+        label={label}
+        name={[...prefixName, 'query']}
+        rules={[
+          {
+            required,
+            message: '请输入查询条件',
+          },
+        ]}
+      >
         <Input />
       </Form.Item>
     );
   }
   return (
     <InputGroupWithFormItem label={label} labelWidth={84}>
-      <Form.Item {...prefixField} name={[...prefixName, 'query']} style={{ width }}>
+      <Form.Item
+        {...prefixField}
+        name={[...prefixName, 'query']}
+        style={{ width }}
+        rules={[
+          {
+            required,
+            message: '请输入查询条件',
+          },
+        ]}
+      >
         <Input />
       </Form.Item>
     </InputGroupWithFormItem>
