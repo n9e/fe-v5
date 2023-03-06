@@ -274,12 +274,17 @@ export function getVaraiableSelected(name: string, id: string) {
     if (!v) {
       v = localStorage.getItem(`dashboard_${id}_${name}`);
     }
+    if (v === null) return null; // null 表示没有初始化过，空字符串表示值被设置成空
+    try {
+      v = JSON.parse(v);
+    } catch (e) {}
+    return v || '';
+  } else {
+    try {
+      v = JSON.parse(v);
+    } catch (e) {}
+    return v || undefined;
   }
-  if (v === null) return null; // null 表示没有初始化过，空字符串表示值被设置成空
-  try {
-    v = JSON.parse(v);
-  } catch (e) {}
-  return v || '';
 }
 
 export const replaceExpressionVarsSpecifyRule = (
