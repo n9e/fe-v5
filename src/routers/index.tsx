@@ -71,6 +71,7 @@ import RecordingRule from '@/pages/recordingRules';
 import RecordingRuleAdd from '@/pages/recordingRules/add';
 import RecordingRuleEdit from '@/pages/recordingRules/edit';
 import { dynamicPackages, Entry } from '@/utils';
+import { useTranslation } from 'react-i18next';
 
 const Packages = dynamicPackages();
 let lazyRoutes = Packages.reduce((result: any, module: Entry) => {
@@ -90,6 +91,7 @@ function RouteWithSubRoutes(route) {
 }
 
 export default function Content() {
+  const { t, i18n } = useTranslation();
   let { profile } = useSelector<RootState, accountStoreState>((state) => state.account);
   const location = useLocation();
   const dispatch = useDispatch();
