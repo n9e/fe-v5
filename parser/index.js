@@ -113,132 +113,132 @@ const runParser = function (code) {
       }
     },
     StringLiteral: function (path) {
-      const { node, parent } = path;
-      const { value } = node;
-      // import 语句中不处理
-      if (t.isImportDeclaration(parent)) {
-        return;
-      }
-      // 至少一个中文
-      if (!hasChinese(value)) {
-        return;
-      }
-      // new Error('屏蔽标识、资源标识、屏蔽标签不能同时为空') 这种会先new，再调用CallExpression 所以会重复
-      if (t.isNewExpression(parent)) {
-        return;
-      }
-      if (t.isCallExpression(parent)) {
-        // output[value] = value;
-        const { callee } = parent;
-        if (t.isIdentifier(callee) && callee.name === I8N_FUNC_NAME) return;
-      }
-      if (t.isJSXAttribute(parent)) {
-        let jsxContainer = createJSXExpressionContainer(value);
-        path.replaceWith(jsxContainer);
-      } else {
-        let newCall = createIntlCall(value);
-        path.replaceWith(newCall);
-      }
+      // const { node, parent } = path;
+      // const { value } = node;
+      // // import 语句中不处理
+      // if (t.isImportDeclaration(parent)) {
+      //   return;
+      // }
+      // // 至少一个中文
+      // if (!hasChinese(value)) {
+      //   return;
+      // }
+      // // new Error('屏蔽标识、资源标识、屏蔽标签不能同时为空') 这种会先new，再调用CallExpression 所以会重复
+      // if (t.isNewExpression(parent)) {
+      //   return;
+      // }
+      // if (t.isCallExpression(parent)) {
+      //   // output[value] = value;
+      //   const { callee } = parent;
+      //   if (t.isIdentifier(callee) && callee.name === I8N_FUNC_NAME) return;
+      // }
+      // if (t.isJSXAttribute(parent)) {
+      //   let jsxContainer = createJSXExpressionContainer(value);
+      //   path.replaceWith(jsxContainer);
+      // } else {
+      //   let newCall = createIntlCall(value);
+      //   path.replaceWith(newCall);
+      // }
     },
     // 模版字符串
     TemplateLiteral: function (path) {
-      const { node } = path;
-      // expressions 表达式
-      // quasis 表示表达式中的间隙字符串, 每个表达式中间都必须有quasis, 同时首尾也必须是quasis,其中末尾元素需要是tail = true
-      // 其中 quasis: {
-      //    value: 值, 如果为‘’,一般表示给表达式的占位符
-      //     tail: 是否为末尾
-      // }
-      const { expressions, quasis } = node;
-      // todo 获取所有quasis中value 不为空和数字的, 如果不为末尾,记录前面有几个''
-      // 生成函数, 插入expressions数组中, 修改quasis节点value为空
-      // 如果字符串为最后一个节点,还需要生成一个空白的节点
-      let hasTail = false;
-      let enCountExpressions = 0;
-      quasis.forEach((node, index) => {
-        const {
-          value: { raw },
-          tail,
-        } = node;
-        if (!hasChinese(raw)) {
-          return;
-        } else {
-          let newCall = createIntlCall(raw);
-          expressions.splice(index + enCountExpressions, 0, newCall);
-          enCountExpressions++;
-          node.value = {
-            raw: '',
-            cooked: '',
-          };
-          // 每增添一个表达式都需要变化原始节点,并新增下一个字符节点
-          quasis.push(
-            t.templateElement(
-              {
-                raw: '',
-                cooked: '',
-              },
-              false,
-            ),
-          );
-        }
-      });
-      quasis[quasis.length - 1].tail = true;
+      // const { node } = path;
+      // // expressions 表达式
+      // // quasis 表示表达式中的间隙字符串, 每个表达式中间都必须有quasis, 同时首尾也必须是quasis,其中末尾元素需要是tail = true
+      // // 其中 quasis: {
+      // //    value: 值, 如果为‘’,一般表示给表达式的占位符
+      // //     tail: 是否为末尾
+      // // }
+      // const { expressions, quasis } = node;
+      // // todo 获取所有quasis中value 不为空和数字的, 如果不为末尾,记录前面有几个''
+      // // 生成函数, 插入expressions数组中, 修改quasis节点value为空
+      // // 如果字符串为最后一个节点,还需要生成一个空白的节点
+      // let hasTail = false;
+      // let enCountExpressions = 0;
+      // quasis.forEach((node, index) => {
+      //   const {
+      //     value: { raw },
+      //     tail,
+      //   } = node;
+      //   if (!hasChinese(raw)) {
+      //     return;
+      //   } else {
+      //     let newCall = createIntlCall(raw);
+      //     expressions.splice(index + enCountExpressions, 0, newCall);
+      //     enCountExpressions++;
+      //     node.value = {
+      //       raw: '',
+      //       cooked: '',
+      //     };
+      //     // 每增添一个表达式都需要变化原始节点,并新增下一个字符节点
+      //     quasis.push(
+      //       t.templateElement(
+      //         {
+      //           raw: '',
+      //           cooked: '',
+      //         },
+      //         false,
+      //       ),
+      //     );
+      //   }
+      // });
+      // quasis[quasis.length - 1].tail = true;
     },
     JSXText: function (path) {
-      const { node, parent } = path;
-      const { value } = node;
-      // console.log(value, node.isNewCreate);
-      if (node.isNewCreate) {
-        return;
-      }
-      // 至少一个中文
-      if (!hasChinese(value)) {
-        return;
-      }
-      // console.log('JSXText', value);
-      // todo 每一个字符串都需要包成函数
-      // 如果没有换行符直接替换
+      // const { node, parent } = path;
+      // const { value } = node;
+      // // console.log(value, node.isNewCreate);
+      // if (node.isNewCreate) {
+      //   return;
+      // }
+      // // 至少一个中文
+      // if (!hasChinese(value)) {
+      //   return;
+      // }
+      // // console.log('JSXText', value);
+      // // todo 每一个字符串都需要包成函数
+      // // 如果没有换行符直接替换
 
-      if (!RegExistSpace.test(value)) {
-        path.replaceWith(createJSXExpressionContainer(value));
-      } else {
-        const contentResults = [];
-        let currentResult;
-        do {
-          currentResult = RegTestContent.exec(value);
-          if (currentResult) {
-            contentResults.push(currentResult);
-          }
-        } while (currentResult !== null);
-        // // 根据结果重新生成所有子节点
-        let endIndex = -1;
-        const newAstNodes = [];
-        contentResults.forEach((contentItem, index) => {
-          const [contentValue] = contentItem;
-          const contentIndex = contentItem.index;
-          if (index === 0) {
-            if (contentIndex === 0) {
-              newAstNodes.push(createJSXExpressionContainer(contentValue));
-            } else {
-              newAstNodes.push(createJSXText(value.substring(0, contentIndex)));
-              newAstNodes.push(hasChinese(contentValue) ? createJSXExpressionContainer(contentValue) : createJSXText(contentValue));
-            }
-          } else {
-            const lastContent = contentResults[index - 1];
-            const [lastContentValue] = lastContent;
-            const lastContentIndex = lastContent.index;
-            const lastEnd = lastContentIndex + lastContentValue.length;
-            newAstNodes.push(createJSXText(value.substring(lastEnd, contentIndex)));
-            newAstNodes.push(hasChinese(contentValue) ? createJSXExpressionContainer(contentValue) : createJSXText(contentValue));
-          }
-          endIndex = contentIndex + contentValue.length;
-        });
-        if (endIndex !== value.length - 1) {
-          newAstNodes.push(createJSXText(value.substring(endIndex, value.length - 1)));
-        }
-        // console.dir(newAstNodes, { depth: null });
-        path.replaceWithMultiple(newAstNodes);
-      }
+      // if (!RegExistSpace.test(value)) {
+      //   path.replaceWith(createJSXExpressionContainer(value));
+      // } else {
+      //   const contentResults = [];
+      //   let currentResult;
+      //   do {
+      //     currentResult = RegTestContent.exec(value);
+      //     if (currentResult) {
+      //       contentResults.push(currentResult);
+      //     }
+      //   } while (currentResult !== null);
+      //   // // 根据结果重新生成所有子节点
+      //   let endIndex = -1;
+      //   const newAstNodes = [];
+      //   contentResults.forEach((contentItem, index) => {
+      //     const [contentValue] = contentItem;
+      //     const contentIndex = contentItem.index;
+      //     if (index === 0) {
+      //       if (contentIndex === 0) {
+      //         newAstNodes.push(createJSXExpressionContainer(contentValue));
+      //       } else {
+      //         newAstNodes.push(createJSXText(value.substring(0, contentIndex)));
+      //         newAstNodes.push(hasChinese(contentValue) ? createJSXExpressionContainer(contentValue) : createJSXText(contentValue));
+      //       }
+      //     } else {
+      //       const lastContent = contentResults[index - 1];
+      //       const [lastContentValue] = lastContent;
+      //       const lastContentIndex = lastContent.index;
+      //       const lastEnd = lastContentIndex + lastContentValue.length;
+      //       newAstNodes.push(createJSXText(value.substring(lastEnd, contentIndex)));
+      //       newAstNodes.push(hasChinese(contentValue) ? createJSXExpressionContainer(contentValue) : createJSXText(contentValue));
+      //     }
+      //     endIndex = contentIndex + contentValue.length;
+      //   });
+      //   if (endIndex !== value.length - 1) {
+      //     newAstNodes.push(createJSXText(value.substring(endIndex, value.length - 1)));
+      //   }
+      //   // console.dir(newAstNodes, { depth: null });
+      //   path.replaceWithMultiple(newAstNodes);
+      // }
     },
     ReturnStatement: function (path) {
       const { node, parent, parentPath } = path;
@@ -250,8 +250,8 @@ const runParser = function (code) {
       // output.push(parentPath.parent);
       if (
         (t.isJSXElement(node.argument) || t.isConditionalExpression(node.argument) || t.isJSXFragment(node.argument)) &&
-        (t.isArrowFunctionExpression(parentPath.parent) || t.isFunctionExpression(parentPath.parent) || t.isFunctionDeclaration(parentPath.parent)) 
-        // path.findParent((path) => path.isArrowFunctionExpression() || path.isFunctionExpression()) === null
+        (t.isArrowFunctionExpression(parentPath.parent) || t.isFunctionExpression(parentPath.parent) || t.isFunctionDeclaration(parentPath.parent)) && 
+        path.findParent((path) => path.isArrowFunctionExpression() || path.isFunctionExpression()) === null
       ) {
         isFunctionComponent = true;
         // 粗浅
