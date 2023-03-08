@@ -12,7 +12,6 @@ export default function Rule({ restField, name, queryValues, form, defaultRuleOp
   }, [defaultRuleOp]);
 
   function renderQueryAndFunc(subName) {
-    const { t } = useTranslation();
     return (
       <Input.Group>
         <span className='ant-input-group-addon'>
