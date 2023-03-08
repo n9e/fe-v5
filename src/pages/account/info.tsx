@@ -169,7 +169,6 @@ export default function Info() {
               Object.keys(profile.contacts)
                 .sort()
                 .map((key, i) => {
-                  const { t } = useTranslation();
                   let contact = contactsList.find((item) => item.key === key);
                   return (
                     <>
@@ -260,7 +259,6 @@ export default function Info() {
       <Modal title={t('更换头像')} visible={isModalVisible} onOk={handleOk} onCancel={handleCancel} wrapClassName='avatar-modal'>
         <div className='avatar-content'>
           {avatarList.map((i) => {
-            const { t } = useTranslation();
             return (
               <div key={i} className={`/image/avatar${i}.png` === selectAvatar ? 'avatar active' : 'avatar'} onClick={() => handleImgClick(i)}>
                 <img src={`/image/avatar${i}.png`} />

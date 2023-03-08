@@ -81,7 +81,6 @@ export default function index(props: IProps) {
                           label={
                             <span>
                               {t('索引')}
-                              {t('引')}{' '}
                               <Tooltip
                                 title={
                                   <div>
@@ -132,7 +131,6 @@ export default function index(props: IProps) {
                           label={
                             <span>
                               {t('查询条件')}
-                              {t('件')}{' '}
                               <a href='https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html#query-string-syntax ' target='_blank'>
                                 <QuestionCircleOutlined />
                               </a>

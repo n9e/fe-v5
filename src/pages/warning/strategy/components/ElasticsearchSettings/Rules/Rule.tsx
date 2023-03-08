@@ -47,7 +47,6 @@ export default function Rule({ restField, name, queryValues, form, defaultRuleOp
   }
 
   function renderOp(subName) {
-    const { t } = useTranslation();
     return (
       <Form.Item noStyle {...restField} name={[subName, 'op']}>
         <Select
@@ -82,7 +81,6 @@ export default function Rule({ restField, name, queryValues, form, defaultRuleOp
   }
 
   function renderRuleOp() {
-    const { t } = useTranslation();
     return (
       <Form.Item noStyle>
         <Select

@@ -429,7 +429,6 @@ export default function index(props: IProps) {
                   dataSource={data}
                   expandable={{
                     expandedRowRender: (record) => {
-                      const { t } = useTranslation();
                       let value = '';
 
                       try {
