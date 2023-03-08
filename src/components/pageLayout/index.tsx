@@ -42,6 +42,12 @@ interface IPageLayoutProps {
   docFn?: Function;
 }
 
+const i18nMap = {
+  zh_CN: '中文',
+  zh_HK: '繁體',
+  // en_US: 'English',
+};
+
 const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, introIcon, children, customArea, showBack, backPath, onChangeCluster, hideCluster = true, docFn }) => {
   const { t, i18n } = useTranslation();
   const history = useHistory();
@@ -50,6 +56,7 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, introI
   const { clusters } = useSelector<CommonRootState, CommonStoreState>((state) => state.common);
   const localCluster = localStorage.getItem('curCluster');
   const [curCluster, setCurCluster] = useState<string>(localCluster || clusters[0]);
+  const [curLanguage, setCurLanguage] = useState(i18nMap[i18n.language] || '中文');
   if (!localCluster && clusters.length > 0) {
     setCurCluster(clusters[0]);
     localStorage.setItem('curCluster', clusters[0]);
@@ -189,16 +196,25 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, introI
 
               {/* 文案完善了再打开 */}
               {window.location.origin.includes('10.206.0.17') && (
-                <span
-                  className='language'
-                  onClick={() => {
-                    let language = i18n.language == 'en_US' ? 'zh_CN' : 'en_US';
-                    i18n.changeLanguage(language);
-                    localStorage.setItem('language', language);
-                  }}
+                <Dropdown
+                  overlay={
+                    <Menu
+                      className='outfire-tree'
+                      onSelect={({ key }) => {
+                        setCurLanguage(i18nMap[i18n.language]);
+                        i18n.changeLanguage(key);
+                        localStorage.setItem('language', key);
+                      }}
+                      selectable
+                    >
+                      {Object.keys(i18nMap).map((el) => {
+                        return <Menu.Item key={el}>{i18nMap[el]}</Menu.Item>;
+                      })}
+                    </Menu>
+                  }
                 >
-                  {i18n.language == 'en_US' ? 'En' : '中'}
-                </span>
+                  <a onClick={(e) => e.preventDefault()}>{curLanguage}</a>
+                </Dropdown>
               )}
               <Dropdown overlay={menu} trigger={['click']}>
                 <span className='avator'>

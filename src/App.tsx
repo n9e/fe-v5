@@ -26,6 +26,7 @@ import Content from './routers';
 import store from '@/store';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import zh_CN from 'antd/lib/locale/zh_CN';
+import zh_HK from 'antd/lib/locale/zh_HK';
 import en_US from 'antd/lib/locale/en_US';
 import { useTranslation } from 'react-i18next';
 import TaskOutput from '@/pages/taskOutput';
@@ -33,10 +34,17 @@ import TaskHostOutput from '@/pages/taskOutput/host';
 
 function App() {
   const { t, i18n } = useTranslation();
+  const i18nMap = {
+    zh_CN,
+    zh_HK,
+    en_US,
+  };
+
   return (
     <div className='App'>
       <ConfigProvider
-        locale={i18n.language == 'en_US' ? en_US : zh_CN}
+        // locale={i18n.language == 'en_US' ? en_US : zh_CN}
+        locale={i18nMap[i18n.language] || zh_CN}
         // getPopupContainer={(node: HTMLElement) => {
         //   if (node) {
         //     return node.parentNode as HTMLElement;
