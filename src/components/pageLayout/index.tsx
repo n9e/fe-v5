@@ -213,7 +213,9 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, introI
                     </Menu>
                   }
                 >
-                  <a onClick={(e) => e.preventDefault()}>{curLanguage}</a>
+                  <a style={{ marginRight: 20 }} onClick={(e) => e.preventDefault()}>
+                    {curLanguage}
+                  </a>
                 </Dropdown>
               )}
               <Dropdown overlay={menu} trigger={['click']}>
