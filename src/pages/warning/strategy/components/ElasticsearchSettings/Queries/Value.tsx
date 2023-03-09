@@ -68,7 +68,6 @@ export default function Value(props: IProps) {
                 label={
                   <div>
                     {t('数值提取')}
-                    {t('取')}{' '}
                     <Tooltip title=''>
                       <QuestionCircleOutlined />
                     </Tooltip>
