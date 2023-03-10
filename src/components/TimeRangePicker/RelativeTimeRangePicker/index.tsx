@@ -25,9 +25,9 @@ import { IRawTimeRange, ITimeRangePickerProps } from '../types';
 import { rangeOptions, momentLocaleZhCN } from '../config';
 import { isRelativeFormat } from './utils';
 import '../style.less';
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 moment.locale('zh-cn', momentLocaleZhCN);
-const validOptions = rangeOptions.filter(o => isRelativeFormat(o.start));
+const validOptions = rangeOptions.filter((o) => isRelativeFormat(o.start));
 const historyCacheKey = 'flashcat-timeRangePicker-relative-history';
 
 const getHistoryCache = () => {
@@ -66,19 +66,9 @@ const setHistoryCache = (range, dateFormat) => {
 };
 
 export default function index(props: ITimeRangePickerProps) {
-  const {
-    t
-  } = useTranslation();
+  const { t } = useTranslation();
   const historyCache = getHistoryCache();
-  const {
-    value,
-    onChange = () => {},
-    dateFormat = 'YYYY-MM-DD HH:mm',
-    placeholder = t("请选择时间"),
-    allowClear = false,
-    onClear = () => {},
-    extraFooter
-  } = props;
+  const { value, onChange = () => {}, dateFormat = 'YYYY-MM-DD HH:mm', placeholder = t('请选择时间'), allowClear = false, onClear = () => {}, extraFooter } = props;
   const [visible, setVisible] = useState(false);
   const [range, setRange] = useState<IRawTimeRange>();
   const [label, setLabel] = useState<string>('');
@@ -88,54 +78,55 @@ export default function index(props: ITimeRangePickerProps) {
     end?: string;
   }>({
     start: undefined,
-    end: undefined
+    end: undefined,
   });
 
   const renderSinglePicker = (key: 'start' | 'end') => {
-    const {
-      t
-    } = useTranslation();
+    const { t } = useTranslation();
     const labelMap = {
-      start: t("开始时间"),
-      end: t("结束时间")
+      start: t('开始时间'),
+      end: t('结束时间'),
     };
     const val = moment(range ? range[key] : undefined, true);
-    return <div className='mb10'>
+    return (
+      <div className='mb10'>
         <span>{labelMap[key]}</span>
-        <Input.Group compact style={{
-        marginTop: 4
-      }}>
-          <Input style={{
-          width: 'calc(100% - 32px)'
-        }} className={rangeStatus[key] === 'invalid' ? 'ant-input-status-error' : ''} value={range ? valueAsString(range[key], dateFormat) : undefined} onChange={e => {
-          const val = e.target.value;
-          setRangeStatus({ ...rangeStatus,
-            [key]: !isValid(val) ? 'invalid' : undefined
-          });
+        <Input.Group
+          compact
+          style={{
+            marginTop: 4,
+          }}
+        >
+          <Input
+            style={{
+              width: 'calc(100% - 32px)',
+            }}
+            className={rangeStatus[key] === 'invalid' ? 'ant-input-status-error' : ''}
+            value={range ? valueAsString(range[key], dateFormat) : undefined}
+            onChange={(e) => {
+              const val = e.target.value;
+              setRangeStatus({ ...rangeStatus, [key]: !isValid(val) ? 'invalid' : undefined });
 
-          if (isValid(val)) {
-            const newRange = { ...(range || {}),
-              [key]: isMathString(val) ? val : moment(val)
-            };
-            setRange((newRange as IRawTimeRange));
-          } else {
-            setRange(({ ...(range || {}),
-              [key]: val
-            } as IRawTimeRange));
-          }
-        }} onBlur={e => {
-          const val = e.target.value;
-          const otherKey = key === 'start' ? 'end' : 'start'; // 必须是绝对时间才缓存
+              if (isValid(val)) {
+                const newRange = { ...(range || {}), [key]: isMathString(val) ? val : moment(val) };
+                setRange(newRange as IRawTimeRange);
+              } else {
+                setRange({ ...(range || {}), [key]: val } as IRawTimeRange);
+              }
+            }}
+            onBlur={(e) => {
+              const val = e.target.value;
+              const otherKey = key === 'start' ? 'end' : 'start'; // 必须是绝对时间才缓存
 
-          if (range && !isMathString(val) && moment.isMoment(range[otherKey])) {
-            setHistoryCache({ ...range,
-              [key]: val
-            }, dateFormat);
-          }
-        }} />
+              if (range && !isMathString(val) && moment.isMoment(range[otherKey])) {
+                setHistoryCache({ ...range, [key]: val }, dateFormat);
+              }
+            }}
+          />
         </Input.Group>
-        <div className='flashcat-timeRangePicker-single-status'>{rangeStatus[key] === 'invalid' ? t("时间格式错误") : undefined}</div>
-      </div>;
+        <div className='flashcat-timeRangePicker-single-status'>{rangeStatus[key] === 'invalid' ? t('时间格式错误') : undefined}</div>
+      </div>
+    );
   };
 
   useEffect(() => {
@@ -144,8 +135,12 @@ export default function index(props: ITimeRangePickerProps) {
       setLabel(describeTimeRange(value, dateFormat));
     }
   }, [JSON.stringify(value), visible]);
-  return <>
-      <Popover overlayClassName='flashcat-timeRangePicker-container' content={<>
+  return (
+    <>
+      <Popover
+        overlayClassName='flashcat-timeRangePicker-container'
+        content={
+          <>
             <div className='flashcat-timeRangePicker'>
               <Row>
                 <Col span={15}>
@@ -153,93 +148,126 @@ export default function index(props: ITimeRangePickerProps) {
                     {renderSinglePicker('start')}
                     {renderSinglePicker('end')}
                     <div className='flashcat-timeRangePicker-absolute-history'>
-                      <span>{t("最近使用的时间范围")}</span>
-                      <ul style={{
-                  marginTop: 8
-                }}>
+                      <span>{t('最近使用的时间范围')}</span>
+                      <ul
+                        style={{
+                          marginTop: 8,
+                        }}
+                      >
                         {_.map(historyCache, (range, idx) => {
-                    const {
-                      t
-                    } = useTranslation();
-                    return <li key={range.start + range.end + idx} onClick={() => {
-                      const newValue = {
-                        start: isMathString(range.start) ? range.start : moment(range.start),
-                        end: isMathString(range.end) ? range.end : moment(range.end)
-                      };
-                      setRange(newValue);
-                      onChange(newValue);
-                      setHistoryCache(newValue, dateFormat);
-                      setVisible(false);
-                    }}>
+                          return (
+                            <li
+                              key={range.start + range.end + idx}
+                              onClick={() => {
+                                const newValue = {
+                                  start: isMathString(range.start) ? range.start : moment(range.start),
+                                  end: isMathString(range.end) ? range.end : moment(range.end),
+                                };
+                                setRange(newValue);
+                                onChange(newValue);
+                                setHistoryCache(newValue, dateFormat);
+                                setVisible(false);
+                              }}
+                            >
                               {describeTimeRange(range, dateFormat)}
-                            </li>;
-                  })}
+                            </li>
+                          );
+                        })}
                       </ul>
                     </div>
                   </div>
                 </Col>
                 <Col span={9}>
                   <div className='flashcat-timeRangePicker-ranges'>
-                    <Input placeholder={t("搜索快捷选项")} prefix={<SearchOutlined />} value={searchValue} onChange={e => {
-                setSearchValue(e.target.value);
-              }} />
+                    <Input
+                      placeholder={t('搜索快捷选项')}
+                      prefix={<SearchOutlined />}
+                      value={searchValue}
+                      onChange={(e) => {
+                        setSearchValue(e.target.value);
+                      }}
+                    />
                     <ul>
-                      {_.map(_.filter(validOptions, item => item.displayZh.indexOf(searchValue) > -1), item => {
-                  const {
-                    t
-                  } = useTranslation();
-                  return <li key={item.display} className={classNames({
-                    active: item.start === range?.start && item.end === range?.end
-                  })} onClick={() => {
-                    const newValue = {
-                      start: item.start,
-                      end: item.end
-                    };
-                    setRange(newValue);
-                    onChange(newValue);
-                    setVisible(false);
-                    setHistoryCache(newValue, dateFormat);
-                  }}>
+                      {_.map(
+                        _.filter(validOptions, (item) => item.displayZh.indexOf(searchValue) > -1),
+                        (item) => {
+                          return (
+                            <li
+                              key={item.display}
+                              className={classNames({
+                                active: item.start === range?.start && item.end === range?.end,
+                              })}
+                              onClick={() => {
+                                const newValue = {
+                                  start: item.start,
+                                  end: item.end,
+                                };
+                                setRange(newValue);
+                                onChange(newValue);
+                                setVisible(false);
+                                setHistoryCache(newValue, dateFormat);
+                              }}
+                            >
                               {item.displayZh}
-                            </li>;
-                })}
+                            </li>
+                          );
+                        },
+                      )}
                     </ul>
                   </div>
                 </Col>
               </Row>
             </div>
             <div className='flashcat-timeRangePicker-footer'>
-              <Button type='primary' onClick={() => {
-          if (rangeStatus.start !== 'invalid' && rangeStatus.end !== 'invalid') {
-            onChange((range as IRawTimeRange));
-            setVisible(false);
-          }
-        }}>
-                {t("确定")}
-             </Button>
+              <Button
+                type='primary'
+                onClick={() => {
+                  if (rangeStatus.start !== 'invalid' && rangeStatus.end !== 'invalid') {
+                    onChange(range as IRawTimeRange);
+                    setVisible(false);
+                  }
+                }}
+              >
+                {t('确定')}
+              </Button>
               {extraFooter && extraFooter(setVisible)}
             </div>
-          </>} trigger='click' placement='bottomRight' visible={visible} onVisibleChange={v => {
-      setVisible(v);
-    }}>
-        <Button style={props.style} className={classNames({
-        'flashcat-timeRangePicker-target': true,
-        'flashcat-timeRangePicker-target-allowClear': allowClear && label
-      })} onClick={() => {
-        setVisible(!visible);
-      }}>
+          </>
+        }
+        trigger='click'
+        placement='bottomRight'
+        visible={visible}
+        onVisibleChange={(v) => {
+          setVisible(v);
+        }}
+      >
+        <Button
+          style={props.style}
+          className={classNames({
+            'flashcat-timeRangePicker-target': true,
+            'flashcat-timeRangePicker-target-allowClear': allowClear && label,
+          })}
+          onClick={() => {
+            setVisible(!visible);
+          }}
+        >
           {props.label || label || placeholder}
-          {!props.label && <span className='flashcat-timeRangePicker-target-icon'>
+          {!props.label && (
+            <span className='flashcat-timeRangePicker-target-icon'>
               {visible ? <UpOutlined /> : <DownOutlined />}
-              <CloseCircleOutlined onClick={e => {
-            e.nativeEvent.stopImmediatePropagation();
-            e.stopPropagation();
-            setRange(undefined);
-            setLabel('');
-            onClear();
-          }} />
-            </span>}
+              <CloseCircleOutlined
+                onClick={(e) => {
+                  e.nativeEvent.stopImmediatePropagation();
+                  e.stopPropagation();
+                  setRange(undefined);
+                  setLabel('');
+                  onClear();
+                }}
+              />
+            </span>
+          )}
         </Button>
       </Popover>
-    </>;
+    </>
+  );
 }
