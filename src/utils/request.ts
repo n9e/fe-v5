@@ -5,20 +5,24 @@ import { UpdateAccessToken } from '@/services/login';
 
 /** 异常处理程序，所有的error都被这里处理，页面无法感知具体error */
 const errorHandler = (error: Error): Response => {
-  // 忽略 AbortError 类型的报错
-  // @ts-ignore
-  if (!(error.name === 'AbortError') && !error.silence) {
-    notification.error({
-      message: error.message,
-    });
+  // 忽略掉 setting getter-only property "data" 的错误
+  // 这是 umi-request 的一个 bug，当触发 abort 时 catch callback 里面不能 set data
+  if (error.name !== 'AbortError' && error.message !== 'setting getter-only property "data"') {
+    // @ts-ignore
+    if (!error.silence) {
+      notification.error({
+        message: error.message,
+      });
+    }
+    // @ts-ignore
+    if (error.silence) {
+      // TODO: 兼容 n9e，暂时认定只有开启 silence 的场景才需要传递 error 详情
+      throw error;
+    } else {
+      throw new Error(error.message);
+    }
   }
-  // @ts-ignore
-  if (error.silence) {
-    // TODO: 兼容 n9e，暂时认定只有开启 silence 的场景才需要传递 error 详情
-    throw error;
-  } else {
-    throw new Error(error.message);
-  }
+  throw error;
 };
 
 /** 配置request请求时的默认参数 */
