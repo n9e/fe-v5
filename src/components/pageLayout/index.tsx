@@ -201,8 +201,8 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, introI
                     <Menu
                       className='outfire-tree'
                       onSelect={({ key }) => {
-                        setCurLanguage(i18nMap[i18n.language]);
                         i18n.changeLanguage(key);
+                        setCurLanguage(i18nMap[key]);
                         localStorage.setItem('language', key);
                       }}
                       selectable
