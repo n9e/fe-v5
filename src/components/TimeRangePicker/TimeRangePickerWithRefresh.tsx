@@ -21,38 +21,43 @@ import AutoRefresh from './AutoRefresh';
 import TimeRangePicker from './TimeRangePicker';
 import { ITimeRangePickerWithRefreshProps } from './types';
 import { valueAsString } from './utils';
-import { useTranslation } from "react-i18next";
-export default function TimeRangePickerWithRefresh(props: ITimeRangePickerWithRefreshProps) {
-  const {
-    t
-  } = useTranslation();
-  const {
-    value,
-    onChange,
-    style,
-    refreshTooltip,
-    dateFormat = 'YYYY-MM-DD HH:mm',
-    localKey
-  } = props;
-  return <Space style={style}>
-      <AutoRefresh localKey={localKey && `${localKey}_refresh`} tooltip={refreshTooltip} onRefresh={() => {
-      if (value && onChange) {
-        onChange({ ...value,
-          refreshFlag: _.uniqueId('refreshFlag_ ')
-        });
-      }
-    }} intervalSeconds={props.intervalSeconds} onIntervalSecondsChange={props.onIntervalSecondsChange} />
-      <TimeRangePicker {..._.omit(props, ['style'])} onChange={val => {
-      if (localKey) {
-        localStorage.setItem(localKey, JSON.stringify({
-          start: valueAsString(val.start, dateFormat),
-          end: valueAsString(val.end, dateFormat)
-        }));
-      }
 
-      if (onChange) {
-        onChange(val);
-      }
-    }} />
-    </Space>;
+export default function TimeRangePickerWithRefresh(props: ITimeRangePickerWithRefreshProps) {
+  const { value, onChange, style, refreshTooltip, dateFormat = 'YYYY-MM-DD HH:mm', localKey } = props;
+
+  return (
+    <Space style={style}>
+      <AutoRefresh
+        localKey={localKey && `${localKey}_refresh`}
+        tooltip={refreshTooltip}
+        onRefresh={() => {
+          if (value && onChange) {
+            onChange({
+              ...value,
+              refreshFlag: _.uniqueId('refreshFlag_ '),
+            });
+          }
+        }}
+        intervalSeconds={props.intervalSeconds}
+        onIntervalSecondsChange={props.onIntervalSecondsChange}
+      />
+      <TimeRangePicker
+        {..._.omit(props, ['style'])}
+        onChange={(val) => {
+          if (localKey) {
+            localStorage.setItem(
+              localKey,
+              JSON.stringify({
+                start: valueAsString(val.start, dateFormat),
+                end: valueAsString(val.end, dateFormat),
+              }),
+            );
+          }
+          if (onChange) {
+            onChange(val);
+          }
+        }}
+      />
+    </Space>
+  );
 }

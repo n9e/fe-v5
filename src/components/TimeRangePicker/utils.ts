@@ -16,6 +16,7 @@
  */
 import _, { includes, isDate } from 'lodash';
 import moment, { Moment } from 'moment';
+import i18next from 'i18next';
 import { IRawTimeRange } from './types';
 import { spans, rangeOptions, units } from './config';
 
@@ -180,12 +181,14 @@ export function describeTextRange(expr: any) {
     const amount = parseInt(parts[2], 10);
     const span = spans[unit];
     if (span) {
-      opt.displayZh = isLast ? '最近 ' : '接下来 ';
-      opt.displayZh += amount + ' ' + span.displayZh;
-      opt.section = span.section;
+      opt.display = isLast ? i18next.t('timeRangePicker:last') : i18next.t('timeRangePicker:next');
+      opt.display += ' ' + amount + ' ' + i18next.t(`timeRangePicker:spans.${span.display}`);
+      if (amount > 1 && i18next.language === 'en_US') {
+        opt.display += 's';
+      }
     }
   } else {
-    opt.displayZh = opt.start + ' ~ ' + opt.end;
+    opt.display = opt.start + ' ~ ' + opt.end;
     opt.invalid = true;
   }
 
@@ -196,7 +199,7 @@ export function describeTimeRange(range: IRawTimeRange, dateFormat: string): str
   const option = rangeIndex[range.start.toString() + ' ~ ' + range.end.toString()];
 
   if (option) {
-    return option.displayZh;
+    return i18next.t(`timeRangePicker:rangeOptions.${option.display}`);
   }
 
   if (moment.isMoment(range.start) && moment.isMoment(range.end)) {
@@ -215,7 +218,7 @@ export function describeTimeRange(range: IRawTimeRange, dateFormat: string): str
 
   if (range.end.toString() === 'now') {
     const res = describeTextRange(range.start);
-    return res.displayZh;
+    return res.display;
   }
 
   return range.start.toString() + ' ~ ' + range.end.toString();

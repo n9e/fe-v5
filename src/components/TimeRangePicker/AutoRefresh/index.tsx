@@ -19,7 +19,7 @@ import { Dropdown, Button, Menu, Tooltip } from 'antd';
 import { DownOutlined, UpOutlined, SyncOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import './style.less';
-import { useTranslation } from 'react-i18next';
+
 const refreshMap = {
   0: 'off',
   5: '5s',
@@ -32,6 +32,7 @@ const refreshMap = {
   300: '5m',
   600: '10m',
 };
+
 interface IProps {
   tooltip?: string;
   onRefresh: () => void;
@@ -41,22 +42,22 @@ interface IProps {
 }
 
 function Refresh(props: IProps, ref) {
-  const { t } = useTranslation();
   const intervalSecondsCache = props.localKey ? _.toNumber(window.localStorage.getItem(props.localKey)) : 0;
   const [intervalSeconds, setIntervalSeconds] = useState(props.intervalSeconds || intervalSecondsCache);
   const [visible, setVisible] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout>();
+
   useEffect(() => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
-
     if (intervalSeconds) {
       intervalRef.current = setInterval(() => {
         props.onRefresh();
       }, intervalSeconds * 1000);
     }
   }, [intervalSeconds, props.onRefresh]);
+
   useEffect(() => {
     return () => {
       if (intervalRef.current) {
@@ -64,15 +65,18 @@ function Refresh(props: IProps, ref) {
       }
     };
   }, []);
+
   useEffect(() => {
     setIntervalSeconds(props.intervalSeconds || intervalSecondsCache);
   }, [props.intervalSeconds]);
+
   useImperativeHandle(ref, () => ({
     closeRefresh() {
       setIntervalSeconds(0);
       props.localKey && window.localStorage.setItem(props.localKey, '0');
     },
   }));
+
   return (
     <div className='auto-refresh-container'>
       <Tooltip title={props.tooltip}>
@@ -108,16 +112,7 @@ function Refresh(props: IProps, ref) {
             alignItems: 'center',
           }}
         >
-          {refreshMap[intervalSeconds]}{' '}
-          {visible ? (
-            <UpOutlined />
-          ) : (
-            <DownOutlined
-              style={{
-                fontSize: 12,
-              }}
-            />
-          )}
+          {refreshMap[intervalSeconds]} {visible ? <UpOutlined /> : <DownOutlined style={{ fontSize: 12 }} />}
         </Button>
       </Dropdown>
     </div>
