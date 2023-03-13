@@ -34,9 +34,10 @@ import PrometheusDetail from './Detail/Prometheus';
 import ElasticsearchDetail from './Detail/Elasticsearch';
 import AliyunSLSDetail from './Detail/AliyunSLS';
 import './detail.less';
-
+import { useTranslation } from 'react-i18next';
 const { Paragraph } = Typography;
 const EventDetailPage: React.FC = () => {
+  const { t } = useTranslation();
   const { busiId, eventId } = useParams<{ busiId: string; eventId: string }>();
   const { busiGroups } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const handleNavToWarningList = (id) => {
@@ -184,8 +185,8 @@ const EventDetailPage: React.FC = () => {
           history,
         })
       : [false]),
-    ...(eventDetail?.cate === 'elasticsearch' ? ElasticsearchDetail() : [false]),
-    ...(eventDetail?.cate === 'aliyun-sls' ? AliyunSLSDetail() : [false]),
+    ...(eventDetail?.cate === 'elasticsearch' ? ElasticsearchDetail(t) : [false]),
+    ...(eventDetail?.cate === 'aliyun-sls' ? AliyunSLSDetail(t) : [false]),
     {
       label: '执行频率',
       key: 'prom_eval_interval',

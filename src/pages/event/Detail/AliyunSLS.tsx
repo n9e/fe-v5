@@ -1,41 +1,40 @@
 import React from 'react';
 import _ from 'lodash';
 
-const severityMap = {
-  1: '一级告警',
-  2: '二级告警',
-  3: '三级告警',
-};
-
-export default function AliyunSLSDetail() {
+export default function AliyunSLSDetail(t) {
+  const severityMap = {
+    1: t('一级告警'),
+    2: t('二级告警'),
+    3: t('三级告警'),
+  };
   return [
     {
-      label: '项目',
+      label: t('项目'),
       key: 'queries',
       render(val) {
         return _.get(val, '[0].project');
       },
     },
     {
-      label: '日志库',
+      label: t('日志库'),
       key: 'queries',
       render(val) {
         return _.get(val, '[0].logstore');
       },
     },
     {
-      label: '查询条件',
+      label: t('查询条件'),
       key: 'queries',
       render(val) {
         return _.get(val, '[0].query');
       },
     },
     {
-      label: '告警条件',
+      label: t('告警条件'),
       key: 'triggers',
       render(val) {
         const trigger = _.get(val, '[0]');
-        return `${trigger?.exp} 触发 ${severityMap[trigger?.severity]}`;
+        return `${trigger?.exp} ${t('触发')} ${severityMap[trigger?.severity]}`;
       },
     },
   ];

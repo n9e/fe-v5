@@ -40,7 +40,7 @@ export default function index(props: IProps) {
                   <Form.Item
                     label={
                       <div>
-                        {t('单位')}位{' '}
+                        {t('单位')}
                         <Tooltip
                           overlayInnerStyle={{
                             width: 500,
@@ -49,7 +49,7 @@ export default function index(props: IProps) {
                           title={
                             <div>
                               <div>
-                                {t('默认会做')} SI Prefixes {t('处理，如不想默认的处理可选择')} none {t('关闭')}闭
+                                {t('默认会做')} SI Prefixes {t('处理，如不想默认的处理可选择')} none {t('关闭')}
                               </div>
                               <div>
                                 {t('Data(SI):')} {t('基数为')} 1000, {t('单位为')} B、kB、MB、GB、TB、PB、EB、ZB、YBB
