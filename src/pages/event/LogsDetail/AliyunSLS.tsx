@@ -7,7 +7,7 @@ import { getEventLogQuery } from '@/services/warning';
 import ModalHOC, { ModalWrapProps } from '@/pages/dashboard/Components/ModalHOC';
 import RawTable from '@/pages/metric/explorer/AliyunSLS/RawTable';
 import './style.less';
-
+import { useTranslation } from 'react-i18next';
 interface IProps {
   id: string;
   start: number;
@@ -15,6 +15,7 @@ interface IProps {
 }
 
 function index(props: IProps & ModalWrapProps) {
+  const { t } = useTranslation();
   const { id, start, end, visible, destroy } = props;
   const [range, setRange] = useState<IRawTimeRange>({
     start: moment.unix(start),
@@ -52,12 +53,12 @@ function index(props: IProps & ModalWrapProps) {
   }, [id, JSON.stringify(range), limit]);
 
   return (
-    <Drawer title='日志详情' width={960} placement='right' onClose={destroy} visible={visible}>
+    <Drawer title={t('日志详情')} width={960} placement='right' onClose={destroy} visible={visible}>
       <div style={{ marginBottom: 10 }}>
         <Space>
           <TimeRangePicker dateFormat='YYYY-MM-DD HH:mm:ss' value={range} onChange={setRange} />
           <Input.Group>
-            <span className='ant-input-group-addon'>结果数</span>
+            <span className='ant-input-group-addon'>{t('结果数')}</span>
             <Select
               value={limit}
               onChange={(val) => {
@@ -73,7 +74,7 @@ function index(props: IProps & ModalWrapProps) {
             </Select>
           </Input.Group>
           <Input.Group>
-            <span className='ant-input-group-addon'>筛选字段</span>
+            <span className='ant-input-group-addon'>{t('筛选字段')}</span>
             <Select
               mode='multiple'
               value={selectedFields}

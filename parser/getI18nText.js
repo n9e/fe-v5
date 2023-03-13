@@ -7,9 +7,9 @@
 const { match } = require('assert');
 const fs = require('fs');
 const path = require('path');
-const srcPath = path.resolve('../', 'src/');
+const srcPath = path.resolve('../', 'src/pages/event');
 // const srcPath = path.resolve('../', 'src');
-const localePath = path.resolve('../src','locales/en.json')
+const localePath = path.resolve('../src','locales/zh_HK.json')
 const outputPath = path.resolve('../', 'output.json');
 const { getAllTSXFile } = require('./util');
 let arg = process.argv.slice(2);
