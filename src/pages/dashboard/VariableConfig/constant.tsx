@@ -238,9 +238,7 @@ function attachVariable2Url(key, value, id: string, vars?: IVariable[]) {
   const newQuery = {};
   _.forEach(_.merge({}, varsValue, query, { [key]: value }), (value, key) => {
     const val = typeof value === 'string' ? value : JSON.stringify(value);
-    if (key !== '__variable_value_fixed') {
-      newQuery[key] = val;
-    }
+    newQuery[key] = val;
   });
   const newurl = `${protocol}//${host}${pathname}?${queryString.stringify(newQuery)}`;
   window.history.replaceState({ path: newurl }, '', newurl);
