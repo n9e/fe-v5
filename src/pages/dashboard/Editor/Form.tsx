@@ -47,6 +47,7 @@ function FormCpt(props, ref) {
   useEffect(() => {
     setVariableConfigWithOptions(props.variableConfigWithOptions);
   }, [JSON.stringify(props.variableConfigWithOptions)]);
+
   return (
     <Form layout='vertical' form={chartForm} initialValues={_.merge({}, defaultValues, initialValues)}>
       <Form.Item name='type' hidden />

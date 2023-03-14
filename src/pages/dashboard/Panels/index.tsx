@@ -240,6 +240,7 @@ function index(props: IProps) {
                       id: item.id,
                       initialValues: {
                         type: 'timeseries',
+                        name: t('标题'),
                         targets: [
                           {
                             refId: 'A',

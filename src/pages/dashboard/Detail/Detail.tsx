@@ -220,6 +220,7 @@ export default function DetailV2({ isPreview = false }: { isPreview?: boolean })
                       expr: '',
                     },
                   ],
+                  name: t('标题'),
                   custom: defaultCustomValuesMap[type],
                   options: defaultOptionsValuesMap[type],
                 },
