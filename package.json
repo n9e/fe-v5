@@ -23,7 +23,7 @@
     "@d3-charts/ts-graph": "^0.3.7",
     "@fc-components/menu": "1.0.0",
     "@fc-plot/ts-graph": "^0.22.7",
-    "@minko-fe/use-antd-resizable-header": "^2.5.0",
+    "@minko-fe/use-antd-resizable-header": "^2.8.12",
     "@types/echarts": "^4.9.7",
     "@uiw/react-codemirror": "4.6.0",
     "@y0c/react-datepicker": "^1.0.4",
