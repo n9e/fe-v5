@@ -339,6 +339,10 @@ export default function Stat(props: IProps) {
   const realHeight = isNaN(height) ? 0 : height;
   const { components, resizableColumns, tableWidth, resetColumns } = useAntdResizableHeader({
     columns: useMemo(() => tableColumns, [JSON.stringify(columns), displayMode, JSON.stringify(calculatedValues), sortObj, themeMode, aggrDimension, overrides, size]),
+    columnsState: {
+      persistenceType: 'localStorage',
+      persistenceKey: `dashboard-table-resizable-${values.id}`,
+    },
   });
   return (
     <div className='renderer-table-container' ref={eleRef}>
