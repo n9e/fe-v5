@@ -82,7 +82,7 @@ export default function Login() {
           <img src='/image/nightingale.svg' />
         </div>
         <div className='banner-image'>
-          <img src={'/image/夜莺插画.svg'} />
+          <img src={'/image/login-dashboard.svg'} />
         </div>
       </div>
       <div className='login-panel'>
