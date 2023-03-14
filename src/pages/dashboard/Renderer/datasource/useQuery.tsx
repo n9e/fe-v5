@@ -17,6 +17,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import _ from 'lodash';
 import { IRawTimeRange } from '@/components/TimeRangePicker';
+import { useDebounceFn } from 'ahooks';
 import { ITarget } from '../../types';
 import { getVaraiableSelected } from '../../VariableConfig/constant';
 import { IVariable } from '../../VariableConfig/definition';
@@ -55,17 +56,22 @@ export default function usePrometheus(props: IProps) {
     'elasticsearch-log': elasticSearchLogQuery,
     'aliyun-sls': aliyunSLS,
   };
-  const fetchData = () => {
-    if (!datasourceCate) return;
-    setLoading(true);
-    fetchQueryMap[datasourceCate](props)
-      .then((res: any[]) => {
-        setSeries(res);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  };
+  const { run: fetchData } = useDebounceFn(
+    () => {
+      if (!datasourceCate) return;
+      setLoading(true);
+      fetchQueryMap[datasourceCate](props)
+        .then((res: any[]) => {
+          setSeries(res);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    },
+    {
+      wait: 500,
+    },
+  );
 
   useEffect(() => {
     // 配置变化时且图表在可视区域内重新请求数据，同时重置 flag
