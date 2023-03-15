@@ -53,6 +53,7 @@ export const fetchHistoryBatch = (data, signalKey, datasourceValue) => {
     headers: {
       'X-Cluster': datasourceValue,
     },
+    silence: true,
   }).finally(() => {
     delete signals[signalKey];
   });
