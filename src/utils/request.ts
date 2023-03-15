@@ -48,7 +48,7 @@ request.interceptors.request.use((url, options) => {
   if (!headers['X-Cluster']) {
     headers['X-Cluster'] = localStorage.getItem('curCluster') || '';
   }
-  headers['X-Language'] = 'zh';
+  headers['X-Language'] = localStorage.getItem('language') || 'zh_CN';
   return {
     url,
     options: { ...options, headers },
