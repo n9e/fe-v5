@@ -80,7 +80,20 @@ function FormCpt(props, ref) {
             >
               <Form.Item shouldUpdate noStyle>
                 {({ getFieldsValue }) => {
-                  return <Renderer dashboardId={id} time={range} step={step} values={getFieldsValue()} variableConfig={variableConfigWithOptions} isPreview />;
+                  const values = getFieldsValue();
+                  return (
+                    <Renderer
+                      dashboardId={id}
+                      time={range}
+                      step={step}
+                      values={{
+                        ...values,
+                        datasourceName: values.datasourceName || cluster,
+                      }}
+                      variableConfig={variableConfigWithOptions}
+                      isPreview
+                    />
+                  );
                 }}
               </Form.Item>
             </div>
