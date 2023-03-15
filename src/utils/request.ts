@@ -25,6 +25,15 @@ const errorHandler = (error: Error): Response => {
   throw error;
 };
 
+const uploadSentryRequestId = (data) => {
+  if (data.request_id) {
+    const event = new CustomEvent('upload-sentry', {
+      detail: 'The request id is ' + data.request_id,
+    });
+    window.dispatchEvent(event);
+  }
+};
+
 /** 配置request请求时的默认参数 */
 const request = extend({
   errorHandler, // 默认错误处理
@@ -65,6 +74,7 @@ request.interceptors.response.use(
               if (response.url.indexOf('/api/n9e/prometheus/api/v1') > -1 || response.url.indexOf('/api/v1/datasource/prometheus') > -1) {
                 return data;
               } else {
+                uploadSentryRequestId(data);
                 // @ts-ignore
                 throw new Error(data.error.message, { cause: options.silence });
               }
@@ -111,6 +121,7 @@ request.interceptors.response.use(
             //   return { success: true };
             // }
           } else if (data.error) {
+            uploadSentryRequestId(data);
             throw {
               name: data.error.name,
               message: data.error.message,
@@ -179,6 +190,7 @@ request.interceptors.response.use(
               }
             }
             if (response.url.includes('/api/v1') || response.url.includes('/api/v2')) {
+              uploadSentryRequestId(data);
               throw {
                 // TODO: 后端服务异常后可能返回的错误数据也不是一个正常的结构，后面得考虑下怎么处理
                 name: data.error ? data.error.name : JSON.stringify(data),
@@ -188,6 +200,7 @@ request.interceptors.response.use(
                 response,
               };
             } else {
+              uploadSentryRequestId(data);
               throw new Error(data.err ? data.err : data);
             }
           });
