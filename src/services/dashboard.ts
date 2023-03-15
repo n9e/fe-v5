@@ -206,6 +206,7 @@ export const getLabelNames = function (data, datasourceValue: string) {
     headers: {
       'X-Cluster': datasourceValue,
     },
+    silence: true,
   });
 };
 
@@ -216,6 +217,7 @@ export const getLabelValues = function (label, data, datasourceValue: string) {
     headers: {
       'X-Cluster': datasourceValue,
     },
+    silence: true,
   });
 };
 
@@ -226,6 +228,7 @@ export const getMetricSeries = function (data, datasourceValue: string) {
     headers: {
       'X-Cluster': datasourceValue,
     },
+    silence: true,
   });
 };
 
@@ -236,6 +239,7 @@ export const getMetric = function (data = {}, datasourceValue: string) {
     headers: {
       'X-Cluster': datasourceValue,
     },
+    silence: true,
   });
 };
 
@@ -246,6 +250,7 @@ export const getQueryResult = function (data, datasourceValue: string) {
     headers: {
       'X-Cluster': datasourceValue,
     },
+    silence: true,
   });
 };
 
