@@ -195,7 +195,7 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, introI
               </AdvancedWrap>
 
               {/* 文案完善了再打开 */}
-              {window.location.origin.includes('10.206.0.17') && (
+              {(window.location.origin.includes('10.206.0.17') || window.location.origin.includes('demo.flashcat.cloud')) && (
                 <Dropdown
                   overlay={
                     <Menu
