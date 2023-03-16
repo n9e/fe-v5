@@ -1,31 +1,125 @@
-.profile {
-  padding: 20px;
-  .ant-tabs-nav {
-    padding: 10px 10px 0;
-    margin-bottom: 0px;
-  }
-  .ant-tabs-content {
-    padding: 20px 40px;
-  }
-  .avatar {
-    display: flex;
-    flex-direction: column;
-    align-content: flex-start;
-    justify-content: space-evenly;
-    align-items: center;
-    img {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
+.profile-page {
+  &-container {
+    margin-top: 50px;
+    position: relative;
+    height: calc(100% - 50px);
+    border-radius: 8px;
+    box-shadow: none !important;
+    .basic-info {
+      display: flex;
+      align-items: center;
+      position: absolute;
+      top: -50px;
+      left: 40px;
+      .avatar {
+        position: relative;
+        border-radius: 50%;
+        overflow: hidden;
+        img {
+          width: 100px;
+          height: 100px;
+        }
+        &-btn {
+          position: absolute;
+          z-index: 1;
+          top: 0;
+          left: 0;
+          opacity: 0;
+          width: 100px;
+          height: 100px;
+          line-height: 100px;
+          text-align: center;
+          color: #fff;
+          cursor: pointer;
+          transition: all ease 0.2s;
+        }
+        &:hover {
+          .avatar-btn {
+            opacity: 1;
+            background-color: rgba(0, 0, 0, 0.4);
+          }
+        }
+      }
+      .desc {
+        margin-left: 16px;
+        .name {
+          margin-bottom: 16px;
+          font-size: 18px;
+          line-height: 28px;
+          color: @colorGray1;
+          font-family: 'PingFangSC-Medium';
+        }
+        .roles {
+          font-size: 14px;
+          line-height: 22px;
+          color: @colorGray4;
+        }
+      }
+    }
+    .additional-info {
+      height: 100%;
+      padding: 82px 16px 16px 16px;
+      &-container {
+        display: flex;
+        height: 123px;
+        padding: 32px 16px 0 24px;
+        border: 1px solid #E3E4E6;
+        border-radius: 4px;
+        background: no-repeat url('/image/profile-info-bg.png');
+        background-size: 300%;
+        .info-icon {
+          width: 36px;
+          height: 36px;
+          border-radius: 4px;
+          background-color: rgba(108, 83, 177, 0.16);
+          color: black;
+          font-size: 24px;
+          padding: 0 6px;
+        }
+        .info-desc {
+          margin-left: 16px;
+          &-header {
+            padding: 7px 0;
+            font-size: 14px;
+            line-height: 22px;
+            color: @colorGray4;
+          }
+          &-content {
+            display: flex;
+            .edit-icon {
+              cursor: pointer;
+              height: 36px;
+              padding: 8px;
+              margin-top: -8px;
+              opacity: 0;
+            }
+          }
+        }
+        &:hover {
+          border-color: #DAC7FF;
+          .info-desc .info-desc-content .edit-icon {
+            opacity: 1;
+          }
+        }
+        .add-more {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 100%;
+          height: 100%;
+          padding-bottom: 32px;
+          font-size: 14px;
+          color: @primary-color;
+          .anticon {
+            font-size: 16px;
+            margin-right: 4px;
+          }
+        }
+      }
     }
   }
-  .ant-form-item-control {
-    width: 600px;
-  }
-  .update-avatar {
-    margin-top: 20px;
-  }
 }
+
 .avatar-modal {
   .avatar-content {
     display: flex;
@@ -37,9 +131,10 @@
     display: flex;
     flex-direction: column;
     width: 100px;
+    cursor: pointer;
     &.active {
       img {
-        border: 2px solid purple;
+        border: 1px solid #6C53B1;
       }
     }
     img {

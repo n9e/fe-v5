@@ -216,7 +216,7 @@ export default function index() {
                         className='table-operator-area-normal'
                         onClick={async () => {
                           Modal.confirm({
-                            title: `${t('是否克隆大盘')}?${record.name}`,
+                            title: `${t('是否克隆大盘')}${record.name}?`,
                             onOk: async () => {
                               await cloneDashboard(busiId as number, record.id);
                               message.success(t('克隆大盘成功'));
@@ -244,7 +244,7 @@ export default function index() {
                         className='table-operator-area-warning'
                         onClick={async () => {
                           Modal.confirm({
-                            title: `${t('是否删除大盘：')}?${record.name}`,
+                            title: `${t('是否删除大盘：')}${record.name}?`,
                             onOk: async () => {
                               await removeDashboards([record.id]);
                               message.success(t('删除大盘成功'));
