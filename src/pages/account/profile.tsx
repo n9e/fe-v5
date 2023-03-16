@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import { Tabs } from 'antd';
-import ChangePassword from './ChangePassword';
+import ChangePassword from './changePassword';
 import Info from './info';
 import SecretKey from './secretKey';
 import './profile.less';

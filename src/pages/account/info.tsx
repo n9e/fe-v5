@@ -23,7 +23,7 @@ import { ContactsItem } from '@/store/manageInterface';
 import { MinusCircleOutlined, PlusCircleOutlined, CaretDownOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import IconFont from '@/components/IconFont';
-import ChangePassword from './ChangePassword';
+import ChangePassword from './changePassword';
 import AddContact from './AddContact';
 
 const CONTACTS_ICON_MAP = {
