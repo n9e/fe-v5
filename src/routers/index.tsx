@@ -102,8 +102,6 @@ export default function Content() {
     if (
       !location.pathname.startsWith('/chart/') &&
       !location.pathname.startsWith('/dashboards/share/') &&
-      !location.pathname.startsWith('/alert-cur-events/') &&
-      !location.pathname.startsWith('/alert-his-events/') &&
       !location.pathname.startsWith('/callback') &&
       !location.pathname.startsWith('/polaris/screen/')
     ) {

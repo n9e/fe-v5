@@ -48,7 +48,7 @@ request.interceptors.request.use((url, options) => {
   if (!headers['X-Cluster']) {
     headers['X-Cluster'] = localStorage.getItem('curCluster') || '';
   }
-  headers['X-Language'] = 'zh';
+  headers['X-Language'] = localStorage.getItem('language') || 'zh_CN';
   return {
     url,
     options: { ...options, headers },
@@ -61,8 +61,10 @@ request.interceptors.request.use((url, options) => {
 request.interceptors.response.use(
   async (response, options) => {
     const { status } = response;
-
     if (status === 200) {
+      setTimeout(() => {
+        window['auth-401'] = false;
+      }, 3000);
       return response
         .clone()
         .json()
@@ -133,6 +135,7 @@ request.interceptors.response.use(
         });
     }
     if (status === 401) {
+      window['auth-401'] = true;
       if (response.url.indexOf('/api/n9e/prometheus/api/v1') > -1 || response.url.indexOf('/api/v1/datasource/prometheus') > -1) {
         return response
           .clone()
