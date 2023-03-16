@@ -163,6 +163,7 @@ request.interceptors.response.use(
       // } else if (status === 404) {
       //   location.href = '/404';
     } else if (status === 403 && (response.url.includes('/api/v1') || response.url.includes('/api/v2'))) {
+      window['auth-401'] = true;
       return response
         .clone()
         .json()
