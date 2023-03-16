@@ -14,14 +14,24 @@
  * limitations under the License.
  *
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Form, Input, Button, Modal, Row, Col, message, Space, Select } from 'antd';
+import { Form, Input, Button, Modal, Row, Col, message, Space, Select, Drawer } from 'antd';
 import { getNotifyChannels } from '@/services/manage';
 import { RootState, accountStoreState } from '@/store/accountInterface';
 import { ContactsItem } from '@/store/manageInterface';
 import { MinusCircleOutlined, PlusCircleOutlined, CaretDownOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
+import IconFont from '@/components/IconFont';
+import ChangePassword from './ChangePassword';
+import AddContact from './AddContact';
+
+const CONTACTS_ICON_MAP = {
+  wecom_robot_token: 'Wecom',
+  dingtalk_robot_token: 'Dingtalk',
+  feishu_robot_token: 'Feishu',
+};
+
 const { Option } = Select;
 export default function Info() {
   const { t } = useTranslation();
@@ -32,6 +42,60 @@ export default function Info() {
   const [selectAvatar, setSelectAvatar] = useState<string>(profile.portrait || '/image/avatar1.png');
   const [customAvatar, setCustomAvatar] = useState('');
   const dispatch = useDispatch();
+  const [curEditingCard, setCurEditingCard] = useState<string>('');
+  const [pwdDrawerVisible, setPwdDrawerVisible] = useState(false);
+  const [contactsDrawerVisible, setContactsDrawerVisible] = useState(false);
+
+  const cardsInfo = useMemo(
+    () =>
+      [
+        {
+          title: t('显示名'),
+          key: 'nickname',
+          value: profile.nickname,
+          icon: 'DisplayName',
+          editMode: 'current',
+        },
+        {
+          title: t('密码'),
+          key: 'password',
+          value: '********',
+          icon: 'Lock',
+          editMode: 'drawer',
+          editCallback: () => setPwdDrawerVisible(true),
+        },
+        {
+          title: t('邮箱'),
+          key: 'email',
+          value: profile.email,
+          icon: 'Letter',
+          editMode: 'current',
+        },
+        {
+          title: t('手机'),
+          key: 'phone',
+          value: profile.phone,
+          icon: 'Telephone',
+          editMode: 'current',
+        },
+        ...Object.keys(profile.contacts || {})
+          .sort()
+          .map((key) => {
+            let contact = contactsList.find((item) => item.key === key);
+            return (
+              contact && {
+                title: contact.label,
+                key: 'contacts.' + contact.key,
+                value: profile.contacts[contact.key],
+                icon: CONTACTS_ICON_MAP[contact.key],
+                editMode: 'current',
+              }
+            );
+          }),
+      ].filter((p) => p),
+    [profile, contactsList],
+  );
+
   useEffect(() => {
     const { id, nickname, email, phone, contacts, portrait } = profile;
     form.setFieldsValue({
@@ -45,20 +109,12 @@ export default function Info() {
       setCustomAvatar(portrait);
     }
   }, [profile]);
+
   useEffect(() => {
     getNotifyChannels().then((data: Array<ContactsItem>) => {
       setContactsList(data);
     });
   }, []);
-
-  const handleSubmit = async () => {
-    try {
-      await form.validateFields();
-      updateProfile();
-    } catch (err) {
-      console.log(t('输入有误'), err);
-    }
-  };
 
   const handleOk = () => {
     if (customAvatar) {
@@ -72,14 +128,14 @@ export default function Info() {
       })
         .then((res) => {
           setIsModalVisible(false);
-          handleSubmit();
+          updateProfile('portrait', customAvatar);
         })
         .catch((err) => {
           message.error(t('自定义头像') + err);
         });
     } else {
       setIsModalVisible(false);
-      handleSubmit();
+      updateProfile('portrait', selectAvatar);
     }
   };
 
@@ -87,37 +143,26 @@ export default function Info() {
     setIsModalVisible(false);
   };
 
-  const updateProfile = () => {
-    const { nickname, email, phone, moreContacts } = form.getFieldsValue();
-    let { contacts } = form.getFieldsValue();
+  const updateProfile = (key: string, value: any) => {
+    const updateProfile = { ...profile };
 
-    if (moreContacts && moreContacts.length > 0) {
-      moreContacts.forEach((item) => {
-        const { key, value } = item;
-
-        if (key && value) {
-          if (contacts) {
-            contacts[key] = value;
-          } else {
-            contacts = {
-              [key]: value,
-            };
-          }
-        }
-      });
-    }
-
-    for (let key in contacts) {
-      if (!contacts[key]) {
-        delete contacts[key];
+    if (key.includes('contacts.')) {
+      const realKey = key.split('contacts.')[1];
+      if (!value) {
+        delete updateProfile['contacts'][realKey];
+      } else {
+        updateProfile['contacts'][realKey] = value;
       }
+    } else {
+      updateProfile[key] = value;
     }
 
     dispatch({
       type: 'account/updateProfile',
-      data: { ...profile, portrait: customAvatar || selectAvatar, nickname, email, phone, contacts },
+      data: updateProfile,
     });
-    message.success(t('信息保存成功'));
+    setCurEditingCard('');
+    // message.success(t('信息保存成功'));
   };
 
   const avatarList = new Array(8).fill(0).map((_, i) => i + 1);
@@ -127,135 +172,83 @@ export default function Info() {
   };
 
   return (
-    <>
-      <Form form={form} layout='vertical'>
-        <Row
-          gutter={16}
-          style={{
-            marginBottom: '24px',
-          }}
-        >
-          <Col span={20}>
-            <Row
-              gutter={16}
-              style={{
-                marginBottom: '24px',
-              }}
-            >
-              <Col span={4}>
-                <div>
-                  <label>{t('用户名')}：</label>
-                  <span>{profile.username}</span>
-                </div>
-              </Col>
-              <Col span={4}>
-                <div>
-                  <label>{t('角色')}：</label>
-                  <span>{profile.roles.join(', ')}</span>
-                </div>
-              </Col>
-            </Row>
-            <Form.Item label={<span>{t('显示名')}：</span>} name='nickname'>
-              <Input placeholder={t('请输入显示名')} />
-            </Form.Item>
-            <Form.Item label={<span>{t('邮箱')}：</span>} name='email'>
-              <Input placeholder={t('请输入邮箱')} />
-            </Form.Item>
-            <Form.Item label={<span>{t('手机')}：</span>} name='phone'>
-              <Input placeholder={t('请输入手机号')} />
-            </Form.Item>
-
-            {profile.contacts &&
-              Object.keys(profile.contacts)
-                .sort()
-                .map((key, i) => {
-                  let contact = contactsList.find((item) => item.key === key);
-                  return (
-                    <>
-                      {contact ? (
-                        <Form.Item label={contact.label + '：'} name={['contacts', key]} key={i}>
-                          <Input placeholder={`${t('请输入')}${key}`} />
-                        </Form.Item>
-                      ) : null}
-                    </>
-                  );
-                })}
-
-            <Form.Item label={t('更多联系方式')}>
-              <Form.List name='moreContacts'>
-                {(fields, { add, remove }) => (
-                  <>
-                    {fields.map(({ key, name, fieldKey, ...restField }) => (
-                      <Space
-                        key={key}
-                        style={{
-                          display: 'flex',
-                        }}
-                        align='baseline'
-                      >
-                        <Form.Item
-                          style={{
-                            width: '180px',
-                          }}
-                          {...restField}
-                          name={[name, 'key']}
-                          fieldKey={[fieldKey, 'key']}
-                          rules={[
-                            {
-                              required: true,
-                              message: t('联系方式不能为空'),
-                            },
-                          ]}
-                        >
-                          <Select suffixIcon={<CaretDownOutlined />} placeholder={t('请选择联系方式')}>
-                            {contactsList.map((item, index) => (
-                              <Option value={item.key} key={index}>
-                                {item.label}
-                              </Option>
-                            ))}
-                          </Select>
-                        </Form.Item>
-                        <Form.Item
-                          {...restField}
-                          style={{
-                            width: '330px',
-                          }}
-                          name={[name, 'value']}
-                          fieldKey={[fieldKey, 'value']}
-                          rules={[
-                            {
-                              required: true,
-                              message: t('值不能为空'),
-                            },
-                          ]}
-                        >
-                          <Input placeholder={t('请输入值')} />
-                        </Form.Item>
-                        <MinusCircleOutlined className='control-icon-normal' onClick={() => remove(name)} />
-                      </Space>
-                    ))}
-                    <PlusCircleOutlined className='control-icon-normal' onClick={() => add()} />
-                  </>
-                )}
-              </Form.List>
-            </Form.Item>
-
-            <Form.Item>
-              <Button type='primary' onClick={handleSubmit}>
-                {t('确认修改')}
-              </Button>
-            </Form.Item>
-          </Col>
-          <Col span={4}>
-            <div className='avatar'>
-              <img src={profile.portrait || '/image/avatar1.png'} />
-              <Button type='primary' className='update-avatar' onClick={() => setIsModalVisible(true)}>
-                {t('更换头像')}
-              </Button>
+    <div className='profile-page'>
+      <div className='profile-page-container'>
+        <div className='basic-info'>
+          <div className='avatar'>
+            <img src={profile.portrait || '/image/avatar1.png'} />
+            <div className='avatar-btn' onClick={() => setIsModalVisible(true)}>
+              {t('更换头像')}
             </div>
-          </Col>
-        </Row>
-      </Form>
+          </div>
+          <div className='desc'>
+            <div className='name'>{`${profile.nickname}（${profile.username}）`}</div>
+            <div className='roles'>{profile.roles.join(', ')}</div>
+          </div>
+        </div>
+        <div className='additional-info'>
+          <Row gutter={[16, 16]}>
+            {cardsInfo.map((item, i) => (
+              <Col xs={24} sm={24} md={12} lg={8} xl={6} xxl={6}>
+                <div className='additional-info-container' style={{ backgroundPosition: `${(16 * (i + 2)) % 100}% ${(27 * (i + 1)) % 100}%` }}>
+                  <div className='info-icon'>
+                    <IconFont type={'icon-' + item?.icon} />
+                  </div>
+                  <div className='info-desc'>
+                    <div className='info-desc-header'>{item?.title}</div>
+                    <div className='info-desc-content'>
+                      {curEditingCard === item?.key ? (
+                        <>
+                          <Input
+                            defaultValue={item.value}
+                            onPressEnter={(e) => {
+                              updateProfile(item.key, (e.target as any)?.value);
+                            }}
+                          />
+                        </>
+                      ) : (
+                        <>
+                          <div>{item?.value || t('立即设置')}</div>
+                          <div
+                            className='edit-icon'
+                            onClick={() => {
+                              if (item?.editMode === 'current') {
+                                setCurEditingCard(item.key);
+                              } else {
+                                (item as any)?.editCallback?.();
+                                setCurEditingCard('');
+                              }
+                            }}
+                          >
+                            <IconFont type='icon-Editor' />
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </Col>
+            ))}
+            {contactsList.length > Object.keys(profile.contacts).length && (
+              <Col xs={24} sm={24} md={12} lg={8} xl={6} xxl={6}>
+                <div
+                  className='additional-info-container'
+                  style={{ backgroundPosition: `${(16 * (cardsInfo.length + 1)) % 100}% ${(27 * cardsInfo.length) % 100}%`, cursor: 'pointer' }}
+                  onClick={() => {
+                    setContactsDrawerVisible(true);
+                  }}
+                >
+                  <div className='add-more'>
+                    <IconFont type='icon-Plus' />
+                    {t('新增更多联系方式')}
+                  </div>
+                </div>
+              </Col>
+            )}
+          </Row>
+        </div>
+      </div>
+
       <Modal title={t('更换头像')} visible={isModalVisible} onOk={handleOk} onCancel={handleCancel} wrapClassName='avatar-modal'>
         <div className='avatar-content'>
           {avatarList.map((i) => {
@@ -268,6 +261,10 @@ export default function Info() {
         </div>
         <Input addonBefore={<span>{t('头像URL')}:</span>} onChange={(e) => setCustomAvatar(e.target.value)} value={customAvatar} />
       </Modal>
-    </>
+
+      <ChangePassword visible={pwdDrawerVisible} setVisible={setPwdDrawerVisible} />
+
+      <AddContact visible={contactsDrawerVisible} setVisible={setContactsDrawerVisible} contactsList={contactsList} updateProfile={updateProfile} profile={profile} />
+    </div>
   );
 }
