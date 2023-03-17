@@ -175,8 +175,8 @@ export default function index({ form, prefixField = {}, fullPrefixName = [], pre
                     <CloseCircleOutlined
                       style={{
                         position: 'absolute',
-                        right: 16,
-                        top: 16,
+                        right: -4,
+                        top: -4,
                       }}
                       onClick={() => {
                         remove(field.name);
