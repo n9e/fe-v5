@@ -7,7 +7,9 @@ import Elasticsearch from './Elasticsearch';
 import ElasticsearchLog from './ElasticsearchLog';
 import AliyunSLS from './AliyunSLS';
 import ClusterSelect from './components/ClusterSelect';
+import InfluxDB from '@/plugins/datasource/influxDB/Dashboard/QueryBuilder';
 import { useTranslation } from 'react-i18next';
+
 const prometheusCate = {
   value: 'prometheus',
   label: 'Prometheus',
@@ -24,6 +26,10 @@ export default function index({ chartForm, defaultDatasourceName }) {
     {
       value: 'aliyun-sls',
       label: t('阿里云SLS'),
+    },
+    {
+      value: 'influxdb',
+      label: 'InfluxDB',
     },
   ];
   return (
@@ -135,14 +141,19 @@ export default function index({ chartForm, defaultDatasourceName }) {
 
           if (cate === 'elasticsearch') {
             return <Elasticsearch chartForm={chartForm} />;
-          } // 兼容老数据，当前最新版本没有 elasticsearch-log 类型
+          }
 
+          // 兼容老数据，当前最新版本没有 elasticsearch-log 类型
           if (cate === 'elasticsearch-log') {
             return <ElasticsearchLog chartForm={chartForm} />;
           }
 
           if (cate === 'aliyun-sls') {
             return <AliyunSLS chartForm={chartForm} />;
+          }
+
+          if (cate === 'influxdb') {
+            return <InfluxDB chartForm={chartForm} />;
           }
 
           return null;

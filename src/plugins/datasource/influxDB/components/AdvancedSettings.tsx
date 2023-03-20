@@ -70,7 +70,9 @@ function AdvancedSettings(props: IProps) {
   );
 
   useEffect(() => {
-    fetchData('measures');
+    if (dbname) {
+      fetchData('measures');
+    }
   }, [dbname]);
 
   useEffect(() => {
@@ -116,7 +118,11 @@ function AdvancedSettings(props: IProps) {
                 }}
               >
                 {_.map(options.measurement, (item) => {
-                  return <Select.Option value={item}>{item}</Select.Option>;
+                  return (
+                    <Select.Option value={item} key={item}>
+                      {item}
+                    </Select.Option>
+                  );
                 })}
               </Select>
             </InputGroupWithFormItem>
@@ -134,7 +140,11 @@ function AdvancedSettings(props: IProps) {
                 }}
               >
                 {_.map(options.tag, (item) => {
-                  return <Select.Option value={item}>{item}</Select.Option>;
+                  return (
+                    <Select.Option value={item} key={item}>
+                      {item}
+                    </Select.Option>
+                  );
                 })}
               </Select>
             </InputGroupWithFormItem>
@@ -152,7 +162,11 @@ function AdvancedSettings(props: IProps) {
                 }}
               >
                 {_.map(options.field, (item) => {
-                  return <Select.Option value={item}>{item}</Select.Option>;
+                  return (
+                    <Select.Option value={item} key={item}>
+                      {item}
+                    </Select.Option>
+                  );
                 })}
               </Select>
             </InputGroupWithFormItem>

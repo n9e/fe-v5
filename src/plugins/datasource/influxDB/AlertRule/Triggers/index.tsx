@@ -1,8 +1,9 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Form } from 'antd';
 import { PlusCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import Trigger from './Trigger';
-import { useTranslation } from 'react-i18next';
+
 interface IProps {
   prefixField?: any;
   fullPrefixName?: string[]; // 完整的前置字段名，用于 getFieldValue 获取指定字段的值

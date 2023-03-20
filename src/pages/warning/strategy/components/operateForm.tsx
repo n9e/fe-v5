@@ -34,7 +34,7 @@ import OldElasticsearchSettings from './ElasticsearchSettings/Old';
 import ElasticsearchSettings from './ElasticsearchSettings';
 import AliyunSLSSettings from './AliyunSLSSettings';
 import ClickHouseSettings from './ClickHouseSettings';
-import InfluxdbSettings from '@/plugins/influxDB/AlertRule';
+import InfluxdbSettings from '@/plugins/datasource/influxDB/AlertRule';
 import CateSelect from './CateSelect';
 import ClusterSelect, { ClusterAll } from './ClusterSelect';
 import { parseValues, stringifyValues } from './utils';

@@ -2,10 +2,10 @@
  * 简单模式
  */
 import React from 'react';
-import { Form, Space, Input, Select, InputNumber } from 'antd';
+import { Form, Space, Select, InputNumber } from 'antd';
 import { PlusCircleOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash';
-import { useTranslation } from 'react-i18next';
+
 interface IProps {
   prefixField?: any;
   fullPrefixName?: (string | number)[]; // 完整的前置字段名，用于 getFieldValue 获取指定字段的值
@@ -16,7 +16,6 @@ interface IProps {
 }
 const alphabet = 'ABCDEFGHIGKLMNOPQRSTUVWXYZ'.split('');
 export default function Builder(props: IProps) {
-  const { t } = useTranslation();
   const { prefixField = {}, fullPrefixName = [], prefixName = [], queries } = props;
   return (
     <div>

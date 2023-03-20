@@ -1,11 +1,12 @@
 import React from 'react';
-import { Form, Radio, Space, Input, Select } from 'antd';
-import { PlusCircleOutlined, MinusCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import _ from 'lodash';
+import { useTranslation } from 'react-i18next';
+import { Form, Radio, Space, Input, Select } from 'antd';
+import { PlusCircleOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import InputGroupWithFormItem from '@/components/InputGroupWithFormItem';
 import Builder from './Builder';
 import Code from './Code';
-import { useTranslation } from 'react-i18next';
+
 interface IProps {
   prefixField?: any;
   fullPrefixName?: (string | number)[]; // 完整的前置字段名，用于 getFieldValue 获取指定字段的值

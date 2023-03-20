@@ -1,15 +1,15 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef } from 'react';
 import _ from 'lodash';
 import { useTranslation } from 'react-i18next';
-import { Row, Col, Form, Space, Button, Input, Tooltip, Select } from 'antd';
+import { Row, Col, Form, Space, Button, Input, Tooltip } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { FormInstance } from 'antd/lib/form/Form';
 import { DatasourceCateEnum } from '@/utils/constant';
 import TimeRangePicker from '@/components/TimeRangePicker';
 import InputGroupWithFormItem from '@/components/InputGroupWithFormItem';
 import Metric from './Metric';
-import { getInfluxdbDBs } from './services';
-import AdvancedSettings from './components/AdvancedSettings';
+import AdvancedSettings from '../components/AdvancedSettings';
+import DBNameSelect from '../components/DBNameSelect';
 
 interface IProps {
   datasourceCate: DatasourceCateEnum.influxDB;
@@ -21,7 +21,6 @@ export default function index(props: IProps) {
   const { t } = useTranslation();
   const { datasourceCate, datasourceName, form } = props;
   const metricRef = useRef<any>();
-  const [dbnames, setDbnames] = useState<string[]>([]);
 
   const onExecute = () => {
     form.validateFields().then((values) => {
@@ -31,32 +30,11 @@ export default function index(props: IProps) {
     });
   };
 
-  useEffect(() => {
-    if (datasourceName) {
-      getInfluxdbDBs({
-        cate: datasourceCate,
-        cluster: datasourceName,
-      }).then((res) => {
-        setDbnames(res);
-      });
-    }
-  }, [datasourceName]);
-
   return (
     <div>
       <Row gutter={8}>
         <Col flex='240px'>
-          <InputGroupWithFormItem
-            label={
-              <Space>
-                <span>数据库</span>
-                <Tooltip title={''}>
-                  <QuestionCircleOutlined />
-                </Tooltip>
-              </Space>
-            }
-            labelWidth={84}
-          >
+          <InputGroupWithFormItem label='数据库' labelWidth={84}>
             <Form.Item
               name={['query', 'dbname']}
               rules={[
@@ -66,15 +44,7 @@ export default function index(props: IProps) {
                 },
               ]}
             >
-              <Select>
-                {_.map(dbnames, (dbname) => {
-                  return (
-                    <Select.Option key={dbname} value={dbname}>
-                      {dbname}
-                    </Select.Option>
-                  );
-                })}
-              </Select>
+              <DBNameSelect datasourceCate={datasourceCate} datasourceName={datasourceName} />
             </Form.Item>
           </InputGroupWithFormItem>
         </Col>
@@ -95,7 +65,15 @@ export default function index(props: IProps) {
               }
               labelWidth={95}
             >
-              <Form.Item name={['query', 'command']}>
+              <Form.Item
+                name={['query', 'command']}
+                rules={[
+                  {
+                    required: true,
+                    message: t('请输入查询条件'),
+                  },
+                ]}
+              >
                 <Input style={{ width: 500 }} />
               </Form.Item>
             </InputGroupWithFormItem>

@@ -7,6 +7,7 @@ import { getStepByTimeAndStep } from '@/pages/dashboard/utils';
 import AlgoGraph from './AlgoGraph';
 import ElasticsearchGraph from './ElasticsearchGraph';
 import AliyunSLSGraph from './AliyunSLSGraph';
+import InfluxDBPreview from '@/plugins/datasource/influxDB/Event/Preview';
 
 export default function index({ data, triggerTime, onClick }) {
   const [range, setRange] = useState<IRawTimeRange>();
@@ -34,6 +35,7 @@ export default function index({ data, triggerTime, onClick }) {
       {data.rule_algo && <AlgoGraph rid={data.rule_id} tags={data.tags} range={range} step={step} />}
       {data.cate === 'elasticsearch' && <ElasticsearchGraph eventId={data.id} range={range} triggerTime={triggerTime} onClick={onClick} />}
       {data.cate === 'aliyun-sls' && <AliyunSLSGraph eventId={data.id} range={range} triggerTime={triggerTime} onClick={onClick} />}
+      {data.cate === 'influxdb' && <InfluxDBPreview eventId={data.id} range={range} triggerTime={triggerTime} onClick={onClick} />}
     </div>
   );
 }

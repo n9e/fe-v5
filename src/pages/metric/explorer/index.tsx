@@ -28,7 +28,7 @@ import Elasticsearch from './Elasticsearch';
 import Prometheus from './Prometheus';
 import AliyunSLS, { setDefaultValues } from './AliyunSLS';
 import ClickHouse from './ClickHouse';
-import InfluxDB from '@/plugins/influxDB/Explorer';
+import InfluxDB from '@/plugins/datasource/influxDB/Explorer';
 import './index.less';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';

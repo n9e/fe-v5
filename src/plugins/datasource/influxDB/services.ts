@@ -29,3 +29,17 @@ export const getInfluxdbQuery = (data: InfluxDBQueryParams): Promise<InfluxDBQue
     data,
   }).then((res) => res.dat);
 };
+
+export function getEventTSQuery(params) {
+  return request('/api/n9e-plus/event-ts-query', {
+    method: RequestMethod.Post,
+    data: params,
+  });
+}
+
+export function getEventLogQuery(params) {
+  return request('/api/n9e-plus/event-log-query', {
+    method: RequestMethod.Post,
+    data: params,
+  });
+}

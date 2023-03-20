@@ -27,6 +27,7 @@ import prometheusQuery from './prometheus';
 import elasticSearchQuery from './elasticSearch';
 import elasticSearchLogQuery from './elasticSearchLog';
 import aliyunSLS from './aliyunSLS';
+import influxDB from '@/plugins/datasource/influxDB/Dashboard/datasource';
 
 interface IProps {
   id?: string;
@@ -55,6 +56,7 @@ export default function usePrometheus(props: IProps) {
     elasticsearch: elasticSearchQuery,
     'elasticsearch-log': elasticSearchLogQuery,
     'aliyun-sls': aliyunSLS,
+    influxdb: influxDB,
   };
   const { run: fetchData } = useDebounceFn(
     () => {

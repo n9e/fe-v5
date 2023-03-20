@@ -2,10 +2,10 @@ import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import _ from 'lodash';
 import moment from 'moment';
 import { Spin, Empty } from 'antd';
-import { getInfluxdbQuery } from './services';
 import { parseRange } from '@/components/TimeRangePicker';
 import Timeseries from '@/pages/dashboard/Renderer/Renderer/Timeseries';
 import { getSerieName } from '@/pages/dashboard/Renderer/datasource/utils';
+import { getInfluxdbQuery } from '../services';
 
 function Metric(props, ref) {
   const [loading, setLoading] = useState(false);
