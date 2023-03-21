@@ -157,12 +157,14 @@ export default function Info() {
       updateProfile[key] = value;
     }
 
-    dispatch({
+    const promise = dispatch({
       type: 'account/updateProfile',
       data: updateProfile,
     });
-    setCurEditingCard('');
-    // message.success(t('信息保存成功'));
+    (promise as unknown as (Promise<any>)).then(() => {
+      setCurEditingCard('');
+      message.success(t('信息保存成功'));
+    })
   };
 
   const avatarList = new Array(8).fill(0).map((_, i) => i + 1);
@@ -172,7 +174,16 @@ export default function Info() {
   };
 
   return (
-    <div className='profile-page'>
+    <div
+      className='profile-page'
+      onClick={(e) => {
+        const name = (e.target as any)?.nodeName?.toLowerCase() || '';
+        const className = (e.target as any)?.className;
+        if (name !== 'svg' && name !== 'input' && name !== 'use' && !className.includes('edit-icon') && !className.includes('anticon')) {
+          setCurEditingCard('');
+        }
+      }}
+    >
       <div className='profile-page-container'>
         <div className='basic-info'>
           <div className='avatar'>
