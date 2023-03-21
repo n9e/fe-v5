@@ -113,7 +113,7 @@ export default function index() {
                       {_.map(_.split(text, ' '), (tag, index) => {
                         return tag ? (
                           <Tag
-                            color='blue'
+                            color='purple'
                             key={index}
                             style={{
                               cursor: 'pointer',
@@ -141,7 +141,7 @@ export default function index() {
                   title: t('更新时间'),
                   width: 120,
                   dataIndex: 'update_at',
-                  render: (text: number) => moment.unix(text).format('YYYY-MM-DD HH:mm:ss'),
+                  render: (text: number) => <div style={{ width: 120 }}>{moment.unix(text).format('YYYY-MM-DD HH:mm:ss')}</div>,
                 },
                 {
                   title: t('发布人'),
@@ -195,7 +195,7 @@ export default function index() {
                   title: t('操作'),
                   width: '180px',
                   render: (text: string, record: DashboardType) => (
-                    <div className='table-operator-area'>
+                    <div className='table-operator-area' style={{ width: 180 }}>
                       <div
                         className='table-operator-area-normal'
                         onClick={() => {

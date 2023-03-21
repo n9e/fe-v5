@@ -36,12 +36,8 @@ import ImportAndDownloadModal, { ModalStatus } from '@/components/ImportAndDownl
 import EditModal from './components/editModal';
 import ColumnSelect from '@/components/ColumnSelect';
 import AdvancedWrap from '@/components/AdvancedWrap';
-const {
-  confirm
-} = Modal;
-const {
-  TabPane
-} = Tabs;
+const { confirm } = Modal;
+const { TabPane } = Tabs;
 import { useTranslation } from 'react-i18next';
 const exportIgnoreAttrsObj = {
   cluster: undefined,
@@ -53,28 +49,22 @@ const exportIgnoreAttrsObj = {
   notify_users: undefined,
   create_at: undefined,
   update_at: undefined,
-  update_by: undefined
+  update_by: undefined,
 };
 interface Props {
   bgid?: number;
 }
 
-const PageTable: React.FC<Props> = ({
-  bgid
-}) => {
+const PageTable: React.FC<Props> = ({ bgid }) => {
   const [severity, setSeverity] = useState<number>();
   const [clusters, setClusters] = useState<string[]>([]);
-  const {
-    t
-  } = useTranslation();
+  const { t } = useTranslation();
   const history = useHistory();
   const [modalType, setModalType] = useState<ModalStatus>(ModalStatus.None);
   const [selectRowKeys, setSelectRowKeys] = useState<React.Key[]>([]);
   const [selectedRows, setSelectedRows] = useState<strategyItem[]>([]);
   const [exportData, setExportData] = useState<string>('');
-  const {
-    curBusiItem
-  } = useSelector<RootState, CommonStoreState>(state => state.common);
+  const { curBusiItem } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const [query, setQuery] = useState<string>('');
   const [isModalVisible, setisModalVisible] = useState<boolean>(false);
   const [currentStrategyDataAll, setCurrentStrategyDataAll] = useState([]);
@@ -96,26 +86,28 @@ const PageTable: React.FC<Props> = ({
     }
 
     setLoading(true);
-    const {
-      success,
-      dat
-    } = await getStrategyGroupSubList({
-      id: bgid
+    const { success, dat } = await getStrategyGroupSubList({
+      id: bgid,
     });
 
     if (success) {
-      setCurrentStrategyDataAll(dat.filter(item => {
-        return !severity || item.severity === severity;
-      }) || []);
+      setCurrentStrategyDataAll(
+        dat.filter((item) => {
+          return !severity || item.severity === severity;
+        }) || [],
+      );
       setLoading(false);
     }
   };
 
   const filterData = () => {
     const data = JSON.parse(JSON.stringify(currentStrategyDataAll));
-    const res = data.filter(item => {
+    const res = data.filter((item) => {
       const lowerCaseQuery = query.toLowerCase();
-      return (item.name.toLowerCase().indexOf(lowerCaseQuery) > -1 || item.append_tags.join(' ').toLowerCase().indexOf(lowerCaseQuery) > -1) && (clusters && clusters?.indexOf(item.cluster) > -1 || clusters?.length === 0);
+      return (
+        (item.name.toLowerCase().indexOf(lowerCaseQuery) > -1 || item.append_tags.join(' ').toLowerCase().indexOf(lowerCaseQuery) > -1) &&
+        ((clusters && clusters?.indexOf(item.cluster) > -1) || clusters?.length === 0)
+      );
     });
     setCurrentStrategyData(res || []);
   };
@@ -128,116 +120,165 @@ const PageTable: React.FC<Props> = ({
     getAlertRules();
   };
 
-  const columns: ColumnType<strategyItem>[] = [{
-    title: t('集群'),
-    dataIndex: 'cluster',
-    render: data => {
-      const array = data.split(' ') || [];
-      return array.length && array.map((tag: string, index: number) => {
-        return <ColorTag text={tag} key={index}></ColorTag>;
-      }) || <div></div>;
-    }
-  }, {
-    title: t('级别'),
-    dataIndex: 'severity',
-    render: data => {
-      return <Tag color={priorityColor[data - 1]}>S{data}</Tag>;
-    }
-  }, {
-    title: t('名称'),
-    dataIndex: 'name',
-    render: (data, record) => {
-      return <Link className='table-active-text' to={{
-        pathname: `/alert-rules/edit/${record.id}`
-      }}>
+  const columns: ColumnType<strategyItem>[] = [
+    {
+      title: t('集群'),
+      dataIndex: 'cluster',
+      render: (data) => {
+        const array = data.split(' ') || [];
+        return (
+          (array.length &&
+            array.map((tag: string, index: number) => {
+              return <ColorTag text={tag} key={index}></ColorTag>;
+            })) || <div></div>
+        );
+      },
+    },
+    {
+      title: t('级别'),
+      dataIndex: 'severity',
+      render: (data) => {
+        return <Tag color={priorityColor[data - 1]}>S{data}</Tag>;
+      },
+    },
+    {
+      title: t('名称'),
+      dataIndex: 'name',
+      render: (data, record) => {
+        return (
+          <Link
+            className='table-active-text'
+            to={{
+              pathname: `/alert-rules/edit/${record.id}`,
+            }}
+          >
             {data}
-          </Link>;
-    }
-  }, {
-    title: t('告警接收者'),
-    dataIndex: 'notify_groups_obj',
-    width: 100,
-    render: (data, record) => {
-      return data.length && data.map((user: {
-        nickname: string;
-        username: string;
-      } & {
-        name: string;
-      }, index: number) => {
-        return <ColorTag text={user.nickname || user.username || user.name} key={index}></ColorTag>;
-      }) || <div></div>;
-    }
-  }, {
-    title: t('附加标签'),
-    dataIndex: 'append_tags',
-    render: data => {
-      const array = data || [];
-      return array.length && array.map((tag: string, index: number) => {
-        return <ColorTag text={tag} key={index}></ColorTag>;
-      }) || <div></div>;
-    }
-  }, {
-    title: t('更新时间'),
-    dataIndex: 'update_at',
-    width: 120,
-    render: (text: string) => dayjs(Number(text) * 1000).format('YYYY-MM-DD HH:mm:ss')
-  }, {
-    title: t('启用'),
-    dataIndex: 'disabled',
-    render: (disabled, record) => <Switch checked={disabled === strategyStatus.Enable} size='small' onChange={() => {
-      const {
-        id,
-        disabled
-      } = record;
-      updateAlertRules({
-        ids: [id],
-        fields: {
-          disabled: !disabled ? 1 : 0
-        }
-      }, curBusiItem.id).then(() => {
-        refreshList();
-      });
-    }} />
-  }, {
-    title: t('操作'),
-    dataIndex: 'operator',
-    width: 160,
-    render: (data, record: any) => {
-      return <div className='table-operator-area'>
-            <Link className='table-operator-area-normal' style={{
-          marginRight: 8
-        }} to={{
-          pathname: `/alert-rules/edit/${record.id}?mode=clone`
-        }} target='_blank'>
+          </Link>
+        );
+      },
+    },
+    {
+      title: t('告警接收者'),
+      dataIndex: 'notify_groups_obj',
+      width: 100,
+      render: (data, record) => {
+        return (
+          (data.length &&
+            data.map(
+              (
+                user: {
+                  nickname: string;
+                  username: string;
+                } & {
+                  name: string;
+                },
+                index: number,
+              ) => {
+                return <ColorTag text={user.nickname || user.username || user.name} key={index}></ColorTag>;
+              },
+            )) || <div></div>
+        );
+      },
+    },
+    {
+      title: t('附加标签'),
+      dataIndex: 'append_tags',
+      render: (data) => {
+        const array = data || [];
+        return (
+          (array.length &&
+            array.map((tag: string, index: number) => {
+              return <ColorTag text={tag} key={index}></ColorTag>;
+            })) || <div></div>
+        );
+      },
+    },
+    {
+      title: t('更新时间'),
+      dataIndex: 'update_at',
+      width: 120,
+      render: (text: string) => <div style={{ width: 120 }}>{dayjs(Number(text) * 1000).format('YYYY-MM-DD HH:mm:ss')}</div>,
+    },
+    {
+      title: t('启用'),
+      dataIndex: 'disabled',
+      render: (disabled, record) => (
+        <Switch
+          checked={disabled === strategyStatus.Enable}
+          size='small'
+          onChange={() => {
+            const { id, disabled } = record;
+            updateAlertRules(
+              {
+                ids: [id],
+                fields: {
+                  disabled: !disabled ? 1 : 0,
+                },
+              },
+              curBusiItem.id,
+            ).then(() => {
+              refreshList();
+            });
+          }}
+        />
+      ),
+    },
+    {
+      title: t('操作'),
+      dataIndex: 'operator',
+      width: 160,
+      render: (data, record: any) => {
+        return (
+          <div className='table-operator-area' style={{ width: 160 }}>
+            <Link
+              className='table-operator-area-normal'
+              style={{
+                marginRight: 8,
+              }}
+              to={{
+                pathname: `/alert-rules/edit/${record.id}?mode=clone`,
+              }}
+              target='_blank'
+            >
               {t('克隆')}
             </Link>
-            <div className='table-operator-area-warning' onClick={() => {
-          confirm({
-            title: t('是否删除该告警规则?'),
-            onOk: () => {
-              deleteStrategy([record.id], curBusiItem.id).then(() => {
-                message.success(t('删除成功'));
-                refreshList();
-              });
-            },
+            <div
+              className='table-operator-area-warning'
+              onClick={() => {
+                confirm({
+                  title: t('是否删除该告警规则?'),
+                  onOk: () => {
+                    deleteStrategy([record.id], curBusiItem.id).then(() => {
+                      message.success(t('删除成功'));
+                      refreshList();
+                    });
+                  },
 
-            onCancel() {}
-
-          });
-        }}>
+                  onCancel() {},
+                });
+              }}
+            >
               {t('删除')}
             </div>
-            {record.algorithm === 'holtwinters' && <div>
-                <Link to={{
-            pathname: `/alert-rules/brain/${record.id}`
-          }}>{t("训练结果")}</Link>
-              </div>}
-          </div>;
-    }
-  }];
+            {record.algorithm === 'holtwinters' && (
+              <div>
+                <Link
+                  to={{
+                    pathname: `/alert-rules/brain/${record.id}`,
+                  }}
+                >
+                  {t('训练结果')}
+                </Link>
+              </div>
+            )}
+          </div>
+        );
+      },
+    },
+  ];
 
   const toOneArr = (arr, res, name) => {
-    arr.forEach(ele => {
+    arr.forEach((ele) => {
       if (Array.isArray(ele)) {
         toOneArr(ele, res, name);
       } else {
@@ -256,57 +297,63 @@ const PageTable: React.FC<Props> = ({
   };
 
   const menu = useMemo(() => {
-    return <ul className='ant-dropdown-menu'>
+    return (
+      <ul className='ant-dropdown-menu'>
         <li className='ant-dropdown-menu-item' onClick={() => setModalType(ModalStatus.BuiltIn)}>
           <span>{t('导入告警规则')}</span>
         </li>
-        <li className='ant-dropdown-menu-item' onClick={() => {
-        if (selectedRows.length) {
-          const exportData = selectedRows.map(item => {
-            return { ...item,
-              ...exportIgnoreAttrsObj
-            };
-          });
-          setExportData(JSON.stringify(exportData, null, 2));
-          setModalType(ModalStatus.Export);
-        } else {
-          message.warning(t('未选择任何规则'));
-        }
-      }}>
+        <li
+          className='ant-dropdown-menu-item'
+          onClick={() => {
+            if (selectedRows.length) {
+              const exportData = selectedRows.map((item) => {
+                return { ...item, ...exportIgnoreAttrsObj };
+              });
+              setExportData(JSON.stringify(exportData, null, 2));
+              setModalType(ModalStatus.Export);
+            } else {
+              message.warning(t('未选择任何规则'));
+            }
+          }}
+        >
           <span>{t('导出告警规则')}</span>
         </li>
-        <li className='ant-dropdown-menu-item' onClick={() => {
-        if (selectRowKeys.length) {
-          confirm({
-            title: t('是否批量删除告警规则?'),
-            onOk: () => {
-              deleteStrategy((selectRowKeys as number[]), curBusiItem?.id).then(() => {
-                message.success(t('删除成功'));
-                refreshList();
+        <li
+          className='ant-dropdown-menu-item'
+          onClick={() => {
+            if (selectRowKeys.length) {
+              confirm({
+                title: t('是否批量删除告警规则?'),
+                onOk: () => {
+                  deleteStrategy(selectRowKeys as number[], curBusiItem?.id).then(() => {
+                    message.success(t('删除成功'));
+                    refreshList();
+                  });
+                },
+
+                onCancel() {},
               });
-            },
-
-            onCancel() {}
-
-          });
-        } else {
-          message.warning(t('未选择任何规则'));
-        }
-      }}>
+            } else {
+              message.warning(t('未选择任何规则'));
+            }
+          }}
+        >
           <span>{t('批量删除规则')}</span>
         </li>
-        <li className='ant-dropdown-menu-item' onClick={() => {
-        openModel(t('批量更新规则'), 1);
-      }}>
+        <li
+          className='ant-dropdown-menu-item'
+          onClick={() => {
+            openModel(t('批量更新规则'), 1);
+          }}
+        >
           <span>{t('批量更新规则')}</span>
         </li>
-      </ul>;
+      </ul>
+    );
   }, [selectRowKeys, t]);
 
-  const handleImportStrategy = async data => {
-    const {
-      dat
-    } = await addOrEditStrategy(data, curBusiItem.id, 'Post');
+  const handleImportStrategy = async (data) => {
+    const { dat } = await addOrEditStrategy(data, curBusiItem.id, 'Post');
     return dat || {};
   };
 
@@ -314,14 +361,17 @@ const PageTable: React.FC<Props> = ({
     if (isOk) {
       const action = fieldsData.action;
       delete fieldsData.action;
-      const res = await updateAlertRules({
-        ids: selectRowKeys,
-        fields: fieldsData,
-        action
-      }, curBusiItem.id);
+      const res = await updateAlertRules(
+        {
+          ids: selectRowKeys,
+          fields: fieldsData,
+          action,
+        },
+        curBusiItem.id,
+      );
 
       if (!res.err) {
-        message.success(t("修改成功！"));
+        message.success(t('修改成功！'));
         refreshList();
         setisModalVisible(false);
       } else {
@@ -332,24 +382,33 @@ const PageTable: React.FC<Props> = ({
     }
   };
 
-  return <div className='strategy-table-content'>
+  return (
+    <div className='strategy-table-content'>
       <div className='strategy-table-search table-handle'>
         <Space>
-          <RefreshIcon onClick={() => {
-          refreshList();
-        }} />
+          <RefreshIcon
+            onClick={() => {
+              refreshList();
+            }}
+          />
           <AdvancedWrap var='VITE_IS_ALERT_ES_DS'>
-            <Select value={cate} onChange={val => {
-            setCate(val);
-          }} style={{
-            width: 120
-          }} placeholder={t("数据源类型")} allowClear>
+            <Select
+              value={cate}
+              onChange={(val) => {
+                setCate(val);
+              }}
+              style={{
+                width: 120,
+              }}
+              placeholder={t('数据源类型')}
+              allowClear
+            >
               <Select.Option value='prometheus'>Prometheus</Select.Option>
               <Select.Option value='elasticsearch'>Elasticsearch</Select.Option>
-              <Select.Option value='aliyun-sls'>{t("阿里云")} SLSS</Select.Option>
+              <Select.Option value='aliyun-sls'>{t('阿里云')} SLSS</Select.Option>
             </Select>
           </AdvancedWrap>
-          <ColumnSelect noLeftPadding noRightPadding onSeverityChange={e => setSeverity(e)} onClusterChange={e => setClusters(e)} />
+          <ColumnSelect noLeftPadding noRightPadding onSeverityChange={(e) => setSeverity(e)} onClusterChange={(e) => setClusters(e)} />
           <SearchInput className={'searchInput'} placeholder={t('搜索名称或标签')} onSearch={setQuery} allowClear />
         </Space>
         <div className='strategy-table-search-right'>
@@ -358,52 +417,78 @@ const PageTable: React.FC<Props> = ({
           </Button>
           <div className={'table-more-options'}>
             <Dropdown overlay={menu} trigger={['click']}>
-              <Button onClick={e => e.stopPropagation()}>
+              <Button onClick={(e) => e.stopPropagation()}>
                 {t('更多操作')}
-                <DownOutlined style={{
-                marginLeft: 2
-              }} />
+                <DownOutlined
+                  style={{
+                    marginLeft: 2,
+                  }}
+                />
               </Button>
             </Dropdown>
           </div>
         </div>
       </div>
 
-      <Table rowKey='id' // sticky
-    pagination={{
-      total: currentStrategyData.length,
-      showQuickJumper: true,
-      showSizeChanger: true,
-      showTotal: total => {
-        return `${t("共 ")}${total}${t(" 条数据")}`;
-      },
-      pageSizeOptions: pageSizeOptionsDefault,
-      defaultPageSize: 30
-    }} loading={loading} dataSource={_.filter(currentStrategyData, item => {
-      const curItemCate = item.cate || 'prometheus';
+      <Table
+        rowKey='id' // sticky
+        pagination={{
+          total: currentStrategyData.length,
+          showQuickJumper: true,
+          showSizeChanger: true,
+          showTotal: (total) => {
+            return `${t('共 ')}${total}${t(' 条数据')}`;
+          },
+          pageSizeOptions: pageSizeOptionsDefault,
+          defaultPageSize: 30,
+        }}
+        loading={loading}
+        dataSource={_.filter(currentStrategyData, (item) => {
+          const curItemCate = item.cate || 'prometheus';
 
-      if (cate) {
-        return curItemCate === cate;
-      }
+          if (cate) {
+            return curItemCate === cate;
+          }
 
-      return true;
-    })} rowSelection={{
-      selectedRowKeys: selectedRows.map(item => item.id),
-      onChange: (selectedRowKeys: React.Key[], selectedRows: strategyItem[]) => {
-        setSelectRowKeys(selectedRowKeys);
-        setSelectedRows(selectedRows);
-      }
-    }} columns={columns} />
-      <ImportAndDownloadModal bgid={bgid} status={modalType} fetchBuiltinFunc={getBuiltinAlerts} submitBuiltinFunc={createBuiltinAlerts} onClose={() => {
-      setModalType(ModalStatus.None);
-    }} onSuccess={() => {
-      getAlertRules();
-    }} onSubmit={handleImportStrategy} label={t("告警规则")} title={ModalStatus.Export === modalType ? t("告警规则") : <Tabs defaultActiveKey={ModalStatus.BuiltIn} onChange={(e: ModalStatus) => setModalType(e)} className='custom-import-alert-title'>
-              <TabPane tab={t(" 导入内置告警规则")} key={ModalStatus.BuiltIn}></TabPane>
-              <TabPane tab={t("导入告警规则JSON")} key={ModalStatus.Import}></TabPane>
-            </Tabs>} exportData={exportData} />
+          return true;
+        })}
+        rowSelection={{
+          selectedRowKeys: selectedRows.map((item) => item.id),
+          onChange: (selectedRowKeys: React.Key[], selectedRows: strategyItem[]) => {
+            setSelectRowKeys(selectedRowKeys);
+            setSelectedRows(selectedRows);
+          },
+        }}
+        columns={columns}
+      />
+      <ImportAndDownloadModal
+        bgid={bgid}
+        status={modalType}
+        fetchBuiltinFunc={getBuiltinAlerts}
+        submitBuiltinFunc={createBuiltinAlerts}
+        onClose={() => {
+          setModalType(ModalStatus.None);
+        }}
+        onSuccess={() => {
+          getAlertRules();
+        }}
+        onSubmit={handleImportStrategy}
+        label={t('告警规则')}
+        title={
+          ModalStatus.Export === modalType ? (
+            t('告警规则')
+          ) : (
+            <Tabs defaultActiveKey={ModalStatus.BuiltIn} onChange={(e: ModalStatus) => setModalType(e)} className='custom-import-alert-title'>
+              <TabPane tab={t(' 导入内置告警规则')} key={ModalStatus.BuiltIn}></TabPane>
+              <TabPane tab={t('导入告警规则JSON')} key={ModalStatus.Import}></TabPane>
+            </Tabs>
+          )
+        }
+        exportData={exportData}
+      />
       {isModalVisible && <EditModal isModalVisible={isModalVisible} editModalFinish={editModalFinish} />}
-    </div>;
+    </div>
+  );
 };
 
 export default PageTable;

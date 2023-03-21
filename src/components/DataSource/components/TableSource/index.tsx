@@ -10,13 +10,12 @@ import { SortableContainer, SortableElement, SortableHandle } from 'react-sortab
 import { kafkaOffsetReset, setDatasourceDefault } from '@/components/DataSource/LogSource/services';
 import LogPopover from '../LogPopover';
 // import { ESsourceType, IDefaultES } from '@/Packages/Settings/pages/LogSource';
+import { useTranslation } from 'react-i18next';
 export interface IDefaultES {
   default_id: number;
   system_id: number;
 }
-
 export const ESsourceType = ['elasticsearch', 'tencent-es', 'aliyun-es'];
-
 export interface IPropsType {
   pluginList?: {
     name: string;
@@ -30,18 +29,22 @@ export interface IPropsType {
   defaultES?: IDefaultES;
   setDefaultES?: (val: IDefaultES) => void;
 }
-
 export interface IKeyValue {
   [key: string]: string | boolean | undefined;
 }
-
-const DragHandle = SortableHandle(() => <MenuOutlined style={{ cursor: 'grab', color: '#999' }} />);
+const DragHandle = SortableHandle(() => (
+  <MenuOutlined
+    style={{
+      cursor: 'grab',
+      color: '#999',
+    }}
+  />
+));
 const SortableItem = SortableElement((props: React.HTMLAttributes<HTMLTableRowElement>) => <tr {...props} />);
 const SortableBody = SortableContainer((props) => <tbody {...props} />);
-
 const TableSource = (props: IPropsType) => {
+  const { t } = useTranslation();
   const { nameClick, category, pluginList, isDrag = false, logName, defaultES, setDefaultES } = props;
-
   const [tableData, setTableData] = useState<any>([]);
   const [refresh, setRefresh] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -52,18 +55,17 @@ const TableSource = (props: IPropsType) => {
     current: 1,
     pageSize: 10,
   });
-
   useEffect(() => {
     init(logName);
   }, [pageObj, tableFilters, tableSort, refresh]);
-
   const init = (searchName?: string) => {
     setLoading(true);
     getDataSourceList({
       p: pageObj.current,
       limit: pageObj.pageSize,
       category,
-      orderby: category === 'tracing' ? 'updated_at' : undefined, // 默认根据更新时间排序
+      orderby: category === 'tracing' ? 'updated_at' : undefined,
+      // 默认根据更新时间排序
       name: searchName ? searchName : undefined,
       ...tableFilters,
       ...tableSort,
@@ -81,29 +83,42 @@ const TableSource = (props: IPropsType) => {
         setLoading(false);
       });
   };
-
   const onSearch = (value: string, e) => {
     e.stopPropagation();
     init(value);
   };
-
   const defaultColumns = [
     {
       title: ({ sortOrder, sortColumn, filters }) => {
         return (
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignContent: 'center' }}>
-            <Tooltip placement='top' title={!sortOrder ? '点击升序' : sortOrder === 'ascend' ? '点击降序' : '取消排序'}>
-              <div style={{ lineHeight: '24px', flex: '1' }}>数据源名称</div>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignContent: 'center',
+            }}
+          >
+            <Tooltip placement='top' title={!sortOrder ? t('点击升序') : sortOrder === 'ascend' ? t('点击降序') : t('取消排序')}>
+              <div
+                style={{
+                  lineHeight: '24px',
+                  flex: '1',
+                }}
+              >
+                {t('数据源名称')}
+              </div>
             </Tooltip>
 
             <Input.Search
               size='small'
               defaultValue={logName}
-              placeholder='请输入要查询的名称'
+              placeholder={t('请输入要查询的名称')}
               allowClear
               onSearch={onSearch}
               onClick={(e) => e.stopPropagation()}
-              style={{ width: 170 }}
+              style={{
+                width: 170,
+              }}
             />
           </div>
         );
@@ -129,8 +144,12 @@ const TableSource = (props: IPropsType) => {
                 <>
                   {text}
                   {record.defaultSource && (
-                    <Tooltip placement='top' title='该ES集群为日志分析的默认集群'>
-                      <CheckCircleFilled style={{ visibility: 'visible' }} />
+                    <Tooltip placement='top' title={t('该ES集群为日志分析的默认集群')}>
+                      <CheckCircleFilled
+                        style={{
+                          visibility: 'visible',
+                        }}
+                      />
                     </Tooltip>
                   )}
                 </>
@@ -141,20 +160,26 @@ const TableSource = (props: IPropsType) => {
       },
     },
     {
-      title: '状态',
+      title: t('状态'),
       width: 300,
       dataIndex: 'status',
       sorter: true,
       filters: [
-        { text: '启用中', value: 'enabled' },
-        { text: '停用中', value: 'disabled' },
+        {
+          text: t('启用中'),
+          value: 'enabled',
+        },
+        {
+          text: t('停用中'),
+          value: 'disabled',
+        },
       ],
       render: (text) => {
-        return text === 'enabled' ? <span className='theme-color'>启用中</span> : <span className='second-color'>停用中</span>;
+        return text === 'enabled' ? <span className='theme-color'>{t('启用中')}</span> : <span className='second-color'>{t('停用中')}</span>;
       },
     },
     {
-      title: '数据类型',
+      title: t('数据类型'),
       width: 300,
       dataIndex: 'plugin_type_name',
       sorter: true,
@@ -167,26 +192,26 @@ const TableSource = (props: IPropsType) => {
       }),
     },
     {
-      title: '操作',
+      title: t('操作'),
       width: 300,
       render: (record) => {
         return (
           <Space>
             <Popconfirm
               placement='topLeft'
-              title={`是否确定${record.status === 'enabled' ? '停用' : '启用'}${record.name}?`}
+              title={`${t('是否确定')}${record.status === 'enabled' ? t('停用') : t('启用')}?${record.name}`}
               onConfirm={() => {
                 updateDataSourceStatus({
                   id: record.id,
                   status: record.status === 'enabled' ? 'disabled' : 'enabled',
                 }).then((res) => {
-                  message.success(record.status === 'enabled' ? '停用成功' : '启用成功');
+                  message.success(record.status === 'enabled' ? t('停用成功') : t('启用成功'));
                   setRefresh((oldVal) => !oldVal);
                 });
               }}
             >
               <Button type='link' size='small'>
-                {record.status === 'enabled' ? '停用' : '启用'}
+                {record.status === 'enabled' ? t('停用') : t('启用')}
               </Button>
             </Popconfirm>
 
@@ -197,30 +222,32 @@ const TableSource = (props: IPropsType) => {
                 danger
                 onClick={() => {
                   Modal.confirm({
-                    title: `确定删除${record.name}数据源吗?`,
-                    okText: '确认',
-                    cancelText: '取消',
+                    title: `${t('确定删除')}${record.name}${t('数据源吗?')}`,
+                    okText: t('确认'),
+                    cancelText: t('取消'),
                     onOk() {
                       deleteDataSourceById(record.id).then(() => {
-                        message.success('删除数据源成功');
+                        message.success(t('删除数据源成功'));
                         setRefresh((oldVal) => !oldVal);
                       });
                     },
                   });
                 }}
               >
-                删除
+                {t('删除')}
               </Button>
             )}
             {category === 'logging' && ESsourceType.includes(record.plugin_type.split('.')?.[0]) && (
               <>
                 <Popconfirm
                   placement='topLeft'
-                  title='是否把该ES集群设置为日志分析的默认集群?'
+                  title={t('是否把该ES集群设置为日志分析的默认集群?')}
                   onConfirm={() => {
                     setLoading(true);
-                    setDatasourceDefault({ id: record.id }).then((res) => {
-                      res === 'ok' && message.success('设置默认ES集群成功');
+                    setDatasourceDefault({
+                      id: record.id,
+                    }).then((res) => {
+                      res === 'ok' && message.success(t('设置默认ES集群成功'));
                       defaultES &&
                         setDefaultES &&
                         setDefaultES({
@@ -239,7 +266,7 @@ const TableSource = (props: IPropsType) => {
                   disabled={record.defaultSource}
                 >
                   <Button type='link' size='small' disabled={record.defaultSource}>
-                    设为默认
+                    {t('设为默认')}
                   </Button>
                 </Popconfirm>
               </>
@@ -250,17 +277,19 @@ const TableSource = (props: IPropsType) => {
                 <LogPopover logSourceId={record.id} />
                 <Popconfirm
                   placement='topLeft'
-                  title='请确认所有使用该数据源的下游均可接收重置, 是否继续重置?'
+                  title={t('请确认所有使用该数据源的下游均可接收重置, 是否继续重置?')}
                   onConfirm={() => {
-                    kafkaOffsetReset({ id: record.id }).then((res) => {
-                      message.success('重置数据源成功');
+                    kafkaOffsetReset({
+                      id: record.id,
+                    }).then((res) => {
+                      message.success(t('重置数据源成功'));
                     });
                   }}
                   disabled={record.status === 'enabled'}
                 >
-                  <Tooltip title={record.status === 'enabled' ? '需先停用数据源, 待后端消费者停掉以后才能执行重置, 且重置后所有使用该数据源的下游都会收到影响' : ''}>
+                  <Tooltip title={record.status === 'enabled' ? t('需先停用数据源, 待后端消费者停掉以后才能执行重置, 且重置后所有使用该数据源的下游都会收到影响') : ''}>
                     <Button type='link' size='small' disabled={record.status === 'enabled'}>
-                      重置offset
+                      {t('重置offset')}
                     </Button>
                   </Tooltip>
                 </Popconfirm>
@@ -281,12 +310,10 @@ const TableSource = (props: IPropsType) => {
     }
   };
   const DraggableContainer = React.memo((props) => <SortableBody useDragHandle disableAutoscroll helperClass='row-dragging' onSortEnd={onSortEnd} {...props} />);
-
   const DraggableBodyRow = React.memo(({ className, style, ...restProps }: any) => {
     const index = tableData.findIndex((x) => x.id === restProps['data-row-key']);
     return <SortableItem index={index} {...restProps} />;
   });
-
   const handleTableChange = (pagination, filters, sorter, { action }) => {
     if (action === 'paginate') {
       setPageObj({
@@ -294,7 +321,6 @@ const TableSource = (props: IPropsType) => {
         pageSize: pagination.pageSize,
       });
     }
-
     if (action === 'filter') {
       const filtersFormat: IKeyValue = {};
       for (const key in filters) {
@@ -310,7 +336,6 @@ const TableSource = (props: IPropsType) => {
         ...filtersFormat,
       });
     }
-
     if (action === 'sort') {
       setTableSort(
         sorter.order
@@ -322,7 +347,6 @@ const TableSource = (props: IPropsType) => {
       );
     }
   };
-
   return (
     <Table
       size='small'
@@ -343,10 +367,9 @@ const TableSource = (props: IPropsType) => {
         pageSize: pageObj.pageSize,
         total: dataTotal,
         pageSizeOptions: ['10', '20', '50'],
-        showTotal: (total) => `总共 ${total} 条`,
+        showTotal: (total) => `${t('总共 ')}${total}${t(' 条')}`,
       }}
     />
   );
 };
-
 export default TableSource;

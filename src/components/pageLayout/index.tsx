@@ -194,30 +194,27 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, introI
                 <License />
               </AdvancedWrap>
 
-              {/* 文案完善了再打开 */}
-              {(window.location.origin.includes('10.206.0.17') || window.location.origin.includes('demo.flashcat.cloud')) && (
-                <Dropdown
-                  overlay={
-                    <Menu
-                      className='outfire-tree'
-                      onSelect={({ key }) => {
-                        i18n.changeLanguage(key);
-                        setCurLanguage(i18nMap[key]);
-                        localStorage.setItem('language', key);
-                      }}
-                      selectable
-                    >
-                      {Object.keys(i18nMap).map((el) => {
-                        return <Menu.Item key={el}>{i18nMap[el]}</Menu.Item>;
-                      })}
-                    </Menu>
-                  }
-                >
-                  <a style={{ marginRight: 20 }} onClick={(e) => e.preventDefault()}>
-                    {curLanguage}
-                  </a>
-                </Dropdown>
-              )}
+              <Dropdown
+                overlay={
+                  <Menu
+                    className='outfire-tree'
+                    onSelect={({ key }) => {
+                      i18n.changeLanguage(key);
+                      setCurLanguage(i18nMap[key]);
+                      localStorage.setItem('language', key);
+                    }}
+                    selectable
+                  >
+                    {Object.keys(i18nMap).map((el) => {
+                      return <Menu.Item key={el}>{i18nMap[el]}</Menu.Item>;
+                    })}
+                  </Menu>
+                }
+              >
+                <a style={{ marginRight: 20 }} onClick={(e) => e.preventDefault()}>
+                  {curLanguage}
+                </a>
+              </Dropdown>
               <Dropdown overlay={menu} trigger={['click']}>
                 <span className='avator'>
                   <img src={profile.portrait || '/image/avatar1.png'} alt='' />
