@@ -53,7 +53,7 @@ export default function AddContact(props: {
             },
           ]}
         >
-          <Select suffixIcon={<CaretDownOutlined />} placeholder={t('请选择联系方式')}>
+          <Select placeholder={t('请选择联系方式')}>
             {contactsList.map((item, index) => (
               <Select.Option value={item.key} key={index} disabled={Object.keys(profile.contacts).includes(item.key)}>
                 {item.label}

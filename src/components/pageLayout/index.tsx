@@ -43,8 +43,8 @@ interface IPageLayoutProps {
 }
 
 const i18nMap = {
-  zh_CN: '中_简体',
-  zh_HK: '中_繁體',
+  zh_CN: '简体',
+  zh_HK: '繁體',
   // en_US: 'English',
 };
 
