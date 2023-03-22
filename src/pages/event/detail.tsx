@@ -33,6 +33,7 @@ import LogsDetail from './LogsDetail';
 import PrometheusDetail from './Detail/Prometheus';
 import ElasticsearchDetail from './Detail/Elasticsearch';
 import AliyunSLSDetail from './Detail/AliyunSLS';
+import InfluxDBDetail from '@/plugins/datasource/influxDB/Event';
 import './detail.less';
 import { useTranslation } from 'react-i18next';
 const { Paragraph } = Typography;
@@ -187,6 +188,7 @@ const EventDetailPage: React.FC = () => {
       : [false]),
     ...(eventDetail?.cate === 'elasticsearch' ? ElasticsearchDetail(t) : [false]),
     ...(eventDetail?.cate === 'aliyun-sls' ? AliyunSLSDetail(t) : [false]),
+    ...(eventDetail?.cate === 'influxdb' ? InfluxDBDetail(t) : [false]),
     {
       label: '执行频率',
       key: 'prom_eval_interval',
@@ -304,7 +306,7 @@ const EventDetailPage: React.FC = () => {
           >
             {eventDetail && (
               <div>
-                {parsedEventDetail.rule_algo || parsedEventDetail.cate === 'elasticsearch' || parsedEventDetail.cate === 'aliyun-sls' ? (
+                {parsedEventDetail.rule_algo || parsedEventDetail.cate === 'elasticsearch' || parsedEventDetail.cate === 'aliyun-sls' || parsedEventDetail.cate === 'influxdb' ? (
                   <Preview
                     data={parsedEventDetail}
                     triggerTime={eventDetail.trigger_time}

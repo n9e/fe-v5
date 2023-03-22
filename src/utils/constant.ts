@@ -78,6 +78,10 @@ export const datasourceCates = [
     value: 'ck',
     label: 'ClickHouse',
   },
+  {
+    value: 'influxdb',
+    label: 'influxDB',
+  },
 ];
 
 export const datasourceCatesMap = {
@@ -90,4 +94,5 @@ export enum DatasourceCateEnum {
   elasticsearch = 'elasticsearch',
   aliyunSLS = 'aliyun-sls',
   ck = 'ck',
+  influxDB = 'influxdb',
 }
