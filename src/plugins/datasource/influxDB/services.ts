@@ -3,21 +3,21 @@ import { RequestMethod } from '@/store/common';
 import { InfluxDBBaseParams, InfluxDBMeasureParams, InfluxDBTagFieldParams, InfluxDBQueryParams, InfluxDBQueryResult } from './types';
 
 export const getInfluxdbDBs = (data: InfluxDBBaseParams): Promise<string[]> => {
-  return request('/api/n9e-plus/influxdb_dbs', {
+  return request('/api/n9e-plus/influxdb-dbs', {
     method: RequestMethod.Post,
     data,
   }).then((res) => res.dat);
 };
 
 export const getInfluxdbMeasures = (data: InfluxDBMeasureParams): Promise<string[]> => {
-  return request('/api/n9e-plus/influxdb_measures', {
+  return request('/api/n9e-plus/influxdb-measures', {
     method: RequestMethod.Post,
     data,
   }).then((res) => res.dat);
 };
 
 export const getInfluxdbTagfields = (data: InfluxDBTagFieldParams): Promise<{ fields: string[]; tags: string[] }> => {
-  return request('/api/n9e-plus/influxdb_tagfields', {
+  return request('/api/n9e-plus/influxdb-tagfields', {
     method: RequestMethod.Post,
     data,
   }).then((res) => res.dat);
