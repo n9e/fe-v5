@@ -80,7 +80,7 @@ export const datasourceCates = [
   },
   {
     value: 'influxdb',
-    label: 'influxDB',
+    label: 'InfluxDB',
   },
 ];
 
