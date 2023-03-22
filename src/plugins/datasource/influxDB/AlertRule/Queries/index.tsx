@@ -77,7 +77,7 @@ export default function index({ form, datasourceValue, prefixField = {}, fullPre
                       <InputGroupWithFormItem
                         label={
                           <Space>
-                            <span>数据库</span>
+                            <span>{t('数据库')}</span>
                             <Tooltip title={''}>
                               <QuestionCircleOutlined />
                             </Tooltip>

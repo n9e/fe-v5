@@ -34,7 +34,7 @@ export default function index(props: IProps) {
     <div>
       <Row gutter={8}>
         <Col flex='240px'>
-          <InputGroupWithFormItem label='数据库' labelWidth={84}>
+          <InputGroupWithFormItem label={t('数据库')} labelWidth={84}>
             <Form.Item
               name={['query', 'dbname']}
               rules={[

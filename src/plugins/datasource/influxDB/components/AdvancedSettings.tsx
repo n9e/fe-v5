@@ -106,7 +106,7 @@ function AdvancedSettings(props: IProps) {
       >
         <Row gutter={8}>
           <Col span={8}>
-            <InputGroupWithFormItem label={<span>数据表列表</span>} labelWidth={100}>
+            <InputGroupWithFormItem label={t('数据表列表')} labelWidth={100}>
               <Select
                 style={{ width: '100%' }}
                 value={values.measurement}
@@ -128,7 +128,7 @@ function AdvancedSettings(props: IProps) {
             </InputGroupWithFormItem>
           </Col>
           <Col span={8}>
-            <InputGroupWithFormItem label={<span>Tag列表</span>} labelWidth={100}>
+            <InputGroupWithFormItem label={t('Tag列表')} labelWidth={100}>
               <Select
                 style={{ width: '100%' }}
                 value={values.tag}
@@ -150,7 +150,7 @@ function AdvancedSettings(props: IProps) {
             </InputGroupWithFormItem>
           </Col>
           <Col span={8}>
-            <InputGroupWithFormItem label={<span>Field列表</span>} labelWidth={100}>
+            <InputGroupWithFormItem label={t('Field列表')} labelWidth={100}>
               <Select
                 style={{ width: '100%' }}
                 value={values.field}
