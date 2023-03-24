@@ -9,8 +9,9 @@ export default function index({ visible, form }) {
     elasticsearch: 'Elasticsearch',
     'aliyun-sls': t('阿里云SLS'),
     ck: 'ClickHouse',
+    influxdb: 'InfluxDB',
   };
-  const options = visible ? ['prometheus', 'elasticsearch', 'aliyun-sls', 'ck'] : ['prometheus'];
+  const options = visible ? ['prometheus', 'elasticsearch', 'aliyun-sls', 'ck', 'influxdb'] : ['prometheus'];
   return (
     <Form.Item label={t('数据源类型')} name='cate' initialValue='prometheus'>
       <Select

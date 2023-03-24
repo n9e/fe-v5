@@ -22,12 +22,13 @@ import PageLayout from '@/components/pageLayout';
 import { generateID } from '@/utils';
 import AdvancedWrap from '@/components/AdvancedWrap';
 import InputGroupWithFormItem from '@/components/InputGroupWithFormItem';
-import { getCommonESClusters, getCommonClusters, getCommonSLSClusters, getCommonCKClusters } from '@/services/common';
+import { getCommonESClusters, getCommonClusters, getCommonSLSClusters, getCommonCKClusters, getCommonInfluxDBClusters } from '@/services/common';
 import { datasourceCatesMap, DatasourceCateEnum } from '@/utils/constant';
 import Elasticsearch from './Elasticsearch';
 import Prometheus from './Prometheus';
 import AliyunSLS, { setDefaultValues } from './AliyunSLS';
 import ClickHouse from './ClickHouse';
+import InfluxDB from '@/plugins/datasource/influxDB/Explorer';
 import './index.less';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -50,30 +51,32 @@ function getUrlParamsByName(name) {
 
 const getDefaultDatasourceName = (datasourceCate, datasourceList) => {
   const localPrometheus = localStorage.getItem('curCluster'); // curCluster 是全局的 key name
-
   const localElasticsearch = localStorage.getItem('datasource_es_name');
   const localAliyunSLS = localStorage.getItem('datasource_aliyunsls_name');
   const localCK = localStorage.getItem('datasource_ck_name');
+  const localInfluxdb = localStorage.getItem('datasource_influxdb_name');
   if (datasourceCate === 'prometheus') return localPrometheus || _.get(datasourceList, [datasourceCate, 0]);
   if (datasourceCate === 'elasticsearch') return localElasticsearch || _.get(datasourceList, [datasourceCate, 0]);
   if (datasourceCate === 'aliyun-sls') return localAliyunSLS || _.get(datasourceList, [datasourceCate, 0]);
   if (datasourceCate === 'ck') return localCK || _.get(datasourceList, [datasourceCate, 0]);
+  if (datasourceCate === 'influxdb') return localInfluxdb || _.get(datasourceList, [datasourceCate, 0]);
 };
 
 const setDefaultDatasourceName = (datasourceCate, value) => {
   if (datasourceCate === 'prometheus') {
     localStorage.setItem('curCluster', value);
   }
-
   if (datasourceCate === 'elasticsearch') {
     localStorage.setItem('datasource_es_name', value);
   }
-
   if (datasourceCate === 'aliyun-sls') {
     localStorage.setItem('datasource_aliyunsls_name', value);
   }
   if (datasourceCate === 'ck') {
     localStorage.setItem('datasource_ck_name', value);
+  }
+  if (datasourceCate === 'influxdb') {
+    localStorage.setItem('datasource_influxdb_name', value);
   }
 };
 
@@ -224,6 +227,8 @@ const Panel = ({
               return <AliyunSLS datasourceCate={DatasourceCateEnum.aliyunSLS} datasourceName={datasourceName} headerExtra={headerExtraRef.current} form={form} />;
             } else if (datasourceCate === DatasourceCateEnum.ck) {
               return <ClickHouse datasourceCate={datasourceCate} datasourceName={datasourceName} headerExtra={headerExtraRef.current} form={form} />;
+            } else if (datasourceCate === DatasourceCateEnum.influxDB) {
+              return <InfluxDB datasourceCate={datasourceCate} datasourceName={datasourceName} form={form} />;
             }
           }}
         </Form.Item>
@@ -253,11 +258,13 @@ const PanelList = () => {
     elasticsearch: string[];
     'aliyun-sls': string[];
     ck: string[];
+    influxdb: string[];
   }>({
     prometheus: [],
     elasticsearch: [],
     'aliyun-sls': [],
     ck: [],
+    influxdb: [],
   });
   useEffect(() => {
     const fetchDatasourceList = async () => {
@@ -265,11 +272,13 @@ const PanelList = () => {
       const esList = await getCommonESClusters().then((res) => res.dat);
       const slsList = await getCommonSLSClusters().then((res) => res.dat);
       const ckList = await getCommonCKClusters().then((res) => res.dat);
+      const influxDBList = await getCommonInfluxDBClusters().then((res) => res.dat);
       setDatasourceList({
         prometheus: promList,
         elasticsearch: esList,
         'aliyun-sls': slsList,
         ck: ckList,
+        influxdb: influxDBList,
       });
     };
 
@@ -279,6 +288,7 @@ const PanelList = () => {
         elasticsearch: [],
         'aliyun-sls': [],
         ck: [],
+        influxdb: [],
       });
     });
   }, []); // 添加一个查询面板

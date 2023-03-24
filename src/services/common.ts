@@ -127,6 +127,32 @@ export function getCommonCKClusters() {
   });
 }
 
+// 获取 influxdb 集群信息
+export function getCommonInfluxDBClusters() {
+  if (import.meta.env.VITE_IS_COMMON_DS === 'true') {
+    let url = '/api/v1/datasource/list';
+    if (import.meta.env.VITE_IS_DS_SETTING === 'true') {
+      url = '/api/n9e-plus/datasource/list';
+    }
+    return request(url, {
+      method: RequestMethod.Post,
+      data: {
+        p: 1,
+        limit: 100,
+        category: 'timeseries',
+        plugin_type: 'influxdb',
+      },
+    }).then((res) => {
+      return {
+        dat: _.map(res.data.items, 'name'),
+      };
+    });
+  }
+  return Promise.resolve({
+    dat: [],
+  });
+}
+
 export function getBusiGroups(query: string, limit: number = 200) {
   return request(`/api/n9e/busi-groups`, {
     method: RequestMethod.Get,

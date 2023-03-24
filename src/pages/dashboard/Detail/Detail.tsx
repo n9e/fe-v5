@@ -141,7 +141,7 @@ export default function DetailV2({ isPreview = false }: { isPreview?: boolean })
     if (valueWithOptions) {
       setVariableConfigWithOptions(valueWithOptions);
       setDashboardMeta({
-        dashboardId: _.toString(dashboard.id),
+        dashboardId: _.toString(id),
         variableConfigWithOptions: valueWithOptions,
       });
     }

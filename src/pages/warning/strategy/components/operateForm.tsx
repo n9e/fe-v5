@@ -34,6 +34,7 @@ import OldElasticsearchSettings from './ElasticsearchSettings/Old';
 import ElasticsearchSettings from './ElasticsearchSettings';
 import AliyunSLSSettings from './AliyunSLSSettings';
 import ClickHouseSettings from './ClickHouseSettings';
+import InfluxdbSettings from '@/plugins/datasource/influxDB/AlertRule';
 import CateSelect from './CateSelect';
 import ClusterSelect, { ClusterAll } from './ClusterSelect';
 import { parseValues, stringifyValues } from './utils';
@@ -169,7 +170,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
             });
             return false;
           }
-        } else if (values.cate === 'elasticsearch' || values.cate === 'aliyun-sls' || values.cate === 'ck') {
+        } else if (values.cate === 'elasticsearch' || values.cate === 'aliyun-sls' || values.cate === 'ck' || values.cate === 'influxdb') {
           values = stringifyValues(values);
         }
 
@@ -333,9 +334,10 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                 </Form.Item>
               </Col>
             </Row>
-            <Form.Item shouldUpdate={(prevValues, curValues) => prevValues.cate !== curValues.cate} noStyle>
+            <Form.Item shouldUpdate={(prevValues, curValues) => prevValues.cate !== curValues.cate || !_.isEqual(prevValues.cluster, curValues.cluster)} noStyle>
               {({ getFieldValue }) => {
                 const cate = getFieldValue('cate');
+                const cluster = getFieldValue('cluster');
 
                 if (cate === 'prometheus') {
                   return (
@@ -444,6 +446,9 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
 
                 if (cate === 'ck') {
                   return <ClickHouseSettings form={form} />;
+                }
+                if (cate === 'influxdb') {
+                  return <InfluxdbSettings form={form} datasourceValue={cluster[0]} />;
                 }
               }}
             </Form.Item>
