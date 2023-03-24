@@ -799,5 +799,7 @@
   "事件类别": "Event category",
   "事件级别": "Event level",
   "tooltip中展示所有曲线的值": "Show all curve values in the tooltip",
-  "是否批量删除大盘":"Are you sure to delete dashboard in batches?"
+  "是否批量删除大盘": "Are you sure to delete dashboard in batches?",
+  "plugin.ck.valuekey.tip": "通过此字段从返回结果中提取数值。例如 查询条件为 `select count() AS cnt, event_time from system.query_log ` 返回结果为 cnt:11，ValueKey 写了 cnt，则会根据 cnt 提取到 11，作为查询结果的值",
+  "plugin.ck.labelkey.tip": "将此字段对应的 value，作为tag，追加到监控数据的标签中，例如 查询条件为 `select count() cnt, event_time, type from system.query_log GROUP BY type, event_time` 返回结果为 `[{cnt:11 type:QueryFinish},{cnt:10 type:QueryStart}]`, LabelKey 写了 type, 则返回的数据中type会作为时序数据的labels"
 }

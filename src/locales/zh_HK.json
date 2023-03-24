@@ -817,5 +817,7 @@
   "查询辅助": "查詢輔助",
   "数据表列表": "數據表列表",
   "Tag列表": "Tag列表",
-  "Field列表": "Field列表"
+  "Field列表": "Field列表",
+  "plugin.ck.valuekey.tip": "通過此字段從返回結果中提取數值。例如 查詢條件為 `select count() AS cnt, event_time from system.query_log ` 返回結果為 cnt:11，ValueKey 寫了 cnt，則會根據 cnt 提取到 11，作為查詢結果的值",
+  "plugin.ck.labelkey.tip": "將此字段對應的 value，作為tag，追加到監控數據的標籤中，例如 查詢條件為 `select count() cnt, event_time, type from system.query_log GROUP BY type, event_time` 返回結果為 `[{cnt:11 type:QueryFinish},{cnt:10 type:QueryStart}]`, LabelKey 寫了 type, 則返回的數據中type會作為時序數據的labels"
 }

@@ -42,11 +42,7 @@ function AdvancedSettings(props: IProps) {
               label={
                 <span>
                   ValueKey{' '}
-                  <Tooltip
-                    title={t(
-                      '通过此字段从返回结果中提取数值。例如 查询条件为 `select count() AS cnt, event_time from system.query_log ` 返回结果为 cnt:11，ValueKey 写了 cnt，则会根据 cnt 提取到 11，作为查询结果的值',
-                    )}
-                  >
+                  <Tooltip title={t('plugin.ck.valuekey.tip')}>
                     <QuestionCircleOutlined />
                   </Tooltip>
                 </span>
@@ -74,11 +70,7 @@ function AdvancedSettings(props: IProps) {
               label={
                 <span>
                   LabelKey{' '}
-                  <Tooltip
-                    title={t(
-                      '将此字段对应的 value，作为tag，追加到监控数据的标签中，例如 查询条件为 `select count() cnt, event_time, type from system.query_log GROUP BY type, event_time` 返回结果为 `[{cnt:11 type:QueryFinish},{cnt:10 type:QueryStart}]`, LabelKey 写了 type, 则返回的数据中type会作为时序数据的labels',
-                    )}
-                  >
+                  <Tooltip title={t('plugin.ck.labelkey.tip')}>
                     <QuestionCircleOutlined />
                   </Tooltip>
                 </span>
