@@ -9,6 +9,13 @@ export const getInfluxdbDBs = (data: InfluxDBBaseParams): Promise<string[]> => {
   }).then((res) => res.dat);
 };
 
+export const getInfluxdbRetentionpolicy = (data: InfluxDBMeasureParams): Promise<string[]> => {
+  return request('/api/n9e-plus/influxdb-retentionpolicy', {
+    method: RequestMethod.Post,
+    data,
+  }).then((res) => res.dat);
+};
+
 export const getInfluxdbMeasures = (data: InfluxDBMeasureParams): Promise<string[]> => {
   return request('/api/n9e-plus/influxdb-measures', {
     method: RequestMethod.Post,

@@ -9,6 +9,7 @@ export interface InfluxDBMeasureParams extends InfluxDBBaseParams {
 
 export interface InfluxDBTagFieldParams extends InfluxDBMeasureParams {
   measurement: string;
+  retentionpolicy: string;
 }
 
 export interface InfluxDBQueryParams extends InfluxDBBaseParams {

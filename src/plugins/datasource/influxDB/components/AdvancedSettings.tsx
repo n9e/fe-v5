@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useDebounceFn } from 'ahooks';
 import InputGroupWithFormItem from '@/components/InputGroupWithFormItem';
 import { DatasourceCateEnum } from '@/utils/constant';
-import { getInfluxdbMeasures, getInfluxdbTagfields } from '../services';
+import { getInfluxdbRetentionpolicy, getInfluxdbMeasures, getInfluxdbTagfields } from '../services';
 
 interface IProps {
   datasourceCate: DatasourceCateEnum.influxDB;
@@ -19,42 +19,54 @@ function AdvancedSettings(props: IProps) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [values, setValues] = useState<{
+    retentionpolicy: string;
     measurement: string;
     tag: string;
     field: string;
   }>({
+    retentionpolicy: '',
     measurement: '',
     tag: '',
     field: '',
   });
   const [options, setOptions] = useState<{
+    retentionpolicy: string[];
     measurement: string[];
     tag: string[];
     field: string[];
   }>({
+    retentionpolicy: [],
     measurement: [],
     tag: [],
     field: [],
   });
   const { run: fetchData } = useDebounceFn(
-    (type: 'measures' | 'tagfields') => {
+    async (type: 'measures' | 'tagfields') => {
       if (type === 'measures') {
-        getInfluxdbMeasures({
-          cate: datasourceCate,
-          cluster: datasourceName,
-          dbname: dbname,
-        }).then((res) => {
+        try {
+          const retentionpolicyResult = await getInfluxdbRetentionpolicy({
+            cate: datasourceCate,
+            cluster: datasourceName,
+            dbname: dbname,
+          });
+          const measuresResult = await getInfluxdbMeasures({
+            cate: datasourceCate,
+            cluster: datasourceName,
+            dbname: dbname,
+          });
           setOptions({
             ...options,
-            measurement: res,
+            retentionpolicy: retentionpolicyResult,
+            measurement: measuresResult,
           });
-        });
+        } catch (error) {}
       } else if (type === 'tagfields') {
         getInfluxdbTagfields({
           cate: datasourceCate,
           cluster: datasourceName,
           dbname: dbname,
           measurement: values.measurement,
+          retentionpolicy: values.retentionpolicy,
         }).then((res) => {
           setOptions({
             ...options,
@@ -105,8 +117,32 @@ function AdvancedSettings(props: IProps) {
         }}
       >
         <Row gutter={8}>
-          <Col span={8}>
-            <InputGroupWithFormItem label={t('数据表列表')} labelWidth={100}>
+          <Col span={6}>
+            <InputGroupWithFormItem label={t('保留策略')} labelWidth={70}>
+              <Select
+                style={{ width: '100%' }}
+                value={values.retentionpolicy}
+                onChange={(val) => {
+                  setValues({
+                    ...values,
+                    retentionpolicy: val,
+                    tag: '',
+                    field: '',
+                  });
+                }}
+              >
+                {_.map(options.retentionpolicy, (item) => {
+                  return (
+                    <Select.Option value={item} key={item}>
+                      {item}
+                    </Select.Option>
+                  );
+                })}
+              </Select>
+            </InputGroupWithFormItem>
+          </Col>
+          <Col span={6}>
+            <InputGroupWithFormItem label={t('数据表列表')} labelWidth={82}>
               <Select
                 style={{ width: '100%' }}
                 value={values.measurement}
@@ -114,6 +150,8 @@ function AdvancedSettings(props: IProps) {
                   setValues({
                     ...values,
                     measurement: val,
+                    tag: '',
+                    field: '',
                   });
                 }}
               >
@@ -127,8 +165,8 @@ function AdvancedSettings(props: IProps) {
               </Select>
             </InputGroupWithFormItem>
           </Col>
-          <Col span={8}>
-            <InputGroupWithFormItem label={t('Tag列表')} labelWidth={100}>
+          <Col span={6}>
+            <InputGroupWithFormItem label={t('Tag列表')} labelWidth={70}>
               <Select
                 style={{ width: '100%' }}
                 value={values.tag}
@@ -149,8 +187,8 @@ function AdvancedSettings(props: IProps) {
               </Select>
             </InputGroupWithFormItem>
           </Col>
-          <Col span={8}>
-            <InputGroupWithFormItem label={t('Field列表')} labelWidth={100}>
+          <Col span={6}>
+            <InputGroupWithFormItem label={t('Field列表')} labelWidth={72}>
               <Select
                 style={{ width: '100%' }}
                 value={values.field}

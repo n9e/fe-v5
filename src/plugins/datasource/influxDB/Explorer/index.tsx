@@ -58,12 +58,9 @@ export default function index(props: IProps) {
               label={
                 <Space>
                   <span>{t('查询条件')}</span>
-                  <Tooltip title={''}>
-                    <QuestionCircleOutlined />
-                  </Tooltip>
                 </Space>
               }
-              labelWidth={95}
+              labelWidth={84}
             >
               <Form.Item
                 name={['query', 'command']}
