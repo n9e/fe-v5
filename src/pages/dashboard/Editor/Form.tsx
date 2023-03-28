@@ -88,7 +88,7 @@ function FormCpt(props, ref) {
                       step={step}
                       values={{
                         ...values,
-                        datasourceName: values.datasourceName || cluster,
+                        datasourceName: values.datasourceName ? values.datasourceName : values.datasourceCate === 'prometheus' ? cluster : undefined,
                       }}
                       variableConfig={variableConfigWithOptions}
                       isPreview

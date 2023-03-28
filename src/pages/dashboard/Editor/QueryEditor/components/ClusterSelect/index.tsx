@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Select } from 'antd';
-import { getCommonESClusters, getCommonClusters, getCommonSLSClusters, getCommonInfluxDBClusters } from '@/services/common';
+import { getCommonESClusters, getCommonClusters, getCommonSLSClusters, getCommonInfluxDBClusters, getCommonZabbixClusters } from '@/services/common';
 import { useTranslation } from 'react-i18next';
 export default function index(props: { cate: string; defaultDatasourceName?: string; name?: string | string[]; label?: React.ReactNode }) {
   const { t } = useTranslation();
@@ -25,6 +25,14 @@ export default function index(props: { cate: string; defaultDatasourceName?: str
         });
     } else if (cate === 'influxdb') {
       getCommonInfluxDBClusters()
+        .then(({ dat }) => {
+          setClusterList(dat);
+        })
+        .catch(() => {
+          setClusterList([]);
+        });
+    } else if (cate === 'zabbix') {
+      getCommonZabbixClusters()
         .then(({ dat }) => {
           setClusterList(dat);
         })

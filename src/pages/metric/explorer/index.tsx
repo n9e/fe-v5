@@ -22,13 +22,14 @@ import PageLayout from '@/components/pageLayout';
 import { generateID } from '@/utils';
 import AdvancedWrap from '@/components/AdvancedWrap';
 import InputGroupWithFormItem from '@/components/InputGroupWithFormItem';
-import { getCommonESClusters, getCommonClusters, getCommonSLSClusters, getCommonCKClusters, getCommonInfluxDBClusters } from '@/services/common';
+import { getCommonESClusters, getCommonClusters, getCommonSLSClusters, getCommonCKClusters, getCommonInfluxDBClusters, getCommonZabbixClusters } from '@/services/common';
 import { datasourceCatesMap, DatasourceCateEnum } from '@/utils/constant';
 import Elasticsearch from './Elasticsearch';
 import Prometheus from './Prometheus';
 import AliyunSLS, { setDefaultValues } from './AliyunSLS';
 import ClickHouse from './ClickHouse';
 import InfluxDB from '@/plugins/datasource/influxDB/Explorer';
+import Zabbix from '@/plugins/datasource/zabbix/Explorer';
 import './index.less';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -55,11 +56,13 @@ const getDefaultDatasourceName = (datasourceCate, datasourceList) => {
   const localAliyunSLS = localStorage.getItem('datasource_aliyunsls_name');
   const localCK = localStorage.getItem('datasource_ck_name');
   const localInfluxdb = localStorage.getItem('datasource_influxdb_name');
+  const localZabbix = localStorage.getItem('datasource_zabbix_name');
   if (datasourceCate === 'prometheus') return localPrometheus || _.get(datasourceList, [datasourceCate, 0]);
   if (datasourceCate === 'elasticsearch') return localElasticsearch || _.get(datasourceList, [datasourceCate, 0]);
   if (datasourceCate === 'aliyun-sls') return localAliyunSLS || _.get(datasourceList, [datasourceCate, 0]);
   if (datasourceCate === 'ck') return localCK || _.get(datasourceList, [datasourceCate, 0]);
   if (datasourceCate === 'influxdb') return localInfluxdb || _.get(datasourceList, [datasourceCate, 0]);
+  if (datasourceCate === 'zabbix') return localZabbix || _.get(datasourceList, [datasourceCate, 0]);
 };
 
 const setDefaultDatasourceName = (datasourceCate, value) => {
@@ -77,6 +80,9 @@ const setDefaultDatasourceName = (datasourceCate, value) => {
   }
   if (datasourceCate === 'influxdb') {
     localStorage.setItem('datasource_influxdb_name', value);
+  }
+  if (datasourceCate === 'zabbix') {
+    localStorage.setItem('datasource_zabbix_name', value);
   }
 };
 
@@ -229,6 +235,8 @@ const Panel = ({
               return <ClickHouse datasourceCate={datasourceCate} datasourceName={datasourceName} headerExtra={headerExtraRef.current} form={form} />;
             } else if (datasourceCate === DatasourceCateEnum.influxDB) {
               return <InfluxDB datasourceCate={datasourceCate} datasourceName={datasourceName} form={form} />;
+            } else if (datasourceCate === DatasourceCateEnum.zabbix) {
+              return <Zabbix datasourceCate={datasourceCate} datasourceName={datasourceName} headerExtra={headerExtraRef.current} form={form} />;
             }
           }}
         </Form.Item>
@@ -259,12 +267,14 @@ const PanelList = () => {
     'aliyun-sls': string[];
     ck: string[];
     influxdb: string[];
+    zabbix: string[];
   }>({
     prometheus: [],
     elasticsearch: [],
     'aliyun-sls': [],
     ck: [],
     influxdb: [],
+    zabbix: [],
   });
   useEffect(() => {
     const fetchDatasourceList = async () => {
@@ -273,12 +283,14 @@ const PanelList = () => {
       const slsList = await getCommonSLSClusters().then((res) => res.dat);
       const ckList = await getCommonCKClusters().then((res) => res.dat);
       const influxDBList = await getCommonInfluxDBClusters().then((res) => res.dat);
+      const zabbixList = await getCommonZabbixClusters().then((res) => res.dat);
       setDatasourceList({
         prometheus: promList,
         elasticsearch: esList,
         'aliyun-sls': slsList,
         ck: ckList,
         influxdb: influxDBList,
+        zabbix: zabbixList,
       });
     };
 
@@ -289,6 +301,7 @@ const PanelList = () => {
         'aliyun-sls': [],
         ck: [],
         influxdb: [],
+        zabbix: [],
       });
     });
   }, []); // 添加一个查询面板
