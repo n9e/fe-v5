@@ -121,6 +121,7 @@ function AdvancedSettings(props: IProps) {
             <InputGroupWithFormItem label={t('保留策略')} labelWidth={70}>
               <Select
                 style={{ width: '100%' }}
+                allowClear
                 value={values.retentionpolicy}
                 onChange={(val) => {
                   setValues({
