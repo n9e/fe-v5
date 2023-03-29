@@ -67,7 +67,6 @@ export default function Rule({ restField, name, queryValues, form, defaultRuleOp
   }
 
   function renderThreshold(subName) {
-    const { t } = useTranslation();
     return (
       <Form.Item noStyle {...restField} name={[subName, 'threshold']}>
         <InputNumber
