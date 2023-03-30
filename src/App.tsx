@@ -51,12 +51,13 @@ function App() {
         //   }
         //   return document.body;
         // }}
-        // renderEmpty={() => (
-        //   <div style={{ padding: 20 }}>
-        //     <img src='/image/empty.png' width='64' />
-        //     <div className='ant-empty-description'>{t('无数据')}</div>
-        //   </div>
-        // )}
+        renderEmpty={() => (
+          // <div style={{ padding: 20 }}>
+          //   <img src='/image/empty.png' width='64' />
+          //   <div className='ant-empty-description'>{t('无数据')}</div>
+          // </div>
+          <Empty description={t('暂无数据')} />
+        )}
       >
         <Provider store={store as any}>
           <Router>

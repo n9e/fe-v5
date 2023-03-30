@@ -16,7 +16,7 @@
  */
 
 /**
- * 大盘列表页面
+ * 仪表盘列表页面
  */
 import React, { useState, useEffect } from 'react';
 import { useHistory, Link } from 'react-router-dom';
@@ -67,7 +67,7 @@ export default function index() {
   });
 
   return (
-    <PageLayout title={t('监控大盘')} icon={<FundViewOutlined />} hideCluster={true}>
+    <PageLayout title={t('仪表盘')} icon={<FundViewOutlined />} hideCluster={true}>
       <div
         style={{
           display: 'flex',
@@ -93,7 +93,7 @@ export default function index() {
               dataSource={data}
               columns={[
                 {
-                  title: t('大盘名称'),
+                  title: t('仪表盘名称'),
                   dataIndex: 'name',
                   className: 'name-column',
                   render: (text: string, record: DashboardType) => {
@@ -159,12 +159,12 @@ export default function index() {
                           checked={text === 1}
                           onChange={() => {
                             Modal.confirm({
-                              title: `${t('确定')}${record.public ? t('取消分享') : t('分享')}${t('大盘：')}${record.name}${t('吗?')}`,
+                              title: `${t('确定')}${record.public ? t('取消分享') : t('分享')}${t('仪表盘：')}${record.name}${t('吗?')}`,
                               onOk: async () => {
                                 await updateDashboardPublic(record.id, {
                                   public: record.public ? 0 : 1,
                                 });
-                                message.success(`${record.public ? t('取消分享') : t('分享')}${t('大盘成功')}`);
+                                message.success(`${record.public ? t('取消分享') : t('分享')}${t('仪表盘成功')}`);
                                 setRefreshKey(_.uniqueId('refreshKey_'));
                               },
                             });
@@ -216,10 +216,10 @@ export default function index() {
                         className='table-operator-area-normal'
                         onClick={async () => {
                           Modal.confirm({
-                            title: `${t('是否克隆大盘')}${record.name}?`,
+                            title: `${t('是否克隆仪表盘')}${record.name}?`,
                             onOk: async () => {
                               await cloneDashboard(busiId as number, record.id);
-                              message.success(t('克隆大盘成功'));
+                              message.success(t('克隆仪表盘成功'));
                               setRefreshKey(_.uniqueId('refreshKey_'));
                             },
 
@@ -244,10 +244,10 @@ export default function index() {
                         className='table-operator-area-warning'
                         onClick={async () => {
                           Modal.confirm({
-                            title: `${t('是否删除大盘：')}${record.name}?`,
+                            title: `${t('是否删除仪表盘：')}${record.name}?`,
                             onOk: async () => {
                               await removeDashboards([record.id]);
-                              message.success(t('删除大盘成功'));
+                              message.success(t('删除仪表盘成功'));
                               setRefreshKey(_.uniqueId('refreshKey_'));
                             },
 
@@ -280,7 +280,7 @@ export default function index() {
             />
           </div>
         ) : (
-          <BlankBusinessPlaceholder text={t('监控大盘')} />
+          <BlankBusinessPlaceholder text={t('仪表盘')} />
         )}
       </div>
     </PageLayout>

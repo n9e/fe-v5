@@ -100,7 +100,7 @@ export default function Prometheus({ chartForm }) {
                           name={[field.name, 'time']}
                           tooltip={{
                             getPopupContainer: () => document.body,
-                            title: t('可指定时间范围，默认为大盘全局时间范围'),
+                            title: t('可指定时间范围，默认为仪表盘全局时间范围'),
                           }}
                           normalize={(val) => {
                             return {
@@ -133,7 +133,7 @@ export default function Prometheus({ chartForm }) {
                           name={[field.name, 'step']}
                           tooltip={{
                             getPopupContainer: () => document.body,
-                            title: t('可指定 step，默认为大盘全局 step'),
+                            title: t('可指定 step，默认为仪表盘全局 step'),
                           }}
                         >
                           <Resolution />

@@ -84,8 +84,8 @@ function Import(props: IProps & ModalWrapProps) {
       className='dashboard-import-modal'
       title={
         <Tabs activeKey={modalType} onChange={(e: ModalType) => setModalType(e)} className='custom-import-alert-title'>
-          <TabPane tab={t('导入内置大盘模块')} key='BuiltIn'></TabPane>
-          <TabPane tab={t('导入大盘JSON')} key='Import'></TabPane>
+          <TabPane tab={t('导入内置仪表盘模块')} key='BuiltIn'></TabPane>
+          <TabPane tab={t('导入仪表盘JSON')} key='Import'></TabPane>
           <TabPane
             tab={
               <div
@@ -93,7 +93,7 @@ function Import(props: IProps & ModalWrapProps) {
                   position: 'relative',
                 }}
               >
-                {t('导入Grafana大盘JSON')}
+                {t('导入Grafana仪表盘JSON')}
                 <BetaIcon
                   style={{
                     fontSize: 24,
@@ -119,7 +119,7 @@ function Import(props: IProps & ModalWrapProps) {
         <>
           <Input
             prefix={<SearchOutlined />}
-            placeholder={t('请输入要查询的大盘名称')}
+            placeholder={t('请输入要查询的仪表盘名称')}
             value={searchVal}
             onChange={(e) => {
               setSearchVal(e.target.value);
@@ -134,7 +134,7 @@ function Import(props: IProps & ModalWrapProps) {
             dataSource={filteredBuildinList}
             columns={[
               {
-                title: t('大盘名称'),
+                title: t('仪表盘名称'),
                 dataIndex: 'name',
               },
               {
@@ -179,16 +179,16 @@ function Import(props: IProps & ModalWrapProps) {
           }}
         >
           <Form.Item
-            label={t('大盘JSON')}
+            label={t('仪表盘JSON')}
             name='import'
             rules={[
               {
                 required: true,
-                message: t('请输入大盘JSON'),
+                message: t('请输入仪表盘JSON'),
               },
             ]}
           >
-            <Input.TextArea className='code-area' placeholder={t('请输入大盘 JSON')} rows={16} />
+            <Input.TextArea className='code-area' placeholder={t('请输入仪表盘 JSON')} rows={16} />
           </Form.Item>
           <Form.Item>
             <Button type='primary' htmlType='submit'>
@@ -214,19 +214,19 @@ function Import(props: IProps & ModalWrapProps) {
               marginBottom: 10,
             }}
           >
-            <Alert message={t('目前只支持导入 v8+ 版本的大盘配置，导入完的图表只支持夜莺目前支持的图表类型和功能')} type='info' />
+            <Alert message={t('目前只支持导入 v8+ 版本的仪表盘配置，导入完的图表只支持夜莺目前支持的图表类型和功能')} type='info' />
           </div>
           <Form.Item
-            label={t('大盘JSON')}
+            label={t('仪表盘JSON')}
             name='import'
             rules={[
               {
                 required: true,
-                message: t('请输入大盘JSON'),
+                message: t('请输入仪表盘JSON'),
               },
             ]}
           >
-            <Input.TextArea className='code-area' placeholder={t('请输入大盘 JSON')} rows={16} />
+            <Input.TextArea className='code-area' placeholder={t('请输入仪表盘 JSON')} rows={16} />
           </Form.Item>
           <Form.Item>
             <Button type='primary' htmlType='submit'>

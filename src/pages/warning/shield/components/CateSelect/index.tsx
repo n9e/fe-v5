@@ -1,6 +1,7 @@
 import React from 'react';
 import { Form, Select } from 'antd';
 import { CaretDownOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 
 const typeNameMap = {
   prometheus: 'Prometheus',
@@ -11,9 +12,10 @@ const typeNameMap = {
 };
 
 export default function index({ visible, form }) {
+  const { t } = useTranslation();
   const options = visible ? ['prometheus', 'elasticsearch', 'aliyun-sls', 'ck', 'influxdb'] : ['prometheus'];
   return (
-    <Form.Item label={'数据源类型'} name='cate'>
+    <Form.Item label={t('数据源类型')} name='cate'>
       <Select
         suffixIcon={<CaretDownOutlined />}
         onChange={() => {

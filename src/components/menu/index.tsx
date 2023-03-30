@@ -90,7 +90,7 @@ const SideMenu: FC = () => {
         },
         {
           key: '/dashboards',
-          label: t('监控大盘'),
+          label: t('仪表盘'),
         },
       ],
     },
@@ -255,7 +255,7 @@ const SideMenu: FC = () => {
     ) {
       return true;
     }
-    // 大盘全屏模式下也需要隐藏左侧菜单
+    // 仪表盘全屏模式下也需要隐藏左侧菜单
     if (location.pathname.indexOf('/dashboard') === 0) {
       const query = querystring.parse(location.search);
       if (query?.viewMode === 'fullscreen') {
