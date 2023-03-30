@@ -487,7 +487,7 @@ export default function index(props: IProps) {
               justifyContent: 'center',
             }}
           >
-            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('暂无数据')} />
           </div>
         )}
       </Spin>

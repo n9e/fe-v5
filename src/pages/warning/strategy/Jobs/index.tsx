@@ -198,7 +198,7 @@ export default function Jobs() {
                   );
                 }
 
-                return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />;
+                return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('暂无数据')} />;
               },
             }}
           />
