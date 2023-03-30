@@ -77,7 +77,7 @@ function index(props: IProps) {
               const regFilterOptions = filterOptionsByReg(options, item.reg, result, idx, id);
               result[idx] = item;
               result[idx].fullDefinition = definition;
-              result[idx].options = item.type === 'query' ? _.sortBy(regFilterOptions) : regFilterOptions; // 当大盘变量值为空时，设置默认值
+              result[idx].options = item.type === 'query' ? _.sortBy(regFilterOptions) : regFilterOptions; // 当仪表盘变量值为空时，设置默认值
               // 如果已选项不在待选项里也视做空值处理
 
               const selected = getVaraiableSelected(item.name, id);
@@ -181,7 +181,7 @@ function index(props: IProps) {
               onOpenFire && onOpenFire();
             }}
           >
-            {t('添加大盘变量')}
+            {t('添加仪表盘变量')}
           </div>
         )}
       </div>

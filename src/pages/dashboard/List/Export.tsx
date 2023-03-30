@@ -19,40 +19,51 @@ import { Modal, Input } from 'antd';
 import { CopyOutlined } from '@ant-design/icons';
 import ModalHOC, { ModalWrapProps } from '@/components/ModalHOC';
 import { download, copyToClipBoard } from '@/utils';
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 interface IProps {
   data: string;
 }
 
 function Export(props: IProps & ModalWrapProps) {
-  const {
-    t
-  } = useTranslation();
-  const {
-    visible,
-    destroy
-  } = props;
+  const { t } = useTranslation();
+  const { visible, destroy } = props;
   const [data, setData] = useState(props.data);
-  return <Modal title={t("导出大盘")} visible={visible} onCancel={() => {
-    destroy();
-  }} footer={null}>
+  return (
+    <Modal
+      title={t('导出仪表盘')}
+      visible={visible}
+      onCancel={() => {
+        destroy();
+      }}
+      footer={null}
+    >
       <p>
-        <a onClick={() => {
-        download([data], 'download.json');
-      }}>
+        <a
+          onClick={() => {
+            download([data], 'download.json');
+          }}
+        >
           Download.json
         </a>
-        <a style={{
-        float: 'right'
-      }} onClick={() => copyToClipBoard(data, val => val)}>
+        <a
+          style={{
+            float: 'right',
+          }}
+          onClick={() => copyToClipBoard(data, (val) => val)}
+        >
           <CopyOutlined />
-          {t("复制JSON内容到剪贴板")}
-       </a>
+          {t('复制JSON内容到剪贴板')}
+        </a>
       </p>
-      <Input.TextArea value={data} onChange={e => {
-      setData(e.target.value);
-    }} rows={15} />
-    </Modal>;
+      <Input.TextArea
+        value={data}
+        onChange={(e) => {
+          setData(e.target.value);
+        }}
+        rows={15}
+      />
+    </Modal>
+  );
 }
 
 export default ModalHOC(Export);

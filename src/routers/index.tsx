@@ -110,7 +110,7 @@ export default function Content() {
     }
   }
 
-  // 大盘在全屏和暗黑主题下需要定义个 dark 样式名
+  // 仪表盘在全屏和暗黑主题下需要定义个 dark 样式名
   let themeClassName = '';
   if (location.pathname.indexOf('/dashboard') === 0) {
     const query = querystring.parse(location.search);

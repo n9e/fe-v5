@@ -83,7 +83,7 @@ function index(props: IProps) {
     const isAuthorized = !_.some(roles, (item) => item === 'Guest');
 
     if (!editable) {
-      message.warning(t('大盘已经被别人修改，为避免相互覆盖，请刷新大盘查看最新配置和数据'));
+      message.warning(t('仪表盘已经被别人修改，为避免相互覆盖，请刷新仪表盘查看最新配置和数据'));
     }
 
     if (!_.isEmpty(roles) && isAuthorized && editable) {
