@@ -155,14 +155,14 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, introI
               {introIcon}
               {docFn && (
                 <a onClick={() => docFn()} style={{ marginRight: 20 }}>
-                  文档
+                  {t('文档')}
                 </a>
               )}
               {/* 整合版本关闭文档链接 */}
               {import.meta.env.VITE_IS_COMMON_DS !== 'true' && (
                 <div style={{ marginRight: 32, position: 'relative' }}>
                   <a target='_blank' href='http://n9e.flashcat.cloud'>
-                    文档
+                    {t('文档')}
                   </a>
                   <Icon
                     style={{ fontSize: 16, position: 'absolute', top: -16, right: -28 }}
