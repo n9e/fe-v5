@@ -28,6 +28,7 @@ import elasticSearchQuery from './elasticSearch';
 import elasticSearchLogQuery from './elasticSearchLog';
 import aliyunSLS from './aliyunSLS';
 import influxDB from '@/plugins/datasource/influxDB/Dashboard/datasource';
+import zabbix from '@/plugins/datasource/zabbix/datasource';
 
 interface IProps {
   id?: string;
@@ -57,6 +58,7 @@ export default function usePrometheus(props: IProps) {
     'elasticsearch-log': elasticSearchLogQuery,
     'aliyun-sls': aliyunSLS,
     influxdb: influxDB,
+    zabbix: zabbix,
   };
   const { run: fetchData } = useDebounceFn(
     () => {

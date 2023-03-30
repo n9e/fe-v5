@@ -8,6 +8,7 @@ import ElasticsearchLog from './ElasticsearchLog';
 import AliyunSLS from './AliyunSLS';
 import ClusterSelect from './components/ClusterSelect';
 import InfluxDB from '@/plugins/datasource/influxDB/Dashboard/QueryBuilder';
+import Zabbix, { defaultTargetQueryValue as zabbixDefaultTargetQueryValue } from '@/plugins/datasource/zabbix/Dashboard/QueryBuilder';
 import { useTranslation } from 'react-i18next';
 
 const prometheusCate = {
@@ -30,6 +31,10 @@ export default function index({ chartForm, defaultDatasourceName }) {
     {
       value: 'influxdb',
       label: 'InfluxDB',
+    },
+    {
+      value: 'zabbix',
+      label: 'Zabbix',
     },
   ];
   return (
@@ -77,6 +82,16 @@ export default function index({ chartForm, defaultDatasourceName }) {
                                   interval: 1,
                                   interval_unit: 'min',
                                 },
+                              },
+                            ],
+                            datasourceName: undefined,
+                          });
+                        } else if (val === 'zabbix') {
+                          chartForm.setFieldsValue({
+                            targets: [
+                              {
+                                refId: 'A',
+                                query: zabbixDefaultTargetQueryValue,
                               },
                             ],
                             datasourceName: undefined,
@@ -154,6 +169,10 @@ export default function index({ chartForm, defaultDatasourceName }) {
 
           if (cate === 'influxdb') {
             return <InfluxDB chartForm={chartForm} />;
+          }
+
+          if (cate === 'zabbix') {
+            return <Zabbix chartForm={chartForm} />;
           }
 
           return null;

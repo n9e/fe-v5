@@ -60,10 +60,10 @@ export default function GraphStyles({ chartForm }) {
             <Form.Item label={t('显示模式')} name={[...namePrefix, 'displayMode']}>
               <Select suffixIcon={<CaretDownOutlined />}>
                 <Select.Option value='seriesToRows'>
-                  {t('每行展示')} serie {t('的值')}值
+                  {t('每行展示')} serie {t('的值')}
                 </Select.Option>
                 <Select.Option value='labelsOfSeriesToRows'>
-                  {t('每行展示')} labels {t('的值')}值
+                  {t('每行展示')} labels {t('的值')}
                 </Select.Option>
                 <Select.Option value='labelValuesToRows'>{t('每行展示指定聚合维度的值')}</Select.Option>
               </Select>

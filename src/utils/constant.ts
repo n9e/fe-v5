@@ -82,6 +82,10 @@ export const datasourceCates = [
     value: 'influxdb',
     label: 'InfluxDB',
   },
+  {
+    value: 'zabbix',
+    label: 'Zabbix',
+  },
 ];
 
 export const datasourceCatesMap = {
@@ -95,4 +99,5 @@ export enum DatasourceCateEnum {
   aliyunSLS = 'aliyun-sls',
   ck = 'ck',
   influxDB = 'influxdb',
+  zabbix = 'zabbix',
 }
