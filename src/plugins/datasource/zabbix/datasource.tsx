@@ -66,7 +66,7 @@ export async function getItemsFunc(options: { cate: string; cluster: string; ite
   let data: any[] = [];
   try {
     if (cluster) {
-      const result = await getItems({
+      data = await getItems({
         cate,
         cluster,
         itemtype: itemType,
@@ -75,7 +75,6 @@ export async function getItemsFunc(options: { cate: string; cluster: string; ite
         application: { filter: application },
         item: { filter: item },
       });
-      data = _.unionBy(result, 'name');
     }
   } catch (error) {}
   return data;
