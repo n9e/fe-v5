@@ -61,29 +61,24 @@ export async function getHostsAndFilteredIDs(options: { cate: string; cluster: s
   };
 }
 
-export async function getItemsAndFiltered(options: { cate: string; cluster: string; itemType: 'num' | 'text'; hostids?: string[]; applicationids?: string[]; value?: string }) {
-  const { cate, cluster, value, itemType, hostids, applicationids } = options;
+export async function getItemsFunc(options: { cate: string; cluster: string; itemType: 'num' | 'text'; group: string; host: string; application: string; item: string }) {
+  const { cate, cluster, itemType, group, host, application, item } = options;
   let data: any[] = [];
-  let filtered: any[] = [];
   try {
     if (cluster) {
       const result = await getItems({
         cate,
         cluster,
-        itemType,
-        hostids: _.isEmpty(hostids) ? undefined : hostids,
-        applicationids: _.isEmpty(applicationids) ? undefined : applicationids,
+        itemtype: itemType,
+        group: { filter: group },
+        host: { filter: host },
+        application: { filter: application },
+        item: { filter: item },
       });
       data = _.unionBy(result, 'name');
-      if (value) {
-        filtered = filterData<any>(data, value);
-      }
     }
   } catch (error) {}
-  return {
-    data,
-    filtered,
-  };
+  return data;
 }
 
 export async function getHistory(options: IOptions<TargetQuery>) {
@@ -106,6 +101,7 @@ export async function getHistory(options: IOptions<TargetQuery>) {
           host: query.host,
           application: query.application,
           item: query.item,
+          options: query.options,
           functions: _.isEmpty(query.functions)
             ? undefined
             : _.map(query.functions, (funcValue) => {
@@ -153,6 +149,7 @@ export async function getHistoryByIDs(options: IOptions<TargetQueryIDs>) {
           end,
           queryType: '3',
           itemids: query.itemids,
+          options: query.options,
           functions: _.isEmpty(query.functions)
             ? undefined
             : _.map(query.functions, (funcValue) => {
@@ -191,35 +188,21 @@ export async function getHistoryText(options: IOptions<TargetQueryText>) {
   let end = moment(parsedRange.end).unix();
   let batchParams: LogsQuery[] = [];
   let series: Serie[] = [];
+
   try {
-    let allItems = _.reduce(
-      targets,
-      (acc, target: Target<TargetQueryText>) => {
-        return _.compact(_.concat(acc, target.query.items));
-      },
-      [],
-    );
-    if (_.isEmpty(allItems)) {
-      for (let i = 0; i < targets.length; i++) {
-        const target = targets[i];
-        const { filteredIDs: groupids } = await getGroupsAndFilteredIDs({
-          ...baseParms,
-          value: target.query.group?.filter,
-        });
-        const { filteredIDs: hostids } = await getHostsAndFilteredIDs({
-          ...baseParms,
-          groupids,
-          value: target.query.host?.filter,
-        });
-        const { filtered: items } = await getItemsAndFiltered({
-          ...baseParms,
-          itemType: target.query?.mode === 'timeseries' ? 'num' : 'text',
-          hostids,
-          value: target.query.item?.filter,
-        });
-        target.query.items = items;
-        allItems = items;
-      }
+    let allItems = [];
+    for (let i = 0; i < targets.length; i++) {
+      const target = targets[i];
+      const items = await getItemsFunc({
+        ...baseParms,
+        itemType: target.query?.mode === 'timeseries' ? 'num' : 'text',
+        group: target.query.group?.filter,
+        host: target.query.host?.filter,
+        application: target.query.application?.filter,
+        item: target.query.item?.filter || '/.*/',
+      });
+      target.query.items = items;
+      allItems = _.concat(allItems, items);
     }
     const groupedItems = _.groupBy(allItems, 'value_type');
     _.forEach(groupedItems, (items, valueType) => {

@@ -5,7 +5,6 @@ import GroupSelect from '../components/GroupSelect';
 import HostSelect from '../components/HostSelect';
 import AppSelect from '../components/AppSelect';
 import ItemSelect from '../components/ItemSelect';
-import { Item } from '../types';
 
 interface IProps {
   datasourceCate: string;
@@ -21,12 +20,10 @@ export default function Metrics(props: IProps) {
     groupids: string[];
     hostids: string[];
     applicationids: string[];
-    items: Item[];
   }>({
     groupids: [],
     hostids: [],
     applicationids: [],
-    items: [],
   });
   const baseParams = {
     cate: datasourceCate,
@@ -80,19 +77,17 @@ export default function Metrics(props: IProps) {
           </Form.Item>
         </Col>
         <Col span={12}>
-          <Form.Item {...prefixField} label={t('监控项')} name={[...prefixName, 'item', 'filter']} rules={[{ required: true, message: t('请选择监控项') }]}>
-            <ItemSelect
-              baseParams={baseParams}
-              hostids={selected.hostids}
-              applicationids={selected.applicationids}
-              itemType='text'
-              onSelect={(val) => {
-                setSelected({
-                  ...selected,
-                  items: val,
-                });
-              }}
-            />
+          <Form.Item shouldUpdate noStyle>
+            {({ getFieldValue }) => {
+              const group = getFieldValue(['targets', ...prefixName, 'group', 'filter']);
+              const host = getFieldValue(['targets', ...prefixName, 'host', 'filter']);
+              const application = getFieldValue(['targets', ...prefixName, 'application', 'filter']);
+              return (
+                <Form.Item {...prefixField} label={t('监控项')} name={[...prefixName, 'item', 'filter']} rules={[{ required: true, message: t('请选择监控项') }]}>
+                  <ItemSelect baseParams={baseParams} group={group} host={host} application={application} itemType='text' />
+                </Form.Item>
+              );
+            }}
           </Form.Item>
         </Col>
       </Row>

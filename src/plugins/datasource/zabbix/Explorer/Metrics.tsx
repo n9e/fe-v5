@@ -7,6 +7,7 @@ import HostSelect from '../components/HostSelect';
 import AppSelect from '../components/AppSelect';
 import ItemSelect from '../components/ItemSelect';
 import FunctionsEditor from '../components/FunctionsEditor';
+// import Options from '../components/Options';
 
 interface IProps {
   datasourceCate: string;
@@ -91,11 +92,20 @@ export default function Metrics(props: IProps) {
               </InputGroupWithFormItem>
             </Col>
             <Col span={12}>
-              <InputGroupWithFormItem label={t('监控项')} labelWidth={84}>
-                <Form.Item name={['query', 'item', 'filter']} rules={[{ required: true, message: t('请选择监控项') }]}>
-                  <ItemSelect baseParams={baseParams} hostids={selected.hostids} applicationids={selected.applicationids} itemType='num' />
-                </Form.Item>
-              </InputGroupWithFormItem>
+              <Form.Item shouldUpdate noStyle>
+                {({ getFieldValue }) => {
+                  const group = getFieldValue(['query', 'group', 'filter']);
+                  const host = getFieldValue(['query', 'host', 'filter']);
+                  const application = getFieldValue(['query', 'application', 'filter']);
+                  return (
+                    <InputGroupWithFormItem label={t('监控项')} labelWidth={84}>
+                      <Form.Item name={['query', 'item', 'filter']} rules={[{ required: true, message: t('请选择监控项') }]}>
+                        <ItemSelect baseParams={baseParams} itemType='num' group={group} host={host} application={application} />
+                      </Form.Item>
+                    </InputGroupWithFormItem>
+                  );
+                }}
+              </Form.Item>
             </Col>
           </Row>
         </Col>
@@ -104,6 +114,7 @@ export default function Metrics(props: IProps) {
       <Form.Item name={['query', 'functions']}>
         <FunctionsEditor />
       </Form.Item>
+      {/* <Options /> */}
     </>
   );
 }

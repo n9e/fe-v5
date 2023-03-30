@@ -1,7 +1,6 @@
 import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import _ from 'lodash';
 import { Spin, Empty, Table } from 'antd';
-import { Item } from '../types';
 import { getHistoryText } from '../datasource';
 
 function TimeseriesCpt(props, ref) {
@@ -9,21 +8,14 @@ function TimeseriesCpt(props, ref) {
   const [data, setData] = useState<any[]>([]);
 
   useImperativeHandle(ref, () => ({
-    fetchData: (datasourceCate, datasourceName, values, items: Item[]) => {
+    fetchData: (datasourceCate, datasourceName, values) => {
       setLoading(true);
       try {
         getHistoryText({
           datasourceCate,
           datasourceName,
           time: values.query.range,
-          targets: [
-            {
-              query: {
-                ...values.query,
-                items,
-              },
-            },
-          ],
+          targets: [values],
         }).then((res) => {
           setData(
             _.map(res, (item) => {

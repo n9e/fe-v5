@@ -51,6 +51,12 @@ export interface FuncValue {
   params: Array<string | number>;
 }
 
+export interface Options {
+  showDisabledItems: boolean;
+  useZabbixValueMapping: boolean;
+  disableDataAlignment: boolean;
+}
+
 export interface BaseQuery {
   group: {
     filter: string;
@@ -64,52 +70,30 @@ export interface BaseQuery {
   item: {
     filter: string;
   };
+  options: Options;
 }
 
-export interface TargetQuery {
-  group: {
-    filter: string;
-  };
-  host: {
-    filter: string;
-  };
-  application: {
-    filter: string;
-  };
-  item: {
-    filter: string;
-  };
+export interface TargetQuery extends BaseQuery {
   functions: FuncValue[];
 }
 
 export interface TargetQueryIDs {
   itemids: string;
   functions: FuncValue[];
+  options: Options;
 }
 
 export interface TargetQueryText extends TargetQuery {
   mode: 'timeseries' | 'text';
   textFilter: string;
   useCaptureGroups: boolean;
-  items: Item[];
+  items?: Item[];
 }
 
-export interface DBQuery {
+export interface DBQuery extends BaseQuery {
   start: number;
   end: number;
   queryType: '0';
-  group: {
-    filter: string;
-  };
-  host: {
-    filter: string;
-  };
-  application: {
-    filter: string;
-  };
-  item: {
-    filter: string;
-  };
   functions: {
     def: FuncDef;
     params: Array<string | number>;
@@ -125,6 +109,7 @@ export interface DBQueryIDs {
     def: FuncDef;
     params: Array<string | number>;
   }[];
+  options: Options;
 }
 
 export interface LogsQuery {

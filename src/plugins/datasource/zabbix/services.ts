@@ -33,12 +33,14 @@ export const getApps = (
 
 export const getItems = (
   data: BaseParams & {
-    hostids?: string[];
-    applicationids?: string[];
-    itemType: 'num' | 'text';
+    group: { filter: string };
+    host: { filter: string };
+    application: { filter: string };
+    item: { filter: string };
+    itemtype: 'num' | 'text';
   },
 ): Promise<Item[]> => {
-  return request('/api/n9e-plus/zabbix-items', {
+  return request('/api/n9e-plus/zabbix-filter-items', {
     method: RequestMethod.Post,
     data,
   }).then((res) => res.dat);

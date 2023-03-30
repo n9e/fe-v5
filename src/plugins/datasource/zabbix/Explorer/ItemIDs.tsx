@@ -18,7 +18,7 @@ export default function ItemIDs(props: IProps) {
         <Col flex='auto'>
           <InputGroupWithFormItem label={t('监控 IDs')} labelWidth={84}>
             <Form.Item name={['query', 'itemids']} rules={[{ required: true, message: t('请输入监控 IDs') }]}>
-              <Input />
+              <Input placeholder='多个 itemid 用逗号分隔' />
             </Form.Item>
           </InputGroupWithFormItem>
         </Col>

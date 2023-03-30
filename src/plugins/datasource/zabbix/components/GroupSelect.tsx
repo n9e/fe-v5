@@ -27,6 +27,7 @@ export default function GroupSelect(props: GroupSelectProps) {
 
   return (
     <AutoComplete
+      allowClear
       style={{ width: '100%' }}
       dropdownMatchSelectWidth={false}
       options={data.map((item) => {
@@ -39,6 +40,9 @@ export default function GroupSelect(props: GroupSelectProps) {
         const value = e.target.value as string;
         const filtered = filterData<Group>(data, value);
         onSelect(_.map(filtered, 'groupid'));
+      }}
+      filterOption={(inputValue, option) => {
+        return option?.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1;
       }}
       value={value}
       onChange={onChange}

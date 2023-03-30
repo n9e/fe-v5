@@ -1,45 +1,53 @@
 import React, { useState, useEffect } from 'react';
 import { AutoComplete } from 'antd';
 import _ from 'lodash';
-import { getItems } from '../services';
+import { useDebounceFn } from 'ahooks';
 import { BaseParams, Item } from '../types';
 import { filterData } from '../utils';
-import { getItemsAndFiltered } from '../datasource';
+import { getItemsFunc } from '../datasource';
 
 interface ItemSelectProps {
   baseParams: BaseParams;
-  hostids: string[];
-  applicationids: string[];
+  group: string;
+  host: string;
+  application: string;
   itemType: 'text' | 'num';
-  onSelect?: (value: Item[]) => void;
   value?: string;
   onChange?: (value: string) => void;
 }
 
 export default function ItemSelect(props: ItemSelectProps) {
-  const { baseParams, hostids, applicationids, itemType, onSelect, value, onChange } = props;
+  const { baseParams, group, host, application, itemType, value, onChange } = props;
   const { cate, cluster } = baseParams;
   const [data, setData] = useState<Item[]>([]);
-
-  console.log(hostids, applicationids);
+  const { run: fetchData } = useDebounceFn(
+    () => {
+      if (cluster) {
+        getItemsFunc({
+          cate,
+          cluster,
+          itemType,
+          group,
+          host,
+          application,
+          item: '/.*/',
+        }).then((res) => {
+          setData(res);
+        });
+      }
+    },
+    {
+      wait: 500,
+    },
+  );
 
   useEffect(() => {
-    if (cluster) {
-      getItemsAndFiltered({
-        cate,
-        cluster,
-        itemType,
-        hostids,
-        applicationids,
-      }).then((res) => {
-        setData(res.data);
-        onSelect && onSelect(res.filtered);
-      });
-    }
-  }, [cluster, _.join(hostids), _.join(applicationids)]);
+    fetchData();
+  }, [cluster, group, host, application]);
 
   return (
     <AutoComplete
+      allowClear
       style={{ width: '100%' }}
       dropdownMatchSelectWidth={false}
       options={_.map(data, (item) => {
@@ -48,10 +56,8 @@ export default function ItemSelect(props: ItemSelectProps) {
           label: item.name,
         };
       })}
-      onBlur={(e: any) => {
-        const value = e.target.value as string;
-        const filtered = filterData<Item>(data, value);
-        onSelect && onSelect(filtered);
+      filterOption={(inputValue, option) => {
+        return option?.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1;
       }}
       value={value}
       onChange={onChange}

@@ -10,7 +10,6 @@ import ItemIDs from './ItemIDs';
 import Text from './Text';
 import Timeseries from './Timeseries';
 import Table from './Table';
-import { Item } from '../types';
 import './style.less';
 
 interface ExplorerProps {
@@ -59,7 +58,7 @@ export default function Explorer(props: ExplorerProps) {
   const [subMode, setSubMode] = useState('metrics');
   const timeseriesRef = useRef<any>();
   const tableRef = useRef<any>();
-  const renderExecute = (items?: Item[]) => {
+  const renderExecute = () => {
     return (
       <Space size={10}>
         <Form.Item
@@ -75,7 +74,7 @@ export default function Explorer(props: ExplorerProps) {
           <Button
             type='primary'
             onClick={() => {
-              onExecute(items);
+              onExecute();
             }}
           >
             {t('查询')}
@@ -84,7 +83,7 @@ export default function Explorer(props: ExplorerProps) {
       </Space>
     );
   };
-  const onExecute = (items?: Item[]) => {
+  const onExecute = () => {
     form.validateFields().then((values) => {
       if (mode === 'timeseries') {
         if (timeseriesRef.current && timeseriesRef.current.fetchData) {
@@ -92,7 +91,7 @@ export default function Explorer(props: ExplorerProps) {
         }
       } else if (mode === 'text') {
         if (tableRef.current && tableRef.current.fetchData) {
-          tableRef.current.fetchData(datasourceCate, datasourceName, values, items);
+          tableRef.current.fetchData(datasourceCate, datasourceName, values);
         }
       }
     });

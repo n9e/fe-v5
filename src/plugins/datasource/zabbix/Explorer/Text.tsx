@@ -21,12 +21,10 @@ export default function Metrics(props: IProps) {
     groupids: string[];
     hostids: string[];
     applicationids: string[];
-    items: Item[];
   }>({
     groupids: [],
     hostids: [],
     applicationids: [],
-    items: [],
   });
   const baseParams = {
     cate: datasourceCate,
@@ -71,7 +69,7 @@ export default function Metrics(props: IProps) {
             </Col>
           </Row>
         </Col>
-        <Col flex='430px'>{renderExecute(selected.items)}</Col>
+        <Col flex='430px'>{renderExecute()}</Col>
       </Row>
       <Row gutter={10}>
         <Col flex='auto'>
@@ -93,22 +91,20 @@ export default function Metrics(props: IProps) {
               </InputGroupWithFormItem>
             </Col>
             <Col span={12}>
-              <InputGroupWithFormItem label={t('监控项')} labelWidth={84}>
-                <Form.Item name={['query', 'item', 'filter']} rules={[{ required: true, message: t('请选择监控项') }]}>
-                  <ItemSelect
-                    baseParams={baseParams}
-                    hostids={selected.hostids}
-                    applicationids={selected.applicationids}
-                    itemType='text'
-                    onSelect={(val) => {
-                      setSelected({
-                        ...selected,
-                        items: val,
-                      });
-                    }}
-                  />
-                </Form.Item>
-              </InputGroupWithFormItem>
+              <Form.Item shouldUpdate noStyle>
+                {({ getFieldValue }) => {
+                  const group = getFieldValue(['query', 'group', 'filter']);
+                  const host = getFieldValue(['query', 'host', 'filter']);
+                  const application = getFieldValue(['query', 'application', 'filter']);
+                  return (
+                    <InputGroupWithFormItem label={t('监控项')} labelWidth={84}>
+                      <Form.Item name={['query', 'item', 'filter']} rules={[{ required: true, message: t('请选择监控项') }]}>
+                        <ItemSelect baseParams={baseParams} group={group} host={host} application={application} itemType='text' />
+                      </Form.Item>
+                    </InputGroupWithFormItem>
+                  );
+                }}
+              </Form.Item>
             </Col>
           </Row>
         </Col>
@@ -120,7 +116,7 @@ export default function Metrics(props: IProps) {
             <Col span={12}>
               <InputGroupWithFormItem label={t('文本过滤')} labelWidth={84}>
                 <Form.Item name={['query', 'textFilter']}>
-                  <Input />
+                  <Input placeholder='/.*/' />
                 </Form.Item>
               </InputGroupWithFormItem>
             </Col>

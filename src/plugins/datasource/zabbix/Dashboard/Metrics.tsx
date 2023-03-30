@@ -78,8 +78,17 @@ export default function Metrics(props: IProps) {
           </Form.Item>
         </Col>
         <Col span={12}>
-          <Form.Item {...prefixField} label={t('监控项')} name={[...prefixName, 'item', 'filter']} rules={[{ required: true, message: t('请选择监控项') }]}>
-            <ItemSelect baseParams={baseParams} hostids={selected.hostids} applicationids={selected.applicationids} itemType='num' />
+          <Form.Item shouldUpdate noStyle>
+            {({ getFieldValue }) => {
+              const group = getFieldValue(['targets', ...prefixName, 'group', 'filter']);
+              const host = getFieldValue(['targets', ...prefixName, 'host', 'filter']);
+              const application = getFieldValue(['targets', ...prefixName, 'application', 'filter']);
+              return (
+                <Form.Item {...prefixField} label={t('监控项')} name={[...prefixName, 'item', 'filter']} rules={[{ required: true, message: t('请选择监控项') }]}>
+                  <ItemSelect baseParams={baseParams} itemType='num' group={group} host={host} application={application} />
+                </Form.Item>
+              );
+            }}
           </Form.Item>
         </Col>
       </Row>

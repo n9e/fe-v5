@@ -24,6 +24,7 @@ export default function HostSelect(props: HostSelectProps) {
       cate,
       cluster,
       groupids,
+      value,
     }).then((res) => {
       setData(res.data);
       onSelect(res.filteredIDs);
@@ -32,6 +33,7 @@ export default function HostSelect(props: HostSelectProps) {
 
   return (
     <AutoComplete
+      allowClear
       style={{ width: '100%' }}
       dropdownMatchSelectWidth={false}
       options={[
@@ -50,6 +52,9 @@ export default function HostSelect(props: HostSelectProps) {
         const value = e.target.value as string;
         const filtered = filterData<Host>(data, value);
         onSelect(_.map(filtered, 'hostid'));
+      }}
+      filterOption={(inputValue, option) => {
+        return option?.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1;
       }}
       value={value}
       onChange={onChange}

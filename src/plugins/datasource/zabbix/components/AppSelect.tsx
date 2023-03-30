@@ -36,6 +36,7 @@ export default function AppSelect(props: AppSelectProps) {
 
   return (
     <AutoComplete
+      allowClear
       style={{ width: '100%' }}
       dropdownMatchSelectWidth={false}
       options={_.map(data, (item) => {
@@ -48,6 +49,9 @@ export default function AppSelect(props: AppSelectProps) {
         const value = e.target.value as string;
         const filtered = filterData<App>(data, value);
         onSelect(_.map(filtered, 'applicationid'));
+      }}
+      filterOption={(inputValue, option) => {
+        return option?.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1;
       }}
       value={value}
       onChange={onChange}
