@@ -32,7 +32,7 @@ export default function ItemSelect(props: ItemSelectProps) {
           application,
           item: '/.*/',
         }).then((res) => {
-          setData(res);
+          setData(_.unionBy(res, 'name'));
         });
       }
     },
