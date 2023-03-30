@@ -7,12 +7,10 @@ import { parseRange } from '@/components/TimeRangePicker';
 import Timeseries from '@/pages/dashboard/Renderer/Renderer/Timeseries';
 import { getSerieName } from '@/pages/dashboard/Renderer/datasource/utils';
 import AdvancedSettings from './AdvancedSettings';
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 
 function Metric(props, ref) {
-  const {
-    t
-  } = useTranslation();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [series, setSeries] = useState([]);
   useImperativeHandle(ref, () => ({
@@ -30,61 +28,82 @@ function Metric(props, ref) {
       const requestParams = {
         cate: datasourceCate,
         cluster: datasourceName,
-        query: [{
-          project: query.project,
-          logstore: query.logstore,
-          from: moment(parseRange(query.range).start).unix(),
-          to: moment(parseRange(query.range).end).unix(),
-          lines: 500,
-          offset: 0,
-          reverse: false,
-          power_sql: query.power_sql,
-          query: query.query,
-          keys: query.keys
-        }]
+        query: [
+          {
+            project: query.project,
+            logstore: query.logstore,
+            from: moment(parseRange(query.range).start).unix(),
+            to: moment(parseRange(query.range).end).unix(),
+            lines: 500,
+            offset: 0,
+            reverse: false,
+            power_sql: query.power_sql,
+            query: query.query,
+            keys: query.keys,
+          },
+        ],
       };
       setLoading(true);
-      getDsQuery(requestParams).then(res => {
-        setSeries(_.map(res, item => {
-          return {
-            name: getSerieName(item.metric),
-            metric: item.metric,
-            data: item.values
-          };
-        }));
-      }).finally(() => {
-        setLoading(false);
-      });
-    }
+      getDsQuery(requestParams)
+        .then((res) => {
+          setSeries(
+            _.map(res, (item) => {
+              return {
+                name: getSerieName(item.metric),
+                metric: item.metric,
+                data: item.values,
+              };
+            }),
+          );
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    },
   }));
-  return <>
+  return (
+    <>
       <AdvancedSettings />
-      {!_.isEmpty(series) ? <Spin spinning={loading}>
-          <div style={{
-        height: 500
-      }}>
-            <Timeseries series={series} values={({
-          custom: {
-            drawStyle: 'lines',
-            lineInterpolation: 'smooth'
-          },
-          options: {
-            legend: {
-              displayMode: 'table'
-            },
-            tooltip: {
-              mode: 'all'
-            }
-          }
-        } as any)} />
+      {!_.isEmpty(series) ? (
+        <Spin spinning={loading}>
+          <div
+            style={{
+              height: 500,
+            }}
+          >
+            <Timeseries
+              series={series}
+              values={
+                {
+                  custom: {
+                    drawStyle: 'lines',
+                    lineInterpolation: 'smooth',
+                  },
+                  options: {
+                    legend: {
+                      displayMode: 'table',
+                    },
+                    tooltip: {
+                      mode: 'all',
+                    },
+                  },
+                } as any
+              }
+            />
           </div>
-        </Spin> : <div style={{
-      display: 'flex',
-      justifyContent: 'center'
-    }}>
-          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-        </div>}
-    </>;
+        </Spin>
+      ) : (
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+          }}
+        >
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('暂无数据')} />
+        </div>
+      )}
+    </>
+  );
 }
 
 export default forwardRef(Metric);

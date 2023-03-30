@@ -314,7 +314,6 @@ const index = (_props: any) => {
                   setSelectedIds(selectedRowKeys);
                 },
               }}
-              // locale={{ emptyText: <Empty description={t('暂无数据')} /> }}
               pagination={
                 {
                   ...tableProps.pagination,

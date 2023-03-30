@@ -6,8 +6,10 @@ import { parseRange } from '@/components/TimeRangePicker';
 import Timeseries from '@/pages/dashboard/Renderer/Renderer/Timeseries';
 import { getSerieName } from '@/pages/dashboard/Renderer/datasource/utils';
 import { getInfluxdbQuery } from '../services';
+import { useTranslation } from 'react-i18next';
 
 function Metric(props, ref) {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [series, setSeries] = useState([]);
 
@@ -82,7 +84,7 @@ function Metric(props, ref) {
             justifyContent: 'center',
           }}
         >
-          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('暂无数据')} />
         </div>
       )}
     </>
