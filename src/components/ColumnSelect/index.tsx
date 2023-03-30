@@ -23,6 +23,7 @@ import { getBusiGroups } from '@/services/common';
 import { CommonStoreState } from '@/store/commonInterface';
 import { eventStoreState } from '@/store/eventInterface';
 import { debounce } from 'lodash';
+import { useTranslation } from 'react-i18next';
 interface Props {
   noLeftPadding?: boolean;
   noRightPadding?: boolean;
@@ -32,6 +33,7 @@ interface Props {
   onEventTypeChange?: (v: number | undefined) => void;
 }
 export default function ColumnSelect(props: Props) {
+  const { t } = useTranslation();
   const { onSeverityChange, onEventTypeChange, onBusiGroupChange, onClusterChange, noLeftPadding, noRightPadding = true } = props;
   const { clusters, busiGroups } = useSelector<RootState, CommonStoreState>((state) => state.common);
   const [filteredBusiGroups, setFilteredBusiGroups] = useState(busiGroups);
@@ -49,7 +51,7 @@ export default function ColumnSelect(props: Props) {
           mode='multiple'
           allowClear
           style={{ minWidth: 80 }}
-          placeholder='集群'
+          placeholder={t('集群')}
           onChange={onClusterChange}
           getPopupContainer={() => document.body}
           dropdownMatchSelectWidth={false}
@@ -66,7 +68,7 @@ export default function ColumnSelect(props: Props) {
           allowClear
           showSearch
           style={{ minWidth: 120 }}
-          placeholder='业务组'
+          placeholder={t('业务组')}
           dropdownClassName='overflow-586'
           filterOption={false}
           onSearch={handleSearch}
@@ -92,14 +94,28 @@ export default function ColumnSelect(props: Props) {
         </Select>
       )}
       {onSeverityChange && (
-        <Select suffixIcon={<CaretDownOutlined />} allowClear style={{ minWidth: 80 }} placeholder='事件级别' onChange={onSeverityChange} getPopupContainer={() => document.body}>
-          <Select.Option value={1}>一级告警</Select.Option>
-          <Select.Option value={2}>二级告警</Select.Option>
-          <Select.Option value={3}>三级告警</Select.Option>
+        <Select
+          suffixIcon={<CaretDownOutlined />}
+          allowClear
+          style={{ minWidth: 80 }}
+          placeholder={t('事件级别')}
+          onChange={onSeverityChange}
+          getPopupContainer={() => document.body}
+        >
+          <Select.Option value={1}>{t('一级告警')}</Select.Option>
+          <Select.Option value={2}>{t('二级告警')}</Select.Option>
+          <Select.Option value={3}>{t('三级告警')}</Select.Option>
         </Select>
       )}
       {onEventTypeChange && (
-        <Select suffixIcon={<CaretDownOutlined />} allowClear style={{ minWidth: 80 }} placeholder='事件类别' onChange={onEventTypeChange} getPopupContainer={() => document.body}>
+        <Select
+          suffixIcon={<CaretDownOutlined />}
+          allowClear
+          style={{ minWidth: 80 }}
+          placeholder={t('事件类别')}
+          onChange={onEventTypeChange}
+          getPopupContainer={() => document.body}
+        >
           <Select.Option value={0}>Triggered</Select.Option>
           <Select.Option value={1}>Recovered</Select.Option>
         </Select>

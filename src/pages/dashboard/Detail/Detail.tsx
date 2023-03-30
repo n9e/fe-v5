@@ -238,7 +238,7 @@ export default function DetailV2({ isPreview = false }: { isPreview?: boolean })
                 padding: '5px 10px',
               }}
             >
-              <Alert type='warning' message={t('大盘已经被别人修改，为避免相互覆盖，请刷新大盘查看最新配置和数据')} />
+              <Alert type='warning' message={t('仪表盘已经被别人修改，为避免相互覆盖，请刷新仪表盘查看最新配置和数据')} />
             </div>
           )}
           <div className='dashboard-detail-content-header'>

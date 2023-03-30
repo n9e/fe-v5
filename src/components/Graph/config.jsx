@@ -43,8 +43,8 @@ export const graphPropTypes = {
   comparison: PropTypes.arrayOf(PropTypes.string), // 环比值 (ms eg. 一小时 3600000)
   comparisonOptions: PropTypes.array, // 环比待选项目
   relativeTimeComparison: PropTypes.bool, // 相对时间环比
-  // 高级配置 -> 用户大盘 todo: 后面会逐步考虑在监控看图也开发这类配置
-  tag_id: PropTypes.number, // 大盘分类Id
+  // 高级配置 -> 用户仪表盘 todo: 后面会逐步考虑在监控看图也开发这类配置
+  tag_id: PropTypes.number, // 仪表盘分类Id
   fillNull: PropTypes.number,
   threshold: PropTypes.number,
   unit: PropTypes.string, // Y轴单位

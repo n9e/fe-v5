@@ -40,8 +40,8 @@ const layout = {
 function FormCpt(props: IProps & ModalWrapProps) {
   const { t } = useTranslation();
   const titleMap = {
-    crate: t('创建新监控大盘'),
-    edit: t('编辑监控大盘'),
+    crate: t('创建新仪表盘'),
+    edit: t('编辑仪表盘'),
   };
   const { mode, initialValues = {}, visible, busiId, refreshList, destroy, clusters } = props;
   const [form] = Form.useForm();
@@ -57,7 +57,7 @@ function FormCpt(props: IProps & ModalWrapProps) {
           ident: values.ident,
           tags: _.join(values.tags, ' '),
         });
-        message.success(t('编辑大盘成功'));
+        message.success(t('编辑仪表盘成功'));
       } else if (mode === 'crate') {
         result = await createDashboard(busiId, {
           name: values.name,
@@ -69,7 +69,7 @@ function FormCpt(props: IProps & ModalWrapProps) {
             version: '2.0.0',
           }),
         });
-        message.success(t('新建大盘成功'));
+        message.success(t('新建仪表盘成功'));
       }
 
       if (result) {
@@ -108,7 +108,7 @@ function FormCpt(props: IProps & ModalWrapProps) {
     >
       <Form {...layout} form={form} preserve={false} initialValues={initialValues}>
         <Form.Item
-          label={t('大盘名称')}
+          label={t('仪表盘名称')}
           name='name'
           labelCol={{
             span: 5,
@@ -119,7 +119,7 @@ function FormCpt(props: IProps & ModalWrapProps) {
           rules={[
             {
               required: true,
-              message: t('请输入大盘名称'),
+              message: t('请输入仪表盘名称'),
             },
           ]}
         >

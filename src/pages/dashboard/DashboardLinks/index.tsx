@@ -57,7 +57,7 @@ export default function index(props: IProps) {
         }
       >
         <Button>
-          {t('大盘链接')}
+          {t('仪表盘链接')}
           <DownOutlined />
         </Button>
       </Dropdown>

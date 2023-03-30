@@ -36,9 +36,9 @@ interface IProps {
 export default function EditItems(props: IProps) {
   const { t } = useTranslation();
   const titleMap = {
-    list: t('大盘变量'),
-    add: t('添加大盘变量'),
-    edit: t('编辑大盘变量'),
+    list: t('仪表盘变量'),
+    add: t('添加仪表盘变量'),
+    edit: t('编辑仪表盘变量'),
   };
   const { visible, setVisible, onChange, value, range, id, cluster } = props;
   const [data, setData] = useState<IVariable[]>(value || []);
