@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { AutoComplete } from 'antd';
 import _ from 'lodash';
 import { useDebounceFn } from 'ahooks';
 import { BaseParams, Item } from '../types';
-import { filterData } from '../utils';
 import { getItemsFunc } from '../datasource';
 
 interface ItemSelectProps {
@@ -20,6 +19,7 @@ export default function ItemSelect(props: ItemSelectProps) {
   const { baseParams, group, host, application, itemType, value, onChange } = props;
   const { cate, cluster } = baseParams;
   const [data, setData] = useState<Item[]>([]);
+  const [open, setOpen] = useState(false);
   const { run: fetchData } = useDebounceFn(
     () => {
       if (cluster) {
@@ -41,10 +41,6 @@ export default function ItemSelect(props: ItemSelectProps) {
     },
   );
 
-  useEffect(() => {
-    fetchData();
-  }, [cluster, group, host, application]);
-
   return (
     <AutoComplete
       allowClear
@@ -61,6 +57,18 @@ export default function ItemSelect(props: ItemSelectProps) {
       }}
       value={value}
       onChange={onChange}
+      open={open}
+      onDropdownVisibleChange={(open) => {
+        setOpen(open);
+        if (open) {
+          fetchData();
+        } else {
+          setData([]);
+        }
+      }}
+      onClear={() => {
+        setOpen(false);
+      }}
     />
   );
 }

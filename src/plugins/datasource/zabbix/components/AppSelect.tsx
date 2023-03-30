@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { AutoComplete } from 'antd';
 import _ from 'lodash';
 import { getApps } from '../services';
@@ -17,6 +17,7 @@ export default function AppSelect(props: AppSelectProps) {
   const { baseParams, hostids, onSelect, value, onChange } = props;
   const { cate, cluster } = baseParams;
   const [data, setData] = useState<App[]>([]);
+  const ref = useRef<any>(null);
 
   useEffect(() => {
     if (!cluster || _.isEmpty(hostids)) return;
@@ -36,6 +37,7 @@ export default function AppSelect(props: AppSelectProps) {
 
   return (
     <AutoComplete
+      ref={ref}
       allowClear
       style={{ width: '100%' }}
       dropdownMatchSelectWidth={false}
@@ -55,6 +57,9 @@ export default function AppSelect(props: AppSelectProps) {
       }}
       value={value}
       onChange={onChange}
+      onClear={() => {
+        ref.current.focus(); // TODO: 点击 clear 时，强制将焦点移动到当前组件
+      }}
     />
   );
 }
