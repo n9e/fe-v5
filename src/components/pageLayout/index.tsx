@@ -146,7 +146,7 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, introI
                   }}
                 />
               )}
-              {icon}
+              {/* {icon} */}
               {title}
             </div>
 
