@@ -211,7 +211,7 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, introI
                   </Menu>
                 }
               >
-                <a style={{ marginRight: 20 }} onClick={(e) => e.preventDefault()}>
+                <a style={{ marginRight: 20 }} onClick={(e) => e.preventDefault()} id='i18n-btn'>
                   {curLanguage}
                 </a>
               </Dropdown>
