@@ -76,7 +76,8 @@ export default defineConfig({
         changeOrigin: true,
       },
       '/api/v1/': {
-        target: 'http://10.206.0.11:9000/',
+        target: 'http://10.206.0.17:9012',
+        // target: 'http://10.206.0.11:9000/',
         changeOrigin: true,
       },
       '/api/fc-brain': {
