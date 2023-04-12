@@ -151,7 +151,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
       .validateFields()
       .then(async (values) => {
         if (values.cate === 'prometheus') {
-          if (!isChecked && values.algorithm === 'holtwinters') {
+          if (!isChecked && (values.algorithm === 'holtwinters' || values.algorithm === 'hisense')) {
             message.warning(t('请先校验指标'));
             return;
           }
@@ -203,7 +203,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
         } else {
           const licenseRulesRemaining = _.toNumber(window.localStorage.getItem('license_rules_remaining'));
 
-          if (licenseRulesRemaining === 0 && data.algorithm === 'holtwinters') {
+          if (licenseRulesRemaining === 0 && (data.algorithm === 'holtwinters' || data.algorithm === 'hisense')) {
             message.error(t('可添加的智能告警规则数量已达上限，请联系客服'));
           }
 
@@ -347,6 +347,8 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                       </AdvancedWrap>
                       <Form.Item noStyle shouldUpdate={(prevValues, curValues) => prevValues.cluster !== curValues.cluster}>
                         {({ getFieldValue }) => {
+                          const algorithm = getFieldValue('algorithm');
+                          const isAbnormalDetection = algorithm === 'holtwinters' || algorithm === 'hisense';
                           return (
                             <Form.Item
                               label='PromQL'
@@ -364,7 +366,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                                     <Input.Group compact>
                                       <Form.Item
                                         style={{
-                                          width: visible && getFieldValue('algorithm') === 'holtwinters' ? 'calc(100% - 80px)' : '100%',
+                                          width: visible && isAbnormalDetection ? 'calc(100% - 80px)' : '100%',
                                         }}
                                         name='prom_ql'
                                         validateTrigger={['onBlur']}
@@ -387,7 +389,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                                           }}
                                         />
                                       </Form.Item>
-                                      {visible && getFieldValue('algorithm') === 'holtwinters' && (
+                                      {visible && isAbnormalDetection && (
                                         <Button
                                           onClick={() => {
                                             const values = form.getFieldsValue();
