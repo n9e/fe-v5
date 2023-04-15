@@ -379,6 +379,14 @@ export const getBrainParams = function () {
   });
 };
 
+export const getBrainAlgorithms = function () {
+  return request('/api/fc-brain/n9e-algorithms', {
+    method: RequestMethod.Get,
+  }).then((res) => {
+    return res.data;
+  });
+};
+
 export const checkBrainPromql = function (data) {
   return request('/api/fc-brain/promql-check', {
     method: RequestMethod.Post,
