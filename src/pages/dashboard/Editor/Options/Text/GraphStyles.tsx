@@ -15,14 +15,16 @@
  *
  */
 import React from 'react';
-import { Form, Input, Row, Col, Select, InputNumber, Mentions } from 'antd';
+import { Form, Row, Col, Select, InputNumber, Mentions } from 'antd';
 import _ from 'lodash';
+import { useTranslation } from 'react-i18next';
 import { Panel } from '../../Components/Collapse';
 import ColorPicker from '../../../Components/ColorPicker';
-import { useTranslation } from 'react-i18next';
+
 export default function GraphStyles({ variableConfigWithOptions }) {
   const { t } = useTranslation();
   const namePrefix = ['custom'];
+
   return (
     <Panel header={t('图表样式')}>
       <Row gutter={10}>
@@ -31,17 +33,22 @@ export default function GraphStyles({ variableConfigWithOptions }) {
             <ColorPicker />
           </Form.Item>
         </Col>
+        <Col span={4}>
+          <Form.Item label={t('暗黑文字颜色')} name={[...namePrefix, 'textDarkColor']}>
+            <ColorPicker />
+          </Form.Item>
+        </Col>
         <Col span={3}>
           <Form.Item label={t('背景色')} name={[...namePrefix, 'bgColor']}>
             <ColorPicker />
           </Form.Item>
         </Col>
-        <Col span={6}>
+        <Col span={4}>
           <Form.Item label={t('字体大小')} name={[...namePrefix, 'textSize']}>
-            <InputNumber />
+            <InputNumber style={{ width: 70 }} min={12} />
           </Form.Item>
         </Col>
-        <Col span={6}>
+        <Col span={5}>
           <Form.Item label={t('左右对齐')} name={[...namePrefix, 'justifyContent']}>
             <Select>
               <Select.Option value='unset'>{t('不设置')}</Select.Option>
@@ -51,7 +58,7 @@ export default function GraphStyles({ variableConfigWithOptions }) {
             </Select>
           </Form.Item>
         </Col>
-        <Col span={6}>
+        <Col span={5}>
           <Form.Item label={t('上下对齐')} name={[...namePrefix, 'alignItems']}>
             <Select>
               <Select.Option value='unset'>{t('不设置')}</Select.Option>
@@ -68,7 +75,7 @@ export default function GraphStyles({ variableConfigWithOptions }) {
           <div>
             <div>{t('默认简单模式，可通过上方设置简单配置卡片样式')}</div>
             <div>
-              {t('支持')} Markdown {t('和')} HTMLL
+              {t('支持')} Markdown {t('和')} HTML
             </div>
             <div>
               {t('如输入')} Markdown {t('或')} HTML {t('建议关闭上方的对齐设置')}置
