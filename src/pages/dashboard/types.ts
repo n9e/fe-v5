@@ -168,6 +168,7 @@ export interface IBarGaugeStyles {
 export interface ITextStyles {
   version: string;
   textColor: string;
+  textDarkColor: string;
   bgColor: string;
   textSize: number;
   justifyContent: 'unset' | 'flexStart' | 'center' | 'flexEnd';
