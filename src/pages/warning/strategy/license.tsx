@@ -12,7 +12,7 @@ export default function License() {
     const now = moment().unix();
     getBrainLicense()
       .then((res) => {
-        setDays(_.round((res?.data?.expire - now) / 86400));
+        setDays(_.floor((res?.data?.expire - now) / 86400));
         setRules(res?.data?.rules_remaining);
         window.localStorage.setItem('license_rules_remaining', _.toString(res?.data?.rules_remaining));
       })
@@ -28,7 +28,7 @@ export default function License() {
         }, 10000);
       });
   }, []);
-  if (!days || days > 30) return null;
+  if (days === undefined || days > 30) return null;
   return (
     <div
       style={{
