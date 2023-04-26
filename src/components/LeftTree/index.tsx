@@ -18,6 +18,7 @@ import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { Badge, Checkbox, Col, Input, Radio, Row, Space } from 'antd';
 import { Resizable } from 're-resizable';
 import { useDispatch, useSelector } from 'react-redux';
+import { RootState as AccountRootState, accountStoreState } from '@/store/accountInterface';
 import { RootState } from '@/store/common';
 import { getBusiGroups } from '@/services/common';
 import { CommonStoreState } from '@/store/commonInterface';
@@ -337,6 +338,7 @@ const LeftTree: React.FC<LeftTreeProps> = ({ clusterGroup = {}, busiGroup = {}, 
   const { t } = useTranslation();
   const history = useHistory();
   const [collapse, setCollapse] = useState(localStorage.getItem('leftlist') === '1');
+  let { profile } = useSelector<AccountRootState, accountStoreState>((state) => state.account);
   const groupItems: IGroupItemProps[] = [
     clustersGroupContent(clusterGroup),
     busiGroupContent(busiGroup),
@@ -430,7 +432,7 @@ const LeftTree: React.FC<LeftTreeProps> = ({ clusterGroup = {}, busiGroup = {}, 
               <div key={i} className={`left-area-group ${shrink ? 'group-shrink' : ''}`} style={typeof shrink === 'object' ? shrink.style : {}}>
                 <div className='left-area-group-title'>
                   {title}
-                  {title === t('业务组') && <SettingOutlined onClick={() => history.push(`/busi-groups`)} />}
+                  {title === t('业务组') && profile.admin && <SettingOutlined onClick={() => history.push(`/busi-groups`)} />}
                 </div>
                 {render()}
               </div>
