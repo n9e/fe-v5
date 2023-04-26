@@ -56,7 +56,7 @@ function App() {
           //   <img src='/image/empty.png' width='64' />
           //   <div className='ant-empty-description'>{t('无数据')}</div>
           // </div>
-          <Empty description={t('暂无数据')} />
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('暂无数据')} />
         )}
       >
         <Provider store={store as any}>
