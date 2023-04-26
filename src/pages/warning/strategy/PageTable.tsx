@@ -260,7 +260,7 @@ const PageTable: React.FC<Props> = ({ bgid }) => {
             >
               {t('删除')}
             </div>
-            {record.algorithm === 'holtwinters' && (
+            {(record.algorithm === 'holtwinters' || record.algorithm === 'hisense') && (
               <div>
                 <Link
                   to={{
