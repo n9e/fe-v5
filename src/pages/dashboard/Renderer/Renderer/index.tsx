@@ -100,7 +100,7 @@ function index(props: IProps) {
     pie: () => <Pie {...subProps} themeMode={themeMode} />,
     hexbin: () => <Hexbin {...subProps} themeMode={themeMode} />,
     barGauge: () => <BarGauge {...subProps} themeMode={themeMode} />,
-    text: () => <Text {...subProps} />,
+    text: () => <Text {...subProps} themeMode={themeMode} />,
     gauge: () => <Gauge {...subProps} themeMode={themeMode} />,
   };
   return (

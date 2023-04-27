@@ -236,10 +236,14 @@ function attachVariable2Url(key, value, id: string, vars?: IVariable[]) {
   const query = queryString.parse(search);
   const varsValue = getVarsValue(id, vars);
   const newQuery = {};
-  _.forEach(_.merge({}, varsValue, query, { [key]: value }), (value, key) => {
+  _.forEach(_.assign({}, varsValue, query, { [key]: value }), (value, key) => {
     const val = typeof value === 'string' ? value : JSON.stringify(value);
     newQuery[key] = val;
   });
+  // 当清空变量值时，需要在开启固定变量值模式，以防止变量值又处理默认值逻辑
+  if (value === undefined) {
+    newQuery['__variable_value_fixed'] = 'true';
+  }
   const newurl = `${protocol}//${host}${pathname}?${queryString.stringify(newQuery)}`;
   window.history.replaceState({ path: newurl }, '', newurl);
 }
@@ -258,8 +262,9 @@ export function setVaraiableSelected({
   urlAttach?: boolean;
   vars?: IVariable[];
 }) {
-  if (value === undefined) return;
-  localStorage.setItem(`dashboard_${id}_${name}`, JSON.stringify(value));
+  if (value !== undefined) {
+    localStorage.setItem(`dashboard_${id}_${name}`, JSON.stringify(value));
+  }
   urlAttach && attachVariable2Url(name, JSON.stringify(value), id, vars);
 }
 
@@ -321,7 +326,7 @@ export const replaceExpressionVarsSpecifyRule = (
                 );
               }
             } else {
-              const realSelected = _.size(selected) === 1 ? selected[0] : `(${(selected as string[]).join('|')})`;
+              const realSelected = _.size(selected) === 0 ? '' : _.size(selected) === 1 ? selected[0] : `(${(selected as string[]).join('|')})`;
               newExpression = replaceAllPolyfill(newExpression, placeholder, realSelected);
             }
           } else if (typeof selected === 'string') {
@@ -330,7 +335,7 @@ export const replaceExpressionVarsSpecifyRule = (
             } else {
               newExpression = replaceAllPolyfill(newExpression, placeholder, selected as string);
             }
-          } else if (selected === null) {
+          } else if (selected === null || selected === undefined) {
             // 未选择或填写变量值时替换为空字符串
             newExpression = replaceAllPolyfill(newExpression, placeholder, '');
           }
