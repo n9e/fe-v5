@@ -58,7 +58,7 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, introI
   const [curCluster, setCurCluster] = useState<string>(localCluster || clusters[0]);
   const [curLanguage, setCurLanguage] = useState(i18nMap[i18n.language] || '中文');
   useEffect(() => {
-    useState(i18nMap[i18n.language] || '中文');
+    setCurLanguage(i18nMap[i18n.language] || '中文');
   }, [i18n.language]);
 
   if (!localCluster && clusters.length > 0) {
