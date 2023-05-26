@@ -20,6 +20,7 @@ import { useHistory, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { getSsoConfig, getRedirectURL, getRedirectURLCAS, getRedirectURLOAuth } from '@/services/login';
+import { getGlobalConfig, getMultiGlobalConfig } from '@/Packages/Outfire/services';
 import './login.less';
 import { useTranslation } from 'react-i18next';
 export interface DisplayName {
@@ -28,7 +29,7 @@ export interface DisplayName {
   oauth: string;
 }
 export default function Login() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [form] = Form.useForm();
   const history = useHistory();
   const location = useLocation();
@@ -67,7 +68,10 @@ export default function Login() {
       username,
       password,
     });
-
+    !localStorage.getItem('language') &&
+      getGlobalConfig('default-i18n').then((res) => {
+        i18n.changeLanguage(res);
+      });
     if (!err) {
       history.push(redirect || '/metric/explorer');
     }

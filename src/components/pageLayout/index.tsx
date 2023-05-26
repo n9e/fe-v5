@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-import React, { useState, ReactNode } from 'react';
+import React, { useState, ReactNode, useEffect } from 'react';
 import './index.less';
 import { useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
@@ -57,6 +57,10 @@ const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, introI
   const localCluster = localStorage.getItem('curCluster');
   const [curCluster, setCurCluster] = useState<string>(localCluster || clusters[0]);
   const [curLanguage, setCurLanguage] = useState(i18nMap[i18n.language] || '中文');
+  useEffect(() => {
+    useState(i18nMap[i18n.language] || '中文');
+  }, [i18n.language]);
+
   if (!localCluster && clusters.length > 0) {
     setCurCluster(clusters[0]);
     localStorage.setItem('curCluster', clusters[0]);
