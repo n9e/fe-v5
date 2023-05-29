@@ -168,6 +168,7 @@ export default function Table(props: IProps) {
               const exceedHourLimit = globalVar.RangePickerHour ? moment().diff(current, 'hour') > Number(globalVar.RangePickerHour) : false;
               return exceedHourLimit || current > moment();
             }}
+            renderExtraFooter={() => (globalVar.RangePickerHour ? <div style={{ color: 'lightgray' }}>时间范围不能超过{globalVar.RangePickerHour}小时</div> : null)}
           />
         </Input.Group>
       </div>
