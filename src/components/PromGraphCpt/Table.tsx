@@ -20,7 +20,7 @@ import _ from 'lodash';
 import { Input, DatePicker, List } from 'antd';
 import { getPromData } from './services';
 import { QueryStats } from './components/QueryStatsView';
-
+import { useGlobalVar } from '@/utils/useHook';
 interface IProps {
   url: string;
   datasourceId?: number;
@@ -75,6 +75,7 @@ function getListItemValue(resultType, record) {
 }
 
 export default function Table(props: IProps) {
+  const [globalVar] = useGlobalVar();
   const { url, datasourceId, datasourceIdRequired, datasourceName, promql, setQueryStats, setErrorContent, contentMaxHeight, timestamp, setTimestamp, refreshFlag } = props;
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState<{
@@ -163,7 +164,11 @@ export default function Table(props: IProps) {
             showTime
             placeholder='Evaluation time'
             getPopupContainer={() => document.body}
-            disabledDate={(current) => current > moment()}
+            disabledDate={(current) => {
+              const exceedHourLimit = globalVar.RangePickerHour ? moment().diff(current, 'hour') > Number(globalVar.RangePickerHour) : false;
+              return exceedHourLimit || current > moment();
+            }}
+            renderExtraFooter={() => (globalVar.RangePickerHour ? <div style={{ color: 'lightgray' }}>时间范围不能超过{globalVar.RangePickerHour}小时</div> : null)}
           />
         </Input.Group>
       </div>

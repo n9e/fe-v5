@@ -28,7 +28,7 @@ export interface DisplayName {
   oauth: string;
 }
 export default function Login() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [form] = Form.useForm();
   const history = useHistory();
   const location = useLocation();
@@ -67,7 +67,6 @@ export default function Login() {
       username,
       password,
     });
-
     if (!err) {
       history.push(redirect || '/metric/explorer');
     }
