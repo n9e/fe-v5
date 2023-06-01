@@ -304,7 +304,7 @@ export default function index(props: IProps) {
                     title: 'Max',
                     dataIndex: 'max',
                     width: 100,
-                    sorter: (a, b) => a.max.value - b.max.value,
+                    sorter: (a, b) => a.max.stat - b.max.stat,
                     render: (text) => {
                       return text.text;
                     },
@@ -313,7 +313,7 @@ export default function index(props: IProps) {
                     title: 'Min',
                     dataIndex: 'min',
                     width: 100,
-                    sorter: (a, b) => a.min.value - b.min.value,
+                    sorter: (a, b) => a.min.stat - b.min.stat,
                     render: (text) => {
                       return text.text;
                     },
@@ -322,7 +322,7 @@ export default function index(props: IProps) {
                     title: 'Avg',
                     dataIndex: 'avg',
                     width: 100,
-                    sorter: (a, b) => a.avg.value - b.avg.value,
+                    sorter: (a, b) => a.avg.stat - b.avg.stat,
                     render: (text) => {
                       return text.text;
                     },
@@ -331,7 +331,7 @@ export default function index(props: IProps) {
                     title: 'Sum',
                     dataIndex: 'sum',
                     width: 100,
-                    sorter: (a, b) => a.sum.value - b.sum.value,
+                    sorter: (a, b) => a.sum.stat - b.sum.stat,
                     render: (text) => {
                       return text.text;
                     },
@@ -340,7 +340,7 @@ export default function index(props: IProps) {
                     title: 'Last',
                     dataIndex: 'last',
                     width: 100,
-                    sorter: (a, b) => a.last.value - b.last.value,
+                    sorter: (a, b) => a.last.stat - b.last.stat,
                     render: (text) => {
                       return text.text;
                     },
