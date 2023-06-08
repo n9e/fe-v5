@@ -37,7 +37,7 @@ export default function index({ form, prefixField = {}, fullPrefixName = [], pre
                 marginBottom: 8,
               }}
             >
-              {t('查询统计')}计{' '}
+              {t('查询统计')}
               <PlusCircleOutlined
                 style={{
                   cursor: 'pointer',
