@@ -44,7 +44,6 @@ export default function index(props: IProps) {
             }}
           >
             {t('查询统计')}
-            {t('计')}{' '}
             <PlusCircleOutlined
               onClick={() => {
                 add({});
