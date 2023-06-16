@@ -41,7 +41,7 @@ function App() {
   };
 
   return (
-    <div className='App'>
+    <div className={i18n.language + ' App'}>
       <ConfigProvider
         // locale={i18n.language == 'en_US' ? en_US : zh_CN}
         locale={i18nMap[i18n.language] || zh_CN}
