@@ -1,6 +1,6 @@
 import React from 'react';
 import { Input } from 'antd';
-
+import './style.less';
 interface IProps {
   children: React.ReactNode;
   label: React.ReactNode;
@@ -9,20 +9,22 @@ interface IProps {
 }
 
 export default function index(props: IProps) {
-  const { children, label, labelWidth = 60, noStyle = false } = props;
+  const { children, label, labelWidth = 'max-content', noStyle = false } = props;
   return (
-    <Input.Group compact>
+    <Input.Group compact className='input-group-with-form-item'>
       <span
-        className={!noStyle ? 'ant-input-group-addon' : ''}
+        className={!noStyle ? 'ant-input-group-addon input-group-with-form-item-label' : 'input-group-with-form-item-label'}
         style={{
           height: 32,
           lineHeight: '32px',
+          maxWidth: 'unset',
           width: labelWidth,
         }}
       >
         {label}
       </span>
       <div
+        className='input-group-with-form-item-content'
         style={{
           width: `calc(100% - ${labelWidth}px)`,
         }}

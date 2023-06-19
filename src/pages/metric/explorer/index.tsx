@@ -136,7 +136,7 @@ const Panel = ({
         }}
       >
         <Space align='start'>
-          <InputGroupWithFormItem label={t('数据源类型')} labelWidth={84}>
+          <InputGroupWithFormItem label={t('数据源类型')}>
             <AdvancedWrap
               var='VITE_IS_QUERY_ES_DS'
               children={(isES) => {
