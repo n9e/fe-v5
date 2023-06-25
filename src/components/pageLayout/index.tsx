@@ -45,7 +45,7 @@ interface IPageLayoutProps {
 const i18nMap = {
   zh_CN: '简体',
   zh_HK: '繁體',
-  // en_US: 'English',
+  en_US: 'En',
 };
 
 const PageLayout: React.FC<IPageLayoutProps> = ({ icon, title, rightArea, introIcon, children, customArea, showBack, backPath, onChangeCluster, hideCluster = true, docFn }) => {
