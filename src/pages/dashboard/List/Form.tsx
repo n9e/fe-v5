@@ -28,14 +28,6 @@ interface IProps {
   refreshList: () => void;
   clusters: string[];
 }
-const layout = {
-  labelCol: {
-    span: 4,
-  },
-  wrapperCol: {
-    span: 16,
-  },
-};
 
 function FormCpt(props: IProps & ModalWrapProps) {
   const { t } = useTranslation();
@@ -106,7 +98,7 @@ function FormCpt(props: IProps & ModalWrapProps) {
       }}
       destroyOnClose
     >
-      <Form {...layout} form={form} preserve={false} initialValues={initialValues}>
+      <Form form={form} preserve={false} initialValues={initialValues}>
         <Form.Item
           label={t('仪表盘名称')}
           name='name'
