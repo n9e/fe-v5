@@ -822,5 +822,6 @@
   "重复发送频率（分钟）": "Repeated sending frequency (minutes)",
   "模糊搜索规则和标签(多个关键词请用空格分隔)": "Fuzzy search rules and tags (please separate multiple keywords with spaces)",
   "规则标题&事件标签": "Rule title & event tag",
-  "业务组（监控对象、仪表盘、告警规则、自愈脚本都要归属某个业务组）为空，请先": "The business group (monitoring object, dashboard, alarm rule, and self-healing script must belong to a business group), please fill it first"
+  "业务组（监控对象、仪表盘、告警规则、自愈脚本都要归属某个业务组）为空，请先": "The business group (monitoring object, dashboard, alarm rule, and self-healing script must belong to a business group), please fill it first",
+  "请输入分类标签(请用回车分割)": "Please enter the classification tag (please use Enter to separate)"
 }

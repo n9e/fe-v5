@@ -98,12 +98,12 @@ function FormCpt(props: IProps & ModalWrapProps) {
       }}
       destroyOnClose
     >
-      <Form form={form} preserve={false} initialValues={initialValues}>
+      <Form layout='vertical' form={form} preserve={false} initialValues={initialValues}>
         <Form.Item
           label={t('仪表盘名称')}
           name='name'
           labelCol={{
-            span: 5,
+            span: 24,
           }}
           wrapperCol={{
             span: 24,
@@ -121,7 +121,7 @@ function FormCpt(props: IProps & ModalWrapProps) {
           label={t('英文标识')}
           name='ident'
           labelCol={{
-            span: 5,
+            span: 24,
           }}
           wrapperCol={{
             span: 24,
@@ -137,7 +137,7 @@ function FormCpt(props: IProps & ModalWrapProps) {
         </Form.Item>
         <Form.Item
           labelCol={{
-            span: 5,
+            span: 24,
           }}
           wrapperCol={{
             span: 24,
@@ -155,7 +155,7 @@ function FormCpt(props: IProps & ModalWrapProps) {
         </Form.Item>
         <Form.Item
           labelCol={{
-            span: 5,
+            span: 24,
           }}
           wrapperCol={{
             span: 24,
