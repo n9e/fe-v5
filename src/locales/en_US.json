@@ -712,8 +712,8 @@
   "暂无指标数据，请选择左侧": "No metric data available, please select from the left",
   "搜索，空格分隔多个关键字": "Search, separate multiple keywords with spaces",
   "配置JSON：": "Configure JSON:",
-  "Lable Value 样例": "Lable Value sample",
-  "Lable Value 数量": "Lable Value quantity",
+  "Label Value 样例": "Label Value sample",
+  "Label Value 数量": "Label Value quantity",
   "复制JSON内容到剪贴板": "Copy JSON content to clipboard",
   "清空所有选中的对象": "Clear all selected objects",
   "搜索标识、标签、备注": "Search for identification, label, and remarks",
@@ -823,5 +823,16 @@
   "模糊搜索规则和标签(多个关键词请用空格分隔)": "Fuzzy search rules and tags (please separate multiple keywords with spaces)",
   "规则标题&事件标签": "Rule title & event tag",
   "业务组（监控对象、仪表盘、告警规则、自愈脚本都要归属某个业务组）为空，请先": "The business group (monitoring object, dashboard, alarm rule, and self-healing script must belong to a business group), please fill it first",
-  "请输入分类标签(请用回车分割)": "Please enter the classification tag (please use Enter to separate)"
+  "请输入分类标签(请用回车分割)": "Please enter the classification tag (please use Enter to separate)",
+  "如果你的角色是管理员，则可以在任意机器执行脚本；否则，只能对有管理权限的业务组下的机器执行脚本": "If your role is administrator, you can execute scripts on any machine; otherwise, you can only execute scripts on machines under business groups with management permissions",
+  "table.operations": "Operations",
+  "last.7.days": "Last 7 days",
+  "last.15.days": "Last 15 days",
+  "last.30.days": "Last 30 days",
+  "last.60.days": "Last 60 days",
+  "last.90.days": "Last 90 days",
+  "form.submit": "Submit",
+  "table.batch.operations": "Batch operations",
+  "是否批量删除记录规则?": "Are you sure to delete the record rule in batches?",
+  "请输入要查询的": "Please enter the "
 }

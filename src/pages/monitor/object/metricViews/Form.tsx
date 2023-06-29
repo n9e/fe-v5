@@ -186,7 +186,7 @@ function FormCpt(props: ModalWrapProps & IProps) {
                     paddingBottom: 8,
                   }}
                 >
-                  {t('前置过滤条件')}件{' '}
+                  {t('前置过滤条件')}
                   <PlusCircleOutlined
                     onClick={() => {
                       add({
@@ -323,18 +323,18 @@ function FormCpt(props: ModalWrapProps & IProps) {
               rowKey='label'
               columns={[
                 {
-                  title: 'Lable Key',
+                  title: 'Label Key',
                   dataIndex: 'label',
                 },
                 {
-                  title: t('Lable Value 数量'),
+                  title: t('Label Value 数量'),
                   dataIndex: 'values',
                   render: (text) => {
                     return text.length;
                   },
                 },
                 {
-                  title: t('Lable Value 样例'),
+                  title: t('Label Value 样例'),
                   dataIndex: 'values',
                   render: (text) => {
                     return (

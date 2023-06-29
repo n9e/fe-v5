@@ -26,7 +26,6 @@ export default function index({ form }) {
             label={
               <span>
                 {t('过滤条件')}
-                {t('件')}{' '}
                 <a href='https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html#query-string-syntax ' target='_blank'>
                   <QuestionCircleOutlined />
                 </a>

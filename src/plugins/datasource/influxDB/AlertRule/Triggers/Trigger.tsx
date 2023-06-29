@@ -52,7 +52,7 @@ export default function Trigger(props: IProps) {
                 marginBottom: 8,
               }}
             >
-              {t('关联')} Lable:{' '}
+              {t('关联')} Label:{' '}
               <PlusCircleOutlined
                 onClick={() => {
                   add();

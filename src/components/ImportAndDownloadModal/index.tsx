@@ -63,24 +63,24 @@ export default function ImportAndDownloadModal(props: Props) {
       dataIndex: 'name',
     },
     {
-      title: '导入结果',
+      title: t('导入结果'),
       dataIndex: 'isTrue',
       render: (data) => {
         return data ? <CheckCircleOutlined style={{ color: '#389e0d', fontSize: '18px' }} /> : <CloseCircleOutlined style={{ color: '#d4380d', fontSize: '18px' }} />;
       },
     },
     {
-      title: '错误消息',
+      title: t('错误消息'),
       dataIndex: 'msg',
     },
   ];
   const builtinColumn = [
     {
-      title: `${label}名称`,
+      title: `${label}` + t('名称'),
       dataIndex: 'name',
     },
     {
-      title: '操作',
+      title: t('操作'),
       dataIndex: 'id',
       render(id, record) {
         return (
@@ -102,7 +102,7 @@ export default function ImportAndDownloadModal(props: Props) {
                 });
             }}
           >
-            导入
+            {t('导入')}
           </Button>
         );
       },
@@ -202,7 +202,7 @@ export default function ImportAndDownloadModal(props: Props) {
             <a onClick={handleExportTxt}>Download.json</a>
             <a style={{ float: 'right' }} onClick={() => copyToClipBoard(exportData, t)}>
               <CopyOutlined />
-              复制JSON内容到剪贴板
+              {t('复制JSON内容到剪贴板')}
             </a>
           </p>
         )}
@@ -243,7 +243,7 @@ export default function ImportAndDownloadModal(props: Props) {
                   )}
                 </Form>
                 <Input
-                  placeholder={`请输入要查询的${label}名称`}
+                  placeholder={t(`请输入要查询的`) + label + t('名称')}
                   prefix={<SearchOutlined />}
                   style={{ marginBottom: '8px' }}
                   allowClear

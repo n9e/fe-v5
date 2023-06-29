@@ -20,7 +20,6 @@ export default function index({ form }) {
                   }}
                 >
                   {t('告警条件')}
-                  {t('件')}{' '}
                   <PlusCircleOutlined
                     style={{
                       cursor: 'pointer',
