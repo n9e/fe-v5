@@ -29,7 +29,7 @@ import Graph from './Graph';
 import QueryStatsView, { QueryStats } from './components/QueryStatsView';
 import MetricsExplorer from './components/MetricsExplorer';
 import './style.less';
-
+import { useTranslation } from 'react-i18next';
 interface IProps {
   url?: string;
   datasourceId?: number;
@@ -52,6 +52,7 @@ interface IProps {
 const TabPane = Tabs.TabPane;
 
 export default function index(props: IProps) {
+  const { t } = useTranslation();
   const {
     url = '/api/v1/datasource/prometheus',
     datasourceId,
@@ -166,7 +167,7 @@ export default function index(props: IProps) {
                 setPromql(value);
               }}
             >
-              查询
+              {t('查询')}
             </Button>
           </span>
         </Input.Group>
