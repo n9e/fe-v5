@@ -834,5 +834,6 @@
   "form.submit": "Submit",
   "table.batch.operations": "Batch operations",
   "是否批量删除记录规则?": "Are you sure to delete the record rule in batches?",
-  "请输入要查询的": "Please enter the "
+  "请输入要查询的": "Please enter the ",
+  "吗?":"?"
 }

@@ -98,7 +98,7 @@ export default function Header(props: IProps) {
                     onClick={() => {
                       if (selectRowKeys.length) {
                         Modal.confirm({
-                          title: t('是否批量删除仪表盘?'),
+                          title: t('是否批量删除仪表盘') + '?',
                           onOk: async () => {
                             removeDashboards(selectRowKeys).then(() => {
                               message.success(t('批量删除仪表盘成功'));
