@@ -48,7 +48,7 @@ export const visualizations = [
   },
   {
     type: 'gauge',
-    name: '仪表盘',
+    name: 'gauge',
   },
 ];
 

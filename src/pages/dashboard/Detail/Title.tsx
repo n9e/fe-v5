@@ -126,7 +126,7 @@ export default function Title(props: IProps) {
                               onAddPanel(item.type);
                             }}
                           >
-                            {item.name}
+                            {t(item.name)}
                           </Menu.Item>
                         );
                       },

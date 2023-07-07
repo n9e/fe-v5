@@ -71,5 +71,6 @@
   "last.90.days": "最近 90 天",
   "form.submit": "提交",
   "plugin.ck.labelkey.tip": "将此字段对应的 value，作为tag，追加到监控数据的标签中，例如 查询条件为 `select count() cnt, event_time, type from system.query_log GROUP BY type, event_time` 返回结果为 `[{cnt:11 type:QueryFinish},{cnt:10 type:QueryStart}]`, LabelKey 写了 type, 则返回的数据中type会作为时序数据的labels",
-  "table.batch.operations": "批量操作"
+  "table.batch.operations": "批量操作",
+  "gauge": "仪表盘"
 }

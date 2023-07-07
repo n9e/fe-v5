@@ -17,17 +17,18 @@
 import { Button, Result } from 'antd';
 import React from 'react';
 import { useHistory } from 'react-router';
-
+import { useTranslation } from 'react-i18next';
 const NotFound: React.FC = () => {
   const history = useHistory();
+  const { t } = useTranslation();
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
       <Result
         title='403'
-        subTitle='你没有权限访问该页面, 请联系管理员!'
+        subTitle={t('你没有权限访问该页面, 请联系管理员!')}
         extra={
           <Button type='primary' onClick={() => history.go(-2)}>
-            返回上一页
+            {t('返回上一页')}
           </Button>
         }
       />

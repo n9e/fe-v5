@@ -835,5 +835,14 @@
   "table.batch.operations": "Batch operations",
   "是否批量删除记录规则?": "Are you sure to delete the record rule in batches?",
   "请输入要查询的": "Please enter the ",
-  "吗?":"?"
+  "吗?":"?",
+  "你没有权限访问该页面, 请联系管理员!": "You do not have permission to access this page, please contact the administrator!",
+  "返回上一页": "Back to previous page",
+  "时间序列图": "Timeseries",
+  "指标值":"Stat",
+  "饼图": "Pie",
+  "蜂窝图":"Hexbin",
+  "排行榜":"BarGauge",
+  "文字卡片":"text",
+  "gauge":"Gauge"
 }
