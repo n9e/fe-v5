@@ -97,6 +97,8 @@ function FormCpt(props: IProps & ModalWrapProps) {
         destroy();
       }}
       destroyOnClose
+      okText={t('确认')}
+      cancelText={t('取消')}
     >
       <Form layout='vertical' form={form} preserve={false} initialValues={initialValues}>
         <Form.Item
