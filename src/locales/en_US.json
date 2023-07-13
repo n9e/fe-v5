@@ -854,5 +854,6 @@
   "table.clone": "Clone",
   "如果值为0，则不做最大发送次数的限制":"If the value is 0, there is no limit on the maximum number of transmissions",
   "提示信息：移出所属业务组，该业务组的管理人员将不再有权限操作这些监控对象！您可能需要提前清空这批监控对象的标签和备注信息！":"Prompt: If you remove the business group, the administrator of the business group will no longer have permission to operate these monitoring objects! You may need to clear the tags and remarks of these monitoring objects in advance!",
-  "提示信息：该操作会把监控对象从系统内中彻底删除，非常危险，慎重操作！":"Prompt: This operation will completely delete the monitoring object from the system, which is very dangerous, please operate with caution!"
+  "提示信息：该操作会把监控对象从系统内中彻底删除，非常危险，慎重操作！":"Prompt: This operation will completely delete the monitoring object from the system, which is very dangerous, please operate with caution!",
+  "模糊搜索表格内容(多个关键词请用空格分隔)": "Fuzzy search table content (please separate multiple keywords with spaces)"
 }
