@@ -289,9 +289,14 @@ const EventDetailPage: React.FC = () => {
                       danger
                       onClick={() => {
                         if (eventDetail.group_id) {
-                          deleteAlertEventsModal(eventDetail.group_id, [Number(eventId)], () => {
-                            history.replace('/alert-cur-events');
-                          });
+                          deleteAlertEventsModal(
+                            eventDetail.group_id,
+                            [Number(eventId)],
+                            () => {
+                              history.replace('/alert-cur-events');
+                            },
+                            t,
+                          );
                         } else {
                           message.warn('该告警未返回业务组ID');
                         }

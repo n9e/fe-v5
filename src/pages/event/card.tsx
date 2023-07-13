@@ -146,10 +146,15 @@ function Card(props: Props, ref) {
               type='link'
               danger
               onClick={() =>
-                deleteAlertEventsModal(undefined, [record.id], () => {
-                  setSelectedRowKeys(selectedRowKeys.filter((key) => key !== record.id));
-                  fetchCardDetail(openedCard!);
-                })
+                deleteAlertEventsModal(
+                  undefined,
+                  [record.id],
+                  () => {
+                    setSelectedRowKeys(selectedRowKeys.filter((key) => key !== record.id));
+                    fetchCardDetail(openedCard!);
+                  },
+                  t,
+                )
               }
             >
               删除
@@ -196,10 +201,15 @@ function Card(props: Props, ref) {
               danger
               disabled={selectedRowKeys.length === 0}
               onClick={() =>
-                deleteAlertEventsModal(undefined, selectedRowKeys, () => {
-                  setSelectedRowKeys([]);
-                  fetchCardDetail(openedCard!);
-                })
+                deleteAlertEventsModal(
+                  undefined,
+                  selectedRowKeys,
+                  () => {
+                    setSelectedRowKeys([]);
+                    fetchCardDetail(openedCard!);
+                  },
+                  t,
+                )
               }
             >
               批量删除
