@@ -531,6 +531,7 @@
   "密码不一致": "Passwords do not match",
   "立即设置": "Set up immediately",
   "新增更多联系方式": "Add More Contacts",
+  "联系方式": "Contact",
   "头像URL": "Avatar URL",
   "数据源管理": "Data source",
   "管理员迁移": "Migration",
@@ -855,5 +856,16 @@
   "如果值为0，则不做最大发送次数的限制":"If the value is 0, there is no limit on the maximum number of transmissions",
   "提示信息：移出所属业务组，该业务组的管理人员将不再有权限操作这些监控对象！您可能需要提前清空这批监控对象的标签和备注信息！":"Prompt: If you remove the business group, the administrator of the business group will no longer have permission to operate these monitoring objects! You may need to clear the tags and remarks of these monitoring objects in advance!",
   "提示信息：该操作会把监控对象从系统内中彻底删除，非常危险，慎重操作！":"Prompt: This operation will completely delete the monitoring object from the system, which is very dangerous, please operate with caution!",
-  "模糊搜索表格内容(多个关键词请用空格分隔)": "Fuzzy search table content (please separate multiple keywords with spaces)"
+  "模糊搜索表格内容(多个关键词请用空格分隔)": "Fuzzy search table content (please separate multiple keywords with spaces)",
+  "最后一个非空值":"Last not null",
+  "最后一个值":"Last",
+  "第一个非空值":"First not null",
+  "第一个值":"First",
+  "最小值":"Min",
+  "最大值":"Max",
+  "平均值":"Avg",
+  "总和":"Sum",
+  "数量":"Count",
+  "刷新间隔小于 step(": "Refresh interval less than step(",
+  "s) 将不会更新数据":"s) will not update the data"
 }

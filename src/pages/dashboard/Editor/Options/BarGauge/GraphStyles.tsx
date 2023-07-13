@@ -35,7 +35,7 @@ export default function GraphStyles() {
                 {_.map(calcsOptions, (item, key) => {
                   return (
                     <Select.Option key={key} value={key}>
-                      {item.name}
+                      {t('item.name')}
                     </Select.Option>
                   );
                 })}
