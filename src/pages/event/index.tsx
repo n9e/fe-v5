@@ -36,11 +36,11 @@ import './index.less';
 
 const { confirm } = Modal;
 export const SeverityColor = ['red', 'orange', 'yellow', 'green'];
-export function deleteAlertEventsModal(busiId, ids: number[], onSuccess = () => {}) {
+export function deleteAlertEventsModal(busiId, ids: number[], onSuccess = () => {}, t) {
   confirm({
     title: '删除告警事件',
     icon: <ExclamationCircleOutlined />,
-    content: '通常只有在确定监控数据永远不再上报的情况下（比如调整了监控数据标签，或者机器下线）才删除告警事件，因为相关告警事件永远无法自动恢复了，您确定要这么做吗？',
+    content: t('通常只有在确定监控数据永远不再上报的情况下（比如调整了监控数据标签，或者机器下线）才删除告警事件，因为相关告警事件永远无法自动恢复了，您确定要这么做吗？'),
     okText: '确认删除',
     maskClosable: true,
     okButtonProps: { danger: true },
@@ -176,10 +176,15 @@ const Event: React.FC = () => {
               type='link'
               danger
               onClick={() =>
-                deleteAlertEventsModal(curBusiId, [record.id], () => {
-                  setSelectedRowKeys(selectedRowKeys.filter((key) => key !== record.id));
-                  view === 'list' && tableRef.current.handleReload();
-                })
+                deleteAlertEventsModal(
+                  curBusiId,
+                  [record.id],
+                  () => {
+                    setSelectedRowKeys(selectedRowKeys.filter((key) => key !== record.id));
+                    view === 'list' && tableRef.current.handleReload();
+                  },
+                  t,
+                )
               }
             >
               删除
@@ -244,7 +249,7 @@ const Event: React.FC = () => {
           <Input
             className='search-input'
             prefix={<SearchOutlined />}
-            placeholder='模糊搜索规则和标签(多个关键词请用空格分隔)'
+            placeholder={t('模糊搜索规则和标签(多个关键词请用空格分隔)')}
             value={queryContent}
             onChange={(e) => saveData('queryContent', e.target.value)}
             onPressEnter={(e) => view === 'list' && tableRef.current.handleReload()}
@@ -257,10 +262,15 @@ const Event: React.FC = () => {
               style={{ marginRight: 8 }}
               disabled={selectedRowKeys.length === 0}
               onClick={() =>
-                deleteAlertEventsModal(curBusiId, selectedRowKeys, () => {
-                  setSelectedRowKeys([]);
-                  view === 'list' && tableRef.current.handleReload();
-                })
+                deleteAlertEventsModal(
+                  curBusiId,
+                  selectedRowKeys,
+                  () => {
+                    setSelectedRowKeys([]);
+                    view === 'list' && tableRef.current.handleReload();
+                  },
+                  t,
+                )
               }
             >
               批量删除

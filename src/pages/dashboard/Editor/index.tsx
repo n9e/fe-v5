@@ -131,7 +131,7 @@ function index(props: IProps) {
               {_.map(visualizations, (item) => {
                 return (
                   <Select.Option value={item.type} key={item.type}>
-                    {item.name}
+                    {t(item.name)}
                   </Select.Option>
                 );
               })}

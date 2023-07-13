@@ -686,7 +686,7 @@ const editModal: React.FC<Props> = ({ isModalVisible, editModalFinish }) => {
                         >
                           <InputNumber min={0} precision={0} />
                         </Form.Item>
-                        <Tooltip title={t(`${t('如果值为0，则不做最大发送次数的限制')}`)}>
+                        <Tooltip title={t('如果值为0，则不做最大发送次数的限制')}>
                           <QuestionCircleFilled />
                         </Tooltip>
                       </Space>

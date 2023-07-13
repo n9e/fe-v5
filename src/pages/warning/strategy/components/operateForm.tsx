@@ -735,7 +735,7 @@ const operateForm: React.FC<Props> = ({ type, detail = {} }) => {
                       message: t('最大发送次数不能为空'),
                     },
                   ]}
-                  tooltip={t(`${t('如果值为0，则不做最大发送次数的限制')}`)}
+                  tooltip={t('如果值为0，则不做最大发送次数的限制')}
                 >
                   <InputNumber
                     min={0}
