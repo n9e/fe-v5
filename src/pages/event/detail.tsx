@@ -45,7 +45,7 @@ const EventDetailPage: React.FC = () => {
     if (busiGroups.find((item) => item.id === id)) {
       history.push(`/alert-rules?id=${id}`);
     } else {
-      message.error('该业务组已删除或无查看权限');
+      message.error(t('该业务组已删除或无查看权限'));
     }
   };
   const history = useHistory();
@@ -55,7 +55,7 @@ const EventDetailPage: React.FC = () => {
   const parsedEventDetail = parseValues(eventDetail);
   const descriptionInfo = [
     {
-      label: '规则标题',
+      label: t('规则标题'),
       key: 'rule_name',
       render(content, { rule_id }) {
         return (
@@ -71,7 +71,7 @@ const EventDetailPage: React.FC = () => {
       },
     },
     {
-      label: '业务组',
+      label: t('业务组'),
       key: 'group_name',
       render(content, { group_id }) {
         return (
@@ -81,24 +81,24 @@ const EventDetailPage: React.FC = () => {
         );
       },
     },
-    { label: '规则备注', key: 'rule_note' },
+    { label: t('规则备注'), key: 'rule_note' },
     { label: '所属集群', key: 'cluster' },
     {
-      label: '告警级别',
+      label: t('告警级别'),
       key: 'severity',
       render: (severity) => {
         return <Tag color={priorityColor[severity - 1]}>S{severity}</Tag>;
       },
     },
     {
-      label: '事件状态',
+      label: t('事件状态'),
       key: 'is_recovered',
       render(isRecovered) {
         return <Tag color={isRecovered ? 'green' : 'red'}>{isRecovered ? 'Recovered' : 'Triggered'}</Tag>;
       },
     },
     {
-      label: '事件标签',
+      label: t('事件标签'),
       key: 'tags',
       render(tags) {
         return tags
@@ -110,16 +110,16 @@ const EventDetailPage: React.FC = () => {
           : '';
       },
     },
-    { label: '对象备注', key: 'target_note' },
+    { label: t('对象备注'), key: 'target_note' },
     {
-      label: '触发时间',
+      label: t('触发时间'),
       key: 'trigger_time',
       render(time) {
         return moment(time * 1000).format('YYYY-MM-DD HH:mm:ss');
       },
     },
     {
-      label: '触发时值',
+      label: t('触发时值'),
       key: 'trigger_value',
       render(val) {
         return (
@@ -137,7 +137,7 @@ const EventDetailPage: React.FC = () => {
                   });
                 }}
               >
-                日志详情
+                {t('日志详情')}
               </Button>
             )}
             {eventDetail?.cate === 'aliyun-sls' && (
@@ -152,7 +152,7 @@ const EventDetailPage: React.FC = () => {
                   });
                 }}
               >
-                日志详情
+                {t('日志详情')}
               </Button>
             )}
           </span>
@@ -160,24 +160,24 @@ const EventDetailPage: React.FC = () => {
       },
     },
     {
-      label: '恢复时间',
+      label: t('恢复时间'),
       key: 'recover_time',
       render(time) {
         return moment((time || 0) * 1000).format('YYYY-MM-DD HH:mm:ss');
       },
     },
     {
-      label: '告警方式',
+      label: t('告警方式'),
       key: 'rule_algo',
       render(text) {
         if (text) {
-          return '智能告警';
+          return t('智能告警');
         }
-        return '阈值告警';
+        return t('阈值告警');
       },
     },
     {
-      label: '数据源类型',
+      label: t('数据源类型'),
       key: 'cate',
     },
     ...(eventDetail?.cate === 'prometheus'
@@ -190,35 +190,35 @@ const EventDetailPage: React.FC = () => {
     ...(eventDetail?.cate === 'aliyun-sls' ? AliyunSLSDetail(t) : [false]),
     ...(eventDetail?.cate === 'influxdb' ? InfluxDBDetail(t) : [false]),
     {
-      label: '执行频率',
+      label: t('执行频率'),
       key: 'prom_eval_interval',
       render(content) {
         return `${content} 秒`;
       },
     },
     {
-      label: '持续时长',
+      label: t('持续时长'),
       key: 'prom_for_duration',
       render(content) {
-        return `${content} 秒`;
+        return `${content} ` + t('秒');
       },
     },
     {
-      label: '通知媒介',
+      label: t('通知媒介'),
       key: 'notify_channels',
       render(channels) {
         return channels.join(' ');
       },
     },
     {
-      label: '告警接收组',
+      label: t('告警接收组'),
       key: 'notify_groups_obj',
       render(groups) {
         return groups ? groups.map((group) => <Tag color='purple'>{group.name}</Tag>) : '';
       },
     },
     {
-      label: '回调地址',
+      label: t('回调地址'),
       key: 'callbacks',
       render(callbacks) {
         return callbacks
@@ -233,7 +233,7 @@ const EventDetailPage: React.FC = () => {
       },
     },
     {
-      label: '预案链接',
+      label: t('预案链接'),
       key: 'runbook_url',
       render(url) {
         return (
@@ -253,12 +253,12 @@ const EventDetailPage: React.FC = () => {
   }, [busiId, eventId]);
 
   return (
-    <PageLayout title='告警详情' showBack backPath='/alert-his-events' hideCluster>
+    <PageLayout title={t('告警详情')} showBack backPath='/alert-his-events' hideCluster>
       <div className='event-detail-container'>
         <Spin spinning={!eventDetail}>
           <Card
             className='desc-container'
-            title='告警事件详情'
+            title={t('告警事件详情')}
             actions={[
               <div className='action-btns'>
                 <Space>
@@ -282,7 +282,7 @@ const EventDetailPage: React.FC = () => {
                       });
                     }}
                   >
-                    屏蔽
+                    {t('屏蔽')}
                   </Button>
                   {!isHistory && (
                     <Button
@@ -298,11 +298,11 @@ const EventDetailPage: React.FC = () => {
                             t,
                           );
                         } else {
-                          message.warn('该告警未返回业务组ID');
+                          message.warn(t('该告警未返回业务组ID'));
                         }
                       }}
                     >
-                      删除
+                      {t('删除')}
                     </Button>
                   )}
                 </Space>
