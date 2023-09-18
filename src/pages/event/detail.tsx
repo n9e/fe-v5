@@ -82,7 +82,7 @@ const EventDetailPage: React.FC = () => {
       },
     },
     { label: t('规则备注'), key: 'rule_note' },
-    { label: '所属集群', key: 'cluster' },
+    { label: t('所属集群'), key: 'cluster' },
     {
       label: t('告警级别'),
       key: 'severity',

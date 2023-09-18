@@ -5,13 +5,12 @@
   "复制": "Copy",
   "新增订阅规则": "New subscription rule",
   "订阅规则": "Subscription",
-  "删除成功": "",
   "删除": "Delete",
   "克隆": "Clone",
   "编辑": "Edit",
   "操作": "Operation",
   "编辑人": "Editor",
-  "告警接收组": "Alarm recipient group",
+  "告警接收组": "Alarm recipients",
   "订阅标签": "Subscription label",
   "告警规则": "Alarm rule",
   "集群": "Cluster",
@@ -95,7 +94,7 @@
   "留观时长": "Observation duration",
   "重复发送频率": "Repeat send frequency",
   "持续时长": "Duration",
-  "执行频率": "Execution frequency",
+  "执行频率": "Exec frequency",
   "三级告警": "Level 3 alarm",
   "二级告警": "Level 2 alarm",
   "一级告警": "Level 1 alarm",
@@ -878,5 +877,6 @@
   "告警详情": "Alert details",
   "告警事件详情": "Alert event details",
   "屏蔽": "Mute",
-  "该告警未返回业务组ID": "The alarm did not return the business group ID"
+  "该告警未返回业务组ID": "The alarm did not return the business group ID",
+  "所属集群": "Cluster"
 }
