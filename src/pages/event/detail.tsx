@@ -193,7 +193,7 @@ const EventDetailPage: React.FC = () => {
       label: t('执行频率'),
       key: 'prom_eval_interval',
       render(content) {
-        return `${content} 秒`;
+        return `${content} ` + t('秒');
       },
     },
     {
