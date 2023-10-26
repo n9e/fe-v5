@@ -1,15 +1,11 @@
-/* 本脚本的目标是动态在tsx进行如下操作
- *  1. 插入依赖
- *  2. 调用useTranslation hook
- *  3. 包裹字符串
- *  因为他是hook，所以只能在function component中使用，所以class component需要手动改一改
+/* 
+  本脚本用于提取项目中的中文文案，生成一个json文件，用于翻译
  */
-const { match } = require('assert');
 const fs = require('fs');
 const path = require('path');
-const srcPath = path.resolve('../', 'src/pages/event');
+const srcPath = path.resolve('/Users/flashcat/JavaScript/srm-fe/src/Packages');
 // const srcPath = path.resolve('../', 'src');
-const localePath = path.resolve('../src','locales/zh_HK.json')
+const localePath = path.resolve('/Users/flashcat/Desktop/v5_en_US.json');
 const outputPath = path.resolve('../', 'output.json');
 const { getAllTSXFile } = require('./util');
 let arg = process.argv.slice(2);
@@ -18,46 +14,47 @@ if (fs.existsSync(outputPath)) {
   fs.unlinkSync(outputPath);
 }
 
-const reg = /t\('([\u4e00-\u9fa5：，。、a-zA-Z\f\r\t\n\s]+)'\)/g
-const regDoubleQuotation = /t\("([\u4e00-\u9fa5：，。、a-zA-Z\f\r\t\n\s]+)"\)/g
+const reg = /t\('([\u4e00-\u9fa5：，。、a-zA-Z\f\r\t\n\s]+)'\)/g;
+const regDoubleQuotation = /t\("([\u4e00-\u9fa5：，。、a-zA-Z\f\r\t\n\s]+)"\)/g;
 
-let obj = {}
+let obj = {};
 
-const extractI18nKey = (str)=>{
-  const matchArr = str.match(reg)
-  if(matchArr && matchArr.length > 0 ){
+const extractI18nKey = (str) => {
+  const matchArr = str.match(reg);
+  console.log(matchArr);
+  if (matchArr && matchArr.length > 0) {
     // "t('新增指标')" => {新增指标:''}
-    const a = matchArr.map(k=>({[k.slice(3, -2)]:''})).reduce((prev,curr)=>{
-      return {...curr, ...prev}
-    },{})
-    obj = {...a,...obj}
+    const a = matchArr
+      .map((k) => ({ [k.slice(3, -2)]: '' }))
+      .reduce((prev, curr) => {
+        return { ...curr, ...prev };
+      }, {});
+    obj = { ...a, ...obj };
   }
-  const matchArr1 = str.match(regDoubleQuotation)
-  if(matchArr1 && matchArr1.length > 0 ){
+  const matchArr1 = str.match(regDoubleQuotation);
+  if (matchArr1 && matchArr1.length > 0) {
     // "t('新增指标')" => {新增指标:''}
-    const a = matchArr1.map(k=>({[k.slice(3, -2)]:''})).reduce((prev,curr)=>{
-      return {...curr, ...prev}
-    },{})
-    obj = {...a,...obj}
+    const a = matchArr1
+      .map((k) => ({ [k.slice(3, -2)]: '' }))
+      .reduce((prev, curr) => {
+        return { ...curr, ...prev };
+      }, {});
+    obj = { ...a, ...obj };
   }
-  console.log(obj)
-}
+};
 
-const filterEmptyKey = (obj, locales)=>{
-  const objArr = Object.keys(obj).filter(item => !locales[item])
-  const result = objArr.reduce((prev,curr)=> ({...prev,[curr]:''}),{} )
-  console.log(objArr, result)
-   return result 
-  
-}
-const locales = JSON.parse(fs.readFileSync(localePath, 'utf8'))
+const filterEmptyKey = (obj, locales) => {
+  const objArr = Object.keys(obj).filter((item) => !locales[item]);
+  const result = objArr.reduce((prev, curr) => ({ ...prev, [curr]: '' }), {});
+  return result;
+};
+const locales = JSON.parse(fs.readFileSync(localePath, 'utf8'));
 if (arg[0] === 'all') {
   try {
     let fileLists = getAllTSXFile(srcPath, []);
     fileLists.forEach((file) => {
-
       const code = fs.readFileSync(path.resolve(file), 'utf8');
-      extractI18nKey(code)
+      extractI18nKey(code);
     });
   } catch (error) {
     console.log(error);
@@ -65,7 +62,7 @@ if (arg[0] === 'all') {
   }
 } else {
   const code = fs.readFileSync(path.resolve('../', 'src/pages/dashboard/List/Import.tsx'), 'utf8');
-  extractI18nKey(code)
+  extractI18nKey(code);
 }
 
 // write the mountainous log into the output
